@@ -1,0 +1,164 @@
+<div id="<?php echo $this->getContainerId(); ?>">
+
+    <div class="entry-edit" id="magento_block_buy_synchronization_templates">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Templates Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="buy_templates_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <?php $templates_mode = $this->templatesMode ? $this->templatesMode : 0; ?>
+                            <select id="buy_templates_mode" name="buy_templates_mode" onchange="SynchronizationHandlerObj.changeTemplatesMode('<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>');">
+                                <option value="0"<?php if (0 == $templates_mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if (1 == $templates_mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__("Updates and synchronizes Rakuten.com Listings according to<br/>Synchronization Templates' rules."); ?></span>
+                            </p>
+                        </td>
+                        <td class="value">
+                            <div id="buy_templates_run_now_container" <?php if ($templates_mode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('buy')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $this->getChildHtml('buy_templates_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('buy')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('buy_templates_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('buy_templates_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_buy_synchronization_orders">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Orders Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="buy_orders_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <?php $orders_mode = $this->ordersMode ? $this->ordersMode : 0; ?>
+                            <select id="buy_orders_mode" name="buy_orders_mode" onchange="SynchronizationHandlerObj.changeOrdersMode('<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>');">
+                                <option value="0"<?php if (0 == $orders_mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if (1 == $orders_mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes Rakuten.com Orders for accounts,<br/>which have enabled Import Rakuten.com Orders in their<br/>Accounts settings.'); ?></span>
+                            </p>
+                        </td>
+                        <td class="value">
+                            <div id="buy_orders_run_now_container" <?php if ($orders_mode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('buy')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <?php echo $this->getChildHtml('buy_orders_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('buy')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('buy_orders_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('buy_orders_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_buy_synchronization_listings">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('3rd Party Listings Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="buy_other_listings_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <?php $otherListingsMode = $this->otherListingsMode ? $this->otherListingsMode : 0; ?>
+                            <select id="buy_other_listings_mode" name="buy_other_listings_mode" onchange="SynchronizationHandlerObj.changeOtherListingsMode('<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>');">
+                                <option value="0"<?php if (0 == $otherListingsMode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if (1 == $otherListingsMode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for Rakuten.com<br/>accounts, which have enabled Import 3rd Party Listings<br/>in their Accounts settings.'); ?></span>
+                            </p>
+                        </td>
+                        <td class="value">
+                            <div id="buy_other_listings_run_now_container" <?php if ($otherListingsMode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('buy')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <?php echo $this->getChildHtml('buy_other_listings_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('buy')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('buy_other_listings_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('buy_other_listings_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

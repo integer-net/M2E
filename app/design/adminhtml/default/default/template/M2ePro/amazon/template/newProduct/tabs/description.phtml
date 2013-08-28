@@ -1,0 +1,937 @@
+<div id="block_notice_amazon_template_newProduct_description" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Description'); ?>">
+    <?php echo Mage::helper('M2ePro')->__(
+    'Description is used to design your items\' description on Amazon. The more information you provide the easier it is for buyers to make a choice.<br/><br/>
+    It is possible to choose a Product Description or Product Short Description, which will be taken from Magento. Or you can create a Custom Description by adding necessary information.'
+); ?>
+</div>
+
+<?php
+
+$formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data') : array();
+
+!empty($formData['description']['bullet_points']) && $formData['description']['bullet_points'] = json_decode($formData['description']['bullet_points'], true);
+!empty($formData['description']['search_terms']) && $formData['description']['search_terms'] = json_decode($formData['description']['search_terms'], true);
+
+$default = array(
+
+    'category' => array(
+        'item_package_quantity_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct::ITEM_PACKAGE_QUANTITY_MODE_NONE,
+        'item_package_quantity_custom_value' => '',
+        'item_package_quantity_custom_attribute' => '',
+
+        'number_of_items_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct::NUMBER_OF_ITEMS_MODE_NONE,
+        'number_of_items_custom_value' => '',
+        'number_of_items_custom_attribute' => '',
+    ),
+
+    'description' => array(
+        'title' => '',
+
+        'title_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TITLE_MODE_PRODUCT,
+        'title_template' => '',
+
+        'brand_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BRAND_MODE_NONE,
+        'brand_template' => '',
+
+        'manufacturer_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_MODE_NONE,
+        'manufacturer_template' => '',
+
+        'manufacturer_part_number_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_PART_NUMBER_MODE_NONE,
+        'manufacturer_part_number_custom_value' => '',
+        'manufacturer_part_number_custom_attribute' => '',
+
+        'package_weight_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_MODE_NONE,
+        'package_weight_custom_value' => '',
+        'package_weight_custom_attribute' => '',
+
+        'package_weight_unit_of_measure_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE,
+        'package_weight_unit_of_measure_custom_value' => '',
+        'package_weight_unit_of_measure_custom_attribute' => '',
+
+        'shipping_weight_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_MODE_NONE,
+        'shipping_weight_custom_value' => '',
+        'shipping_weight_custom_attribute' => '',
+
+        'shipping_weight_unit_of_measure_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE,
+        'shipping_weight_unit_of_measure_custom_value' => '',
+        'shipping_weight_unit_of_measure_custom_attribute' => '',
+
+        'target_audience_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TARGET_AUDIENCE_MODE_NONE,
+        'target_audience_custom_value' => '',
+        'target_audience_custom_attribute' => '',
+
+        'search_terms_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SEARCH_TERMS_MODE_NONE,
+        'search_terms' => array(),
+
+        'image_main_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::IMAGE_MAIN_MODE_PRODUCT,
+        'image_main_attribute' => '',
+
+        'gallery_images_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::GALLERY_IMAGES_MODE_NONE,
+        'gallery_images_limit' => 1,
+        'gallery_images_attribute' => '',
+
+        'bullet_points_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BULLET_POINTS_MODE_NONE,
+        'bullet_points' => array(),
+
+        'description_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_NONE,
+        'description_template' => '',
+    )
+);
+
+$formData = array_merge($default, $formData);
+
+$isEdit = !!$this->getRequest()->getParam('id');
+
+?>
+
+<script type="text/javascript">
+
+    Event.observe(window, 'load', function() {
+
+        Validation.add('M2ePro-validate-package-weight', '<?php echo Mage::helper('M2ePro')->__('Please enter a number 0 or greater in this field.'); ?>', function(value, el) {
+
+            if (!el.up('tr').visible()) {
+                return true;
+            }
+
+            value = str_replace(',','.',value);
+
+            var numValue = parseNumber(value);
+            if (isNaN(numValue)) {
+                return false;
+            }
+
+            return numValue >= 0;
+        });
+
+        Validation.add('M2ePro-validate-shipping-weight', '<?php echo Mage::helper('M2ePro')->__('Please enter a number 0.01 or greater in this field.'); ?>', function(value, el) {
+
+            if (!el.up('tr').visible()) {
+                return true;
+            }
+
+            value = str_replace(',','.',value);
+
+            var numValue = parseNumber(value);
+            if (isNaN(numValue)) {
+                return false;
+            }
+
+            return numValue >= 0.01;
+        });
+
+        AmazonTemplateNewProductDescriptionHandlerObj = new AmazonTemplateNewProductDescriptionHandler();
+        AmazonTemplateNewProductDescriptionHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Template_Description'); ?>');
+        AmazonTemplateNewProductDescriptionHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Amazon_Template_NewProduct_Description'); ?>');
+
+        M2ePro.formData.description  = <?php echo json_encode($formData['description']); ?>;
+
+        $('amazonTemplateNewProductEditTabs_description').observe('click', AmazonTemplateNewProductHandlerObj.checkAttributeSetSelection);
+
+        $('attribute_sets_confirm_button').observe('click',AmazonTemplateNewProductDescriptionHandlerObj.attribute_sets_confirm.bind(AmazonTemplateNewProductDescriptionHandlerObj));
+        $('attribute_sets').value && AmazonTemplateNewProductDescriptionHandlerObj.attribute_sets_confirm();
+
+        $('title_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.title_mode_change)
+            .simulate('change');
+
+        $('brand_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.brand_mode_change)
+            .simulate('change');
+
+        $('manufacturer_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.manufacturer_mode_change)
+            .simulate('change');
+
+        $('manufacturer_part_number_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.manufacturer_part_number_mode_change)
+            .simulate('change');
+
+        $('item_package_quantity_mode')
+            .observe('change', function() { AmazonTemplateNewProductHandlerObj.item_package_quantity_mode_change(this) })
+            .simulate('change');
+
+        $('number_of_items_mode')
+            .observe('change', function() { AmazonTemplateNewProductHandlerObj.number_of_items_mode_change(this) })
+            .simulate('change');
+
+        $('package_weight_unit_of_measure_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.package_weight_unit_of_measure_mode_change);
+
+        $('shipping_weight_unit_of_measure_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.shipping_weight_unit_of_measure_mode_change);
+
+        $('package_weight_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.package_weight_mode_change)
+            .simulate('change');
+
+        $('shipping_weight_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.shipping_weight_mode_change)
+            .simulate('change');
+
+        $('target_audience_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.target_audience_mode_change)
+            .simulate('change');
+
+        $('bullet_points_mode')
+            .observe('change', function () {
+                AmazonTemplateNewProductDescriptionHandlerObj.multi_element_mode_change.call(this,'bullet_points',5);
+            })
+            .simulate('change');
+
+        $('search_terms_mode')
+            .observe('change', function () {
+                AmazonTemplateNewProductDescriptionHandlerObj.multi_element_mode_change.call(this,'search_terms',5);
+            })
+            .simulate('change');
+
+        $('description_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.description_mode_change)
+            .simulate('change');
+
+        $('image_main_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.image_main_mode_change)
+            .simulate('change');
+
+        $('gallery_images_mode')
+            .observe('change', AmazonTemplateNewProductDescriptionHandlerObj.gallery_images_mode_change)
+            .simulate('change');
+    });
+
+</script>
+
+<style type="text/css">
+
+    .input-text-small {
+        width: 120px !important;
+    }
+    .textarea {
+        width: 98% !important;
+        height: 500px !important;
+    }
+    select.select-main {
+        width: 356px !important;
+    }
+    .select-wrapper {
+        margin-left: 15px;
+    }
+    a.action-disabled {
+        color: gray !important;
+        text-decoration: none !important;
+    }
+    a.action-disabled:hover {
+        color: gray !important;
+        text-decoration: none !important;
+    }
+    td.value {
+        width: auto !important;
+    }
+</style>
+
+<div class="entry-edit" id="magento_block_amazon_template_description_details">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Item Details'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Item Title'); ?>: </label>
+                    </td>
+                    <td class="value">
+                        <select id="title_mode" name="description[title_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TITLE_MODE_PRODUCT; ?>" <?php if ($formData['description']['title_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TITLE_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Name'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TITLE_MODE_CUSTOM; ?>" <?php if ($formData['description']['title_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TITLE_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Title'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Item\'s title that buyers will see on Amazon listing.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="custom_title_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Title'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="title_template" name="description[title_template]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['title_template']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                        <span id="select_attributes_for_title_span" class="select-wrapper"></span>
+                        <?php echo $this->getChildHtml('select_attributes_for_title_button'); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Item Brand'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="brand_mode" name="description[brand_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BRAND_MODE_NONE; ?>" <?php if ($formData['description']['brand_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BRAND_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BRAND_MODE_CUSTOM; ?>" <?php if ($formData['description']['brand_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BRAND_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Brand'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Brand of the product(s). Max. 50 characters.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="custom_brand_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Brand'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="brand_template" name="description[brand_template]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['brand_template']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                        <span id="select_attributes_for_brand_span" class="select-wrapper"></span>
+                        <?php echo $this->getChildHtml('select_attributes_for_brand_button'); ?>
+                    </td>
+                </tr>
+                     <td style="padding: 10px 0" colspan="2">
+                        <hr style="border: 1px solid silver; border-bottom: none;">
+                     </td>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Item Manufacturer'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="manufacturer_mode" name="description[manufacturer_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_MODE_NONE; ?>" <?php if ($formData['description']['manufacturer_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_MODE_CUSTOM; ?>" <?php if ($formData['description']['manufacturer_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Manufacturer'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Manufacturer of the product(s). Max. 50 characters.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="custom_manufacturer_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Manufacturer'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="manufacturer_template" name="description[manufacturer_template]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['manufacturer_template']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                        <span id="select_attributes_for_manufacturer_span" class="select-wrapper"></span>
+                        <?php echo $this->getChildHtml('select_attributes_for_manufacturer_button'); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Item Manufacturer Part Number'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="manufacturer_part_number_mode" name="description[manufacturer_part_number_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_PART_NUMBER_MODE_NONE; ?>" <?php if ($formData['description']['manufacturer_part_number_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_PART_NUMBER_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['description']['manufacturer_part_number_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['description']['manufacturer_part_number_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Manufacturer Part Number of the product(s). Max. 40 characters.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="manufacturer_part_number_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="manufacturer_part_number_custom_value" name="description[manufacturer_part_number_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['manufacturer_part_number_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                    </td>
+                </tr>
+
+                <tr id="manufacturer_part_number_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="manufacturer_part_number_attribute_td"></div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="padding: 10px 0">
+                        <hr style="border: 1px solid silver; border-bottom: none;">
+                    </td>
+                </tr>
+
+                <tr id="item_package_quantity_mode_tr">
+                    <td class="label">
+                        <label for="item_package_quantity_mode"><?php echo Mage::helper('M2ePro')->__('Item Package Quantity') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <select name="category[item_package_quantity_mode]" id="item_package_quantity_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::ITEM_PACKAGE_QUANTITY_MODE_NONE; ?>" <?php if ($formData['category']['item_package_quantity_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::ITEM_PACKAGE_QUANTITY_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['category']['item_package_quantity_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($formData['category']['item_package_quantity_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute') ?></option>
+                        </select>
+                        <p class="note">
+                            <?php echo Mage::helper('M2ePro')->__('The number of units included in the item you are offering for sale, <br>such that each unit
+                            is packaged for individual sale.'); ?>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="item_package_quantity_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="item_package_quantity_custom_value" name="category[item_package_quantity_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['item_package_quantity_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validate-greater-than-1" />
+                    </td>
+                </tr>
+
+                <tr id="item_package_quantity_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="item_package_quantity_attribute_td"></div>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Item Package Quantity.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="number_of_items_mode_tr">
+                    <td class="label">
+                        <label for="number_of_items_mode"><?php echo Mage::helper('M2ePro')->__('Number of Items') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <select name="category[number_of_items_mode]" id="number_of_items_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::NUMBER_OF_ITEMS_MODE_NONE; ?>" <?php if ($formData['category']['number_of_items_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::NUMBER_OF_ITEMS_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::NUMBER_OF_ITEMS_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['category']['number_of_items_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::NUMBER_OF_ITEMS_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::NUMBER_OF_ITEMS_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($formData['category']['number_of_items_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::NUMBER_OF_ITEMS_MODE_CUSTOM_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute') ?></option>
+                        </select>
+                        <p class="note">
+                            <?php echo Mage::helper('M2ePro')->__('The number of discrete items included in the item you are offering for sale,
+                            <br>such that each item is not packaged for individual sale.
+                                <br>
+                                <strong>For ex.</strong>, if you are selling a case of 10 packages of socks,
+                                and each package contains
+                                <br>3 pairs of socks, the case would have Item Package Quantity = 10 and Number of Items = 30.
+                            '); ?>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="number_of_items_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="number_of_items_custom_value" name="category[number_of_items_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['number_of_items_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validate-greater-than-1" />
+                    </td>
+                </tr>
+
+                <tr id="number_of_items_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="number_of_items_attribute_td"></div>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Number Of Items.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="padding: 10px 0">
+                        <hr style="border: 1px solid silver; border-bottom: none;">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Package Weight'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="package_weight_mode" name="description[package_weight_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_MODE_NONE; ?>" <?php if ($formData['description']['package_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['description']['package_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['description']['package_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Package Weight of the product(s).'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="package_weight_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="package_weight_custom_value" name="description[package_weight_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['package_weight_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validate-package-weight"/>
+                    </td>
+                </tr>
+
+                <tr id="package_weight_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="package_weight_attribute_td"></div>
+                    </td>
+                </tr>
+
+                <tr id="package_weight_unit_of_measure_mode_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Package Weight Units'); ?>: </label>
+                    </td>
+                    <td class="value">
+                        <select id="package_weight_unit_of_measure_mode" name="description[package_weight_unit_of_measure_mode]" class="select M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['description']['package_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['description']['package_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::PACKAGE_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="package_weight_unit_of_measure_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="package_weight_unit_of_measure_custom_value" name="description[package_weight_unit_of_measure_custom_value]" class="input-text M2ePro-required-when-visible">
+                            <option value="" style="display: none"></option>
+                            <option value="GR" <?php if ($formData['description']['package_weight_unit_of_measure_custom_value'] == 'GR'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('GR'); ?></option>
+                            <option value="KG" <?php if ($formData['description']['package_weight_unit_of_measure_custom_value'] == 'KG'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('KG'); ?></option>
+                            <option value="OZ" <?php if ($formData['description']['package_weight_unit_of_measure_custom_value'] == 'OZ'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('OZ'); ?></option>
+                            <option value="LB" <?php if ($formData['description']['package_weight_unit_of_measure_custom_value'] == 'LB'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('LB'); ?></option>
+                            <option value="MG" <?php if ($formData['description']['package_weight_unit_of_measure_custom_value'] == 'MG'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('MG'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="package_weight_unit_of_measure_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="package_weight_unit_of_measure_attribute_td"></div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="padding: 10px 0">
+                        <hr style="border: 1px solid silver; border-bottom: none;">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Shipping Weight'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="shipping_weight_mode" name="description[shipping_weight_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_MODE_NONE; ?>" <?php if ($formData['description']['shipping_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['description']['shipping_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['description']['shipping_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Shipping Weight of the product(s).'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="shipping_weight_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="shipping_weight_custom_value" name="description[shipping_weight_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['shipping_weight_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validate-shipping-weight"/>
+                    </td>
+                </tr>
+
+                <tr id="shipping_weight_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="shipping_weight_attribute_td"></div>
+                    </td>
+                </tr>
+
+                <tr id="shipping_weight_unit_of_measure_mode_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Shipping Weight Units'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="shipping_weight_unit_of_measure_mode" name="description[shipping_weight_unit_of_measure_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['description']['shipping_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['description']['shipping_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SHIPPING_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="shipping_weight_unit_of_measure_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="shipping_weight_unit_of_measure_custom_value" name="description[shipping_weight_unit_of_measure_custom_value]" class="input-text M2ePro-required-when-visible">
+                            <option value="" style="display: none"></option>
+                            <option value="GR" <?php if ($formData['description']['shipping_weight_unit_of_measure_custom_value'] == 'GR'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('GR'); ?></option>
+                            <option value="KG" <?php if ($formData['description']['shipping_weight_unit_of_measure_custom_value'] == 'KG'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('KG'); ?></option>
+                            <option value="OZ" <?php if ($formData['description']['shipping_weight_unit_of_measure_custom_value'] == 'OZ'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('OZ'); ?></option>
+                            <option value="LB" <?php if ($formData['description']['shipping_weight_unit_of_measure_custom_value'] == 'LB'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('LB'); ?></option>
+                            <option value="MG" <?php if ($formData['description']['shipping_weight_unit_of_measure_custom_value'] == 'MG'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('MG'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="shipping_weight_unit_of_measure_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="shipping_weight_unit_of_measure_attribute_td"></div>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_amazon_template_description_keywords">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Keywords'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Target Audience'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="target_audience_mode" name="description[target_audience_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TARGET_AUDIENCE_MODE_NONE; ?>" <?php if ($formData['description']['target_audience_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TARGET_AUDIENCE_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TARGET_AUDIENCE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['description']['target_audience_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TARGET_AUDIENCE_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TARGET_AUDIENCE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['description']['target_audience_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TARGET_AUDIENCE_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('For whom the product is intended.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="target_audience_custom_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="target_audience_custom_value" name="description[target_audience_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['target_audience_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                    </td>
+                </tr>
+
+                <tr id="target_audience_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="target_audience_attribute_td"></div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Search Terms Mode') ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="search_terms_mode" name="description[search_terms_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SEARCH_TERMS_MODE_NONE; ?>" <?php if ($formData['description']['search_terms_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SEARCH_TERMS_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SEARCH_TERMS_MODE_CUSTOM; ?>" <?php if ($formData['description']['search_terms_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SEARCH_TERMS_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Search Terms'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Provide specific search terms to help customers find your product(s) on Amazon.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <?php for ($i = 0; $i < 5; $i++): ?>
+                    <tr class="search_terms_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Value #%s', $i + 1); ?>:</label>
+                        </td>
+                        <td class="value">
+                            <input id="search_terms_<?php echo $i; ?>"
+                                   onkeyup="AmazonTemplateNewProductDescriptionHandlerObj.multi_element_keyup('search_terms',this)"
+                                   name="description[search_terms][]"
+                                   type="text"
+                                   class="input-text M2ePro-required-when-visible"
+                                   value="<?php echo !empty($formData['description']['search_terms'][$i]) ? $formData['description']['search_terms'][$i] : ''; ?>">
+                            <span id="select_attributes_for_search_terms_<?php echo $i; ?>_span" class="select-wrapper"></span>
+                            <?php echo $this->getChildHtml("select_attributes_for_search_terms_{$i}_button"); ?>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Max. 50 characters.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+                <?php endfor; ?>
+
+                <tr id="search_terms_actions_tr" style="display: none;">
+                    <td></td>
+                    <td class="value" style="padding-top: 0 !important;">
+                        <a id="show_search_terms_action" href="javascript: void(0);" onclick="AmazonTemplateNewProductDescriptionHandlerObj.showElement('search_terms');"><?php echo Mage::helper('M2ePro')->__('Add New') ?></a>
+                        /
+                        <a id="hide_search_terms_action" href="javascript: void(0);" onclick="AmazonTemplateNewProductDescriptionHandlerObj.hideElement('search_terms');"><?php echo Mage::helper('M2ePro')->__('Remove') ?></a>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_amazon_template_description_image">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Images'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr class="requirie-attribute-set">
+                    <td class="label">
+                        <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Item Image'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="image_main_mode" name="description[image_main_mode]">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::IMAGE_MAIN_MODE_NONE; ?>" <?php if ($formData['description']['image_main_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::IMAGE_MAIN_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::IMAGE_MAIN_MODE_PRODUCT; ?>" <?php if ($formData['description']['image_main_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::IMAGE_MAIN_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::IMAGE_MAIN_MODE_ATTRIBUTE; ?>" <?php if ($formData['description']['image_main_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::IMAGE_MAIN_MODE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Image you will see on your Amazon listing.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="image_main_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Product Image Attribute'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <div id="image_main_attribute_td"></div>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose Media Image Attribute or Attribute, that contains absolute url.
+                            <br/>i.e. http://mymagentostore.com/images/baseimage.jpg'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="gallery_images_mode_tr">
+                    <td class="label">
+                        <label for="gallery_images_mode"><?php echo Mage::helper('M2ePro')->__('Additional Images'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="gallery_images_mode" name="description[gallery_images_mode]">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::GALLERY_IMAGES_MODE_NONE; ?>" <?php if ($formData['description']['gallery_images_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::GALLERY_IMAGES_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::GALLERY_IMAGES_MODE_PRODUCT; ?>" <?php if ($formData['description']['gallery_images_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::GALLERY_IMAGES_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Images'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::GALLERY_IMAGES_MODE_ATTRIBUTE; ?>" <?php if ($formData['description']['gallery_images_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::GALLERY_IMAGES_MODE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="gallery_images_attribute_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Additional Images Attribute'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <div id="gallery_images_attribute_td"></div>
+                            <p class="note">
+                                <?php echo Mage::helper('M2ePro')->__('Choose Text, Multiple Select or Dropdown type attribute. In Text type attribute urls must be separated with comma.
+                                <br/>e.g.  http://mymagentostore.com/images/baseimage1.jpg,  http://mymagentostore.com/images/baseimage2.jpg'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
+                <tr id="gallery_images_limit_tr" style="display: none;">
+                        <td class="label">
+                            <label for="gallery_images_limit"><?php echo Mage::helper('M2ePro')->__('Additional Images Quantity'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+
+                            <select id="gallery_images_limit" name="description[gallery_images_limit]">
+                                <option value="1" <?php if ($formData['description']['gallery_images_limit'] == 1): echo ' selected="selected"'; endif; ?>>1</option>
+                                <?php for ($i = 2; $i <= 8; $i++): ?>
+                                <option value="<?php echo $i; ?>" <?php if ($formData['description']['gallery_images_limit'] == $i): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Up to').' '.$i; ?></option>
+                                <?php endfor ?>
+                            </select>
+
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('The number of Additional Images. The images will be taken from Magento Product settings.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_amazon_template_description_bullet_points">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Bullet Points'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0" style="width:100%">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Bullet Points Mode') ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="bullet_points_mode" name="description[bullet_points_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BULLET_POINTS_MODE_NONE; ?>" <?php if ($formData['description']['bullet_points_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BULLET_POINTS_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BULLET_POINTS_MODE_CUSTOM; ?>" <?php if ($formData['description']['bullet_points_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BULLET_POINTS_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Bullet Points'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Allows highlighting some of the product\'s most important qualities.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <?php for ($i = 0; $i < 5; $i++): ?>
+                    <tr class="bullet_points_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Value #%s', $i + 1); ?>:</label>
+                        </td>
+                        <td class="value">
+                            <input id="bullet_points_<?php echo $i; ?>"
+                                   name="description[bullet_points][]"
+                                   type="text"
+                                   onkeyup="AmazonTemplateNewProductDescriptionHandlerObj.multi_element_keyup('bullet_points',this)"
+                                   class="input-text M2ePro-required-when-visible"
+                                   value="<?php echo !empty($formData['description']['bullet_points'][$i]) ? $formData['description']['bullet_points'][$i] : ''; ?>">
+                            <span id="select_attributes_for_bullet_points_<?php echo $i; ?>_span" class="select-wrapper"></span>
+                            <?php echo $this->getChildHtml("select_attributes_for_bullet_points_{$i}_button"); ?>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Max. 100 characters.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+                <?php endfor; ?>
+
+                <tr id="bullet_points_actions_tr" style="display: none;">
+                    <td></td>
+                    <td class="value" style="padding-top: 0 !important;">
+                        <a id="show_bullet_points_action" href="javascript: void(0);" onclick="AmazonTemplateNewProductDescriptionHandlerObj.showElement('bullet_points');"><?php echo Mage::helper('M2ePro')->__('Add New') ?></a>
+                        /
+                        <a id="hide_bullet_points_action" href="javascript: void(0);" onclick="AmazonTemplateNewProductDescriptionHandlerObj.hideElement('bullet_points');"><?php echo Mage::helper('M2ePro')->__('Remove') ?></a>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_amazon_template_description_description">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Description'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0" style="width:100%">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Description Source'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <select id="description_mode" name="description[description_mode]" class="required-entry">
+                                <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_NONE; ?>" <?php if ($formData['description']['description_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_PRODUCT; ?>" <?php if ($formData['description']['description_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Description'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_SHORT; ?>" <?php if ($formData['description']['description_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_SHORT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Short Description'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_CUSTOM; ?>" <?php if ($formData['description']['description_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Description'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Item description is limited to 2\'000 characters.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr class="c-custom_description_tr" style="display: none;">
+                        <td class="label"></td>
+                        <td class="value">
+
+                            <script type="text/javascript">
+                                wysiwygtext = {
+                                    isEnabled: function() {
+                                        return false;
+                                    }
+                                };
+                            </script>
+
+                            <textarea id="description_template" name="description[description_template]" class="textarea"><?php echo Mage::helper('M2ePro')->escapeHtml($formData['description']['description_template']); ?></textarea>
+
+                        </td>
+                    </tr>
+
+                    <tr class="c-custom_description_tr" style="display: none;">
+                        <td class="label"></td>
+                        <td class="value">
+
+                            <div class="entry-edit-head" style="background: #D6D6D6;">
+                                <h4 class="icon-head head-edit-form fieldset-legend" style="color: #EA7601;"><?php echo Mage::helper('M2ePro')->__('Custom Description Inserts'); ?></h4>
+                            </div>
+
+                            <div class="fieldset">
+                                <div class="hor-scroll">
+                                    <table cellspacing="0" class="form-list">
+                                        <tr>
+                                            <td class="label">
+                                                <label for="select_attributes_span"><?php echo Mage::helper('M2ePro')->__('Product Attribute');?>:</label>
+                                            </td>
+                                            <td class="value">
+                                                <span id="select_attributes_span"></span>
+                                                &nbsp;
+                                                <?php echo $this->getChildHtml('add_product_attribute_button'); ?>
+                                                <p class="note">
+                                                    <span><?php echo Mage::helper('M2ePro')->__('Attributes related to the previously chosen Attribute Set.'); ?></span>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+    </div>

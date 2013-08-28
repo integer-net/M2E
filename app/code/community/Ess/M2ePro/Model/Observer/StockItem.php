@@ -1,0 +1,215 @@
+<?php
+
+/*
+ * @copyright  Copyright (c) 2011 by  ESS-UA.
+ */
+
+class Ess_M2ePro_Model_Observer_StockItem
+{
+    //####################################
+
+    public function catalogInventoryStockItemSaveAfter(Varien_Event_Observer $observer)
+    {
+        try {
+
+             // Get product id
+             $productId = $observer->getData('item')->getData('product_id');
+
+             // skip qty changes when it was reserved
+             $reservationTempKey = Ess_M2ePro_Helper_Data::CUSTOM_IDENTIFIER.'_order_reservation';
+             $reservationTempValue = $observer->getData('item')->getData($reservationTempKey);
+             if (!is_null($reservationTempValue)) {
+                 return;
+             }
+
+             // Get listings, other listings where is product
+             $listingsArray = Mage::getResourceModel('M2ePro/Listing')->getListingsWhereIsProduct($productId);
+             $otherListingsArray = Mage::getResourceModel('M2ePro/Listing_Other')->getItemsWhereIsProduct($productId);
+
+             if (count($listingsArray) > 0 || count($otherListingsArray) > 0) {
+
+                    // Save global changes
+                    //--------------------
+                    Mage::getModel('M2ePro/ProductChange')
+                                ->addUpdateAction( $productId,
+                                                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+                    //--------------------
+
+                    // Save changes for qty
+                    //--------------------
+                    $qtyOld = (int)$observer->getData('item')->getOrigData('qty');
+                    $qtyNew = (int)$observer->getData('item')->getData('qty');
+
+                    $rez = Mage::getModel('M2ePro/ProductChange')
+                                 ->updateAttribute( $productId, 'qty',
+                                                    $qtyOld, $qtyNew,
+                                                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+
+                    if ($rez !== false) {
+
+                          foreach ($listingsArray as $listingTemp) {
+
+                                 $tempLog = Mage::getModel('M2ePro/Listing_Log');
+                                 $tempLog->setComponentMode($listingTemp['component_mode']);
+                                 $tempLog->addProductMessage(
+                                    $listingTemp['id'],
+                                    $productId,
+                                    NULL,
+                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    NULL,
+                                    Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_QTY,
+                                    // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                                    Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
+                                        'From [%from%] to [%to%]',array('!from'=>$qtyOld,'!to'=>$qtyNew)
+                                    ),
+                                    Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                                 );
+                          }
+
+                          foreach ($otherListingsArray as $otherListingTemp) {
+
+                                 $tempLog = Mage::getModel('M2ePro/Listing_Other_Log');
+                                 $tempLog->setComponentMode($otherListingTemp['component_mode']);
+                                 $tempLog->addProductMessage(
+                                    $otherListingTemp['id'],
+                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    NULL,
+                                    Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_QTY,
+                                    // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                                    Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
+                                        'From [%from%] to [%to%]',array('!from'=>$qtyOld,'!to'=>$qtyNew)
+                                    ),
+                                    Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                                 );
+                          }
+                    }
+                    //--------------------
+
+                    // Save changes for stock Availability
+                    //--------------------
+                    $stockAvailabilityOld = (bool)$observer->getData('item')->getOrigData('is_in_stock');
+                    $stockAvailabilityNew = (bool)$observer->getData('item')->getData('is_in_stock');
+
+                    $rez = Mage::getModel('M2ePro/ProductChange')
+                                     ->updateAttribute( $productId, 'stock_availability',
+                                                        (int)$stockAvailabilityOld, (int)$stockAvailabilityNew,
+                                                        Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+
+                    if ($rez !== false) {
+
+                          $stockAvailabilityOld = $stockAvailabilityOld ? 'IN Stock' : 'OUT of Stock';
+                          $stockAvailabilityNew = $stockAvailabilityNew ? 'IN Stock' : 'OUT of Stock';
+
+                          foreach ($listingsArray as $listingTemp) {
+
+                                 $tempLog = Mage::getModel('M2ePro/Listing_Log');
+                                 $tempLog->setComponentMode($listingTemp['component_mode']);
+                                 $tempLog->addProductMessage(
+                                    $listingTemp['id'],
+                                    $productId,
+                                    NULL,
+                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    NULL,
+                                    Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
+                                    // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                                    // Parser hack -> Mage::helper('M2ePro')->__('IN Stock');
+                                    // Parser hack -> Mage::helper('M2ePro')->__('OUT of Stock');
+                                    Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
+                                        'From [%from%] to [%to%]',
+                                        array('from'=>$stockAvailabilityOld,'to'=>$stockAvailabilityNew)
+                                    ),
+                                    Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                                 );
+                          }
+
+                        foreach ($otherListingsArray as $otherListingTemp) {
+
+                                 $tempLog = Mage::getModel('M2ePro/Listing_Other_Log');
+                                 $tempLog->setComponentMode($otherListingTemp['component_mode']);
+                                 $tempLog->addProductMessage(
+                                    $otherListingTemp['id'],
+                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    NULL,
+                                    Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
+                                    // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                                    // Parser hack -> Mage::helper('M2ePro')->__('IN Stock');
+                                    // Parser hack -> Mage::helper('M2ePro')->__('OUT of Stock');
+                                    Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
+                                        'From [%from%] to [%to%]',
+                                        array('from'=>$stockAvailabilityOld,'to'=>$stockAvailabilityNew)
+                                    ),
+                                    Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                                 );
+                          }
+                    }
+                    //--------------------
+            }
+
+        } catch (Exception $exception) {
+
+            Mage::helper('M2ePro/Exception')->process($exception);
+            return;
+        }
+    }
+
+    //####################################
+
+    public function disableAutomaticReindex(Varien_Event_Observer $observer)
+    {
+        $indexMode = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/product/index/', 'mode');
+
+        if (!$indexMode) {
+            return;
+        }
+
+        /** @var $index Ess_M2ePro_Model_Magento_Product_Index */
+        $index = Mage::getSingleton('M2ePro/Magento_Product_Index');
+
+        foreach ($index->getSwitchableIndexes() as $code) {
+            $index->disableAutomaticReindex($code);
+        }
+    }
+
+    public function enableAutomaticReindex(Varien_Event_Observer $observer)
+    {
+        $indexMode = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/product/index/', 'mode');
+
+        if (!$indexMode) {
+            return;
+        }
+
+        /** @var $index Ess_M2ePro_Model_Magento_Product_Index */
+        $index = Mage::getSingleton('M2ePro/Magento_Product_Index');
+        $reindexExecuted = false;
+
+        if (!$index->hasDisabledSwitchableIndexes()) {
+            return;
+        }
+
+        foreach ($index->getRequiredIndexes() as $code) {
+            if ($index->reindex($code)) {
+                $reindexExecuted = true;
+            }
+            $index->enableAutomaticReindex($code);
+        }
+
+        /** @var $synchronizationLog Ess_M2ePro_Model_Synchronization_Log */
+        $synchronizationLog = Mage::helper('M2ePro')->getGlobalValue('synchLogs');
+
+        if (!$reindexExecuted || !$synchronizationLog) {
+            return;
+        }
+
+        $synchronizationLog->addMessage(
+            Mage::helper('M2ePro')->__('Product reindex was executed.'),
+            Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+            Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+        );
+    }
+
+    //####################################
+}

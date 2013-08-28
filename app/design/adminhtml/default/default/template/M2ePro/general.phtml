@@ -1,0 +1,12 @@
+<script type="text/javascript">
+    var VALIDATION_CHECK_REPETITION_URL = '<?php echo $this->getUrl('*/adminhtml_general/validationCheckRepetitionValue'); ?>';
+    var BLOCK_NOTICES_SHOW = <?php echo $this->block_notices_show ? 'true' : 'false'; ?>;
+
+    var CONFIRM = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Are you sure?')); ?>';
+    var HELP = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Help')); ?>';
+    var HIDE_BLOCK = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Hide Block')); ?>';
+    var SHOW_TIPS = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Show Tips')); ?>';
+    var HIDE_TIPS = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Hide Tips')); ?>';
+
+    var REQUIRED_FIELD_ERROR = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('This is a required field.')); ?>';
+</script>

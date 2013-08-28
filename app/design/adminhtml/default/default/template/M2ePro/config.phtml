@@ -1,0 +1,115 @@
+<script type="text/javascript">
+
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.customData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.url.formSubmit = '<?php echo $this->getUrl('*/*/save',array('mode'=>Mage::helper('M2ePro')->getGlobalValue('config_mode'))); ?>';
+    M2ePro.url.deleteAction = '<?php echo $this->getUrl('*/*/delete',array('mode'=>Mage::helper('M2ePro')->getGlobalValue('config_mode'))); ?>';
+
+    M2ePro.text.config_data_successfully_added_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The config data has been successfully added.')); ?>';
+    M2ePro.text.config_data_successfully_updated_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The config data has been successfully updated.')); ?>';
+    M2ePro.text.config_data_successfully_deleted_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The config data has been successfully deleted.')); ?>';
+    M2ePro.text.config_data_confirm_delete_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Are you sure?')); ?>';
+
+    M2ePro.text.config_data_edit_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Edit Config Data')); ?>';
+    M2ePro.text.config_data_add_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Add Config Data')); ?>';
+
+    Event.observe(window, 'load', function() {
+        ConfigHandlerObj = new ConfigHandler();
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+    });
+
+</script>
+
+<div id="config_container" style="display:none;">
+
+    <form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
+
+        <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
+
+        <input id="config_mode" name="config_mode" value="add" type="hidden" />
+        <input id="config_id" name="config_id" value="" type="hidden" />
+
+        <div class="entry-edit" id="magento_block_config_add_edit" collapseable="no">
+
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-edit-form fieldset-legend" id="config_edit_form_header"><?php echo Mage::helper('M2ePro')->__('Add Config Data'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+                <div class="hor-scroll">
+
+                    <table class="form-list" cellspacing="0" cellpadding="0">
+
+                        <colgroup class="label"></colgroup>
+                        <colgroup class="value"></colgroup>
+
+                        <tbody>
+
+                            <tr>
+                                <td class="label">
+                                    <label for="config_group"><?php echo Mage::helper('M2ePro')->__('Group'); ?>: </label>
+                                </td>
+                                <td class="value">
+                                    <input id="config_group" name="config_group" value="" type="text" style="width: 400px;" class="input-text" />
+                                    <p class="note">
+                                        <span><?php echo Mage::helper('M2ePro')->__('Set empty if you want add global data.'); ?></span>
+                                    </p>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <label for="config_key"><?php echo Mage::helper('M2ePro')->__('Key'); ?>: <span class="required">*</span></label>
+                                </td>
+                                <td class="value">
+                                    <input id="config_key" name="config_key" value="" type="text" style="width: 400px;" class="required-entry input-text" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <label for="config_value"><?php echo Mage::helper('M2ePro')->__('Value'); ?>: <span class="required">*</span></label>
+                                </td>
+                                <td class="value">
+                                    <input id="config_value" name="config_value" value="" type="text" style="width: 400px;" class="required-entry input-text" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <label for="config_notice"><?php echo Mage::helper('M2ePro')->__('Notice'); ?>:</label>
+                                </td>
+                                <td class="value">
+                                    <textarea id="config_notice" name="config_notice" disabled="disabled" style="width: 400px; height: 100px;" class="textarea"></textarea>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+
+                                </td>
+                                <td class="value">
+                                    <?php echo $this->getChildHtml('save_form'); ?>
+                                    &nbsp;
+                                    <?php echo $this->getChildHtml('cancel_edit'); ?>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>

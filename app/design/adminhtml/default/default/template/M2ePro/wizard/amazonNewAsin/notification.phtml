@@ -1,0 +1,32 @@
+<?php
+
+$version = Mage::helper('M2ePro/Module')->getVersion();
+$completeWizardLink = $this->getUrl("*/adminhtml_wizard_amazonNewAsin/complete");
+$marketplacesLink = $this->getUrl("*/adminhtml_marketplace/index/tab/amazon");
+
+$docsLink = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/documentation/', 'baseurl');
+$docsLink .= 'Amazon+Listings+Management#AmazonListingsManagement-AddNewASINtoItem%28s%29';
+
+?>
+
+<div class="wizard-note">
+
+    <a class="wizard-close" href="javascript:void(0);" onclick="WizardHandlerObj.complete('<?php echo $completeWizardLink; ?>');" title="<?php echo Mage::helper('M2ePro')->__('Complete Wizard') ?>">&times;</a>
+
+    <div>
+        <?php
+
+        echo Mage::helper('M2ePro')->__(
+            '<u><b>Add New ASIN / ISBN</b></u> feature was added for <b>Amazon</b> marketplace in the current version.
+            Please, update <a href="%s" target="_blank">Amazon marketplaces</a> before using it.
+            <br/>
+            <br/>
+            To find out how to use this option see our <a href="%s" target="_blank">documentation</a>.',
+            $marketplacesLink,
+            $docsLink
+        );
+
+        ?>
+    </div>
+
+</div>

@@ -1,0 +1,285 @@
+<div id="<?php echo $this->getContainerId(); ?>">
+
+    <div class="entry-edit" id="magento_block_ebay_synchronization_templates">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Templates Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="ebay_templates_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <?php $templates_mode = $this->templates['mode'] ? $this->templates['mode'] : 0; ?>
+                            <select id="ebay_templates_mode" name="ebay_templates_mode" onchange="SynchronizationHandlerObj.changeTemplatesMode('<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK; ?>');">
+                                <option value="0"<?php if ($templates_mode == 0) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if ($templates_mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__("Updates and synchronizes eBay Listings according to<br/>Synchronization Templates' rules."); ?></span>
+                            </p>
+                        </td>
+
+                        <td class="value">
+                            <div id="ebay_templates_run_now_container" <?php if ($templates_mode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <?php echo $this->getChildHtml('ebay_templates_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('ebay_templates_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('ebay_templates_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_synchronization_orders">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Orders Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="ebay_orders_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <?php $orders_mode = $this->orders ? $this->orders : 0; ?>
+                            <select id="ebay_orders_mode" name="ebay_orders_mode" onchange="SynchronizationHandlerObj.changeOrdersMode('<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK; ?>');">
+                                <option value="0"<?php if ($orders_mode == 0) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if ($orders_mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes eBay Orders for accounts,<br/>which have enabled Import eBay Orders in their<br/>Accounts settings.'); ?></span>
+                            </p>
+                        </td>
+                        <td class="value">
+                            <div id="ebay_orders_run_now_container" <?php if ($orders_mode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <?php echo $this->getChildHtml('ebay_orders_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('ebay_orders_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('ebay_orders_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_synchronization_feedbacks">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Feedbacks Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="ebay_feedbacks_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <?php $feedbacks_mode = $this->feedbacks ? $this->feedbacks : 0; ?>
+                            <select id="ebay_feedbacks_mode" name="ebay_feedbacks_mode" onchange="SynchronizationHandlerObj.changeFeedbacksMode('<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK; ?>');">
+                                <option value="0"<?php if ($feedbacks_mode == 0) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if ($feedbacks_mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__("Imports buyers' feedbacks and automatically sends<br/>Auto Responses according to eBay Accounts settings."); ?></span>
+                            </p>
+                        </td>
+                        <td class="value">
+                            <div id="ebay_feedbacks_run_now_container" <?php if ($feedbacks_mode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <?php echo $this->getChildHtml('ebay_feedbacks_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('ebay_feedbacks_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('ebay_feedbacks_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_synchronization_other_listings">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('3rd Party Listings Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="ebay_other_listings_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" width="305px;">
+                            <?php $otherListingsMode = $this->otherListings ? $this->otherListings : 0; ?>
+                            <select id="ebay_other_listings_mode" name="ebay_other_listings_mode" onchange="SynchronizationHandlerObj.changeOtherListingsMode('<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK; ?>');">
+                                <option value="0"<?php if ($otherListingsMode == 0) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if ($otherListingsMode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for eBay<br/>accounts, which have enabled Import 3rd Party Listings<br/>in their Accounts settings.'); ?></span>
+                            </p>
+                        </td>
+                        <td class="value" id="ebay_other_listings_synchronization_settings_button_container" <?php if ($otherListingsMode != 1) echo ' style="display: none;"'; ?>>
+                            <?php echo $this->getChildHtml('ebay_other_listings_synchronization_settings'); ?>
+                            <p class="note" style="width: 150px;">
+                                <span><?php echo Mage::helper('M2ePro')->__('Settings for 3rd Party Listings Synchronization.'); ?></span>
+                            </p>
+                        </td>
+                        <td class="value">
+                            <div id="ebay_other_listings_run_now_container" <?php if ($otherListingsMode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <?php echo $this->getChildHtml('ebay_other_listings_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('ebay_other_listings_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('ebay_other_listings_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <?php if ((bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/ebay/messages/', 'mode')) { ?>
+
+    <div class="entry-edit" id="magento_block_ebay_synchronization_messages">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('My Messages Synchronization'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="ebay_messages_mode"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <?php $messages_mode = $this->messages ? $this->messages : 0; ?>
+                            <select id="ebay_messages_mode" name="ebay_messages_mode" onchange="SynchronizationHandlerObj.changeMessagesMode('<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK; ?>');">
+                                <option value="0"<?php if ($messages_mode == 0) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1"<?php if ($messages_mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports buyers\' messages according to<br />eBay Accounts settings.'); ?></span>
+                            </p>
+                        </td>
+                        <td class="value">
+                            <div id="ebay_messages_run_now_container" <?php if ($messages_mode != 1) echo ' style="display: none;"'; ?>>
+                                <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <?php echo $this->getChildHtml('ebay_messages_run_now'); ?>
+                                <?php } ?>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php if (Mage::helper('M2ePro/Wizard')->isFinished('ebay')) { ?>
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('ebay_messages_view_log'); ?>
+                            &nbsp;&nbsp;
+                            <?php echo $this->getChildHtml('ebay_messages_clear_log'); ?>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <?php } ?>
+
+</div>

@@ -1,0 +1,542 @@
+<!-- ########################################################################################### -->
+
+<script type="text/javascript">
+
+    var cmdKeys = [67, 77, 68];
+    var cmdPressedKeys = [];
+
+    document.observe('keydown', function (event) {
+
+        if (cmdPressedKeys.length < cmdKeys.length) {
+            if (cmdKeys[cmdPressedKeys.length] == event.keyCode) {
+                cmdPressedKeys.push(event.keyCode);
+                if (cmdPressedKeys.length == cmdKeys.length) {
+                    $$('.cmd')[0].show();
+                    $$('.manage_db_table_item').each(function(blockObj) {
+                        blockObj.show();
+                    });
+                    $$('.tech_info').each(function(blockObj) {
+                        blockObj.show();
+                    });
+                    cmdPressedKeys = [];
+                }
+            } else {
+                cmdPressedKeys = [];
+            }
+        }
+    });
+
+    Event.observe(window,'load',function() {
+        $$('ul.tabs-horiz li').each(function(el) {
+            el.setStyle({margin: '0 4px'})
+        });
+    });
+
+</script>
+
+<!-- ########################################################################################### -->
+
+<div style="clear: both;"></div>
+
+<div class="box-left">
+
+<div class="entry-edit tech_info" id="magento_block_about_magento" <?php if ($this->isGoEdition) : ?>style="display: none;"<?php endif; ?>>
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Magento Info'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Edition'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->platform['mode']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Version'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->platform['version']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Add Secret Key to URLs'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->platform['is_secret_key'] ?  Mage::helper('M2ePro')->__('Enabled') : Mage::helper('M2ePro')->__('Disabled'); ?>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_about_module">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Module Info'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Name'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->module['name']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Version (revision)'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->module['version']; ?>.r<?php echo $this->module['revision']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Application Key'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->module['application_key']; ?>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_about_license_data">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('License Info'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('License Key'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->license['key']; ?>
+                        </td>
+                    </tr>
+
+                    <?php if ($this->license['domain'] != ''): ?>
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Valid Domain'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <?php echo $this->license['domain']; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+
+                    <?php if ($this->license['ip'] != ''): ?>
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Valid IP'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <?php echo $this->license['ip']; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+
+                    <?php if ($this->license['directory'] != ''): ?>
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Valid Directory'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <?php echo $this->license['directory']; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_about_location">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Location Info'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Host'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->location['host']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Domain'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->location['domain']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('IP'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->location['ip']; ?>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit tech_info" id="magento_block_about_system" <?php if ($this->isGoEdition) : ?>style="display: none;"<?php endif; ?>>
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('System Info'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Name'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->system['name']; ?>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit tech_info" id="magento_block_about_php" <?php if ($this->isGoEdition) : ?>style="display: none;"<?php endif; ?>>
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('PHP Info'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Version'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->php['version']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Server API'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->php['api']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Memory Limit'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->php['settings']['memory_limit'] == -1 ? Mage::helper('M2ePro')->__('Unlimited') : $this->php['settings']['memory_limit'] . ' Mb'; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Max Execution Time'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->php['settings']['max_execution_time'] == 0 ? Mage::helper('M2ePro')->__('Unlimited') : $this->php['settings']['max_execution_time']; ?>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <?php if (!Mage::helper('M2ePro/Magento')->isGoEdition()) : ?>
+
+        <div class="entry-edit" id="magento_block_about_cron_info">
+
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Cron Info'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+                <div class="hor-scroll">
+
+                    <table class="form-list" cellspacing="0" cellpadding="0">
+
+                        <tr>
+                            <td class="label" colspan="2">
+                                <strong><?php echo Mage::helper('M2ePro')->__('We recommend to set up your cron job to be run every 5 minutes (e.g. */5 * * * *).'); ?></strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Last Run'); ?>: </label>
+                            </td>
+                            <?php
+                                $style = '';
+                                if ($this->cron['last_run_highlight'] == 'error') {
+                                    $style = ' style="color: red"';
+                                } else if ($this->cron['last_run_highlight'] == 'warning') {
+                                    $style = ' style="color: #EB5E00"';
+                                }
+                            ?>
+                            <td class="value">
+                                <span<?php echo $style; ?>><?php echo $this->cron['last_run'] ?></span>
+                                <?php
+                                    if ($this->cron['last_run_highlight'] == 'error') {
+                                        echo ' (' . Mage::helper('M2ePro')->__('not working') . ')';
+                                    }
+                                ?>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('PHP command'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <?php echo $this->cron['php'] ?>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('GET command'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <?php echo $this->cron['get'] ?>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="entry-edit" id="magento_block_about_requirements_info">
+
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('System Requirements'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+                <div class="hor-scroll">
+
+                    <?php echo $this->getChildHtml('requirements') ?>
+
+                </div>
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+</div>
+
+<!-- ########################################################################################### -->
+
+<div class="box-right">
+
+    <div class="entry-edit" id="magento_block_about_database_tables">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Database Tables'); ?></h4>
+        </div>
+
+            <div class="fieldset">
+
+                <?php echo $this->getChildHtml('tables_tabs'); ?>
+
+            </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_about_database_summary">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Database Summary'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Total Tables'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['total']['magento_tables']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Total Module Tables'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['total']['module_tables']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Total Module Records'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['total']['module_records']; ?>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit tech_info" id="magento_block_about_mysql_info" <?php if ($this->isGoEdition) : ?>style="display: none;"<?php endif; ?>>
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('MySQL Info'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Version'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['version']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Server API'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['api']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Database Name'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['database_name']; ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Tables Prefix'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['prefix'] != '' ? $this->mySql['prefix'] : Mage::helper('M2ePro')->__('Disabled'); ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Connection Timeout'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['settings']['connect_timeout']; ?> <?php echo Mage::helper('M2ePro')->__('sec'); ?>.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Wait Timeout'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <?php echo $this->mySql['settings']['wait_timeout']; ?> <?php echo Mage::helper('M2ePro')->__('sec'); ?>.
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ########################################################################################### -->

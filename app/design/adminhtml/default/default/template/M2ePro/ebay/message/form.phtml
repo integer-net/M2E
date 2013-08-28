@@ -1,0 +1,87 @@
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.customData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.url.formSubmit = '<?php echo $this->getUrl('*/*/save'); ?>';
+    M2ePro.url.getMessageInfo = '<?php echo $this->getUrl('*/*/getMessageInfo'); ?>';
+
+    M2ePro.text.message_max_length_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Please enter correct number of characters.')); ?>';
+    M2ePro.text.message_sent_successfully = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Message has been successfully sent.')); ?>';
+    M2ePro.text.message_text_title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Full Message Text')); ?>';
+    M2ePro.text.message_response_title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('My Full Response')); ?>';
+
+    Event.observe(window, 'load', function() {
+        EbayMessageHandlerObj = new EbayEbayMessageHandler();
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+    });
+
+</script>
+
+<form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
+
+    <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
+
+    <div class="entry-edit" id="magento_block_ebay_messages_response" collapseable="no" style="display: none;">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Response Message'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <input id="message_id" name="message_id" value="" type="hidden" />
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Item ID'); ?>:</label>
+                        </td>
+                        <td class="label">
+                            <span id="item_id" style="width: 275px;"></span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Subject'); ?>:</label>
+                        </td>
+                        <td class="label">
+                            <span id="message_subject" style="width: 275px;"></span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label for="message_text"><?php echo Mage::helper('M2ePro')->__('Response Message'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="label">
+                            <textarea id="message_text" name="message_text" style="padding: 0px; height: 40px; width: 275px;" class="textarea M2ePro-validate-message-max-length"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label"></td>
+                        <td class="value">
+                            <?php echo $this->getChildHtml('send_message');?>
+                            <?php echo $this->getChildHtml('cancel_message');?>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</form>

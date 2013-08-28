@@ -1,0 +1,12 @@
+/* General Styles */
+/* ================================================ */
+
+.area_wrapper {
+    position: absolute !important;
+    z-index: 1000 !important;
+    opacity: 0.4 !important;
+    filter: alpha(opacity=40) !important;
+    background-color: #f8fcfd !important;
+}
+
+/* ================================================ */

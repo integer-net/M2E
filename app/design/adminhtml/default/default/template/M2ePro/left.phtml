@@ -1,0 +1,11 @@
+<div class="columns" id="m2epro_container">
+    <div id="<?php echo $this->getLeftElementId() ?>" class="side-col">
+        <?php echo $this->getChildHtml('left') ?>
+    </div>
+    <div class="main-col" id="<?php echo $this->getContentElementId() ?>">
+        <div class="main-col-inner">
+            <div id="m2epro_messages"><?php echo $this->getMessagesBlock()->getGroupedHtml() ?></div>
+            <?php echo $this->getChildHtml('content') ?>
+        </div>
+    </div>
+</div>

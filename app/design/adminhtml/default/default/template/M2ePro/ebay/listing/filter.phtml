@@ -1,0 +1,194 @@
+<?php  if (count($this->sellingFormatTemplates) > 1 || count($this->descriptionsTemplates) > 1 || count($this->generalTemplates) > 1 || count($this->synchronizationsTemplates) > 1 || !$this->sellingFormatTemplatesDropDown || !$this->descriptionsTemplatesDropDown || !$this->generalTemplatesDropDown || !$this->synchronizationsTemplatesDropDown): ?>
+
+    <p class="<?php echo Mage::helper('M2ePro/Magento')->isGoEdition() ? '' : 'switcher'; ?>">
+
+        <?php if (count($this->sellingFormatTemplates) > 1 || !$this->sellingFormatTemplatesDropDown) { ?>
+            <label for="ebay_selling_format_template_switcher"><?php echo $this->__('Selling Format Template'); ?>:</label>
+            <?php if ($this->sellingFormatTemplatesDropDown) { ?>
+                <select id="ebay_selling_format_template_switcher" name="ebay_selling_format_template_switcher" style="min-width: 100px; width: 130px; margin-right: 30px;" onchange="return switchTemplate(this,'<?php echo $this->sellingFormatTemplateUrl; ?>','filter_ebay_selling_format_template');">
+                    <option value="0" <?php if ($this->selectedSellingFormatTemplate == 0) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('All Templates') ?></option>
+                    <?php foreach ($this->sellingFormatTemplates as $id => $title) { ?>
+                        <option value="<?php echo $id; ?>" <?php if ($this->selectedSellingFormatTemplate == $id) echo 'selected="selected"'; ?>><?php echo $title; ?></option>
+                    <?php } ?>
+                </select>
+            <?php } else { ?>
+                <input id="ebay_selling_format_template_autocomplete"
+                       type="text"
+                       class="input-text"
+                       name="ebay_selling_format_template_autocomplete"
+                       selected_id=""
+                       style="width: 130px; margin-right: 30px; font-size: 10px"
+                       onblur="if (this.value.trim().length == 0) {
+                           this.value = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>';
+                           this.style.color = 'gray';
+                       }"
+                       onfocus="if (this.value == '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>') {
+                           this.value = '';
+                           this.style.color = '';
+                       }" />
+            <?php } ?>
+        <?php } ?>
+
+        <?php if (count($this->descriptionsTemplates) > 1 || !$this->descriptionsTemplatesDropDown): ?>
+            <label for="ebay_description_template_switcher"><?php echo $this->__('Description Template'); ?>:</label>
+            <?php if ($this->descriptionsTemplatesDropDown): ?>
+                <select id="ebay_description_template_switcher" name="ebay_description_template_switcher" style="min-width: 100px; width: 130px; margin-right: 30px;" onchange="return switchTemplate(this,'<?php echo $this->descriptionTemplateUrl; ?>','filter_ebay_description_template');">
+                    <option value="0" <?php if ($this->selectedDescriptionTemplate == 0) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('All Templates') ?></option>
+                    <?php foreach ($this->descriptionsTemplates as $id => $title): ?>
+                        <option value="<?php echo $id; ?>" <?php if ($this->selectedDescriptionTemplate == $id) echo 'selected="selected"'; ?>><?php echo $title; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            <?php else: ?>
+                <input id="ebay_description_template_autocomplete"
+                       type="text"
+                       class="input-text"
+                       name="ebay_description_template_autocomplete"
+                       selected_id=""
+                       style="width: 130px; margin-right: 30px; font-size: 10px"
+                       onblur="if (this.value.trim().length == 0) {
+                           this.value = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>';
+                           this.style.color = 'gray';
+                       }"
+                       onfocus="if (this.value == '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>') {
+                           this.value = '';
+                           this.style.color = '';
+                       }" />
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <?php if (count($this->generalTemplates) > 1 || !$this->generalTemplatesDropDown): ?>
+            <label for="ebay_general_template_switcher"><?php echo $this->__('General Template'); ?>:</label>
+            <?php if ($this->generalTemplatesDropDown): ?>
+                <select id="ebay_general_template_switcher" name="ebay_general_template_switcher" style="min-width: 100px; width: 130px; margin-right: 30px;" onchange="return switchTemplate(this,'<?php echo $this->generalTemplateUrl; ?>','filter_ebay_general_template');">
+                    <option value="0" <?php if ($this->selectedGeneralTemplate == 0) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('All Templates') ?></option>
+                    <?php foreach ($this->generalTemplates as $id => $title): ?>
+                        <option value="<?php echo $id; ?>" <?php if ($this->selectedGeneralTemplate == $id) echo 'selected="selected"'; ?>><?php echo $title; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            <?php else: ?>
+                <input id="ebay_general_template_autocomplete"
+                       type="text"
+                       class="input-text"
+                       name="ebay_general_template_autocomplete"
+                       selected_id=""
+                       style="width: 130px; margin-right: 30px; font-size: 10px"
+                       onblur="if (this.value.trim().length == 0) {
+                           this.value = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>';
+                           this.style.color = 'gray';
+                       }"
+                       onfocus="if (this.value == '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>') {
+                           this.value = '';
+                           this.style.color = '';
+                       }" />
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <?php if (count($this->synchronizationsTemplates) > 1 || !$this->synchronizationsTemplatesDropDown): ?>
+            <label for="ebay_synchronization_template_switcher"><?php echo $this->__('Synchronization Template') ?>:</label>
+            <?php if ($this->synchronizationsTemplatesDropDown): ?>
+                <select id="ebay_synchronization_template_switcher" name="ebay_synchronization_template_switcher" style="min-width: 100px; width: 130px;" onchange="return switchTemplate(this,'<?php echo $this->synchronizationTemplateUrl; ?>','filter_ebay_synchronization_template');">
+                    <option value="0" <?php if ($this->selectedSynchronizationTemplate == 0) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('All Templates') ?></option>
+                    <?php foreach ($this->synchronizationsTemplates as $id => $title): ?>
+                        <option value="<?php echo $id; ?>" <?php if ($this->selectedSynchronizationTemplate == $id) echo 'selected="selected"'; ?>><?php echo $title; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            <?php else: ?>
+                <input id="ebay_synchronization_template_autocomplete"
+                       type="text"
+                       class="input-text"
+                       name="ebay_synchronization_template_autocomplete"
+                       selected_id=""
+                       style="width: 130px; font-size: 10px"
+                       onblur="if (this.value.trim().length == 0) {
+                           this.value = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>';
+                           this.style.color = 'gray';
+                       }"
+                       onfocus="if (this.value == '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Template Name Here...')); ?>') {
+                           this.value = '';
+                           this.style.color = '';
+                       }" />
+            <?php endif; ?>
+        <?php endif; ?>
+
+    </p>
+
+    <script type="text/javascript">
+
+        function switchTemplate(obj,url,urlParamName)
+        {
+            if (obj.value == 0) {
+                setLocation(url);
+            } else {
+                setLocation(url+urlParamName+'/'+obj.value+'/');
+            }
+        }
+
+        autoCompleteHandler = new AutoComplete();
+
+        <?php if (!$this->sellingFormatTemplatesDropDown): ?>
+            autoCompleteHandler.bind(
+                'ebay_selling_format_template_autocomplete',
+                "<?php echo $this->getUrl('*/adminhtml_general/searchAutocomplete', array(
+                    'component' => Ess_M2ePro_Helper_Component_Ebay::NICK,
+                    'model'     => 'Template_SellingFormat'
+                )) ?>",
+                "<?php echo $this->selectedSellingFormatTemplate; ?>",
+                "<?php echo $this->selectedSellingFormatTemplateValue; ?>",
+                function (id) {
+                    switchTemplate({value: id}, '<?php echo $this->sellingFormatTemplateUrl; ?>', 'filter_ebay_selling_format_template');
+                }
+            );
+            $('ebay_selling_format_template_autocomplete').simulate('blur');
+        <?php endif; ?>
+
+        <?php if (!$this->descriptionsTemplatesDropDown): ?>
+            autoCompleteHandler.bind(
+                'ebay_description_template_autocomplete',
+                "<?php echo $this->getUrl('*/adminhtml_general/searchAutocomplete', array(
+                    'component' => Ess_M2ePro_Helper_Component_Ebay::NICK,
+                    'model'     => 'Template_Description'
+                )) ?>",
+                "<?php echo $this->selectedDescriptionTemplate; ?>",
+                "<?php echo $this->selectedDescriptionTemplateValue; ?>",
+                function (id) {
+                    switchTemplate({value: id}, '<?php echo $this->descriptionTemplateUrl; ?>', 'filter_ebay_description_template');
+                }
+            );
+            $('ebay_description_template_autocomplete').simulate('blur');
+        <?php endif; ?>
+
+        <?php if (!$this->generalTemplatesDropDown): ?>
+            autoCompleteHandler.bind(
+                'ebay_general_template_autocomplete',
+                "<?php echo $this->getUrl('*/adminhtml_general/searchAutocomplete', array(
+                    'component' => Ess_M2ePro_Helper_Component_Ebay::NICK,
+                    'model'     => 'Template_General'
+                )) ?>",
+                "<?php echo $this->selectedGeneralTemplate; ?>",
+                "<?php echo $this->selectedGeneralTemplateValue; ?>",
+                function (id) {
+                    switchTemplate({value: id}, '<?php echo $this->generalTemplateUrl; ?>', 'filter_ebay_general_template');
+                }
+            );
+            $('ebay_general_template_autocomplete').simulate('blur');
+        <?php endif; ?>
+
+        <?php if (!$this->synchronizationsTemplatesDropDown): ?>
+            autoCompleteHandler.bind(
+                'ebay_synchronization_template_autocomplete',
+                "<?php echo $this->getUrl('*/adminhtml_general/searchAutocomplete', array(
+                    'component' => Ess_M2ePro_Helper_Component_Ebay::NICK,
+                    'model'     => 'Template_Synchronization'
+                )) ?>",
+                "<?php echo $this->selectedSynchronizationTemplate; ?>",
+                "<?php echo $this->selectedSynchronizationTemplateValue; ?>",
+                function (id) {
+                    switchTemplate({value: id}, '<?php echo $this->synchronizationTemplateUrl; ?>', 'filter_ebay_synchronization_template');
+                }
+            );
+            $('ebay_synchronization_template_autocomplete').simulate('blur');
+        <?php endif; ?>
+
+    </script>
+
+<?php endif; ?>

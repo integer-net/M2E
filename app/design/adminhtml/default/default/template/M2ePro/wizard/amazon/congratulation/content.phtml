@@ -1,0 +1,94 @@
+<script type="text/javascript" src="<?php echo $this->getJsUrl('M2ePro/VideoTutorialHandler.js'); ?>"></script>
+
+<script type="text/javascript">
+
+    if (typeof M2eProAmazonCongratulationTutorial == 'undefined') {
+        M2eProAmazonCongratulationTutorial = {};
+        M2eProAmazonCongratulationTutorial.url = {};
+        M2eProAmazonCongratulationTutorial.formData = {};
+        M2eProAmazonCongratulationTutorial.text = {};
+    }
+
+    M2eProAmazonCongratulationTutorialHandlerObj = new VideoTutorialHandler(
+        M2eProAmazonCongratulationTutorial,'amazon_congratulation_video_tutorial_pop_up',
+        '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('M2E Pro - Amazon/Magento Integration : Listings')); ?>',
+        function() {}
+    );
+
+</script>
+
+<?php
+$listingTemplatesUrl = $this->getUrl('*/adminhtml_template_general/index');
+$synchronizationTemplatesUrl = $this->getUrl('*/adminhtml_template_synchronization/index');
+$sellingFormatTemplatesUrl = $this->getUrl('*/adminhtml_template_sellingFormat/index');
+
+$listingsUrl = $this->getUrl('*/adminhtml_listing/index',array('tab'=>'amazon'));
+$docsLink = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/documentation/', 'baseurl');
+
+$menuLabel = Mage::helper('M2ePro/Module')->getMenuRootNodeLabel();
+?>
+
+<div id="block_notice_wizard_congratulation" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+    <table>
+        <tr>
+            <td>
+                <a href="javascript:" onclick="M2eProAmazonCongratulationTutorialHandlerObj.openPopUp()">
+                    <img src="<?php echo $this->getSkinUrl('M2ePro/images/amazon-video-thumbnail.png'); ?>" alt="">
+                </a>
+                <h4 style="text-align: center">Amazom Listings (10 min. video)</h4>
+            </td>
+
+            <td style="padding: 10px  0 0 30px">
+
+                <h3><?php echo Mage::helper('M2ePro')->__('With M2E, listing your Magento inventory on Amazon couldn\'t be easier.'); ?></h3>
+                <br/>
+                <p>
+                    <?php
+                        echo Mage::helper('M2ePro')->__(
+                            '<strong>The main settings were successfully set.</strong> <br/><br/>
+                            Now you can continue working with extension.
+                            <br/>
+                            You can see below the short instructions, you may follow to start
+                            listing on Amazon quickly.<br/> The more detailed information can be found in the <a href="%s" target="_blank">Documentation</a>.<br/><br/>',
+                            $docsLink
+                        );
+                    ?>
+                </p>
+                <br/>
+
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 25px">
+        <?php
+            echo Mage::helper('M2ePro')->__(
+                '<strong>The next steps you need to perform are:</strong><br/><br/>
+
+                <span style="text-decoration: underline;"><strong>1)</strong> Selling Format Template creation:</span><br/>
+                Navigate to %s > Templates > <a href="%s" target="_blank">Selling Format Templates</a>,
+                Press on the Add Selling Format Template button;
+                Fill in all necessary data;
+                Save the template.<br/><br/>
+
+                <span style="text-decoration: underline;"><strong>2)</strong> Synchronization Template creation:</span><br/>
+                Navigate to %s > Templates > <a href="%s" target="_blank">Synchronization Templates</a>;
+                Press on the Add Synchronization Template button;
+                Fill in all necessary data;
+                Save the template.<br/><br/>
+
+                After completing these two necessary steps, you can start to create Listings (%s > Manage
+
+                Listings > <a href="%s" target="_blank">Listings</a>), add Magento products to them and list on Amazon.<br/><br/>
+                <em>Thank you for choosing M2E Pro.</em>',
+                $menuLabel, $sellingFormatTemplatesUrl, $menuLabel, $synchronizationTemplatesUrl, $menuLabel, $listingsUrl
+            );
+        ?>
+    </div>
+</div>
+
+<div id="amazon_congratulation_video_tutorial_pop_up" style="display: none;">
+    <div class="player_container" style="margin: 20px 5px; ">
+       <object width="853" height="480"><param name="movie" value="http://www.youtube.com/v/odyMO2KABcs?version=3&amp;hl=ru_RU&amp;rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/odyMO2KABcs?version=3&amp;hl=ru_RU&amp;rel=0" type="application/x-shockwave-flash" width="853" height="480" allowscriptaccess="always" allowfullscreen="true"></embed></object>
+    </div>
+</div>
