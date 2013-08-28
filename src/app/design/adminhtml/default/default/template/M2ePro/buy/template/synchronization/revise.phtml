@@ -1,0 +1,195 @@
+<div id="block_notice_buy_template_synchronization_revise" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Revise Rules'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('Revise Rules are the conditions, at which automatic full and partial listings revising features are enabled.
+<br/>If the certain condition is enabled (<i>Yes</i> is chosen in appropriate line) and met,
+then Rakuten.com Listings, which were listed using current Synchronization Template,
+will be automatically fully or partially updated.<br/>
+    <ul class="list">
+        <li><b>Partial Revise</b> - contains list of product details, which changes you want to be reflected on Rakuten.com.</li>
+        <li><b>Full Revise</b> - contains groups of M2E settings. If any data of these groups (Selling Format Template, Listing Channel Settings) is changed, then listings, which use these templates in their settings, will be automatically fully revised.</li>
+    </ul>'); ?>
+</div>
+
+<?php
+$formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+$defaults = array(
+    'revise_update_qty' => Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_QTY_YES,
+    'revise_update_qty_max_applied_value' => Ess_M2ePro_Model_Template_Synchronization::REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT,
+    'revise_update_price' => Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_PRICE_YES,
+    'revise_change_selling_format_template' => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES,
+    'revise_change_description_template' => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES,
+    'revise_change_general_template' => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_GENERAL_TEMPLATE_YES
+);
+$formData = array_merge($defaults, $formData);
+$isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.formData.revise_update_qty = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['revise_update_qty']); ?>';
+    M2ePro.formData.revise_update_price = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['revise_update_price']); ?>';
+    M2ePro.formData.revise_change_selling_format_template = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['revise_change_selling_format_template']); ?>';
+    M2ePro.formData.revise_change_description_template = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['revise_change_description_template']); ?>';
+    M2ePro.formData.revise_change_general_template = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['revise_change_general_template']); ?>';
+    M2ePro.formData.revise_update_qty_max_applied_value = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['revise_update_qty_max_applied_value']); ?>';
+
+    Event.observe(window, 'load', function() {
+        BuyTemplateSynchronizationHandlerObj = new BuyTemplateSynchronizationHandler();
+        BuyTemplateSynchronizationHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Buy_Template_Synchronization'); ?>');
+        BuyTemplateSynchronizationHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Template_Synchronization'); ?>');
+
+        $('revise_update_qty')
+                .observe('change', BuyTemplateSynchronizationHandlerObj.reviseQty_change)
+                .simulate('change');
+
+        $('revise_update_qty_mode')
+                .observe('change', BuyTemplateSynchronizationHandlerObj.reviseQtyMode_change)
+                .simulate('change');
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_buy_template_synchronization_revise_products">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Partial Revise'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Item Quantity'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_update_qty" name="revise_update_qty" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_QTY_NONE; ?>" <?php if ($formData['revise_update_qty'] == Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_QTY_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_QTY_YES; ?>" <?php if ($formData['revise_update_qty'] == Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_QTY_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises quantity on Rakuten.com listing(s) when the quantity or attribute for quantity of its product is changed in Magento.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- max Affected value-->
+                <tr id="revise_update_qty_max_applied_value_mode_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Conditional Revise'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_update_qty_mode" name="revise_update_qty_mode" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_OFF; ?>" <?php if ($formData['revise_update_qty_max_applied_value'] == 0): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON; ?>" <?php if ($formData['revise_update_qty_max_applied_value'] > 0): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Updates Rakuten.com qty only when the Condition you set below is met.
+                            <br/><b>Note:</b> By using this option you can significantly increase Synchronization performance.'); ?></span>
+                            </p>
+                    </td>
+                </tr>
+
+                <tr id="revise_update_qty_max_applied_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Revise When Less or Equal to'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td id="revise_update_qty_max_applied_value_td" class="value" style="width: auto;">
+                        <input id="revise_update_qty_max_applied_value" name="revise_update_qty_max_applied_value" value="<?php echo $this->escapeHtml($formData['revise_update_qty_max_applied_value']); ?>" type="text" class="input-text validate-qty input-text M2ePro-required-when-visible" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('The value should not be too high (i.e. 100). Recommended value is in range 10 - 20.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="revise_update_qty_max_applied_value_line_tr">
+                    <td class="value" colspan="2" style="width: auto;">
+                        <hr style="border: 1px solid silver; border-bottom: none;">
+                    </td>
+                <tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Item Price'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_update_price" name="revise_update_price" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_PRICE_NONE; ?>" <?php if ($formData['revise_update_price'] == Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_PRICE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_PRICE_YES; ?>" <?php if ($formData['revise_update_price'] == Ess_M2ePro_Model_Buy_Template_Synchronization::REVISE_UPDATE_PRICE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises price on Rakuten.com listing(s) when the price(s) or attribute(s) for price(s) of its product is (are) changed in Magento.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_buy_template_synchronization_revise_templates">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Full Revise'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Selling Format Template'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_change_selling_format_template" name="revise_change_selling_format_template" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_NONE; ?>" <?php if ($formData['revise_change_selling_format_template'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_selling_format_template'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Rakuten.com listing(s) if its Selling Format Template was changed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr style="display:none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Description Template'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input type="hidden" id="revise_change_description_template" name="revise_change_description_template" value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE; ?>" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Rakuten.com listing(s) if its Description Template was changed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Listing Channel Settings'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_change_general_template" name="revise_change_general_template" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_GENERAL_TEMPLATE_NONE; ?>" <?php if ($formData['revise_change_general_template'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_GENERAL_TEMPLATE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_GENERAL_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_general_template'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_GENERAL_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Rakuten.com listing(s) if its Listing Settings was changed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>

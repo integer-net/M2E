@@ -1,0 +1,496 @@
+<?php
+    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+    $defaults = array(
+        'condition_mode' => 0,
+        'condition_value' => '',
+        'condition_attribute' => '',
+
+        'motors_specifics_attribute' => '',
+
+        'product_details_isbn_mode' => 0,
+        'product_details_isbn_cv' => '',
+        'product_details_isbn_ca' => '',
+
+        'product_details_epid_mode' => 0,
+        'product_details_epid_cv' => '',
+        'product_details_epid_ca' => '',
+
+        'product_details_upc_mode' => 0,
+        'product_details_upc_cv' => '',
+        'product_details_upc_ca' => '',
+
+        'product_details_ean_mode' => 0,
+        'product_details_ean_cv' => '',
+        'product_details_ean_ca' => ''
+    );
+    $formData = array_merge($defaults, $formData);
+
+    $isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.formData.condition_value = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['condition_value']); ?>';
+    M2ePro.formData.condition_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['condition_attribute']); ?>';
+
+    M2ePro.formData.motors_specifics_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['motors_specifics_attribute']); ?>';
+    M2ePro.formData.item_specifics = <?php echo json_encode($formData['item_specifics']); ?>;
+
+    M2ePro.formData.product_details_isbn_ca = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['product_details_isbn_ca']); ?>';
+    M2ePro.formData.product_details_epid_ca = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['product_details_epid_ca']); ?>';
+    M2ePro.formData.product_details_upc_ca  = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['product_details_upc_ca']); ?>';
+    M2ePro.formData.product_details_ean_ca  = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['product_details_ean_ca']); ?>';
+
+    M2ePro.customData.attributesReceiving.push(
+        {
+            id : 'product_details_isbn_ca',
+            container : 'product_details_isbn_ca_td'
+        }, {
+            id : 'product_details_epid_ca',
+            container : 'product_details_epid_ca_td'
+        }, {
+            id : 'product_details_upc_ca',
+            container : 'product_details_upc_ca_td'
+        }, {
+            id : 'product_details_ean_ca',
+            container : 'product_details_ean_ca_td'
+        }
+    );
+
+    M2ePro.url.getAttributeType = '<?php echo $this->getUrl('*/*/getAttributeType') ?>';
+
+    M2ePro.text.category_without_item_specific_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__("The category <b>%cat%</b> doesn't have Item Specific.")); ?>';
+    M2ePro.text.validate_motors_specifics_attribute_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__("Only Text Area type attributes are allowed.")); ?>';
+
+    Event.observe(window, 'load', function() {
+
+        EbayTemplateGeneralSpecificHandlerObj = new EbayTemplateGeneralSpecificHandler();
+        EbayTemplateGeneralSpecificHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Helper_Component_Ebay'); ?>');
+        EbayTemplateGeneralSpecificHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Template_General'); ?>');
+        EbayTemplateGeneralSpecificHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Template_General'); ?>');
+        EbayTemplateGeneralSpecificHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Template_General_Specific'); ?>');
+
+        $('ebayTemplateGeneralEditTabs_specific').observe('click', EbayTemplateGeneralTabHandlerObj.checkAttributeSetSelection);
+        $('ebayTemplateGeneralEditTabs_specific').observe('click', EbayTemplateGeneralTabHandlerObj.checkCategoriesSelection);
+
+        $('product_details_isbn_mode')
+            .observe('change', EbayTemplateGeneralSpecificHandlerObj.product_details_isbn_mode_change)
+            .simulate('change');
+
+        $('product_details_epid_mode')
+            .observe('change', EbayTemplateGeneralSpecificHandlerObj.product_details_epid_mode_change)
+            .simulate('change');
+
+        $('product_details_upc_mode')
+            .observe('change', EbayTemplateGeneralSpecificHandlerObj.product_details_upc_mode_change)
+            .simulate('change');
+
+        $('product_details_ean_mode')
+            .observe('change', EbayTemplateGeneralSpecificHandlerObj.product_details_ean_mode_change)
+            .simulate('change');
+    });
+    //-----------------------------
+
+</script>
+
+<div id="listing_template_specifics_condition_container">
+
+    <div id="block_notice_ebay_template_general_specifics_condition" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Item Condition'); ?>">
+        <?php echo Mage::helper('M2ePro')->__('The Item Condition setting depends on the way of the Primary Category choosing.
+        If it is chosen from eBay Categories list, the list of Item Condition is uploaded from eBay and you are required to choose from it.
+        If the Primary Category is set via Custom Attribute, the list of attributes related to the previously chosen Attribute Set is uploaded and
+        you are required to choose the Item Condition by choosing appropriate attribute.<br/><br/>
+        <b>Note:</b> Attribute must contain an ID of the Item Condition.'); ?>
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_general_specifics_condition">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Condition'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr id="item_condition_mode_container" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Item Condition Mode'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="item_condition_mode" name="item_condition_mode" onchange="EbayTemplateGeneralSpecificHandlerObj.conditionModeChange(this)">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::CONDITION_MODE_EBAY ?>" <?php if ($formData['condition_mode'] == Ess_M2ePro_Model_Ebay_Template_General::CONDITION_MODE_EBAY) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('eBay Conditions'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::CONDITION_MODE_ATTRIBUTE ?>" <?php if ($formData['condition_mode'] == Ess_M2ePro_Model_Ebay_Template_General::CONDITION_MODE_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Attributes'); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr id="item_condition_value_container" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Item Condition'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="condition_value" name="condition_value"></select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Condition of the product(s) you want to list on eBay'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="item_condition_attribute_container" style="display: none;">
+                        <td class="label nobr">
+                            <label><?php echo Mage::helper('M2ePro')->__('Item Condition Attribute'); ?>: <span id="required_condition" class="required">*</span></label>
+                        </td>
+                        <td id="item_condition_attribute_container_td" class="value"></td>
+                        <td id="item_condition_attribute_container_td_note" style="display: none;">
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('The Condition Attribute must have condition ID as value.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="listing_template_specifics_details_container" style="display: none;">
+
+    <div id="block_notice_ebay_template_general_specifics_details" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Product Details'); ?>">
+        <?php echo Mage::helper('M2ePro')->__('To make easier finding your Listing in eBay search results specify products\' identifiers,
+        such as ISBN, ePID (Product Reference ID), UPC, EAN.
+        <br/>Use the Custom Value option to enter necessary value, or choose a Custom Attribute that contains it.<br/><br/>
+        <b>Note:</b> These options correspond to the Primary eBay Category, NOT the Secondary Category.'); ?>
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_general_specifics_details">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Product Details'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr id="product_details_isbn">
+                        <td class="label">
+                            <label for="product_details_isbn_mode"><?php echo Mage::helper('M2ePro')->__('ISBN'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="product_details_isbn_mode" name="product_details_isbn_mode" class="required-entry">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE; ?>" <?php if ($formData['product_details_isbn_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['product_details_isbn_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['product_details_isbn_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_isbn_cv" style="display: none;">
+                        <td class="label">
+                            <label for="product_details_isbn_cv"><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <input name="product_details_isbn_cv" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['product_details_isbn_cv']); ?>" type="text" class="M2ePro-required-when-visible input-text" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Unique books\' identifier, includes 10 or 13 characters.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_isbn_ca_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td id="product_details_isbn_ca_td" class="value" style="width: auto;"></td>
+                        <td id="product_details_isbn_ca_td_note" class="value" style="display: none;">
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose the ISBN attribute that contains unique books\' identifier.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_epid">
+                        <td class="label">
+                            <label for="product_details_epid_mode"><?php echo Mage::helper('M2ePro')->__('ePID (Product Reference ID)'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="product_details_epid_mode" name="product_details_epid_mode" class="required-entry">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE; ?>" <?php if ($formData['product_details_epid_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['product_details_epid_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['product_details_epid_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_epid_cv" style="display: none;">
+                        <td class="label">
+                            <label for="product_details_epid_cv"><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <input name="product_details_epid_cv" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['product_details_epid_cv']); ?>" type="text" class="M2ePro-required-when-visible input-text" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('The eBay\'s short global reference ID for a catalog product. i.e. EPID235742 or 235742'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_epid_ca_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td id="product_details_epid_ca_td" class="value" style="width: auto;"></td>
+                        <td id="product_details_epid_ca_td_note" class="value" style="display: none;">
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose the ePid attribute that contains eBay\'s short global reference ID.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_upc">
+                        <td class="label">
+                            <label for="product_details_upc_mode"><?php echo Mage::helper('M2ePro')->__('UPC'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="product_details_upc_mode" name="product_details_upc_mode" class="required-entry">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE; ?>" <?php if ($formData['product_details_upc_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['product_details_upc_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['product_details_upc_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_upc_cv" style="display: none;">
+                        <td class="label">
+                            <label for="product_details_upc_cv"><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <input name="product_details_upc_cv" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['product_details_upc_cv']); ?>" type="text" class="M2ePro-required-when-visible input-text" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Unique 12-character identifier that many industries use to identify products.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_upc_ca_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td id="product_details_upc_ca_td" class="value" style="width: auto;"></td>
+                        <td id="product_details_upc_ca_td_note" class="value" style="display: none;">
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose the UPC attribute that contains unique 12-character identifier.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_ean">
+                        <td class="label">
+                            <label for="product_details_ean_mode"><?php echo Mage::helper('M2ePro')->__('EAN'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="product_details_ean_mode" name="product_details_ean_mode" class="required-entry">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE; ?>" <?php if ($formData['product_details_ean_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['product_details_ean_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['product_details_ean_mode'] == Ess_M2ePro_Model_Ebay_Template_General::PRODUCT_DETAIL_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_ean_cv" style="display: none;">
+                        <td class="label">
+                            <label for="product_details_ean_cv"><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <input name="product_details_ean_cv" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['product_details_ean_cv']); ?>" type="text" class="M2ePro-required-when-visible input-text" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Unique 8 or 13 digit identifier that many industries (such as book publishers) use to identify products.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="product_details_ean_ca_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td id="product_details_ean_ca_td" class="value" style="width: auto;"></td>
+                        <td id="product_details_ean_ca_td_note" class="value" style="display: none;">
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose the EAN attribute that contains unique 8 or 13 digit identifier.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="listing_template_specifics_item_specifics_container">
+
+    <div id="block_notice_ebay_template_general_specifics_item_specifics" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Item Specifics'); ?>">
+        <?php echo Mage::helper('M2ePro')->__('Adding specific item details will attract your buyers and help them to find your item in a search.
+        You can set item detail from the list uploaded from eBay by choosing eBay Recommended option, or create custom detail
+        by choosing the Custom Attribute    that contains the item specific ID or typing necessary text into the Custom Value field.<br/><br/>
+        <b>Note:</b> These options correspond to the Primary eBay Category, NOT the Secondary Category.'); ?>
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_general_specifics_item_specifics">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Item Specifics'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <?php if ($isEdit): ?>
+                <input id="general_id" type="hidden" value="<?php echo $this->getRequest()->getParam('id') ?>">
+                <?php endif; ?>
+
+                <table id="item_specifics_table" class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+
+                        <td colspan="2">
+
+                            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                                <tr class="item-specifics-tr">
+                                    <td class="grid" colspan="2">
+
+                                        <table class="border" cellpadding="0" cellspacing="0" style="width: 900px;">
+                                            <thead>
+                                            <tr class="headings">
+                                                <th style="width: 30%;"><?php echo Mage::helper('M2ePro')->__('Name'); ?></th>
+                                                <th style="width: 30%;"><?php echo Mage::helper('M2ePro')->__('Mode'); ?></th>
+                                                <th style="width: 37%;"><?php echo Mage::helper('M2ePro')->__('Value'); ?></th>
+                                                <th style="width: 3%;">&nbsp;</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="item_specifics_tbody">
+                                            <!-- #specific_table_row_template inserts here -->
+                                            </tbody>
+                                            <tfoot id="add_custom_container">
+                                                <tr>
+                                                    <td colspan="4" class="a-right"><?php echo $this->getChildHtml('add_custom_specific_button'); ?></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                            <p class="note">
+                                <?php echo Mage::helper('M2ePro')->__('Add more information to help buyers find your item in search results.') ?>
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="listing_template_specifics_motors_specifics_container" style="display: none;">
+
+    <div id="block_notice_ebay_template_general_specifics_motors_specifics" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Compatibility'); ?>">
+        <?php echo Mage::helper('M2ePro')->__('Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing. You can create one listing describing a single part and add a complete list of compatible vehicles.
+    <br/><br/><u>To use this feature you have to:</u>
+     <ul class="list">
+        <li>In the section below choose the attribute, which will be used for saving ePIDs (Product Reference IDs) of compatible vehicles.</li>
+        <li>In created M2E listing on the \'View Listing\' page use the <b>Add Compatible Vehicles tool</b> to find necessary compatible items.</li>
+    </ul>
+'); ?>
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_general_specifics_motors_specifics">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Compatibility'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="motors_specifics_attribute"><?php echo Mage::helper('M2ePro')->__('Compatibility Attribute'); ?>:</label>
+                        </td>
+                        <td id="motors_specifics_attribute_td" class="value" style="width: auto;"></td>
+                        <td id="motors_specifics_attribute_td_note" style="display: none;">
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose only Text Area type attribute.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script type="text/m2e-template-html" id="specific_template">
+
+    <input id="item_specifics_mode_%i%" name="item_specifics_mode_%i%" value="%relation_mode%" type="hidden" />
+    <input id="item_specifics_mode_relation_id_%i%" name="item_specifics_mode_relation_id_%i%" value="%relation_id%" type="hidden" />
+
+    <input id="item_specifics_attribute_id_%i%" name="item_specifics_attribute_id_%i%" value="%attribute_id%" type="hidden" />
+    <input id="item_specifics_attribute_title_%i%" name="item_specifics_attribute_title_%i%" value="%attribute_title%" type="hidden" />
+
+    <tr id="specific_%i%_row" class="specific-row not-custom" style="height: 30px;">
+        <td style="vertical-align:middle;">
+            <span id="attribute_title_%i%">%attribute_title%%required%</span>
+            <input id="custom_item_specifics_label_custom_value_%i%" name="custom_item_specifics_label_custom_value_%i%" type="text" style="display: none; width: 98%;" class="input-text M2ePro-required-when-visible custom-item-specific" />
+            <input id="custom_item_specifics_label_custom_label_attribute_%i%" name="custom_item_specifics_label_custom_label_attribute_%i%" type="text" style="display: none; width: 98%;" class="input-text M2ePro-required-when-visible custom-item-specific" />
+            <span id="custom_item_specifics_label_custom_attribute_%i%" style="display:none;"><strong>From attribute label</strong></span>
+        </td>
+        <td style="vertical-align:middle;">
+            <select id="item_specifics_value_mode_%i%" name="item_specifics_value_mode_%i%" style="width: 100%;" onchange="EbayTemplateGeneralSpecificHandlerObj.specificModeChange(this);">
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General_Specific::VALUE_MODE_NONE ?>" class="specific-mode-none"><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General_Specific::VALUE_MODE_EBAY_RECOMMENDED ?>" class="specific-mode-recommended"><?php echo Mage::helper('M2ePro')->__('eBay Recommended'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General_Specific::VALUE_MODE_CUSTOM_VALUE ?>" class="specific-mode-custom-value"><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General_Specific::VALUE_MODE_CUSTOM_ATTRIBUTE ?>" class="custom-specific-mode-custom-attribute"><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+            </select>
+            <select id="custom_item_specifics_value_mode_%i%" name="custom_item_specifics_value_mode_%i%" style="display: none; width: 100%;" onchange="EbayTemplateGeneralSpecificHandlerObj.specificCustomModeChange(this);">
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General_Specific::VALUE_MODE_CUSTOM_ATTRIBUTE ?>" class="custom-specific-mode-custom-attribute"><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General_Specific::VALUE_MODE_CUSTOM_VALUE ?>" class="custom-specific-mode-custom-value"><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_General_Specific::VALUE_MODE_CUSTOM_LABEL_ATTRIBUTE ?>" class="custom-specific-mode-custom-label-attribute"><?php echo Mage::helper('M2ePro')->__('Custom Label / Attribute'); ?></option>
+            </select>
+        </td>
+        <td id="specific_value_%i%_cell" style="width: 100%; vertical-align:middle; text-align: left; padding-top: 2px !important;" class="value">
+            <input id="item_specifics_value_custom_value_%i%" name="item_specifics_value_custom_value_%i%" type="text" style="display: none; width: 100%; padding-left: 2px; padding-right: 0px;" class="input-text M2ePro-required-when-visible item-specific" />
+            <select id="item_specifics_value_ebay_recommended_%i%" name="item_specifics_value_ebay_recommended_%i%" style="display: none; width: 100%;" class="M2ePro-required-when-visible item-specific"></select>
+            <select id="item_specifics_value_custom_attribute_%i%" name="item_specifics_value_custom_attribute_%i%" style="display: none; width: 100%;"></select>
+        </td>
+        <td id="custom_item_specific_remove_%i%" style="display: none; text-align: center; vertical-align: middle;">
+            <?php echo $this->getChildHtml('remove_custom_specific_button'); ?>
+        </td>
+    </tr>
+
+</script>

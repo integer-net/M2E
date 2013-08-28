@@ -1,0 +1,37 @@
+<?php
+
+$version = Mage::helper('M2ePro/Module')->getVersion();
+
+$skipWizardLink = $this->getUrl("*/adminhtml_wizard_ebayPartsCompatibility/skip");
+$completeWizardLink = $this->getUrl("*/adminhtml_wizard_ebayPartsCompatibility/complete");
+
+$docsLink = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/documentation/', 'baseurl');
+$docsLink .= 'eBay+Motors+Compatibility';
+
+?>
+
+<div class="wizard-note">
+
+    <a class="wizard-close" href="javascript:void(0);" onclick="setLocation('<?php echo $skipWizardLink; ?>');" title="<?php echo Mage::helper('M2ePro')->__('Skip Wizard') ?>">&times;</a>
+
+    <div>
+        <?php
+
+        echo Mage::helper('M2ePro')->__(
+            '<b>Parts Compatibility</b> feature for <b>eBay Motors</b> was added in the current version.
+            <br/>
+            If you intend to use it, update
+            <a href="%s">eBay Motors</a> marketplace, if no,
+            <a href="%s">disregard</a> this message.
+            <br/><br/>
+            To find out how to use this option see our
+            <a href="%s" target="_blank">documentation</a>.',
+            $completeWizardLink,
+            $skipWizardLink,
+            $docsLink
+        );
+
+        ?>
+    </div>
+
+</div>

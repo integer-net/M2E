@@ -1,0 +1,14 @@
+<div id="<?php echo $this->getContainerId(); ?>" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('3rd Party Listings'); ?>">
+    <?php
+        $menuLabel = Mage::helper('M2ePro/Module')->getMenuRootNodeLabel();
+        echo Mage::helper('M2ePro')->__('
+This section contains eBay Listings, which belong to registered eBay Accounts (%1$s > Configuration > eBay Accounts) and were listed not by M2E Pro extension.<br/>
+Use eBay Accounts and Marketplaces dropdowns to filter them.
+Also, you can manage these Listings on eBay by choosing appropriate options in the Actions dropdown in the top right corner of the grid.<br/><br/>
+<b>Note:</b> To import eBay 3rd Party Listings the 3rd Party Listings Import must be enabled in account\'s settings
+(%1$s > Configuration > eBay Accounts > General tab) and the 3rd Party Listings Synchronization must be enabled in %1$s > Configuration > Synchronization.
+<br/><br/>
+<b>Important:</b> Initially (the first synchronization of 3rd Party Listings) M2E imports items which have been listed not later than a year ago.
+', $menuLabel);
+?>
+</div>

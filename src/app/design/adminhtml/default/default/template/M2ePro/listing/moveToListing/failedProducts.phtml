@@ -1,0 +1,43 @@
+<div id="pop_up_content">
+    <div class="hor-scroll" style="padding-top: 7px; ">
+
+        <div id="messages">
+            <ul class="messages">
+                <li class="warning-msg">
+                    <ul>
+                        <li>
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'The products below will not be moved into the chosen listing. <br />
+                                    <div style="font-weight: normal;">
+                                        <span style="text-decoration: underline">Possible reasons:</span> <br />
+                                        The products are already present in the chosen listing.<br />
+                                        The chosen listing has \'Do Not Show\' in \'Products Presented in Other Listings\' and these products are present in another listing(s).<br />
+                                    </div>'
+                                ); ?>
+                            </span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div style="float: left; padding-top: 10px">
+
+        </div>
+        <div style="float: left; padding-top: 10px; margin-left: 15px">
+
+        </div>
+        <div class="clear"></div>
+
+        <div id="help_grid" style="margin: 0 auto; padding-top: 10px;">
+            <?php echo $this->getChildHtml('failedProducts_grid') ?>
+        </div>
+
+        <div style="float: right; margin-top: 20px">
+            <?php echo $this->getChildHtml('failedProducts_back_button'); ?>
+            <?php echo $this->getChildHtml('failedProducts_continue_button'); ?>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,241 @@
+<div id="block_notice_amazon_accounts_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('
+        Fill in the title, choose the Marketplace(s) you want to work with and click the <i>Get Access Data</i> link.
+        <br/>You will be redirected to the Amazon website.<br/><br/>
+    <b>Note:</b> To be eligible to sell on Amazon sellers must have at least one of the following: a non-individual Selling on Amazon account,
+    an Amazon WebStore account, a Checkout by Amazon account, or an Amazon Product Ads account.<br/>
+    If you are an individual seller you have to upgrade to a Pro Merchant seller account from the Amazon Services Selling on Amazon page.
+        <br/>
+        <br/>Sign-in and complete steps of getting access for each marketplace:
+        <ul class="list">
+            <li>Select <i>\'I want to use an application to access my Amazon seller account with MWS.\'</i></li>
+            <li>Fill in Application Name and Application\'s Developer Account Number, which you can find in the Marketplaces section on the current page.</li>
+            <li>Accept the Amazon MWS License Agreement.</li>
+            <li>Copy generated Merchant ID and paste it in the corresponding fields of the current page.</li>
+        </ul>
+        Continue working with 3rd Party Listings and Orders settings tabs.
+    '); ?>
+</div>
+
+<?php
+    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+
+    if (isset($formData['other_listings_mapping_settings'])) {
+        $formData['other_listings_mapping_settings'] = (array)json_decode($formData['other_listings_mapping_settings'],true);
+    }
+
+    $defaults = array(
+        'title' => ''
+    );
+
+    $formData = array_merge($defaults, $formData);
+
+    $isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.url.formSubmit = '<?php echo $this->getUrl('*/*/save', array('id' => $this->getRequest()->getParam('id'))); ?>';
+    M2ePro.url.deleteAction = '<?php echo $this->getUrl('*/*/delete', array('id' => $this->getRequest()->getParam('id'))); ?>';
+    M2ePro.url.checkAuthAction = '<?php echo $this->getUrl('*/*/checkAuth'); ?>'
+
+    M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
+
+    M2ePro.text.account_delete_alert = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.')) ?>';
+
+    Event.observe(window, 'load', function() {
+        AmazonAccountHandlerObj = new AmazonAccountHandler();
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+    });
+    //-----------------------------
+
+</script>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';
+
+    M2ePro.text.title_not_unique_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified title is already used for other account. Account title must be unique.')); ?>';
+    M2ePro.text.need_select_marketplaces_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('You must choose marketplace first.')); ?>';
+    M2ePro.text.need_authorized_account_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Merchant ID.')); ?>';
+    M2ePro.text.account_access_certain_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Amazon account. Reason: %s')) ?>';
+
+    Event.observe(window, 'load', function() {
+        AmazonAccountHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Amazon_Account'); ?>');
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_amazon_accounts_general_general">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="title"><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="title" name="title" value="<?php echo $this->escapeHtml($formData['title']); ?>" type="text" class="input-text required-entry M2ePro-account-title" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Title or identifier of Amazon account for your internal use.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<?php if ($this->synchronizeProcessing) { ?>
+    <div class="locked_block">
+
+        <div class="locked_wrapper">
+            <div><?php echo Mage::helper('M2ePro')->__('Synchronizing Now') ?></div>
+        </div>
+<?php } ?>
+
+<div class="entry-edit" id="magento_block_amazon_accounts_marketplaces_access" collapseable="no">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Marketplace'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <?php if (count($this->marketplaces) <= 0) { ?>
+
+                <div id="block_notice_amazon_accounts_general_marketplaces_access_none" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('None Marketplaces'); ?>" collapseable="no" always_show="yes" hideblock="no">
+                    <?php echo Mage::helper('M2ePro')->__('You must select and update Amazon marketplaces to get access to this section.'); ?>
+                </div>
+
+                <input type="hidden" name="validate_selected_marketplaces" value="" class="M2ePro-require-select-marketplaces" />
+
+            <?php } else { ?>
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <?php
+                        $isLockedMarketplace = false;
+                        $isModeMarketplace = false;
+                        foreach ($this->marketplaces as $marketplaceRow) {
+                            isset($marketplaceRow['locked']) && $marketplaceRow['locked'] &&
+                                $isLockedMarketplace = true;
+                            isset($marketplaceRow['account_data']['mode']) && $marketplaceRow['account_data']['mode'] &&
+                                $isModeMarketplace = true;
+                        }
+                    ?>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Choose Marketplace'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+
+                            <select id="marketplace_id" <?php if ($isLockedMarketplace || $isEdit) { ?>disabled="disabled"<?php } ?>
+                                onchange="AmazonAccountHandlerObj.changeMarketplace(this.value);">
+
+                                <?php if (!$isModeMarketplace) { ?>
+                                    <option class="marketplace_empty_option" selected="selected"></option>
+                                <?php } ?>
+
+                                <?php foreach ($this->marketplaces as $marketplaceRow) { ?>
+
+                                    <option value="<?php echo $marketplaceRow['id']; ?>" <?php if ($marketplaceRow['account_data']['mode']) { ?>selected="selected"<?php } ?>>
+
+                                        <?php echo Mage::helper('M2ePro')->__($marketplaceRow['title']); ?>
+                                        <?php
+                                            if ($marketplaceRow['locked']) {
+                                                echo ' - '.Mage::helper('M2ePro')->__('Used in Listing(s)');
+                                            }
+                                        ?>
+
+                                    </option>
+
+                                <?php } ?>
+                            </select>
+
+                            <?php if (!$this->synchronizeProcessing) { ?>
+                                <input type="hidden" name="validate_selected_marketplaces" value="" class="M2ePro-require-select-marketplaces" />
+                            <?php } ?>
+
+                        </td>
+                    </tr>
+
+                    <?php foreach ($this->marketplaces as $marketplaceRow) { ?>
+
+                        <input class="marketplaces_current_mode_element" type="hidden"
+                                   id="marketplace_current_mode_<?php echo $marketplaceRow['id']; ?>"
+                                   name="marketplace_current_mode_<?php echo $marketplaceRow['id']; ?>"
+                                   value="<?php echo (int)$marketplaceRow['account_data']['mode']; ?>" />
+
+                        <input class="marketplaces_mode_element" type="hidden"
+                               id="marketplace_mode_<?php echo $marketplaceRow['id']; ?>"
+                               name="marketplace_mode_<?php echo $marketplaceRow['id']; ?>"
+                               value="<?php echo (int)$marketplaceRow['account_data']['mode']; ?>" />
+
+                        <tr class="marketplaces_view_element" id="marketplaces_application_name_container_<?php echo $marketplaceRow['id']; ?>" style="display:none;">
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Application Name') ?>:</td>
+                            <td class="value" style="width: auto;"><?php echo $marketplaceRow['application_name'] ?></td>
+                        </tr>
+
+                        <tr class="marketplaces_view_element" id="marketplaces_developer_key_container_<?php echo $marketplaceRow['id']; ?>" style="display:none;">
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Developer Account Number') ?>:</td>
+                            <td class="value" style="width: auto;"><?php echo $marketplaceRow['developer_key'] ?></td>
+                        </tr>
+
+                        <tr class="marketplaces_view_element" id="marketplaces_register_url_container_<?php echo $marketplaceRow['id']; ?>" style="display:none;">
+                            <td class="label"></td>
+                            <td class="value" style="width: auto;">
+                                <a href="<?php echo $marketplaceRow['account_data']['register_url']; ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Get Access Data') ?></a>
+                            </td>
+                        </tr>
+
+                        <tr class="marketplaces_view_element" id="marketplaces_merchant_id_container_<?php echo $marketplaceRow['id']; ?>" <?php if (!$marketplaceRow['account_data']['mode']) echo ' style="display:none;"'; ?>>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Merchant ID'); ?>: <span class="required">*</span></label>
+                            </td>
+                            <td class="value" style="width: auto;">
+                                <input type="text" class="M2ePro-marketplace-merchant-id input-text" name="marketplace_merchant_id_<?php echo $marketplaceRow['id']; ?>" value="<?php echo $marketplaceRow['account_data']['merchant_id']; ?>" <?php if ($isEdit) echo 'disabled="disabled"'; ?> class="input-text M2ePro-required-when-visible" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Paste generated Merchant ID from Amazon. (It must look like: A15UFR7CZVW5YA).'); ?></span>
+                            </p>
+                            </td>
+                        </tr>
+
+                    <?php } ?>
+
+                <?php } ?>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<?php if ($this->synchronizeProcessing) { ?>
+    </div>
+<?php } ?>

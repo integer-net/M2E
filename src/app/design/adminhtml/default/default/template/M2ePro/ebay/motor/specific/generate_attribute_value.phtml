@@ -1,0 +1,107 @@
+<style type="text/css">
+    #specifics_grid_container table td, #specifics_grid_container table th {
+        padding: 5px;
+    }
+
+    #generate_attribute_content_container td.label {
+        width: 100px;
+    }
+
+    #generate_attribute_content_container label {
+        width: 100px;
+    }
+</style>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.customData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.formData.id = '<?php echo Mage::helper('M2ePro')->escapeJs($this->getRequest()->getParam('id')) ?>';
+    M2ePro.formData.general_template_id = '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('general_template_id')) ?>';
+
+    M2ePro.url.motorSpecificGrid = '<?php echo $this->getUrl('*/*/motorSpecificGrid'); ?>';
+    M2ePro.url.updateProductsAttribute = '<?php echo $this->getUrl('*/*/updateProductsAttribute'); ?>';
+
+    M2ePro.text.items_not_selected_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Please select items.')) ?>';
+    M2ePro.text.motors_specifics_attribute_not_selected_error = '<?php echo Mage::helper('M2ePro')->escapeJs(
+            Mage::helper('M2ePro')->__('Please go to the <a href="%s" target="_blank">general template</a> and choose Compatibility Attribute.',
+                                       $this->getUrl('*/ebay_template_general/edit', array('id' => $this->getData('general_template_id'), 'tab' => 'specific')))
+    ) ?>';
+
+    Event.observe(window, 'load', function() {
+
+        EbayMotorSpecificHandlerObj = new EbayMotorSpecificHandler(
+            '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('motors_specifics_attribute')) ?>',
+            '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('specifics_grid_id')) ?>',
+            '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('products_grid_id')) ?>'
+        );
+        EbayMotorSpecificHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Template_General'); ?>');
+        EbayMotorSpecificHandlerObj.initPopUp('<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Add Compatible Vehicles')); ?>', 'pop_up_content');
+
+    });
+
+</script>
+
+<div id="pop_up_content" style="display: none;">
+
+    <div id="block_notice_motors_specifics_generate_attribute_value" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Add Compatipable Vehicles'); ?>" style="margin-top: 15px;">
+        <?php echo Mage::helper('M2ePro')->__('The grid below contains a list of cars, trucks and motorcycles which can be found on eBay Motors.<br/><br/>
+Select items, compatible with your part and choose one of three actions in the Actions dropdown:
+<ul class=list>
+<li><b>Overwrite ePIDs in Compatibility Attribute</b> - replaces items ePIDs in the Compatibility Attribute chosen in the General Template with selected ones.</li>
+<li><b>Add ePIDs to Compatibility Attribute</b> - adds selected items ePIDs to existing ones in Compatibility Attribute chosen in the General Template.</li>
+<li><b>Show ePIDs</b> - displays selected items ePIDs in the text field.</li>
+</ul>
+<b>Note:</b> Compatibility Items of listed products can not be replaced or removed from eBay when you revise or relist product, only new ones can be added in these cases.
+'); ?>
+    </div>
+
+    <div id="generate_attribute_content_container" class="<?php echo Mage::helper('M2ePro/Magento')->isGoEdition() ? '' : 'switcher'; ?>" style="display: none; margin-top: 15px;">
+
+        <table cellspacing="0" class="form-list">
+            <tbody>
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Selected ePIDs') ?>:</label>
+                    </td>
+                    <td class="value" style="width: 100%; padding-right: 10px;">
+                        <input class="left-col-block input-text" style="width: 100%;" name="attribute_content" id="attribute_content">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="hor-scroll">
+
+        <div id="specifics">
+            <div class="content-header skip-header">
+                <table cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td style="width: 50%;">
+                                <h3 class="icon-head head-adminhtml-ebay-template-general-motor-specific">
+                                    <?php echo Mage::helper('M2ePro')->__('Add Vehicles') ?>
+                                </h3>
+                            </td>
+                            <td class="form-buttons"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="specifics_grid_container"></div>
+        </div>
+
+    </div>
+
+</div>

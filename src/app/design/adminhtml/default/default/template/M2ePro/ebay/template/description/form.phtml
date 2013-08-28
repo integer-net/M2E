@@ -1,0 +1,887 @@
+<div id="block_notice_ebay_template_description_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Description Template'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('Description Template is used to design your items\' description on eBay. <br/>
+    <br/>It is possible to choose a Product Description or Product Short Description, which will be taken from Magento.
+    Or you can create a Custom Description by adding necessary information,
+    appropriate attributes from dropdown lists and image tags.
+    <br/><br/>It is possible to create custom description in 2 modes:
+    <ul class="list">
+        <li><b>WYSIWYG</b> - allows creating simple good looking product description. No HTML knowledge is required.</li>
+        <li><b>HTML</b> - allows using HTML tags and CSS styles for the description. You can create much more complex, improved and advanced item\'s description using this mode.</li>
+    </ul>
+    <b>Note:</b> Listing Titles are limited to 80 characters and Subtitles are limited to 55 characters on eBay.<br/>'); ?>
+</div>
+
+<?php
+    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+
+    if (isset($formData['watermark_settings'])) {
+        $watermarkSettings = json_decode($formData['watermark_settings'], true);
+        if (!is_null($watermarkSettings)) {
+            $formData['watermark_position'] = $watermarkSettings['position'];
+            $formData['watermark_scale'] = $watermarkSettings['scale'];
+            $formData['watermark_transparent'] = $watermarkSettings['transparent'];
+        }
+    }
+
+    $paramsAttributeSetId = $this->getRequest()->getParam('attribute_set_id');
+    !is_null($paramsAttributeSetId) && $formData['attribute_sets'] = array($paramsAttributeSetId);
+
+    $default = array(
+        'title' => '',
+        'attribute_sets' => array(),
+
+        'title_mode' => Ess_M2ePro_Model_Ebay_Template_Description::TITLE_MODE_PRODUCT,
+        'title_template' => '',
+
+        'subtitle_mode' => Ess_M2ePro_Model_Ebay_Template_Description::SUBTITLE_MODE_NONE,
+        'subtitle_template' => '',
+
+        'description_mode' => Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_PRODUCT,
+        'description_template' => '',
+
+        'cut_long_titles' => Ess_M2ePro_Model_Ebay_Template_Description::CUT_LONG_TITLE_DISABLED,
+        'hit_counter' => 'NoHitCounter',
+        'editor_type' => Ess_M2ePro_Model_Ebay_Template_Description::EDITOR_TYPE_SIMPLE,
+
+        'image_main_mode' => Ess_M2ePro_Model_Ebay_Template_Description::IMAGE_MAIN_MODE_PRODUCT,
+        'image_main_attribute' => '',
+        'gallery_images_mode' => Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_NONE,
+        'gallery_images_limit' => 1,
+        'gallery_images_attribute' => '',
+
+        'use_supersize_images' => Ess_M2ePro_Model_Ebay_Template_Description::USE_SUPERSIZE_IMAGES_NO,
+
+        'watermark_mode' => Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_NO,
+        'watermark_position' => Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_POSITION_TOP,
+        'watermark_scale' => Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_SCALE_MODE_NONE,
+        'watermark_transparent' => Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_TRANSPARENT_MODE_NO,
+        'watermark_image' => NULL,
+        'variation_configurable_images' => ''
+    );
+    $formData = array_merge($default, $formData);
+
+    $tinymceEnabledForJavascript = $formData['editor_type'] == Ess_M2ePro_Model_Ebay_Template_Description::EDITOR_TYPE_TINYMCE ? 'true' : 'false';
+
+    $isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.customData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.url.formSubmit = '<?php echo $this->getUrl('*/*/save', array('id' => $this->getRequest()->getParam('id'))); ?>';
+    M2ePro.url.formSubmitNew = '<?php echo $this->getUrl('*/*/save'); ?>';
+    M2ePro.url.deleteAction = '<?php echo $this->getUrl('*/adminhtml_template_description/delete', array('id' => $this->getRequest()->getParam('id'))); ?>';
+    M2ePro.url.preview = '<?php echo $this->getUrl('*/*/preview'); ?>';
+
+    M2ePro.url.getAttributesForConfigurableProduct = '<?php echo $this->getUrl('*/*/getAttributesForConfigurableProduct'); ?>';
+    M2ePro.url.magentoGetAttributesByAttributeSets = '<?php echo $this->getUrl('*/adminhtml_general/magentoGetAttributesByAttributeSets'); ?>';
+
+    M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
+    M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';
+    M2ePro.formData.variation_configurable_images = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['variation_configurable_images']); ?>';
+
+    M2ePro.formData.image_main_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['image_main_attribute']); ?>';
+    M2ePro.formData.image_main_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['image_main_mode']); ?>';
+
+    M2ePro.formData.gallery_images_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['gallery_images_attribute']); ?>';
+    M2ePro.formData.gallery_images_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['gallery_images_mode']); ?>';
+
+    M2ePro.formData.watermark_image_uploaded = '<?php echo !is_null($formData['watermark_image']); ?>';
+
+    <?php
+        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
+            $componentName = ' eBay';
+        } else {
+            $componentName = '';
+        }
+    ?>
+
+    M2ePro.text.chapter_when_duplicate = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__("Add%s Description Template", $componentName)); ?>';
+    M2ePro.text.title_not_unique_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified title is already used for other template. Template title must be unique.')); ?>';
+    M2ePro.text.attribute_set_not_selected_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('You should select Attribute Sets first and press Confirm button.')); ?>';
+
+    M2ePro.text.none_word = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('None')); ?>';
+    M2ePro.text.adding_image_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Adding Image')); ?>';
+
+    Event.observe(window, 'load', function() {
+
+        AttributeSetHandlerObj = new AttributeSetHandler();
+
+        EbayTemplateDescriptionHandlerObj = new EbayTemplateDescriptionHandler();
+        EbayTemplateDescriptionHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Template_Description'); ?>');
+        EbayTemplateDescriptionHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Template_Description'); ?>');
+
+        $('attribute_sets').observe('change', AttributeSetHandlerObj.changeAttributeSets);
+        $('attribute_sets').value && EbayTemplateDescriptionHandlerObj.attribute_sets_confirm();
+
+        $('title_mode')
+            .observe('change', EbayTemplateDescriptionHandlerObj.title_mode_change)
+            .simulate('change');
+
+        $('subtitle_mode')
+            .observe('change', EbayTemplateDescriptionHandlerObj.subtitle_mode_change)
+            .simulate('change');
+
+        $('watermark_scale')
+            .observe('change', EbayTemplateDescriptionHandlerObj.watermark_scale_mode_change)
+            .simulate('change');
+
+        $('watermark_mode')
+            .observe('change', EbayTemplateDescriptionHandlerObj.watermark_mode_change)
+            .simulate('change');
+
+        $('description_mode')
+            .observe('change', EbayTemplateDescriptionHandlerObj.description_mode_change)
+            .simulate('change');
+
+        $('image_main_mode')
+            .observe('change', EbayTemplateDescriptionHandlerObj.image_main_mode_change)
+            .simulate('change');
+
+        $('gallery_images_mode')
+            .observe('change', EbayTemplateDescriptionHandlerObj.gallery_images_mode_change)
+            .simulate('change');
+
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+    });
+    //-----------------------------
+
+</script>
+
+<style type="text/css">
+    .input-text-title {
+        width: 350px !important;
+    }
+    .input-text-small {
+        width: 120px !important;
+    }
+    .textarea {
+        width: 98% !important;
+        height: 500px !important;
+    }
+    select.select-main {
+        width: 356px !important;
+    }
+    .select-wrapper {
+        margin-left: 15px;
+    }
+</style>
+
+<form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
+
+    <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
+
+    <input id="editor_type" name="editor_type" value="<?php echo $formData['editor_type']; ?>" type="hidden" />
+
+    <div class="entry-edit" id="magento_block_ebay_template_description_general">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="title"><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <input id="title" name="title" value="<?php echo $formData['title']; ?>" type="text" class="input-text required-entry M2ePro-description-tpl-title" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Short meaningful template title for your internal use.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label for="attribute_sets"><?php echo Mage::helper('M2ePro')->__('Product Attribute Sets'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <div id="attribute_sets_container" <?php if ($this->attribute_set_locked): ?>style="display: none;"<?php endif; ?>>
+                                <?php $this->attribute_set_locked ? $attributeSetPostfix = '_fake' : $attributeSetPostfix = ''; ?>
+                                <select id="attribute_sets<?php echo $attributeSetPostfix; ?>" name="attribute_sets<?php echo $attributeSetPostfix; ?>[]" multiple="multiple" class="<?php if (!$this->attribute_set_locked): ?>M2ePro-validate-attribute-sets<?php endif; ?>">
+                                    <?php foreach ($this->getData('attributes_sets') as $set): ?>
+                                        <option value="<?php echo $set['attribute_set_id']; ?>"<?php if (in_array($set['attribute_set_id'], $formData['attribute_sets'])): echo ' selected="selected"'; endif;?>><?php echo $set['attribute_set_name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <?php if ($this->attribute_set_locked): ?>
+                                <div id="attribute_sets_breadcrumb" style="width: 280px;">
+                                    <?php $breadcrumb = array(); foreach ($this->getData('attributes_sets') as $set): ?>
+                                        <?php if (in_array($set['attribute_set_id'], $formData['attribute_sets'])): $breadcrumb[] = $set['attribute_set_name']; endif; ?>
+                                    <?php endforeach; ?>
+                                    <strong><?php echo implode(', ', $breadcrumb); ?></strong>
+                                </div>
+                                <input id="attribute_sets" name="attribute_sets" value="<?php echo $this->escapeHtml(implode(',', $formData['attribute_sets'])); ?>" type="hidden" />
+                            <?php endif; ?>
+
+                            <div id="attribute_sets_buttons_container" style="padding-top: 5px; <?php if ($this->attribute_set_locked): ?>display: none;<?php endif; ?>">
+                                <?php echo $this->getChildHtml('attribute_sets_select_all_button'); ?>
+                                <?php echo $this->getChildHtml('attribute_sets_confirm_button'); ?>
+                            </div>
+
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Attribute Sets of products which will be listed on eBay<br />using this template.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_description_details">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Item Details'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Item Title'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <select id="title_mode" name="title_mode" class="select">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::TITLE_MODE_PRODUCT; ?>" <?php if ($formData['title_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::TITLE_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Name'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::TITLE_MODE_CUSTOM; ?>" <?php if ($formData['title_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::TITLE_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Title'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Item\'s title that buyers will see on eBay listing.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="custom_title_tr">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Custom Title'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <input id="title_template" name="title_template" value="<?php echo Mage::helper('M2ePro')->__($formData['title_template']); ?>" type="text" class="input-text input-text-title  M2ePro-required-when-visible" />
+                            <span id="select_attributes_for_title_span" class="select-wrapper"></span>
+                            <?php echo $this->getChildHtml('select_attributes_for_title_button'); ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Item Subtitle'); ?>:</label>
+                        </td>
+                        <td class="value">
+                            <select id="subtitle_mode" name="subtitle_mode">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::SUBTITLE_MODE_NONE; ?>" <?php if ($formData['subtitle_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::SUBTITLE_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::TITLE_MODE_CUSTOM; ?>" <?php if ($formData['subtitle_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::SUBTITLE_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Add Subtitle'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Adding subtitle to eBay item.<br/><b>Note:</b> Additional fee is charged.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="custom_subtitle_tr">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Subtitle'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <input id="subtitle_template" name="subtitle_template" value="<?php echo Mage::helper('M2ePro')->__($formData['subtitle_template']); ?>" type="text" class="input-text input-text-title M2ePro-required-when-visible" />
+                            <span id="select_attributes_for_subtitle_span" class="select-wrapper"></span>
+                            <?php echo $this->getChildHtml('add_subtitle_button'); ?>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Cut Long Titles'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="cut_long_titles" name="cut_long_titles">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::CUT_LONG_TITLE_DISABLED; ?>" <?php if ($formData['cut_long_titles'] == Ess_M2ePro_Model_Ebay_Template_Description::CUT_LONG_TITLE_DISABLED): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::CUT_LONG_TITLE_ENABLED; ?>" <?php if ($formData['cut_long_titles'] == Ess_M2ePro_Model_Ebay_Template_Description::CUT_LONG_TITLE_ENABLED): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Automatically shortens items\' titles to 80 characters and subtitles to 55 characters.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Hit Counter'); ?>:</label>
+                        </td>
+                        <td class="value">
+                            <select id="hit_counter" name="hit_counter">
+                                <option value="NoHitCounter" <?php if ($formData['hit_counter'] == 'NoHitCounter'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No Hit Counter'); ?></option>
+                                <option value="BasicStyle" <?php if ($formData['hit_counter'] == 'BasicStyle'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Basic Style'); ?></option>
+                                <option value="GreenLED" <?php if ($formData['hit_counter'] == 'GreenLED'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Green LED'); ?></option>
+                                <option value="HiddenStyle" <?php if ($formData['hit_counter'] == 'HiddenStyle'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Hidden Style'); ?></option>
+                                <option value="HonestyStyle" <?php if ($formData['hit_counter'] == 'HonestyStyle'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Honesty Style'); ?></option>
+                                <option value="RetroStyle" <?php if ($formData['hit_counter'] == 'RetroStyle'): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Retro Style'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Adding the tool that counts the visitors\' number of eBay listing.<br/><b>Note:</b> Green LED, Honesty Style and Retro Style styles are available only on US-store.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_description_image">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Images'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr class="requirie-attribute-set">
+                        <td class="label">
+                            <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Item Image'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="image_main_mode" name="image_main_mode">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::IMAGE_MAIN_MODE_NONE; ?>" <?php if ($formData['image_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::IMAGE_MAIN_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::IMAGE_MAIN_MODE_PRODUCT; ?>" <?php if ($formData['image_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::IMAGE_MAIN_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::IMAGE_MAIN_MODE_ATTRIBUTE; ?>" <?php if ($formData['image_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::IMAGE_MAIN_MODE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Image you will see on your eBay listing.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="image_main_attribute_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Product Image Attribute'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <div id="image_main_attribute_td"></div>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose Media Image Attribute or Attribute, that contains absolute url.
+                                <br/>e.g. http://mymagentostore.com/images/baseimage.jpg'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="use_supersize_images_tr">
+                        <td class="label">
+                            <label for="use_supersize_images"><?php echo Mage::helper('M2ePro')->__('Picture Pack'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="use_supersize_images" name="use_supersize_images">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::USE_SUPERSIZE_IMAGES_NO; ?>" <?php if ($formData['use_supersize_images'] == Ess_M2ePro_Model_Ebay_Template_Description::USE_SUPERSIZE_IMAGES_NO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::USE_SUPERSIZE_IMAGES_YES; ?>" <?php if ($formData['use_supersize_images'] == Ess_M2ePro_Model_Ebay_Template_Description::USE_SUPERSIZE_IMAGES_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Displays larger, more detailed pictures (up to 800w x 800h pixels - 800 pixels on the longest side). <br/><b>Note:</b> This feature may come with additional fee.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="gallery_images_mode_tr">
+                        <td class="label">
+                            <label for="gallery_images_mode"><?php echo Mage::helper('M2ePro')->__('Item Gallery Images'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="gallery_images_mode" name="gallery_images_mode">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_NONE; ?>" <?php if ($formData['gallery_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_PRODUCT; ?>" <?php if ($formData['gallery_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Images'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_ATTRIBUTE; ?>" <?php if ($formData['gallery_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Adds small thumbnails that appear under the large Base Image.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="gallery_images_attribute_tr" style="display: none;">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Gallery Images Attribute'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <div id="gallery_images_attribute_td"></div>
+                            <p class="note">
+                                <?php echo Mage::helper('M2ePro')->__('Choose Text, Multiple Select or Dropdown type attribute. In Text type attribute urls must be separated with comma.
+                                <br/>e.g.  http://mymagentostore.com/images/baseimage1.jpg,  http://mymagentostore.com/images/baseimage2.jpg'); ?>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="gallery_images_limit_tr">
+                        <td class="label">
+                            <label for="gallery_images_limit"><?php echo Mage::helper('M2ePro')->__('Gallery Images Quantity'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="gallery_images_limit" name="gallery_images_limit">
+                                <option value="1" <?php if ($formData['gallery_images_limit'] == 1): echo ' selected="selected"'; endif; ?>>1</option>
+                                <?php for ($i = 2; $i <= 11; $i++): ?>
+                                <option value="<?php echo $i; ?>" <?php if ($formData['gallery_images_limit'] == $i): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Up to').' '.$i; ?></option>
+                                <?php endfor ?>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('The number of images in item\'s gallery.'); ?></span>
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <tr id="variation_configurable_images_container" style="display: none;">
+                        <td class="label">
+                            <label for="variation_configurable_images"><?php echo Mage::helper('M2ePro')->__('Variation of Configurable Products Images for Attribute'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="variation_configurable_images" name="variation_configurable_images"></select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Only for Configurable products. Determines option at which images should change on eBay.<br/><b>Note:</b> If several Attribute Sets have been chosen, only common attributes are shown.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_description_watermark">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Watermark'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <div id="block_notice_ebay_template_description_watermark" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Watermark'); ?>">
+                    <?php echo Mage::helper('M2ePro')->__('This section allows adding custom watermark to your main and item gallery images.
+                    <br/><br/>
+                    <b>Note:</b> If products images are not taken from the same server where Magento Store is, the watermark will not be applied.'); ?>
+                </div>
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr id="watermark_mode_container">
+                        <td class="label">
+                            <label for="watermark_mode"><?php echo Mage::helper('M2ePro')->__('Use Watermark'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="watermark_mode" name="watermark_mode">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_NO ?>" <?php if ($formData['watermark_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_NO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_YES ?>" <?php if ($formData['watermark_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Automatically adds your custom watermark to gallery images.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="watermark_image_container">
+                        <td class="label">
+                            <label for="watermark_image" id="watermark_image_label"><?php echo Mage::helper('M2ePro')->__('Watermark Upload'); ?>: <?php if (is_null($formData['watermark_image'])) echo '<span class="required">*</span>' ?></label>
+                        </td>
+                        <td class="value">
+                            <input type="file" accept="image/png" name="watermark_image" id="watermark_image" <?php if (is_null($formData['watermark_image'])) echo 'class="M2ePro-required-when-visible"' ?>>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Select image that you want to add as a watermark.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <?php if (!is_null($formData['watermark_image'])): ?>
+                    <tr id="watermark_uploaded_image_container">
+                        <td class="label">
+                            <label for="watermark_uploaded_image"><?php echo Mage::helper('M2ePro')->__('Watermark Uploaded Image'); ?>:</label>
+                        </td>
+                        <td class="value">
+                            <img id="watermark_uploaded_image" src="data:image/png;base64,<?php echo base64_encode($formData['watermark_image']) ?>" style="max-width: 280px;">
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+
+                    <tr id="watermark_transparent_container">
+                        <td class="label">
+                            <label for="watermark_transparent"><?php echo Mage::helper('M2ePro')->__('Watermark Transparency'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="watermark_transparent" name="watermark_transparent">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_TRANSPARENT_MODE_NO; ?>" <?php if ($formData['watermark_transparent'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_TRANSPARENT_MODE_NO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disable'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_TRANSPARENT_MODE_YES; ?>" <?php if ($formData['watermark_transparent'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_TRANSPARENT_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enable'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Sets transparency of watermark image to 30 %.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="watermark_scale_container">
+                        <td class="label">
+                            <label for="watermark_scale"><?php echo Mage::helper('M2ePro')->__('Scale Watermark Image'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="watermark_scale" name="watermark_scale">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_SCALE_MODE_NONE; ?>" <?php if ($formData['watermark_scale'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_SCALE_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_SCALE_MODE_IN_WIDTH; ?>" <?php if ($formData['watermark_scale'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_SCALE_MODE_IN_WIDTH): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('In Width'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_SCALE_MODE_STRETCH; ?>" <?php if ($formData['watermark_scale'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_SCALE_MODE_STRETCH): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Full Image'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Scales watermark image in width or full image.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="watermark_position_container">
+                        <td class="label">
+                            <label for="watermark_position"><?php echo Mage::helper('M2ePro')->__('Watermark Position'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="watermark_position" name="watermark_position">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_POSITION_TOP; ?>" <?php if ($formData['watermark_position'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_POSITION_TOP): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Top'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_POSITION_MIDDLE; ?>" <?php if ($formData['watermark_position'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_POSITION_MIDDLE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Middle'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_POSITION_BOTTOM; ?>" <?php if ($formData['watermark_position'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_POSITION_BOTTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Bottom'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Watermark position on the image.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_template_description_description">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Description'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0" style="width:100%">
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Description Source'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value">
+                            <select id="description_mode" name="description_mode" class="required-entry">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_PRODUCT; ?>" <?php if ($formData['description_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Description'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_SHORT; ?>" <?php if ($formData['description_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_SHORT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Short Description'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_CUSTOM; ?>" <?php if ($formData['description_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Description'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Item\'s description source for eBay Listing.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr class="c-custom_description_tr">
+                        <td class="label"></td>
+                        <td class="value">
+
+                            <?php if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()): ?>
+                                <div id="buttonstext" class="buttons-set">
+                                    <?php echo $this->getChildHtml('show_hide_mce_button'); ?>
+                                    <p class="note">
+                                        <span><?php echo Mage::helper('M2ePro')->__('Click the button to switch between HTML and WYSIWYG modes.'); ?></span>
+                                    </p>
+                                </div>
+                            <?php endif ?>
+
+                            <textarea id="description_template" name="description_template" class="textarea"><?php echo Mage::helper('M2ePro')->escapeHtml($formData['description_template']); ?></textarea>
+
+                            <script type="text/javascript">
+                                //<![CDATA[
+                                <?php if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()): ?>
+                                    tinyMceWysiwygSetup.prototype.notifyFirebug = function() {}
+                                    tinyMceWysiwygSetup.prototype.closePopups = function() {}
+                                    tinyMceWysiwygSetup.prototype.setup = function(mode)
+                                    {
+                                        if (this.config.widget_plugin_src) {
+                                            tinymce.PluginManager.load('magentowidget', this.config.widget_plugin_src);
+                                        }
+
+                                        if (this.config.plugins) {
+                                            (this.config.plugins).each(function(plugin){
+                                                tinymce.PluginManager.load(plugin.name, plugin.src);
+                                            });
+                                        }
+
+                                        tinyMCE.init(Object.extend({
+                                            extended_valid_elements: 'link[charset|class|dir<ltr?rtl|href|hreflang|id|lang|media|onclick'
+                                                + '|ondblclick|onkeydown|onkeypress|onkeyup|onmousedown|onmousemove'
+                                                + '|onmouseout|onmouseover|onmouseup|rel|rev|style|title|target|type],'
+                                        }, this.getSettings(mode)));
+                                    };
+                                    tinyMceWysiwygSetup.prototype.isEnabled = function()
+                                    {
+                                        return !!tinyMCE.get(this.id);
+                                    }
+                                    tinyMceWysiwygSetup.prototype.toggle = function()
+                                    {
+                                        var enabled = this.isEnabled();
+                                        enabled ? this.turnOff() : this.turnOn();
+                                        $('editor_type').value = enabled ? '0' : '1'; // enabled - old state
+                                    }
+                                    var tinyMceEnabled = <?php echo $tinymceEnabledForJavascript; ?>;
+
+                                    wysiwygtext = new tinyMceWysiwygSetup('description_template', {
+                                        'hidden': false,
+                                        'use_container': false,
+                                        'add_variables': false,
+                                        'add_widgets': false,
+                                        'no_display': false,
+                                        'translator': {},
+                                        'width' : '98%',
+                                        'height' : '500px',
+                                        'encode_directives': true,
+
+                                        strict_loading_mode : true,
+                                        verify_html : true,
+                                        cleanup : true,
+
+                                        'plugins': []
+                                    });
+
+                                    tinyMceEnabled && Event.observe(window, "load", wysiwygtext.setup.bind(wysiwygtext, "exact"));
+                                    editorFormValidationHandler = wysiwygtext.onFormValidation.bind(wysiwygtext);
+                                    Event.observe("toggletext", "click", wysiwygtext.toggle.bind(wysiwygtext));
+                                    varienGlobalEvents.attachEventHandler("formSubmit", editorFormValidationHandler);
+                                    varienGlobalEvents.attachEventHandler("tinymceBeforeSetContent", wysiwygtext.beforeSetContent.bind(wysiwygtext));
+                                    varienGlobalEvents.attachEventHandler("tinymceSaveContent", wysiwygtext.saveContent.bind(wysiwygtext));
+                                    varienGlobalEvents.attachEventHandler("open_browser_callback", wysiwygtext.openFileBrowser.bind(wysiwygtext));
+                                <?php else: ?>
+                                    wysiwygtext = {
+                                        isEnabled : function()
+                                        {
+                                            return false;
+                                        }
+                                    }
+                                <?php endif; ?>
+                                //]]>
+                            </script>
+                        </td>
+                    </tr>
+
+                    <tr class="c-custom_description_tr">
+                        <td class="label"></td>
+                        <td class="value">
+
+                            <div class="entry-edit-head" style="background: #D6D6D6;">
+                                <h4 class="icon-head head-edit-form fieldset-legend" style="color: #EA7601;"><?php echo Mage::helper('M2ePro')->__('Custom Description Inserts'); ?></h4>
+                            </div>
+
+                            <div class="fieldset">
+                                <div class="hor-scroll">
+                                    <table cellspacing="0" class="form-list">
+                                        <tr>
+                                            <td class="label">
+                                                <label for="select_attributes_span"><?php echo Mage::helper('M2ePro')->__('Product Attribute');?>:</label>
+                                            </td>
+                                            <td class="value">
+                                                <span id="select_attributes_span"></span>
+                                                &nbsp;
+                                                <?php echo $this->getChildHtml('add_product_attribute_button'); ?>
+                                                <p class="note">
+                                                    <span><?php echo Mage::helper('M2ePro')->__('Attributes related to the previously chosen Attribute Set.'); ?></span>
+                                                </p>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="label">
+                                                <label><?php echo Mage::helper('M2ePro')->__('Product Image(s)');?>:</label>
+                                            </td>
+                                            <td class="value">
+                                                <?php echo $this->getChildHtml('insert_image_window_button'); ?>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <script type="text/m2e-template-html" id="image_insertion">
+                                <div class="hor-scroll" style="padding-top: 15px;">
+
+                                    <table cellspacing="0" class="form-list">
+
+                                        <tr>
+                                            <td class="label">
+                                                <label for="select_attributes_image"><?php echo Mage::helper('M2ePro')->__('Add Image(s)');?></label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="select_attributes_image" style="width: 200px;">
+                                                    <option value="image" selected="selected"><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
+                                                    <option value="media_gallery"><?php echo Mage::helper('M2ePro')->__('Product Images'); ?></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="all-products-images" style="display: none;">
+                                            <td class="label">
+                                                <label for="select_attributes_image_count"><?php echo Mage::helper('M2ePro')->__('Quantity');?></label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="select_attributes_image_count" style="width: 200px;">
+                                                    <option value="0"><?php echo Mage::helper('M2ePro')->__('All'); ?></option>
+                                                    <?php for ($i = 1; $i <= 20; $i++):?>
+                                                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                    <?php endfor; ?>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="all-products-images" style="display: none;">
+                                            <td class="label">
+                                                <label for="display_products_images"><?php echo Mage::helper('M2ePro')->__('Displaying Images'); ?></label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="display_products_images" style="width: 200px;">
+                                                    <option value="custom_settings"><?php echo Mage::helper('M2ePro')->__('Custom Settings'); ?></option>
+                                                    <option value="gallery_view"><?php echo Mage::helper('M2ePro')->__('Gallery View'); ?></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="label">
+                                                <label for="image_width_mode">
+                                                    <span class="products-images-custom-settings"><?php echo Mage::helper('M2ePro')->__('Image(s) Width'); ?></span>
+                                                    <span class="products-images-gallery-view" style="display: none;"><?php echo Mage::helper('M2ePro')->__('Main Image Width'); ?></span>
+                                                </label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="image_width_mode" style="width: 200px;">
+                                                    <option value="0"><?php echo Mage::helper('M2ePro')->__('Original'); ?></option>
+                                                    <option value="1"><?php echo Mage::helper('M2ePro')->__('Custom'); ?></option>
+                                                </select>
+                                                <span id="image_width_span" style="display: none;"><input id="image_width" type="text" class="input-text-small" /> px</span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="label">
+                                                <label for="image_height_mode">
+                                                    <span class="products-images-custom-settings"><?php echo Mage::helper('M2ePro')->__('Image(s) Height');?></span>
+                                                    <span class="products-images-gallery-view" style="display: none;"><?php echo Mage::helper('M2ePro')->__('Main Image Height'); ?></span>
+                                                </label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="image_height_mode" style="width: 200px;">
+                                                    <option value="0"><?php echo Mage::helper('M2ePro')->__('Original'); ?></option>
+                                                    <option value="1"><?php echo Mage::helper('M2ePro')->__('Custom'); ?></option>
+                                                </select>
+                                                <span id="image_height_span" style="display: none;"><input id="image_height" type="text" class="input-text-small" /> px</span>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="products-images-custom-settings">
+                                            <td class="label">
+                                                <label for="image_margin_mode"><?php echo Mage::helper('M2ePro')->__('Image(s) Margin');?></label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="image_margin_mode" style="width: 200px;">
+                                                    <option value="0"><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                                    <option value="1"><?php echo Mage::helper('M2ePro')->__('Custom'); ?></option>
+                                                </select>
+                                                <span id="image_margin_span" style="display: none;"><input id="image_margin" type="text" class="input-text-small" /> px</span>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="all-products-images" style="display: none;">
+                                            <td class="label">
+                                                <label for="select_attributes_image_layout"><?php echo Mage::helper('M2ePro')->__('Images Layout');?></label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="select_attributes_image_layout" style="width: 200px;">
+                                                    <option value="row"><?php echo Mage::helper('M2ePro')->__('Horizontal'); ?></option>
+                                                    <option value="column"><?php echo Mage::helper('M2ePro')->__('Vertical'); ?></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="products-images-gallery-view" style="display: none;">
+                                            <td class="label">
+                                                <label for="gallery_hint_text"><?php echo Mage::helper('M2ePro')->__('Gallery Hint'); ?></label>
+                                            </td>
+                                            <td class="value">
+                                                <textarea id="gallery_hint_text" style="width: 195px; height: 30px;"><?php echo Mage::helper('M2ePro')->__('Click on the image below to get zoomed view of the item'); ?></textarea>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="products-images-custom-settings">
+                                            <td class="label">
+                                                <label for="image_linked_mode"><?php echo Mage::helper('M2ePro')->__('Open original size image<br/> in a new  window');?></label>
+                                            </td>
+                                            <td class="value">
+                                                <select id="image_linked_mode" style="width: 200px;">
+                                                    <option value="0"><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                                    <option value="1"><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                                                </select>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="label"></td>
+                                            <td class="value">
+                                                <p class="note">
+                                                    <span><?php echo Mage::helper('M2ePro')->__('Choose configuration how the image(s) should be displayed and press the <i>Insert</i> button. Image\'s tag will be added to the end of the text.'); ?></span>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label"></td>
+                                            <td class="value">
+                                                <?php echo $this->getChildHtml('insert_gallery_button'); ?>
+                                            </td>
+                                        </tr>
+
+                                    </table>
+
+                                </div>
+                            </script>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</form>

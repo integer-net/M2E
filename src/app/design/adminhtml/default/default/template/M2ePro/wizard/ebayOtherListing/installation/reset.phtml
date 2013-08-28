@@ -1,0 +1,46 @@
+<div id="block_notice_wizard_installation_step_reset" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Reimport 3rd Party Listings'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes" style="display:none;">
+    <div>
+        <div class="step_container_description">
+            <?php echo Mage::helper('M2ePro')->__('In the previous versions we have following limitations of the 3rd Party Listings importing:<br/>
+            <ul class="list">
+                <li> The 3rd Party Listings are imported only for the last four months.</li>
+                <li> The quantity of imported 3rd Party Listings at the first time cannot exceed 2000.</li>
+            </ul>
+            In current version there are no such limitations. Auto map settings will be also applied during re-importing process.
+            <br/>So it is recommended to run import process for 3rd party listings again (for that click on the Re-Import button).'); ?>
+        </div>
+        <div class="step_container_completed">
+            <span class="step_completed" style="display:none;"><?php echo Mage::helper('M2ePro')->__('Completed'); ?></span>
+        </div>
+        <div class="step_container_incomplete">
+            <span class="step_incomplete" style="display:none;"><?php echo Mage::helper('M2ePro')->__('Incomplete'); ?></span>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <div class="step_container_buttons">
+        <?php echo $this->getChildHtml('yes'); ?>
+        <?php echo $this->getChildHtml('no'); ?>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    WizardHandlerObj.addStep('reset', 'block_notice_wizard_installation_step_reset');
+
+    Event.observe(window, 'load', function() {
+        $('reset_yes_button').observe('click',function() {
+            new Ajax.Request('<?php echo $this->resetUrl; ?>',{
+                method: 'get',
+                onSuccess: function() {
+                    WizardHandlerObj.setStatus(WizardHandlerObj.STATUS_COMPLETED,function() {
+                    WizardHandlerObj.renderStep('reset');
+                    WizardHandlerObj.setStep(null,function() {
+                        $('wizard_ebayOtherListing_complete').show();
+                    })
+                })
+                }
+            });
+        });
+    });
+
+</script>

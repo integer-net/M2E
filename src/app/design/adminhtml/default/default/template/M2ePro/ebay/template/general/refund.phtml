@@ -1,0 +1,112 @@
+<div id="block_notice_ebay_template_general_return" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Return Policy'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('Sellers are obliged to specify a return policy when listing an item on eBay.
+    Even if the policy is do not accept returns, buyers should know this before bidding or buying.<br/>
+    It is recommended to accept and specify a clear return policy, as it can give buyers confidence to bid or buy and
+    prevent problems after the sale.<br/><br/>
+    <b>Note:</b> Return Policy settings may vary depending on the marketplaces and categories.'); ?>
+</div>
+
+<?php
+    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+    $defaults = array(
+        'refund_accepted' => 'ReturnsNotAccepted',
+        'refund_option' => '',
+        'refund_within' => '',
+        'refund_shippingcost' => '',
+        'refund_restockingfee' => '',
+        'refund_description' => ''
+    );
+    $formData = array_merge($defaults, $formData);
+
+    $isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.formData.refund_accepted     = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['refund_accepted']); ?>';
+    M2ePro.formData.refund_option       = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['refund_option']); ?>';
+    M2ePro.formData.refund_within       = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['refund_within']); ?>';
+    M2ePro.formData.refund_shippingcost = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['refund_shippingcost']); ?>';
+    M2ePro.formData.refund_restockingfee = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['refund_restockingfee']); ?>';
+
+    Event.observe(window, 'load', function() {
+        $('ebayTemplateGeneralEditTabs_refund').observe('click', EbayTemplateGeneralTabHandlerObj.checkMarketplaceSelection);
+        $('refund_accepted').observe('change', EbayTemplateGeneralHandlerObj.refund_accepted_change);
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_ebay_template_general_refund_return_policy">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Return Policy'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr class="refund">
+                    <td class="label">
+                        <label for="refund_accepted"><?php echo Mage::helper('M2ePro')->__('Return Policy'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="refund_accepted" name="refund_accepted" class="required-entry"></select>
+                    </td>
+                </tr>
+
+                <tr id="refund_option_tr" class="refund refund-accepted">
+                    <td class="label">
+                        <label for="refund_option"><?php echo Mage::helper('M2ePro')->__('Refund Will Be Given As'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="refund_option" name="refund_option"></select>
+                    </td>
+                </tr>
+
+                <tr id="refund_within_tr" class="refund refund-accepted">
+                    <td class="label">
+                        <label for="refund_within"><?php echo Mage::helper('M2ePro')->__('Item Must Be Returned Within'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="refund_within" name="refund_within"></select>
+                    </td>
+                </tr>
+
+                <tr id="refund_shippingcost_tr" class="refund refund-accepted">
+                    <td class="label">
+                        <label for="refund_shippingcost"><?php echo Mage::helper('M2ePro')->__('Return Shipping Will Be Paid By'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="refund_shippingcost" name="refund_shippingcost"></select>
+                    </td>
+                </tr>
+
+                <tr id="refund_restockingfee_tr" class="refund refund-accepted">
+                    <td class="label">
+                        <label for="refund_restockingfee"><?php echo Mage::helper('M2ePro')->__('Restocking Fee Value'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="refund_restockingfee" name="refund_restockingfee"></select>
+                    </td>
+                </tr>
+
+                <tr id="refund_description_tr" class="refund refund-accepted">
+                    <td class="label">
+                        <label for="refund_description"><?php echo Mage::helper('M2ePro')->__('Refund Description'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <textarea id="refund_description" name="refund_description" class="input-text" style="width: 600px; height: 250px;"><?php echo Mage::helper('M2ePro')->escapeHtml($formData['refund_description']); ?></textarea>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,9 @@
+src/app/code/community/AwHh/*                           app/code/community/AwHh/
+src/app/design/adminhtml/default/default/layout/*       app/design/adminhtml/default/default/layout/
+src/app/design/adminhtml/default/default/template/*     app/design/adminhtml/default/default/template/
+src/app/design/frontend/base/default/layout/*           app/design/frontend/base/default/layout/
+src/app/design/frontend/base/default/template/*         app/design/frontend/base/default/template/
+src/app/etc/modules/*                                   app/etc/modules/
+src/app/locale/de_DE/*                                  app/locale/de_DE/
+src/app/locale/en_US/*                                  app/locale/en_US/
+src/js/aw/*                                             js/aw/*

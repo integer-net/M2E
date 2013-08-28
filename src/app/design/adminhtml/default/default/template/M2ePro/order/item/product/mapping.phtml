@@ -1,0 +1,64 @@
+<style type="text/css">
+    #orderItemProductMappingGrid table td, #orderItemProductMappingGrid table th {
+        padding: 5px;
+    }
+
+    #orderItemProductMappingGrid td.label {
+        width: 100px;
+    }
+
+    #orderItemProductMappingGrid label {
+        width: 100px;
+    }
+</style>
+
+<div id="mapping_pop_up_content">
+
+    <div class="hor-scroll" style="padding-top: 15px; ">
+
+        <div id="order_item_product_mapping_pop_up_help" class="" title="<?php echo Mage::helper('M2ePro')->__('Order Item Mapping'); ?>" style="padding-top: 10px;">
+            <?php
+                echo Mage::helper('M2ePro')->__('As M2E Pro was not able to find appropriate product in Magento Catalog, you are supposed to find and map it manualy.
+                <br/><br/><b>Note:</b> Magento Order can be only created when all products of eBay Order are found in Magento Catalog.');
+            ?>
+        </div>
+
+        <div style="float:left; padding: 10px; border: 1px solid #CDDDDD !important; background: none repeat scroll 0 0 #E7EFEF !important" >
+            <label for="product_id"><?php echo Mage::helper('M2ePro')->__('Enter Product ID'); ?></label>
+            <input id="product_id" type="text" name="product_id" class="input-text" style="margin: 0 10px 0 10px; width: 75px" />
+
+            <input id="order_item_id" type="hidden" name="order_item_id" />
+
+            <label for="sku"><?php echo Mage::helper('M2ePro')->__('Or SKU'); ?></label>
+            <input id="sku" type="text" name="sku" class="input-text" style="margin: 0 20px 0 10px" />
+
+            <?php echo $this->getChildHtml('product_mapping_submit_button'); ?>
+        </div>
+
+        <div style="clear: both; padding-top: 10px">
+            <?php echo $this->getChildHtml('product_mapping_advanced_search_button'); ?>
+        </div>
+
+        <div id="help_grid" style="margin: 0 auto; padding-top: 10px; display: none;">
+            <?php echo $this->getChildHtml('product_mapping_grid') ?>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    ModuleNoticeObj.observeModulePrepareStart($('order_item_product_mapping_pop_up_help'));
+
+    if (OrderEditItemHandlerObj && OrderEditItemHandlerObj.popUp) {
+        setTimeout(function() { OrderEditItemHandlerObj.popUp.updateHeight(); }, 50);
+    }
+
+    $('product_id').observe('keypress', function(event) {
+        event.keyCode == Event.KEY_RETURN && OrderEditItemHandlerObj.assignProduct();
+    });
+    $('sku').observe('keypress', function(event) {
+        event.keyCode == Event.KEY_RETURN && OrderEditItemHandlerObj.assignProduct();
+    });
+
+</script>

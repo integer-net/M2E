@@ -1,0 +1,186 @@
+<?php
+    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data') : array();
+
+    $defaults = array(
+        'store_id' => 0,
+        'source_products' => Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CUSTOM,
+        'categories_add_action' => Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_NONE,
+        'categories_delete_action' => Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_NONE,
+        'hide_products_others_listings' => Ess_M2ePro_Model_Listing::HIDE_PRODUCTS_OTHERS_LISTINGS_NO
+    );
+    $formData = array_merge($defaults, $formData);
+
+    if (!isset($formData['id'])) {
+        $blockStoreSwitcher = $this->getLayout()->createBlock('M2ePro/adminhtml_storeSwitcher', '', array('id'=>'store_id','selected' => $formData['store_id']));
+        $this->setChild('store_id', $blockStoreSwitcher);
+    } else {
+        $storeModel = Mage::getModel('core/store')->load($formData['store_id']);
+        $formData['store_name'] = $storeModel->getWebsite()->getName();
+        if (strtolower($formData['store_name']) != 'admin') {
+            $formData['store_name'] .= ' -> '.$storeModel->getGroup()->getName();
+            $formData['store_name'] .= ' -> '.$storeModel->getName();
+        } else {
+            $formData['store_name'] = Mage::helper('M2ePro')->__('Admin (Default Values)');
+        }
+    }
+
+    $isEdit = (bool)$this->getRequest()->getParam('id');
+?>
+
+<?php if (!$isEdit) { ?>
+    <div id="block_notice_amazon_listing_filter" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Products Filter'); ?>">
+        <?php echo Mage::helper('M2ePro')->__('The Products Filter block allows you to filter the products, which you would like to add to the Listing. Filtered Products will be displayed on the next page, after the Next button is pressed.'); ?>
+    </div>
+<?php } ?>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.customData = {};
+        M2ePro.text = {};
+    }
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_amazon_listing_edit_source_products">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Products Filter'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="store_id"><?php echo Mage::helper('M2ePro')->__('Store View'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <?php if (!$isEdit) { ?>
+                        <?php echo $this->getChildHtml('store_id'); ?>
+                        <?php } else { ?>
+                        <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
+                                <span style="display: block; padding: 4px 0 0;">
+                            <?php } ?>
+
+                        <strong><?php echo $formData['store_name']; ?></strong>
+
+                        <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
+                                </span>
+                            <?php } ?>
+                        <?php } ?>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__("Store View the items' information has to be taken from."); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="source_products"><?php echo Mage::helper('M2ePro')->__('Select from'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="source_products" name="source_products" <?php if ($isEdit): ?> disabled="disabled"<?php endif ?> class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CUSTOM; ?>"<?php if (Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CUSTOM == $formData['source_products']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Products List'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CATEGORIES; ?>"<?php if (Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CATEGORIES == $formData['source_products']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Categories'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Modes of the products selection.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="hide_products_others_listings"><?php echo Mage::helper('M2ePro')->__('Products Presented in Other Listings'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="hide_products_others_listings" name="hide_products_others_listings" class="required-entry" <?php if ($isEdit): ?> disabled="disabled"<?php endif ?>>
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::HIDE_PRODUCTS_OTHERS_LISTINGS_NO; ?>"<?php if (Ess_M2ePro_Model_Listing::HIDE_PRODUCTS_OTHERS_LISTINGS_NO == $formData['hide_products_others_listings']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Show'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::HIDE_PRODUCTS_OTHERS_LISTINGS_YES; ?>"<?php if (Ess_M2ePro_Model_Listing::HIDE_PRODUCTS_OTHERS_LISTINGS_YES == $formData['hide_products_others_listings']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Do Not Show'); ?></option>
+                        </select>
+                        <p class="note"></p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<?php if ($isEdit) : ?>
+<div class="entry-edit" id="magento_block_amazon_listings_edit_categories_product_actions" <?php if ($formData['source_products'] == Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CUSTOM) echo ' style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Actions On Categories\' Products'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tbody>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Selected Categories'); ?>: </label>
+                    </td>
+                    <td class="value">
+                        <?php echo $this->getChildHtml('categoriesTree'); ?>
+                    </td>
+                </tr>
+
+                <tr id="categories_add_action_container">
+                    <td class="label">
+                        <label for="categories_add_action"><?php echo Mage::helper('M2ePro')->__('New Product Added to Category'); ?>: <span class="required" style="float: right;">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="categories_add_action" name="categories_add_action" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_NONE; ?>"<?php if (Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_NONE == $formData['categories_add_action']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No Action'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_ADD; ?>"<?php if (Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_ADD == $formData['categories_add_action']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Add to The Listing'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_ADD_LIST; ?>"<?php if (Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_ADD_LIST == $formData['categories_add_action']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Add to The Listing And List on Amazon'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Actions, which have to be done on products added on categories.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="categories_delete_action_container">
+                    <td class="label">
+                        <label for="categories_delete_action"><?php echo Mage::helper('M2ePro')->__('Product Deleted from Category'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="categories_delete_action" name="categories_delete_action" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_NONE; ?>"<?php if (Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_NONE == $formData['categories_delete_action']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No Action'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_STOP; ?>"<?php if (Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_STOP == $formData['categories_delete_action']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Stop on Amazon'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_STOP_REMOVE; ?>"<?php if (Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_STOP_REMOVE == $formData['categories_delete_action']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Stop on Amazon and Delete from Listing'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Actions, which have to be done on listed products deleted from categories.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<input type="hidden" value="" name="selected_categories" id="selected_categories" />
+<?php endif; ?>

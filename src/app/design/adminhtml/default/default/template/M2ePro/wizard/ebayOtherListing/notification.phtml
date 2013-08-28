@@ -1,0 +1,31 @@
+<?php
+
+$version = Mage::helper('M2ePro/Module')->getVersion();
+$skipWizardLink = $this->getUrl("*/adminhtml_wizard_ebayOtherListing/skip");
+$startWizardLink = $this->getUrl("*/adminhtml_wizard_ebayOtherListing");
+
+?>
+
+<div class="wizard-note">
+
+    <a class="wizard-close" href="javascript:void(0);" onclick="WizardHandlerObj.skip('<?php echo $skipWizardLink; ?>');" title="<?php echo Mage::helper('M2ePro')->__('Skip Wizard') ?>">&times;</a>
+
+    <div>
+        <?php
+
+        echo Mage::helper('M2ePro')->__(
+            'New <strong>3rd Party Listings</strong> functionality was added to this version. Now you can manage your existing listings (not listed by M2E Pro) from the 3rd Party Listings grid.
+            <br/><br/>
+            Please complete the Configuration Wizard (see the link below) steps to quickly set up settings for auto and manual synchronization of the 3rd Party Listings.
+            <br/><br/>
+            Click to
+            <a href="%s">Start Configuration</a> or
+            <a href="%s">Skip</a> the Wizard.<br />',
+            $startWizardLink,
+            $skipWizardLink
+        );
+
+        ?>
+    </div>
+
+</div>

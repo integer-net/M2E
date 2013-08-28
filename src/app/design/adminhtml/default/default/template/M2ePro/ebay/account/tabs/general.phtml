@@ -1,0 +1,224 @@
+<div id="block_notice_ebay_accounts_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('There is a possibility of adding eBay account in Production (Live eBay) or Sandbox (Test eBay) mode.<br/><br/>
+    <b>Note:</b> You cannot use your Production eBay account for the Sandbox environment and vice versa. To register the Sandbox account go to <a href="http://www.developer.ebay.com" target="_blank">www.developer.ebay.com</a><br/>
+    <br/>After completing the required information in General block, press the <span style="text-decoration: underline;">Get Token</span> button. You will be redirected to the eBay website. Sign-in and press <i>I Agree</i> to allow your eBay account connect to the M2E Pro.
+    <br/><br/>If Token has been successfully accepted, Activated status will turn to <i>Yes</i>. Do NOT leave the tab yet. Press <span style="text-decoration: underline;">Save And Continue Edit</span>.
+    <br/>After saving you will see the 3rd Party Listings block and additional setting tabs under Configuration in the left side menu. <br/>'); ?>
+</div>
+
+<?php
+    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+
+    $helper = Mage::helper('M2ePro');
+
+    $temp = $helper->getSessionValue('get_token_account_title', true);
+    !is_null($temp) && $formData['title'] = $temp;
+
+    $temp = $helper->getSessionValue('get_token_account_mode', true);
+    !is_null($temp) && $formData['mode'] = $temp;
+
+    $temp = $helper->getSessionValue('get_token_account_token_session', true);
+    !is_null($temp) && $formData['token_session'] = $temp;
+
+    $defaults = array(
+        'title' => '',
+        'mode' => Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION,
+        'token_session' => '',
+        'token_expired_date' => '',
+        'other_listings_synchronization' => Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES
+    );
+    $formData = array_merge($defaults, $formData);
+
+    $isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.url.formSubmit = '<?php echo $this->getUrl('*/*/save', array('id' => $this->getRequest()->getParam('id'))); ?>';
+    M2ePro.url.deleteAction = '<?php echo $this->getUrl('*/adminhtml_account/delete', array('id' => $this->getRequest()->getParam('id'))); ?>';
+
+    M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
+
+    M2ePro.text.account_delete_alert = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.')) ?>';
+
+    Event.observe(window, 'load', function() {
+        EbayAccountHandlerObj = new EbayAccountHandler();
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+    });
+    //-----------------------------
+
+</script>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.url.getToken = '<?php echo $this->getUrl('*/*/beforeGetToken'); ?>';
+
+    M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';
+    M2ePro.formData.mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['mode']); ?>';
+    M2ePro.formData.token_session = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['token_session']); ?>';
+    M2ePro.formData.token_expired_date = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['token_expired_date']); ?>';
+
+    M2ePro.text.title_not_unique_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified title is already used for other account. Account title must be unique.')); ?>';
+    M2ePro.text.get_token_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('You must get token.')); ?>';
+
+    Event.observe(window, 'load', function() {
+
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_ebay_accounts_general_general">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="title"><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="title" name="title" value="<?php echo $this->escapeHtml($formData['title']); ?>" type="text" class="input-text required-entry M2ePro-account-title" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Title or identifier of eBay account for your internal use.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="mode"><?php echo Mage::helper('M2ePro')->__('Mode'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select <?php if($formData['token_session'] != ''): ?>disabled="disabled"<?php else: ?>id="mode" name="mode"<?php endif; ?> class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION; ?>" <?php if ($formData['mode'] == Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Production (Live eBay)'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX; ?>" <?php if ($formData['mode'] == Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX ): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Sandbox (Test eBay)'); ?></option>
+                        </select>
+                        <?php if($formData['token_session'] != ''): ?>
+                            <input id="mode" name="mode" value="<?php echo $formData['mode']; ?>" type="hidden" class="required-entry" />
+                        <?php endif; ?>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Environment of eBay account.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_ebay_accounts_general_token">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Token'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Grant Access'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <?php echo $this->getChildHtml('get_token_button'); ?>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('The  operation of getting token is limited to 5 minutes by eBay. If you exceed it, you should start getting token again.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="token_session"><?php echo Mage::helper('M2ePro')->__('Activated'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <div><?php if($formData['token_session'] != '') echo Mage::helper('M2ePro')->__('Yes'); else echo Mage::helper('M2ePro')->__('No'); ?></div>
+                        <input id="token_session" name="token_session" value="<?php echo $formData['token_session']; ?>" type="hidden" class="M2ePro-account-token-session" />
+                    </td>
+                </tr>
+
+                <tr <?php if($formData['token_session'] == '' || $formData['token_expired_date'] == ''): ?>style="display: none;"<?php endif; ?>>
+                    <td class="label">
+                        <label for="token_expired_date"><?php echo Mage::helper('M2ePro')->__('Expiration Date'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <div><?php echo $formData['token_expired_date']; ?></div>
+                        <input id="token_expired_date" name="token_expired_date" value="<?php echo $formData['token_expired_date']; ?>" type="hidden" />
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<?php if ($isEdit): ?>
+
+    <?php if ((bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/messages/', 'mode')): ?>
+
+        <div class="entry-edit" id="magento_block_ebay_accounts_general_ebay_messages_receive">
+
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('My Messages Import'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+                <div class="hor-scroll">
+
+                    <div id="block_notice_ebay_accounts_my_messages" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('My Messages'); ?>">
+                        <?php echo Mage::helper('M2ePro')->__('Here you can enable receiving and saving buyers\' messages.<br/><br/>
+                        <b>Note:</b> To allow receiving messages from eBay, My Messages Synchronization should be enabled in eBay > Configuration > Synchronization.'); ?>
+                    </div>
+
+                    <table class="form-list" cellspacing="0" cellpadding="0">
+
+                        <tr>
+                            <td class="label">
+                                <label for="messages_receive"><?php echo Mage::helper('M2ePro')->__('Import My Messages'); ?>:</label>
+                            </td>
+                            <td class="value" style="width: auto;">
+                                <select id="messages_receive" name="messages_receive">
+                                    <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MESSAGES_RECEIVE_YES; ?>" <?php if ($formData['messages_receive'] == Ess_M2ePro_Model_Ebay_Account::MESSAGES_RECEIVE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                                    <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MESSAGES_RECEIVE_NO; ?>" <?php if ($formData['messages_receive'] == Ess_M2ePro_Model_Ebay_Account::MESSAGES_RECEIVE_NO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                </select>
+                                <p class="note">
+                                    <span><?php echo Mage::helper('M2ePro')->__('Allows importing My Messages.'); ?></span>
+                                </p>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+<?php endif; ?>

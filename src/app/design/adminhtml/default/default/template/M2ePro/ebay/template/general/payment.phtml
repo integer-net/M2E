@@ -1,0 +1,119 @@
+<div id="block_notice_ebay_template_general_payment" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Payment'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('You should specify payment method(s) you can offer your buyers.<br/><br/>
+    <b>Note:</b> At least one payment method should be specified.'); ?>
+</div>
+
+<?php
+    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+    $defaults = array(
+        'pay_pal_email_address' => '',
+        'pay_pal_immediate_payment' => 0,
+        'payments' => array()
+    );
+    $formData = array_merge($defaults, $formData);
+
+    $isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.formData.payments = '<?php echo json_encode($formData['payments']); ?>'.evalJSON();
+    M2ePro.text.validate_vat_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Max applicable length is 6 characters, including the decimal (e.g., 12.345).')); ?>';
+    M2ePro.text.validate_payment_method_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Payment method should be specified.')); ?>';
+    M2ePro.text.validate_international_trade_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('PayPal payment method should be specified for Cross Border trade.')); ?>';
+    M2ePro.text.validate_cash_on_delivery_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Cash On Delivery payment method is required.')); ?>';
+
+    Event.observe(window, 'load', function() {
+        $('ebayTemplateGeneralEditTabs_payment').observe('click', EbayTemplateGeneralTabHandlerObj.checkMarketplaceSelection);
+        $('ebayTemplateGeneralEditTabs_payment').observe('click', EbayTemplateGeneralTabHandlerObj.checkCategoriesSelection);
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_ebay_template_general_payment_general">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('PayPal'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('PayPal Accepted'); ?>:</label>
+                    </td>
+                    <td class="value"><label>
+                    <input id="pay_pal_method" name="payments[]" value="PayPal" type="checkbox" onclick="EbayTemplateGeneralHandlerObj.payments_change(this.checked)" class="M2ePro-validate-payment-methods M2ePro-validate-international-trade" <?php if (in_array('PayPal', $formData['payments'])): echo ' checked="checked"'; endif; ?>></label></td>
+                </tr>
+
+                <tr id="paypal_address_tr" style="display: none;">
+                    <td class="label">
+                        <label for="pay_pal_email_address"><?php echo Mage::helper('M2ePro')->__('PayPal Email Address'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <input id="pay_pal_email_address" name="pay_pal_email_address" value="<?php echo $this->escapeHtml($formData['pay_pal_email_address']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Email address for receiving payment.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="immediate_payment_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Require Immediate Payment'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="pay_pal_immediate_payment" name="pay_pal_immediate_payment" value="1" type="checkbox" onclick="EbayTemplateGeneralHandlerObj.immediate_payment_change(this.checked)" <?php if ($formData['pay_pal_immediate_payment']): echo ' checked="checked"'; endif; ?> />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Only applicable to items listed on PayPal-enabled sites in categories that support immediate payment, when a seller has a Premier or Business PayPal account.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_ebay_template_general_payment_additional">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Additional Payment Methods'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <div id="payment_notice_select_category" class="payment-notice" style="font-weight: bold; display: none;"><?php echo Mage::helper('M2ePro')->__('Please select eBay Category to have access to this section'); ?>.</div>
+            <div id="payment_notice_select_marketplace" class="payment-notice" style="font-weight: bold; display: none;"><?php echo Mage::helper('M2ePro')->__('Please select eBay Category to have access to this section'); ?>.</div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr id="payment_methods_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Payment Methods'); ?>:</label>
+                    </td>
+                    <td id="payment_methods_td" class="value"></td>
+                </tr>
+
+                <tr>
+                    <td class="label"></td>
+                    <td class="value">
+                        <input type="hidden" name="validate_cash_on_delivery" class="M2ePro-validate-cash-on-delivery" />
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
