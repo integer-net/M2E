@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_Order extends Mage_Adminhtml_Block_Widget
@@ -22,7 +22,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_Order extends Mage_Admin
 
     protected function _beforeToHtml()
     {
-        $account = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        $account = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
         $magentoOrdersSettings = $account->getData('magento_orders_settings');
         $magentoOrdersSettings = !empty($magentoOrdersSettings) ? json_decode($magentoOrdersSettings, true) : array();
 

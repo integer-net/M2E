@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Listing_Other_Mapping
@@ -119,29 +119,6 @@ class Ess_M2ePro_Model_Buy_Listing_Other_Mapping
             $logModel = Mage::getModel('M2ePro/Listing_Other_Log');
             $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Buy::NICK);
 
-            //TODO Buy temporarily type simple filter
-            //---------------------------
-            $magentoProduct = Mage::getModel('M2ePro/Magento_Product');
-            $magentoProduct->setProductId($magentoProductId);
-            if ($magentoProduct->isProductWithVariations()) {
-                $messageString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                // ->__('Item was not mapped to %id% Product as this is a multi variations product.');
-                    'Item was not mapped to %id% Product as this is a multi variations product.',
-                    array('!id'=>$magentoProductId)
-                );
-
-                $logModel->addProductMessage($otherListing->getId(),
-                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
-                    NULL,
-                    Ess_M2ePro_Model_Listing_Other_Log::ACTION_MAP_LISTING,
-                    $messageString,
-                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-
-                continue;
-            }
-            //---------------------------
-
             $otherListing->mapProduct($magentoProductId, Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
 
             return true;
@@ -166,7 +143,7 @@ class Ess_M2ePro_Model_Buy_Listing_Other_Mapping
             }
             for($i=0;$i<10;$i++) {
                 if (!isset($this->mappingSettings[(int)$value['priority']+$i])) {
-                    $this->mappingSettings[(string)$value['priority']+$i] = (string)$key;
+                    $this->mappingSettings[(int)$value['priority']+$i] = (string)$key;
                     break;
                 }
             }

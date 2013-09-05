@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Config_Abstract extends Ess_M2ePro_Model_Abstract
@@ -94,6 +94,17 @@ class Ess_M2ePro_Model_Config_Abstract extends Ess_M2ePro_Model_Abstract
     {
         $group = $this->prepareGroup($group);
         return $this->deleteAllValues($group);
+    }
+
+    //----------------------------------------
+
+    public function clear()
+    {
+        $tableName = $this->getResource()->getMainTable();
+        Mage::getSingleton('core/resource')->getConnection('core_write')->delete($tableName);
+
+        $this->_cacheData = array();
+        $this->updatePermanentCacheData();
     }
 
     // ########################################
@@ -348,9 +359,9 @@ class Ess_M2ePro_Model_Config_Abstract extends Ess_M2ePro_Model_Abstract
         }
 
         $key = $this->_ormConfig.'_data';
-        $this->_cacheData = Mage::helper('M2ePro')->getCacheValue($key);
+        $this->_cacheData = Mage::helper('M2ePro/Data_Cache')->getValue($key);
 
-        if ($this->_cacheData === false || Mage::helper('M2ePro/Server')->isDeveloper()) {
+        if ($this->_cacheData === false || Mage::helper('M2ePro/Magento')->isDeveloper()) {
             $this->_cacheData = $this->buildCacheData();
             $this->updatePermanentCacheData();
         }
@@ -383,7 +394,7 @@ class Ess_M2ePro_Model_Config_Abstract extends Ess_M2ePro_Model_Abstract
     private function updatePermanentCacheData()
     {
         $key = $this->_ormConfig.'_data';
-        Mage::helper('M2ePro')->setCacheValue($key,$this->_cacheData,array(),60*60);
+        Mage::helper('M2ePro/Data_Cache')->setValue($key,$this->_cacheData,array(),60*60);
     }
 
     // ########################################

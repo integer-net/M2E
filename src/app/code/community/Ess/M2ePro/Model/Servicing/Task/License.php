@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Servicing_Task_License implements Ess_M2ePro_Model_Servicing_Task
@@ -41,19 +41,19 @@ class Ess_M2ePro_Model_Servicing_Task_License implements Ess_M2ePro_Model_Servic
     private function updateValidationMainData(array $validationData)
     {
         if (isset($validationData['domain'])) {
-            Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                 '/'.Mage::helper('M2ePro/Module')->getName().'/license/','domain',(string)$validationData['domain']
             );
         }
 
         if (isset($validationData['ip'])) {
-            Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                 '/'.Mage::helper('M2ePro/Module')->getName().'/license/','ip',(string)$validationData['ip']
             );
         }
 
         if (isset($validationData['directory'])) {
-            Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                 '/'.Mage::helper('M2ePro/Module')->getName().'/license/','directory',(string)$validationData['directory']
             );
         }
@@ -89,25 +89,25 @@ class Ess_M2ePro_Model_Servicing_Task_License implements Ess_M2ePro_Model_Servic
                                     '/license/'.strtolower($component).'/';
 
             if (isset($componentData['mode'])) {
-                Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                     $componentConfigGroup, 'mode', (int)$componentData['mode']
                 );
             }
 
             if (isset($componentData['status'])) {
-                Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                     $componentConfigGroup, 'status', (int)$componentData['status']
                 );
             }
 
             if (isset($componentData['expiration_date'])) {
-                Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                     $componentConfigGroup, 'expiration_date', (string)$componentData['expiration_date']
                 );
             }
 
             if (isset($componentData['is_free'])) {
-                Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                     $componentConfigGroup, 'is_free', (int)$componentData['is_free']
                 );
             }

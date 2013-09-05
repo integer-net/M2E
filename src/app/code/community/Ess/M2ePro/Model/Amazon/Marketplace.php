@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
@@ -22,12 +22,9 @@ class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Chi
             return true;
         }
 
-        $accounts = Mage::getModel('M2ePro/Amazon_Account')->getCollection()->getItems();
-        foreach ($accounts as $account) {
-            /** @var $account Ess_M2ePro_Model_Amazon_Account */
-            if ($account->isExistMarketplaceItem($this->getId())) {
-                return true;
-            }
+        if (Mage::getModel('M2ePro/Amazon_Account')->getCollection()
+                    ->addFieldToFilter('marketplace_id',$this->getId())->getSize() > 0) {
+            return true;
         }
 
         return false;
@@ -59,6 +56,11 @@ class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Chi
 
         $this->delete();
         return true;
+    }
+
+    public function getCurrency()
+    {
+        return $this->getData('default_currency');
     }
 
     // ########################################
@@ -106,13 +108,13 @@ class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Chi
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
         return parent::delete();
     }
 

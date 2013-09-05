@@ -1,30 +1,44 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Adminhtml_SupportController extends Ess_M2ePro_Controller_Adminhtml_MainController
+class Ess_M2ePro_Adminhtml_SupportController
+    extends Ess_M2ePro_Controller_Adminhtml_BaseController
 {
     //#############################################
 
     protected function _initAction()
     {
         $this->loadLayout()
-             ->_setActiveMenu('m2epro/help')
              ->_title(Mage::helper('M2ePro')->__('M2E Pro'))
-             ->_title(Mage::helper('M2ePro')->__('Help'))
              ->_title(Mage::helper('M2ePro')->__('Support'));
 
         $this->getLayout()->getBlock('head')
-             ->addJs('M2ePro/SupportHandler.js');
+            ->addJs('M2ePro/Configuration/General.js')
+            ->addJs('M2ePro/SupportHandler.js')
+            ->addJs('M2ePro/Plugin/DropDown.js')
+            ->addCss('M2ePro/css/Plugin/DropDown.css');
 
         return $this;
     }
 
-    protected function _isAllowed()
+    public function loadLayout($ids=null, $generateBlocks=true, $generateXml=true)
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro/help/support');
+        $tempResult = parent::loadLayout($ids, $generateBlocks, $generateXml);
+
+        if ($this->getRequest()->getParam('referrer') == Ess_M2ePro_Helper_View_Ebay::NICK) {
+            $tempResult->_setActiveMenu(Ess_M2ePro_Helper_View_Ebay::MENU_ROOT_NODE_NICK);
+            $tempResult->_title(Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel());
+        }
+
+        if ($this->getRequest()->getParam('referrer') == Ess_M2ePro_Helper_View_Common::NICK) {
+            $tempResult->_setActiveMenu(Ess_M2ePro_Helper_View_Common::MENU_ROOT_NODE_NICK);
+            $tempResult->_title(Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel());
+        }
+
+        return $tempResult;
     }
 
     //#############################################
@@ -41,20 +55,27 @@ class Ess_M2ePro_Adminhtml_SupportController extends Ess_M2ePro_Controller_Admin
     public function getResultsHtmlAction()
     {
         $query = $this->getRequest()->getParam('query');
-        $blockData = Mage::getModel('M2ePro/Support')->getUserVoiceData($query);
+        $blockData = Mage::helper('M2ePro/Module_Support_Uservoice')->search($query);
 
         $blockHtml = $this->loadLayout()
                           ->getLayout()
                           ->createBlock('M2ePro/adminhtml_support_results', '', array('user_voice_data' => $blockData))
                           ->toHtml();
+
         $this->getResponse()->setBody($blockHtml);
     }
 
-    //#############################################
+    //--------------------------------------------
 
     public function documentationAction()
     {
-        $url = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/documentation/', 'baseurl');
+        $referrer = $this->getRequest()->getParam('referrer');
+
+        $url = Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl();
+
+        if (isset($referrer) && $referrer == Ess_M2ePro_Helper_View_Common::NICK) {
+            $url = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
+        }
 
         $html = '<iframe src="' .$url . '" width="100%" height="650"></iframe>';
         $this->getResponse()->setBody($html);
@@ -64,7 +85,7 @@ class Ess_M2ePro_Adminhtml_SupportController extends Ess_M2ePro_Controller_Admin
     {
         $url = $this->getRequest()->getParam('url');
         if (is_null($url)) {
-            $url = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/support/knowledge_base/', 'baseurl');
+            $url = Mage::helper('M2ePro/Module_Support')->getKnowledgeBaseUrl();
         } else {
             $url = base64_decode($url);
         }
@@ -82,10 +103,10 @@ class Ess_M2ePro_Adminhtml_SupportController extends Ess_M2ePro_Controller_Admin
         }
 
         $keys = array(
-            'subject',
+            'component',
             'contact_mail',
             'contact_name',
-            'component',
+            'subject',
             'description'
         );
 
@@ -101,10 +122,23 @@ class Ess_M2ePro_Adminhtml_SupportController extends Ess_M2ePro_Controller_Admin
             $data[$key] = $post[$key];
         }
 
-        Mage::getModel('M2ePro/Support')->send($data);
+        Mage::helper('M2ePro/Module_Support_Form')->send($data['component'],
+                                                         $data['contact_mail'],
+                                                         $data['contact_name'],
+                                                         $data['subject'],
+                                                         $data['description']);
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Your message has been successfully sent.'));
         $this->_redirect('*/*/index');
+    }
+
+    //#############################################
+
+    public function migrationNotesAction()
+    {
+        $this->_initAction()
+             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_wizard_migrationToV6_notes'))
+             ->renderLayout();
     }
 
     //#############################################

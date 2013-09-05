@@ -551,12 +551,12 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
 
     public function isWeightCustomValue()
     {
-        return $this->getGtinMode() == self::WEIGHT_MODE_CUSTOM_VALUE;
+        return $this->getWeightMode() == self::WEIGHT_MODE_CUSTOM_VALUE;
     }
 
     public function isWeightCustomAttribute()
     {
-        return $this->getGtinMode() == self::WEIGHT_MODE_CUSTOM_ATTRIBUTE;
+        return $this->getWeightMode() == self::WEIGHT_MODE_CUSTOM_ATTRIBUTE;
     }
 
     public function getWeightSource()

@@ -1,13 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
  * @method Ess_M2ePro_Model_Listing_Product_Variation_Option getParentObject()
-*/
-
+ */
 class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_Model_Component_Child_Play_Abstract
 {
     // ########################################
@@ -39,6 +38,16 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
     }
 
     /**
+     * @return Ess_M2ePro_Model_Play_Listing
+     */
+    public function getPlayListing()
+    {
+        return $this->getListing()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
      * @return Ess_M2ePro_Model_Listing_Product
      */
     public function getListingProduct()
@@ -47,63 +56,21 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
     }
 
     /**
-     * @return Ess_M2ePro_Model_Listing_Product_Variation
-     */
-    public function getListingProductVariation()
-    {
-        return $this->getParentObject()->getListingProductVariation();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Template_General
-     */
-    public function getGeneralTemplate()
-    {
-        return $this->getParentObject()->getGeneralTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
-     */
-    public function getSellingFormatTemplate()
-    {
-        return $this->getParentObject()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getParentObject()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getParentObject()->getSynchronizationTemplate();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Play_Listing
-     */
-    public function getPlayListing()
-    {
-        return $this->getListing()->getChildObject();
-    }
-
-    /**
      * @return Ess_M2ePro_Model_Play_Listing_Product
      */
     public function getPlayListingProduct()
     {
         return $this->getListingProduct()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product_Variation
+     */
+    public function getListingProductVariation()
+    {
+        return $this->getParentObject()->getListingProductVariation();
     }
 
     /**
@@ -117,11 +84,47 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Play_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getPlayGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getGeneralTemplate()->getChildObject();
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Play_Account
+     */
+    public function getPlayAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Play_Marketplace
+     */
+    public function getPlayMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_SellingFormat
+     */
+    public function getSellingFormatTemplate()
+    {
+        return $this->getPlayListingProductVariation()->getSellingFormatTemplate();
     }
 
     /**
@@ -132,12 +135,14 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
         return $this->getSellingFormatTemplate()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Play_Template_Description
+     * @return Ess_M2ePro_Model_Template_Synchronization
      */
-    public function getPlayDescriptionTemplate()
+    public function getSynchronizationTemplate()
     {
-        return $this->getDescriptionTemplate()->getChildObject();
+        return $this->getPlayListingProductVariation()->getSynchronizationTemplate();
     }
 
     /**
@@ -152,13 +157,13 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
 
     public function getSku()
     {
-        $src = $this->getPlayGeneralTemplate()->getSkuSource();
+        $src = $this->getPlayListing()->getSkuSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Play_Template_General::SKU_MODE_PRODUCT_ID) {
+        if ($src['mode'] == Ess_M2ePro_Model_Play_Listing::SKU_MODE_PRODUCT_ID) {
             return (string)$this->getParentObject()->getProductId();
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Play_Template_General::SKU_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Play_Listing::SKU_MODE_CUSTOM_ATTRIBUTE) {
             return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -236,13 +241,13 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                 break;
         }
 
-        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-            if (!$this->getMagentoProduct()->getStockAvailability() ||
-                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
-                // Out of stock or disabled Item? Set QTY = 0
-                $qty = 0;
-            }
-        }
+//        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
+//            if (!$this->getMagentoProduct()->getStockAvailability() ||
+//                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
+//                // Out of stock or disabled Item? Set QTY = 0
+//                $qty = 0;
+//            }
+//        }
 
         $qty < 0 && $qty = 0;
 
@@ -251,7 +256,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
 
     // ########################################
 
-    public function getPrice($src)
+    public function getPrice($src, $currency)
     {
         $price = 0;
 
@@ -259,26 +264,26 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
         if ($this->getListingProduct()->getMagentoProduct()->isConfigurableType()) {
 
             if ($this->getPlaySellingFormatTemplate()->isPriceVariationModeParent()) {
-                $price = $this->getConfigurablePriceParent($src);
+                $price = $this->getConfigurablePriceParent($src, $currency);
             } else {
-                $price = $this->getBaseProductPrice($src);
+                $price = $this->getBaseProductPrice($src, $currency);
             }
 
         // Bundle product
         } else if ($this->getListingProduct()->getMagentoProduct()->isBundleType()) {
 
             if ($this->getPlaySellingFormatTemplate()->isPriceVariationModeParent()) {
-                $price = $this->getBundlePriceParent($src);
+                $price = $this->getBundlePriceParent($src, $currency);
             } else {
-                $price = $this->getBaseProductPrice($src);
+                $price = $this->getBaseProductPrice($src, $currency);
             }
 
         // Simple with custom options
         } else if ($this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-            $price = $this->getSimpleWithCustomOptionsPrice($src);
+            $price = $this->getSimpleWithCustomOptionsPrice($src, $currency);
         // Grouped product
         } else if ($this->getListingProduct()->getMagentoProduct()->isGroupedType()) {
-            $price = $this->getBaseProductPrice($src);
+            $price = $this->getBaseProductPrice($src, $currency);
         }
 
         $price < 0 && $price = 0;
@@ -288,7 +293,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
 
     // ########################################
 
-    protected function getConfigurablePriceParent($src)
+    protected function getConfigurablePriceParent($src, $currency)
     {
         $price = 0;
 
@@ -345,11 +350,13 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                     // Base Price of Main product.
 
                     $basePrice = $this->getPlayListingProduct()->getBaseProductPrice($src['mode'],
-                                                                                    $src['attribute']);
+                                                                                     $src['attribute'],
+                                                                                     $currency);
 
                     $price = ($basePrice * (float)$configurableOption['pricing_value']) / 100;
                 } else {
                     $price = (float)$configurableOption['pricing_value'];
+                    $price = $this->getPlayListing()->convertPriceFromStoreToMarketplace($price,$currency);
                 }
 
                 break 2;
@@ -361,7 +368,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
         return $price;
     }
 
-    protected function getBundlePriceParent($src)
+    protected function getBundlePriceParent($src, $currency)
     {
         $price = 0;
 
@@ -398,11 +405,13 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                     // Base Price of Main product.
 
                     $basePrice = $this->getPlayListingProduct()->getBaseProductPrice($src['mode'],
-                                                                                    $src['attribute']);
+                                                                                     $src['attribute'],
+                                                                                     $currency);
 
                     $price = ($basePrice * (float)$tempOption->getData('selection_price_value')) / 100;
                 } else {
                     $price = (float)$tempOption->getData('selection_price_value');
+                    $price = $this->getPlayListing()->convertPriceFromStoreToMarketplace($price,$currency);
                 }
 
                 break 2;
@@ -414,7 +423,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
         return $price;
     }
 
-    protected function getSimpleWithCustomOptionsPrice($src)
+    protected function getSimpleWithCustomOptionsPrice($src, $currency)
     {
         $price = 0;
 
@@ -462,11 +471,13 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                     switch ($tempOption->getData('price_type')) {
                         case 'percent':
                             $basePrice = $this->getPlayListingProduct()->getBaseProductPrice($src['mode'],
-                                                                                            $src['attribute']);
+                                                                                             $src['attribute'],
+                                                                                             $currency);
                             $price = ($basePrice * (float)$tempOption->getData('price')) / 100;
                             break;
                         case 'fixed':
                             $price = (float)$tempOption->getData('price');
+                            $price = $this->getPlayListing()->convertPriceFromStoreToMarketplace($price,$currency);
                             break;
                     }
                 }
@@ -482,7 +493,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
 
     //-----------------------------------------
 
-    protected function getBaseProductPrice($src)
+    protected function getBaseProductPrice($src, $currency)
     {
         $price = 0;
 
@@ -495,20 +506,17 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
             case Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_SPECIAL:
                 $price = $this->getMagentoProduct()->getSpecialPrice();
                 $price <= 0 && $price = $this->getMagentoProduct()->getPrice();
+                $price = $this->getPlayListing()->convertPriceFromStoreToMarketplace($price,$currency);
                 break;
 
             case Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_ATTRIBUTE:
                 $price = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
                 break;
 
-            case Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_FINAL:
-                $customerGroupId = $this->getPlaySellingFormatTemplate()->getCustomerGroupId();
-                $price = $this->getMagentoProduct()->getFinalPrice($customerGroupId);
-                break;
-
             default:
             case Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_PRODUCT:
                 $price = $this->getMagentoProduct()->getPrice();
+                $price = $this->getPlayListing()->convertPriceFromStoreToMarketplace($price,$currency);
                 break;
         }
 

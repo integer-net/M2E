@@ -1,13 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
  * @method Ess_M2ePro_Model_Listing_Product_Variation_Option getParentObject()
-*/
-
+ */
 class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
     // ########################################
@@ -39,6 +38,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
     }
 
     /**
+     * @return Ess_M2ePro_Model_Amazon_Listing
+     */
+    public function getAmazonListing()
+    {
+        return $this->getListing()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
      * @return Ess_M2ePro_Model_Listing_Product
      */
     public function getListingProduct()
@@ -47,63 +56,21 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
     }
 
     /**
-     * @return Ess_M2ePro_Model_Listing_Product_Variation
-     */
-    public function getListingProductVariation()
-    {
-        return $this->getParentObject()->getListingProductVariation();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Template_General
-     */
-    public function getGeneralTemplate()
-    {
-        return $this->getParentObject()->getGeneralTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
-     */
-    public function getSellingFormatTemplate()
-    {
-        return $this->getParentObject()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getParentObject()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getParentObject()->getSynchronizationTemplate();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Amazon_Listing
-     */
-    public function getAmazonListing()
-    {
-        return $this->getListing()->getChildObject();
-    }
-
-    /**
      * @return Ess_M2ePro_Model_Amazon_Listing_Product
      */
     public function getAmazonListingProduct()
     {
         return $this->getListingProduct()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product_Variation
+     */
+    public function getListingProductVariation()
+    {
+        return $this->getParentObject()->getListingProductVariation();
     }
 
     /**
@@ -117,11 +84,47 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Amazon_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getAmazonGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getGeneralTemplate()->getChildObject();
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Account
+     */
+    public function getAmazonAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Marketplace
+     */
+    public function getAmazonMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_SellingFormat
+     */
+    public function getSellingFormatTemplate()
+    {
+        return $this->getAmazonListingProductVariation()->getSellingFormatTemplate();
     }
 
     /**
@@ -132,12 +135,14 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
         return $this->getSellingFormatTemplate()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Amazon_Template_Description
+     * @return Ess_M2ePro_Model_Template_Synchronization
      */
-    public function getAmazonDescriptionTemplate()
+    public function getSynchronizationTemplate()
     {
-        return $this->getDescriptionTemplate()->getChildObject();
+        return $this->getAmazonListingProductVariation()->getSynchronizationTemplate();
     }
 
     /**
@@ -152,13 +157,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
 
     public function getSku()
     {
-        $src = $this->getAmazonGeneralTemplate()->getSkuSource();
+        $src = $this->getAmazonListing()->getSkuSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_General::SKU_MODE_PRODUCT_ID) {
+        if ($src['mode'] == Ess_M2ePro_Model_Amazon_Listing::SKU_MODE_PRODUCT_ID) {
             return (string)$this->getParentObject()->getProductId();
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_General::SKU_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Amazon_Listing::SKU_MODE_CUSTOM_ATTRIBUTE) {
             return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -236,13 +241,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
                 break;
         }
 
-        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-            if (!$this->getMagentoProduct()->getStockAvailability() ||
-                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
-                // Out of stock or disabled Item? Set QTY = 0
-                $qty = 0;
-            }
-        }
+//        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
+//            if (!$this->getMagentoProduct()->getStockAvailability() ||
+//                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
+//                // Out of stock or disabled Item? Set QTY = 0
+//                $qty = 0;
+//            }
+//        }
 
         $qty < 0 && $qty = 0;
 
@@ -355,6 +360,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
                     $price = ($basePrice * (float)$configurableOption['pricing_value']) / 100;
                 } else {
                     $price = (float)$configurableOption['pricing_value'];
+                    $price = $this->getAmazonListing()->convertPriceFromStoreToMarketplace($price);
                 }
 
                 break 2;
@@ -415,6 +421,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
                     $price = ($basePrice * (float)$tempOption->getData('selection_price_value')) / 100;
                 } else {
                     $price = (float)$tempOption->getData('selection_price_value');
+                    $price = $this->getAmazonListing()->convertPriceFromStoreToMarketplace($price);
                 }
 
                 break 2;
@@ -485,6 +492,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
                             break;
                         case 'fixed':
                             $price = (float)$tempOption->getData('price');
+                            $price = $this->getAmazonListing()->convertPriceFromStoreToMarketplace($price);
                             break;
                     }
                 }
@@ -521,20 +529,17 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
                 if (!$returnSalePrice) {
                     $price <= 0 && $price = $this->getMagentoProduct()->getPrice();
                 }
+                $price = $this->getAmazonListing()->convertPriceFromStoreToMarketplace($price);
                 break;
 
             case Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_ATTRIBUTE:
                 $price = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
                 break;
 
-            case Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_FINAL:
-                $customerGroupId = $this->getAmazonSellingFormatTemplate()->getCustomerGroupId();
-                $price = $this->getMagentoProduct()->getFinalPrice($customerGroupId);
-                break;
-
             default:
             case Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_PRODUCT:
                 $price = $this->getMagentoProduct()->getPrice();
+                $price = $this->getAmazonListing()->convertPriceFromStoreToMarketplace($price);
                 break;
         }
 

@@ -1,12 +1,16 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_Abstract
 {
+    // ########################################
+
     public $isCacheEnabled = false;
+
+    // ########################################
 
     /**
      * @var Ess_M2ePro_Model_Account
@@ -264,9 +268,18 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
             'changed_to_value'=>'value_new',
         );
 
+        $limit = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/settings/product_change/', 'max_count_per_one_time'
+        );
         $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
                              ->select()
-                             ->from(array('pc' => $productsChangesTable),$fields)
+                             ->from($productsChangesTable,'*')
+                             ->order(array('id ASC'))
+                             ->limit($limit);
+
+        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+                             ->select()
+                             ->from(array('pc' => $dbSelect),$fields)
                              ->join(array('lo' => $listingsOthersTable),'`pc`.`product_id` = `lo`.`product_id`','id')
                              ->where('`pc`.`action` = ?',(string)Ess_M2ePro_Model_ProductChange::ACTION_UPDATE)
                              ->where("`pc`.`attribute` IN ('".implode("','",$attributes)."')");
@@ -326,7 +339,7 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
 
     // ########################################
 
-    public static function unmapDeletedProduct($product)
+    public function unmapDeletedProduct($product)
     {
         $productId = $product instanceof Mage_Catalog_Model_Product ?
                         (int)$product->getId() : (int)$product;

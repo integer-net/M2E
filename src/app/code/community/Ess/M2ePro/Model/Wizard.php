@@ -1,14 +1,22 @@
 <?php
 
 /*
-* @copyright  Copyright (c) 2011 by  ESS-UA.
+* @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
-abstract class Ess_M2ePro_Model_Wizard
+class Ess_M2ePro_Model_Wizard extends Ess_M2ePro_Model_Abstract
 {
     // ########################################
 
     protected $steps = array();
+
+    // ########################################
+
+    public function _construct()
+    {
+        parent::_construct();
+        $this->_init('M2ePro/Wizard');
+    }
 
     // ########################################
 

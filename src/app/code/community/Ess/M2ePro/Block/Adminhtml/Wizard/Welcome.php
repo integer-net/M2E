@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Block_Adminhtml_Wizard_Welcome extends Ess_M2ePro_Block_Adminhtml_Wizard_Abstract
@@ -13,12 +13,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Wizard_Welcome extends Ess_M2ePro_Bloc
         // Initialization block
         //------------------------------
         $this->setId('wizard'.$this->getNick().'Welcome');
-        //------------------------------
-
-        // Set header text
-        //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Welcome to M2E Pro - Magento %s Integration!',
-                                                        Mage::helper('M2ePro/Module')->getMenuRootNodeLabel());
         //------------------------------
 
         // Buttons

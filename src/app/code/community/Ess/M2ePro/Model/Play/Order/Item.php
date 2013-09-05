@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -115,13 +115,13 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     public function getVariation()
     {
-        $channelItem = $this->getChannelItem();
+        $playItem = $this->getChannelItem();
 
-        if (is_null($channelItem)) {
+        if (is_null($playItem)) {
             return array();
         }
 
-        return $channelItem->getVariationOptions();
+        return $playItem->getVariationOptions();
     }
 
     // ########################################
@@ -213,7 +213,7 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
         $storeId = $this->getPlayAccount()->getMagentoOrdersListingsOtherStoreId();
         if ($storeId == 0) {
-            $storeId = Mage::helper('M2ePro/Magento')->getDefaultStoreId();
+            $storeId = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
         }
 
         $sku = $this->getSku();
@@ -280,8 +280,8 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
     {
         $params = array(
             'play_order_id'   => $this->getPlayOrderItemId(),
-            'tracking_number' => NULL,
-            'carrier_name'    => NULL
+            'tracking_number' => null,
+            'carrier_name'    => null
         );
 
         if (!empty($trackingDetails['carrier_code'])

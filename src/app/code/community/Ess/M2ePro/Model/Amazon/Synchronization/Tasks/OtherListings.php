@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2ePro_Model_Amazon_Synchronization_Tasks
@@ -110,15 +110,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
 
-            $marketplaces = $accountObj->getChildObject()->getMarketplacesItems();
+            $marketplace = $accountObj->getChildObject()->getMarketplace();
 
-            foreach ($marketplaces as $marketplace) {
-
-                $marketplaceObj = $marketplace['object'];
-
-                if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplaceObj->getId())) {
-                    $this->updateAccountMarketplace($accountObj,$marketplaceObj);
-                }
+            if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplace->getId())) {
+                $this->updateAccountMarketplace($accountObj,$marketplace);
             }
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
@@ -145,7 +140,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
         ));
         // Get all changes on Amazon for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
         $dispatcherObject->processConnector('tasks', 'otherListings' ,'requester',
                                             array(), $marketplaceObj, $accountObj,
                                             'Ess_M2ePro_Model_Amazon_Synchronization');
@@ -171,8 +166,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
     {
         $lastTime = strtotime($this->getCheckLastTime());
 
-        $tempGroup = '/amazon/synchronization/settings/other_listings/';
-        $interval = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'interval');
+        $tempGroup = '/amazon/other_listings/';
+        $interval = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'interval');
 
         $totalItems = (int)Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product')->getSize();
         $totalItems += (int)Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other')->getSize();
@@ -187,8 +182,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
 
     private function getCheckLastTime()
     {
-        $tempGroup = '/amazon/synchronization/settings/other_listings/';
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'last_time');
+        $tempGroup = '/amazon/other_listings/';
+        return Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'last_time');
     }
 
     private function setCheckLastTime($time)
@@ -202,8 +197,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
             $time = strftime('%Y-%m-%d %H:%M:%S', $time);
             date_default_timezone_set($oldTimezone);
         }
-        $tempGroup = '/amazon/synchronization/settings/other_listings/';
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue($tempGroup,'last_time',$time);
+        $tempGroup = '/amazon/other_listings/';
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue($tempGroup,'last_time',$time);
     }
 
     //------------------------------------
@@ -214,8 +209,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
 
-        $tempGroup = '/amazon/synchronization/settings/other_listings/';
-        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getConfig()
+        $tempGroup = '/amazon/other_listings/';
+        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                     ->getGroupValue($tempGroup,'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
@@ -24,6 +24,49 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
     {
         is_string($helperName) && $helperName = '/'.$helperName;
         return Mage::helper('M2ePro'.(string)$helperName);
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @param string $modelName
+     * @param mixed $value
+     * @param null|string $field
+     * @return Ess_M2ePro_Model_Abstract
+     */
+    public function getObject($modelName, $value, $field = NULL)
+    {
+        return $this->getModel($modelName)->loadInstance($value, $field);
+    }
+
+    /**
+     * @param string $modelName
+     * @param mixed $value
+     * @param null|string $field
+     * @param array $tags
+     * @return Ess_M2ePro_Model_Abstract
+     */
+    public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
+    {
+        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+            return $this->getObject($modelName,$value,$field);
+        }
+
+        $cacheKey = strtoupper($modelName.'_data_'.$field.'_'.$value);
+        $cacheData = Mage::helper('M2ePro/Data_Cache')->getValue($cacheKey);
+
+        if ($cacheData !== false) {
+            return $cacheData;
+        }
+
+        $tags[] = $modelName;
+        $tags = array_unique($tags);
+        $tags = array_map('strtolower',$tags);
+
+        $cacheData = $this->getObject($modelName,$value,$field);
+        Mage::helper('M2ePro/Data_Cache')->setValue($cacheKey,$cacheData,$tags,60*60*24);
+
+        return $cacheData;
     }
 
     // ########################################
@@ -121,21 +164,6 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function getClassConstantAsJson($class)
-    {
-        $class = 'Ess_M2ePro_'.$class;
-
-        $reflectionClass = new ReflectionClass($class);
-        $tempConstants = $reflectionClass->getConstants();
-
-        $constants = array();
-        foreach ($tempConstants as $key => $value) {
-            $constants[] = array(strtoupper($key), $value);
-        }
-
-        return json_encode($constants);
-    }
-
     public function convertStringToSku($title)
     {
         $skuVal = strtolower($title);
@@ -180,7 +208,7 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
         return $text;
     }
 
-    public static function arrayReplaceRecursive($base, $replacements)
+    public function arrayReplaceRecursive($base, $replacements)
     {
         foreach (array_slice(func_get_args(), 1) as $replacements) {
 
@@ -222,7 +250,7 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
     public function getBackUrlParam($defaultBackIdOrRoute = 'index',
                                     array $defaultBackParams = array())
     {
-        $requestParams = Mage::helper('M2ePro')->getGlobalValue('request_params');
+        $requestParams = Mage::app()->getRequest()->getParams();
         return isset($requestParams['back'])
             ? $requestParams['back'] : $this->makeBackUrlParam($defaultBackIdOrRoute,$defaultBackParams);
     }
@@ -266,115 +294,101 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
 
-        return Mage::helper('M2ePro/Magento')->getUrl($route,$params);
+        return Mage::helper('adminhtml')->getUrl($route,$params);
     }
 
     // ########################################
 
-    public function getCacheValue($key)
+    public function parsePrice($price, $coefficient = false)
     {
-        $cacheKey = self::CUSTOM_IDENTIFIER.'_'.$key;
-        $value = Mage::app()->getCache()->load($cacheKey);
-        $value !== false && $value = unserialize($value);
-        return $value;
-    }
-
-    public function setCacheValue($key, $value, array $tags = array(), $lifeTime = NULL)
-    {
-        if (is_null($lifeTime) || (int)$lifeTime <= 0) {
-            $lifeTime = 60*60*24*365*5;
+        if (is_string($coefficient)) {
+            $coefficient = trim($coefficient);
         }
 
-        $cacheKey = self::CUSTOM_IDENTIFIER.'_'.$key;
-
-        $preparedTags = array(self::CUSTOM_IDENTIFIER.'_main');
-        foreach ($tags as $tag) {
-            $preparedTags[] = self::CUSTOM_IDENTIFIER.'_'.$tag;
+        if ($price <= 0) {
+            return 0;
         }
 
-        Mage::app()->getCache()->save(serialize($value), $cacheKey, $preparedTags, (int)$lifeTime);
-    }
+        if (!$coefficient) {
+            return round($price, 2);
+        }
 
-    //-----------------------------------------
+        if (strpos($coefficient, '%')) {
+            $coefficient = str_replace('%', '', $coefficient);
 
-    public function removeCacheValue($key)
-    {
-        $cacheKey = self::CUSTOM_IDENTIFIER.'_'.$key;
-        Mage::app()->getCache()->remove($cacheKey);
-    }
-
-    public function removeTagCacheValues($tag)
-    {
-        $mode = Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG;
-        $tags = array(self::CUSTOM_IDENTIFIER.'_'.$tag);
-        Mage::app()->getCache()->clean($mode,$tags);
-    }
-
-    public function removeAllCacheValues()
-    {
-        $this->removeTagCacheValues('main');
-    }
-
-    // ########################################
-
-    public function getSessionValue($key, $clear = false)
-    {
-        return Mage::getSingleton('adminhtml/session')->getData(self::CUSTOM_IDENTIFIER.'_'.$key, $clear);
-    }
-
-    public function setSessionValue($key, $value)
-    {
-        Mage::getSingleton('adminhtml/session')->setData(self::CUSTOM_IDENTIFIER.'_'.$key, $value);
-    }
-
-    public function getAllSessionValues()
-    {
-        $return = array();
-        $session = Mage::getSingleton('adminhtml/session')->getData();
-        foreach ($session as $key => $value) {
-            if (substr($key, 0, strlen(self::CUSTOM_IDENTIFIER)) == self::CUSTOM_IDENTIFIER) {
-                $tempReturnedKey = substr($key, strlen(self::CUSTOM_IDENTIFIER)+1);
-                $return[$tempReturnedKey] = Mage::getSingleton('adminhtml/session')->getData($key);
+            if (preg_match('/^[+-]/', $coefficient)) {
+                return round($price + $price * (float)$coefficient / 100, 2);
             }
+            return round($price * (float)$coefficient / 100, 2);
         }
-        return $return;
-    }
 
-    //-----------------------------------------
-
-    public function removeSessionValue($key)
-    {
-        Mage::getSingleton('adminhtml/session')->getData(self::CUSTOM_IDENTIFIER.'_'.$key, true);
-    }
-
-    public function removeAllSessionValues()
-    {
-        $session = Mage::getSingleton('adminhtml/session')->getData();
-        foreach ($session as $key => $value) {
-            if (substr($key, 0, strlen(self::CUSTOM_IDENTIFIER)) == self::CUSTOM_IDENTIFIER) {
-                Mage::getSingleton('adminhtml/session')->getData($key, true);
-            }
+        if (preg_match('/^[+-]/', $coefficient)) {
+            return round($price + (float)$coefficient, 2);
         }
+
+        return round($price * (float)$coefficient, 2);
     }
 
     // ########################################
 
-    public function getGlobalValue($key)
+    public function getClassConstantAsJson($class)
     {
-        $globalKey = self::CUSTOM_IDENTIFIER.'_'.$key;
-        return Mage::registry($globalKey);
+        if (stripos($class,'Ess_M2ePro_') === false) {
+            throw new Exception('Class name must begin with "Ess_M2ePro"');
+        }
+
+        $reflectionClass = new ReflectionClass($class);
+        $tempConstants = $reflectionClass->getConstants();
+
+        $constants = array();
+        foreach ($tempConstants as $key => $value) {
+            $constants[] = array(strtoupper($key), $value);
+        }
+
+        return json_encode($constants);
     }
 
-    public function setGlobalValue($key, $value)
+    public function getControllerActions($controllerClass, array $params = array())
     {
-        $globalKey = self::CUSTOM_IDENTIFIER.'_'.$key;
-        Mage::register($globalKey,$value,!Mage::helper('M2ePro/Server')->isDeveloper());
+        $controllerClass = Mage::helper('M2ePro/View_Development_Controller')->loadControllerAndGetClassName(
+            $controllerClass
+        );
+
+        $route = str_replace('Ess_M2ePro_','',$controllerClass);
+        $route = preg_replace('/Controller$/','',$route);
+        $route = explode('_',$route);
+
+        foreach ($route as &$part) {
+            $part{0} = strtolower($part{0});
+        }
+        unset($part);
+
+        $route = implode('_',$route) . '/';
+
+        $reflectionClass = new ReflectionClass($controllerClass);
+
+        $actions = array();
+        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+
+            if (!preg_match('/Action$/',$method->name)) {
+                continue;
+            }
+
+            $methodName = preg_replace('/Action$/','',$method->name);
+
+            $actions[$route . $methodName] = Mage::helper('adminhtml')->getUrl('M2ePro/'.$route.$methodName, $params);
+        }
+
+        return $actions;
     }
 
-    public function unsetGlobalValue($key)
+    // ########################################
+
+    public function generateUniqueHash($strParam = NULL, $maxLength = NULL)
     {
-        $globalKey = self::CUSTOM_IDENTIFIER.'_'.$key;
-        Mage::unregister($globalKey);
+        $hash = sha1(rand(1,1000000).microtime(true).(string)$strParam);
+        (int)$maxLength > 0 && $hash = substr($hash,0,(int)$maxLength);
+        return $hash;
     }
 
     // ########################################

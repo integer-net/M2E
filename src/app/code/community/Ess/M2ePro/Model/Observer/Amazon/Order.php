@@ -1,11 +1,13 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Observer_Amazon_Order
 {
+    //####################################
+
     public function revertOrderedQty(Varien_Event_Observer $observer)
     {
         /** @var $magentoOrder Mage_Sales_Model_Order */
@@ -28,4 +30,6 @@ class Ess_M2ePro_Model_Observer_Amazon_Order
             $stockItem->addQty($orderItem->getQtyOrdered())->save();
         }
     }
+
+    //####################################
 }

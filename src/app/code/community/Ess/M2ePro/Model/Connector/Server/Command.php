@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Command extends Ess_M2ePro_Model_Connector_Server_Protocol
@@ -15,7 +15,6 @@ abstract class Ess_M2ePro_Model_Connector_Server_Command extends Ess_M2ePro_Mode
     public function __construct(array $params = array())
     {
         $this->params = $params;
-        parent::__construct();
     }
 
     // ########################################
@@ -34,7 +33,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Command extends Ess_M2ePro_Mode
 
         $parsedResponseData = $this->prepareResponseData($responseData);
 
-        if (Mage::helper('M2ePro/Server')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
             $this->parsedResponseData = $parsedResponseData;
         }
 
@@ -51,7 +50,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Command extends Ess_M2ePro_Mode
 
     public function printDebugData()
     {
-        if (!Mage::helper('M2ePro/Server')->isDeveloper()) {
+        if (!Mage::helper('M2ePro/Magento')->isDeveloper()) {
             return;
         }
 

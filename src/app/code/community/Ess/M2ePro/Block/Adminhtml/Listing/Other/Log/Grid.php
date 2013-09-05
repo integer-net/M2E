@@ -1,22 +1,28 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
+abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
 {
+    protected $viewComponentHelper = NULL;
+
     // ####################################
 
     public function __construct()
     {
         parent::__construct();
 
-        $listingData = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        // Initialize view
+        //------------------------------
+        $view = Mage::helper('M2ePro/View')->getCurrentView();
+        $this->viewComponentHelper = Mage::helper('M2ePro/View')->getComponentHelper($view);
+        //------------------------------
 
         // Initialization block
         //------------------------------
-        $this->setId('listingOtherLogGrid'.(isset($listingData['id'])?$listingData['id']:''));
+        $this->setId($view . 'ListingOtherLogGrid' . $this->getEntityId());
         //------------------------------
 
         // Set default values
@@ -32,13 +38,11 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
 
     protected function _prepareCollection()
     {
-        $listingData = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         // Get collection logs
         //--------------------------------
         $collection = Mage::getModel('M2ePro/Listing_Other_Log')->getCollection();
-//        $collection->getSelect()->where('`main_table`.component_mode = ? OR `main_table`.component_mode IS NULL',
-//            Ess_M2ePro_Helper_Component_Amazon::NICK);
         //--------------------------------
 
         // Join amazon_listings_table
@@ -64,6 +68,14 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
         }
         //--------------------------------
 
+        // prepare components
+        //--------------------------------
+        $components = $this->viewComponentHelper->getActiveComponents();
+        $collection->getSelect()
+            ->where('main_table.component_mode IN(\''.implode('\',\'',$components).'\')
+                        OR main_table.component_mode IS NULL');
+        //--------------------------------
+
         // we need sort by id also, because create_date may be same for some adjacents entries
         //--------------------------------
         if ($this->getRequest()->getParam('sort', 'create_date') == 'create_date') {
@@ -79,8 +91,10 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
 
     protected function _prepareColumns()
     {
+        $columnTitles = $this->getColumnTitles();
+
         $this->addColumn('create_date', array(
-            'header'    => Mage::helper('M2ePro')->__('Creation Date'),
+            'header'    => $columnTitles['create_date'],
             'align'     => 'left',
             'type'      => 'datetime',
             'format'    => Mage::app()->getLocale()->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM),
@@ -89,7 +103,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
             'filter_index' => 'main_table.create_date',
         ));
 
-        if (!isset($listingData['id']) && count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
+        if (!$this->getEntityId() && !$this->viewComponentHelper->isSingleActiveComponent()) {
             $this->addColumn('component_mode', array(
                 'header'         => Mage::helper('M2ePro')->__('Channel'),
                 'align'          => 'right',
@@ -98,12 +112,12 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
                 'index'          => 'component_mode',
                 'filter_index'   => 'main_table.component_mode',
                 'sortable'       => false,
-                'options'        => $this->getComponentModeFilterOptions()
+                'options'        => $this->viewComponentHelper->getActiveComponentsTitles()
             ));
         }
 
         $this->addColumn('identifier', array(
-            'header' => Mage::helper('M2ePro')->__('Identifier'),
+            'header' => $columnTitles['identifier'],
             'align'  => 'left',
             'width'  => '100px',
             'type'   => 'text',
@@ -113,7 +127,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
         ));
 
         $this->addColumn('title', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Name'),
+            'header'    => $columnTitles['title'],
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -123,7 +137,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
         ));
 
         $this->addColumn('action', array(
-            'header'    => Mage::helper('M2ePro')->__('Action'),
+            'header'    => $columnTitles['action'],
             'align'     => 'left',
             'width'     => '250px',
             'type'      => 'options',
@@ -134,7 +148,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
         ));
 
         $this->addColumn('description', array(
-            'header'    => Mage::helper('M2ePro')->__('Description'),
+            'header'    => $columnTitles['description'],
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -144,7 +158,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
         ));
 
         $this->addColumn('initiator', array(
-            'header'=> Mage::helper('M2ePro')->__('Run Mode'),
+            'header'=> $columnTitles['initiator'],
             'width' => '80px',
             'index' => 'initiator',
             'align' => 'right',
@@ -155,7 +169,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
         ));
 
         $this->addColumn('type', array(
-            'header'=> Mage::helper('M2ePro')->__('Type'),
+            'header'=> $columnTitles['type'],
             'width' => '80px',
             'index' => 'type',
             'align' => 'right',
@@ -166,7 +180,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
         ));
 
         $this->addColumn('priority', array(
-            'header'=> Mage::helper('M2ePro')->__('Priority'),
+            'header'=> $columnTitles['priority'],
             'width' => '80px',
             'index' => 'priority',
             'align'     => 'right',
@@ -192,52 +206,51 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
 
     public function callbackColumnIdentifier($value, $row, $column, $isExport)
     {
+        $identifier = Mage::helper('M2ePro')->__('N/A');
+
         if (is_null($value) || $value === '') {
-            return Mage::helper('M2ePro')->__('N/A');
-        } else {
-            if ($row->getData('component_mode') == Ess_M2ePro_Helper_Component_Ebay::NICK) {
-                $url = Mage::helper('M2ePro/Component_Ebay')->getItemUrl($value,
-                                                                         $row->getData('account_mode'),
-                                                                         $row->getData('marketplace_id'));
-
-                return '<a href="' . $url . '" target="_blank">' . $value . '</a>';
-            }
-
-            if ($row->getData('component_mode') == Ess_M2ePro_Helper_Component_Amazon::NICK) {
-
-                $url = Mage::helper('M2ePro/Component_Amazon')->getItemUrl($value,
-                                                                           $row->getData('marketplace_id'));
-
-                return '<a href="' . $url . '" target="_blank">' . $value . '</a>';
-            }
-
-            if ($row->getData('component_mode') == Ess_M2ePro_Helper_Component_Buy::NICK) {
-                $url = Mage::helper('M2ePro/Component_Buy')->getItemUrl($value);
-
-                return '<a href="' . $url . '" target="_blank">' . $value . '</a>';
-            }
-
-            if ($row->getData('component_mode') == Ess_M2ePro_Helper_Component_Play::NICK) {
-
-                return '<p>' . $value . '</p>';
-            }
+            return $identifier;
         }
+
+        $accountMode   = $row->getData('account_mode');
+        $marketplaceId = $row->getData('marketplace_id');
+
+        switch ($row->getData('component_mode')) {
+            case Ess_M2ePro_Helper_Component_Ebay::NICK:
+                $url = Mage::helper('M2ePro/Component_Ebay')->getItemUrl($value, $accountMode, $marketplaceId);
+                $identifier = '<a href="' . $url . '" target="_blank">' . $value . '</a>';
+                break;
+
+            case Ess_M2ePro_Helper_Component_Amazon::NICK:
+                $url = Mage::helper('M2ePro/Component_Amazon')->getItemUrl($value, $marketplaceId);
+                $identifier = '<a href="' . $url . '" target="_blank">' . $value . '</a>';
+                break;
+
+            case Ess_M2ePro_Helper_Component_Buy::NICK:
+                $url = Mage::helper('M2ePro/Component_Buy')->getItemUrl($value);
+                $identifier = '<a href="' . $url . '" target="_blank">' . $value . '</a>';
+                break;
+
+            case Ess_M2ePro_Helper_Component_Play::NICK:
+                $identifier = '<p>' . $value . '</p>';
+                break;
+        }
+
+        return $identifier;
     }
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
         if (is_null($value) || $value === '') {
-            $value = Mage::helper('M2ePro')->__('N/A');
-        } else {
-            $value = Mage::helper('M2ePro')->escapeHtml($value);
-            if (strlen($value) > 60) {
-                $value = substr($value, 0, 60) . '...';
-            }
-
-            $value = '<span>' . $value . '</span>';
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
-        return $value;
+        $value = Mage::helper('M2ePro')->escapeHtml($value);
+        if (strlen($value) > 60) {
+            $value = substr($value, 0, 60) . '...';
+        }
+
+        return '<span>' . $value . '</span>';
     }
 
     // ####################################
@@ -251,6 +264,10 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2ePro_Block
     {
         return false;
     }
+
+    // ####################################
+
+    abstract protected function getColumnTitles();
 
     // ####################################
 }

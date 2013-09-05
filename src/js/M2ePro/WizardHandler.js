@@ -17,7 +17,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     skip : function(url)
     {
-        if (!confirm(M2ePro.text.skip_confirm)) {
+        if (!confirm(M2ePro.translator.translate('Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.'))) {
             return;
         }
 
@@ -33,7 +33,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     setStatus : function(status, callback)
     {
-        new Ajax.Request( M2ePro.url.setStatus,
+        new Ajax.Request( M2ePro.url.get('setStatus') ,
         {
             method: 'get',
             parameters: {
@@ -60,7 +60,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     setStep : function(step, callback)
     {
-        new Ajax.Request( M2ePro.url.setStep,
+        new Ajax.Request( M2ePro.url.get('setStep') ,
         {
             method: 'get',
             parameters: {
@@ -142,7 +142,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
         // Render step subtitle
         //----------------
         var stepNumber = self.steps.nicks.indexOf(step) + 1;
-        var subtitle = '[' + M2ePro.text.step_word + ' ' + stepNumber + ']';
+        var subtitle = '[' + M2ePro.translator.translate('Step') + ' ' + stepNumber + ']';
 
         $(stepContainerId).writeAttribute('subtitle', subtitle);
 
@@ -174,8 +174,8 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
         }
 
         if ((currentStepIndex > stepIndex) ||
-            self.currentStatus == self.STATUS_COMPLETED ||
-            self.currentStatus == self.STATUS_SKIPPED) {
+            self.currentStatus == M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED') ||
+            self.currentStatus == M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED')) {
             $$('#'+stepContainerId+' .step_completed').each(function(obj) {
                 obj.show();
             });
@@ -227,7 +227,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
                     });
                 }
 
-                self.setStatus(self.STATUS_COMPLETED,function() {
+                self.setStatus(M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED'),function() {
                     self.renderStep(step);
                     self.setStep(null,callback)
                 })
@@ -252,7 +252,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
             });
         }
 
-        self.setStatus(self.STATUS_COMPLETED,function() {
+        self.setStatus(M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED'),function() {
             if (typeof callback == 'function') {
                 callback();
             }

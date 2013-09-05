@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults extends Ess_M2ePro_Model_Ebay_Synchronization_Tasks
@@ -16,9 +16,13 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults extends Ess_M2ePro_Mo
     {
         // Check tasks config mode
         //-----------------------------
-        $ulpMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/ebay/synchronization/settings/defaults/update_listings_products/','mode');
-        if (!$ulpMode) {
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+        $configGroup = '/ebay/defaults/';
+
+        $ulpMode = (bool)$config->getGroupValue($configGroup . 'update_listings_products/','mode');
+        $rutMode = (bool)$config->getGroupValue($configGroup . 'remove_unused_templates/','mode');
+
+        if (!$ulpMode && !$rutMode) {
             return false;
         }
         //-----------------------------
@@ -32,6 +36,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults extends Ess_M2ePro_Mo
         //---------------------------
         if ($ulpMode) {
             $tempSynch = new Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProducts();
+            $tempSynch->process();
+        }
+        if ($rutMode) {
+            $tempSynch = new Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_RemoveUnusedTemplates();
             $tempSynch->process();
         }
         //---------------------------

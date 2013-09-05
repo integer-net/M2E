@@ -1,12 +1,15 @@
 EbayMotorSpecificHandler = Class.create();
 EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
+    listingId: null,
+    specificsGridId: null,
+    productsGridId: null,
+
     //----------------------------------
 
-    initialize: function(motorsSpecificsAttribute, specificsGridId, productsGridId)
+    initialize: function(listingId, specificsGridId, productsGridId)
     {
-        this.motorsSpecificsAttribute = motorsSpecificsAttribute;
-
+        this.listingId = listingId;
         this.specificsGridId = specificsGridId;
         this.productsGridId = productsGridId;
     },
@@ -35,13 +38,13 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
                 callOriginal();
 
                 $('attribute_content').value = grid.massaction.getCheckedValues()
-                    .replace(/,/g, self.MOTORS_SPECIFICS_VALUE_SEPARATOR);
+                    .replace(/,/g, M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::MOTORS_SPECIFICS_VALUE_SEPARATOR'));
             }
         );
 
         grid.massaction.apply = function () {
             if (this.getCheckedValues() == '') {
-                alert(M2ePro.text.items_not_selected_error);
+                alert(M2ePro.translator.translate('Please select items.'));
                 return;
             }
 
@@ -74,13 +77,11 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = this;
 
-        new Ajax.Request( M2ePro.url.motorSpecificGrid ,
+        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/motorSpecificGrid') ,
         {
             method: 'post',
             asynchronous : false,
-            parameters : {
-                general_template_id: M2ePro.formData.general_template_id
-            },
+            parameters : {},
             onSuccess: function (transport)
             {
                 var responseText = transport.responseText.replace(/>\s+</g, '><');
@@ -108,17 +109,18 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
         MagentoMessageObj.clearAll();
 
-        if (self.motorsSpecificsAttribute == '') {
-            MagentoMessageObj.addError(M2ePro.text.motors_specifics_attribute_not_selected_error);
+        if (self.hasEmptyAttributes()) {
+            MagentoMessageObj.addError(M2ePro.translator.translate('Please edit categories settings for selected products and select the compatibility attribute.'));
             return;
         }
 
         var isSpecificsGridExists = $(self.specificsGridId) != null;
+
         if (!isSpecificsGridExists) {
             self.loadSpecificsGrid();
         }
 
-        this.popUp = Dialog.info('', {
+        this.popUp = Dialog.info(null, {
             id: this.popUpId,
             draggable: true,
             resizable: true,
@@ -136,9 +138,7 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
             closeCallback: function () { self.closeCallback(); return true; }
         });
 
-        $('modal_dialog_message').insert($(self.popUpBlockId));
-
-        $(self.popUpBlockId).show();
+        $('modal_dialog_message').appendChild($(self.popUpBlockId).show());
 
         if (isSpecificsGridExists) {
             self.initSpecificGrid();
@@ -152,8 +152,7 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
     closeCallback: function()
     {
-        $(document.body).appendChild($(this.popUpBlockId));
-        $(this.popUpBlockId).hide();
+        $(document.body).appendChild($(this.popUpBlockId).hide());
 
         var specificsGrid = window[this.specificsGridId + 'JsObject'];
         specificsGrid.massaction.unselectAll();
@@ -169,18 +168,42 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
+    hasEmptyAttributes: function()
+    {
+        var hasEmpty = true;
+        var productsGrid = window[this.productsGridId + 'JsObject'];
+
+        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/hasEmptyMotorsSpecificsAttributes') ,
+        {
+            method: 'get',
+            asynchronous : false,
+            parameters : {
+                listing_id: this.listingId,
+                listing_product_ids: productsGrid.massaction.getCheckedValues()
+            },
+            onSuccess: function (transport)
+            {
+                hasEmpty = transport.responseText.evalJSON()['has_empty'];
+            }
+        });
+
+        return hasEmpty;
+    },
+
+    //----------------------------------
+
     addSpecificsToProducts: function(overwrite)
     {
         var self = this;
         var specificsGrid = window[this.specificsGridId + 'JsObject'];
         var productsGrid = window[this.productsGridId + 'JsObject'];
 
-        new Ajax.Request( M2ePro.url.updateProductsAttribute ,
+        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/updateMotorsSpecificsAttributes') ,
         {
             method: 'post',
             asynchronous : true,
             parameters : {
-                listing_id: M2ePro.formData.id,
+                listing_id: this.listingId,
                 listing_product_ids: productsGrid.massaction.getCheckedValues(),
                 epids: specificsGrid.massaction.getCheckedValues(),
                 overwrite: overwrite ? 'yes' : 'no'

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -162,6 +162,12 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     // ########################################
 
+    /**
+     * Mark whole order as one that requires user action
+     *
+     * @param $required
+     * @return $this
+     */
     public function setActionRequired($required)
     {
         $this->setData('state', $required ? self::STATE_ACTION_REQUIRED : self::STATE_NORMAL);
@@ -217,6 +223,8 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
     // ---------------------------------------
 
     /**
+     * Check whether the order has only single item ordered
+     *
      * @return bool
      */
     public function isSingle()
@@ -225,6 +233,8 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
     }
 
     /**
+     * Check whether the order has multiple items ordered
+     *
      * @return bool
      */
     public function isCombined()
@@ -234,6 +244,11 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     // ---------------------------------------
 
+    /**
+     * Get instances of the channel items (Ebay_Item, Amazon_Item etc)
+     *
+     * @return array
+     */
     public function getChannelItems()
     {
         $channelItems = array();
@@ -253,6 +268,11 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     // ---------------------------------------
 
+    /**
+     * Check whether the order has items, listed by M2E Pro (also true for mapped 3rd party listings)
+     *
+     * @return bool
+     */
     public function hasListingItems()
     {
         $channelItems = $this->getChannelItems();
@@ -260,6 +280,11 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         return count($channelItems) > 0;
     }
 
+    /**
+     * Check whether the order has items, listed by 3rd party software
+     *
+     * @return bool
+     */
     public function hasOtherListingItems()
     {
         $channelItems = $this->getChannelItems();
@@ -308,7 +333,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
     {
         if (is_null($this->shippingAddress)) {
             $this->shippingAddress = $this->getChildObject()->getShippingAddress();
-            $this->shippingAddress->setOrder($this);
         }
 
         return $this->shippingAddress;
@@ -354,6 +378,12 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     // ########################################
 
+    /**
+     * Find the store, where order should be placed
+     *
+     * @param bool $strict
+     * @throws Exception
+     */
     public function associateWithStore($strict = true)
     {
         $storeId = $this->getStoreId() ? $this->getStoreId() : $this->getChildObject()->getAssociatedStoreId();
@@ -381,6 +411,12 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     // ########################################
 
+    /**
+     * Associate each order item with product in magento
+     *
+     * @param bool $strict
+     * @throws Exception|null
+     */
     public function associateItemsWithProducts($strict = true)
     {
         $exception = null;

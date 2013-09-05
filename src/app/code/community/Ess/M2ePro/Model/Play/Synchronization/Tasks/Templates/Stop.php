@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Templates_Stop
@@ -10,8 +10,6 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Templates_Stop
     const PERCENTS_START = 50;
     const PERCENTS_END = 60;
     const PERCENTS_INTERVAL = 10;
-
-    private $_synchronizations = array();
 
     /**
      * @var Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
@@ -23,8 +21,6 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Templates_Stop
     public function __construct()
     {
         parent::__construct();
-
-        $this->_synchronizations = Mage::helper('M2ePro')->getGlobalValue('synchTemplatesArray');
 
         $tempParams = array('runner_actions'=>$this->_runnerActions);
         $this->_productInspector = Mage::getModel(
@@ -111,7 +107,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Templates_Stop
 
             $this->_runnerActions
                  ->setProduct($listingProduct,
-                              Ess_M2ePro_Model_Play_Connector_Product_Dispatcher::ACTION_STOP,
+                              Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_STOP,
                               array());
         }
         //------------------------------------

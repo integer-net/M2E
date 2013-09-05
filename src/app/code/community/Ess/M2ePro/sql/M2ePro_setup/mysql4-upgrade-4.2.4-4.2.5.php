@@ -341,11 +341,11 @@ foreach ($tempAccounts as $account) {
 
     if ($ordersSettings['listing']['store_mode'] == 1 && $ordersSettings['listing']['store_id'] == 0) {
         // store mode == custom & store id == admin
-        $ordersSettings['listing']['store_id'] = Mage::helper('M2ePro/Magento')->getDefaultStoreId();
+        $ordersSettings['listing']['store_id'] = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
     }
     if ($ordersSettings['listing_other']['store_id'] == 0) {
         // store id == admin
-        $ordersSettings['listing_other']['store_id'] = Mage::helper('M2ePro/Magento')->getDefaultStoreId();
+        $ordersSettings['listing_other']['store_id'] = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
     }
 
     $ordersSettings['listing_other']['product_tax_class_id'] = 0;
@@ -380,12 +380,12 @@ foreach ($tempAccounts as $account) {
 
     if ($ordersSettings['listing']['store_mode'] == 1 && $ordersSettings['listing']['store_id'] == 0) {
         // store mode == custom & store id == admin
-        $ordersSettings['listing']['store_id'] = Mage::helper('M2ePro/Magento')->getDefaultStoreId();
+        $ordersSettings['listing']['store_id'] = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
     }
 
     if ($ordersSettings['listing_other']['store_id'] == 0) {
         // store id == admin
-        $ordersSettings['listing_other']['store_id'] = Mage::helper('M2ePro/Magento')->getDefaultStoreId();
+        $ordersSettings['listing_other']['store_id'] = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
     }
 
     $ordersSettings['listing_other']['product_tax_class_id'] = 0;

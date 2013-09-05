@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Template_SellingFormat extends Ess_M2ePro_Model_Component_Parent_Abstract
@@ -15,18 +15,6 @@ class Ess_M2ePro_Model_Template_SellingFormat extends Ess_M2ePro_Model_Component
     }
 
     // ########################################
-
-    public function isLocked()
-    {
-        if (parent::isLocked()) {
-            return true;
-        }
-
-        return (bool)Mage::getModel('M2ePro/Listing')
-                            ->getCollection()
-                            ->addFieldToFilter('template_selling_format_id', $this->getId())
-                            ->getSize();
-    }
 
     public function deleteInstance()
     {
@@ -84,22 +72,6 @@ class Ess_M2ePro_Model_Template_SellingFormat extends Ess_M2ePro_Model_Component
         return $this->getData('cache_attribute_sets_ids');
     }
 
-    //------------------------------------------
-
-    public function getListings($asObjects = false, array $filters = array())
-    {
-        $listings = $this->getRelatedComponentItems('Listing','template_selling_format_id',$asObjects,$filters);
-
-        if ($asObjects) {
-            foreach ($listings as $listing) {
-                /** @var $listing Ess_M2ePro_Model_Listing */
-                $listing->setSellingFormatTemplate($this);
-            }
-        }
-
-        return $listings;
-    }
-
     // ########################################
 
     public function getTitle()
@@ -107,41 +79,16 @@ class Ess_M2ePro_Model_Template_SellingFormat extends Ess_M2ePro_Model_Component
         return $this->getData('title');
     }
 
-    public function getSynchDate()
+    //-----------------------------------------
+
+    public function getCreateDate()
     {
-        return $this->getData('synch_date');
+        return $this->getData('create_date');
     }
 
-    // #######################################
-
-    public function parsePrice($price, $coefficient = false)
+    public function getUpdateDate()
     {
-        if (is_string($coefficient)) {
-            $coefficient = trim($coefficient);
-        }
-
-        if ($price <= 0) {
-            return 0;
-        }
-
-        if (!$coefficient) {
-            return round($price, 2);
-        }
-
-        if (strpos($coefficient, '%')) {
-            $coefficient = str_replace('%', '', $coefficient);
-
-            if (preg_match('/^[+-]/', $coefficient)) {
-                return round($price + $price * (float)$coefficient / 100, 2);
-            }
-            return round($price * (float)$coefficient / 100, 2);
-        }
-
-        if (preg_match('/^[+-]/', $coefficient)) {
-            return round($price + (float)$coefficient, 2);
-        }
-
-        return round($price * (float)$coefficient, 2);
+        return $this->getData('update_date');
     }
 
     // ########################################
@@ -151,17 +98,22 @@ class Ess_M2ePro_Model_Template_SellingFormat extends Ess_M2ePro_Model_Component
         return $this->getChildObject()->getTrackingAttributes();
     }
 
+    public function getUsedAttributes()
+    {
+        return $this->getChildObject()->getUsedAttributes();
+    }
+
     // #######################################
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
         return parent::delete();
     }
 

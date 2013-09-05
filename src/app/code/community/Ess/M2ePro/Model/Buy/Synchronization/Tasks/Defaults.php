@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Defaults extends Ess_M2ePro_Model_Buy_Synchronization_Tasks
@@ -16,8 +16,8 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Defaults extends Ess_M2ePro_Mod
     {
         // Check tasks config mode
         //-----------------------------
-        $buySynchGroup = '/buy/synchronization/settings/defaults/update_listings_products/';
-        $ulpMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+        $buySynchGroup = '/buy/defaults/update_listings_products/';
+        $ulpMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                            ->getGroupValue($buySynchGroup,'mode');
         if (!$ulpMode) {
             return false;

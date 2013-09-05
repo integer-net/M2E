@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_MultipleResponser
@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_MultipleResponser
                 'status_changer' => $this->getStatusChanger()
             );
 
-            Mage::getModel('M2ePro/Amazon_Connector_Product_Helper')
+            Mage::getModel('M2ePro/Connector_Server_Amazon_Product_Helper')
                         ->updateAfterListAction($listingProduct,$requestData,$tempParams);
 
             // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully listed');
@@ -29,14 +29,6 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_MultipleResponser
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                                                   Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
         }
-    }
-
-    // ########################################
-
-    protected function processResponseData($response)
-    {
-        $this->removeFromQueueOfSKus();
-        return parent::processResponseData($response);
     }
 
     // ########################################
@@ -75,6 +67,14 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_MultipleResponser
         }
 
         $lockItem->setData('data',json_encode(array_unique($skus)))->save();
+    }
+
+    // ########################################
+
+    protected function unsetLocks($fail = false, $message = NULL)
+    {
+        $this->removeFromQueueOfSKus();
+        parent::unsetLocks($fail,$message);
     }
 
     // ########################################

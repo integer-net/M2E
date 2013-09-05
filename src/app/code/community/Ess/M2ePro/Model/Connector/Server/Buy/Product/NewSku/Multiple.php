@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Buy_Product_NewSku_Multiple
@@ -85,7 +85,7 @@ class Ess_M2ePro_Model_Connector_Server_Buy_Product_NewSku_Multiple
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            $nativeData = Mage::getModel('M2ePro/Buy_Connector_Product_Helper')
+            $nativeData = Mage::getModel('M2ePro/Connector_Server_Buy_Product_Helper')
                                          ->getNewSkuRequestData($listingProduct,$this->params);
 
             $sendedData = $nativeData;

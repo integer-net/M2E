@@ -1,5 +1,5 @@
-LogCleaningHandler = Class.create();
-LogCleaningHandler.prototype = Object.extend(new CommonHandler(), {
+ConfigurationLogCleaningHandler = Class.create();
+ConfigurationLogCleaningHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
@@ -7,38 +7,18 @@ LogCleaningHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    runNowLogs : function()
-    {
-        MagentoMessageObj.addSuccess(M2ePro.text.clearing_all_logs_started_message);
-        editForm.submit(M2ePro.url.formSubmit + 'task/run_now_logs/');
-    },
-
-    clearAllLogs : function()
-    {
-        if (!confirm(CONFIRM)) {
-            return;
-        }
-
-        MagentoMessageObj.addSuccess(M2ePro.text.clearing_all_logs_started_message);
-        editForm.submit(M2ePro.url.formSubmit + 'task/clear_all_logs/');
-    },
-
-    //----------------------------------
-
     runNowLog : function(log)
     {
-        MagentoMessageObj.addSuccess(str_replace('%log%', str_replace('_',' ',log), M2ePro.text.clearing_log_started_message));
-        editForm.submit(M2ePro.url.formSubmit + 'task/run_now/log/'+log+'/');
+        configEditForm.submit(M2ePro.url.get('formSubmit',{'task': 'run_now','log': log}));
     },
 
     clearAllLog : function(log)
     {
-        if (!confirm(CONFIRM)) {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
         }
 
-        MagentoMessageObj.addSuccess(str_replace('%log%', str_replace('_',' ',log), M2ePro.text.clearing_log_started_message));
-        editForm.submit(M2ePro.url.formSubmit + 'task/clear_all/log/'+log+'/');
+        configEditForm.submit(M2ePro.url.get('formSubmit',{'task': 'clear_all','log': log}));
     },
 
     //----------------------------------

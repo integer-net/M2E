@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Synchronization_LockItem extends Ess_M2ePro_Model_LockItem
@@ -22,8 +22,8 @@ class Ess_M2ePro_Model_Synchronization_LockItem extends Ess_M2ePro_Model_LockIte
 
         $this->setNick('synchronization');
 
-        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getConfig()
-                                        ->getGroupValue('/synchronization/lockItem/','max_deactivate_time');
+        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+                                        ->getGroupValue('/settings/lockItem/','max_deactivate_time');
         $this->setMaxDeactivateTime($maxDeactivateTime);
 
         parent::__construct($params);
@@ -111,7 +111,7 @@ class Ess_M2ePro_Model_Synchronization_LockItem extends Ess_M2ePro_Model_LockIte
 
     public function makeShutdownFunction()
     {
-        $functionCode = "Mage::helper('M2ePro')->getGlobalValue('synchLockItem')->remove();";
+        $functionCode = "Mage::helper('M2ePro/Data_Global')->getValue('synchLockItem')->remove();";
 
         $shutdownDeleteFunction = create_function('', $functionCode);
         register_shutdown_function($shutdownDeleteFunction);

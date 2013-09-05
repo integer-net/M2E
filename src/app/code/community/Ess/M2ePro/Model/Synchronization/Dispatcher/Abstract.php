@@ -1,11 +1,13 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Synchronization_Dispatcher_Abstract
 {
+    //####################################
+
     /**
      * @var array
      */
@@ -58,15 +60,15 @@ abstract class Ess_M2ePro_Model_Synchronization_Dispatcher_Abstract
 
     protected function catchException($exception)
     {
-        Mage::helper('M2ePro/Exception')->process($exception);
+        Mage::helper('M2ePro/Module_Exception')->process($exception);
 
-        Mage::helper('M2ePro')->getGlobalValue('synchLogs')->addMessage(
+        Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')->addMessage(
             Mage::helper('M2ePro')->__($exception->getMessage()),
             Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
         );
 
-        Mage::helper('M2ePro')->getGlobalValue('synchProfiler')->addTitle(
+        Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->addTitle(
             Mage::helper('M2ePro')->__($exception->getMessage()),
             Ess_M2ePro_Model_General_Profiler::TYPE_ERROR
         );

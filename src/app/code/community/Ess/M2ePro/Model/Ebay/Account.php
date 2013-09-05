@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
@@ -18,9 +18,6 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
 
     const FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_NO  = 0;
     const FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES = 1;
-
-    const MESSAGES_RECEIVE_NO  = 0;
-    const MESSAGES_RECEIVE_YES = 1;
 
     const OTHER_LISTINGS_SYNCHRONIZATION_NO  = 0;
     const OTHER_LISTINGS_SYNCHRONIZATION_YES = 1;
@@ -104,14 +101,13 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
             return false;
         }
 
+        $policiesTable  = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_account_policy');
+        Mage::getSingleton('core/resource')->getConnection('core_write')
+            ->delete($policiesTable,array('account_id = ?'=>$this->getId()));
+
         $storeCategoriesTable = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_account_store_category');
         Mage::getSingleton('core/resource')->getConnection('core_write')
             ->delete($storeCategoriesTable,array('account_id = ?'=>$this->getId()));
-
-        $messages = $this->getMessages(true);
-        foreach ($messages as $message) {
-            $message->deleteInstance();
-        }
 
         $feedbacks = $this->getFeedbacks(true);
         foreach ($feedbacks as $feedback) {
@@ -129,11 +125,6 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
     }
 
     // ########################################
-
-    public function getMessages($asObjects = false, array $filters = array())
-    {
-        return $this->getRelatedSimpleItems('Ebay_Message','account_id',$asObjects,$filters);
-    }
 
     public function getFeedbacks($asObjects = false, array $filters = array())
     {
@@ -220,18 +211,6 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
     public function isFeedbacksAutoResponseOnlyPositive()
     {
         return $this->getFeedbacksAutoResponseOnlyPositive() == self::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES;
-    }
-
-    //-----------------------------------------
-
-    public function getMessagesReceive()
-    {
-        return (int)$this->getData('messages_receive');
-    }
-
-    public function isMessagesReceive()
-    {
-        return $this->getMessagesReceive() == self::MESSAGES_RECEIVE_YES;
     }
 
     // ################################################
@@ -820,14 +799,82 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::delete();
+    }
+
+    // ########################################
+
+    public function getDefaultSettingsSimpleMode()
+    {
+        return array(
+
+            'marketplaces_data' => json_encode(array()),
+
+            'feedbacks_receive' => self::FEEDBACKS_RECEIVE_NO,
+            'feedbacks_auto_response' => self::FEEDBACKS_AUTO_RESPONSE_NONE,
+            'feedbacks_auto_response_only_positive' => self::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_NO,
+
+            'other_listings_synchronization' => self::OTHER_LISTINGS_SYNCHRONIZATION_NO,
+            'other_listings_mapping_mode' => self::OTHER_LISTINGS_MAPPING_MODE_NO,
+            'other_listings_mapping_settings' => json_encode(array()),
+            'other_listings_synchronization_mapped_items_mode' => self::OTHER_LISTINGS_MAPPED_SYNCHRONIZATION_NO,
+
+            'orders_mode' => self::ORDERS_MODE_YES,
+
+            'magento_orders_settings' => json_encode(array(
+                'listing' => array(
+                    'mode' => self::MAGENTO_ORDERS_LISTINGS_MODE_YES,
+                    'store_mode' => self::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT,
+                    'store_id' => NULL
+                ),
+                'listing_other' => array(
+                    'mode' => self::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES,
+                    'product_mode' => self::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT,
+                    'product_tax_class_id' => Ess_M2ePro_Model_Magento_Product::TAX_CLASS_ID_NONE,
+                    'store_id' => NULL,
+                ),
+                'customer' => array(
+                    'mode' => self::MAGENTO_ORDERS_CUSTOMER_MODE_GUEST,
+                    'id' => NULL,
+                    'website_id' => NULL,
+                    'group_id' => NULL,
+                    'notifications' => array(
+                        'invoice_created' => false,
+                        'order_created' => false
+                    )
+                ),
+                'creation' => array(
+                    'mode' => self::MAGENTO_ORDERS_CREATE_CHECKOUT_AND_PAID,
+                    'reservation_days' => 0
+                ),
+                'tax' => array(
+                    'mode' => self::MAGENTO_ORDERS_TAX_MODE_MIXED
+                ),
+                'status_mapping' => array(
+                    'mode' => self::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT,
+                    'new' => self::MAGENTO_ORDERS_STATUS_MAPPING_NEW,
+                    'paid' => self::MAGENTO_ORDERS_STATUS_MAPPING_PAID,
+                    'shipped' => self::MAGENTO_ORDERS_STATUS_MAPPING_SHIPPED
+                ),
+                'qty_reservation' => array(
+                    'days' => 0
+                ),
+                'invoice_mode' => self::MAGENTO_ORDERS_INVOICE_MODE_YES,
+                'shipment_mode' => self::MAGENTO_ORDERS_SHIPMENT_MODE_YES
+            ))
+        );
+    }
+
+    public function getDefaultSettingsAdvancedMode()
+    {
+        return $this->getDefaultSettingsSimpleMode();
     }
 
     // ########################################

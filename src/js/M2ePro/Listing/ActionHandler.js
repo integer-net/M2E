@@ -1,20 +1,19 @@
-ListingActionHandler = Class.create();
-ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
+ListingActionHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    initialize: function(M2ePro, listingId)
-    {
-        this.M2ePro = M2ePro;
-        this.sendPartsResponses = new Array();
-        this.listingId = listingId;
-    },
+    sendPartsResponses: [],
 
     //----------------------------------
 
-    setListingItemGridHandlerObj: function(ListingItemGridHandlerObj)
+    // todo next (temp solution)
+
+    options: {},
+
+    setOptions: function(options)
     {
-        this.ListingItemGridHandlerObj = ListingItemGridHandlerObj;
+        this.options = Object.extend(this.options,options);
+        return this;
     },
 
     //----------------------------------
@@ -25,15 +24,15 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
         $('listing_container_errors_summary').hide();
 
         var self = this;
-        new Ajax.Request( self.M2ePro.url.checkLockListing + 'id/' + self.listingId + '/' ,
+        new Ajax.Request( self.options.url.checkLockListing + 'id/' + self.gridHandler.listingId + '/' ,
             {
                 method:'get',
                 onSuccess: function(transport)
                 {
                     if (transport.responseText == 'locked') {
-                        MagentoMessageObj.addError(self.M2ePro.text.listing_locked_message);
+                        MagentoMessageObj.addError(self.options.text.listing_locked_message);
                     } else {
-                        new Ajax.Request( self.M2ePro.url.lockListingNow + 'id/' + self.listingId + '/' ,
+                        new Ajax.Request( self.options.url.lockListingNow + 'id/' + self.gridHandler.listingId + '/' ,
                             {
                                 method:'get',
                                 onSuccess: function(transport)
@@ -62,9 +61,9 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
         if (parts.length == 0) {
 
             ListingProgressBarObj.setPercents(100,0);
-            ListingProgressBarObj.setStatus(self.M2ePro.text.task_completed_message);
+            ListingProgressBarObj.setStatus(self.options.text.task_completed_message);
 
-            new Ajax.Request( self.M2ePro.url.unlockListingNow + 'id/' + self.listingId + '/' ,
+            new Ajax.Request( self.options.url.unlockListingNow + 'id/' + self.gridHandler.listingId + '/' ,
                 {
                     method:'get',
                     onSuccess: function(transport)
@@ -83,16 +82,16 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
                         for (var i=0;i<self.sendPartsResponses.length;i++) {
                             if (typeof self.sendPartsResponses[i].is_processing_items != 'undefined' &&
                                 self.sendPartsResponses[i].is_processing_items == true) {
-                                MagentoMessageObj.addNotice(self.M2ePro.text.locked_obj_notice);
+                                MagentoMessageObj.addNotice(self.options.text.locked_obj_notice);
                                 break;
                             }
                         }
 
                         if (combineResult == 'error') {
 
-                            var message = self.M2ePro.text.task_completed_error_message;
+                            var message = self.options.text.task_completed_error_message;
                             message = message.replace('%s', ListingProgressBarObj.getTitle());
-                            message = message.replace('%s', self.M2ePro.url.logViewUrl);
+                            message = message.replace('%s', self.options.url.logViewUrl);
 
                             MagentoMessageObj.addError(message);
 
@@ -104,7 +103,7 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
                                 actionIds += self.sendPartsResponses[i].action_id;
                             }
 
-                            new Ajax.Request( self.M2ePro.url.getErrorsSummary + 'action_ids/' + actionIds + '/' ,
+                            new Ajax.Request( self.options.url.getErrorsSummary + 'action_ids/' + actionIds + '/' ,
                                 {
                                     method:'get',
                                     onSuccess: function(transportSummary)
@@ -115,13 +114,13 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
                                 });
 
                         } else if (combineResult == 'warning') {
-                            var message = self.M2ePro.text.task_completed_warning_message;
+                            var message = self.options.text.task_completed_warning_message;
                             message = message.replace('%s', ListingProgressBarObj.getTitle());
-                            message = message.replace('%s', self.M2ePro.url.logViewUrl);
+                            message = message.replace('%s', self.options.url.logViewUrl);
 
                             MagentoMessageObj.addWarning(message);
                         } else {
-                            var message = self.M2ePro.text.task_completed_success_message;
+                            var message = self.options.text.task_completed_success_message;
                             message = str_replace('%s', ListingProgressBarObj.getTitle(), message);
 
                             MagentoMessageObj.addSuccess(message);
@@ -134,7 +133,7 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
 
                         self.sendPartsResponses = new Array();
 
-                        self.ListingItemGridHandlerObj.unselectAllAndReload();
+                        self.gridHandler.unselectAllAndReload();
                     }
                 });
 
@@ -155,7 +154,7 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
                     partExecuteString += ', ';
                 }
 
-                var temp = self.ListingItemGridHandlerObj.getProductNameByRowId(part[i]);
+                var temp = self.gridHandler.getProductNameByRowId(part[i]);
 
                 if (temp != '') {
                     if (temp.length > 75) {
@@ -174,9 +173,9 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
 
         partExecuteString += '';
 
-        ListingProgressBarObj.setStatus(str_replace('%s', partExecuteString, self.M2ePro.text.sending_data_message));
+        ListingProgressBarObj.setStatus(str_replace('%s', partExecuteString, self.options.text.sending_data_message));
 
-        new Ajax.Request( url + 'id/' + self.listingId,
+        new Ajax.Request( url + 'id/' + self.gridHandler.listingId,
             {
                 method: 'post',
                 parameters: {
@@ -197,7 +196,7 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
 
                         self.sendPartsResponses = new Array();
 
-                        self.ListingItemGridHandlerObj.unselectAllAndReload();
+                        self.gridHandler.unselectAllAndReload();
 
                         return;
                     }
@@ -212,7 +211,7 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
 
                         self.sendPartsResponses = new Array();
 
-                        new Ajax.Request( self.M2ePro.url.unlockListingNow + 'id/' + self.listingId + '/', {
+                        new Ajax.Request( self.options.url.unlockListingNow + 'id/' + self.gridHandler.listingId + '/', {
                             method: 'get'
                         });
 
@@ -244,114 +243,71 @@ ListingActionHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    runListAllProducts : function()
+    listAction: function()
     {
-        if (!confirm(CONFIRM)) {
-            return;
-        }
-
-        this.ListingItemGridHandlerObj.selectAll();
-
-        var selectedProductsParts = this.ListingItemGridHandlerObj.getSelectedItemsParts();
-        if (selectedProductsParts.length == 0) {
-            alert(this.M2ePro.text.listing_empty_message);
-            return;
-        }
-
-        this.startActions(this.M2ePro.text.listing_all_items_message, this.M2ePro.url.runListProducts,selectedProductsParts);
-    },
-
-    //----------------------------------
-
-    runListProducts : function()
-    {
-        var selectedProductsParts = this.ListingItemGridHandlerObj.getSelectedItemsParts();
+        var selectedProductsParts = this.gridHandler.getSelectedItemsParts();
         if (selectedProductsParts.length == 0) {
             return;
         }
 
-        this.startActions(this.M2ePro.text.listing_selected_items_message, this.M2ePro.url.runListProducts,selectedProductsParts);
+        this.startActions(
+            this.options.text.listing_selected_items_message,
+            this.options.url.runListProducts,selectedProductsParts
+        );
     },
 
-    runReviseProducts : function()
+    relistAction: function()
     {
-        var selectedProductsParts = this.ListingItemGridHandlerObj.getSelectedItemsParts();
+        var selectedProductsParts = this.gridHandler.getSelectedItemsParts();
         if (selectedProductsParts.length == 0) {
             return;
         }
 
-        this.startActions(this.M2ePro.text.revising_selected_items_message, this.M2ePro.url.runReviseProducts,selectedProductsParts);
+        this.startActions(
+            this.options.text.relisting_selected_items_message,
+            this.options.url.runRelistProducts,selectedProductsParts
+        );
     },
 
-    runRelistProducts : function()
+    reviseAction: function()
     {
-        var selectedProductsParts = this.ListingItemGridHandlerObj.getSelectedItemsParts();
+        var selectedProductsParts = this.gridHandler.getSelectedItemsParts();
         if (selectedProductsParts.length == 0) {
             return;
         }
 
-        this.startActions(this.M2ePro.text.relisting_selected_items_message, this.M2ePro.url.runRelistProducts,selectedProductsParts);
+        this.startActions(
+            this.options.text.revising_selected_items_message,
+            this.options.url.runReviseProducts,selectedProductsParts
+        );
     },
 
-    runStopProducts : function()
+    stopAction: function()
     {
-        var selectedProductsParts = this.ListingItemGridHandlerObj.getSelectedItemsParts();
+        var selectedProductsParts = this.gridHandler.getSelectedItemsParts();
         if (selectedProductsParts.length == 0) {
             return;
         }
 
-        this.startActions(this.M2ePro.text.stopping_selected_items_message, this.M2ePro.url.runStopProducts,selectedProductsParts);
+        this.startActions(
+            this.options.text.stopping_selected_items_message,
+            this.options.url.runStopProducts,selectedProductsParts
+        );
     },
 
-    runStopAndRemoveProducts : function()
+    stopAndRemoveAction: function()
     {
-        var selectedProductsParts = this.ListingItemGridHandlerObj.getSelectedItemsParts();
+        var selectedProductsParts = this.gridHandler.getSelectedItemsParts();
         if (selectedProductsParts.length == 0) {
             return;
         }
 
-        this.startActions(this.M2ePro.text.stopping_and_removing_selected_items_message, this.M2ePro.url.runStopAndRemoveProducts,selectedProductsParts);
-    },
-
-    runDeleteAndRemoveProducts : function()
-    {
-        var selectedProductsParts = this.ListingItemGridHandlerObj.getSelectedItemsParts();
-        if (selectedProductsParts.length == 0) {
-            return;
-        }
-
-        this.startActions(this.M2ePro.text.deleting_and_removing_selected_items_message, this.M2ePro.url.runDeleteAndRemoveProducts,selectedProductsParts);
-    },
-
-    //----------------------------------
-
-    duplicateProducts: function(selectedProductsString)
-    {
-        this.scroll_page_to_top();
-        MagentoMessageObj.clearAll();
-
-        new Ajax.Request(this.M2ePro.url.duplicate_products, {
-            method: 'post',
-            parameters: {
-                component: this.M2ePro.customData.componentMode,
-                ids: selectedProductsString
-            },
-            onSuccess: (function(transport) {
-                try {
-                    var response = transport.responseText.evalJSON();
-
-                    MagentoMessageObj['add' + response.type[0].toUpperCase() + response.type.slice(1)](response.message);
-
-                    if (response.type != 'error') {
-                        this.ListingItemGridHandlerObj.unselectAllAndReload();
-                    }
-
-                } catch (e) {
-                    MagentoMessageObj.addError('Internal Error.');
-                }
-            }).bind(this)
-        });
+        this.startActions(
+            this.options.text.stopping_and_removing_selected_items_message,
+            this.options.url.runStopAndRemoveProducts,selectedProductsParts
+        );
     }
 
     //----------------------------------
+
 });

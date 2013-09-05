@@ -1,0 +1,182 @@
+<div id="block_notice_play_accounts_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('On this page you have to provide the access to your Play.com account M2E Pro could interact with Play.com.'); ?>
+</div>
+
+<?php
+$formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
+
+if (isset($formData['other_listings_mapping_settings'])) {
+    $formData['other_listings_mapping_settings'] = (array)json_decode($formData['other_listings_mapping_settings'],true);
+}
+
+$defaults = array(
+    'title' => '',
+    'login' => '',
+    'panel_mode' => Ess_M2ePro_Model_Play_Account::PANEL_MODE_TRADE
+);
+
+$formData = array_merge($defaults, $formData);
+
+$isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Play_Account'); ?>,
+        'Ess_M2ePro_Model_Play_Account'
+    );
+
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Play'); ?>,
+        'Ess_M2ePro_Helper_Component_Play'
+    );
+
+    M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_common_play_account')) ?>);
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'formSubmit' => $this->getUrl('M2ePro/adminhtml_common_play_account/save', array('id' => $this->getRequest()->getParam('id'))),
+        'deleteAction' => $this->getUrl('M2ePro/adminhtml_common_play_account/delete', array('id' => $this->getRequest()->getParam('id')))
+    )); ?>);
+
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => $this->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.')
+    )); ?>);
+
+    M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
+
+    Event.observe(window, 'load', function() {
+        PlayAccountHandlerObj = new CommonPlayAccountHandler();
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+
+        <?php if ($isEdit) : ?>
+            $('panel_mode').observe('change', PlayAccountHandlerObj.update_password);
+            $('login').observe('change', PlayAccountHandlerObj.update_password);
+        <?php endif; ?>
+    });
+    //-----------------------------
+
+</script>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'The specified title is already used for other account. Account title must be unique.' => $this->__('The specified title is already used for other account. Account title must be unique.'),
+        'You must enable marketplace first.' => $this->__('You must enable marketplace first.'),
+        'M2E Pro was not able to get access to the Play.com account. Please, make sure, that you enter correct Play.com login and password. If everything is correct but you still unable to access your account, please contact Play.com Customer Service Department on 0845 800 1020 (UK only) or +44 (0)1534 877595 (outside UK).' => $this->__('M2E Pro was not able to get access to the Play.com account. Please, make sure, that you enter correct Play.com login and password. If everything is correct but you still unable to access your account, please contact Play.com Customer Service Department on 0845 800 1020 (UK only) or +44 (0)1534 877595 (outside UK).')
+    )); ?>);
+
+    M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_play_accounts_general_general">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="title"><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="title" name="title" value="<?php echo $this->escapeHtml($formData['title']); ?>" type="text" class="input-text required-entry M2ePro-account-title" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Title or identifier of Play.com account for your internal use.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<?php if (!$this->marketplace) { ?>
+    <div class="entry-edit" id="magento_block_play_accounts_general_none_marketplace">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Marketplace is disabled'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+                <div id="block_notice_play_accounts_general_marketplaces_access_none" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Disable Marketplace'); ?>" collapseable="no" always_show="yes" hideblock="no">
+                    <?php echo Mage::helper('M2ePro')->__('You must select and update Play.com marketplace to get access to this section.'); ?>
+                </div>
+                <input type="hidden" class="M2ePro-marketplace-disabled" value="" />
+            </div>
+        </div>
+
+    </div>
+<?php } else { ?>
+
+    <div class="entry-edit" id="magento_block_play_accounts_general_access">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('WEB/API Access'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td class="label">
+                            <label for="panel_mode"><?php echo Mage::helper('M2ePro')->__('Account Type'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="panel_mode" name="panel_mode">
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Account::PANEL_MODE_TRADE; ?>" <?php if ($formData['panel_mode'] == Ess_M2ePro_Model_Play_Account::PANEL_MODE_TRADE) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('PlayTrade / ProTrade'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Account::PANEL_MODE_TOOLBOX; ?>" <?php if ($formData['panel_mode'] == Ess_M2ePro_Model_Play_Account::PANEL_MODE_TOOLBOX) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Merchant Toolbox'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Type of your Play.com account.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <label for="login"><?php echo Mage::helper('M2ePro')->__('Login'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <input id="login" name="login" type="text" value="<?php echo $formData['login'] ?>" class="input-text required-entry M2ePro-access" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Login to your Play.com account.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <label for="password"><?php echo Mage::helper('M2ePro')->__('Password'); ?>: <span id="password_required" class="required" <?php if ($isEdit) echo 'style="display: none;"' ?>>*</span></label>
+                        </td>
+                        <td class="value" id="password_button"  <?php if (!$isEdit) echo 'style="display: none;"' ?>>
+                            <?php echo $this->getChildHtml('play_update_password') ?>
+                        </td>
+                        <td class="value" id="password_input"  <?php if ($isEdit) echo 'style="display: none;"' ?>>
+                            <input id="password" name="password" type="password" class="input-text M2ePro-required-when-visible" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Password to your Play.com account.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+<?php } ?>

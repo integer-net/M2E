@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
@@ -33,11 +33,6 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
         return $this->isEnabled() && $this->isAllowed();
     }
 
-    public function isDefault()
-    {
-        return Mage::helper('M2ePro/Component')->getDefaultComponent() == self::NICK;
-    }
-
     public function isObject($modelName, $value, $field = NULL)
     {
         $mode = Mage::helper('M2ePro/Component')->getComponentMode($modelName, $value, $field);
@@ -56,6 +51,13 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
         return Mage::helper('M2ePro/Component')->getComponentObject(self::NICK, $modelName, $value, $field);
     }
 
+    public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
+    {
+        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            self::NICK, $modelName, $value, $field, $tags
+        );
+    }
+
     public function getCollection($modelName)
     {
         return $this->getModel($modelName)->getCollection();
@@ -68,8 +70,6 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
         return self::MARKETPLACE_VIRTUAL_ID;
     }
 
-    // ########################################
-
     public function getItemUrl($playId, $categoryCode, $marketplaceId = NULL)
     {
         $marketplaceId = (int)$marketplaceId;
@@ -78,13 +78,6 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
         $domain = $this->getCachedObject('Marketplace',$marketplaceId)->getUrl();
 
         return 'http://'.$domain.'/Product.aspx?title='.$playId.'&r='.$categoryCode;
-    }
-
-    // ########################################
-
-    public function clearAllCache()
-    {
-        Mage::helper('M2ePro')->removeTagCacheValues(self::NICK);
     }
 
     // ########################################
@@ -123,11 +116,9 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
+    public function clearCache()
     {
-        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            self::NICK, $modelName, $value, $field, $tags
-        );
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);
     }
 
     // ########################################

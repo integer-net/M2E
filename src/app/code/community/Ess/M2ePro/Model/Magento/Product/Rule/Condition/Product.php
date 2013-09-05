@@ -4,7 +4,8 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product extends Mage_Rule_Model_Condition_Abstract
+class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
+    extends Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
 {
     // ####################################
 
@@ -104,42 +105,31 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product extends Mage_Rule_
             $criteria = Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ALL_ATTRIBUTE_SETS;
         }
 
-        if ($criteria == Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ALL_ATTRIBUTE_SETS) {
-            $tempAttributeSets = Mage::helper('M2ePro/Magento')->getAttributeSets();
-            $attributeSets = array();
-            foreach ($tempAttributeSets as $attributeSet) {
-                $attributeSets[] = $attributeSet['attribute_set_id'];
-            }
-        }
-
-        $attributesCollection = Mage::getModel('eav/entity_attribute')->getCollection();
-        $attributesCollection->getSelect()->distinct();
-
-        $attributesCollection->setEntityTypeFilter(
-            Mage::getModel('eav/entity')->setType('catalog_product')->getTypeId()
-        );
-
         $productAttributes = array();
         switch ($criteria) {
             case Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_ALL:
-                $productAttributes = $attributesCollection->getItems();
+                $productAttributes = Mage::helper('M2ePro/Magento_Attribute')->getAll();
                 break;
 
             case Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ATTRIBUTE_SETS:
-            case Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ALL_ATTRIBUTE_SETS:
-                $attributesCollection->setAttributeSetFilter($attributeSets);
-                $productAttributes = $attributesCollection->getItems();
+                $productAttributes = Mage::helper('M2ePro/Magento_Attribute')->getGeneralFromAttributeSets(
+                    $attributeSets
+                );
                 break;
+
+            case Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ALL_ATTRIBUTE_SETS:
+                $productAttributes = Mage::helper('M2ePro/Magento_Attribute')
+                    ->getGeneralFromAllAttributeSets();
+                break;
+        }
+
+        if (empty($productAttributes)) {
+            return $this;
         }
 
         $attributes = array();
         foreach ($productAttributes as $attribute) {
-            /* @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
-            if (!$attribute->getIsVisible()) {
-                continue;
-            }
-
-            $attributes[$attribute->getAttributeCode()] = $attribute->getFrontendLabel();
+            $attributes[$attribute['code']] = $attribute['label'];
         }
 
         $this->_addSpecialAttributes($attributes);

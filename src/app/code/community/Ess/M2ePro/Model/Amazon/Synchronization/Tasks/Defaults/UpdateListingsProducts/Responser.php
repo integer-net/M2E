@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProducts_Responser
@@ -90,7 +90,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
 
             $this->getSynchLogModel()->addMessage(Mage::helper('M2ePro')->__($exception->getMessage()),
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -230,17 +230,15 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
         }
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $generalTemplateTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
         $listingProductMainTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
 
         /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
-        $collection->getSelect()->join(array('gt' => $generalTemplateTable), 'l.template_general_id = gt.id', array());
         $collection->getSelect()->joinLeft(array('api' => $tempTable),
                     '`second_table`.sku = `api`.sku AND `api`.`hash` = \''.$hash.'\'', array('sku'));
-        $collection->getSelect()->where('gt.marketplace_id = ?',(int)$this->getMarketplace()->getId());
-        $collection->getSelect()->where('gt.account_id = ?',(int)$this->getAccount()->getId());
+        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+        $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $collection->getSelect()->where('`main_table`.`status` != ?',
             (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
         $collection->getSelect()->where('`main_table`.`status` != ?',
@@ -299,14 +297,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $generalTemplateTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
 
         /** @var $collection Varien_Data_Collection_Db */
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
-        $collection->getSelect()->join(array('gt' => $generalTemplateTable), 'l.template_general_id = gt.id', array());
-        $collection->getSelect()->where('gt.marketplace_id = ?',(int)$this->getMarketplace()->getId());
-        $collection->getSelect()->where('gt.account_id = ?',(int)$this->getAccount()->getId());
+        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+        $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $collection->getSelect()->where('`main_table`.`status` != ?',
             (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
         $collection->getSelect()->where("`second_table`.`sku` is not null and `second_table`.`sku` != ''");

@@ -1,9 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * Builds the quote object, which then can be converted to magento order
+ */
 class Ess_M2ePro_Model_Magento_Quote
 {
     /** @var Ess_M2ePro_Model_Order_Proxy */
@@ -63,6 +66,7 @@ class Ess_M2ePro_Model_Magento_Quote
             $this->initializeAddresses();
 
             $this->configureStore();
+            $this->configureTaxCalculation();
 
             $this->initializeCurrency();
             $this->initializeShippingMethodData();
@@ -92,6 +96,8 @@ class Ess_M2ePro_Model_Magento_Quote
         $this->quote->setStore($this->proxyOrder->getStore());
         $this->quote->getStore()->setData('current_currency', $this->quote->getStore()->getBaseCurrency());
         $this->quote->save();
+
+        Mage::getSingleton('checkout/session')->replaceQuote($this->quote);
     }
 
     // ########################################
@@ -147,7 +153,7 @@ class Ess_M2ePro_Model_Magento_Quote
     // ########################################
 
     /**
-     * Initialize currency and currency convert rate
+     * Initialize currency
      */
     private function initializeCurrency()
     {
@@ -177,6 +183,15 @@ class Ess_M2ePro_Model_Magento_Quote
         $this->originalStoreConfig = $storeConfigurator->getOriginalStoreConfig();
 
         $storeConfigurator->prepareStoreConfigForOrder();
+    }
+
+    // ########################################
+
+    private function configureTaxCalculation()
+    {
+        // this prevents customer session initialization (which affects cookies)
+        // see Mage_Tax_Model_Calculation::getCustomer()
+        Mage::getSingleton('tax/calculation')->setCustomer($this->quote->getCustomer());
     }
 
     // ########################################
@@ -223,8 +238,8 @@ class Ess_M2ePro_Model_Magento_Quote
      */
     private function initializeShippingMethodData()
     {
-        Mage::helper('M2ePro')->unsetGlobalValue('shipping_data');
-        Mage::helper('M2ePro')->setGlobalValue('shipping_data', $this->proxyOrder->getShippingData());
+        Mage::helper('M2ePro/Data_Global')->unsetValue('shipping_data');
+        Mage::helper('M2ePro/Data_Global')->setValue('shipping_data', $this->proxyOrder->getShippingData());
     }
 
     // ########################################

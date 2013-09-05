@@ -3,9 +3,15 @@ VideoTutorialHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    initialize: function(M2ePro,popUpBlockId,title,callbackWhenClose)
+    // determines either to close or not to close popup window
+    closeCallback: function() {
+        return confirm(M2ePro.translator.translate('Are you sure?'));
+    },
+
+    //----------------------------------
+
+    initialize: function(popUpBlockId,title,callbackWhenClose)
     {
-        this.M2ePro = M2ePro;
         this.title = title;
         this.popUpBlockId = popUpBlockId;
         this.callbackWhenClose = callbackWhenClose;
@@ -15,15 +21,8 @@ VideoTutorialHandler.prototype = Object.extend(new CommonHandler(), {
 
     openPopUp: function()
     {
-        if (this.M2ePro.text.confim_offer_show_video) {
-            if (!confirm(this.M2ePro.text.confim_offer_show_video)) {
-                this.callbackWhenClose();
-                return;
-            }
-        }
-
         var self = this;
-        this.popUp = Dialog.info('', {
+        this.popUp = Dialog.info(null, {
             draggable: true,
             resizable: true,
             closable: true,
@@ -38,27 +37,19 @@ VideoTutorialHandler.prototype = Object.extend(new CommonHandler(), {
             hideEffect: Element.hide,
             showEffect: Element.show,
             closeCallback: function() {
-                if (self.M2ePro.text.confim_close_video) {
-                    return confirm(self.M2ePro.text.confim_close_video);
-                }
-                return true;
+                return self.closeCallback();
             },
             onClose: function() {
                 self.callbackWhenClose();
             }
         });
 
-        $('modal_dialog_message').update($(this.popUpBlockId).innerHTML);
+        this.popUp.options.destroyOnClose = false;
+        $('modal_dialog_message').insert($(this.popUpBlockId).show());
     },
 
     closePopUp: function()
     {
-        if (this.M2ePro.text.confim_close_video) {
-            if (!confirm(this.M2ePro.text.confim_close_video)) {
-                return;
-            }
-        }
-
         this.popUp.close();
         this.callbackWhenClose();
     }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Requester extends Ess_M2ePro_Model_Connector_Server_Protocol
@@ -13,7 +13,6 @@ abstract class Ess_M2ePro_Model_Connector_Server_Requester extends Ess_M2ePro_Mo
     public function __construct(array $params = array())
     {
         $this->params = $params;
-        parent::__construct();
     }
 
     // ########################################
@@ -70,7 +69,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Requester extends Ess_M2ePro_Mo
 
     private function createNewRandomHash()
     {
-        $domain = Mage::helper('M2ePro/Server')->getDomain();
+        $domain = Mage::helper('M2ePro/Client')->getDomain();
         return sha1(rand(1,1000000).microtime(true).$domain);
     }
 

@@ -1,5 +1,26 @@
 <div id="block_notice_ebay_listings_view_grid" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Listing Items'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This section contains information about product items of chosen listing and their statuses on eBay.<br/>
-    You can manage items by choosing appropriate actions from the Actions dropdown of the grid and manage Listing and
-    its settings by using buttons in the top right corner.'); ?>
+    <p>
+        <?php echo Mage::helper('M2ePro')->__(
+            'This page contains products you have added to the Listing. You can review them and perform necessary actions.
+            <br/>You can also add a new M2E Pro Listing or navigate to other Listing directly from this page. Click the icon next to your Listing Title and a drop down menu appears.'
+        ); ?>
+    </p>
+
+    <?php if(Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) : ?>
+        <div>
+            <?php echo Mage::helper('M2ePro')->__(
+                'There are three <b>\'Views\'</b> available to you in Advanced mode:
+                <ul class="list">
+                    <li><b>eBay</b> - displays product information related to eBay. In this mode, you can easily find products by eBay information, perform actions in bulk (i.e. List, Revise, Relist, Stop, etc);</li>
+                    <li><b>Magento</b> - displays products information  related to Magento Catalog. In this mode, you can easily find products using magento products information (i.e. Magento QTY, Stock Status, etc);</li>
+                    <li><b>Settings</b> - displays information about settings set for products (i.e. Selling settings, eBay categories, etc). In this mode, you can easily find products by settings they use, change the settings in bulk.</li>
+                </ul>
+                You can switch between modes using dropdown at the top of the product grid.
+                <br/>
+                <br/><b>Note:</b> If you need to search by magento product attributes which is not presented in the filters of the grid, you can use <b>\'Show Advanced Filter\'</b> option.
+                It\'s at the top of the page on the right hand side.'
+            ); ?>
+        </div>
+    <?php endif; ?>
+
 </div>

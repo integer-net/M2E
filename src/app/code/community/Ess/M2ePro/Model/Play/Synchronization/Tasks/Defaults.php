@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults extends Ess_M2ePro_Model_Play_Synchronization_Tasks
@@ -16,8 +16,8 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults extends Ess_M2ePro_Mo
     {
         // Check tasks config mode
         //-----------------------------
-        $config = Mage::helper('M2ePro/Module')->getConfig();
-        $configGroup = '/play/synchronization/settings/defaults/';
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+        $configGroup = '/play/defaults/';
 
         $ulpMode = (bool)$config->getGroupValue($configGroup . 'update_listings_products/','mode');
         $gplMode = (bool)$config->getGroupValue($configGroup . 'getting_products_links/','mode');

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Amazon_Account_Delete_EntityResponser
@@ -27,12 +27,6 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Account_Delete_EntityResponser
 
     protected function processResponseData($response)
     {
-        try {
-            /** @var $amazonAccount Ess_M2ePro_Model_Amazon_Account */
-            $amazonAccount = $this->getAccount()->getChildObject();
-            $amazonAccount->deleteMarketplaceItem($this->params['marketplace_id']);
-        } catch(Exception $exception) {}
-
         return $response;
     }
 

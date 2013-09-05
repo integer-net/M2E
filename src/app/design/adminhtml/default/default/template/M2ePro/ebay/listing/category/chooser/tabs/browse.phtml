@@ -1,0 +1,23 @@
+<style>
+    .category-children-block {
+        display: inline-block;
+        margin-left: 10px;
+    }
+</style>
+
+<script type="text/javascript">
+    EbayListingCategoryChooserBrowseHandlerObj = new EbayListingCategoryChooserBrowseHandler();
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'adminhtml_general/getChildCategories' => $this->getUrl('M2ePro/adminhtml_general/getChildCategories')
+    )); ?>);
+
+    EbayListingCategoryChooserBrowseHandlerObj.setMarketplaceId(EbayListingCategoryChooserHandlerObj.getMarketplaceId());
+    EbayListingCategoryChooserBrowseHandlerObj.renderTopLevelCategories('chooser_browser');
+    EbayListingCategoryChooserBrowseHandlerObj.observe('leaf_selected', function(selected) {
+        var leafId = selected[selected.length-1];
+        EbayListingCategoryChooserHandlerObj.selectCategory(M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY'), leafId);
+    });
+</script>
+
+<div id="chooser_browser"></div>

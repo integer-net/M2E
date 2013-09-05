@@ -1,10 +1,10 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Ess_M2ePro_Block_Adminhtml_Component_Grid
+class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
     public function __construct()
     {
@@ -46,7 +46,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Ess_M2ePro_Block_Adminht
             $collection->addFieldToFilter('main_table.order_id', $orderId);
         }
 
-        $components = Mage::helper('M2ePro/Component')->getActiveComponents();
+        $components = Mage::helper('M2ePro/View')->getComponentHelper()->getActiveComponents();
         $collection->addFieldToFilter('main_table.component_mode', array('in'=>$components));
 
         //--------------------------------
@@ -72,7 +72,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Ess_M2ePro_Block_Adminht
             'filter_index' => 'main_table.create_date'
         ));
 
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
+        if (!Mage::helper('M2ePro/View')->getComponentHelper()->isSingleActiveComponent()) {
             $this->addColumn('component_mode', array(
                 'header'         => Mage::helper('M2ePro')->__('Channel'),
                 'align'          => 'right',
@@ -81,7 +81,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Ess_M2ePro_Block_Adminht
                 'index'          => 'component_mode',
                 'filter_index'   => 'main_table.component_mode',
                 'sortable'       => false,
-                'options'        => $this->getComponentModeFilterOptions()
+                'options'        => Mage::helper('M2ePro/View')->getComponentHelper()->getActiveComponentsTitles()
             ));
         }
 

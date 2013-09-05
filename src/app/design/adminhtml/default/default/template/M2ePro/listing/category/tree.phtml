@@ -1,23 +1,16 @@
 <?php
-    $selectedCategories = Mage::helper('M2ePro')->getGlobalValue('temp_listing_categories');
+    $selectedCategories = $this->getSelectedCategories();
+    $highlightedCategories = $this->getHighlightedCategories();
+    $callback = $this->getCallback();
 ?>
 
 <script type="text/javascript">
-
-    if (typeof M2ePro == 'undefined') {
-        M2ePro = {};
-        M2ePro.url = {};
-        M2ePro.formData = {};
-        M2ePro.customData = {};
-        M2ePro.text = {};
-    }
-
-    M2ePro.text.select_items_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Please select categories.')); ?>';
-
     ListingCategoryTreeHandlerObj = new ListingCategoryTreeHandler();
-
 </script>
 
+<div class="tree-actions" style="margin-bottom: 5px;">
+    <a href="#" onclick="tree.collapseAll(); return false;"><?php echo Mage::helper('catalog')->__('Collapse All'); ?></a> <span class="separator">|</span> <a href="#" onclick="tree.expandAll(); return false;"><?php echo Mage::helper('catalog')->__('Expand All'); ?></a>
+</div>
 <div class="categories-side-col">
     <div class="tree-holder">
         <div id="tree-div" style="width: 100%; overflow: auto;"></div>
@@ -26,19 +19,28 @@
 
 <script type="text/javascript">
 
-    var categories_selected_items = new Array();
-    var initTreeSelectedNodes = new Array();
+    categories_selected_items = [];
+    initTreeSelectedNodes = [];
+    initTreeHighlightedNodes = [];
+
+    ignoreTreeCallback = false;
+    lastCallbackParams = [];
 
     <?php foreach ($selectedCategories as $category) { ?>
         categories_selected_items.push('<?php echo $category; ?>');
-        initTreeSelectedNodes[initTreeSelectedNodes.length] = new Array();
+        initTreeSelectedNodes[initTreeSelectedNodes.length] = [];
         initTreeSelectedNodes[initTreeSelectedNodes.length-1][0] = '<?php echo $category; ?>';
         initTreeSelectedNodes[initTreeSelectedNodes.length-1][1] = null;
     <?php } ?>
 
-    Ext.EventManager.onDocumentReady(function() {
+    <?php foreach ($highlightedCategories as $category) { ?>
+        initTreeHighlightedNodes[initTreeHighlightedNodes.length] = [];
+        initTreeHighlightedNodes[initTreeHighlightedNodes.length-1][0] = '<?php echo $category; ?>';
+        initTreeHighlightedNodes[initTreeHighlightedNodes.length-1][1] = null;
+    <?php } ?>
 
-        var tree = new Ext.tree.TreePanel('tree-div', {
+    function init() {
+        tree = new Ext.tree.TreePanel('tree-div', {
             animate: true,
             enableDD: false,
             containerScroll: true,
@@ -47,20 +49,43 @@
             rootVisible: false
         });
 
+        tree.on('click', function(node) {
+            <?php if (!empty($callback)): ?>
+                !ignoreTreeCallback && (<?php echo $callback ?>)([node.id]);
+            <?php endif; ?>
+
+            categories_selected_items.each(function(nodeId){
+                tree.getNodeById(nodeId).ui.checkbox.checked = false;
+            });
+
+            categories_selected_items = [node.id];
+        }, tree);
+
         tree.on('check', function(node) {
-            if (node.attributes.checked) {
-                ListingCategoryTreeHandlerObj.tree_categoryAdd(node.id, node);
-            } else {
-                ListingCategoryTreeHandlerObj.tree_categoryRemove(node.id, node);
+            if (categories_selected_items.length == 1 &&
+                tree.getNodeById(categories_selected_items[0]).isSelected()) {
+
+                tree.getNodeById(categories_selected_items[0]).unselect();
+                categories_selected_items = [];
             }
+
+            if (node.ui.checkbox.checked) {
+                ListingCategoryTreeHandlerObj.tree_categoryAdd(node.id);
+            } else {
+                ListingCategoryTreeHandlerObj.tree_categoryRemove(node.id);
+            }
+
+            // todo next
+            <?php if (!empty($callback)): ?>
+                !ignoreTreeCallback && (<?php echo $callback ?>)(categories_selected_items);
+            <?php endif; ?>
         }, tree);
 
         var root = new Ext.tree.TreeNode({
             text: 'root',
             draggable: false,
             checked: 'false',
-            id: '__root__',
-            uiProvider: Ext.tree.CheckboxNodeUI
+            id: '__root__'
         });
 
         tree.setRootNode(root);
@@ -70,15 +95,47 @@
         root.expand();
 
         var tempTree;
-        for (var j=0;j<initTreeSelectedNodes.length;j++) {
-            tempTree = initTreeSelectedNodes[j][1];
+        var tempNodes = []
+
+        for (var i=0;i<initTreeSelectedNodes.length;i++) {
+            tempTree = initTreeSelectedNodes[i][1];
+            tempNodes = [];
+
+            while (tempTree.parentNode != null && tempTree.parentNode.id != '__root__') {
+                tempNodes[tempNodes.length] = tempTree;
+                tempTree = tempTree.parentNode;
+            }
+
+            tempNodes.reverse();
+
+            tempNodes.each(function(node) {
+                node.render();
+                node.expand();
+            });
+        }
+
+        for (var j=0;j<initTreeHighlightedNodes.length;j++) {
+            tempTree = initTreeHighlightedNodes[j][1];
+
+            tempTree.parentNode.render();
+            tempTree.render();
+            tempTree.ui.textNode.style.color = 'blue';
+
             while (tempTree.parentNode != null && tempTree.parentNode.id != '__root__') {
                 tempTree.parentNode.render();
-                tempTree.parentNode.expand();
+                tempTree.parentNode.ui.textNode.style.color = 'blue';
 
                 tempTree = tempTree.parentNode;
             }
+
+//            root.firstChild.ui.textNode.style.color = '';
         }
-    });
+    }
+
+    <?php if ($this->_isAjax): ?>
+        init();
+    <?php else: ?>
+        Ext.EventManager.onDocumentReady(function() {(init)();});
+    <?php endif; ?>
 
 </script>

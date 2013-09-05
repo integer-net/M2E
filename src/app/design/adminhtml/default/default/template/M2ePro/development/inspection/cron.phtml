@@ -1,0 +1,49 @@
+<table class="form-list" cellspacing="0" cellpadding="0">
+
+    <tr>
+        <td class="label" colspan="2" style="width: 600px">
+            <strong><?php echo Mage::helper('M2ePro')->__('We recommend to set up your cron job to be run every 5 minutes (e.g. */5 * * * *).'); ?></strong>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Last Run'); ?>: </label>
+        </td>
+        <?php
+            $style = '';
+            if ($this->cronLastRunHighlight == 'error') {
+                $style = ' style="color: red"';
+            } else if ($this->cronLastRunHighlight == 'warning') {
+                $style = ' style="color: #EB5E00"';
+            }
+        ?>
+        <td class="value">
+            <span<?php echo $style; ?>><?php echo $this->cronLastRun ?></span>
+            <?php
+                if ($this->cronLastRunHighlight == 'error') {
+                    echo ' (' . Mage::helper('M2ePro')->__('not working') . ')';
+                }
+            ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('PHP command'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->cronPhp ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('GET command'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->cronGet ?>
+        </td>
+    </tr>
+
+</table>

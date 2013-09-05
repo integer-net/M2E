@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Marketplaces extends Ess_M2ePro_Model_Buy_Synchronization_Tasks
@@ -16,8 +16,8 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Marketplaces extends Ess_M2ePro
     {
         // Check tasks config mode
         //-----------------------------
-        $buySynchGroup = '/buy/synchronization/settings/marketplaces/categories/';
-        $categoriesMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+        $buySynchGroup = '/buy/marketplaces/categories/';
+        $categoriesMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                   ->getGroupValue($buySynchGroup,'mode');
 
         if (!$categoriesMode) {

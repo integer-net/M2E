@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
@@ -167,7 +167,7 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
      * @param bool $asObjects
      * @param array $filters
      * @param array $sort
-     * @return array
+     * @return array|Ess_M2ePro_Model_Abstract[]
      * @throws LogicException
      */
     protected function getRelatedSimpleItems($modelName, $fieldName, $asObjects = false,
@@ -192,7 +192,7 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
      * @param bool $asObjects
      * @param array $filters
      * @param array $sort
-     * @return array
+     * @return array|Ess_M2ePro_Model_Abstract[]
      * @throws LogicException
      */
     protected function getRelatedItems(Ess_M2ePro_Model_Abstract $model, $fieldName, $asObjects = false,
@@ -367,6 +367,19 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
         $this->setSettings($fieldName, $settings, $encodeType);
 
         return $this;
+    }
+
+    // ########################################
+
+    public function getDataSnapshot()
+    {
+        $data = $this->getData();
+
+        foreach ($data as &$value) {
+            !is_null($value) && !is_array($value) && $value = (string)$value;
+        }
+
+        return $data;
     }
 
     // ########################################

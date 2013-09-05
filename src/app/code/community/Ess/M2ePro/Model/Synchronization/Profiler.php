@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Synchronization_Profiler extends Ess_M2ePro_Model_General_Profiler
@@ -17,7 +17,7 @@ class Ess_M2ePro_Model_Synchronization_Profiler extends Ess_M2ePro_Model_General
         empty($args[0]) && $args[0] = array();
         $params = $args[0];
 
-        $mode = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/synchronization/profiler/','mode');
+        $mode = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue('/settings/profiler/','mode');
 
         if ($mode == Ess_M2ePro_Model_General_Profiler::MODE_DEVELOPING) {
 
@@ -33,8 +33,8 @@ class Ess_M2ePro_Model_Synchronization_Profiler extends Ess_M2ePro_Model_General
             $this->setProductionMode();
         }
 
-        $printType = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/synchronization/profiler/','print_type'
+        $printType = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/settings/profiler/','print_type'
         );
         $this->setPrintType($printType);
 
@@ -50,8 +50,8 @@ class Ess_M2ePro_Model_Synchronization_Profiler extends Ess_M2ePro_Model_General
 
     public function setClearResources()
     {
-        $deleteResources = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/synchronization/profiler/','delete_resources'
+        $deleteResources = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/settings/profiler/','delete_resources'
         );
         if ($deleteResources == 1) {
             $this->clearResourcesAfterEnd();
@@ -60,7 +60,7 @@ class Ess_M2ePro_Model_Synchronization_Profiler extends Ess_M2ePro_Model_General
 
     public function makeShutdownFunction()
     {
-        $functionCode = "Mage::helper('M2ePro')->getGlobalValue('synchProfiler')->stop();";
+        $functionCode = "Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->stop();";
 
         $shutdownDeleteFunction = create_function('', $functionCode);
         register_shutdown_function($shutdownDeleteFunction);

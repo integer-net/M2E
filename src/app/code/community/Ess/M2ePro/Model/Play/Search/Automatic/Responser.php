@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Search_Automatic_Responser
@@ -77,7 +77,7 @@ class Ess_M2ePro_Model_Play_Search_Automatic_Responser
                 'step' => $this->currentStep + 1
             );
 
-            $dispatcherObject = Mage::getModel('M2ePro/Play_Connector')->getDispatcher();
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
             $dispatcherObject->processConnector('search', 'automatic' ,'requester',
                                                 $params,
                                                 $this->getMarketplace(),
@@ -91,7 +91,7 @@ class Ess_M2ePro_Model_Play_Search_Automatic_Responser
             if (!isset($receivedItems[0]['variations'])) {
 
                 $childListingProduct->setData('general_id',$receivedItems[0]['general_id']);
-                $childListingProduct->setData('general_id_type',Ess_M2ePro_Model_Play_Template_General::GENERAL_ID_MODE_GENERAL_ID);
+                $childListingProduct->setData('general_id_type',Ess_M2ePro_Model_Play_Listing::GENERAL_ID_MODE_GENERAL_ID);
                 $childListingProduct->setData('general_id_search_status',
                                       Ess_M2ePro_Model_Play_Listing_Product::GENERAL_ID_SEARCH_STATUS_SET_AUTOMATIC);
                 $childListingProduct->setData('general_id_search_suggest_data',NULL);
@@ -104,7 +104,7 @@ class Ess_M2ePro_Model_Play_Search_Automatic_Responser
 
                 reset($receivedItems[0]['variations']['play_ids']);
                 $childListingProduct->setData('general_id',key($receivedItems[0]['variations']['play_ids']));
-                $childListingProduct->setData('general_id_type',Ess_M2ePro_Model_Play_Template_General::GENERAL_ID_MODE_GENERAL_ID);
+                $childListingProduct->setData('general_id_type',Ess_M2ePro_Model_Play_Listing::GENERAL_ID_MODE_GENERAL_ID);
                 $childListingProduct->setData('general_id_search_status',
                                       Ess_M2ePro_Model_Play_Listing_Product::GENERAL_ID_SEARCH_STATUS_SET_AUTOMATIC);
                 $childListingProduct->setData('general_id_search_suggest_data',NULL);

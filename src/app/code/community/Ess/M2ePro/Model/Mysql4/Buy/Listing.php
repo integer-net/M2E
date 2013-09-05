@@ -1,18 +1,25 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Mysql4_Buy_Listing extends Ess_M2ePro_Model_Mysql4_Component_Child_Abstract
+class Ess_M2ePro_Model_Mysql4_Buy_Listing
+    extends Ess_M2ePro_Model_Mysql4_Component_Child_Abstract
 {
+    // ########################################
+
     protected $_isPkAutoIncrement = false;
+
+    // ########################################
 
     public function _construct()
     {
         $this->_init('M2ePro/Buy_Listing', 'listing_id');
         $this->_isPkAutoIncrement = false;
     }
+
+    // ########################################
 
     public function updateStatisticColumns()
     {
@@ -34,4 +41,37 @@ class Ess_M2ePro_Model_Mysql4_Buy_Listing extends Ess_M2ePro_Model_Mysql4_Compon
 
         $this->_getWriteAdapter()->query($query);
     }
+
+    // ########################################
+
+    public function isDifferent($newData, $oldData)
+    {
+        $ignoreFields = array(
+            'id', 'title',
+            'component_mode',
+            'create_date', 'update_date'
+        );
+
+        $dataConversions = array(
+            array('field' => 'shipping_one_day_value', 'type' => 'float'),
+            array('field' => 'shipping_two_day_value', 'type' => 'float'),
+            array('field' => 'shipping_standard_value', 'type' => 'float'),
+            array('field' => 'shipping_expedited_value', 'type' => 'float'),
+        );
+
+        foreach ($dataConversions as $data) {
+            $type = $data['type'] . 'val';
+
+            array_key_exists($data['field'],$newData) && $newData[$data['field']] = $type($newData[$data['field']]);
+            array_key_exists($data['field'],$oldData) && $oldData[$data['field']] = $type($oldData[$data['field']]);
+        }
+
+        foreach ($ignoreFields as $ignoreField) {
+            unset($newData[$ignoreField],$oldData[$ignoreField]);
+        }
+
+        return (count(array_diff_assoc($newData,$oldData)) > 0);
+    }
+
+    // ########################################
 }

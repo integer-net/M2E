@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Observer_Invoice
@@ -12,9 +12,9 @@ class Ess_M2ePro_Model_Observer_Invoice
     {
         try {
 
-            if (Mage::helper('M2ePro')->getGlobalValue('skip_invoice_observer')) {
+            if (Mage::helper('M2ePro/Data_Global')->getValue('skip_invoice_observer')) {
                 // Not process invoice observer when set such flag
-                Mage::helper('M2ePro')->unsetGlobalValue('skip_invoice_observer');
+                Mage::helper('M2ePro/Data_Global')->unsetValue('skip_invoice_observer');
                 return;
             }
 
@@ -44,7 +44,7 @@ class Ess_M2ePro_Model_Observer_Invoice
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return;
         }
     }
@@ -59,6 +59,7 @@ class Ess_M2ePro_Model_Observer_Invoice
 
     private function addSessionErrorMessage(Ess_M2ePro_Model_Order $order)
     {
+        // todo adminhtml_log
         $url = Mage::helper('adminhtml')->getUrl('M2ePro/adminhtml_log/order', array('order_id' => $order->getId()));
 
         $startLink = '<a href="' . $url . '" target="_blank">';

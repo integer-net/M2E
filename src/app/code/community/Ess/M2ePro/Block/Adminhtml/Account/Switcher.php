@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Account_Switcher extends Ess_M2ePro_Block_Adminhtml_Component_Switcher
@@ -32,19 +32,12 @@ class Ess_M2ePro_Block_Adminhtml_Account_Switcher extends Ess_M2ePro_Block_Admin
         $items = array();
 
         foreach ($collection as $account) {
+            /** @var $account Ess_M2ePro_Model_Account */
+
             if (!isset($items[$account->getComponentMode()]['label'])) {
                 $label = '';
-                if ($account->isComponentModeEbay()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
-                }
-                if ($account->isComponentModeAmazon()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
-                }
-                if ($account->isComponentModeBuy()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
-                }
-                if ($account->isComponentModePlay()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+                if (isset($componentTitles[$account->getComponentMode()])) {
+                    $label = $componentTitles[$account->getComponentMode()];
                 }
 
                 $items[$account->getComponentMode()]['label'] = $label;

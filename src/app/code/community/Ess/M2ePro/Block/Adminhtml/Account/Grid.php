@@ -1,18 +1,28 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Ess_M2ePro_Block_Adminhtml_Component_Grid
+abstract class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
+    protected $viewComponentHelper = NULL;
+
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
 
+        // Initialize view
+        //------------------------------
+        $view = Mage::helper('M2ePro/View')->getCurrentView();
+        $this->viewComponentHelper = Mage::helper('M2ePro/View')->getComponentHelper($view);
+        //------------------------------
+
         // Initialization block
         //------------------------------
-        $this->setId('accountGrid');
+        $this->setId($view . 'accountGrid');
         //------------------------------
 
         // Set default values
@@ -28,10 +38,10 @@ class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Ess_M2ePro_Block_Adminhtml
 
     protected function _prepareCollection()
     {
-        // Get collection of synchronizations
+        // Get collection of accounts
         $collection = Mage::getModel('M2ePro/Account')->getCollection();
 
-        $components = Mage::helper('M2ePro/Component')->getActiveComponents();
+        $components = $this->viewComponentHelper->getActiveComponents();
         $collection->addFieldToFilter('main_table.component_mode', array('in'=>$components));
 
         // Set collection to grid
@@ -42,38 +52,6 @@ class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Ess_M2ePro_Block_Adminhtml
 
     protected function _prepareColumns()
     {
-        $this->addColumn('id', array(
-            'header'    => Mage::helper('M2ePro')->__('ID'),
-            'align'     => 'right',
-            'width'     => '100px',
-            'type'      => 'number',
-            'index'     => 'id',
-            'filter_index' => 'main_table.id'
-        ));
-
-        $this->addColumn('title', array(
-            'header'    => Mage::helper('M2ePro')->__('Title'),
-            'align'     => 'left',
-            //'width'     => '200px',
-            'type'      => 'text',
-            'index'     => 'title',
-            'filter_index' => 'main_table.title',
-            'frame_callback' => array($this, 'callbackColumnTitle')
-        ));
-
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $this->addColumn('component_mode', array(
-                'header'         => Mage::helper('M2ePro')->__('Channel'),
-                'align'          => 'left',
-                'width'          => '120px',
-                'type'           => 'options',
-                'index'          => 'component_mode',
-                'filter_index'   => 'main_table.component_mode',
-                'sortable'       => false,
-                'options'        => $this->getComponentModeFilterOptions()
-            ));
-        }
-
         $this->addColumn('create_date', array(
             'header'    => Mage::helper('M2ePro')->__('Creation Date'),
             'align'     => 'left',
@@ -151,13 +129,6 @@ class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Ess_M2ePro_Block_Adminhtml
 
     // ####################################
 
-    public function callbackColumnTitle($value, $row, $column, $isExport)
-    {
-        return Mage::helper('M2ePro')->escapeHtml($value);
-    }
-
-    // ####################################
-
     public function getGridUrl()
     {
         return $this->getUrl('*/*/accountGrid', array('_current'=>true));
@@ -165,7 +136,8 @@ class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Ess_M2ePro_Block_Adminhtml
 
     public function getRowUrl($row)
     {
-        return $this->getComponentRowUrl($row, 'account', 'edit', array('id' => $row->getData('id')));
+        return Mage::helper('M2ePro/View')
+            ->getUrl($row, 'account', 'edit', array('id' => $row->getData('id')));
     }
 
     // ####################################

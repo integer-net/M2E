@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -29,6 +29,8 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     const REVISE_MAX_AFFECTED_QTY_MODE_OFF = 0;
     const REVISE_MAX_AFFECTED_QTY_MODE_ON = 1;
 
+    const REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT = 10;
+
     const REVISE_UPDATE_PRICE_NONE = 0;
     const REVISE_UPDATE_PRICE_YES  = 1;
 
@@ -40,6 +42,21 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
     const REVISE_UPDATE_SUB_TITLE_NONE = 0;
     const REVISE_UPDATE_SUB_TITLE_YES  = 1;
+
+    const REVISE_CHANGE_PAYMENT_TEMPLATE_NONE = 0;
+    const REVISE_CHANGE_PAYMENT_TEMPLATE_YES  = 1;
+
+    const REVISE_CHANGE_SHIPPING_TEMPLATE_NONE = 0;
+    const REVISE_CHANGE_SHIPPING_TEMPLATE_YES  = 1;
+
+    const REVISE_CHANGE_RETURN_TEMPLATE_NONE = 0;
+    const REVISE_CHANGE_RETURN_TEMPLATE_YES  = 1;
+
+    const REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE = 0;
+    const REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES  = 1;
+
+    const REVISE_CHANGE_CATEGORY_TEMPLATE_NONE = 0;
+    const REVISE_CHANGE_CATEGORY_TEMPLATE_YES  = 1;
 
     const RELIST_FILTER_USER_LOCK_NONE = 0;
     const RELIST_FILTER_USER_LOCK_YES  = 1;
@@ -60,15 +77,6 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     const RELIST_QTY_LESS    = 1;
     const RELIST_QTY_BETWEEN = 2;
     const RELIST_QTY_MORE    = 3;
-
-    const RELIST_SCHEDULE_TYPE_IMMEDIATELY = 0;
-    const RELIST_SCHEDULE_TYPE_THROUGH = 1;
-    const RELIST_SCHEDULE_TYPE_WEEK = 2;
-
-    const RELIST_SCHEDULE_THROUGH_METRIC_NONE    = 0;
-    const RELIST_SCHEDULE_THROUGH_METRIC_MINUTES = 1;
-    const RELIST_SCHEDULE_THROUGH_METRIC_HOURS   = 2;
-    const RELIST_SCHEDULE_THROUGH_METRIC_DAYS    = 3;
 
     const STOP_STATUS_DISABLED_NONE = 0;
     const STOP_STATUS_DISABLED_YES  = 1;
@@ -91,9 +99,24 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
     // ########################################
 
-    public function getListings($asObjects = false, array $filters = array())
+    public function isLocked()
     {
-        return $this->getParentObject->getListings($asObjects,$filters);
+        if (parent::isLocked()) {
+            return true;
+        }
+
+        return (bool)Mage::getModel('M2ePro/Ebay_Listing')
+                            ->getCollection()
+                            ->addFieldToFilter('template_synchronization_mode',
+                                                Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE)
+                            ->addFieldToFilter('template_synchronization_id', $this->getId())
+                            ->getSize() ||
+               (bool)Mage::getModel('M2ePro/Ebay_Listing_Product')
+                            ->getCollection()
+                            ->addFieldToFilter('template_synchronization_mode',
+                                                Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE)
+                            ->addFieldToFilter('template_synchronization_id', $this->getId())
+                            ->getSize();
     }
 
     // ########################################
@@ -120,14 +143,33 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
     //------------------------
 
-    public function isReviseWhenChangeQty()
+    public function getReviseUpdateQtyMaxAppliedValueMode()
     {
-        return $this->getData('revise_update_qty') != self::REVISE_UPDATE_QTY_NONE;
+        return (int)$this->getData('revise_update_qty_max_applied_value_mode');
     }
+
+    public function isReviseUpdateQtyMaxAppliedValueModeOn()
+    {
+        return $this->getReviseUpdateQtyMaxAppliedValueMode() == self::REVISE_MAX_AFFECTED_QTY_MODE_ON;
+    }
+
+    public function isReviseUpdateQtyMaxAppliedValueModeOff()
+    {
+        return $this->getReviseUpdateQtyMaxAppliedValueMode() == self::REVISE_MAX_AFFECTED_QTY_MODE_OFF;
+    }
+
+    //------------------------
 
     public function getReviseUpdateQtyMaxAppliedValue()
     {
         return (int)$this->getData('revise_update_qty_max_applied_value');
+    }
+
+    //------------------------
+
+    public function isReviseWhenChangeQty()
+    {
+        return $this->getData('revise_update_qty') != self::REVISE_UPDATE_QTY_NONE;
     }
 
     public function isReviseWhenChangePrice()
@@ -148,6 +190,38 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     public function isReviseWhenChangeDescription()
     {
         return $this->getData('revise_update_description') != self::REVISE_UPDATE_DESCRIPTION_NONE;
+    }
+
+    //------------------------
+
+    public function isReviseCategoryTemplate()
+    {
+        return (int)$this->getData('revise_change_category_template') !=
+            self::REVISE_CHANGE_CATEGORY_TEMPLATE_NONE;
+    }
+
+    public function isRevisePaymentTemplate()
+    {
+        return (int)$this->getData('revise_change_payment_template') !=
+            self::REVISE_CHANGE_PAYMENT_TEMPLATE_NONE;
+    }
+
+    public function isReviseReturnTemplate()
+    {
+        return (int)$this->getData('revise_change_return_template') !=
+            self::REVISE_CHANGE_RETURN_TEMPLATE_NONE;
+    }
+
+    public function isReviseShippingTemplate()
+    {
+        return (int)$this->getData('revise_change_shipping_template') !=
+            self::REVISE_CHANGE_SHIPPING_TEMPLATE_NONE;
+    }
+
+    public function isReviseDescriptionTemplate()
+    {
+        return (int)$this->getData('revise_change_description_template') !=
+            self::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE;
     }
 
     //------------------------
@@ -180,88 +254,6 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     public function isRelistWhenQtyHasValue()
     {
         return $this->getData('relist_qty') != self::RELIST_QTY_NONE;
-    }
-
-    public function isRelistSchedule()
-    {
-        return $this->getData('relist_schedule_type') != self::RELIST_SCHEDULE_TYPE_IMMEDIATELY;
-    }
-
-    //------------------------
-
-    public function isRelistScheduleWeekDayNow()
-    {
-        $synchronizationDaysOfWeek = $this->getRelistScheduleWeek();
-        $synchronizationDaysOfWeek = explode('_',$synchronizationDaysOfWeek);
-
-        $enabledDaysOfWeek = array();
-        foreach ($synchronizationDaysOfWeek as $item) {
-            if (!isset($item{2}) || (int)$item{2} != 1) {
-                continue;
-            }
-            $enabledDaysOfWeek[] = $item{0}.$item{1};
-        }
-        $synchronizationDaysOfWeek = $enabledDaysOfWeek;
-
-        foreach ($synchronizationDaysOfWeek as &$item) {
-            $item = strtolower($item);
-            switch ($item) {
-                case 'mo': $item = 'monday'; break;
-                case 'tu': $item = 'tuesday'; break;
-                case 'we': $item = 'wednesday'; break;
-                case 'th': $item = 'thursday'; break;
-                case 'fr': $item = 'friday'; break;
-                case 'sa': $item = 'saturday'; break;
-                case 'su': $item = 'sunday'; break;
-            }
-        }
-
-        $todayDayOfWeek = getdate(Mage::helper('M2ePro')->getCurrentGmtDate(true));
-        $todayDayOfWeek = strtolower($todayDayOfWeek['weekday']);
-
-        if (!in_array($todayDayOfWeek,$synchronizationDaysOfWeek)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function isRelistScheduleWeekTimeNow()
-    {
-        if (is_null($this->getData('relist_schedule_week_start_time')) ||
-            $this->getData('relist_schedule_week_start_time') == '' ||
-            is_null($this->getData('relist_schedule_week_end_time')) ||
-            $this->getData('relist_schedule_week_end_time') == '') {
-            return true;
-        }
-
-        $tempStartTime = explode(':',$this->getData('relist_schedule_week_start_time'));
-        $tempEndTime = explode(':',$this->getData('relist_schedule_week_end_time'));
-
-        if (!is_array($tempStartTime) || count($tempStartTime) < 2 ||
-            !is_array($tempEndTime) || count($tempEndTime) < 2) {
-            return true;
-        }
-
-        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-
-        $startTimeStampCurrentDay = mktime(0, 0, 0, date('m',$currentTimeStamp),
-                                                    date('d',$currentTimeStamp),
-                                                    date('Y',$currentTimeStamp)) +
-                                    (int)$tempStartTime[0]*60*60 +
-                                    (int)$tempStartTime[1]*60;
-        $endTimeStampCurrentDay = mktime(0, 0, 0, date('m',$currentTimeStamp),
-                                                  date('d',$currentTimeStamp),
-                                                  date('Y',$currentTimeStamp)) +
-                                    (int)$tempEndTime[0]*60*60 +
-                                    (int)$tempEndTime[1]*60;
-
-        if ($currentTimeStamp < $startTimeStampCurrentDay ||
-            $currentTimeStamp > $endTimeStampCurrentDay) {
-            return false;
-        }
-
-        return true;
     }
 
     //------------------------
@@ -315,26 +307,6 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
         return $this->getData('relist_qty_value_max');
     }
 
-    public function getRelistScheduleType()
-    {
-        return $this->getData('relist_schedule_type');
-    }
-
-    public function getRelistScheduleThroughMetric()
-    {
-        return $this->getData('relist_schedule_through_metric');
-    }
-
-    public function getRelistScheduleThroughValue()
-    {
-        return $this->getData('relist_schedule_through_value');
-    }
-
-    public function getRelistScheduleWeek()
-    {
-       return $this->getData('relist_schedule_week');
-    }
-
     //------------------------
 
     public function getStopWhenQtyHasValueType()
@@ -352,19 +324,260 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
         return $this->getData('stop_qty_value_max');
     }
 
-    // ########################################
+    //------------------------
+
+    public function isScheduleEnabled()
+    {
+        return (int)$this->getData('schedule_mode') == 1;
+    }
+
+    public function isScheduleIntervalNow()
+    {
+        $intervalSettings = $this->getSettings('schedule_interval_settings');
+
+        if (empty($intervalSettings)) {
+            return true;
+        }
+
+        if (!isset($intervalSettings['mode'], $intervalSettings['date_from'], $intervalSettings['date_to'])) {
+            return true;
+        }
+
+        if ($intervalSettings['mode'] == 0) {
+            return true;
+        }
+
+        $from = strtotime($intervalSettings['date_from']);
+        $to   = strtotime($intervalSettings['date_to']);
+        $now  = Mage::helper('M2ePro')->getCurrentGmtDate(true);
+
+        return $now >= $from && $now <= $to;
+    }
+
+    public function isScheduleWeekNow()
+    {
+        $weekSettings = $this->getSettings('schedule_week_settings');
+
+        if (empty($weekSettings)) {
+            return false;
+        }
+
+        $todayDayOfWeek = getdate(Mage::helper('M2ePro')->getCurrentGmtDate(true));
+        $todayDayOfWeek = strtolower($todayDayOfWeek['weekday']);
+
+        if (!isset($weekSettings[$todayDayOfWeek])) {
+            return false;
+        }
+
+        if (!isset($weekSettings[$todayDayOfWeek]['time_from'], $weekSettings[$todayDayOfWeek]['time_to'])) {
+            return false;
+        }
+
+        $now = Mage::helper('M2ePro')->getCurrentGmtDate(true);
+
+        list($fromHour,$fromMinute,$fromSecond) = explode(':',$weekSettings[$todayDayOfWeek]['time_from']);
+        $from = mktime($fromHour,$fromMinute,$fromSecond, date('m',$now),date('d',$now),date('Y',$now));
+
+        list($toHour,$toMinute,$toSecond) = explode(':',$weekSettings[$todayDayOfWeek]['time_to']);
+        $to = mktime($toHour,$toMinute,$toSecond, date('m',$now),date('d',$now),date('Y',$now));
+
+        return $now >= $from && $now <= $to;
+    }
+
+    // #######################################
+
+    public function getNick()
+    {
+        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
+    }
+
+    // #######################################
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
         return parent::delete();
     }
 
     // ########################################
+
+    public function getDefaultSettingsSimpleMode()
+    {
+        return array_merge(
+            $this->getListDefaultSettingsSimpleMode(),
+            $this->getReviseDefaultSettingsSimpleMode(),
+            $this->getRelistDefaultSettingsSimpleMode(),
+            $this->getStopDefaultSettingsSimpleMode(),
+            $this->getScheduleDefaultSettingsSimpleMode()
+        );
+    }
+
+    public function getDefaultSettingsAdvancedMode()
+    {
+        return array_merge(
+            $this->getListDefaultSettingsAdvancedMode(),
+            $this->getReviseDefaultSettingsAdvancedMode(),
+            $this->getRelistDefaultSettingsAdvancedMode(),
+            $this->getStopDefaultSettingsAdvancedMode(),
+            $this->getScheduleDefaultSettingsAdvancedMode()
+        );
+    }
+
+    //------------------------
+
+    public function getListDefaultSettingsSimpleMode()
+    {
+        return array(
+            'list_mode'           => self::LIST_MODE_NONE,
+            'list_status_enabled' => self::LIST_STATUS_ENABLED_YES,
+            'list_is_in_stock'    => self::LIST_IS_IN_STOCK_YES,
+            'list_qty'            => self::LIST_QTY_NONE,
+            'list_qty_value'      => '1',
+            'list_qty_value_max'  => '10',
+        );
+    }
+
+    public function getReviseDefaultSettingsSimpleMode()
+    {
+        return array(
+            'revise_update_qty'                        => self::REVISE_UPDATE_QTY_YES,
+            'revise_update_qty_max_applied_value_mode' => self::REVISE_MAX_AFFECTED_QTY_MODE_OFF,
+            'revise_update_qty_max_applied_value'      => self::REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT,
+            'revise_update_price'                      => self::REVISE_UPDATE_PRICE_YES,
+            'revise_update_title'                      => self::REVISE_UPDATE_TITLE_YES,
+            'revise_update_sub_title'                  => self::REVISE_UPDATE_SUB_TITLE_YES,
+            'revise_update_description'                => self::REVISE_UPDATE_DESCRIPTION_YES,
+
+            'revise_change_selling_format_template'    =>
+                    Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES,
+            'revise_change_description_template'       => self::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES,
+            'revise_change_category_template'          => self::REVISE_CHANGE_CATEGORY_TEMPLATE_YES,
+            'revise_change_payment_template'           => self::REVISE_CHANGE_PAYMENT_TEMPLATE_YES,
+            'revise_change_shipping_template'          => self::REVISE_CHANGE_SHIPPING_TEMPLATE_YES,
+            'revise_change_return_template'            => self::REVISE_CHANGE_RETURN_TEMPLATE_YES
+        );
+    }
+
+    public function getRelistDefaultSettingsSimpleMode()
+    {
+        return array(
+            'relist_mode'             => self::RELIST_MODE_YES,
+            'relist_filter_user_lock' => self::RELIST_FILTER_USER_LOCK_YES,
+            'relist_send_data'        => self::RELIST_SEND_DATA_YES,
+            'relist_status_enabled'   => self::RELIST_STATUS_ENABLED_YES,
+            'relist_is_in_stock'      => self::RELIST_IS_IN_STOCK_YES,
+            'relist_qty'              => self::RELIST_QTY_NONE,
+            'relist_qty_value'        => '1',
+            'relist_qty_value_max'    => '10',
+        );
+    }
+
+    public function getStopDefaultSettingsSimpleMode()
+    {
+        return array(
+            'stop_status_disabled' => self::STOP_STATUS_DISABLED_YES,
+            'stop_out_off_stock'   => self::STOP_OUT_OFF_STOCK_YES,
+            'stop_qty'             => self::STOP_QTY_NONE,
+            'stop_qty_value'       => '0',
+            'stop_qty_value_max'   => '10'
+        );
+    }
+
+    public function getScheduleDefaultSettingsSimpleMode()
+    {
+        return array(
+            'schedule_mode'              => 0,
+
+            'schedule_interval_settings' => json_encode(array(
+                'mode'      => 0,
+                'date_from' => Mage::helper('M2ePro')->getCurrentTimezoneDate(false,'Y-m-d'),
+                'date_to'   => Mage::helper('M2ePro')->getCurrentTimezoneDate(false,'Y-m-d')
+            )),
+
+            'schedule_week_settings'     => json_encode(array())
+        );
+    }
+
+    //------------------------
+
+    public function getListDefaultSettingsAdvancedMode()
+    {
+        $simpleSettings = $this->getListDefaultSettingsSimpleMode();
+
+        $simpleSettings['list_mode'] = self::LIST_MODE_YES;
+
+        return $simpleSettings;
+    }
+
+    public function getReviseDefaultSettingsAdvancedMode()
+    {
+        $simpleSettings = $this->getReviseDefaultSettingsSimpleMode();
+
+        $simpleSettings['revise_update_qty_max_applied_value_mode'] = self::REVISE_MAX_AFFECTED_QTY_MODE_ON;
+
+        return $simpleSettings;
+    }
+
+    public function getRelistDefaultSettingsAdvancedMode()
+    {
+        return $this->getRelistDefaultSettingsSimpleMode();
+    }
+
+    public function getStopDefaultSettingsAdvancedMode()
+    {
+        return $this->getStopDefaultSettingsSimpleMode();
+    }
+
+    public function getScheduleDefaultSettingsAdvancedMode()
+    {
+        return $this->getScheduleDefaultSettingsSimpleMode();
+    }
+
+    // #######################################
+
+    public function getAffectedListingProducts($asObjects = false)
+    {
+        if (is_null($this->getId())) {
+            throw new LogicException('Method require loaded instance first');
+        }
+
+        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
+
+        $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
+        $templateManager->setTemplate($template);
+
+        $listingProducts = $templateManager->getAffectedItems(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
+            $this->getId(),
+            array(), $asObjects
+        );
+
+        foreach ($listingProducts as $key => $listingProduct) {
+            unset($listingProducts[$key]);
+            $listingProducts[$listingProduct['id']] = $listingProduct;
+        }
+
+        $listings = $templateManager->getAffectedItems(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
+            $this->getId()
+        );
+
+        foreach ($listings as $listing) {
+            $tempListingProducts = $listing->getChildObject()->getAffectedListingProducts($template,$asObjects);
+
+            foreach ($tempListingProducts as $listingProduct) {
+                $listingProducts[$listingProduct['id']] = $listingProduct;
+            }
+        }
+
+        return $listingProducts;
+    }
+
+    // #######################################
 }

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>5.2.5</version>
+            <version>6.0.3</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -35,7 +35,7 @@
                 <use>m2epro_custom</use>
                 <args>
                     <module>Ess_M2ePro</module>
-                    <frontName>m2epro</frontName>
+                    <frontName>M2ePro</frontName>
                 </args>
             </M2ePro>
         </routers>
@@ -62,9 +62,48 @@
             </modules>
         </translate>
         <menu>
-            <m2epro module="M2ePro">
-                <title>Sell On Multi-Channels</title>
+
+            <m2epro_ebay module="M2ePro">
+                <title>Sell On eBay</title>
                 <sort_order>71</sort_order>
+                <children>
+
+                    <listings module="M2ePro">
+                        <title>Listings</title>
+                        <sort_order>1</sort_order>
+                        <action>M2ePro/adminhtml_ebay_listing/index</action>
+                    </listings>
+
+                    <orders module="M2ePro">
+                        <title>Sales</title>
+                        <sort_order>2</sort_order>
+                        <action>M2ePro/adminhtml_ebay_order/index</action>
+                    </orders>
+
+                    <accounts module="M2ePro">
+                        <title>Logs</title>
+                        <sort_order>3</sort_order>
+                        <action>M2ePro/adminhtml_ebay_log/listing</action>
+                    </accounts>
+
+                    <configuration module="M2ePro">
+                        <title>Configuration</title>
+                        <sort_order>4</sort_order>
+                        <action>M2ePro/adminhtml_ebay_synchronization/index</action>
+                    </configuration>
+
+                    <help module="M2ePro">
+                        <title>Help</title>
+                        <sort_order>5</sort_order>
+                        <action>M2ePro/adminhtml_support/index/referrer/ebay</action>
+                    </help>
+
+                </children>
+            </m2epro_ebay>
+
+            <m2epro_common module="M2ePro">
+                <title>Sell On Multi-Channels</title>
+                <sort_order>72</sort_order>
                 <children>
 
                     <listings module="M2ePro">
@@ -74,144 +113,91 @@
                             <listing module="M2ePro">
                                 <title>Listings</title>
                                 <sort_order>1</sort_order>
-                                <action>M2ePro/adminhtml_listing/index</action>
+                                <action>M2ePro/adminhtml_common_listing/index</action>
                             </listing>
                             <listing_other module="M2ePro">
                                 <title>3rd Party Listings</title>
                                 <sort_order>2</sort_order>
-                                <action>M2ePro/adminhtml_listingOther/index</action>
+                                <action>M2ePro/adminhtml_common_listing_other/index</action>
                             </listing_other>
                         </children>
                     </listings>
 
-                    <sales module="M2ePro">
+                    <orders module="M2ePro">
                         <title>Sales</title>
                         <sort_order>2</sort_order>
-                        <children>
-                            <order module="M2ePro">
-                                <title>Orders</title>
-                                <sort_order>1</sort_order>
-                                <action>M2ePro/adminhtml_order/index</action>
-                            </order>
-                            <analytic module="M2ePro">
-                                <title>Analytics</title>
-                                <sort_order>2</sort_order>
-                                <action>M2ePro/adminhtml_analytic/index</action>
-                            </analytic>
-                        </children>
-                    </sales>
-
-                    <communication module="M2ePro">
-                        <title>Communication</title>
-                        <sort_order>3</sort_order>
-                        <children>
-                            <feedback module="M2ePro">
-                                <title>Feedbacks</title>
-                                <sort_order>1</sort_order>
-                                <action>M2ePro/adminhtml_ebay_feedback/index</action>
-                            </feedback>
-                            <my_message module="M2ePro">
-                                <title>My Messages</title>
-                                <sort_order>2</sort_order>
-                                <action>M2ePro/adminhtml_ebay_message/index</action>
-                            </my_message>
-                        </children>
-                    </communication>
+                        <action>M2ePro/adminhtml_common_order/index</action>
+                    </orders>
 
                     <templates module="M2ePro">
                         <title>Templates</title>
-                        <sort_order>4</sort_order>
+                        <sort_order>3</sort_order>
                         <children>
                             <selling_format module="M2ePro">
                                 <title>Selling Format Templates</title>
                                 <sort_order>1</sort_order>
-                                <action>M2ePro/adminhtml_template_sellingFormat/index</action>
+                                <action>M2ePro/adminhtml_common_template_sellingFormat/index</action>
                             </selling_format>
-                            <description module="M2ePro">
-                                <title>Description Templates</title>
-                                <sort_order>2</sort_order>
-                                <action>M2ePro/adminhtml_template_description/index</action>
-                            </description>
-                            <general module="M2ePro">
-                                <title>General Templates</title>
-                                <sort_order>3</sort_order>
-                                <action>M2ePro/adminhtml_template_general/index</action>
-                            </general>
                             <synchronization module="M2ePro">
                                 <title>Synchronization Templates</title>
-                                <sort_order>4</sort_order>
-                                <action>M2ePro/adminhtml_template_synchronization/index</action>
+                                <sort_order>2</sort_order>
+                                <action>M2ePro/adminhtml_common_template_synchronization/index</action>
                             </synchronization>
                         </children>
                     </templates>
 
                     <logs module="M2ePro">
                         <title>Activity Logs</title>
-                        <sort_order>5</sort_order>
+                        <sort_order>4</sort_order>
                         <children>
                             <listing module="M2ePro">
                                 <title>Listings Log</title>
                                 <sort_order>1</sort_order>
-                                <action>M2ePro/adminhtml_log/listing</action>
+                                <action>M2ePro/adminhtml_common_log/listing</action>
                             </listing>
                             <listing_other module="M2ePro">
                                 <title>3rd Party Listings Log</title>
                                 <sort_order>2</sort_order>
-                                <action>M2ePro/adminhtml_log/listingOther</action>
+                                <action>M2ePro/adminhtml_common_log/listingOther</action>
                             </listing_other>
                             <synchronization module="M2ePro">
                                 <title>Synchronization Log</title>
                                 <sort_order>3</sort_order>
-                                <action>M2ePro/adminhtml_log/synchronization</action>
+                                <action>M2ePro/adminhtml_common_log/synchronization</action>
                             </synchronization>
                             <order module="M2ePro">
                                 <title>Orders Log</title>
                                 <sort_order>4</sort_order>
-                                <action>M2ePro/adminhtml_log/order</action>
+                                <action>M2ePro/adminhtml_common_log/order</action>
                             </order>
                         </children>
                     </logs>
 
                     <configuration module="M2ePro">
                         <title>Configuration</title>
-                        <sort_order>6</sort_order>
+                        <sort_order>5</sort_order>
                         <children>
                             <account module="M2ePro">
-                                <title>Accounts</title>
+                                <title>Account Settings</title>
                                 <sort_order>1</sort_order>
-                                <action>M2ePro/adminhtml_account/index</action>
+                                <action>M2ePro/adminhtml_common_account/index</action>
                             </account>
                             <marketplace module="M2ePro">
                                 <title>Marketplaces</title>
                                 <sort_order>2</sort_order>
-                                <action>M2ePro/adminhtml_marketplace/index</action>
+                                <action>M2ePro/adminhtml_common_marketplace/index</action>
                             </marketplace>
                             <synchronization module="M2ePro">
                                 <title>Synchronization</title>
                                 <sort_order>3</sort_order>
-                                <action>M2ePro/adminhtml_synchronization/index</action>
+                                <action>M2ePro/adminhtml_common_synchronization/index</action>
                             </synchronization>
-                            <log_cleaning module="M2ePro">
-                                <title>Logs Clearing</title>
-                                <sort_order>4</sort_order>
-                                <action>M2ePro/adminhtml_logCleaning/index</action>
-                            </log_cleaning>
-                            <settings module="M2ePro">
-                                <title>Settings</title>
-                                <sort_order>5</sort_order>
-                                <action>M2ePro/adminhtml_settings/index</action>
-                            </settings>
-                            <license module="M2ePro">
-                                <title>License</title>
-                                <sort_order>6</sort_order>
-                                <action>M2ePro/adminhtml_license/index</action>
-                            </license>
                         </children>
                     </configuration>
 
                     <help module="M2ePro">
                         <title>Help</title>
-                        <sort_order>7</sort_order>
+                        <sort_order>6</sort_order>
                         <children>
                             <doc module="M2ePro">
                                 <title>Documentation</title>
@@ -223,28 +209,17 @@
                                 <sort_order>2</sort_order>
                                 <action>M2ePro/adminhtml_support/index</action>
                             </tutorial>
-                            <!--
-                            <translation module="M2ePro">
-                                <title>Translation</title>
-                                <sort_order>3</sort_order>
-                                <action>M2ePro/adminhtml_translation/index</action>
-                            </translation>
-                            -->
                             <support module="M2ePro">
                                 <title>Support</title>
-                                <sort_order>4</sort_order>
-                                <action>M2ePro/adminhtml_support/index</action>
+                                <sort_order>3</sort_order>
+                                <action>M2ePro/adminhtml_support/index/referrer/common</action>
                             </support>
-                            <about module="M2ePro">
-                                <title>About</title>
-                                <sort_order>5</sort_order>
-                                <action>M2ePro/adminhtml_about/index</action>
-                            </about>
                         </children>
                     </help>
 
                 </children>
-            </m2epro>
+            </m2epro_common>
+
         </menu>
         <acl>
             <resources>
@@ -253,9 +228,43 @@
                 </all>
                 <admin>
                     <children>
-                        <m2epro>
-                            <title>Sell On Multi-Channels</title>
+
+                        <m2epro_ebay>
+                            <title>Sell On eBay</title>
                             <sort_order>71</sort_order>
+                            <children>
+
+                                <listings>
+                                    <title>Listings</title>
+                                    <sort_order>1</sort_order>
+                                </listings>
+
+                                <orders>
+                                    <title>Sales</title>
+                                    <sort_order>2</sort_order>
+                                </orders>
+
+                                <logs>
+                                    <title>Logs</title>
+                                    <sort_order>3</sort_order>
+                                </logs>
+
+                                <configuration>
+                                    <title>Configuration</title>
+                                    <sort_order>4</sort_order>
+                                </configuration>
+
+                                <help>
+                                    <title>Help</title>
+                                    <sort_order>5</sort_order>
+                                </help>
+
+                            </children>
+                        </m2epro_ebay>
+
+                        <m2epro_common>
+                            <title>Sell On Multi-Channels</title>
+                            <sort_order>72</sort_order>
                             <children>
 
                                 <listings>
@@ -273,62 +282,29 @@
                                     </children>
                                 </listings>
 
-                                <sales>
+                                <orders>
                                     <title>Sales</title>
                                     <sort_order>2</sort_order>
-                                    <children>
-                                        <order>
-                                            <title>Orders</title>
-                                            <sort_order>1</sort_order>
-                                        </order>
-                                        <analytic>
-                                            <title>Analytics</title>
-                                            <sort_order>2</sort_order>
-                                        </analytic>
-                                    </children>
-                                </sales>
-
-                                <communication>
-                                    <title>Communication</title>
-                                    <sort_order>3</sort_order>
-                                    <children>
-                                        <feedback>
-                                            <title>Feedbacks</title>
-                                            <sort_order>1</sort_order>
-                                        </feedback>
-                                        <my_message>
-                                            <title>My Messages</title>
-                                            <sort_order>2</sort_order>
-                                        </my_message>
-                                    </children>
-                                </communication>
+                                </orders>
 
                                 <templates>
                                     <title>Templates</title>
-                                    <sort_order>4</sort_order>
+                                    <sort_order>3</sort_order>
                                     <children>
                                         <selling_format>
                                             <title>Selling Format Templates</title>
                                             <sort_order>1</sort_order>
                                         </selling_format>
-                                        <description>
-                                            <title>Description Templates</title>
-                                            <sort_order>2</sort_order>
-                                        </description>
-                                        <general>
-                                            <title>General Templates</title>
-                                            <sort_order>3</sort_order>
-                                        </general>
                                         <synchronization>
                                             <title>Synchronization Templates</title>
-                                            <sort_order>4</sort_order>
+                                            <sort_order>2</sort_order>
                                         </synchronization>
                                     </children>
                                 </templates>
 
                                 <logs>
                                     <title>Activity Logs</title>
-                                    <sort_order>5</sort_order>
+                                    <sort_order>4</sort_order>
                                     <children>
                                         <listing>
                                             <title>Listings Log</title>
@@ -351,10 +327,10 @@
 
                                 <configuration>
                                     <title>Configuration</title>
-                                    <sort_order>6</sort_order>
+                                    <sort_order>5</sort_order>
                                     <children>
                                         <account>
-                                            <title>Accounts</title>
+                                            <title>Account Settings</title>
                                             <sort_order>1</sort_order>
                                         </account>
                                         <marketplace>
@@ -365,24 +341,12 @@
                                             <title>Synchronization</title>
                                             <sort_order>3</sort_order>
                                         </synchronization>
-                                        <log_cleaning>
-                                            <title>Logs Clearing</title>
-                                            <sort_order>4</sort_order>
-                                        </log_cleaning>
-                                        <settings>
-                                            <title>Settings</title>
-                                            <sort_order>5</sort_order>
-                                        </settings>
-                                        <license>
-                                            <title>License</title>
-                                            <sort_order>6</sort_order>
-                                        </license>
                                     </children>
                                 </configuration>
 
                                 <help>
                                     <title>Help</title>
-                                    <sort_order>7</sort_order>
+                                    <sort_order>6</sort_order>
                                     <children>
                                         <doc>
                                             <title>Documentation</title>
@@ -392,25 +356,40 @@
                                             <title>Video Tutorials</title>
                                             <sort_order>2</sort_order>
                                         </tutorial>
-                                        <!--
-                                        <translation>
-                                            <title>Translation</title>
-                                            <sort_order>3</sort_order>
-                                        </translation>
-                                        -->
                                         <support>
                                             <title>Support</title>
-                                            <sort_order>4</sort_order>
+                                            <sort_order>3</sort_order>
                                         </support>
-                                        <about>
-                                            <title>About</title>
-                                            <sort_order>5</sort_order>
-                                        </about>
                                     </children>
                                 </help>
 
                             </children>
-                        </m2epro>
+                        </m2epro_common>
+
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <m2epro_components>
+                                            <title>Channels</title>
+                                            <sort_order>1</sort_order>
+                                        </m2epro_components>
+                                        <m2epro_settings>
+                                            <title>General</title>
+                                            <sort_order>2</sort_order>
+                                        </m2epro_settings>
+                                        <m2epro_logs_cleaning>
+                                            <title>Logs Clearing</title>
+                                            <sort_order>3</sort_order>
+                                        </m2epro_logs_cleaning>
+                                        <m2epro_license>
+                                            <title>License</title>
+                                            <sort_order>4</sort_order>
+                                        </m2epro_license>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
 
                     </children>
                 </admin>
@@ -427,6 +406,15 @@
     <global>
         <events>
 
+            <controller_action_predispatch_adminhtml_system_config_save>
+                <observers>
+                    <ess_M2ePro_observer_config>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Magento_Configuration</class>
+                        <method>systemConfigSaveAction</method>
+                    </ess_M2ePro_observer_config>
+                </observers>
+            </controller_action_predispatch_adminhtml_system_config_save>
             <catalog_product_save_before>
                 <observers>
                     <ess_M2ePro_observer_product>
@@ -579,12 +567,18 @@
 
                     <!-- GENERAL -->
 
-                    <Config_Ess>
-                        <table>ess_config</table>
-                    </Config_Ess>
+                    <Config_Primary>
+                        <table>m2epro_primary_config</table>
+                    </Config_Primary>
                     <Config_Module>
                         <table>m2epro_config</table>
                     </Config_Module>
+                    <Config_Cache>
+                        <table>m2epro_cache_config</table>
+                    </Config_Cache>
+                    <Config_Synchronization>
+                        <table>m2epro_synchronization_config</table>
+                    </Config_Synchronization>
 
                     <LockItem>
                         <table>m2epro_lock_item</table>
@@ -598,6 +592,12 @@
                     <AttributeSet>
                         <table>m2epro_attribute_set</table>
                     </AttributeSet>
+                    <StopQueue>
+                        <table>m2epro_stop_queue</table>
+                    </StopQueue>
+                    <Wizard>
+                        <table>m2epro_wizard</table>
+                    </Wizard>
 
                     <Synchronization_Log>
                         <table>m2epro_synchronization_log</table>
@@ -618,6 +618,9 @@
                     <Ebay_Account>
                         <table>m2epro_ebay_account</table>
                     </Ebay_Account>
+                    <Ebay_Account_Policy>
+                        <table>m2epro_ebay_account_policy</table>
+                    </Ebay_Account_Policy>
                     <Amazon_Account>
                         <table>m2epro_amazon_account</table>
                     </Amazon_Account>
@@ -646,22 +649,6 @@
 
                     <!-- TEMPLATES -->
 
-                    <Template_General>
-                        <table>m2epro_template_general</table>
-                    </Template_General>
-                    <Ebay_Template_General>
-                        <table>m2epro_ebay_template_general</table>
-                    </Ebay_Template_General>
-                    <Amazon_Template_General>
-                        <table>m2epro_amazon_template_general</table>
-                    </Amazon_Template_General>
-                    <Buy_Template_General>
-                        <table>m2epro_buy_template_general</table>
-                    </Buy_Template_General>
-                    <Play_Template_General>
-                        <table>m2epro_play_template_general</table>
-                    </Play_Template_General>
-
                     <Template_SellingFormat>
                         <table>m2epro_template_selling_format</table>
                     </Template_SellingFormat>
@@ -677,22 +664,6 @@
                     <Play_Template_SellingFormat>
                         <table>m2epro_play_template_selling_format</table>
                     </Play_Template_SellingFormat>
-
-                    <Template_Description>
-                        <table>m2epro_template_description</table>
-                    </Template_Description>
-                    <Ebay_Template_Description>
-                        <table>m2epro_ebay_template_description</table>
-                    </Ebay_Template_Description>
-                    <Amazon_Template_Description>
-                        <table>m2epro_amazon_template_description</table>
-                    </Amazon_Template_Description>
-                    <Buy_Template_Description>
-                        <table>m2epro_buy_template_description</table>
-                    </Buy_Template_Description>
-                    <Play_Template_Description>
-                        <table>m2epro_play_template_description</table>
-                    </Play_Template_Description>
 
                     <Template_Synchronization>
                         <table>m2epro_template_synchronization</table>
@@ -803,18 +774,6 @@
                         <table>m2epro_play_listing_product_variation_option</table>
                     </Play_Listing_Product_Variation_Option>
 
-                    <!-- TRANSLATION -->
-
-                    <Translation_Language>
-                        <table>m2epro_translation_language</table>
-                    </Translation_Language>
-                    <Translation_Text>
-                        <table>m2epro_translation_text</table>
-                    </Translation_Text>
-                    <Translation_CustomSuggestion>
-                        <table>m2epro_translation_custom_suggestion</table>
-                    </Translation_CustomSuggestion>
-
                     <!-- ORDERS -->
 
                     <Order_Log>
@@ -865,10 +824,6 @@
                         <table>m2epro_ebay_item</table>
                     </Ebay_Item>
 
-                    <Ebay_Message>
-                        <table>m2epro_ebay_message</table>
-                    </Ebay_Message>
-
                     <Ebay_Feedback>
                         <table>m2epro_ebay_feedback</table>
                     </Ebay_Feedback>
@@ -879,22 +834,50 @@
                     <Ebay_Motor_Specific>
                         <table>m2epro_ebay_motor_specific</table>
                     </Ebay_Motor_Specific>
-                    <Ebay_Template_General_CalculatedShipping>
-                        <table>m2epro_ebay_template_general_calculated_shipping</table>
-                    </Ebay_Template_General_CalculatedShipping>
-                    <Ebay_Template_General_Payment>
-                        <table>m2epro_ebay_template_general_payment</table>
-                    </Ebay_Template_General_Payment>
-                    <Ebay_Template_General_Shipping>
-                        <table>m2epro_ebay_template_general_shipping</table>
-                    </Ebay_Template_General_Shipping>
-                    <Ebay_Template_General_Specific>
-                        <table>m2epro_ebay_template_general_specific</table>
-                    </Ebay_Template_General_Specific>
-
                     <Ebay_Order_ExternalTransaction>
                         <table>m2epro_ebay_order_external_transaction</table>
                     </Ebay_Order_ExternalTransaction>
+
+                    <Ebay_Listing_Auto_Category>
+                        <table>m2epro_ebay_listing_auto_category</table>
+                    </Ebay_Listing_Auto_Category>
+                    <Ebay_Listing_Auto_Category_Group>
+                        <table>m2epro_ebay_listing_auto_category_group</table>
+                    </Ebay_Listing_Auto_Category_Group>
+                    <Ebay_Listing_Auto_Filter>
+                        <table>m2epro_ebay_listing_auto_filter</table>
+                    </Ebay_Listing_Auto_Filter>
+
+                    <Ebay_Template_Payment>
+                        <table>m2epro_ebay_template_payment</table>
+                    </Ebay_Template_Payment>
+                    <Ebay_Template_Payment_Service>
+                        <table>m2epro_ebay_template_payment_service</table>
+                    </Ebay_Template_Payment_Service>
+                    <Ebay_Template_Shipping>
+                        <table>m2epro_ebay_template_shipping</table>
+                    </Ebay_Template_Shipping>
+                    <Ebay_Template_Shipping_Service>
+                        <table>m2epro_ebay_template_shipping_service</table>
+                    </Ebay_Template_Shipping_Service>
+                    <Ebay_Template_Shipping_Calculated>
+                        <table>m2epro_ebay_template_shipping_calculated</table>
+                    </Ebay_Template_Shipping_Calculated>
+                    <Ebay_Template_Return>
+                        <table>m2epro_ebay_template_return</table>
+                    </Ebay_Template_Return>
+                    <Ebay_Template_Description>
+                        <table>m2epro_ebay_template_description</table>
+                    </Ebay_Template_Description>
+                    <Ebay_Template_Policy>
+                        <table>m2epro_ebay_template_policy</table>
+                    </Ebay_Template_Policy>
+                    <Ebay_Template_Category>
+                        <table>m2epro_ebay_template_category</table>
+                    </Ebay_Template_Category>
+                    <Ebay_Template_Category_Specific>
+                        <table>m2epro_ebay_template_category_specific</table>
+                    </Ebay_Template_Category_Specific>
 
                     <!-- AMAZON -->
 
@@ -965,7 +948,7 @@
             </M2ePro>
             <adminhtml>
                 <rewrite>
-                    <page_menu>Ess_M2ePro_Block_Adminhtml_Menu</page_menu>
+                    <page_menu>Ess_M2ePro_Block_Adminhtml_Magento_Menu</page_menu>
                 </rewrite>
             </adminhtml>
         </blocks>

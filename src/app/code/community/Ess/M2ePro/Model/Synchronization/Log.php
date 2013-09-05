@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
@@ -12,17 +12,17 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
     const SYNCH_TASK_DEFAULTS = 1;
     const _SYNCH_TASK_DEFAULTS = 'Default Synchronization';
     const SYNCH_TASK_TEMPLATES = 2;
-    const _SYNCH_TASK_TEMPLATES = 'Templates Synchronization';
+    const _SYNCH_TASK_TEMPLATES = 'Stock Level Synchronization';
     const SYNCH_TASK_ORDERS = 3;
     const _SYNCH_TASK_ORDERS = 'Orders Synchronization';
     const SYNCH_TASK_FEEDBACKS = 4;
-    const _SYNCH_TASK_FEEDBACKS = 'Feedbacks Synchronization';
+    const _SYNCH_TASK_FEEDBACKS = 'Feedback Synchronization';
     const SYNCH_TASK_MARKETPLACES = 5;
     const _SYNCH_TASK_MARKETPLACES = 'Marketplaces Synchronization';
     const SYNCH_TASK_OTHER_LISTINGS = 6;
     const _SYNCH_TASK_OTHER_LISTINGS = '3rd Party Listings Synchronization';
-    const SYNCH_TASK_MESSAGES = 7;
-    const _SYNCH_TASK_MESSAGES = 'Messages Synchronization';
+    const SYNCH_TASK_POLICIES = 7;
+    const _SYNCH_TASK_OTHER_POLICIES = 'Business Policies Synchronization';
 
     /**
      * @var null|int

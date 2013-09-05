@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation_Synchronization extends Mage_Adminhtml_Block_Template
@@ -14,7 +14,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation_Synchronization exte
 
         // Initialization block
         //------------------------------
-        $this->setId('wizardAmazonInstallationSynchronization');
+        $this->setId('wizardInstallationSynchronization');
         //------------------------------
 
         $this->setTemplate('M2ePro/wizard/amazon/installation/synchronization.phtml');
@@ -26,7 +26,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation_Synchronization exte
     {
         //-------------------------------
         $params = array(
-            '\''.$this->getUrl('*/adminhtml_synchronization/index',array('hide_upgrade_notification'=>'yes')).'\'',
+            '\''.$this->getUrl('*/adminhtml_common_synchronization/index',array('wizard'=>true)).'\'',
             '\'synchronization\''
         );
         $buttonBlock = $this->getLayout()

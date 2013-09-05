@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widget_Grid_Container
@@ -19,7 +19,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widg
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('eBay Feedbacks');
+        $accountTitle = '';
+        $accountId = $this->getRequest()->getParam('account');
+        if (!is_null($accountId)) {
+            $accountTitle = Mage::getModel('M2ePro/Account')->load((int)$accountId)->getTitle();
+        }
+
+        $this->_headerText = Mage::helper('M2ePro')->__('Feedback for account "%s"', $accountTitle);
         //------------------------------
 
         // Set buttons actions
@@ -33,13 +39,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widg
 
         $this->_addButton('goto_orders', array(
             'label'     => Mage::helper('M2ePro')->__('Orders'),
-            'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_order/index').'\')',
+            'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_ebay_order/index').'\')',
             'class'     => 'button_link'
         ));
 
         $this->_addButton('goto_accounts', array(
             'label'     => Mage::helper('M2ePro')->__('Accounts'),
-            'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_account/index').'\')',
+            'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_ebay_account/index').'\')',
             'class'     => 'button_link'
         ));
 
@@ -54,15 +60,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widg
     public function getGridHtml()
     {
         $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_feedback_help');
-
-        $filtersBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_account_switcher', '', array(
-            'component_mode' => Ess_M2ePro_Helper_Component_Ebay::NICK,
-            'controller_name' => 'adminhtml_ebay_feedback'
-        ));
-        $filtersBlock->setUseConfirm(false);
-
         $formBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_feedback_form');
 
-        return $helpBlock->toHtml() . $filtersBlock->toHtml() . $formBlock->toHtml() . parent::getGridHtml();
+        return $helpBlock->toHtml() . $formBlock->toHtml() . parent::getGridHtml();
     }
 }

@@ -5,7 +5,7 @@ EbayFeedbackHandler.prototype = Object.extend(new CommonHandler(), {
 
     initialize: function()
     {
-        Validation.add('M2ePro-validate-max-length', M2ePro.text.response_text_error, function(value, el) {
+        Validation.add('M2ePro-validate-max-length', M2ePro.translator.translate('Should be between 2 and 80 characters long.'), function(value, el) {
             return value.length >= 2 && value.length <= 80;
         });
     },
@@ -33,7 +33,7 @@ EbayFeedbackHandler.prototype = Object.extend(new CommonHandler(), {
         $('buyer_text').innerHTML = buyerText;
         $('feedback_text').value = '';
 
-        new Ajax.Request( M2ePro.url.getFeedbackTemplates ,
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_feedback/getFeedbackTemplates') ,
         {
             method: 'get',
             asynchronous: true,
@@ -75,9 +75,9 @@ EbayFeedbackHandler.prototype = Object.extend(new CommonHandler(), {
 
         var urlLastSymbol = window.location.href.charAt(window.location.href.length-1);
         if (urlLastSymbol == '#') {
-            window.location.href = window.location.href;
+            setLocation(location.href);
         } else {
-            window.location.href += '#';
+            setLocation(location.href + '#');
         }
     },
 
@@ -100,13 +100,13 @@ EbayFeedbackHandler.prototype = Object.extend(new CommonHandler(), {
 
         if (editForm.validate()) {
             var self = this;
-            new Ajax.Request( M2ePro.url.formSubmit + '?' + $('edit_form').serialize() ,
+            new Ajax.Request(M2ePro.url.get('formSubmit', $('edit_form').serialize(true)) ,
             {
                 method: 'get',
                 asynchronous: true,
                 onSuccess: function(transport)
                 {
-                    MagentoMessageObj.addSuccess(M2ePro.text.feedback_sent_successfully);
+                    MagentoMessageObj.addSuccess(M2ePro.translator.translate('Feedback has been successfully sent.'));
 
                     self.cancelFeedback();
 

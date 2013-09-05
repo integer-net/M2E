@@ -10,22 +10,12 @@
 
     Event.observe(window, 'load', function() {
 
-        if (typeof M2ePro == 'undefined') {
-            M2ePro = {};
-            M2ePro.url = {};
-            M2ePro.formData = {};
-            M2ePro.customData = {};
-            M2ePro.text = {};
-        }
+        M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_order')) ?>);
 
-        M2ePro.text.product_and_sku_not_defined = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Please enter correct product ID or SKU.')) ?>';
-        M2ePro.text.product_not_defined = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Please enter correct product ID.')) ?>';
-
-        M2ePro.url.edit_item = '<?php echo $this->getUrl('*/adminhtml_order/editItem') ?>';
-        M2ePro.url.assign_product = '<?php echo $this->getUrl('*/adminhtml_order/assignProduct') ?>';
-        M2ePro.url.assign_product_details = '<?php echo $this->getUrl('*/adminhtml_order/assignProductDetails') ?>';
-        M2ePro.url.unassign_product = '<?php echo $this->getUrl('*/adminhtml_order/unassignProduct') ?>';
-        M2ePro.url.check_product_option_stock_availability = '<?php echo $this->getUrl('*/adminhtml_order/checkProductOptionStockAvailability') ?>';
+        M2ePro.translator.add(<?php echo json_encode(array(
+            'Please enter correct product ID or SKU.' => $this->__('Please enter correct product ID or SKU.'),
+            'Please enter correct product ID.' => $this->__('Please enter correct product ID.')
+        )); ?>);
 
         OrderEditItemHandlerObj = new OrderEditItemHandler();
 

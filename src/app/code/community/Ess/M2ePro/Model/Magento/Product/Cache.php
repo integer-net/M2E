@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Product
@@ -257,22 +257,6 @@ class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Pr
 
     // ########################################
 
-    public function getFinalPrice($customerGroupId)
-    {
-        $cacheKey = array(
-            __METHOD__,
-            func_get_args()
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getFinalPrice($customerGroupId));
-    }
-
-    // ########################################
-
     public function getQty()
     {
         $cacheKey = array(
@@ -287,20 +271,6 @@ class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Pr
     }
 
     // ########################################
-
-    public function getAttributeLabel($attributeCode)
-    {
-        $cacheKey = array(
-            __METHOD__,
-            func_get_args()
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getAttributeLabel($attributeCode));
-    }
 
     public function getAttributeValue($attributeCode)
     {

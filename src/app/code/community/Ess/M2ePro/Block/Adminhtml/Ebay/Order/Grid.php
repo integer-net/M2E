@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Widget_Grid
@@ -29,7 +29,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Wi
 
     public function getMassactionBlockName()
     {
-        return 'M2ePro/adminhtml_component_grid_massaction';
+        return 'M2ePro/adminhtml_grid_massaction';
     }
 
     protected function _prepareCollection()
@@ -196,9 +196,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Wi
             'filter_condition_callback' => array($this, 'callbackFilterShippingCondition')
         ));
 
-        $back = Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_order/index', array(
-            'tab' => Ess_M2ePro_Block_Adminhtml_Component_Abstract::TAB_ID_EBAY
-        ));
+        $back = Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_ebay_order/index', array());
 
         $this->addColumn('action', array(
             'header'  => Mage::helper('M2ePro')->__('Action'),
@@ -331,51 +329,30 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Wi
                 'date' => Mage::app()->getLocale()->date(strtotime($log->getData('create_date')))->toString($format)
             );
         }
-
-        $lastLogRow = $logRows[0];
         // --------------------------------
 
-        // Get log icon
-        // --------------------------------
-        $icon = 'normal';
-        $iconTip = Mage::helper('M2ePro')->escapeHtml(
-            Mage::helper('M2ePro')->__('Last order action was completed successfully.')
+        $tips = array(
+            Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS => 'Last order action was completed successfully.',
+            Ess_M2ePro_Model_Order_Log::TYPE_ERROR => 'Last order action was completed with error(s).',
+            Ess_M2ePro_Model_Order_Log::TYPE_WARNING => 'Last order action was completed with warning(s).'
         );
 
-        if ($lastLogRow['type'] == Ess_M2ePro_Model_Order_Log::TYPE_ERROR) {
-            $icon = 'error';
-            $iconTip = Mage::helper('M2ePro')->escapeHtml(
-                Mage::helper('M2ePro')->__('Last order action was completed with error(s).')
-            );
-        } else if ($lastLogRow['type'] == Ess_M2ePro_Model_Order_Log::TYPE_WARNING) {
-            $icon = 'warning';
-            $iconTip = Mage::helper('M2ePro')->escapeHtml(
-                Mage::helper('M2ePro')->__('Last order action was completed with warning(s).')
-            );
-        }
+        $icons = array(
+            Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS => 'normal',
+            Ess_M2ePro_Model_Order_Log::TYPE_ERROR => 'error',
+            Ess_M2ePro_Model_Order_Log::TYPE_WARNING => 'warning'
+        );
 
-        $iconSrc = $this->getSkinUrl('M2ePro').'/images/log_statuses/'.$icon.'.png';
-        // --------------------------------
+        $summary = $this->getLayout()->createBlock('M2ePro/adminhtml_log_grid_summary', '', array(
+            'entity_id' => $orderId,
+            'rows' => $logRows,
+            'tips' => $tips,
+            'icons' => $icons,
+            'view_help_handler' => 'OrderHandlerObj.viewOrderHelp',
+            'hide_help_handler' => 'OrderHandlerObj.hideOrderHelp',
+        ));
 
-        $gridId = $this->getId();
-        $logRows = base64_encode(json_encode($logRows));
-
-        $html = <<<HTML
-<span style="float: right;">
-    <a title="{$iconTip}" id="orders_grid_help_icon_open_{$orderId}"
-       href="javascript:void(0);"
-       onclick="OrderHandlerObj.viewOrderHelp({$orderId}, '{$logRows}', '{$gridId}');">
-        <img src="{$iconSrc}" alt="{$iconTip}" />
-    </a>
-    <a title="{$iconTip}" id="orders_grid_help_icon_close_{$orderId}" style="display: none;"
-       href="javascript:void(0);"
-       onclick="OrderHandlerObj.hideOrderHelp({$orderId}, '{$gridId}');">
-        <img src="{$iconSrc}" alt="{$iconTip}" />
-    </a>
-</span>
-HTML;
-
-        return $html;
+        return $summary->toHtml();
     }
 
     public function getInitiatorForAction($initiator)
@@ -629,10 +606,23 @@ HTML;
     public function getRowUrl($row)
     {
         $back = Mage::helper('M2ePro')->makeBackUrlParam(
-            '*/adminhtml_order/index', array('tab' => Ess_M2ePro_Block_Adminhtml_Component_Abstract::TAB_ID_EBAY)
+            '*/adminhtml_ebay_order/index'
         );
 
         return $this->getUrl('*/adminhtml_ebay_order/view', array('id' => $row->getId(), 'back' => $back));
+    }
+
+    //##############################################################
+
+    protected function _toHtml()
+    {
+        $tempGridIds = array();
+        Mage::helper('M2ePro/Component_Ebay')->isActive() && $tempGridIds[] = $this->getId();
+
+        $generalBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_order_general');
+        $generalBlock->setGridIds($tempGridIds);
+
+        return $generalBlock->toHtml() . parent::_toHtml();
     }
 
     //##############################################################

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
@@ -11,16 +11,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
     const PERCENTS_END = 60;
     const PERCENTS_INTERVAL = 10;
 
-    private $_synchronizations = array();
     private $_checkedListingsProductsIds = array();
-
-    //####################################
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->_synchronizations = Mage::helper('M2ePro')->getGlobalValue('synchTemplatesArray');
-    }
 
     //####################################
 
@@ -80,64 +71,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
 
     private function execute()
     {
-        $this->immediatelyChangeEbayStatus();
-
-        $this->_lockItem->setPercents(self::PERCENTS_START + 1*self::PERCENTS_INTERVAL/2);
-        $this->_lockItem->activate();
-
         $this->immediatelyChangedProducts();
     }
 
     //####################################
-
-    private function immediatelyChangeEbayStatus()
-    {
-        $this->_profiler->addTimePoint(__METHOD__,'Immediately when eBay status active');
-
-        // Get changed listings products
-        //------------------------------------
-        $changedListingsProducts = $this->getChangedInstancesByListingProduct(
-            array('ebay_listing_product_status')
-        );
-        //------------------------------------
-
-        // Filter only needed listings products
-        //------------------------------------
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-        foreach ($changedListingsProducts as $listingProduct) {
-
-            $tempNewValue = explode('_status_',$listingProduct->getData('changed_to_value'));
-
-            if (!is_array($tempNewValue) || count($tempNewValue) != 2) {
-                continue;
-            }
-
-            $tempListingProductId = (int)str_replace('listing_product_id_','',$tempNewValue[0]);
-
-            if ($tempListingProductId != (int)$listingProduct->getId()) {
-                continue;
-            }
-
-            $changedToValue = (int)$tempNewValue[1];
-
-            if ((int)$changedToValue == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
-                continue;
-            }
-
-            if (!$this->isMeetStopRequirements($listingProduct)) {
-                continue;
-            }
-
-            $this->_runnerActions->setProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP,
-                array()
-            );
-        }
-        //------------------------------------
-
-        $this->_profiler->saveTimePoint(__METHOD__);
-    }
 
     private function immediatelyChangedProducts()
     {
@@ -202,63 +139,59 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
         }
         //--------------------
 
-        // Correct synchronization
-        //--------------------
-        if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
-            return false;
-        }
-        //--------------------
-
-        $uniqueOptionsProductsIds = NULL;
+        $productsIdsForEachVariation = NULL;
 
         // Check filters
         //--------------------
-        if ($listingProduct->getSynchronizationTemplate()->getChildObject()->isStopStatusDisabled()) {
+        if ($listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isStopStatusDisabled()) {
 
             if ($listingProduct->getMagentoProduct()->getStatus() ==
                 Mage_Catalog_Model_Product_Status::STATUS_DISABLED) {
                 return true;
             } else {
 
-                if (is_null($uniqueOptionsProductsIds)) {
-                    $uniqueOptionsProductsIds = $listingProduct->getUniqueOptionsProductsIds();
+                if (is_null($productsIdsForEachVariation)) {
+                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
                 }
 
-                if (count($uniqueOptionsProductsIds) > 0) {
+                if (count($productsIdsForEachVariation) > 0) {
 
-                    $statusesTemp = $listingProduct->getUniqueOptionsProductsStatuses($uniqueOptionsProductsIds);
-                    if ((int)min($statusesTemp) == Mage_Catalog_Model_Product_Status::STATUS_DISABLED) {
+                    $tempStatuses = $listingProduct->getVariationsStatuses($productsIdsForEachVariation);
+
+                    // all variations are disabled
+                    if ((int)min($tempStatuses) == Mage_Catalog_Model_Product_Status::STATUS_DISABLED) {
                         return true;
                     }
                 }
             }
         }
 
-        if ($listingProduct->getSynchronizationTemplate()->getChildObject()->isStopOutOfStock()) {
+        if ($listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isStopOutOfStock()) {
 
             if (!$listingProduct->getMagentoProduct()->getStockAvailability()) {
                 return true;
             } else {
 
-                if (is_null($uniqueOptionsProductsIds)) {
-                    $uniqueOptionsProductsIds = $listingProduct->getUniqueOptionsProductsIds();
+                if (is_null($productsIdsForEachVariation)) {
+                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
                 }
 
-                if (count($uniqueOptionsProductsIds) > 0) {
+                if (count($productsIdsForEachVariation) > 0) {
 
-                    $stockAvailabilityTemp = $listingProduct
-                                                ->getUniqueOptionsProductsStockAvailability($uniqueOptionsProductsIds);
-                    if (!(int)max($stockAvailabilityTemp)) {
+                    $tempStocks = $listingProduct->getVariationsStockAvailabilities($productsIdsForEachVariation);
+
+                    // all variations are out of stock
+                    if (!(int)max($tempStocks)) {
                         return true;
                     }
                 }
             }
         }
 
-        if ($listingProduct->getSynchronizationTemplate()->getChildObject()->isStopWhenQtyHasValue()) {
+        if ($listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isStopWhenQtyHasValue()) {
 
             $productQty = (int)$listingProduct->getChildObject()->getQty(true);
-            $ebaySynchronizationTemplate = $listingProduct->getSynchronizationTemplate()->getChildObject();
+            $ebaySynchronizationTemplate = $listingProduct->getChildObject()->getEbaySynchronizationTemplate();
 
             $typeQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyHasValueType();
             $minQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyHasValueMin();

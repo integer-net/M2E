@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Amazon_Product_Revise_Multiple
@@ -82,7 +82,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_Revise_Multiple
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            $nativeData = Mage::getModel('M2ePro/Amazon_Connector_Product_Helper')
+            $nativeData = Mage::getModel('M2ePro/Connector_Server_Amazon_Product_Helper')
                                          ->getReviseRequestData($listingProduct,$this->params);
 
             $sendedData = $nativeData;

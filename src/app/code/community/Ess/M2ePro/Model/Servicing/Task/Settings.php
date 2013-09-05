@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Servicing_Task_Settings implements Ess_M2ePro_Model_Servicing_Task
@@ -35,7 +35,7 @@ class Ess_M2ePro_Model_Servicing_Task_Settings implements Ess_M2ePro_Model_Servi
         );
 
         if (isset($data['lock']) && in_array((int)$data['lock'],$validValues)) {
-            Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                 '/'.Mage::helper('M2ePro/Module')->getName().'/server/','lock',(int)$data['lock']
             );
         }

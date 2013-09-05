@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule_Chooser_Category
     extends Mage_Adminhtml_Block_Catalog_Category_Checkboxes_Tree
 {
+    // ########################################
+
     public function getLoadTreeUrl($expanded=null)
     {
         $params = array(
@@ -23,4 +25,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule_Chooser_Category
 
         return $this->getUrl('*/*/categoriesJson', $params);
     }
+
+    // ########################################
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProducts
@@ -109,7 +109,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
             if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplaceObj->getId())) {
 
                 /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
-                $collection = Mage::getModel('M2ePro/Template_General')->getCollection();
+                $collection = Mage::getModel('M2ePro/Listing')->getCollection();
                 $collection->addFieldToFilter('component_mode',Ess_M2ePro_Helper_Component_Play::NICK);
                 $collection->addFieldToFilter('marketplace_id',(int)$marketplaceObj->getId());
                 $collection->addFieldToFilter('account_id',(int)$accountObj->getId());
@@ -142,7 +142,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
 
         // Get all changes on Play for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Play_Connector')->getDispatcher();
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
         $dispatcherObject->processConnector('defaults', 'updateListingsProducts' ,'requester',
                                             array(), $marketplaceObj, $accountObj,
                                             'Ess_M2ePro_Model_Play_Synchronization_Tasks');
@@ -168,8 +168,8 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
     {
         $lastTime = strtotime($this->getCheckLastTime());
 
-        $tempGroup = '/play/synchronization/settings/defaults/update_listings_products/';
-        $interval = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'interval');
+        $tempGroup = '/play/defaults/update_listings_products/';
+        $interval = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'interval');
 
         $totalItems = (int)Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product')->getSize();
         $totalItems += (int)Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Other')->getSize();
@@ -184,8 +184,8 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
 
     private function getCheckLastTime()
     {
-        $tempGroup = '/play/synchronization/settings/defaults/update_listings_products/';
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'last_time');
+        $tempGroup = '/play/defaults/update_listings_products/';
+        return Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'last_time');
     }
 
     private function setCheckLastTime($time)
@@ -199,8 +199,8 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
             $time = strftime('%Y-%m-%d %H:%M:%S', $time);
             date_default_timezone_set($oldTimezone);
         }
-        $tempGroup = '/play/synchronization/settings/defaults/update_listings_products/';
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue($tempGroup,'last_time',$time);
+        $tempGroup = '/play/defaults/update_listings_products/';
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue($tempGroup,'last_time',$time);
     }
 
     //------------------------------------
@@ -211,8 +211,8 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
 
-        $tempGroup = '/play/synchronization/settings/defaults/update_listings_products/';
-        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getConfig()
+        $tempGroup = '/play/defaults/update_listings_products/';
+        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                     ->getGroupValue($tempGroup,'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);
 

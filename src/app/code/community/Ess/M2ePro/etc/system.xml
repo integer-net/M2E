@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <config>
+    <tabs>
+        <m2epro translate="label">
+            <label>M2e Pro</label>
+            <sort_order>100</sort_order>
+        </m2epro>
+    </tabs>
     <sections>
         <carriers>
             <groups>
@@ -62,5 +68,45 @@
                 </m2epropayment>
             </groups>
         </payment>
+        <m2epro_components translate="label" module="M2ePro">
+            <label>Channels</label>
+            <tab>m2epro</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <frontend_model>M2ePro/adminhtml_configuration_components_form</frontend_model>
+        </m2epro_components>
+        <m2epro_settings translate="label" module="M2ePro">
+            <label>General</label>
+            <tab>m2epro</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>20</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <frontend_model>M2ePro/adminhtml_configuration_settings_form</frontend_model>
+        </m2epro_settings>
+        <m2epro_logs_cleaning translate="label" module="M2ePro">
+            <label>Logs Clearing</label>
+            <tab>m2epro</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>30</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <frontend_model>M2ePro/adminhtml_configuration_logsCleaning_form</frontend_model>
+        </m2epro_logs_cleaning>
+        <m2epro_license translate="label" module="M2ePro">
+            <label>License</label>
+            <tab>m2epro</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>40</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <frontend_model>M2ePro/adminhtml_configuration_license_form</frontend_model>
+        </m2epro_license>
     </sections>
 </config>

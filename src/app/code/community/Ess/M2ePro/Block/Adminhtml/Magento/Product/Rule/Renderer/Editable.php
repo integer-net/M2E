@@ -4,9 +4,12 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule_Renderer_Editable extends Mage_Core_Block_Abstract
+class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule_Renderer_Editable
+    extends Mage_Core_Block_Abstract
     implements Varien_Data_Form_Element_Renderer_Interface
 {
+    // ########################################
+
     /**
      * Render element
      *
@@ -60,4 +63,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule_Renderer_Editable extends 
 
         return $html;
     }
+
+    // ########################################
 }

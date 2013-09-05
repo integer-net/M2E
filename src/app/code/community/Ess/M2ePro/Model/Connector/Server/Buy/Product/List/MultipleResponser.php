@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Buy_Product_List_MultipleResponser
@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Connector_Server_Buy_Product_List_MultipleResponser
                 'status_changer' => $this->getStatusChanger()
             );
 
-            Mage::getModel('M2ePro/Buy_Connector_Product_Helper')
+            Mage::getModel('M2ePro/Connector_Server_Buy_Product_Helper')
                         ->updateAfterListAction($listingProduct,$requestData,$tempParams);
 
             // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully listed');
@@ -49,9 +49,6 @@ class Ess_M2ePro_Model_Connector_Server_Buy_Product_List_MultipleResponser
             return;
         }
 
-        /** @var $generalTemplate Ess_M2ePro_Model_Template_General */
-        $generalTemplate = $tempListingsProducts[0]->getGeneralTemplate();
-
         $listingProductsPacks = array_chunk($tempListingsProducts,5,true);
 
         foreach ($listingProductsPacks as $listingProductsPack) {
@@ -65,13 +62,13 @@ class Ess_M2ePro_Model_Connector_Server_Buy_Product_List_MultipleResponser
             try {
 
                 /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Buy_Dispatcher */
-                $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getDispatcher();
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
                 $response = $dispatcherObject->processVirtualAbstract('product','search','skuByReferenceId',
-                    array('items' => $skus),'items', $generalTemplate->getMarketplaceId(),
-                                                     $generalTemplate->getAccountId());
+                    array('items' => $skus),'items', $tempListingsProducts[0]->getListing()->getMarketplaceId(),
+                                                     $tempListingsProducts[0]->getListing()->getAccountId());
 
             } catch (Exception $exception) {
-                Mage::helper('M2ePro/Exception')->process($exception);
+                Mage::helper('M2ePro/Module_Exception')->process($exception);
                 continue;
             }
 
@@ -92,10 +89,10 @@ class Ess_M2ePro_Model_Connector_Server_Buy_Product_List_MultipleResponser
 
     // ########################################
 
-    protected function processResponseData($response)
+    protected function unsetLocks($fail = false, $message = NULL)
     {
         $this->removeFromQueueOfSKus();
-        return parent::processResponseData($response);
+        parent::unsetLocks($fail,$message);
     }
 
     // ########################################

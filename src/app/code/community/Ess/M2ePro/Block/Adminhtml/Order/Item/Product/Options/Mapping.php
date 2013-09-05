@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Options_Mapping extends Mage_Adminhtml_Block_Widget_Container
@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Options_Mapping extends Mage
      */
     public function getOrderItem()
     {
-        return Mage::helper('M2ePro')->getGlobalValue('order_item');
+        return Mage::helper('M2ePro/Data_Global')->getValue('order_item');
     }
 
     public function getProductTypeHeader()
@@ -147,27 +147,14 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Options_Mapping extends Mage
         //------------------------------
 
         //------------------------------
-        $buttonBlock = $this->getLayout()
-                            ->createBlock('adminhtml/widget_button')
-                            ->setData( array(
-                                'id'    => 'product_options_mapping_submit_button',
-                                'label' => Mage::helper('M2ePro')->__('Confirm'),
-                                'class' => 'product_options_mapping_submit_button submit',
-                                'onclick' => 'OrderEditItemHandlerObj.assignProductDetails();'
-                            ) );
+        $data = array(
+            'id'      => 'product_options_mapping_submit_button',
+            'label'   => Mage::helper('M2ePro')->__('Confirm'),
+            'class'   => 'product_options_mapping_submit_button submit',
+            'onclick' => 'OrderEditItemHandlerObj.assignProductDetails();'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('product_options_mapping_submit_button',$buttonBlock);
-        //------------------------------
-
-        //------------------------------
-        $buttonBlock = $this->getLayout()
-                            ->createBlock('adminhtml/widget_button')
-                            ->setData( array(
-                                'id'    => 'product_options_mapping_cancel_button',
-                                'label' => Mage::helper('M2ePro')->__('Cancel'),
-                                'class' => 'product_options_mapping_cancel_button submit',
-                                'onclick' => 'OrderEditItemHandlerObj.closePopUp();'
-                            ) );
-        $this->setChild('product_options_mapping_cancel_button',$buttonBlock);
         //------------------------------
 
         parent::_beforeToHtml();

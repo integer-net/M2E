@@ -1,0 +1,14 @@
+<script type="text/javascript">
+
+    var initDropDown = function() {
+        $$('.<?php echo $this->getTargetCssClass() ?>')[0].innerHTML += '<?php echo Mage::helper('M2ePro')->escapeJs($this->getDropDownHtml()) ?>';
+        DropDownObj = new DropDown();
+        DropDownObj.prepare($$('.<?php echo $this->getTargetCssClass() ?>')[0]);
+    };
+
+    <?php if (!$this->getRequest()->isXmlHttpRequest()): ?>
+        Event.observe(window, 'load', initDropDown);
+    <?php else: ?>
+        initDropDown();
+    <?php endif; ?>
+</script>

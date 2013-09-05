@@ -1,11 +1,15 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_Form_Container
 {
+    private $referrer = NULL;
+
+    // ########################################
+
     public function __construct()
     {
         parent::__construct();
@@ -16,16 +20,16 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_Con
         $this->_blockGroup = 'M2ePro';
         $this->_controller = 'adminhtml';
         $this->_mode = 'support';
+        $this->referrer = $this->getRequest()->getParam('referrer');
         //------------------------------
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Support');
-        //------------------------------
-
-        // Set template
-        //------------------------------
-        $this->setTemplate('M2ePro/support.phtml');
+        $m2eProVersion = '(M2E Pro ver. ' . Mage::helper('M2ePro/Module')->getVersion() . ')';
+        $m2eProVersion = '<span style="color: #777; font-size: small; font-weight: normal">' .
+                            $m2eProVersion .
+                         '</span>';
+        $this->_headerText = Mage::helper('M2ePro')->__("Support {$m2eProVersion}");
         //------------------------------
 
         // Set buttons actions
@@ -36,58 +40,165 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_Con
         $this->removeButton('add');
         $this->removeButton('save');
         $this->removeButton('edit');
+        //------------------------------
 
-        $this->_addButton('goto_cmd', array(
-            'label'     => 'CMD',
-            'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_cmd/index').'\')',
-            'class'     => 'button_link cmd',
-            'style'     => is_null($this->getRequest()->getParam('show_cmd')) ? 'display: none;' : ''
+        //------------------------------
+        $url = Mage::helper('M2ePro/View_Development')->getPageUrl();
+        $this->_addButton('goto_development', array(
+            'label'     => 'Development',
+            'onclick' => 'window.open(\''.$url.'\')',
+            'class'     => 'button_link development',
+            'style'     => 'display: none;'
         ));
+        //------------------------------
 
-        $this->_addButton('goto_about', array(
-            'label'     => Mage::helper('M2ePro')->__('About'),
-            'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_about/index').'\')',
-            'class'     => 'button_link'
-        ));
+        //------------------------------
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+        $migrationTable = Mage::getSingleton('core/resource')->getTableName('m2epro_migration_v6');
 
-        $videoLink = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/video_tutorials/', 'baseurl');
-        $this->_addButton('goto_video_tutorials', array(
-            'label'     => Mage::helper('M2ePro')->__('Video Tutorials'),
-            'onclick'   => 'window.open(\''.$videoLink.'\', \'_blank\'); return false;',
-            'class'     => 'button_link'
-        ));
+        $html = $connRead->select()->from($migrationTable,'data')
+            ->where('`component` = \'*\'')->where('`group` = \'notes\'')
+            ->query()->fetchColumn();
 
-        $docsLink = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/documentation/', 'baseurl');
-        $this->_addButton('goto_docs', array(
-            'label'     => Mage::helper('M2ePro')->__('Documentation'),
-            'onclick'   => 'window.open(\''.$docsLink.'\', \'_blank\'); return false;',
-            'class'     => 'button_link'
-        ));
+        if (!empty($html)) {
+            $url = $this->getUrl('*/adminhtml_support/migrationNotes');
+            $this->_addButton('migration_notes', array(
+                'label'     => Mage::helper('M2ePro')->__('Migration Notes'),
+                'onclick'   => 'window.open(\''.$url.'\', \'_blank\'); return false;',
+            ));
+        }
+        //------------------------------
 
+        //------------------------------
+        if (is_null($this->referrer)) {
+            $this->_addButton('goto_docs', array(
+                'label' => Mage::helper('M2ePro')->__('Documentation'),
+                'class' => 'button_link drop_down button_documentation'
+            ));
+
+            //------------------------------
+
+            $this->_addButton('goto_video_tutorials', array(
+                'label' => Mage::helper('M2ePro')->__('Video Tutorials'),
+                'class' => 'button_link drop_down button_video_tutorial'
+            ));
+        } else {
+            $url = ($this->referrer == Ess_M2ePro_Helper_View_Ebay::NICK)
+                        ? Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl()
+                            : Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
+
+            $this->_addButton('goto_docs', array(
+                'label'     => Mage::helper('M2ePro')->__('Documentation'),
+                'onclick'   => 'window.open(\''.$url.'\', \'_blank\'); return false;',
+                'class'     => 'button_link'
+            ));
+
+            //------------------------------
+
+            $url = ($this->referrer == Ess_M2ePro_Helper_View_Ebay::NICK)
+                        ? Mage::helper('M2ePro/View_Ebay')->getVideoTutorialsUrl()
+                            : Mage::helper('M2ePro/View_Common')->getVideoTutorialsUrl();
+
+            $this->_addButton('goto_video_tutorials', array(
+                'label'     => Mage::helper('M2ePro')->__('Video Tutorials'),
+                'onclick'   => 'window.open(\''.$url.'\', \'_blank\'); return false;',
+                'class'     => 'button_link'
+            ));
+        }
+        //------------------------------
+
+        //------------------------------
         $this->_addButton('reset', array(
             'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'SupportHandlerObj.reset_click()',
+            'onclick'   => 'CommonHandlerObj.reset_click()',
             'class'     => 'reset'
         ));
         //------------------------------
     }
 
-    protected function _beforeToHtml()
-    {
-        //-------------------------------
-        $buttonBlock = $this->getLayout()
-            ->createBlock('adminhtml/widget_button')
-            ->setData( array(
-            'label'   => Mage::helper('M2ePro')->__('Search'),
-            'onclick' => 'SupportHandlerObj.searchUserVoiceData();',
-            'id' => 'send_button'
-        ) );
-        $this->setChild('user_voice_search',$buttonBlock);
-        //-------------------------------
+    // ----------------------------------------
 
-        //-------------------------------
-        $tabsBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_support_tabs');
-        $this->setChild('tabs', $tabsBlock);
-        //-------------------------------
+    public function getHeaderHtml()
+    {
+        if (is_null($this->referrer)) {
+            $data = array(
+                'target_css_class' => 'button_documentation',
+                'style' => 'max-height: 120px; overflow: auto; width: 150px;',
+                'items' => $this->getDocumentationDropDownItems()
+            );
+
+            $dropDownBlockDocumentation = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+
+            $data = array(
+                'target_css_class' => 'button_video_tutorial',
+                'style' => 'max-height: 120px; overflow: auto; width: 150px;',
+                'items' => $this->getVideoTutorialDropDownItems()
+            );
+
+            $dropDownBlockVideoTutorial = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+
+            return parent::getHeaderHtml()
+            . $dropDownBlockDocumentation->toHtml()
+            . $dropDownBlockVideoTutorial->toHtml();
+        }
+
+        return parent::getHeaderHtml();
     }
+
+    // ----------------------------------------
+
+    private function getVideoTutorialDropDownItems()
+    {
+        $items = array();
+
+        //------------------------------
+        $url = Mage::helper('M2ePro/View_Ebay')->getVideoTutorialsUrl();
+        $items[] = array(
+            'url' => $url,
+            'label' => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+            'target' => '_blank'
+        );
+        //------------------------------
+
+        //------------------------------
+        $url = Mage::helper('M2ePro/View_Common')->getVideoTutorialsUrl();
+        $items[] = array(
+            'url' => $url,
+            'label' => Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel(),
+            'target' =>'_blank'
+        );
+        //------------------------------
+
+        return $items;
+    }
+
+    // ----------------------------------------
+
+    private function getDocumentationDropDownItems()
+    {
+        $items = array();
+
+        //------------------------------
+        $url = Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl();
+        $items[] = array(
+            'url' => $url,
+            'label' => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+            'target' => '_blank'
+        );
+        //------------------------------
+
+        //------------------------------
+        $url = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
+        $items[] = array(
+            'url' => $url,
+            'label' => Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel(),
+            'target' =>'_blank'
+        );
+        //------------------------------
+
+        return $items;
+    }
+
+    // ########################################
 }

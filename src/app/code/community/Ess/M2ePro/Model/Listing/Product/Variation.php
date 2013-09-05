@@ -1,17 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Listing_Product_Variation extends Ess_M2ePro_Model_Component_Parent_Abstract
 {
-    const ADD_NO   = 0;
-    const ADD_YES  = 1;
-
-    const DELETE_NO   = 0;
-    const DELETE_YES  = 1;
-
     // ########################################
 
     /**
@@ -72,7 +66,7 @@ class Ess_M2ePro_Model_Listing_Product_Variation extends Ess_M2ePro_Model_Compon
          $this->listingProductModel = $instance;
     }
 
-    //-----------------------------------------
+    // ########################################
 
     /**
      * @return Ess_M2ePro_Model_Listing
@@ -85,35 +79,19 @@ class Ess_M2ePro_Model_Listing_Product_Variation extends Ess_M2ePro_Model_Compon
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getListingProduct()->getGeneralTemplate();
+        return $this->getListingProduct()->getAccount();
     }
 
     /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
+     * @return Ess_M2ePro_Model_Marketplace
      */
-    public function getSellingFormatTemplate()
+    public function getMarketplace()
     {
-        return $this->getListingProduct()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getListingProduct()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getListingProduct()->getSynchronizationTemplate();
+        return $this->getListingProduct()->getMarketplace();
     }
 
     // ########################################
@@ -139,91 +117,6 @@ class Ess_M2ePro_Model_Listing_Product_Variation extends Ess_M2ePro_Model_Compon
     public function getListingProductId()
     {
         return (int)$this->getData('listing_product_id');
-    }
-
-    public function getStatus()
-    {
-        return (int)$this->getData('status');
-    }
-
-    //-----------------------------------------
-
-    public function isAdd()
-    {
-        return (int)$this->getData('add') == self::ADD_YES;
-    }
-
-    public function isDelete()
-    {
-        return (int)$this->getData('delete') == self::DELETE_YES;
-    }
-
-    // ########################################
-
-    public function isNotListed()
-    {
-        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED;
-    }
-
-    public function isUnknown()
-    {
-        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN;
-    }
-
-    public function isBlocked()
-    {
-        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED;
-    }
-
-    //-----------------------------------------
-
-    public function isListed()
-    {
-        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED;
-    }
-
-    public function isSold()
-    {
-        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_SOLD;
-    }
-
-    public function isStopped()
-    {
-        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED;
-    }
-
-    public function isFinished()
-    {
-        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED;
-    }
-
-    //-----------------------------------------
-
-    public function isListable()
-    {
-        return ($this->isNotListed() || $this->isSold() ||
-                $this->isStopped() || $this->isFinished() ||
-                $this->isUnknown()) &&
-                !$this->isBlocked();
-    }
-
-    public function isRelistable()
-    {
-        return ($this->isSold() || $this->isStopped() ||
-                $this->isFinished() || $this->isUnknown()) &&
-                !$this->isBlocked();
-    }
-
-    public function isRevisable()
-    {
-        return ($this->isListed() || $this->isUnknown()) &&
-                !$this->isBlocked();
-    }
-
-    public function isStoppable()
-    {
-        return ($this->isListed() || $this->isUnknown()) &&
-                !$this->isBlocked();
     }
 
      // ########################################

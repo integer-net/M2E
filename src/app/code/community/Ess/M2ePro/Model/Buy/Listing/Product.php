@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -20,12 +20,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
     const GENERAL_ID_SEARCH_STATUS_SET_AUTOMATIC  = 2;
     const GENERAL_ID_SEARCH_STATUS_PROCESSING = 3;
 
-    const TRIED_TO_LIST_YES = 1;
-    const TRIED_TO_LIST_NO  = 0;
-
-    const IGNORE_NEXT_INVENTORY_SYNCH_YES = 1;
-    const IGNORE_NEXT_INVENTORY_SYNCH_NO  = 0;
-
     const SKU_MAX_LENGTH = 30;
 
     // ########################################
@@ -37,14 +31,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
     }
 
     // ########################################
-
-    /**
-     * @return Ess_M2ePro_Model_Listing
-     */
-    public function getListing()
-    {
-        return $this->getParentObject()->getListing();
-    }
 
     /**
      * @return Ess_M2ePro_Model_Magento_Product
@@ -82,38 +68,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Template_General
+     * @return Ess_M2ePro_Model_Listing
      */
-    public function getGeneralTemplate()
+    public function getListing()
     {
-        return $this->getParentObject()->getGeneralTemplate();
+        return $this->getParentObject()->getListing();
     }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
-     */
-    public function getSellingFormatTemplate()
-    {
-        return $this->getParentObject()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getParentObject()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getParentObject()->getSynchronizationTemplate();
-    }
-
-    //-----------------------------------------
 
     /**
      * @return Ess_M2ePro_Model_Buy_Listing
@@ -126,11 +86,47 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Buy_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getBuyGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getGeneralTemplate()->getChildObject();
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Buy_Account
+     */
+    public function getBuyAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Buy_Marketplace
+     */
+    public function getBuyMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_SellingFormat
+     */
+    public function getSellingFormatTemplate()
+    {
+        return $this->getBuyListing()->getSellingFormatTemplate();
     }
 
     /**
@@ -141,12 +137,14 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         return $this->getSellingFormatTemplate()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Buy_Template_Description
+     * @return Ess_M2ePro_Model_Template_Synchronization
      */
-    public function getBuyDescriptionTemplate()
+    public function getSynchronizationTemplate()
     {
-        return $this->getDescriptionTemplate()->getChildObject();
+        return $this->getBuyListing()->getSynchronizationTemplate();
     }
 
     /**
@@ -252,12 +250,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
 
     public function isIgnoreNextInventorySynch()
     {
-        return $this->getData('ignore_next_inventory_synch') == self::IGNORE_NEXT_INVENTORY_SYNCH_YES;
-    }
-
-    public function isTriedToList()
-    {
-        return $this->getData('tried_to_list') == self::TRIED_TO_LIST_YES;
+        return (bool)$this->getData('ignore_next_inventory_synch');
     }
 
     // ########################################
@@ -290,13 +283,13 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         return is_null($temp) ? array() : json_decode($temp,true);
     }
 
-    // ########################################
+   // ########################################
 
     public function getAddingSku()
     {
-        $src = $this->getBuyGeneralTemplate()->getSkuSource();
+        $src = $this->getBuyListing()->getSkuSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SKU_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SKU_MODE_NOT_SET) {
             return NULL;
         }
 
@@ -319,25 +312,25 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = '';
-        $src = $this->getBuyGeneralTemplate()->getSkuSource();
+        $src = $this->getBuyListing()->getSkuSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SKU_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SKU_MODE_NOT_SET) {
             $result = NULL;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SKU_MODE_DEFAULT) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SKU_MODE_DEFAULT) {
             $result = $this->getMagentoProduct()->getSku();
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SKU_MODE_PRODUCT_ID) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SKU_MODE_PRODUCT_ID) {
             $result = $this->getParentObject()->getProductId();
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SKU_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SKU_MODE_CUSTOM_ATTRIBUTE) {
             $result = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
-        $result = trim($result);
+        is_string($result) && $result = trim($result);
         $this->setData('cache_adding_sku',$result);
 
         return $result;
@@ -348,7 +341,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         return substr($prefix . '_' . sha1(rand(0,10000) . microtime(1)),0,self::SKU_MAX_LENGTH);
     }
 
-    // ---------------------------------------
+    //-----------------------------------------
 
     public function getAddingGeneralId()
     {
@@ -359,9 +352,9 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = '';
-        $src = $this->getBuyGeneralTemplate()->getGeneralIdSource();
+        $src = $this->getBuyListing()->getGeneralIdSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::GENERAL_ID_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::GENERAL_ID_MODE_NOT_SET) {
             $result = NULL;
         } else {
             $result = $this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
@@ -384,17 +377,17 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = 1;
-        $src = $this->getBuyGeneralTemplate()->getConditionSource();
+        $src = $this->getBuyListing()->getConditionSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::CONDITION_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::CONDITION_MODE_NOT_SET) {
             $result = NULL;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::CONDITION_MODE_DEFAULT) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::CONDITION_MODE_DEFAULT) {
             $result = (int)$src['value'];
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::CONDITION_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::CONDITION_MODE_CUSTOM_ATTRIBUTE) {
             $result = (int)$this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -417,17 +410,17 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = '';
-        $src = $this->getBuyGeneralTemplate()->getConditionNoteSource();
+        $src = $this->getBuyListing()->getConditionNoteSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::CONDITION_NOTE_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::CONDITION_NOTE_MODE_NOT_SET) {
             $result = NULL;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::CONDITION_NOTE_MODE_CUSTOM_VALUE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE) {
             $result = $src['value'];
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE) {
             $result = $this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -447,12 +440,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
             return $temp;
         }
 
-        $src = $this->getBuyGeneralTemplate()->getShippingExpeditedModeSource();
+        $src = $this->getBuyListing()->getShippingExpeditedModeSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_NOT_SET) {
             $result = NULL;
         } else {
-            $result = (int)($src['mode'] != Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DISABLED);
+            $result = (int)($src['mode'] != Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DISABLED);
         }
 
         $this->setData('cache_adding_shipping_expedited_mode',$result);
@@ -468,12 +461,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
             return $temp;
         }
 
-        $src = $this->getBuyGeneralTemplate()->getShippingOneDayModeSource();
+        $src = $this->getBuyListing()->getShippingOneDayModeSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_NOT_SET) {
             $result = NULL;
         } else {
-            $result = (int)($src['mode'] != Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DISABLED);
+            $result = (int)($src['mode'] != Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DISABLED);
         }
 
         $this->setData('cache_adding_shipping_one_day_mode',$result);
@@ -489,12 +482,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
             return $temp;
         }
 
-        $src = $this->getBuyGeneralTemplate()->getShippingTwoDayModeSource();
+        $src = $this->getBuyListing()->getShippingTwoDayModeSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_NOT_SET) {
             $result = NULL;
         } else {
-            $result = (int)($src['mode'] != Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DISABLED);
+            $result = (int)($src['mode'] != Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DISABLED);
         }
 
         $this->setData('cache_adding_shipping_two_day_mode',$result);
@@ -513,25 +506,25 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = 0;
-        $src = $this->getBuyGeneralTemplate()->getShippingStandardModeSource();
+        $src = $this->getBuyListing()->getShippingStandardModeSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_NOT_SET) {
             $result = NULL;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DEFAULT) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DEFAULT) {
             $result = '';
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_FREE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_FREE) {
             $result = 0;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_VALUE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_VALUE) {
             $result = (float)$src['value'];
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
             $result = (float)$this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -553,26 +546,26 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = 0;
-        $src = $this->getBuyGeneralTemplate()->getShippingExpeditedModeSource();
+        $src = $this->getBuyListing()->getShippingExpeditedModeSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_NOT_SET) {
             $result = NULL;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DEFAULT ||
-            $src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DISABLED) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DEFAULT ||
+            $src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DISABLED) {
             $result = '';
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_FREE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_FREE) {
             $result = 0;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_VALUE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_VALUE) {
             $result = (float)$src['value'];
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
             $result = (float)$this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -594,26 +587,26 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = 0;
-        $src = $this->getBuyGeneralTemplate()->getShippingOneDayModeSource();
+        $src = $this->getBuyListing()->getShippingOneDayModeSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_NOT_SET) {
             $result = NULL;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DEFAULT ||
-            $src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DISABLED) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DEFAULT ||
+            $src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DISABLED) {
             $result = '';
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_FREE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_FREE) {
             $result = 0;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_VALUE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_VALUE) {
             $result = (float)$src['value'];
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
             $result = (float)$this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -635,26 +628,26 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $result = 0;
-        $src = $this->getBuyGeneralTemplate()->getShippingTwoDayModeSource();
+        $src = $this->getBuyListing()->getShippingTwoDayModeSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_NOT_SET) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_NOT_SET) {
             $result = NULL;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DEFAULT ||
-            $src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_DISABLED) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DEFAULT ||
+            $src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_DISABLED) {
             $result = '';
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_FREE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_FREE) {
             $result = 0;
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_VALUE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_VALUE) {
             $result = (float)$src['value'];
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SHIPPING_MODE_CUSTOM_ATTRIBUTE) {
             $result = (float)$this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -689,7 +682,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $price = $this->getBaseProductPrice($src['mode'],$src['attribute']);
-        return $this->getSellingFormatTemplate()->parsePrice($price, $src['coefficient']);
+        return Mage::helper('M2ePro')->parsePrice($price, $src['coefficient']);
     }
 
     //-----------------------------------------
@@ -707,22 +700,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
                 } else {
                     $price = $this->getMagentoProduct()->getSpecialPrice();
                     $price <= 0 && $price = $this->getMagentoProduct()->getPrice();
+                    $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                 }
                 break;
 
             case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_ATTRIBUTE:
                 $price = $this->getMagentoProduct()->getAttributeValue($attribute);
-                break;
-
-            case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_FINAL:
-                if ($this->getMagentoProduct()->isGroupedType()) {
-                    $price = $this->getBaseGroupedProductPrice(
-                        Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_FINAL
-                    );
-                } else {
-                    $customerGroupId = $this->getBuySellingFormatTemplate()->getCustomerGroupId();
-                    $price = $this->getMagentoProduct()->getFinalPrice($customerGroupId);
-                }
                 break;
 
             default:
@@ -732,6 +715,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
                     $price = $this->getBaseGroupedProductPrice($productPrice);
                 } else {
                     $price = $this->getMagentoProduct()->getPrice();
+                    $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                 }
                 break;
         }
@@ -757,17 +741,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
             switch ($priceType) {
                 case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_PRODUCT:
                     $tempPrice = $tempProduct->getPrice();
+                    $tempPrice = $this->getBuyListing()->convertPriceFromStoreToMarketplace($tempPrice);
                     break;
                 case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_SPECIAL:
                     $tempPrice = $tempProduct->getSpecialPrice();
                     $tempPrice <= 0 && $tempPrice = $tempProduct->getPrice();
-                    break;
-                case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_FINAL:
-                    $tempProduct = Mage::getModel('M2ePro/Magento_Product')
-                                            ->setProductId($tempProduct->getProductId())
-                                            ->setStoreId($this->getListing()->getStoreId());
-                    $customerGroupId = $this->getBuySellingFormatTemplate()->getCustomerGroupId();
-                    $tempPrice = $tempProduct->getFinalPrice($customerGroupId);
+                    $tempPrice = $this->getBuyListing()->convertPriceFromStoreToMarketplace($tempPrice);
                     break;
             }
 
@@ -827,7 +806,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         //-- Check max posted QTY on channel
-        if ($src['qty_max_posted_value'] > 0 && $qty > $src['qty_max_posted_value']) {
+        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
             $qty = $src['qty_max_posted_value'];
         }
 
@@ -850,29 +829,29 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
 
     public function listAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_LIST, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST, $params);
     }
 
     public function relistAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_RELIST, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_RELIST, $params);
     }
 
     public function reviseAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_REVISE, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_REVISE, $params);
     }
 
     public function stopAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_STOP, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_STOP, $params);
     }
 
     //-----------------------------------------
 
     protected function processDispatcher($action, array $params = array())
     {
-        $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getProductDispatcher();
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Product_Dispatcher');
         return $dispatcherObject->process($action, $this->getId(), $params);
     }
 
@@ -886,12 +865,33 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         return Mage::getModel('M2ePro/Buy_Template_NewProduct')->loadInstance((int)$this->getTemplateNewProductId());
     }
 
+    // ----------------------------------------
+
     /**
      * @return Ess_M2ePro_Model_Buy_Template_NewProduct_Source
     */
     public function getTemplateNewProductSource()
     {
         return $this->getTemplateNewProduct()->getSource($this);
+    }
+
+    // ########################################
+
+    public function getBuyItem()
+    {
+        return Mage::getModel('M2ePro/Buy_Item')->getCollection()
+                ->addFieldToFilter('account_id', $this->getListing()->getAccountId())
+                ->addFieldToFilter('marketplace_id', $this->getListing()->getMarketplaceId())
+                ->addFieldToFilter('sku', $this->getSku())
+               ->setOrder('create_date', Varien_Data_Collection::SORT_ORDER_DESC)
+                ->getFirstItem();
+    }
+
+    // ########################################
+
+    public function getTrackingAttributes()
+    {
+        return $this->getListing()->getTrackingAttributes();
     }
 
     // ########################################
@@ -955,9 +955,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
     {
         $dataForAdd = array(
             'listing_product_id' => $this->getId(),
-            'add' => Ess_M2ePro_Model_Listing_Product_Variation::ADD_NO,
-            'delete' => Ess_M2ePro_Model_Listing_Product_Variation::DELETE_NO,
-            'status' => Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED
         );
         $variationId = Mage::helper('M2ePro/Component_Buy')->getModel('Listing_Product_Variation')
                                                               ->addData($dataForAdd)
@@ -978,16 +975,16 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
                                                    ->save();
         }
 
-        $this->setData('is_variation_matched',self::IS_VARIATION_MATCHED_YES)->save();
         $this->updateVariationOptions($options);
+        $this->setData('is_variation_matched',self::IS_VARIATION_MATCHED_YES)->save();
 
         if ($this->getParentObject()->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
             return;
         }
 
         $oldItems = Mage::getModel('M2ePro/Buy_Item')->getCollection()
-                                ->addFieldToFilter('account_id',$this->getGeneralTemplate()->getAccountId())
-                                ->addFieldToFilter('marketplace_id',$this->getGeneralTemplate()->getMarketplaceId())
+                                ->addFieldToFilter('account_id',$this->getListing()->getAccountId())
+                                ->addFieldToFilter('marketplace_id',$this->getListing()->getMarketplaceId())
                                 ->addFieldToFilter('sku',$this->getSku())
                                 ->addFieldToFilter('product_id',$this->getParentObject()->getProductId())
                                 ->addFieldToFilter('store_id',$this->getListing()->getStoreId())
@@ -999,8 +996,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         }
 
         $dataForAdd = array(
-            'account_id' => (int)$this->getListing()->getGeneralTemplate()->getAccountId(),
-            'marketplace_id' => (int)$this->getListing()->getGeneralTemplate()->getMarketplaceId(),
+            'account_id' => (int)$this->getListing()->getAccountId(),
+            'marketplace_id' => (int)$this->getListing()->getMarketplaceId(),
             'sku' => $this->getSku(),
             'product_id' =>(int)$this->getParentObject()->getProductId(),
             'store_id' => (int)$this->getListing()->getStoreId(),
@@ -1015,6 +1012,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         Mage::getModel('M2ePro/Buy_Item')->setData($dataForAdd)->save();
     }
 
+    // ---------------------------------------
+
     public function unsetMatchedVariation()
     {
         /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
@@ -1022,15 +1021,16 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
             $variation->deleteInstance();
         }
 
-        $this->setData('is_variation_matched',self::IS_VARIATION_MATCHED_NO)->save();
+        $this->setData('is_variation_matched',self::IS_VARIATION_MATCHED_NO)
+             ->save();
 
         if ($this->getParentObject()->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
             return true;
         }
 
         $oldItems = Mage::getModel('M2ePro/Buy_Item')->getCollection()
-                                ->addFieldToFilter('account_id',$this->getGeneralTemplate()->getAccountId())
-                                ->addFieldToFilter('marketplace_id',$this->getGeneralTemplate()->getMarketplaceId())
+                                ->addFieldToFilter('account_id',$this->getListing()->getAccountId())
+                                ->addFieldToFilter('marketplace_id',$this->getListing()->getMarketplaceId())
                                 ->addFieldToFilter('sku',$this->getSku())
                                 ->addFieldToFilter('product_id',$this->getParentObject()->getProductId())
                                 ->addFieldToFilter('store_id',$this->getListing()->getStoreId())
@@ -1059,7 +1059,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         $additionalData = array_filter($additionalData);
         $additionalData['variation_options'] = $variationOptions;
 
-        return $this->setData('additional_data',json_encode($additionalData))->save();
+        return $this->getParentObject()->setData('additional_data',json_encode($additionalData))->save();
     }
 
     // ########################################

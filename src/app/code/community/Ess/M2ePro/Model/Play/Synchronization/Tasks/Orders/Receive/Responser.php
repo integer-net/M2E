@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive_Responser
@@ -105,7 +105,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive_Responser
                     try {
                         $order->createMagentoOrder();
                     } catch (Exception $e) {
-                        Mage::helper('M2ePro/Exception')->process($e);
+                        Mage::helper('M2ePro/Module_Exception')->process($e);
                     }
                 }
                 if ($order->getChildObject()->canCreateInvoice()) {
@@ -128,7 +128,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive_Responser
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
             );
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
     }
 

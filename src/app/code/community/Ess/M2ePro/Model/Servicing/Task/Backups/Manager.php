@@ -1,24 +1,24 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Servicing_Task_Backups_Manager
 {
     const GENERAL_SETTINGS_ID = 'general';
 
-    private $availableTables = null;
+    private $availableTables = NULL;
 
-    /** @var Ess_M2ePro_Model_Config_Module */
-    private $config = null;
-    private $configGroup = '/backup/settings/';
+    /** @var Ess_M2ePro_Model_Config_Cache */
+    private $cache = NULL;
+    private $cacheGroup = '/backup/settings/';
 
     // ########################################
 
     public function __construct()
     {
-        $this->config = Mage::helper('M2ePro/Module')->getConfig();
+        $this->cache = Mage::helper('M2ePro/Module')->getCacheConfig();
     }
 
     // ########################################
@@ -42,33 +42,40 @@ class Ess_M2ePro_Model_Servicing_Task_Backups_Manager
                 $this->setSetting($generalSettingKey, $generalSettingValue, self::GENERAL_SETTINGS_ID);
             }
         }
+
+        return $this;
     }
 
-    public function deleteSettings($tableName = null)
+    public function deleteSettings($tableName = NULL)
     {
         $group = $this->prepareSettingGroup($tableName);
-        $this->config->deleteAllGroupValues($group);
+        $this->cache->deleteAllGroupValues($group);
+
+        return $this;
     }
 
     // ########################################
 
-    public function setSetting($key, $value, $tableName = null)
+    public function setSetting($key, $value, $tableName = NULL)
     {
         $group = $this->prepareSettingGroup($tableName);
-        $this->config->setGroupValue($group, $key, $value);
+        $this->cache->setGroupValue($group, $key, $value);
+
+        return $this;
     }
 
-    public function getSetting($key, $tableName = null)
+    public function getSetting($key, $tableName = NULL)
     {
         $group = $this->prepareSettingGroup($tableName);
-        return $this->config->getGroupValue($group, $key);
+
+        return $this->cache->getGroupValue($group, $key);
     }
 
     // ########################################
 
-    private function prepareSettingGroup($tableName = null)
+    private function prepareSettingGroup($tableName = NULL)
     {
-        $group = $this->configGroup;
+        $group = $this->cacheGroup;
 
         if (!is_null($tableName)) {
             $group .= $tableName . '/';
@@ -81,7 +88,7 @@ class Ess_M2ePro_Model_Servicing_Task_Backups_Manager
 
     public function canBackupTable($tableName)
     {
-        if (!in_array($tableName, Mage::helper('M2ePro/Module')->getMySqlTables())) {
+        if (!in_array($tableName, Mage::helper('M2ePro/Module_Database')->getMySqlTables())) {
             return false;
         }
 
@@ -103,7 +110,7 @@ class Ess_M2ePro_Model_Servicing_Task_Backups_Manager
         }
 
         $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-        $lastAccessDate = $this->config->getGroupValue('/cache/backup/'.$tableName.'/', 'last_access');
+        $lastAccessDate = $this->cache->getGroupValue('/backup/'.$tableName.'/', 'last_access');
 
         if (!is_null($lastAccessDate) && $currentTimeStamp < strtotime($lastAccessDate) + (int)$interval) {
             return false;
@@ -114,14 +121,14 @@ class Ess_M2ePro_Model_Servicing_Task_Backups_Manager
 
     public function updateTableLastAccessDate($tableName)
     {
-        $this->config->setGroupValue(
-            '/cache/backup/'.$tableName.'/', 'last_access', Mage::helper('M2ePro')->getCurrentGmtDate()
+        $this->cache->setGroupValue(
+            '/backup/'.$tableName.'/', 'last_access', Mage::helper('M2ePro')->getCurrentGmtDate()
         );
     }
 
     // ########################################
 
-    public function getTableDump($tableName, $columns = '*', $count = null, $offset = null)
+    public function getTableDump($tableName, $columns = '*', $count = NULL, $offset = NULL)
     {
         $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
 

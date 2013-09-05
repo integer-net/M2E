@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Reserve_Cancellation
@@ -11,9 +11,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Reserve_Cancellation
     const PERCENTS_END = 100;
     const PERCENTS_INTERVAL = 100;
 
-    // ->__('Qty Reserve Cancellation Synchronization')
     // ->__('Amazon Qty Reserve Cancellation Synchronization')
-    private $name = 'Qty Reserve Cancellation Synchronization';
+    private $name = 'Amazon Qty Reserve Cancellation Synchronization';
 
     public function process()
     {
@@ -42,19 +41,13 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Reserve_Cancellation
         $this->_lockItem->activate();
         $this->_logs->setSynchronizationTask(Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS);
 
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Amazon::TITLE.' ';
-        } else {
-            $componentName = '';
-        }
-
         $this->_profiler->addEol();
-        $this->_profiler->addTitle($componentName.$this->name);
+        $this->_profiler->addTitle($this->name);
         $this->_profiler->addTitle('--------------------------');
         $this->_profiler->addTimePoint(__CLASS__, 'Total time');
         $this->_profiler->increaseLeftPadding(5);
 
-        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($componentName.$this->name));
+        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($this->name));
         $this->_lockItem->setPercents(self::PERCENTS_START);
         $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is started. Please wait...', $this->name));
     }

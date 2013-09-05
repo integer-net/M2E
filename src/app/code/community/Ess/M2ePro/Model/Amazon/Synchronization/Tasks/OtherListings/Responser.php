@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
@@ -96,7 +96,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
 
             $this->getSynchLogModel()->addMessage(Mage::helper('M2ePro')->__($exception->getMessage()),
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -395,12 +395,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
         $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns(array('second_table.sku'));
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $generalTemplateTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
 
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
-        $collection->getSelect()->join(array('gt' => $generalTemplateTable), 'l.template_general_id = gt.id', array());
-        $collection->getSelect()->where('gt.marketplace_id = ?',(int)$this->getMarketplace()->getId());
-        $collection->getSelect()->where('gt.account_id = ?',(int)$this->getAccount()->getId());
+        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+        $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
 
         /** @var $stmtTemp Zend_Db_Statement_Pdo */
         $stmtTemp = $connWrite->query($collection->getSelect()->__toString());

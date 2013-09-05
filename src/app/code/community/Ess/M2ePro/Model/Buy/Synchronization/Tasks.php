@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Buy_Synchronization_Tasks extends Ess_M2ePro_Model_Synchronization_Tasks
@@ -20,7 +20,7 @@ abstract class Ess_M2ePro_Model_Buy_Synchronization_Tasks extends Ess_M2ePro_Mod
         empty($args[0]) && $args[0] = array();
         $params = $args[0];
 
-        $this->_runnerActions = Mage::helper('M2ePro')->getGlobalValue('synchRunnerActions');
+        $this->_runnerActions = Mage::helper('M2ePro/Data_Global')->getValue('synchRunnerActions');
 
         parent::__construct($params);
     }

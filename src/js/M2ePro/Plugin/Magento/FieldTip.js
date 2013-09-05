@@ -3,12 +3,50 @@ MagentoFieldTip.prototype = {
 
     // --------------------------------
 
-    initialize: function() {},
+    initialize: function()
+    {
+        this.isHideToolTip = false;
+    },
+
+    // --------------------------------
+
+    getHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_bt_' + md5(id).substr(0, 10);
+        var notHashedCookie = getCookie(id);
+        var resultCookie = null;
+
+        if (notHashedCookie !== "") {
+            deleteCookie(id, '/', '');
+            this.setHashedCookie(id);
+            resultCookie = notHashedCookie;
+        } else {
+            resultCookie = getCookie(hashedCookieKey);
+        }
+
+        return resultCookie;
+    },
+
+    setHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_bt_' + md5(id).substr(0, 10);
+        setCookie(hashedCookieKey, 1, 3*365, '/');
+    },
+
+    deleteHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_bt_' + md5(id).substr(0, 10);
+
+        deleteCookie(hashedCookieKey, '/', '');
+        deleteCookie(id, '/', '');
+    },
 
     // --------------------------------
 
     showTipsForBlock: function(blockClass,init)
     {
+        var self = MagentoFieldTipObj;
+
         blockClass = blockClass || '';
         if (blockClass == '') {
             return false;
@@ -20,13 +58,17 @@ MagentoFieldTip.prototype = {
 
         var tempHtml = $$('div.'+blockClass)[0].select('div.entry-edit-head div.entry-edit-head-right')[0].innerHTML;
         var tempHtml2 = '<div class="block_tips_changer" style="float: right; color: white; font-size: 11px;">';
-        tempHtml2 += '<a href="javascript:void(0);" onclick="MagentoFieldTipObj.hideTipsForBlock(\''+blockClass+'\',\'0\');">'+HIDE_TIPS+'</a>';
+        tempHtml2 += '<a href="javascript:void(0);" onclick="MagentoFieldTipObj.hideTipsForBlock(\''+blockClass+'\',\'0\');">'+M2ePro.translator.translate('Hide Tips')+'</a>';
         tempHtml2 += '</div>';
         $$('div.'+blockClass)[0].select('div.entry-edit-head div.entry-edit-head-right')[0].innerHTML = tempHtml + tempHtml2;
 
-        deleteCookie(blockClass, '/', '');
+        this.deleteHashedCookie(blockClass);
 
-        $$('div.'+blockClass)[0].select('div.fieldset div.hor-scroll table.form-list tr td.value p.note').each(function(o) {
+        var noteClassName = 'note';
+        if (IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) {
+            noteClassName = 'note-no-tool-tip';
+        }
+        $$('div.'+blockClass)[0].select('div.fieldset div.hor-scroll table.form-list tr td.value p.' + noteClassName).each(function(o) {
 
             if (init == '0') {
                 o.show();
@@ -48,6 +90,8 @@ MagentoFieldTip.prototype = {
 
     hideTipsForBlock: function(blockClass,init)
     {
+        var self = MagentoFieldTipObj;
+
         blockClass = blockClass || '';
         if (blockClass == '') {
             return false;
@@ -59,13 +103,17 @@ MagentoFieldTip.prototype = {
 
         var tempHtml = $$('div.'+blockClass)[0].select('div.entry-edit-head div.entry-edit-head-right')[0].innerHTML;
         var tempHtml2 = '<div class="block_tips_changer" style="float: right; color: white; font-size: 11px;">';
-        tempHtml2 += '<a href="javascript:void(0);" onclick="MagentoFieldTipObj.showTipsForBlock(\''+blockClass+'\',\'0\');">'+SHOW_TIPS+'</a>';
+        tempHtml2 += '<a href="javascript:void(0);" onclick="MagentoFieldTipObj.showTipsForBlock(\''+blockClass+'\',\'0\');">'+M2ePro.translator.translate('Show Tips')+'</a>';
         tempHtml2 += '</div>';
         $$('div.'+blockClass)[0].select('div.entry-edit-head div.entry-edit-head-right')[0].innerHTML = tempHtml + tempHtml2;
 
-        setCookie( blockClass , 1 , 3*365 , '/' );
+        this.setHashedCookie(blockClass);
 
-        $$('div.'+blockClass)[0].select('div.fieldset div.hor-scroll table.form-list tr td.value p.note').each(function(o) {
+        var noteClassName = 'note';
+        if (IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) {
+            noteClassName = 'note-no-tool-tip';
+        }
+        $$('div.'+blockClass)[0].select('div.fieldset div.hor-scroll table.form-list tr td.value p.' + noteClassName).each(function(o) {
 
             if (init == '0') {
                 o.hide();
@@ -105,12 +153,131 @@ MagentoFieldTip.prototype = {
         var blockClass = tempId + '_hide_tips';
         blockObj.addClassName(blockClass);
 
-        var isClosed = getCookie(blockClass);
+        var isClosed = this.getHashedCookie(blockClass);
 
         if (isClosed == '' || isClosed == '0') {
             self.showTipsForBlock(blockClass,'1');
         } else {
             self.hideTipsForBlock(blockClass,'1');
+        }
+    },
+
+    // --------------------------------
+
+    onToolTipMouseLeave: function()
+    {
+        var self = MagentoFieldTipObj;
+        var element = this;
+
+        self.isHideToolTip = true;
+
+        setTimeout(function() {
+            self.isHideToolTip && element.hide();
+        }, 1000);
+    },
+
+    onToolTipMouseEnter: function()
+    {
+        var self = MagentoFieldTipObj;
+        self.isHideToolTip = false;
+    },
+
+    onToolTipIconMouseLeave: function()
+    {
+        var self = MagentoFieldTipObj;
+        var element = this.up().select('.tool-tip-message')[0];
+
+        self.isHideToolTip = true;
+
+        setTimeout(function() {
+            self.isHideToolTip && element.hide();
+        }, 1000);
+    },
+
+    // --------------------------------
+
+    showToolTip: function()
+    {
+        var self = MagentoFieldTipObj;
+
+        self.isHideToolTip = false;
+
+        $$('.tool-tip-message').each(function(element) {
+            element.hide();
+        });
+
+        if (this.up().select('.tool-tip-message').length > 0) {
+            self.changeToolTipPosition(this);
+            this.up().select('.tool-tip-message')[0].show();
+
+            return;
+        }
+
+        var isShowLeft = false;
+        if (this.up().previous('td').select('p.note')[0].hasClassName('show-left')) {
+            isShowLeft = true;
+        }
+
+        var tipText = this.up().previous('td').select('p.note')[0].innerHTML;
+        var tipWidth = this.up().previous('td').select('p.note')[0].getWidth();
+        if (tipWidth > 500) {
+            tipWidth = 500;
+        }
+
+        var additionalClassName = 'tip-right';
+        if (isShowLeft) {
+            additionalClassName = 'tip-left';
+        }
+
+        var toolTipSpan = new Element('span', {
+            'class': 'tool-tip-message ' + additionalClassName
+        }).update(tipText).hide();
+
+        if (isShowLeft) {
+            toolTipSpan.style.width = tipWidth + 'px';
+        }
+
+        var imgUrl = M2ePro.url.get('m2epro_skin_url') + '/images/help.png';
+        var toolTipImg = new Element('img', {
+            'src': imgUrl
+        });
+
+        toolTipSpan.insert({top: toolTipImg});
+        this.insert({after: toolTipSpan});
+
+        self.changeToolTipPosition(this);
+
+        toolTipSpan.show();
+
+        toolTipSpan.observe('mouseout', self.onToolTipMouseLeave);
+        toolTipSpan.observe('mouseover', self.onToolTipMouseEnter);
+    },
+
+    // --------------------------------
+
+    changeToolTipPosition: function(element)
+    {
+        var toolTip = element.up().select('.tool-tip-message')[0];
+
+        var settings = {
+            setHeight: false,
+            setWidth: false,
+            setLeft: true,
+            offsetTop: 25,
+            offsetLeft: 0
+        };
+
+        if (element.up().getStyle('float') == 'right') {
+            settings.offsetLeft += 18;
+        }
+        if (element.up().match('span')) {
+            settings.offsetLeft += 15;
+        }
+
+        toolTip.clonePosition(element, settings);
+
+        if (toolTip.hasClassName('tip-left')) {
+            toolTip.style.left = (parseInt(toolTip.style.left) - toolTip.getWidth() - 10) + 'px';
         }
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
@@ -74,9 +74,9 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
     private function execute()
     {
         if (!empty($this->_params['marketplace_id'])) {
-            $markeptlaceObj = Mage::helper('M2ePro/Component')
+            $marketplaceObj = Mage::helper('M2ePro/Component')
                 ->getUnknownObject('Marketplace',$this->_params['marketplace_id']);
-            if ($markeptlaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Ebay::NICK) {
+            if ($marketplaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Ebay::NICK) {
                 return;
             }
         }
@@ -138,8 +138,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
 
             $this->_profiler->addTimePoint(__METHOD__.'get'.$marketplace->getId(),'Get details from eBay');
 
-            // ->__('The "Receive Details" action for marketplace: "%s" is started. Please wait...')
-            $status = 'The "Receive Details" action for marketplace: "%s" is started. Please wait...';
+            // ->__('The "Receive Details" action for eBay Site: "%s" is started. Please wait...')
+            $status = 'The "Receive Details" action for eBay Site: "%s" is started. Please wait...';
             $tempString = Mage::helper('M2ePro')->__($status, Mage::helper('M2ePro')->__($marketplace->getTitle()));
             $this->_lockItem->setStatus($tempString);
 
@@ -164,8 +164,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
 
             $this->_profiler->addTimePoint(__METHOD__.'save'.$marketplace->getId(),'Save details to DB');
 
-            // ->__('The "Receive Details" action for marketplace "%s" is in data processing mode. Please wait...')
-            $status = 'The "Receive Details" action for marketplace "%s" is in data processing mode. Please wait...';
+            // ->__('The "Receive Details" action for eBay Site "%s" is in data processing mode. Please wait...')
+            $status = 'The "Receive Details" action for eBay Site "%s" is in data processing mode. Please wait...';
             $tempString = Mage::helper('M2ePro')->__($status, Mage::helper('M2ePro')->__($marketplace->getTitle()));
             $this->_lockItem->setStatus($tempString);
 
@@ -184,7 +184,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
                 'shipping_locations'  => json_encode($details['shipping_locations']),
                 'shipping_locations_exclude' => json_encode($details['shipping_locations_exclude']),
                 'categories_features_defaults' => json_encode($details['categories_features_defaults']),
-                'tax_categories' => json_encode($details['tax_categories'])
+                'tax_categories' => json_encode($details['tax_categories']),
+                'charities'      => json_encode($details['charities']),
             );
 
             $connWrite->insertOnDuplicate($tableMarketplaces, $data);
@@ -230,9 +231,9 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
             $logMarketplacesString .= $marketplace->getTitle();
         }
 
-        // ->__('The "Receive Details" action for marketplace: "%mrk%"  has been successfully completed.');
+        // ->__('The "Receive Details" action for eBay Site: "%mrk%"  has been successfully completed.');
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Receive Details" action for marketplace: "%mrk%"  has been successfully completed.',
+            'The "Receive Details" action for eBay Site: "%mrk%"  has been successfully completed.',
             array('mrk'=>$logMarketplacesString)
         );
         $this->_logs->addMessage($tempString,

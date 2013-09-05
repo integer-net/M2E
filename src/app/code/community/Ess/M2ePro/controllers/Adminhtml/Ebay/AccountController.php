@@ -1,20 +1,17 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_Adminhtml_MainController
+class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
 {
     //#############################################
 
     protected function _initAction()
     {
         $this->loadLayout()
-             ->_setActiveMenu('m2epro/configuration')
-             ->_title(Mage::helper('M2ePro')->__('M2E Pro'))
-             ->_title(Mage::helper('M2ePro')->__('Configuration'))
-             ->_title(Mage::helper('M2ePro')->__('eBay Accounts'));
+             ->_title(Mage::helper('M2ePro')->__('Accounts'));
 
         $this->getLayout()->getBlock('head')
              ->setCanLoadExtJs(true)
@@ -25,14 +22,20 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro/configuration/account');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_ebay/configuration');
     }
 
     //#############################################
 
     public function indexAction()
     {
-        return $this->_redirect('*/adminhtml_account/index');
+        $this->_initAction()
+            ->_addContent(
+                $this->getLayout()->createBlock(
+                    'M2ePro/adminhtml_ebay_configuration', '',
+                    array('active_tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_ACCOUNT)
+                )
+            )->renderLayout();
     }
 
     //#############################################
@@ -49,14 +52,14 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
         if (!$model->getId() && $id) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Account does not exist.'));
-            return $this->_redirect('*/adminhtml_account/index');
+            return $this->_redirect('*/adminhtml_ebay_account/index');
         }
 
-        Mage::helper('M2ePro')->setGlobalValue('temp_data', $model);
+        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
 
         $this->_initAction()
-             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_account_edit'))
              ->_addLeft($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_account_edit_tabs'))
+             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_account_edit'))
              ->renderLayout();
     }
 
@@ -67,7 +70,6 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         // Get and save form data
         //-------------------------------
         $accountId = $this->getRequest()->getParam('id', 0);
-        $accountTitle = strip_tags($this->getRequest()->getParam('title'));
         $accountMode = (int)$this->getRequest()->getParam('mode', Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX);
         //-------------------------------
 
@@ -80,12 +82,12 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         try {
             $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')->processVirtualAbstract(
                 'account','get','authUrl',
-                array('back_url'=>$this->getUrl('*/*/afterGetToken')),
+                array('back_url'=>$this->getUrl('*/*/afterGetToken',array('_current' => true))),
                 NULL,NULL,NULL,$mode
             );
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
 
             // ->__('The eBay token obtaining is currently unavailable.<br />Reason: %s')
             $error = 'The eBay token obtaining is currently unavailable.<br />Reason: %s';
@@ -96,10 +98,9 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
             return $this->indexAction();
         }
 
-        Mage::helper('M2ePro')->setSessionValue('get_token_account_id', $accountId);
-        Mage::helper('M2ePro')->setSessionValue('get_token_account_title', $accountTitle);
-        Mage::helper('M2ePro')->setSessionValue('get_token_account_mode', $accountMode);
-        Mage::helper('M2ePro')->setSessionValue('get_token_session_id', $response['session_id']);
+        Mage::helper('M2ePro/Data_Session')->setValue('get_token_account_id', $accountId);
+        Mage::helper('M2ePro/Data_Session')->setValue('get_token_account_mode', $accountMode);
+        Mage::helper('M2ePro/Data_Session')->setValue('get_token_session_id', $response['session_id']);
 
         $this->_redirectUrl($response['url']);
         //-------------------------------
@@ -109,32 +110,23 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
     {
         // Get eBay session id
         //-------------------------------
-        $sessionId = Mage::helper('M2ePro')->getSessionValue('get_token_session_id', true);
+        $sessionId = Mage::helper('M2ePro/Data_Session')->getValue('get_token_session_id', true);
         is_null($sessionId) && $this->_redirect('*/*/index');
         //-------------------------------
 
         // Get account form data
         //-------------------------------
-        Mage::helper('M2ePro')->setSessionValue('get_token_account_token_session', $sessionId);
+        Mage::helper('M2ePro/Data_Session')->setValue('get_token_account_token_session', $sessionId);
         //-------------------------------
-
-        /* @var $wizardHelper Ess_M2ePro_Helper_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Wizard');
-
-        $routerParams = array();
-        if ($wizardHelper->isActive('ebay') &&
-            $wizardHelper->getStep('ebay') == 'account') {
-            $routerParams['hide_upgrade_notification'] = 'yes';
-        }
 
         // Goto account add or edit page
         //-------------------------------
-        $accountId = (int)Mage::helper('M2ePro')->getSessionValue('get_token_account_id', true);
+        $accountId = (int)Mage::helper('M2ePro/Data_Session')->getValue('get_token_account_id', true);
 
         if ($accountId == 0) {
-            $this->_redirect('*/*/new',$routerParams);
+            $this->_redirect('*/*/new',array('_current' => true));
         } else {
-            $this->_redirect('*/*/edit', array_merge(array('id' => $accountId),$routerParams));
+            $this->_redirect('*/*/edit', array('id' => $accountId, '_current' => true));
         }
         //-------------------------------
     }
@@ -167,10 +159,8 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         // tab: general
         //--------------------
         $keys = array(
-            'title',
             'mode',
             'token_session',
-            'messages_receive'
         );
         foreach ($keys as $key) {
             if (isset($post[$key])) {
@@ -446,6 +436,11 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         }
         //--------------------
 
+        // Get Model
+        $model = Mage::helper('M2ePro/Component_Ebay')->getModel('Account');
+        !is_null($id) && $model->load($id);
+        //--------------------
+
         // Add or update server
         //--------------------
         $requestMode = $data['mode'] == Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION ?
@@ -455,7 +450,7 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         if ((bool)$id) {
 
             $requestTempParams = array(
-                'title' => $data['title'],
+                'title' => $model->getTitle(),
                 'mode' => $requestMode,
                 'token_session' => $data['token_session']
             );
@@ -463,17 +458,19 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
                         ->processVirtualAbstract('account','update','entity',
                                                   $requestTempParams,NULL,
                                                   NULL,$id,NULL);
+
+            $data['title'] = $model->getTitle();
+
         } else {
 
             $requestTempParams = array(
-                'title' => $data['title'],
                 'mode' => $requestMode,
                 'token_session' => $data['token_session']
             );
-            $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                        ->processVirtualAbstract('account','add','entity',
-                                                  $requestTempParams,NULL,
-                                                  NULL,NULL,$requestMode);
+
+            $response = $this->processAccountAddEntity($requestTempParams);
+
+            $data['title'] = $response['account_title'];
         }
 
         if (!isset($response['token_expired_date'])) {
@@ -505,9 +502,8 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
         // Add or update model
         //--------------------
-        $model = Mage::helper('M2ePro/Component_Ebay')->getModel('Account');
         is_null($id) && $model->setData($data);
-        !is_null($id) && $model->load($id)->addData($data);
+        !is_null($id) && $model->addData($data);
         $id = $model->save()->getId();
         //--------------------
 
@@ -519,46 +515,73 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         }
         //--------------------
 
-        /* @var $wizardHelper Ess_M2ePro_Helper_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Wizard');
-
-        $routerParams = array('id'=>$id);
-        if ($wizardHelper->isActive('ebay') &&
-            $wizardHelper->getStep('ebay') == 'account') {
-            $routerParams['hide_upgrade_notification'] = 'yes';
-        }
-
-        if ($wizardHelper->isActive('ebayOtherListing') &&
-            $wizardHelper->getStep('ebayOtherListing') == 'account') {
-            $currentId = Mage::helper('M2ePro')->getSessionValue('current_account_id');
-            $nextId = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account')
-                ->addFieldToFilter('id',array('gt' => $currentId))
-                ->setOrder('id','ASC')
-                ->getFirstItem()
-                ->getId();
-
-            Mage::helper('M2ePro')->setSessionValue('current_account_id',$nextId);
-
-            return $this->_redirect(
-                '*/adminhtml_ebay_account/edit',
-                array(
-                    'id' => $nextId,
-                    'hide_upgrade_notification' => 'yes',
-                    'tab' => 'listingOther'
-                )
-            );
-        }
-
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Account was successfully saved'));
 
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl(
-            'list',array(),array('edit'=>$routerParams)
+            'list',array(),array('edit'=>array('id'=>$id,'_current'=>true))
         ));
     }
 
     public function deleteAction()
     {
-        $this->_forward('delete','adminhtml_account');
+        $ids = $this->getRequestIds();
+
+        if (count($ids) == 0) {
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select account(s) to remove.'));
+            $this->_redirect('*/*/index');
+            return;
+        }
+
+        $deleted = $locked = 0;
+        foreach ($ids as $id) {
+
+            /** @var $account Ess_M2ePro_Model_Account */
+            $account = Mage::getModel('M2ePro/Account')->loadInstance($id);
+
+            if ($account->isLocked(true)) {
+                $locked++;
+            } else {
+
+                try {
+
+                    Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
+                        ->processVirtualAbstract('account','delete','entity',
+                                                 array(), NULL,
+                                                 NULL,$account->getId(),NULL);
+
+                } catch (Exception $e) {
+
+                    $account->deleteProcessingRequests();
+                    $account->deleteObjectLocks();
+                    $account->deleteInstance();
+
+                    throw $e;
+                }
+
+                $account->deleteProcessingRequests();
+                $account->deleteObjectLocks();
+                $account->deleteInstance();
+
+                $deleted++;
+            }
+        }
+
+        $tempString = Mage::helper('M2ePro')->__('%s record(s) were successfully deleted.', $deleted);
+        $deleted && $this->_getSession()->addSuccess($tempString);
+
+        $tempString  = Mage::helper('M2ePro')->__('%s record(s) are used in M2E Listing(s).', $locked) . ' ';
+        $tempString .= Mage::helper('M2ePro')->__('Account must not be in use to be deleted.');
+        $locked && $this->_getSession()->addError($tempString);
+
+        $this->_redirect('*/*/index');
+    }
+
+    //#############################################
+
+    public function accountGridAction()
+    {
+        $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_account_grid')->toHtml();
+        $this->getResponse()->setBody($response);
     }
 
     //#############################################
@@ -572,7 +595,7 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
             return;
         }
 
-        Mage::helper('M2ePro')->setGlobalValue('temp_data', $model);
+        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
 
         // Response for grid
         //----------------------------
@@ -613,6 +636,41 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         $id = $this->getRequest()->getParam('id');
         Mage::getModel('M2ePro/Ebay_Feedback_Template')->loadInstance($id)->deleteInstance();
         exit('ok');
+    }
+
+    //#############################################
+
+    private function processAccountAddEntity($requestParams)
+    {
+        $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
+                        ->processVirtualAbstract('account','add','entity',
+                                                  $requestParams,NULL,
+                                                  NULL,NULL,$requestParams['mode']);
+
+        $initialTitle = empty($response['info']['UserID']) ? 'Unknown' : $response['info']['UserID'];
+        $accountTitle = $initialTitle;
+
+        $i = 0;
+        while ($i < 10) {
+
+            $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account');
+            $collection->addFieldToFilter('title', $accountTitle);
+
+            if ($collection->getSize() == 0) {
+                break;
+            }
+            ++$i;
+
+            $accountTitle =  $initialTitle . ' ('.($i + 1).')';
+        }
+
+        if ($i == 10) {
+            throw new Exception();
+        }
+
+        $response['account_title'] = $accountTitle;
+
+        return $response;
     }
 
     //#############################################

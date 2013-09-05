@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Specific_GenerateAttributeValue
@@ -17,17 +17,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Specific_GenerateAttributeValue
     {
         $specificsGrid = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_motor_specific_grid');
         $this->setData('specifics_grid_id', $specificsGrid->getId());
-
-        $attributeCode = $this->getData('motors_specifics_attribute');
-        $attributeName = '';
-
-        $attribute = Mage::getResourceModel('catalog/product')->getAttribute($attributeCode);
-
-        if ($attribute !== false) {
-            $attributeName = $attribute->getFrontendLabel();
-        }
-
-        $this->setData('motors_specifics_attribute', $attributeName);
 
         return parent::_beforeToHtml();
     }

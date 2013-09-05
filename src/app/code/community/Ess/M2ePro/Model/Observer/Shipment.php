@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Observer_Shipment
@@ -12,9 +12,9 @@ class Ess_M2ePro_Model_Observer_Shipment
     {
         try {
 
-            if (Mage::helper('M2ePro')->getGlobalValue('skip_shipment_observer')) {
+            if (Mage::helper('M2ePro/Data_Global')->getValue('skip_shipment_observer')) {
                 // Not process invoice observer when set such flag
-                Mage::helper('M2ePro')->unsetGlobalValue('skip_shipment_observer');
+                Mage::helper('M2ePro/Data_Global')->unsetValue('skip_shipment_observer');
                 return;
             }
 
@@ -39,7 +39,7 @@ class Ess_M2ePro_Model_Observer_Shipment
             $result = $shipmentHandler->handle($order, $shipment);
             // -------------
 
-            if (!is_null(Mage::helper('M2ePro')->getGlobalValue('cron_running'))) {
+            if (!is_null(Mage::helper('M2ePro/Data_Global')->getValue('cron_running'))) {
                 return;
             }
 
@@ -54,7 +54,7 @@ class Ess_M2ePro_Model_Observer_Shipment
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
 
         }
     }
@@ -114,6 +114,7 @@ class Ess_M2ePro_Model_Observer_Shipment
 
     private function addSessionErrorMessage(Ess_M2ePro_Model_Order $order)
     {
+        // todo adminhtml_log
         $url = Mage::helper('adminhtml')->getUrl('M2ePro/adminhtml_log/order', array('order_id' => $order->getId()));
 
         $startLink = '<a href="' . $url . '" target="_blank">';

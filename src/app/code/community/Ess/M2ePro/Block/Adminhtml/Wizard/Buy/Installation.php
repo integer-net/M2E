@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation extends Ess_M2ePro_Block_Adminhtml_Wizard_Installation
@@ -14,28 +14,28 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation extends Ess_M2ePro_Bloc
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
-                'id' => 'wizard_buy_complete',
+                'id' => 'wizard_complete',
                 'label'   => Mage::helper('M2ePro')->__('Complete Configuration'),
                 'onclick' => 'setLocation(\''.$this->getUrl('*/*/complete').'\');',
-                'class' => 'end_buy_button',
+                'class' => 'end_button',
                 'style' => 'display: none'
             ) );
-        $this->setChild('end_buy_button',$buttonBlock);
+        $this->setChild('end_button',$buttonBlock);
         //-------------------------------
 
         // Steps
         //-------------------------------
         $this->setChild(
             'step_marketplace',
-            $this->helper('M2ePro/Wizard')->createBlock('installation_marketplace',$this->getNick())
+            $this->helper('M2ePro/Module_Wizard')->createBlock('installation_marketplace',$this->getNick())
         );
         $this->setChild(
             'step_synchronization',
-            $this->helper('M2ePro/Wizard')->createBlock('installation_synchronization',$this->getNick())
+            $this->helper('M2ePro/Module_Wizard')->createBlock('installation_synchronization',$this->getNick())
         );
         $this->setChild(
             'step_account',
-            $this->helper('M2ePro/Wizard')->createBlock('installation_account',$this->getNick())
+            $this->helper('M2ePro/Module_Wizard')->createBlock('installation_account',$this->getNick())
         );
         //-------------------------------
 
@@ -57,7 +57,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation extends Ess_M2ePro_Bloc
             . $this->getChildHtml('step_marketplace')
             . $this->getChildHtml('step_synchronization')
             . $this->getChildHtml('step_account')
-            . $this->getChildHtml('end_buy_button');
+            . $this->getChildHtml('end_button');
     }
 
     // ########################################

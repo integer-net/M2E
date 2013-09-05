@@ -1,13 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
  * @method Ess_M2ePro_Model_Listing_Product_Variation getParentObject()
-*/
-
+ */
 class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
     // ########################################
@@ -29,53 +28,21 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
     }
 
     /**
-     * @return Ess_M2ePro_Model_Listing_Product
-     */
-    public function getListingProduct()
-    {
-        return $this->getParentObject()->getListingProduct();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_General
-     */
-    public function getGeneralTemplate()
-    {
-        return $this->getParentObject()->getGeneralTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
-     */
-    public function getSellingFormatTemplate()
-    {
-        return $this->getParentObject()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getParentObject()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getParentObject()->getSynchronizationTemplate();
-    }
-
-    //-----------------------------------------
-
-    /**
      * @return Ess_M2ePro_Model_Amazon_Listing
      */
     public function getAmazonListing()
     {
         return $this->getListing()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product
+     */
+    public function getListingProduct()
+    {
+        return $this->getParentObject()->getListingProduct();
     }
 
     /**
@@ -86,12 +53,50 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
         return $this->getListingProduct()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Amazon_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getAmazonGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getGeneralTemplate()->getChildObject();
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Account
+     */
+    public function getAmazonAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Marketplace
+     */
+    public function getAmazonMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_SellingFormat
+     */
+    public function getSellingFormatTemplate()
+    {
+        return $this->getAmazonListingProduct()->getSellingFormatTemplate();
     }
 
     /**
@@ -102,12 +107,14 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
         return $this->getSellingFormatTemplate()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Amazon_Template_Description
+     * @return Ess_M2ePro_Model_Template_Synchronization
      */
-    public function getAmazonDescriptionTemplate()
+    public function getSynchronizationTemplate()
     {
-        return $this->getDescriptionTemplate()->getChildObject();
+        return $this->getAmazonListingProduct()->getSynchronizationTemplate();
     }
 
     /**
@@ -215,7 +222,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
 
         //-- Check max posted QTY on channel
         $src = $this->getAmazonSellingFormatTemplate()->getQtySource();
-        if ($src['qty_max_posted_value'] > 0 && $qty > $src['qty_max_posted_value']) {
+        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
             $qty = $src['qty_max_posted_value'];
         }
 
@@ -285,7 +292,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
 
         $price < 0 && $price = 0;
 
-        return $this->getSellingFormatTemplate()->parsePrice($price, $src['coefficient']);
+        return Mage::helper('M2ePro')->parsePrice($price, $src['coefficient']);
     }
 
     // ########################################

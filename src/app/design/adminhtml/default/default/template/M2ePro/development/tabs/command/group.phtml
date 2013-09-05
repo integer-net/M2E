@@ -1,0 +1,47 @@
+<?php
+$number = 0;
+foreach($this->commands as $command) : ?>
+
+    <table>
+
+        <?php
+        $number++;
+        ?>
+
+        <tr>
+            <td class="group_number_td">
+                <b><?php echo $number; ?>.</b>
+            </td>
+            <td style="width: 10px;">
+                |
+            </td>
+            <td>
+
+                <a href="<?php echo $command['url']; ?>" <?php if ($command['confirm'] != ''): ?>onclick="return confirm('<?php echo $command['confirm']; ?>');"<?php endif; ?> <?php if ($command['new_window']): ?>target="_blank"<?php endif; ?> title="<?php echo $command['description']; ?>" alt="<?php echo $command['description']; ?>"><?php echo $command['title']; ?></a>
+
+                <?php
+                $components = array();
+                if ($command['components']) {
+                    $components = $command['components'] === true ? $this->enabledComponents : $command['components'];
+                }
+                ?>
+
+                <?php if (count($components) > 1): ?>
+                    <?php foreach ($this->enabledComponents as $key => $component): ?>
+                        <?php echo $key == 0 ? '(' : ''; ?><a href="<?php echo rtrim($command['url'], '/') . '/component/' . $component . '/'; ?>" <?php if ($command['confirm'] != ''): ?>onclick="return confirm('<?php echo $command['confirm']; ?>');"<?php endif; ?>><?php echo $component; ?></a><?php echo isset($this->enabledComponents[$key + 1]) ? ', ' : ')'; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+
+        <?php if ($command['new_line']): ?>
+            <tr>
+                <td colspan="3">
+                    <hr style="margin-top: 8px;"/>
+                </td>
+            </tr>
+        <?php endif; ?>
+
+    </table>
+
+<?php endforeach; ?>

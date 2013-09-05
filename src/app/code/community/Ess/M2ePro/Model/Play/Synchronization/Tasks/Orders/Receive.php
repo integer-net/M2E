@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2ePro_Model_Play_Synchronization_Tasks
@@ -14,16 +14,25 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
 
     //####################################
 
-    /** @var Ess_M2ePro_Model_Config_Module */
+    // ->__('Play.com Orders Receive Synchronization')
+    private $name = 'Play.com Orders Receive Synchronization';
+
+    /** @var Ess_M2ePro_Model_Config_Synchronization */
     private $config = NULL;
-    private $configGroup = '/play/synchronization/settings/orders/receive/';
+
+    //####################################
+
+    public function __construct()
+    {
+        $this->config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+
+        parent::__construct();
+    }
 
     //####################################
 
     public function process()
     {
-        $this->config = Mage::helper('M2ePro/Module')->getConfig();
-
         // PREPARE SYNCH
         //---------------------------
         $this->prepareSynch();
@@ -47,31 +56,21 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         $this->_lockItem->activate();
         $this->_logs->setSynchronizationTask(Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS);
 
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Play::TITLE.' ';
-        } else {
-            $componentName = '';
-        }
-
         $this->_profiler->addEol();
-        $this->_profiler->addTitle($componentName.'Orders Receive Synchronization');
+        $this->_profiler->addTitle($this->name);
         $this->_profiler->addTitle('--------------------------');
         $this->_profiler->addTimePoint(__CLASS__, 'Total time');
         $this->_profiler->increaseLeftPadding(5);
 
-        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($componentName.'Orders Receive Synchronization'));
+        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($this->name));
         $this->_lockItem->setPercents(self::PERCENTS_START);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Receive Synchronization" is started. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is started. Please wait...', $this->name));
     }
 
     private function cancelSynch()
     {
         $this->_lockItem->setPercents(self::PERCENTS_END);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Receive Synchronization" is finished. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is finished. Please wait...', $this->name));
 
         $this->_profiler->decreaseLeftPadding(5);
         $this->_profiler->addEol();
@@ -134,12 +133,14 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         Ess_M2ePro_Model_Account $account,
         Ess_M2ePro_Model_Marketplace $marketplace
     ) {
-        $title = 'Starting account "'.$account->getTitle().'" and marketplace "'.$marketplace->getTitle().'"';
+        $title = 'Starting account "%s" and marketplace "%s%';
+        $title = sprintf($title, $account->getTitle(), $marketplace->getTitle());
+
         $this->_profiler->addTitle($title);
         $this->_profiler->addTimePoint(__METHOD__.'send'.$account->getId(),'Get orders from Play');
 
-        $status = 'Task "Orders Synchronization" for %s "%s" Account and "%s" marketplace is started. Please wait...';
-        $status = Mage::helper('M2ePro')->__($status, 'Play.com', $account->getTitle(), $marketplace->getTitle());
+        $status = 'Task "%s" for Play.com "%s" Account and "%s" marketplace is started. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle(), $marketplace->getTitle());
         $this->_lockItem->setStatus($status);
 
         //------------------------------
@@ -156,7 +157,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         // Get open orders from Play.com for account
         //---------------------------
         /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Play_Dispatcher */
-        $dispatcherObject = Mage::getModel('M2ePro/Play_Connector')->getDispatcher();
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
         $prefix = 'Ess_M2ePro_Model_Play_Synchronization';
         $dispatcherObject->processConnector(
             'tasks', 'orders_receive', 'requester', $params, $marketplace, $account, $prefix
@@ -171,18 +172,22 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
 
     private function prepareSynchLastTime()
     {
-        $lastTime = $this->getSynchLastTime();
-        if (empty($lastTime)) {
-            $lastTime = new DateTime('now', new DateTimeZone('UTC'));
-            $lastTime->modify('-1 year');
-            $this->setSynchLastTime($lastTime);
+        $lastTime = $this->config->getGroupValue('/play/orders/receive/', 'last_time');
+
+        if (!empty($lastTime)) {
+            return;
         }
+
+        $lastTime = new DateTime('now', new DateTimeZone('UTC'));
+        $lastTime->modify('-1 year');
+
+        $this->setSynchLastTime($lastTime);
     }
 
     private function isSynchLocked()
     {
-        $lastTime = strtotime($this->getSynchLastTime());
-        $interval = (int)$this->config->getGroupValue($this->configGroup,'interval');
+        $lastTime = strtotime($this->config->getGroupValue('/play/orders/receive/', 'last_time'));
+        $interval = (int)$this->config->getGroupValue('/play/orders/receive/','interval');
 
         if ($lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true)) {
             return true;
@@ -191,16 +196,12 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         return false;
     }
 
-    private function getSynchLastTime()
-    {
-        return $this->config->getGroupValue($this->configGroup,'last_time');
-    }
-
     private function setSynchLastTime($time)
     {
         if ($time instanceof DateTime) {
             $time = (int)$time->format('U');
         }
+
         if (is_int($time)) {
             $oldTimezone = date_default_timezone_get();
             date_default_timezone_set('UTC');
@@ -208,7 +209,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
             date_default_timezone_set($oldTimezone);
         }
 
-        $this->config->setGroupValue($this->configGroup, 'last_time', $time);
+        $this->config->setGroupValue('/play/orders/receive/', 'last_time', $time);
     }
 
     //####################################
@@ -219,14 +220,10 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
 
-        $maxDeactivateTime = (int)$this->config->getGroupValue($this->configGroup, 'max_deactivate_time');
+        $maxDeactivateTime = (int)$this->config->getGroupValue('/play/orders/receive/', 'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);
 
-        if ($lockItem->isExist()) {
-            return true;
-        }
-
-        return false;
+        return $lockItem->isExist();
     }
 
     //####################################

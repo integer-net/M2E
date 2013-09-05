@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml_Block_Widget_Grid
@@ -24,10 +24,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         $this->setSaveParametersInSession(true);
         $this->setUseAjax(true);
         //------------------------------
-
-        $this->attributeSets = Mage::getResourceModel('eav/entity_attribute_set_collection')
-                                    ->setEntityTypeFilter(Mage::getModel('catalog/product')->getResource()->getTypeId())
-                                    ->load()->toOptionHash();
     }
 
     // ####################################
@@ -36,49 +32,125 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
     {
         // Get collection products in listing
         //--------------------------------
-        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
-        $collection->getSelect()->distinct();
-        $collection->getSelect()->join(array('l'=>Mage::getResourceModel('M2ePro/Listing')->getMainTable()),
-                                       '(`l`.`id` = `main_table`.`listing_id`)',
-                                       array('listing_title'=>'title','store_id','template_selling_format_id'));
-        //--------------------------------
+        $nameAttribute = Mage::getResourceModel('catalog/product')->getAttribute('name');
+        $nameAttributeId = $nameAttribute ? (int)$nameAttribute->getId() : 0;
 
-        // Communicate with magento product table
-        //--------------------------------
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                                     ->select()
-                                     ->from(Mage::getSingleton('core/resource')
-                                                ->getTableName('catalog_product_entity_varchar'),
-                                            new Zend_Db_Expr('MAX(`store_id`)'))
-                                     ->where("`entity_id` = `main_table`.`product_id`")
-                                     ->where("`attribute_id` = `ea`.`attribute_id`")
-                                     ->where("`store_id` = 0 OR `store_id` = `l`.`store_id`");
+        $listingProductCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+        $listingProductCollection->getSelect()->distinct();
 
-        $collection->getSelect()
-                   //->join(array('csi'=>Mage::getSingleton('core/resource')
-                   //                     ->getTableName('cataloginventory_stock_item')),
-                   //       '(csi.product_id = `main_table`.product_id)',array('qty'))
-                   ->join(array('cpe'=>Mage::getSingleton('core/resource')
-                                        ->getTableName('catalog_product_entity')),
-                          '(cpe.entity_id = `main_table`.product_id)',array('sku'))
-                   ->join(array('cisi'=>Mage::getSingleton('core/resource')
-                                        ->getTableName('cataloginventory_stock_item')),
-                          '(cisi.product_id = `main_table`.product_id AND cisi.stock_id = 1)',array('is_in_stock'))
-                   ->join(array('cpev'=>Mage::getSingleton('core/resource')
-                                        ->getTableName('catalog_product_entity_varchar')),
-                          "( `cpev`.`entity_id` = `main_table`.product_id
-                             AND cpev.store_id = (".$dbSelect->__toString()."))", array('value'))
-                   ->join(array('ea'=>Mage::getSingleton('core/resource')
-                                        ->getTableName('eav_attribute')),
-                          '(`cpev`.`attribute_id` = `ea`.`attribute_id` AND `ea`.`attribute_code` = \'name\')',array())
-                   ->joinLeft(array('ebit'=>Mage::getResourceModel('M2ePro/Ebay_Item')->getMainTable()),
-                              '(`ebit`.`id` = `second_table`.`ebay_item_id`)',array('item_id'));
-        //--------------------------------
+        $listingProductCollection->getSelect()->join(
+            array('l' => Mage::getResourceModel('M2ePro/Listing')->getMainTable()),
+            '`l`.`id` = `main_table`.`listing_id`'
+        );
 
-        //exit($collection->getSelect()->__toString());
+        $listingProductCollection->getSelect()->join(
+            array('em' => Mage::getResourceModel('M2ePro/Ebay_Marketplace')->getMainTable()),
+            '`em`.`marketplace_id` = `l`.`marketplace_id`'
+        );
 
-        // Set collection to grid
-        $this->setCollection($collection);
+        $listingProductCollection->getSelect()->join(
+            array('cpe' => Mage::getSingleton('core/resource')->getTableName('catalog_product_entity')),
+            'cpe.entity_id = `main_table`.product_id'
+        );
+
+        $listingProductCollection->getSelect()->joinLeft(
+            array('cpev' => Mage::getSingleton('core/resource')->getTableName('catalog_product_entity_varchar')),
+            '`cpev`.`entity_id` = `main_table`.`product_id`'
+                . ' AND `cpev`.`attribute_id` = ' . $nameAttributeId
+                . ' AND `cpev`.`store_id` = 0'
+        );
+
+        $listingProductCollection->getSelect()->joinLeft(
+            array('ebit' => Mage::getResourceModel('M2ePro/Ebay_Item')->getMainTable()),
+            '(`ebit`.`id` = `second_table`.`ebay_item_id`)',
+            array('item_id')
+        );
+
+        $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+        $listingProductCollection->getSelect()->columns(
+            array(
+                'account_id'            => 'l.account_id',
+                'marketplace_id'        => 'l.marketplace_id',
+                'product_id'            => 'main_table.product_id',
+                'product_name'          => 'cpev.value',
+                'product_sku'           => 'cpe.sku',
+                'currency'              => 'em.currency',
+                'ebay_item_id'          => 'ebit.item_id',
+                'status'                => 'main_table.status',
+                'online_sku'            => 'second_table.online_sku',
+                'online_title'          => 'second_table.online_title',
+                'online_qty'            => 'second_table.online_qty',
+                'online_qty_sold'       => 'second_table.online_qty_sold',
+                'online_buyitnow_price' => 'second_table.online_buyitnow_price',
+                'listing_id'            => 'l.id',
+                'listing_title'         => 'l.title',
+                'is_m2epro_listing'     => new Zend_Db_Expr(1)
+            )
+        );
+        //------------------------------
+
+        //------------------------------
+        $listingOtherCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Other');
+        $listingOtherCollection->getSelect()->distinct();
+        $listingOtherCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+        $listingOtherCollection->getSelect()->columns(
+            array(
+                'account_id'            => 'main_table.account_id',
+                'marketplace_id'        => 'main_table.marketplace_id',
+                'product_id'            => 'main_table.product_id',
+                'product_name'          => 'second_table.title',
+                'product_sku'           => 'second_table.sku',
+                'currency'              => 'second_table.currency',
+                'ebay_item_id'          => 'second_table.item_id',
+                'status'                => 'main_table.status',
+                'online_sku'            => new Zend_Db_Expr('NULL'),
+                'online_title'          => new Zend_Db_Expr('NULL'),
+                'online_qty'            => 'second_table.online_qty',
+                'online_qty_sold'       => 'second_table.online_qty_sold',
+                'online_buyitnow_price' => 'second_table.online_price',
+                'listing_id'            => new Zend_Db_Expr('NULL'),
+                'listing_title'         => new Zend_Db_Expr('NULL'),
+                'is_m2epro_listing'     => new Zend_Db_Expr(0)
+            )
+        );
+        //------------------------------
+
+        //------------------------------
+        $selects = array($listingProductCollection->getSelect());
+        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
+            $selects[] = $listingOtherCollection->getSelect();
+        }
+
+        $unionSelect = Mage::getResourceModel('core/config')->getReadConnection()->select();
+        $unionSelect->union($selects);
+
+        $resultCollection = new Varien_Data_Collection_Db(Mage::getResourceModel('core/config')->getReadConnection());
+        $resultCollection->getSelect()->reset()->from(
+            array('main_table' => $unionSelect),
+            array(
+                'account_id',
+                'marketplace_id',
+                'product_id',
+                'product_name',
+                'product_sku',
+                'currency',
+                'ebay_item_id',
+                'status',
+                'online_sku',
+                'online_title',
+                'online_qty',
+                'online_qty_sold',
+                'online_buyitnow_price',
+                'listing_id',
+                'listing_title',
+                'is_m2epro_listing',
+            )
+        );
+        //------------------------------
+
+//        exit($resultCollection->getSelect().'');
+
+        $this->setCollection($resultCollection);
 
         return parent::_prepareCollection();
     }
@@ -95,39 +167,38 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             'frame_callback' => array($this, 'callbackColumnProductId')
         ));
 
-        $this->addColumn('name', array(
+        $this->addColumn('product_name', array(
             'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
-            'index'     => 'value',
-            'filter_index' => 'cpev.value',
+            'index'     => 'product_name',
+            'filter_index' => 'product_name',
             'frame_callback' => array($this, 'callbackColumnProductTitle'),
             'filter_condition_callback' => array($this, 'callbackFilterTitle')
         ));
 
-        $this->addColumn('stock_availability',
-            array(
-                'header'=> Mage::helper('M2ePro')->__('Stock Availability'),
-                'width' => '100px',
-                'index' => 'is_in_stock',
-                'filter_index' => 'cisi.is_in_stock',
-                'type'  => 'options',
-                'sortable'  => false,
-                'options' => array(
-                    1 => Mage::helper('M2ePro')->__('In Stock'),
-                    0 => Mage::helper('M2ePro')->__('Out of Stock')
-                ),
-                'frame_callback' => array($this, 'callbackColumnStockAvailability')
-        ));
+        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
+            $this->addColumn('is_m2epro_listing', array(
+                'header'    => Mage::helper('M2ePro')->__('Listing Type'),
+                'align'     => 'left',
+                'width'     => '100px',
+                'type'      => 'options',
+                'index'     => 'is_m2epro_listing',
+                'options'   => array(
+                    1 => Mage::helper('M2ePro')->__('M2E Pro'),
+                    0 => Mage::helper('M2ePro')->__('3rd Party')
+                )
+            ));
+        }
 
         $this->addColumn('ebay_item_id', array(
             'header'    => Mage::helper('M2ePro')->__('eBay Item ID'),
             'align'     => 'left',
             'width'     => '100px',
             'type'      => 'text',
-            'index'     => 'item_id',
-            'filter_index' => 'ebit.item_id',
+            'index'     => 'ebay_item_id',
+            'filter_index' => 'ebay_item_id',
             'frame_callback' => array($this, 'callbackColumnEbayItemId')
         ));
 
@@ -139,7 +210,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             'index'     => 'online_qty_sold',
             'filter'    => false,
             'sortable'  => false,
-            'filter_index' => 'second_table.online_qty_sold',
+            'filter_index' => 'online_qty_sold',
             'frame_callback' => array($this, 'callbackColumnOnlineAvailableQty')
         ));
 
@@ -149,7 +220,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             'width'     => '50px',
             'type'      => 'number',
             'index'     => 'online_qty_sold',
-            'filter_index' => 'second_table.online_qty_sold',
+            'filter_index' => 'online_qty_sold',
             'frame_callback' => array($this, 'callbackColumnOnlineQtySold')
         ));
 
@@ -159,7 +230,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             'width'     => '50px',
             'type'      => 'number',
             'index'     => 'online_buyitnow_price',
-            'filter_index' => 'second_table.online_buyitnow_price',
+            'filter_index' => 'online_buyitnow_price',
             'frame_callback' => array($this, 'callbackColumnOnlineBuyItNowPrice')
         ));
 
@@ -168,7 +239,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
                 'header'=> Mage::helper('M2ePro')->__('Status'),
                 'width' => '100px',
                 'index' => 'status',
-                'filter_index' => 'main_table.status',
+                'filter_index' => 'status',
                 'type'  => 'options',
                 'sortable'  => false,
                 'options' => array(
@@ -199,6 +270,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnProductId($value, $row, $column, $isExport)
     {
+        if (is_null($row->getData('product_id'))) {
+            return Mage::helper('M2ePro')->__('N/A');
+        }
+
         $productId = (int)$row->getData('product_id');
         $storeId = (int)$row->getData('store_id');
 
@@ -206,7 +281,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         $withoutImageHtml = '<a href="'.$url.'" target="_blank">'.$productId.'</a>';
 
         $showProductsThumbnails = (bool)(int)Mage::helper('M2ePro/Module')
-                                                ->getConfig()->getGroupValue('/products/settings/','show_thumbnails');
+                                                ->getConfig()->getGroupValue('/view/','show_products_thumbnails');
         if (!$showProductsThumbnails) {
             return $withoutImageHtml;
         }
@@ -229,44 +304,70 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
+        $onlineTitle = $row->getData('online_title');
+        !empty($onlineTitle) && $value = $onlineTitle;
+
+        $html = $value;
+
+        if (strlen($html) > 60) {
+            $html = substr($html, 0, 60) . '...';
         }
 
-        $value = '<span>'.Mage::helper('M2ePro')->escapeHtml($value).'</span>';
+        $html = '<span>' . Mage::helper('M2ePro')->escapeHtml($html) . '</span>';
 
-        $urlParams = array();
-        $urlParams['id'] = $row->getData('listing_id');
-        $urlParams['back'] = Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_ebay_listing/search');
+        $additional = $this->getListingHtml($row);
+        $additional .= $this->getSkuHtml($row);
 
-        $listingUrl = $this->getUrl('*/adminhtml_ebay_listing/view',$urlParams);
+        if ($additional) {
+            $html .= '<br/><hr style="border: none; border-top: 1px solid silver; margin: 2px 0px;"/>'
+                . $additional;
+        }
+
+        return $html;
+    }
+
+    private function getListingHtml($row)
+    {
+        if (is_null($row->getData('listing_id'))) {
+            return '';
+        }
+
+        $listingUrl = $this->getUrl('*/adminhtml_ebay_listing/view', array('id' => $row->getData('listing_id')));
         $listingTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('listing_title'));
 
         if (strlen($listingTitle) > 50) {
             $listingTitle = substr($listingTitle, 0, 50) . '...';
         }
 
-        $value .= '<br/><hr style="border:none; border-top:1px solid silver; margin: 2px 0px;"/>';
-        $value .= '<strong>'.Mage::helper('M2ePro')->__('Listing')
-                 .': </strong> <a href="'.$listingUrl.'">'.$listingTitle.'</a>';
-
-        $tempSku = $row->getData('sku');
-        is_null($tempSku) && $tempSku = Mage::getModel('M2ePro/Magento_Product')
-                                                ->setProductId($row->getData('product_id'))->getSku();
-
-        $value .= '<br/><strong>'.Mage::helper('M2ePro')->__('SKU').':</strong> '
-                 .Mage::helper('M2ePro')->escapeHtml($tempSku);
-
-        return $value;
+        return '<strong>' . Mage::helper('M2ePro')->__('Listing') . ':</strong>'
+            . '&nbsp;<a href="'.$listingUrl.'" target="_blank">'.$listingTitle.'</a><br/>';
     }
 
-    public function callbackColumnStockAvailability($value, $row, $column, $isExport)
+    private function getSkuHtml($row)
     {
-        if ((int)$row->getData('is_in_stock') <= 0) {
-            return '<span style="color: red;">'.$value.'</span>';
+        $sku = $row->getData('product_sku');
+        if (is_null($sku) && !is_null($row->getData('product_id'))) {
+            $sku = Mage::getModel('M2ePro/Magento_Product')
+                ->setProductId($row->getData('product_id'))
+                ->getSku();
         }
 
-        return $value;
+        $onlineSku = $row->getData('online_sku');
+        !empty($onlineSku) && $sku = $onlineSku;
+
+        if (!$sku && $row->getData('is_m2epro_listing')) {
+            return '';
+        }
+
+        if (!$row->getData('is_m2epro_listing') && is_null($sku)) {
+            $sku = '<i style="color:gray;">' . Mage::helper('M2ePro')->__('receiving') . '...</i>';
+        } else if (!$row->getData('is_m2epro_listing') && !$sku) {
+            $sku = '<i style="color:gray;">' . Mage::helper('M2ePro')->__('none') . '</i>';
+        } else {
+            $sku = Mage::helper('M2ePro')->escapeHtml($sku);
+        }
+
+        return '<strong>'. Mage::helper('M2ePro')->__('SKU') . ':</strong>&nbsp;' . $sku;
     }
 
     public function callbackColumnEbayItemId($value, $row, $column, $isExport)
@@ -275,10 +376,16 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        $value = '<a href="'.$this->getUrl('*/adminhtml_ebay_listing/gotoEbay/', array('item_id' => $value))
-                .'" target="_blank">'.$value.'</a>';
+        $url = $this->getUrl(
+            '*/adminhtml_ebay_listing/gotoEbay/',
+            array(
+                'item_id' => $row->getData('ebay_item_id'),
+                'account_id' => $row->getData('account_id'),
+                'marketplace_id' => $row->getData('marketplace_id'),
+            )
+        );
 
-        return $value;
+        return '<a href="'. $url . '" target="_blank">'.$value.'</a>';
     }
 
     public function callbackColumnOnlineAvailableQty($value, $row, $column, $isExport)
@@ -319,14 +426,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             return '<span style="color: #f00;">0</span>';
         }
 
-        $currency = Mage::helper('M2ePro/Component_Ebay')
-                                ->getCachedObject('Template_SellingFormat',
-                                                  $row->getData('template_selling_format_id'), NULL,
-                                                  array('template'))
-                                ->getChildObject()
-                                ->getCurrency();
-
-        return Mage::app()->getLocale()->currency($currency)->toCurrency($value);
+        return Mage::app()->getLocale()->currency($row->getData('currency'))->toCurrency($value);
     }
 
     public function callbackColumnStatus($value, $row, $column, $isExport)
@@ -365,21 +465,31 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
     {
         $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to listing'));
         $iconSrc = $this->getSkinUrl('M2ePro').'/images/goto_listing.png';
-        $url = $this->getUrl('*/adminhtml_ebay_listing/view/', array(
-            'id' => $row->getData('listing_id'),
-            'filter' => base64_encode(
-                'product_id[from]='.(int)$row->getData('product_id')
-                .'&product_id[to]='.(int)$row->getData('product_id')
-            )
-        ));
 
-        $html = <<<HTML
+        if ($row->getData('is_m2epro_listing')) {
+            $url = $this->getUrl('*/adminhtml_ebay_listing/view/', array(
+                'view_mode' => Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View::VIEW_MODE_EBAY,
+                'id' => $row->getData('listing_id'),
+                'filter' => base64_encode(
+                    'product_id[from]='.(int)$row->getData('product_id')
+                    .'&product_id[to]='.(int)$row->getData('product_id')
+                )
+            ));
+        } else {
+            $url = $this->getUrl('*/adminhtml_ebay_listing_other/view/', array(
+                'account' => $row->getData('account_id'),
+                'marketplace' => $row->getData('marketplace_id'),
+                'filter' => base64_encode(
+                    'item_id='.(int)$row->getData('ebay_item_id')
+                )
+            ));
+        }
+
+        return <<<HTML
 <div style="float:right; margin:5px 15px 0 0;">
     <a title="{$altTitle}" target="_blank" href="{$url}"><img src="{$iconSrc}" /></a>
 </div>
 HTML;
-
-        return $html;
     }
 
     protected function callbackFilterTitle($collection, $column)
@@ -390,7 +500,10 @@ HTML;
             return;
         }
 
-        $collection->getSelect()->where('cpev.value LIKE ? OR cpe.sku LIKE ? OR l.title LIKE ?', '%'.$value.'%');
+        $collection->getSelect()->where(
+            'product_name LIKE ? OR product_sku LIKE ? OR listing_title LIKE ?'.
+            ' OR online_sku LIKE ? OR online_title LIKE ?', '%'.$value.'%'
+        );
     }
 
     // ####################################

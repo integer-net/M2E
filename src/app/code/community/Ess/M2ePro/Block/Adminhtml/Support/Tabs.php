@@ -20,7 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Support_Tabs extends Mage_Adminhtml_Block_Widge
 
     protected function _prepareLayout()
     {
-        $isFromError = $this->getRequest()->getParam('error') === 'true';
+        $isFromError = $this->getIsFromError();
 
         $this->addTab('results', array(
             'label'     => $this->__('Search Results'),
@@ -28,9 +28,15 @@ class Ess_M2ePro_Block_Adminhtml_Support_Tabs extends Mage_Adminhtml_Block_Widge
             'active'    => !$isFromError,
         ));
 
+        $params = array();
+
+        if (!is_null($this->getRequest()->getParam('referrer'))) {
+            $params['referrer'] = $this->getRequest()->getParam('referrer');
+        }
+
         $this->addTab('documentation', array(
             'label'     => $this->__('Documentation'),
-            'url'       => $this->getUrl('*/adminhtml_support/documentation'),
+            'url'       => $this->getUrl('*/adminhtml_support/documentation', $params),
             'active'    => false,
             'class'     => 'ajax',
         ));

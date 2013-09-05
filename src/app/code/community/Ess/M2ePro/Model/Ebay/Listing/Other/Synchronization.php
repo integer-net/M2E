@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization
@@ -57,8 +57,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization
     public function getConfigValue($tab, $key)
     {
         $value = Mage::helper('M2ePro/Module')
-            ->getConfig()
-            ->getGroupValue('/ebay/synchronization/settings/other_listing/'.$tab.'/', $key);
+            ->getSynchronizationConfig()
+            ->getGroupValue('/ebay/other_listing/'.$tab.'/', $key);
 
         return $value;
     }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Magento_Order_Shipment
@@ -42,8 +42,8 @@ class Ess_M2ePro_Model_Magento_Order_Shipment
     {
         // Skip shipment observer
         // -----------------
-        Mage::helper('M2ePro')->unsetGlobalValue('skip_shipment_observer');
-        Mage::helper('M2ePro')->setGlobalValue('skip_shipment_observer', true);
+        Mage::helper('M2ePro/Data_Global')->unsetValue('skip_shipment_observer');
+        Mage::helper('M2ePro/Data_Global')->setValue('skip_shipment_observer', true);
         // -----------------
 
         $qtys = array();
@@ -61,7 +61,7 @@ class Ess_M2ePro_Model_Magento_Order_Shipment
         // -----------------
         $this->shipment = $this->magentoOrder->prepareShipment($qtys);
         $this->shipment->register();
-        // this is need for updating qty_shipped field in sales_flat_order_item table
+        // it is necessary for updating qty_shipped field in sales_flat_order_item table
         $this->shipment->getOrder()->setIsInProcess(true);
 
         Mage::getModel('core/resource_transaction')

@@ -1,11 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Marketplaces_Categories extends
-                                                                        Ess_M2ePro_Model_Buy_Synchronization_Tasks
+class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Marketplaces_Categories
+    extends Ess_M2ePro_Model_Buy_Synchronization_Tasks
 {
     const PERCENTS_START = 0;
     const PERCENTS_END = 100;
@@ -74,10 +74,10 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Marketplaces_Categories extends
     private function execute()
     {
         if (!empty($this->_params['marketplace_id'])) {
-            $markeptlaceObj = Mage::helper('M2ePro/Component')->getUnknownObject(
+            $marketplaceObj = Mage::helper('M2ePro/Component')->getUnknownObject(
                                                                         'Marketplace',$this->_params['marketplace_id']
                                                                 );
-            if ($markeptlaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Buy::NICK) {
+            if ($marketplaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Buy::NICK) {
                 return;
             }
         }

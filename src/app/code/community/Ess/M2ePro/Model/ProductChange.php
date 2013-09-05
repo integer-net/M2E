@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
@@ -153,23 +153,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
     //####################################
 
-    public function clearAll($creatorType = NULL, $maximumDate = NULL)
-    {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $tableName = $this->getResource()->getMainTable();
-
-        $where = array();
-
-        !is_null($creatorType) && $where['creator_type = ?'] = $creatorType;
-        !is_null($maximumDate) && $where['update_date <= ?'] = $maximumDate;
-
-        $connWrite->delete($tableName, count($where) <= 0 ? '' : $where);
-    }
-
-    //-----------------------------------
-
-    public static function removeDeletedProduct($product)
+    public function removeDeletedProduct($product)
     {
         $productId = $product instanceof Mage_Catalog_Model_Product ?
                         (int)$product->getId() : (int)$product;
@@ -182,6 +166,74 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
         foreach ($productsChanges as $productChange) {
             $productChange->deleteInstance();
         }
+    }
+
+    //####################################
+
+    public function clearLastProcessed($date, $maxPerOneTime)
+    {
+        $stmt = $this->getResource()->getReadConnection()
+            ->select()
+            ->from(array('pc' => $this->getResource()->getMainTable()),'id')
+            ->order(array('id ASC'))
+            ->limit($maxPerOneTime)
+            ->query();
+
+        $ids = array();
+        while ($ids[] = (int)$stmt->fetchColumn());
+        $ids = array_values(array_unique(array_filter($ids)));
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $ids = implode(',',$ids);
+        $creatorObserver = self::CREATOR_TYPE_OBSERVER;
+
+        $this->clear("id IN ({$ids}) AND (update_date <= '{$date}' OR creator_type != {$creatorObserver})");
+    }
+
+    public function clearOutdated($maxLifeTime)
+    {
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
+        $tempDate = new DateTime('now', new DateTimeZone('UTC'));
+        $tempDate->modify('-'.$maxLifeTime.' seconds');
+        $tempDate = Mage::helper('M2ePro')->getDate($tempDate->format('U'));
+
+        Mage::getModel('M2ePro/ProductChange')->clear(
+            'update_date <= ' . $connWrite->quote($tempDate)
+        );
+    }
+
+    public function clearExcessive($maxProductsChanges)
+    {
+        $countOfProductChanges = Mage::getModel('M2ePro/ProductChange')->getCollection()->getSize();
+
+        if (($countOfProductChangesToDelete = $countOfProductChanges - $maxProductsChanges) > 0) {
+            Mage::getModel('M2ePro/ProductChange')->clear(NULL, $countOfProductChangesToDelete);
+        }
+    }
+
+    //####################################
+
+    public function clear($where = NULL, $limit = NULL)
+    {
+        if ($limit < 0) {
+            $limit = NULL;
+        }
+
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $tableName = $this->getResource()->getMainTable();
+
+        $where && $where = "AND {$where}";
+        $limit && $limit = "LIMIT {$limit}";
+
+        $sql = "DELETE FROM {$tableName} WHERE 1 {$where} ORDER BY id ASC {$limit}";
+
+        $connWrite->query($sql);
     }
 
     //####################################

@@ -1,0 +1,182 @@
+<?php
+
+/*
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
+ */
+
+class Ess_M2ePro_Block_Adminhtml_Common_Play_Synchronization_Form extends Mage_Adminhtml_Block_Widget_Form
+{
+    private $component = Ess_M2ePro_Helper_Component_Play::NICK;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Initialization block
+        //------------------------------
+        $this->setId('playSynchronizationForm');
+        $this->setContainerId('magento_block_play_synchronization');
+        $this->setTemplate('M2ePro/common/play/synchronization.phtml');
+        //------------------------------
+    }
+
+    protected function _beforeToHtml()
+    {
+        //----------------------------
+        $this->templatesMode = Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/play/templates/', 'mode');
+        $this->ordersMode = Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/play/orders/', 'mode');
+        $this->otherListingsMode = Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/play/other_listings/', 'mode');
+        //----------------------------
+
+        //-------------------------------
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Run Now'),
+            'onclick' => 'SynchronizationHandlerObj.saveSettings(\'runNowTemplates\', \'' . $this->component . '\');',
+            'class'   => 'templates_run_now'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_templates_run_now', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $areYouSure = Mage::helper('adminhtml')->__('Are you sure?');
+
+        $backUrl = Mage::helper('M2ePro')->makeBackUrlParam(
+            '*/adminhtml_common_synchronization/index',
+            array(
+                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_PLAY
+            )
+        );
+        //-------------------------------
+
+        //-------------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_common_synchronization/clearLog',
+            array(
+                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_TEMPLATES,
+                'component'  => $this->component,
+                'back'       => $backUrl
+            )
+        );
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Clear Log'),
+            'onclick' => 'deleteConfirm(\'' . $areYouSure . '\', \'' . $url . '\')',
+            'class'   => 'templates_clear_log'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_templates_clear_log', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_common_log/synchronization',
+            array(
+                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_TEMPLATES,
+                'component'  => $this->component,
+            )
+        );
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('View Log'),
+            'onclick' => 'window.open(\'' . $url . '\')',
+            'class'   => 'button_link'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_templates_view_log', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Run Now'),
+            'onclick' => 'SynchronizationHandlerObj.saveSettings(\'runNowOrders\', \'' . $this->component . '\');',
+            'class'   => 'orders_run_now'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_orders_run_now', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_common_synchronization/clearLog',
+            array(
+                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS,
+                'component'  => $this->component,
+                'back'       => $backUrl
+            )
+        );
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Clear Log'),
+            'onclick' => 'deleteConfirm(\'' . $areYouSure . '\', \'' . $url . '\')',
+            'class'   => 'orders_clear_log'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_orders_clear_log', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_common_log/synchronization',
+            array(
+                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS,
+                'component'  => $this->component
+            )
+        );
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('View Log'),
+            'onclick' => 'window.open(\'' . $url . '\')',
+            'class'   => 'button_link'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_orders_view_log', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Run Now'),
+            'onclick' => 'SynchronizationHandlerObj.saveSettings(\'runNowOtherListings\',\''.$this->component.'\');',
+            'class'   => 'other_listings_run_now'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_other_listings_run_now', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_common_synchronization/clearLog',
+            array(
+                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_OTHER_LISTINGS,
+                'component'  => $this->component,
+                'back'       => $backUrl
+            )
+        );
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Clear Log'),
+            'onclick' => 'deleteConfirm(\'' . $areYouSure . '\', \'' . $url . '\')',
+            'class'   => 'orders_clear_log'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_other_listings_clear_log', $buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_common_log/synchronization',
+            array(
+                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_OTHER_LISTINGS,
+                'component'  => $this->component,
+            )
+        );
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('View Log'),
+            'onclick' => 'window.open(\'' . $url . '\')',
+            'class'   => 'button_link'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('play_other_listings_view_log', $buttonBlock);
+        //-------------------------------
+
+        return parent::_beforeToHtml();
+    }
+}

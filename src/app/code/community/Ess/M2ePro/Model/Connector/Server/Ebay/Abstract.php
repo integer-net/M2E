@@ -1,13 +1,13 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Ebay_Abstract extends Ess_M2ePro_Model_Connector_Server_Command
 {
     const COMPONENT = 'Ebay';
-    const COMPONENT_VERSION = 4;
+    const COMPONENT_VERSION = 5;
 
     const MODE_SANDBOX = 'sandbox';
     const MODE_PRODUCTION = 'production';

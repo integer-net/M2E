@@ -1,7 +1,7 @@
 <?php
 
 /*
-* @copyright  Copyright (c) 2012 by  ESS-UA.
+* @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
@@ -108,10 +108,10 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
     private function processAccountMarketplaceLinks(Ess_M2ePro_Model_Account $accountObj,
                                                     Ess_M2ePro_Model_Marketplace $marketplaceObj)
     {
-        $config = Mage::helper('M2ePro/Module')->getConfig();
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
 
-        $syncGroup = '/synchronization/settings/other_listings/';
-        $playSyncGroup = '/play/synchronization/settings/other_listings/';
+        $syncGroup = '/other_listings/';
+        $playSyncGroup = '/play/other_listings/';
 
         $isGlobalSyncEnabled = (bool)$config->getGroupValue($syncGroup,'mode');
         $isPlaySyncEnabled = (bool)$config->getGroupValue($playSyncGroup,'mode');
@@ -292,18 +292,14 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
                                                  Ess_M2ePro_Model_Marketplace $marketplaceObj)
     {
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $generalTemplateTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
 
         /** @var $listingsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $listingsCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
         $listingsCollection->getSelect()->join(array('l' => $listingTable),
                                                      'main_table.listing_id = l.id',
                                                      array());
-        $listingsCollection->getSelect()->join(array('gt' => $generalTemplateTable),
-                                                     'l.template_general_id = gt.id',
-                                                     array());
-        $listingsCollection->getSelect()->where('gt.marketplace_id = ?',$marketplaceObj->getId());
-        $listingsCollection->getSelect()->where('gt.account_id = ?',$accountObj->getId());
+        $listingsCollection->getSelect()->where('l.marketplace_id = ?',$marketplaceObj->getId());
+        $listingsCollection->getSelect()->where('l.account_id = ?',$accountObj->getId());
         $listingsCollection->getSelect()->where('`second_table`.`link_info` IS NULL');
         $listingsCollection->getSelect()->where('`second_table`.`play_listing_id` IS NOT NULL');
         $listingsCollection->getSelect()->limit(5);

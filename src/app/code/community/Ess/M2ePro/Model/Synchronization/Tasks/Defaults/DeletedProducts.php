@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Synchronization_Tasks_Defaults_DeletedProducts extends Ess_M2ePro_Model_Synchronization_Tasks
@@ -77,9 +77,11 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults_DeletedProducts extends Es
         $this->deleteListingsProducts();
         $this->unmapListingsOther();
         $this->deleteItems();
+
+        $this->setCheckLastTime(Mage::helper('M2ePro')->getCurrentGmtDate(true));
     }
 
-    //------------------------------------
+    //####################################
 
     private function deleteListingsProducts()
     {
@@ -184,6 +186,7 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults_DeletedProducts extends Es
                 $tempProductsIds[] = (int)$row['product_id'];
 
                 Mage::getSingleton('M2ePro/Item')->removeDeletedProduct((int)$row['product_id'], $component);
+                Mage::getModel('M2ePro/ProductChange')->removeDeletedProduct((int)$row['product_id']);
             }
         }
     }
@@ -204,8 +207,8 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults_DeletedProducts extends Es
     {
         $lastTime = strtotime($this->getCheckLastTime());
 
-        $tempGroup = '/synchronization/settings/defaults/deleted_products/';
-        $interval = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'interval');
+        $tempGroup = '/defaults/deleted_products/';
+        $interval = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'interval');
 
         if ($lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true)) {
             return true;
@@ -214,10 +217,12 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults_DeletedProducts extends Es
         return false;
     }
 
+    //------------------------------------
+
     private function getCheckLastTime()
     {
-        $tempGroup = '/synchronization/settings/defaults/deleted_products/';
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'last_time');
+        $tempGroup = '/defaults/deleted_products/';
+        return Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'last_time');
     }
 
     private function setCheckLastTime($time)
@@ -231,8 +236,8 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults_DeletedProducts extends Es
             $time = strftime('%Y-%m-%d %H:%M:%S', $time);
             date_default_timezone_set($oldTimezone);
         }
-        $tempGroup = '/synchronization/settings/defaults/deleted_products/';
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue($tempGroup,'last_time',$time);
+        $tempGroup = '/defaults/deleted_products/';
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue($tempGroup,'last_time',$time);
     }
 
     //####################################

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract
@@ -45,8 +45,8 @@ abstract class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract
 
         $this->listing = $listing;
 
-        parent::__construct($params,$this->listing->getGeneralTemplate()->getMarketplace(),
-                            $this->listing->getGeneralTemplate()->getAccount(),NULL);
+        parent::__construct($params,$this->listing->getMarketplace(),
+                            $this->listing->getAccount(),NULL);
     }
 
     public function __destruct()
@@ -115,7 +115,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract
 
     //-----------------------------------------
 
-    private function addBaseListingsLogsMessage($listingProduct,
+    protected function addBaseListingsLogsMessage($listingProduct,
                                                 array $message,
                                                 $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
     {
@@ -231,6 +231,65 @@ abstract class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract
         }
 
         return self::STATUS_SUCCESS;
+    }
+
+    // ########################################
+
+    protected function logAdditionalWarningMessages(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $messages = $listingProduct->getData('__additional_warning_messages__');
+        !$messages && $messages = array();
+
+        foreach ($messages as $message) {
+            $this->addListingsProductsLogsMessage($listingProduct,array(
+                parent::MESSAGE_TEXT_KEY => $message,
+                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_WARNING
+            ),Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+        }
+
+        $listingProduct->setData('__additional_warning_messages__',NULL);
+    }
+
+    protected function isTheSameProductAlreadyListed(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $listingProductCollection = Mage::helper('M2ePro/Component_Ebay')
+            ->getCollection('Listing_Product');
+
+        $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
+
+        $listingProductCollection
+            ->getSelect()
+            ->join(array('l'=>$listingTable),'`main_table`.`listing_id` = `l`.`id`',array());
+
+        $listingProductCollection
+            ->addFieldToFilter('status',array('neq' => Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED))
+            ->addFieldToFilter('product_id',$listingProduct->getProductId())
+            ->addFieldToFilter('account_id',$this->account->getId())
+            ->addFieldToFilter('marketplace_id',$this->marketplace->getId());
+
+        $theSameListingProduct = $listingProductCollection->getFirstItem();
+
+        if (!$theSameListingProduct->getId()) {
+            return false;
+        }
+
+        $listing = $theSameListingProduct->getListing();
+
+        $message = Mage::helper('M2ePro')->__(
+        'There is another item with the same eBay user ID, product ID and marketplace presented in "%s" (%d) Listing.',
+        $listing->getTitle(),
+        $listing->getId()
+        );
+
+        $message = array(
+            parent::MESSAGE_TEXT_KEY => $message,
+            parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
+        );
+
+        $this->addListingsProductsLogsMessage($listingProduct,$message,
+                                              Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+
+        return true;
     }
 
     // ########################################

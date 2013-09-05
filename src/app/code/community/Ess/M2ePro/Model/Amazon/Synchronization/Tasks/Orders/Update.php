@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2ePro_Model_Amazon_Synchronization_Tasks
@@ -10,24 +10,33 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
     const PERCENTS_END = 100;
     const PERCENTS_INTERVAL = 100;
 
+    const LOCK_ITEM_PREFIX = 'synchronization_amazon_orders_update';
+
     // we have a limit on the server to retrieve only last 30 orders
     // so if we will update 30 or more orders at a time, we will not be able to receive all updated orders next time
     const MAX_UPDATES_PER_TIME = 25;
 
-    const LOCK_ITEM_PREFIX = 'synchronization_amazon_orders_update';
+    //####################################
+
+    // ->__('Amazon Orders Update Synchronization')
+    private $name = 'Amazon Orders Update Synchronization';
+
+    /** @var Ess_M2ePro_Model_Config_Synchronization */
+    private $config = NULL;
 
     //####################################
 
-    /** @var Ess_M2ePro_Model_Config_Module */
-    private $config = NULL;
-    private $configGroup = '/amazon/synchronization/settings/orders/update/';
+    public function __construct()
+    {
+        $this->config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+
+        parent::__construct();
+    }
 
     //####################################
 
     public function process()
     {
-        $this->config = Mage::helper('M2ePro/Module')->getConfig();
-
         // PREPARE SYNCH
         //---------------------------
         $this->prepareSynch();
@@ -51,31 +60,21 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
         $this->_lockItem->activate();
         $this->_logs->setSynchronizationTask(Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS);
 
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Amazon::TITLE.' ';
-        } else {
-            $componentName = '';
-        }
-
         $this->_profiler->addEol();
-        $this->_profiler->addTitle($componentName.'Orders Update Synchronization');
+        $this->_profiler->addTitle($this->name);
         $this->_profiler->addTitle('--------------------------');
         $this->_profiler->addTimePoint(__CLASS__, 'Total time');
         $this->_profiler->increaseLeftPadding(5);
 
-        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($componentName.'Orders Update Synchronization'));
+        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($this->name));
         $this->_lockItem->setPercents(self::PERCENTS_START);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Update Synchronization" is started. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is started. Please wait...', $this->name));
     }
 
     private function cancelSynch()
     {
         $this->_lockItem->setPercents(self::PERCENTS_END);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Update Synchronization" is finished. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is finished. Please wait...', $this->name));
 
         $this->_profiler->decreaseLeftPadding(5);
         $this->_profiler->addEol();
@@ -119,15 +118,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
             /** @var Ess_M2ePro_Model_Account $account */
 
             /** @var Ess_M2ePro_Model_Marketplace[] $marketplaces */
-            $marketplaces = $account->getChildObject()->getMarketplacesItems();
+            $marketplace = $account->getChildObject()->getMarketplace();
 
-            foreach ($marketplaces as $marketplace) {
-
-                $marketplace = $marketplace['object'];
-
-                if (!$this->isLockedAccountMarketplace($account->getId(), $marketplace->getId())) {
-                    $this->processAccountMarketplace($account, $marketplace);
-                }
+            if (!$this->isLockedAccountMarketplace($account->getId(), $marketplace->getId())) {
+                $this->processAccountMarketplace($account, $marketplace);
             }
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
@@ -149,9 +143,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
         $this->_profiler->addTitle($title);
         $this->_profiler->addTimePoint(__METHOD__.'send'.$account->getId(),'Update orders on Amazon');
 
-        $statusString = 'Task "Orders Update Synchronization" for Rakuten.com "%s" Account and "%s" marketplace ';
-        $statusString .= 'is started. Please wait...';
-        $status = Mage::helper('M2ePro')->__($statusString, $account->getTitle(), $marketplace->getTitle());
+        $status = 'Task "%s" for Amazon "%s" Account and "%s" marketplace is started. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle(), $marketplace->getTitle());
         $this->_lockItem->setStatus($status);
 
         $changesCollection = Mage::getModel('M2ePro/Order_Change')->getCollection();
@@ -159,6 +152,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
         $changesCollection->addFieldToFilter('component', Ess_M2ePro_Helper_Component_Amazon::NICK);
         $changesCollection->addFieldToFilter('action', Ess_M2ePro_Model_Order_Change::ACTION_UPDATE_SHIPPING);
         $changesCollection->setPageSize(self::MAX_UPDATES_PER_TIME);
+        $changesCollection->getSelect()->group(array('order_id'));
 
         if ($changesCollection->getSize() == 0) {
             return;
@@ -177,8 +171,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
                 'amazon_order_id'  => $changeParams['amazon_order_id'],
                 'tracking_number'  => $changeParams['tracking_number'],
                 'carrier_name'     => $changeParams['carrier_name'],
-                'shipping_method'  => isset($changeParams['shipping_method']) ? $changeParams['shipping_method'] : null,
                 'fulfillment_date' => $changeParams['fulfillment_date'],
+                'shipping_method'  => isset($changeParams['shipping_method']) ? $changeParams['shipping_method'] : null,
                 'items'            => $changeParams['items']
             );
         }
@@ -188,7 +182,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
         }
 
         /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Amazon_Dispatcher */
-        $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
         $dispatcherObject->processConnector(
             'orders', 'update', 'items', array('items' => $items), $marketplace, $account
         );
@@ -204,29 +198,30 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
 
     private function prepareSynchLastTime()
     {
-        $lastTime = $this->getSynchLastTime();
-        if (empty($lastTime)) {
-            $lastTime = new DateTime('now', new DateTimeZone('UTC'));
-            $lastTime->modify('-1 year');
-            $this->setSynchLastTime($lastTime);
+        $lastTime = $this->config->getGroupValue('/amazon/orders/update/', 'last_time');
+
+        if (!empty($lastTime)) {
+            return;
         }
+
+        $lastTime = new DateTime('now', new DateTimeZone('UTC'));
+        $lastTime->modify('-1 year');
+
+        $this->setSynchLastTime($lastTime);
     }
 
     private function isSynchLocked()
     {
-        $lastTime = strtotime($this->getSynchLastTime());
-        $interval = (int)$this->config->getGroupValue($this->configGroup,'interval');
+        $lastTime = $this->config->getGroupValue('/amazon/orders/update/', 'last_time');
+        $lastTime = strtotime($lastTime);
+
+        $interval = (int)$this->config->getGroupValue('/amazon/orders/update/','interval');
 
         if ($lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true)) {
             return true;
         }
 
         return false;
-    }
-
-    private function getSynchLastTime()
-    {
-        return $this->config->getGroupValue($this->configGroup,'last_time');
     }
 
     private function setSynchLastTime($time)
@@ -241,7 +236,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
             date_default_timezone_set($oldTimezone);
         }
 
-        $this->config->setGroupValue($this->configGroup, 'last_time', $time);
+        $this->config->setGroupValue('/amazon/orders/update/', 'last_time', $time);
     }
 
     //####################################
@@ -252,14 +247,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders_Update extends Ess_M2
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
 
-        $maxDeactivateTime = (int)$this->config->getGroupValue($this->configGroup, 'max_deactivate_time');
+        $maxDeactivateTime = (int)$this->config->getGroupValue('/amazon/orders/update/', 'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);
 
-        if ($lockItem->isExist()) {
-            return true;
-        }
-
-        return false;
+        return $lockItem->isExist();
     }
 
     //####################################

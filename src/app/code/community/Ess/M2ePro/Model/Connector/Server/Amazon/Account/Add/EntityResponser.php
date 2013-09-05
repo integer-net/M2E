@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Amazon_Account_Add_EntityResponser
@@ -31,11 +31,13 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Account_Add_EntityResponser
     {
         /** @var $amazonAccount Ess_M2ePro_Model_Amazon_Account */
         $amazonAccount = $this->getAccount()->getChildObject();
-        $amazonAccount->addMarketplaceItem($this->params['marketplace_id'],
-                                           $response['hash'],
-                                           $this->params['user_merchant_id'],
-                                           $this->params['related_store_id'],
-                                           $response['info']);
+
+        $dataForUpdate = array(
+            'server_hash' => $response['hash'],
+            'info' => json_encode($response['info'])
+        );
+
+        $amazonAccount->addData($dataForUpdate)->save();
     }
 
     // ########################################

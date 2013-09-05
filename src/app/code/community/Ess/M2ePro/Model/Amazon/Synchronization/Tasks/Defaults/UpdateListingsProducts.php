@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProducts
@@ -102,23 +102,18 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
 
-            $marketplaces = $accountObj->getChildObject()->getMarketplacesItems();
+            $marketplace = $accountObj->getChildObject()->getMarketplace();
 
-            foreach ($marketplaces as $marketplace) {
+            if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplace->getId())) {
 
-                $marketplaceObj = $marketplace['object'];
+                /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
+                $collection = Mage::getModel('M2ePro/Listing')->getCollection();
+                $collection->addFieldToFilter('component_mode',Ess_M2ePro_Helper_Component_Amazon::NICK);
+                $collection->addFieldToFilter('marketplace_id',(int)$marketplace->getId());
+                $collection->addFieldToFilter('account_id',(int)$accountObj->getId());
 
-                if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplaceObj->getId())) {
-
-                    /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
-                    $collection = Mage::getModel('M2ePro/Template_General')->getCollection();
-                    $collection->addFieldToFilter('component_mode',Ess_M2ePro_Helper_Component_Amazon::NICK);
-                    $collection->addFieldToFilter('marketplace_id',(int)$marketplaceObj->getId());
-                    $collection->addFieldToFilter('account_id',(int)$accountObj->getId());
-
-                    if ($collection->getSize()) {
-                        $this->updateAccountMarketplace($accountObj,$marketplaceObj);
-                    }
+                if ($collection->getSize()) {
+                    $this->updateAccountMarketplace($accountObj,$marketplace);
                 }
             }
 
@@ -149,7 +144,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
 
         // Get all changes on Amazon for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
         $dispatcherObject->processConnector('defaults', 'updateListingsProducts' ,'requester',
                                             array(), $marketplaceObj, $accountObj,
                                             'Ess_M2ePro_Model_Amazon_Synchronization_Tasks');
@@ -175,8 +170,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
     {
         $lastTime = strtotime($this->getCheckLastTime());
 
-        $tempGroup = '/amazon/synchronization/settings/defaults/update_listings_products/';
-        $interval = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'interval');
+        $tempGroup = '/amazon/defaults/update_listings_products/';
+        $interval = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'interval');
 
         $totalItems = (int)Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product')->getSize();
         $totalItems += (int)Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other')->getSize();
@@ -191,8 +186,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
 
     private function getCheckLastTime()
     {
-        $tempGroup = '/amazon/synchronization/settings/defaults/update_listings_products/';
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'last_time');
+        $tempGroup = '/amazon/defaults/update_listings_products/';
+        return Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'last_time');
     }
 
     private function setCheckLastTime($time)
@@ -206,8 +201,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
             $time = strftime('%Y-%m-%d %H:%M:%S', $time);
             date_default_timezone_set($oldTimezone);
         }
-        $tempGroup = '/amazon/synchronization/settings/defaults/update_listings_products/';
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue($tempGroup,'last_time',$time);
+        $tempGroup = '/amazon/defaults/update_listings_products/';
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue($tempGroup,'last_time',$time);
     }
 
     //------------------------------------
@@ -218,8 +213,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
 
-        $tempGroup = '/amazon/synchronization/settings/defaults/update_listings_products/';
-        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getConfig()
+        $tempGroup = '/amazon/defaults/update_listings_products/';
+        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                     ->getGroupValue($tempGroup,'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -28,6 +28,8 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization extends Ess_M2ePro_Model_Com
 
     const REVISE_MAX_AFFECTED_QTY_MODE_OFF = 0;
     const REVISE_MAX_AFFECTED_QTY_MODE_ON = 1;
+
+    const REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT = 10;
 
     const REVISE_UPDATE_PRICE_NONE = 0;
     const REVISE_UPDATE_PRICE_YES  = 1;
@@ -58,15 +60,6 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization extends Ess_M2ePro_Model_Com
     const RELIST_QTY_BETWEEN = 2;
     const RELIST_QTY_MORE    = 3;
 
-    const RELIST_SCHEDULE_TYPE_IMMEDIATELY = 0;
-    const RELIST_SCHEDULE_TYPE_THROUGH = 1;
-    const RELIST_SCHEDULE_TYPE_WEEK = 2;
-
-    const RELIST_SCHEDULE_THROUGH_METRIC_NONE    = 0;
-    const RELIST_SCHEDULE_THROUGH_METRIC_MINUTES = 1;
-    const RELIST_SCHEDULE_THROUGH_METRIC_HOURS   = 2;
-    const RELIST_SCHEDULE_THROUGH_METRIC_DAYS    = 3;
-
     const STOP_STATUS_DISABLED_NONE = 0;
     const STOP_STATUS_DISABLED_YES  = 1;
 
@@ -88,9 +81,23 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization extends Ess_M2ePro_Model_Com
 
     // ########################################
 
+    public function isLocked()
+    {
+        if (parent::isLocked()) {
+            return true;
+        }
+
+        return (bool)Mage::getModel('M2ePro/Buy_Listing')
+                            ->getCollection()
+                            ->addFieldToFilter('template_synchronization_id', $this->getId())
+                            ->getSize();
+    }
+
+    // ########################################
+
     public function getListings($asObjects = false, array $filters = array())
     {
-        return $this->getParentObject->getListings($asObjects,$filters);
+        return $this->getRelatedComponentItems('Listing','template_synchronization_id',$asObjects,$filters);
     }
 
     // ########################################
@@ -117,14 +124,33 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization extends Ess_M2ePro_Model_Com
 
     //------------------------
 
-    public function isReviseWhenChangeQty()
+    public function getReviseUpdateQtyMaxAppliedValueMode()
     {
-        return $this->getData('revise_update_qty') != self::REVISE_UPDATE_QTY_NONE;
+        return (int)$this->getData('revise_update_qty_max_applied_value_mode');
     }
+
+    public function isReviseUpdateQtyMaxAppliedValueModeOn()
+    {
+        return $this->getReviseUpdateQtyMaxAppliedValueMode() == self::REVISE_MAX_AFFECTED_QTY_MODE_ON;
+    }
+
+    public function isReviseUpdateQtyMaxAppliedValueModeOff()
+    {
+        return $this->getReviseUpdateQtyMaxAppliedValueMode() == self::REVISE_MAX_AFFECTED_QTY_MODE_OFF;
+    }
+
+    //------------------------
 
     public function getReviseUpdateQtyMaxAppliedValue()
     {
         return (int)$this->getData('revise_update_qty_max_applied_value');
+    }
+
+    //------------------------
+
+    public function isReviseWhenChangeQty()
+    {
+        return $this->getData('revise_update_qty') != self::REVISE_UPDATE_QTY_NONE;
     }
 
     public function isReviseWhenChangePrice()
@@ -157,88 +183,6 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization extends Ess_M2ePro_Model_Com
     public function isRelistWhenQtyHasValue()
     {
         return $this->getData('relist_qty') != self::RELIST_QTY_NONE;
-    }
-
-    public function isRelistSchedule()
-    {
-        return $this->getData('relist_schedule_type') != self::RELIST_SCHEDULE_TYPE_IMMEDIATELY;
-    }
-
-    //------------------------
-
-    public function isRelistScheduleWeekDayNow()
-    {
-        $synchronizationDaysOfWeek = $this->getRelistScheduleWeek();
-        $synchronizationDaysOfWeek = explode('_',$synchronizationDaysOfWeek);
-
-        $enabledDaysOfWeek = array();
-        foreach ($synchronizationDaysOfWeek as $item) {
-            if (!isset($item{2}) || (int)$item{2} != 1) {
-                continue;
-            }
-            $enabledDaysOfWeek[] = $item{0}.$item{1};
-        }
-        $synchronizationDaysOfWeek = $enabledDaysOfWeek;
-
-        foreach ($synchronizationDaysOfWeek as &$item) {
-            $item = strtolower($item);
-            switch ($item) {
-                case 'mo': $item = 'monday'; break;
-                case 'tu': $item = 'tuesday'; break;
-                case 'we': $item = 'wednesday'; break;
-                case 'th': $item = 'thursday'; break;
-                case 'fr': $item = 'friday'; break;
-                case 'sa': $item = 'saturday'; break;
-                case 'su': $item = 'sunday'; break;
-            }
-        }
-
-        $todayDayOfWeek = getdate(Mage::helper('M2ePro')->getCurrentGmtDate(true));
-        $todayDayOfWeek = strtolower($todayDayOfWeek['weekday']);
-
-        if (!in_array($todayDayOfWeek,$synchronizationDaysOfWeek)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function isRelistScheduleWeekTimeNow()
-    {
-        if (is_null($this->getData('relist_schedule_week_start_time')) ||
-            $this->getData('relist_schedule_week_start_time') == '' ||
-            is_null($this->getData('relist_schedule_week_end_time')) ||
-            $this->getData('relist_schedule_week_end_time') == '') {
-            return true;
-        }
-
-        $tempStartTime = explode(':',$this->getData('relist_schedule_week_start_time'));
-        $tempEndTime = explode(':',$this->getData('relist_schedule_week_end_time'));
-
-        if (!is_array($tempStartTime) || count($tempStartTime) < 2 ||
-            !is_array($tempEndTime) || count($tempEndTime) < 2) {
-            return true;
-        }
-
-        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-
-        $startTimeStampCurrentDay = mktime(0, 0, 0, date('m',$currentTimeStamp),
-                                                    date('d',$currentTimeStamp),
-                                                    date('Y',$currentTimeStamp)) +
-                                    (int)$tempStartTime[0]*60*60 +
-                                    (int)$tempStartTime[1]*60;
-        $endTimeStampCurrentDay = mktime(0, 0, 0, date('m',$currentTimeStamp),
-                                                  date('d',$currentTimeStamp),
-                                                  date('Y',$currentTimeStamp)) +
-                                    (int)$tempEndTime[0]*60*60 +
-                                    (int)$tempEndTime[1]*60;
-
-        if ($currentTimeStamp < $startTimeStampCurrentDay ||
-            $currentTimeStamp > $endTimeStampCurrentDay) {
-            return false;
-        }
-
-        return true;
     }
 
     //------------------------
@@ -292,26 +236,6 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization extends Ess_M2ePro_Model_Com
         return $this->getData('relist_qty_value_max');
     }
 
-    public function getRelistScheduleType()
-    {
-        return $this->getData('relist_schedule_type');
-    }
-
-    public function getRelistScheduleThroughMetric()
-    {
-        return $this->getData('relist_schedule_through_metric');
-    }
-
-    public function getRelistScheduleThroughValue()
-    {
-        return $this->getData('relist_schedule_through_value');
-    }
-
-    public function getRelistScheduleWeek()
-    {
-        return $this->getData('relist_schedule_week');
-    }
-
     //------------------------
 
     public function getStopWhenQtyHasValueType()
@@ -329,17 +253,17 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization extends Ess_M2ePro_Model_Com
         return $this->getData('stop_qty_value_max');
     }
 
-    // ########################################
+    // #######################################
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
         return parent::delete();
     }
 

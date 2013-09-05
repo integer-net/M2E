@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Cron
@@ -27,8 +27,8 @@ class Ess_M2ePro_Model_Cron
 
         $this->updateCronLastRunDate();
 
-        Mage::helper('M2ePro/Server')->setMemoryLimit(256);
-        Mage::helper('M2ePro/Exception')->setFatalErrorHandler();
+        Mage::helper('M2ePro/Client')->setMemoryLimit(256);
+        Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
 
         // Run local cron tasks
         //----------------------
@@ -58,13 +58,7 @@ class Ess_M2ePro_Model_Cron
             return false;
         }
 
-        if (!(bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/cron/error/', 'mode')) {
-            return false;
-        }
-
-        if (!Mage::helper('M2ePro/Component_Amazon')->isActive() &&
-            !Mage::helper('M2ePro/Component_Buy')->isActive() &&
-            !Mage::helper('M2ePro/Component_Play')->isActive()) {
+        if (!(bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/common/cron/error/', 'mode')) {
             return false;
         }
 
@@ -77,10 +71,11 @@ class Ess_M2ePro_Model_Cron
         }
 
         $allowedInactiveHours = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/cron/error/', 'max_inactive_hours'
+            '/view/common/cron/error/', 'max_inactive_hours'
         );
 
         $temp = (strtotime($cronLastAccessTime) + ($allowedInactiveHours * 60*60));
+
         if (Mage::helper('M2ePro')->getCurrentGmtDate(true) > $temp) {
             return true;
         }
@@ -94,7 +89,7 @@ class Ess_M2ePro_Model_Cron
             return false;
         }
 
-        if (!(bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/cron/notification/', 'mode')) {
+        if (!(bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/ebay/cron/notification/', 'mode')) {
             return false;
         }
 
@@ -107,10 +102,11 @@ class Ess_M2ePro_Model_Cron
         }
 
         $allowedInactiveHours = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/cron/notification/', 'max_inactive_hours'
+            '/view/ebay/cron/notification/', 'max_inactive_hours'
         );
 
         $temp = (strtotime($cronLastAccessTime) + ($allowedInactiveHours * 60*60));
+
         if (Mage::helper('M2ePro')->getCurrentGmtDate(true) > $temp) {
             return true;
         }
@@ -131,7 +127,7 @@ class Ess_M2ePro_Model_Cron
         try {
             Mage::getModel('M2ePro/Log_Cron')->process();
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
     }
 
@@ -148,7 +144,7 @@ class Ess_M2ePro_Model_Cron
         try {
             Mage::getModel('M2ePro/Servicing_Cron')->process();
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
     }
 
@@ -163,7 +159,7 @@ class Ess_M2ePro_Model_Cron
         try {
             Mage::getModel('M2ePro/Processing_Cron')->process();
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
     }
 
@@ -178,7 +174,7 @@ class Ess_M2ePro_Model_Cron
         try {
             Mage::getModel('M2ePro/Synchronization_Cron')->process();
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
     }
 
@@ -236,7 +232,7 @@ class Ess_M2ePro_Model_Cron
 
     private function isPossibleToRunCron()
     {
-        if (!Mage::helper('M2ePro/Wizard')->isInstallationFinished()) {
+        if (!Mage::helper('M2ePro/Module')->isPossibleToRunCron()) {
             return false;
         }
 
@@ -251,11 +247,11 @@ class Ess_M2ePro_Model_Cron
     {
         usleep(rand(0,1000000));
 
-        if (!is_null(Mage::helper('M2ePro')->getGlobalValue('cron_running'))) {
+        if (!is_null(Mage::helper('M2ePro/Data_Global')->getValue('cron_running'))) {
             return false;
         }
 
-        Mage::helper('M2ePro')->setGlobalValue('cron_running',true);
+        Mage::helper('M2ePro/Data_Global')->setValue('cron_running',true);
 
         if (!(bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/cron/', 'double_run_protection')) {
             return true;
@@ -282,7 +278,7 @@ class Ess_M2ePro_Model_Cron
             fwrite($this->lockFileHandler,'PID: '.getmypid());
 
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return false;
         }
 
@@ -291,12 +287,6 @@ class Ess_M2ePro_Model_Cron
 
     //------------------------------------
 
-    private function getCronLastRunDate()
-    {
-        return Mage::helper('M2ePro/Module')->getConfig()
-                            ->getGroupValue('/cron/', 'last_access');
-    }
-
     private function updateCronLastRunDate()
     {
         Mage::helper('M2ePro/Module')->getConfig()
@@ -304,11 +294,9 @@ class Ess_M2ePro_Model_Cron
                                             Mage::helper('M2ePro')->getCurrentGmtDate());
     }
 
-    //------------------------------------
-
     private function distributeServerLoad()
     {
-        if (Mage::helper('M2ePro/Server')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
             return;
         }
 

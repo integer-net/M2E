@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Listing_Product_Variation_Option extends Ess_M2ePro_Model_Component_Parent_Abstract
@@ -85,7 +85,7 @@ class Ess_M2ePro_Model_Listing_Product_Variation_Option extends Ess_M2ePro_Model
         $this->magentoProductModel = $instance;
     }
 
-    //-----------------------------------------
+    // ########################################
 
     /**
      * @return Ess_M2ePro_Model_Listing
@@ -106,35 +106,19 @@ class Ess_M2ePro_Model_Listing_Product_Variation_Option extends Ess_M2ePro_Model
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getListingProductVariation()->getGeneralTemplate();
+        return $this->getListingProductVariation()->getAccount();
     }
 
     /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
+     * @return Ess_M2ePro_Model_Marketplace
      */
-    public function getSellingFormatTemplate()
+    public function getMarketplace()
     {
-        return $this->getListingProductVariation()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getListingProductVariation()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getListingProductVariation()->getSynchronizationTemplate();
+        return $this->getListingProductVariation()->getMarketplace();
     }
 
     // ########################################
@@ -143,6 +127,8 @@ class Ess_M2ePro_Model_Listing_Product_Variation_Option extends Ess_M2ePro_Model
     {
         return (int)$this->getData('listing_product_variation_id');
     }
+
+    //----------------------------------------
 
     public function getProductId()
     {

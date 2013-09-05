@@ -6,6 +6,40 @@ BlockNotice.prototype = {
     initialize: function(type)
     {
         this.type = type;
+        this.isHideToolTip = false;
+    },
+
+    // --------------------------------
+
+    getHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_bn_' + md5(id).substr(0, 10);
+        var notHashedCookie = getCookie(id);
+        var resultCookie = null;
+
+        if (notHashedCookie !== "") {
+            deleteCookie(id, '/', '');
+            this.setHashedCookie(id);
+            resultCookie = notHashedCookie;
+        } else {
+            resultCookie = getCookie(hashedCookieKey);
+        }
+
+        return resultCookie;
+    },
+
+    setHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_bn_' + md5(id).substr(0, 10);
+        setCookie(hashedCookieKey, 1, 3*365, '/');
+    },
+
+    deleteHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_bn_' + md5(id).substr(0, 10);
+
+        deleteCookie(hashedCookieKey, '/', '');
+        deleteCookie(id, '/', '');
     },
 
     // --------------------------------
@@ -51,7 +85,9 @@ BlockNotice.prototype = {
             object.writeAttribute("onclick",self.type+'NoticeObj.hideContent(\'' + id + '\')');
         });
 
-        deleteCookie(id+'_closed_content', '/', '');
+        if (!IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) {
+            this.deleteHashedCookie(id+'_closed_content');
+        }
 
         return true;
     },
@@ -75,7 +111,7 @@ BlockNotice.prototype = {
             object.writeAttribute("onclick",self.type+'NoticeObj.showContent(\'' + id + '\')');
         });
 
-        setCookie( id+'_closed_content' , 1 , 3*365 , '/' );
+        this.setHashedCookie( id+'_closed_content');
 
         return true;
     },
@@ -89,13 +125,13 @@ BlockNotice.prototype = {
             return false;
         }
         $(id).show();
-        deleteCookie(id+'_hide_block', '/', '');
+        this.deleteHashedCookie(id+'_hide_block');
         return true;
     },
 
     hideBlock: function(id)
     {
-        if (!confirm(CONFIRM)) {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return false;
         }
 
@@ -104,7 +140,7 @@ BlockNotice.prototype = {
             return false;
         }
         $(id).remove();
-        setCookie( id+'_hide_block' , 1 , 3*365 , '/' );
+        this.setHashedCookie(id+'_hide_block');
         return true;
     },
 
@@ -156,7 +192,7 @@ BlockNotice.prototype = {
     {
         var subtitle = object.readAttribute('subtitle');
         if (typeof subtitle != 'string') {
-            subtitle = '['+HELP+']';
+            subtitle = '['+M2ePro.translator.translate('Help')+']';
         }
         object.writeAttribute('subtitle','');
         return subtitle;
@@ -212,7 +248,10 @@ BlockNotice.prototype = {
 
     getHeaderHtml: function(id,title,subtitle,collapseable,hideblock)
     {
-        var isClosedContent = getCookie(id+'_closed_content');
+        var isClosedContent = this.getHashedCookie(id+'_closed_content');
+        if (BLOCK_NOTICES_DISABLE_COLLAPSE) {
+            isClosedContent = 0;
+        }
 
         var titleHtml = '';
         if (title != '') {
@@ -236,7 +275,7 @@ BlockNotice.prototype = {
         var hideBlockHtml = '';
         if (hideblock) {
             var tempOnClick = this.type+'NoticeObj.hideBlock(\'' + id + '\')';
-            hideBlockHtml = '<a href="javascript:void(0);" onclick="' + tempOnClick + '" title="'+HIDE_BLOCK+'"><span class="hideblock">&times;</span></a>';
+            hideBlockHtml = '<a href="javascript:void(0);" onclick="' + tempOnClick + '" title="'+M2ePro.translator.translate('Hide Block')+'"><span class="hideblock">&times;</span></a>';
         }
 
         if (titleHtml == '' && subtitleHtml == '' && arrowHtml == '' && hideBlockHtml == '') {
@@ -267,7 +306,10 @@ BlockNotice.prototype = {
 
     getContentHtml: function(id,content,collapseable)
     {
-        var isClosedContent = getCookie(id+'_closed_content');
+        var isClosedContent = this.getHashedCookie(id+'_closed_content');
+        if (BLOCK_NOTICES_DISABLE_COLLAPSE) {
+            isClosedContent = 0;
+        }
 
         var contentHtml = '';
         if (collapseable && isClosedContent == '1') {
@@ -302,10 +344,153 @@ BlockNotice.prototype = {
         return headerHtml + '<div style="clear: both;"></div>' + contentHtml;
     },
 
+    setCookiesForHide: function(object)
+    {
+        var id = object.id;
+        var isHideBlock = this.getHashedCookie(id + '_hide_block') == 1;
+        var isClosedContent = this.getHashedCookie(id + '_closed_content') == 1;
+
+        if (!isHideBlock && !isClosedContent) {
+            this.setHashedCookie(id + '_closed_content');
+        }
+    },
+
+    // --------------------------------
+
+    showNoticeToolTip: function(element)
+    {
+        $$('.tool-tip-message').invoke('hide');
+
+        var settings = {
+            setHeight: false,
+            setWidth: false,
+            setLeft: true,
+            offsetTop: 20,
+            offsetLeft: 10
+        };
+
+        var toolTipMessage = element.next();
+        toolTipMessage.clonePosition(element, settings);
+        toolTipMessage.show();
+    },
+
+    // --------------------------------
+
+    onClickNoticeToolTip: function(event)
+    {
+        Event.stop(event);
+    },
+
+    onToolTipIconMouseEnter: function(element)
+    {
+        var self = ModuleNoticeObj;
+        self.isHideToolTip = false;
+
+        self.showNoticeToolTip(element);
+    },
+
+    onToolTipIconMouseLeave: function(element)
+    {
+        var self = ModuleNoticeObj;
+        self.isHideToolTip = true;
+
+        setTimeout(function() {
+            self.isHideToolTip && element.next().hide();
+        }, 1000);
+    },
+
+    onToolTipMouseEnter: function()
+    {
+        var self = ModuleNoticeObj;
+        self.isHideToolTip = false;
+    },
+
+    onToolTipMouseLeave: function(element)
+    {
+        var self = ModuleNoticeObj;
+        self.isHideToolTip = true;
+
+        setTimeout(function() {
+            self.isHideToolTip && element.hide();
+        }, 1000);
+    },
+
+    // --------------------------------
+
+    collapseHelpBlockIntoIcon: function(object)
+    {
+        if (this.getHashedCookie(object.id + '_closed_content') != 1 || object.hasClassName('no-icon')) {
+            return false;
+        }
+
+        if ($(object.id + '_tooltip_icon')) {
+            return true;
+        }
+
+        var parentContainer = object;
+        while (!parentContainer.hasClassName('entry-edit')
+               && parentContainer.id != 'page:main-container'
+               && !parentContainer.hasClassName('popup-window')) {
+
+            parentContainer = parentContainer.up();
+        }
+
+        if ((parentContainer.id == 'page:main-container' && !$(object.getAttribute('help_icon_dest_id')))
+            || parentContainer.hasClassName('popup-window')) {
+
+            return false;
+        }
+
+        var toolTipIconSpan = new Element('span', {
+            'id': object.id + '_tooltip_icon',
+            'class': 'notice-tool-tip-icon',
+            'onmouseover': 'ModuleNoticeObj.onToolTipIconMouseEnter(this);',
+            'onmouseout': 'ModuleNoticeObj.onToolTipIconMouseLeave(this);'
+        });
+
+        var toolTipMessageSpan = new Element('span', {
+            'class': 'tool-tip-message',
+            'onclick': 'ModuleNoticeObj.onClickNoticeToolTip(event);',
+            'onmouseover': 'ModuleNoticeObj.onToolTipMouseEnter(this);',
+            'onmouseout': 'ModuleNoticeObj.onToolTipMouseLeave(this);'
+        }).update(object.innerHTML);
+        toolTipMessageSpan.hide();
+
+        var imgUrl = M2ePro.url.get('m2epro_skin_url') + '/images/help.png';
+        var toolTipImg = new Element('img', {
+            'src': imgUrl
+        });
+
+        toolTipMessageSpan.insert({top: toolTipImg});
+
+        if ($(object.getAttribute('help_icon_dest_id'))) {
+            $(object.getAttribute('help_icon_dest_id')).insert({bottom: toolTipIconSpan});
+            return true;
+        }
+
+        if (!parentContainer.hasClassName('entry-edit')) {
+            return true;
+        }
+
+        if (parentContainer.select('.icon-head').length > 0) {
+            parentContainer.select('.icon-head')[0].insert({after: toolTipIconSpan});
+            toolTipIconSpan.insert({after: toolTipMessageSpan});
+            return true;
+        }
+
+        return false;
+    },
+
     // --------------------------------
 
     observeModulePrepareStart: function(object)
     {
+        if (object.hasClassName('is_prepared')) {
+            return;
+        }
+
+        object.addClassName('is_prepared');
+
         var id = this.getPreparedId(object);
         var title = this.getPreparedTitle(object);
         var subtitle = this.getPreparedSubTitle(object);
@@ -313,10 +498,16 @@ BlockNotice.prototype = {
         var hideblock = this.getPreparedHideBlock(object);
         var alwaysShow = this.getPreparedAlwaysShow(object);
 
-        if (!alwaysShow) {
-            if (!BLOCK_NOTICES_SHOW || (hideblock && getCookie(id+'_hide_block') == '1')) {
-                object.remove(); return;
-            }
+        if ((!alwaysShow && !BLOCK_NOTICES_SHOW) || (hideblock && this.getHashedCookie(id+'_hide_block') == '1')) {
+            object.remove();
+            return;
+        }
+
+        if ((IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) && !BLOCK_NOTICES_DISABLE_COLLAPSE
+            && !alwaysShow && this.collapseHelpBlockIntoIcon(object)) {
+
+            object.remove();
+            return;
         }
 
         var headerHtml = this.getHeaderHtml(id,title,subtitle,collapseable,hideblock);
@@ -325,6 +516,10 @@ BlockNotice.prototype = {
 
         object.removeClassName('block_notices_module');
         object.addClassName('block_notices');
+
+        if (IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) {
+            this.setCookiesForHide(object);
+        }
     }
 
     // --------------------------------

@@ -4,7 +4,7 @@ $version = Mage::helper('M2ePro/Module')->getVersion();
 $completeWizardLink = $this->getUrl("*/adminhtml_wizard_buyNewSku/complete");
 $marketplacesLink = $this->getUrl("*/adminhtml_marketplace/index/tab/rakuten");
 
-$docsLink = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/documentation/', 'baseurl');
+$docsLink = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
 $docsLink .= 'Rakuten.com+Listings+Management#Rakuten.comListingsManagement-AddNewRakuten.comSKUtoItem%28s%29';
 
 ?>

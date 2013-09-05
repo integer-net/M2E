@@ -24,26 +24,26 @@
         M2ePro.text = {};
     }
 
-    M2ePro.formData.id = '<?php echo Mage::helper('M2ePro')->escapeJs($this->getRequest()->getParam('id')) ?>';
-    M2ePro.formData.general_template_id = '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('general_template_id')) ?>';
+    M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Ebay_Template_Category'); ?>, 'Ess_M2ePro_Model_Ebay_Template_Category');
 
-    M2ePro.url.motorSpecificGrid = '<?php echo $this->getUrl('*/*/motorSpecificGrid'); ?>';
-    M2ePro.url.updateProductsAttribute = '<?php echo $this->getUrl('*/*/updateProductsAttribute'); ?>';
+    M2ePro.url.add(<?php echo json_encode(array(
+        'adminhtml_ebay_listing/motorSpecificGrid' => $this->getUrl('*/adminhtml_ebay_listing/motorSpecificGrid'),
+        'adminhtml_ebay_listing/updateMotorsSpecificsAttributes' => $this->getUrl('*/adminhtml_ebay_listing/updateMotorsSpecificsAttributes'),
+        'adminhtml_ebay_listing/hasEmptyMotorsSpecificsAttributes' => $this->getUrl('*/adminhtml_ebay_listing/hasEmptyMotorsSpecificsAttributes'),
+    )) ?>);
 
-    M2ePro.text.items_not_selected_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Please select items.')) ?>';
-    M2ePro.text.motors_specifics_attribute_not_selected_error = '<?php echo Mage::helper('M2ePro')->escapeJs(
-            Mage::helper('M2ePro')->__('Please go to the <a href="%s" target="_blank">general template</a> and choose Compatibility Attribute.',
-                                       $this->getUrl('*/ebay_template_general/edit', array('id' => $this->getData('general_template_id'), 'tab' => 'specific')))
-    ) ?>';
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'Please edit categories settings for selected products and select the compatibility attribute.' => $this->__('Please edit categories settings for selected products and select the compatibility attribute.')
+    )) ?>);
 
     Event.observe(window, 'load', function() {
 
         EbayMotorSpecificHandlerObj = new EbayMotorSpecificHandler(
-            '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('motors_specifics_attribute')) ?>',
+            <?php echo (int)$this->getRequest()->getParam('id') ?>,
             '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('specifics_grid_id')) ?>',
             '<?php echo Mage::helper('M2ePro')->escapeJs($this->getData('products_grid_id')) ?>'
         );
-        EbayMotorSpecificHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Template_General'); ?>');
+
         EbayMotorSpecificHandlerObj.initPopUp('<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Add Compatible Vehicles')); ?>', 'pop_up_content');
 
     });
@@ -52,7 +52,7 @@
 
 <div id="pop_up_content" style="display: none;">
 
-    <div id="block_notice_motors_specifics_generate_attribute_value" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Add Compatipable Vehicles'); ?>" style="margin-top: 15px;">
+    <div id="block_notice_motors_specifics_generate_attribute_value" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Add Compatible Vehicles'); ?>" style="margin-top: 15px;">
         <?php echo Mage::helper('M2ePro')->__('The grid below contains a list of cars, trucks and motorcycles which can be found on eBay Motors.<br/><br/>
 Select items, compatible with your part and choose one of three actions in the Actions dropdown:
 <ul class=list>

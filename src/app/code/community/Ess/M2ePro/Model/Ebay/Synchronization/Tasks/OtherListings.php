@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings extends Ess_M2ePro_Model_Ebay_Synchronization_Tasks
@@ -16,12 +16,12 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings extends Ess_M2eP
     {
         // Check tasks config mode
         //-----------------------------
-        $config = Mage::helper('M2ePro/Module')->getConfig();
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
 
         $updateMode = (bool)(int)$config
-                            ->getGroupValue('/ebay/synchronization/settings/other_listings/update/','mode');
+                            ->getGroupValue('/ebay/other_listings/update/','mode');
         $templatesMode = (bool)(int)$config
-                            ->getGroupValue('/ebay/synchronization/settings/other_listings/templates/','mode');
+                            ->getGroupValue('/ebay/other_listings/templates/','mode');
 
         if (!$updateMode && !$templatesMode) {
             return false;

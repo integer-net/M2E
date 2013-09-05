@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Order_ActionRequiredFilter extends Mage_Adminhtml_Block_Widget_Container
@@ -32,9 +32,13 @@ class Ess_M2ePro_Block_Adminhtml_Order_ActionRequiredFilter extends Mage_Adminht
             $params = $this->getRequest()->getParams();
         }
 
-        $params['tab'] = Ess_M2ePro_Block_Adminhtml_Component_Abstract::getTabIdByComponent(
+        $tabId = Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::getTabIdByComponent(
             $this->getData('component_mode')
         );
+
+        if (!is_null($tabId)) {
+            $params['tab'] = $tabId;
+        }
 
         if ($this->isChecked()) {
             unset($params[$this->getParamName()]);

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Responser
@@ -48,7 +48,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Responser
             $this->processResponseData($responseBody);
 
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             $this->completeUnsuccessfulProcessing($exception->getMessage());
             return false;
         }
@@ -78,7 +78,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Responser
             $this->processingRequest->deleteInstance();
         } catch (Exception $exception) {
             $this->forceRemoveLockedObjectsAndRequest();
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
     }
 
@@ -89,7 +89,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Responser
             $this->processingRequest->deleteInstance();
         } catch (Exception $exception) {
             $this->forceRemoveLockedObjectsAndRequest();
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher
@@ -197,7 +197,7 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
 
             $logModel = Mage::getModel('M2ePro/Listing_Log');
             $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);

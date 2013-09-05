@@ -5,23 +5,18 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     initialize: function()
     {
-        this.setValidationCheckRepetitionValue('M2ePro-account-title',
-                                                M2ePro.text.title_not_unique_error,
-                                                'Account', 'title', 'id',
-                                                M2ePro.formData.id);
-
-        Validation.add('M2ePro-account-token-session', M2ePro.text.get_token_error, function(value) {
+        Validation.add('M2ePro-account-token-session', M2ePro.translator.translate('You must get token.'), function(value) {
             return value != '';
         });
 
-        Validation.add('M2ePro-account-customer-id', M2ePro.text.wrong_customer_id_error, function(value) {
+        Validation.add('M2ePro-account-customer-id', M2ePro.translator.translate('No Customer entry is found for specified ID.'), function(value) {
             var checkResult = false;
 
             if ($('magento_orders_customer_id_container').getStyle('display') == 'none') {
                 return true;
             }
 
-            new Ajax.Request(M2ePro.url.checkCustomerId,
+            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/checkCustomerId'),
             {
                 method: 'post',
                 asynchronous : false,
@@ -38,14 +33,14 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return checkResult;
         });
 
-        Validation.add('M2ePro-account-feedback-templates', M2ePro.text.no_feedback_template_error, function(value) {
+        Validation.add('M2ePro-account-feedback-templates', M2ePro.translator.translate('You should create at least one response template.'), function(value) {
             if (value == 0) {
                 return true;
             }
 
             var checkResult = false;
 
-            new Ajax.Request(M2ePro.url.feedbackTemplateCheck,
+            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateCheck'),
             {
                 method: 'post',
                 asynchronous : false,
@@ -61,9 +56,9 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return checkResult;
         });
 
-        Validation.add('M2ePro-require-select-attribute', M2ePro.text.need_select_attributes_error, function(value, el) {
+        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one attribute for product mapping.'), function(value, el) {
 
-            if ($('other_listings_mapping_mode').value == EbayAccountHandlerObj.OTHER_LISTINGS_MAPPING_MODE_NO) {
+            if ($('other_listings_mapping_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_MODE_NO')) {
                 return true;
             }
 
@@ -81,20 +76,33 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    completeStep: function()
+    saveAndClose: function()
     {
-        window.opener.completeStep = 1;
-        window.close();
+        var url = typeof M2ePro.url.urls.formSubmit == 'undefined' ?
+                M2ePro.url.formSubmit + 'back/'+base64_encode('list')+'/' :
+                M2ePro.url.get('formSubmit',{'back': base64_encode('list')});
+
+        if (!editForm.validate()) {
+            return;
+        }
+
+        new Ajax.Request(url,{
+            method: 'post',
+            parameters: Form.serialize($(editForm.formId)),
+            onSuccess: function() {
+                window.close();
+            }
+        });
     },
 
     //----------------------------------
 
     delete_click: function()
     {
-        if (!confirm(M2ePro.text.account_delete_alert)) {
+        if (!confirm(M2ePro.translator.translate('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'))) {
             return;
         }
-        setLocation(M2ePro.url.deleteAction);
+        setLocation(M2ePro.url.get('deleteAction'));
     },
 
     //----------------------------------
@@ -107,7 +115,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         if ($('token_expired_date').value == '') {
             $('token_expired_date').value = '0';
         }
-        this.submitForm(M2ePro.url.getToken + 'id/' + M2ePro.formData.id);
+        this.submitForm(M2ePro.url.get('adminhtml_ebay_account/beforeGetToken',{'id': M2ePro.formData.id}));
     },
 
     //----------------------------------
@@ -116,21 +124,19 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = EbayAccountHandlerObj;
 
-        if ($('feedbacks_receive').value == self.FEEDBACKS_RECEIVE_YES) {
+        if ($('feedbacks_receive').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_YES')) {
             $('magento_block_ebay_accounts_feedbacks_response').show();
         } else {
             $('magento_block_ebay_accounts_feedbacks_response').hide();
 
         }
-        $('feedbacks_auto_response').value = self.FEEDBACKS_AUTO_RESPONSE_NONE;
+        $('feedbacks_auto_response').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_NONE');
         self.feedbacksAutoResponseChange();
     },
 
     feedbacksAutoResponseChange : function()
     {
-        var self = EbayAccountHandlerObj;
-
-        if ($('feedbacks_auto_response').value == self.FEEDBACKS_AUTO_RESPONSE_NONE) {
+        if ($('feedbacks_auto_response').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_NONE')) {
             $('block_accounts_feedbacks_templates').hide();
             $('feedbacks_auto_response_only_positive_container').hide();
         } else {
@@ -202,7 +208,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('feedbacks_templates_body_validate').hide();
         }
 
-        new Ajax.Request(M2ePro.url.feedbackTemplateEdit,
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateEdit'),
         {
             method: 'post',
             asynchronous : false,
@@ -229,7 +235,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('feedbacks_templates_body_validate').hide();
         }
 
-        new Ajax.Request(M2ePro.url.feedbackTemplateEdit,
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateEdit'),
         {
             method: 'post',
             asynchronous : false,
@@ -248,13 +254,11 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     feedbacksDeleteAction : function(id)
     {
-        if (!confirm(CONFIRM)) {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return false;
         }
 
-        var self = EbayAccountHandlerObj;
-
-        new Ajax.Request(M2ePro.url.feedbackTemplateDelete,
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateDelete'),
         {
             method: 'post',
             asynchronous : false,
@@ -273,7 +277,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     ebayStoreUpdate : function()
     {
         var self = EbayAccountHandlerObj;
-        self.submitForm(M2ePro.url.formSubmit + 'update_ebay_store/1/' + 'back/' + base64_encode('edit'));
+        self.submitForm(M2ePro.url.get('formSubmit',{'update_ebay_store': 1, 'back': base64_encode('edit')}));
     },
 
     ebayStoreSelectCategory : function(id)
@@ -294,7 +298,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = EbayAccountHandlerObj;
 
-        if ($('orders_mode').value == self.ORDERS_MODE_YES) {
+        if ($('orders_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::ORDERS_MODE_YES')) {
             $('magento_block_ebay_accounts_magento_orders_listings').show();
             $('magento_block_ebay_accounts_magento_orders_listings_other').show();
         } else {
@@ -302,8 +306,8 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('magento_block_ebay_accounts_magento_orders_listings_other').hide();
         }
 
-        $('magento_orders_listings_mode').value = self.MAGENTO_ORDERS_LISTINGS_MODE_NO;
-        $('magento_orders_listings_other_mode').value = self.MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO;
+        $('magento_orders_listings_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO');
+        $('magento_orders_listings_other_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO');
 
         self.magentoOrdersListingsModeChange();
         self.magentoOrdersListingsOtherModeChange();
@@ -313,13 +317,13 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = EbayAccountHandlerObj;
 
-        if ($('magento_orders_listings_mode').value == self.MAGENTO_ORDERS_LISTINGS_MODE_YES) {
+        if ($('magento_orders_listings_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES')) {
             $('magento_orders_listings_store_mode_container').show();
         } else {
             $('magento_orders_listings_store_mode_container').hide();
         }
 
-        $('magento_orders_listings_store_mode').value = self.MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT;
+        $('magento_orders_listings_store_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT');
         self.magentoOrdersListingsStoreModeChange();
 
         self.changeVisibilityForOrdersModesRelatedBlocks();
@@ -327,9 +331,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     magentoOrdersListingsStoreModeChange : function()
     {
-        var self = EbayAccountHandlerObj;
-
-        if ($('magento_orders_listings_store_mode').value == self.MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM) {
+        if ($('magento_orders_listings_store_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM')) {
             $('magento_orders_listings_store_id_container').show();
         } else {
             $('magento_orders_listings_store_id_container').hide();
@@ -342,7 +344,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = EbayAccountHandlerObj;
 
-        if ($('magento_orders_listings_other_mode').value == self.MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES) {
+        if ($('magento_orders_listings_other_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES')) {
             $('magento_orders_listings_other_product_mode_container').show();
             $('magento_orders_listings_other_store_id_container').show();
         } else {
@@ -350,7 +352,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('magento_orders_listings_other_store_id_container').hide();
         }
 
-        $('magento_orders_listings_other_product_mode').value = self.MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE;
+        $('magento_orders_listings_other_product_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE');
         $('magento_orders_listings_other_store_id').value = '';
 
         self.magentoOrdersListingsOtherProductModeChange();
@@ -359,9 +361,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     magentoOrdersListingsOtherProductModeChange : function()
     {
-        var self = EbayAccountHandlerObj;
-
-        if ($('magento_orders_listings_other_product_mode').value == self.MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE) {
+        if ($('magento_orders_listings_other_product_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE')) {
             $('magento_orders_listings_other_product_mode_note').hide();
             $('magento_orders_listings_other_product_tax_class_id_container').hide();
         } else {
@@ -372,18 +372,17 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     magentoOrdersCustomerModeChange : function()
     {
-        var self = EbayAccountHandlerObj,
-            customerMode = $('magento_orders_customer_mode').value;
+        var customerMode = $('magento_orders_customer_mode').value;
 
-        if (customerMode == self.MAGENTO_ORDERS_CUSTOMER_MODE_PREDEFINED) {
+        if (customerMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_MODE_PREDEFINED')) {
             $('magento_orders_customer_id_container').show();
             $('magento_orders_customer_id').addClassName('M2ePro-account-product-id');
-        } else {  // self.ORDERS_CUSTOMER_MODE_GUEST || self.ORDERS_CUSTOMER_MODE_NEW
+        } else {  // M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::ORDERS_CUSTOMER_MODE_GUEST') || M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::ORDERS_CUSTOMER_MODE_NEW')
             $('magento_orders_customer_id_container').hide();
             $('magento_orders_customer_id').removeClassName('M2ePro-account-product-id');
         }
 
-        var action = (customerMode == self.MAGENTO_ORDERS_CUSTOMER_MODE_NEW) ? 'show' : 'hide';
+        var action = (customerMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW')) ? 'show' : 'hide';
         $('magento_orders_customer_new_website_id_container')[action]();
         $('magento_orders_customer_new_group_id_container')[action]();
         $('magento_orders_customer_new_notifications_container')[action]();
@@ -392,23 +391,21 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('magento_orders_customer_new_website_id').value = '';
         $('magento_orders_customer_new_group_id').value = '';
         $('magento_orders_customer_new_notifications').value = '';
-//        $('magento_orders_customer_new_newsletter_mode').value = self.MAGENTO_ORDERS_CUSTOMER_NEW_SUBSCRIPTION_MODE_NO;
+//        $('magento_orders_customer_new_newsletter_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_NEW_SUBSCRIPTION_MODE_NO');
     },
 
     magentoOrdersStatusMappingModeChange : function()
     {
-        var self = EbayAccountHandlerObj;
-
         // Reset dropdown selected values to default
-        $('magento_orders_status_mapping_new').value = self.MAGENTO_ORDERS_STATUS_MAPPING_NEW;
-        $('magento_orders_status_mapping_paid').value = self.MAGENTO_ORDERS_STATUS_MAPPING_PAID;
-        $('magento_orders_status_mapping_shipped').value = self.MAGENTO_ORDERS_STATUS_MAPPING_SHIPPED;
+        $('magento_orders_status_mapping_new').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_NEW');
+        $('magento_orders_status_mapping_paid').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_PAID');
+        $('magento_orders_status_mapping_shipped').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_SHIPPED');
 
         // Default auto create invoice & shipping
         $('magento_orders_invoice_mode').checked = true;
         $('magento_orders_shipment_mode').checked = true;
 
-        var disabled = $('magento_orders_status_mapping_mode').value == self.MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT;
+        var disabled = $('magento_orders_status_mapping_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT');
         $('magento_orders_status_mapping_new').disabled = disabled;
         $('magento_orders_status_mapping_paid').disabled = disabled;
         $('magento_orders_status_mapping_shipped').disabled = disabled;
@@ -418,10 +415,9 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     magentoOrdersCreationModeChange : function()
     {
-        var self = EbayAccountHandlerObj;
         var creationMode = $('magento_orders_creation_mode').value;
 
-        if (creationMode == self.MAGENTO_ORDERS_CREATE_IMMEDIATELY) {
+        if (creationMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_IMMEDIATELY')) {
             $('magento_orders_creation_reservation_days_container').show();
             $('magento_orders_qty_reservation_days').value = 0;
             $('magento_orders_qty_reservation_days_container').hide();
@@ -436,22 +432,22 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = EbayAccountHandlerObj;
 
-        if ($('magento_orders_listings_mode').value == self.MAGENTO_ORDERS_LISTINGS_MODE_NO &&
-            $('magento_orders_listings_other_mode').value == self.MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) {
+        if ($('magento_orders_listings_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO') &&
+            $('magento_orders_listings_other_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO')) {
 
             $('magento_block_ebay_accounts_magento_orders_customer').hide();
-            $('magento_orders_customer_mode').value = self.MAGENTO_ORDERS_CUSTOMER_MODE_GUEST;
+            $('magento_orders_customer_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_MODE_GUEST');
             self.magentoOrdersCustomerModeChange();
 
             $('magento_block_ebay_accounts_magento_orders_status_mapping').hide();
-            $('magento_orders_status_mapping_mode').value = self.MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT;
+            $('magento_orders_status_mapping_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT');
             self.magentoOrdersStatusMappingModeChange();
 
             $('magento_block_ebay_accounts_magento_orders_rules').hide();
-            $('magento_orders_creation_mode').value = self.MAGENTO_ORDERS_CREATE_CHECKOUT;
+            $('magento_orders_creation_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_CHECKOUT');
 
             $('magento_block_ebay_accounts_magento_orders_tax').hide();
-            $('magento_orders_tax_mode').value = self.MAGENTO_ORDERS_TAX_MODE_MIXED;
+            $('magento_orders_tax_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_TAX_MODE_MIXED');
         } else {
             $('magento_block_ebay_accounts_magento_orders_customer').show();
             $('magento_block_ebay_accounts_magento_orders_status_mapping').show();
@@ -464,14 +460,12 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     other_listings_synchronization_change : function()
     {
-        var self = EbayAccountHandlerObj;
-
-        if (this.value == self.OTHER_LISTINGS_SYNCHRONIZATION_YES) {
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES')) {
             $('other_listings_mapping_mode_tr').show();
             $('other_listings_mapping_mode').simulate('change');
             $('magento_block_ebay_accounts_other_listings_related_store_views').show();
         } else {
-            $('other_listings_mapping_mode').value = self.OTHER_LISTINGS_MAPPING_MODE_NO;
+            $('other_listings_mapping_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_MODE_NO');
             $('other_listings_mapping_mode').simulate('change');
             $('other_listings_mapping_mode_tr').hide();
             $('magento_block_ebay_accounts_other_listings_related_store_views').hide();
@@ -480,17 +474,15 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     other_listings_mapping_mode_change : function()
     {
-        var self = EbayAccountHandlerObj;
-
-        if (this.value == self.OTHER_LISTINGS_MAPPING_MODE_YES) {
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_MODE_YES')) {
             $('magento_block_ebay_accounts_other_listings_product_mapping').show();
             $('magento_block_ebay_accounts_other_listings_product_synchronization_mapped').show();
         } else {
             $('magento_block_ebay_accounts_other_listings_product_mapping').hide();
             $('magento_block_ebay_accounts_other_listings_product_synchronization_mapped').hide();
 
-            $('mapping_sku_mode').value = self.OTHER_LISTINGS_MAPPING_SKU_MODE_NONE;
-            $('mapping_title_mode').value = self.OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE;
+            $('mapping_sku_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_NONE');
+            $('mapping_title_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE');
         }
 
         $('mapping_sku_mode').simulate('change');
@@ -508,15 +500,13 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     mapping_sku_mode_change : function()
     {
-        var self = EbayAccountHandlerObj;
-
-        if (this.value == self.OTHER_LISTINGS_MAPPING_SKU_MODE_NONE) {
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_NONE')) {
             $('mapping_sku_priority_td').hide();
             $('mapping_sku_attribute_tr').hide();
         } else {
             $('mapping_sku_priority_td').show();
 
-            if (this.value == self.OTHER_LISTINGS_MAPPING_SKU_MODE_CUSTOM_ATTRIBUTE) {
+            if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_CUSTOM_ATTRIBUTE')) {
                 $('mapping_sku_attribute_tr').show();
             } else {
                 $('mapping_sku_attribute_tr').hide();
@@ -526,15 +516,13 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     mapping_title_mode_change : function()
     {
-        var self = EbayAccountHandlerObj;
-
-        if (this.value == self.OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE) {
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE')) {
             $('mapping_title_priority_td').hide();
             $('mapping_title_attribute_tr').hide();
         } else {
             $('mapping_title_priority_td').show();
 
-            if (this.value == self.OTHER_LISTINGS_MAPPING_TITLE_MODE_CUSTOM_ATTRIBUTE) {
+            if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_CUSTOM_ATTRIBUTE')) {
                 $('mapping_title_attribute_tr').show();
             } else {
                 $('mapping_title_attribute_tr').hide();

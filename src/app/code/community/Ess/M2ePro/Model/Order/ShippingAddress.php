@@ -1,9 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * Provides simple API to work with address information from the order.
+ */
 abstract class Ess_M2ePro_Model_Order_ShippingAddress extends Varien_Object
 {
     /** @var Ess_M2ePro_Model_Order */
@@ -46,9 +49,20 @@ abstract class Ess_M2ePro_Model_Order_ShippingAddress extends Varien_Object
             $countryRegions->getSelect()->where('code = ? OR default_name = ?', $this->getState());
 
             $this->region = $countryRegions->getFirstItem();
+
+            if ($this->isRegionValidationRequired() && !$this->region->getId()) {
+                throw new Exception(
+                    sprintf('State/Region "%s" in the shipping address is invalid.', $this->getState())
+                );
+            }
         }
 
         return $this->region;
+    }
+
+    public function isRegionValidationRequired()
+    {
+        return false;
     }
 
     public function getCountryName()

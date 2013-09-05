@@ -5,6 +5,9 @@
             <action method="addJs"><script>M2ePro/General/PhpFunctions.js</script></action>
             <action method="addJs"><script>M2ePro/General/PrototypeSimulate.js</script></action>
             <action method="addJs"><script>M2ePro/General/CommonHandler.js</script></action>
+            <action method="addJs"><script>M2ePro/General/TranslatorHandler.js</script></action>
+            <action method="addJs"><script>M2ePro/General/PhpHandler.js</script></action>
+            <action method="addJs"><script>M2ePro/General/UrlHandler.js</script></action>
             <action method="addJs"><script>M2ePro/Plugin/Magento/Message.js</script></action>
             <action method="addJs"><script>M2ePro/Plugin/Magento/Block.js</script></action>
             <action method="addJs"><script>M2ePro/Plugin/Magento/FieldTip.js</script></action>

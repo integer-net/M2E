@@ -1,11 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Buy_Search_Automatic_ServerRequester extends
-                                                          Ess_M2ePro_Model_Connector_Server_Buy_Search_Items
+class Ess_M2ePro_Model_Buy_Search_Automatic_ServerRequester
+    extends Ess_M2ePro_Model_Connector_Server_Buy_Search_Items
 {
     /**
      * @var Ess_M2ePro_Model_Buy_Search_Automatic_Requester

@@ -1,9 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * @method Ess_M2ePro_Model_Listing_Product_Variation getParentObject()
+ */
 class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
     // ########################################
@@ -25,55 +28,21 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     }
 
     /**
-     * @return Ess_M2ePro_Model_Listing_Product
-     */
-    public function getListingProduct()
-    {
-        return $this->getParentObject()->getListingProduct();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Template_General
-     */
-    public function getGeneralTemplate()
-    {
-        return $this->getParentObject()->getGeneralTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
-     */
-    public function getSellingFormatTemplate()
-    {
-        return $this->getParentObject()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getParentObject()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getParentObject()->getSynchronizationTemplate();
-    }
-
-    //-----------------------------------------
-
-    /**
      * @return Ess_M2ePro_Model_Ebay_Listing
      */
     public function getEbayListing()
     {
         return $this->getListing()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product
+     */
+    public function getListingProduct()
+    {
+        return $this->getParentObject()->getListingProduct();
     }
 
     /**
@@ -87,11 +56,47 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Ebay_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getEbayGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getGeneralTemplate()->getChildObject();
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Account
+     */
+    public function getEbayAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Marketplace
+     */
+    public function getEbayMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_SellingFormat
+     */
+    public function getSellingFormatTemplate()
+    {
+        return $this->getEbayListingProduct()->getSellingFormatTemplate();
     }
 
     /**
@@ -102,12 +107,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
         return $this->getSellingFormatTemplate()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     * @return Ess_M2ePro_Model_Template_Synchronization
      */
-    public function getEbayDescriptionTemplate()
+    public function getSynchronizationTemplate()
     {
-        return $this->getDescriptionTemplate()->getChildObject();
+        return $this->getEbayListingProduct()->getSynchronizationTemplate();
     }
 
     /**
@@ -116,6 +123,40 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     public function getEbaySynchronizationTemplate()
     {
         return $this->getSynchronizationTemplate()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     */
+    public function getDescriptionTemplate()
+    {
+        return $this->getEbayListingProduct()->getDescriptionTemplate();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Payment
+     */
+    public function getPaymentTemplate()
+    {
+        return $this->getEbayListingProduct()->getPaymentTemplate();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Return
+     */
+    public function getReturnTemplate()
+    {
+        return $this->getEbayListingProduct()->getReturnTemplate();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Shipping
+     */
+    public function getShippingTemplate()
+    {
+        return $this->getEbayListingProduct()->getShippingTemplate();
     }
 
     // ########################################
@@ -142,15 +183,98 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
         return (int)$this->getData('online_qty_sold');
     }
 
+    //----------------------------------------
+
+    public function isAdd()
+    {
+        return (bool)$this->getData('add');
+    }
+
+    public function isDelete()
+    {
+        return (bool)$this->getData('delete');
+    }
+
+    //----------------------------------------
+
+    public function getStatus()
+    {
+        return (int)$this->getData('status');
+    }
+
+    // ########################################
+
+    public function isNotListed()
+    {
+        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED;
+    }
+
+    public function isUnknown()
+    {
+        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN;
+    }
+
+    public function isBlocked()
+    {
+        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED;
+    }
+
+    //-----------------------------------------
+
+    public function isListed()
+    {
+        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED;
+    }
+
+    public function isSold()
+    {
+        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_SOLD;
+    }
+
+    public function isStopped()
+    {
+        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED;
+    }
+
+    public function isFinished()
+    {
+        return $this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED;
+    }
+
+    //-----------------------------------------
+
+    public function isListable()
+    {
+        return ($this->isNotListed() || $this->isSold() ||
+                $this->isStopped() || $this->isFinished() ||
+                $this->isUnknown()) &&
+                !$this->isBlocked();
+    }
+
+    public function isRelistable()
+    {
+        return ($this->isSold() || $this->isStopped() ||
+                $this->isFinished() || $this->isUnknown()) &&
+                !$this->isBlocked();
+    }
+
+    public function isRevisable()
+    {
+        return ($this->isListed() || $this->isUnknown()) &&
+                !$this->isBlocked();
+    }
+
+    public function isStoppable()
+    {
+        return ($this->isListed() || $this->isUnknown()) &&
+                !$this->isBlocked();
+    }
+
     // ########################################
 
     public function getSku()
     {
-        if ($this->getParentObject()->isDelete()) {
-            return '';
-        }
-
-        if (!$this->getEbayGeneralTemplate()->isSkuEnabled()) {
+        if ($this->isDelete()) {
             return '';
         }
 
@@ -200,7 +324,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     {
         $qty = 0;
 
-        if ($this->getParentObject()->isDelete()) {
+        if ($this->isDelete()) {
             return $qty;
         }
 
@@ -232,7 +356,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
 
         //-- Check max posted QTY on channel
         $src = $this->getEbaySellingFormatTemplate()->getQtySource();
-        if ($src['qty_max_posted_value'] > 0 && $qty > $src['qty_max_posted_value']) {
+        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
             $qty = $src['qty_max_posted_value'];
         }
 
@@ -245,7 +369,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     {
         $price = 0;
 
-        if ($this->getParentObject()->isDelete()) {
+        if ($this->isDelete()) {
             return $price;
         }
 
@@ -303,7 +427,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
 
         $price < 0 && $price = 0;
 
-        return $this->getSellingFormatTemplate()->parsePrice($price, $buyItNowSrc['coefficient']);
+        return Mage::helper('M2ePro')->parsePrice($price, $buyItNowSrc['coefficient']);
     }
 
     // ########################################
@@ -322,7 +446,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
         $variationKeys = array_keys($currentSpecifics);
         $variationValues = array_values($currentSpecifics);
 
-        $realEbayItemId = $this->getListingProduct()->getChildObject()->getEbayItem()->getItemId();
+        $realEbayItemId = $this->getEbayListingProduct()->getEbayItem()->getItemId();
 
         $tempOrdersItemsCollection = Mage::getModel('M2ePro/Ebay_Order_Item')->getCollection();
         $tempOrdersItemsCollection->addFieldToFilter('item_id', $realEbayItemId);

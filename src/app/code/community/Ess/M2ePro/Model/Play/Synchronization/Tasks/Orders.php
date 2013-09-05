@@ -1,14 +1,22 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders extends Ess_M2ePro_Model_Play_Synchronization_Tasks
 {
+    /** @var Ess_M2ePro_Model_Config_Synchronization */
+    private $config = NULL;
+
     //####################################
 
-    private $configGroup = '/play/synchronization/settings/orders/';
+    public function __construct()
+    {
+        $this->config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+
+        parent::__construct();
+    }
 
     //####################################
 
@@ -16,12 +24,9 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders extends Ess_M2ePro_Mode
     {
         // Check tasks config mode
         //-----------------------------
-        /** @var $config Ess_M2ePro_Model_Config_Module */
-        $config = Mage::helper('M2ePro/Module')->getConfig();
-
-        $generalMode = $config->getGroupValue($this->configGroup, 'mode');
-        $receiveMode = $config->getGroupValue($this->configGroup . 'receive/', 'mode');
-        $updateMode = $config->getGroupValue($this->configGroup . 'update/', 'mode');
+        $generalMode = $this->config->getGroupValue('/play/orders/', 'mode');
+        $receiveMode = $this->config->getGroupValue('/play/orders/receive/', 'mode');
+        $updateMode  = $this->config->getGroupValue('/play/orders/update/', 'mode');
 
         if (!$generalMode || (!$receiveMode && !$updateMode)) {
             return;

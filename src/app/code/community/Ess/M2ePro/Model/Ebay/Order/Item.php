@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -21,8 +21,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     // ########################################
 
-    /** @var $channelItem Ess_M2ePro_Model_Ebay_Item */
-    private $channelItem = NULL;
+    /** @var $ebayItem Ess_M2ePro_Model_Ebay_Item */
+    private $ebayItem = NULL;
 
     // ########################################
 
@@ -56,16 +56,16 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     // ########################################
 
-    public function getChannelItem()
+    public function getEbayItem()
     {
-        if (is_null($this->channelItem)) {
-            $this->channelItem = Mage::getModel('M2ePro/Ebay_Item')->getCollection()
+        if (is_null($this->ebayItem)) {
+            $this->ebayItem = Mage::getModel('M2ePro/Ebay_Item')->getCollection()
                 ->addFieldToFilter('item_id', $this->getItemId())
                 ->setOrder('create_date', Varien_Data_Collection::SORT_ORDER_DESC)
                 ->getFirstItem();
         }
 
-        return !is_null($this->channelItem->getId()) ? $this->channelItem : NULL;
+        return !is_null($this->ebayItem->getId()) ? $this->ebayItem : NULL;
     }
 
     // ########################################
@@ -155,10 +155,10 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
     {
         // Item was listed by M2E
         // ----------------
-        if (!is_null($this->getChannelItem())) {
+        if (!is_null($this->getEbayItem())) {
             return $this->getEbayAccount()->isMagentoOrdersListingsStoreCustom()
                 ? $this->getEbayAccount()->getMagentoOrdersListingsStoreId()
-                : $this->getChannelItem()->getStoreId();
+                : $this->getEbayItem()->getStoreId();
         }
         // ----------------
 
@@ -173,8 +173,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
         // Item was listed by M2E
         // ----------------
-        if (!is_null($this->getChannelItem())) {
-            return $this->getChannelItem()->getProductId();
+        if (!is_null($this->getEbayItem())) {
+            return $this->getEbayItem()->getProductId();
         }
         // ----------------
 
@@ -203,15 +203,15 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     private function validate()
     {
-        $channelItem = $this->getChannelItem();
+        $ebayItem = $this->getEbayItem();
 
-        if (!is_null($channelItem) && !$this->getEbayAccount()->isMagentoOrdersListingsModeEnabled()) {
+        if (!is_null($ebayItem) && !$this->getEbayAccount()->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
                 'Magento Order creation for items listed by M2E Pro is disabled in Account settings.'
             );
         }
 
-        if (is_null($channelItem) && !$this->getEbayAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
+        if (is_null($ebayItem) && !$this->getEbayAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
                 'Magento Order creation for items listed by 3rd party software is disabled in Account settings.'
             );
@@ -252,7 +252,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
         $storeId = $this->getEbayAccount()->getMagentoOrdersListingsOtherStoreId();
         if ($storeId == 0) {
-            $storeId = Mage::helper('M2ePro/Magento')->getDefaultStoreId();
+            $storeId = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
         }
 
         $productData['store_id'] = $storeId;

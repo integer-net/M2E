@@ -1,16 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Protocol extends Ess_M2ePro_Model_Connector_Protocol
 {
-    const REQUEST_TYPE = 'POST';
-    //const REQUEST_TYPE = 'GET';
-    const DATA_FORMAT = 'JSON';
-    //const DATA_FORMAT = 'SERIALIZATION';
-
     const API_VERSION = 1;
     const API_VERSION_KEY = 'api_version';
 
@@ -41,17 +36,8 @@ abstract class Ess_M2ePro_Model_Connector_Server_Protocol extends Ess_M2ePro_Mod
     protected $request = array();
     protected $response = array();
 
-    protected $serverScript = '';
-
     protected $messages = array();
     protected $resultType = self::MESSAGE_TYPE_ERROR;
-
-    // ########################################
-
-    public function __construct()
-    {
-        $this->serverScript = Mage::helper('M2ePro/Connector_Server')->getScriptPath().'index.php';
-    }
 
     // ########################################
 
@@ -69,36 +55,72 @@ abstract class Ess_M2ePro_Model_Connector_Server_Protocol extends Ess_M2ePro_Mod
             self::REQUEST_DATA_KEY => $requestData
         );
 
-        $this->request[self::REQUEST_INFO_KEY] = $this->encodeData($this->request[self::REQUEST_INFO_KEY]);
-        $this->request[self::REQUEST_DATA_KEY] = $this->encodeData($this->request[self::REQUEST_DATA_KEY]);
+        $this->request[self::REQUEST_INFO_KEY] = @json_encode($this->request[self::REQUEST_INFO_KEY]);
+        $this->request[self::REQUEST_DATA_KEY] = @json_encode($this->request[self::REQUEST_DATA_KEY]);
 
         $this->response = NULL;
 
         try {
-
-            if (self::REQUEST_TYPE == 'POST') {
-                $this->response = $this->sendRequestAsPost($this->request);
-            }
-            if (self::REQUEST_TYPE == 'GET') {
-                $this->response = $this->sendRequestAsGet($this->request);
-            }
-
+            $this->response = $this->sendHttpRequest($this->request);
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Server')->updateMySqlConnection();
+            Mage::helper('M2ePro/Client')->updateMySqlConnection();
             throw $exception;
         }
 
-        Mage::helper('M2ePro/Server')->updateMySqlConnection();
+        Mage::helper('M2ePro/Client')->updateMySqlConnection();
 
-        $this->response = $this->decodeData($this->response);
+        $this->response = @json_decode($this->response,true);
 
         if (!isset($this->response[self::RESPONSE_INFO_KEY]) || !isset($this->response[self::RESPONSE_DATA_KEY])) {
-            throw new Exception('Server response data has invalid format.');
+            throw new Exception('Please ensure that CURL library is installed on your server and it supports HTTPS
+            protocol. Also ensure that outgoing connection to m2epro.com, port 443 is allowed by firewall.');
         }
 
         $this->processResponseInfo($this->response[self::RESPONSE_INFO_KEY]);
 
         return $this->response[self::RESPONSE_DATA_KEY];
+    }
+
+    protected function sendHttpRequest($params)
+    {
+        $curlObject = curl_init();
+
+        //set the server we are using
+        curl_setopt($curlObject, CURLOPT_URL, Mage::helper('M2ePro/Server')->getEndpoint());
+
+        // stop CURL from verifying the peer's certificate
+        curl_setopt($curlObject, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curlObject, CURLOPT_SSL_VERIFYHOST, false);
+
+        // disable http headers
+        curl_setopt($curlObject, CURLOPT_HEADER, false);
+
+        // set the headers using the array of headers
+        curl_setopt($curlObject, CURLOPT_HTTPHEADER, $this->getRequestHeaders());
+
+        // set the data body of the request
+        curl_setopt($curlObject, CURLOPT_POST, true);
+        curl_setopt($curlObject, CURLOPT_POSTFIELDS, http_build_query($params,'','&'));
+
+        // set it to return the transfer as a string from curl_exec
+        curl_setopt($curlObject, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curlObject, CURLOPT_CONNECTTIMEOUT, $this->getConnectionTimeout());
+
+        $response = curl_exec($curlObject);
+        curl_close($curlObject);
+
+        if ($response === false) {
+            throw new Exception('Server connection is failed. Please try again later.');
+        }
+
+        return $response;
+    }
+
+    //-----------------------------------------
+
+    protected function getConnectionTimeout()
+    {
+        return 300;
     }
 
     protected function processResponseInfo($responseInfo)
@@ -160,7 +182,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Protocol extends Ess_M2ePro_Mod
 
         $name = Mage::helper('M2ePro/Magento')->getName().' ('.Mage::helper('M2ePro/Magento')->getEditionName().')';
         $request = array(
-            'mode' => Mage::helper('M2ePro/Server')->isDeveloper() ? self::MODE_DEVELOPMENT : self::MODE_PRODUCTION,
+            'mode' => Mage::helper('M2ePro/Magento')->isDeveloper() ? self::MODE_DEVELOPMENT : self::MODE_PRODUCTION,
             'client' => array(
                 'platform' => array(
                     'name' => $name,
@@ -173,9 +195,9 @@ abstract class Ess_M2ePro_Model_Connector_Server_Protocol extends Ess_M2ePro_Mod
                     'revision' => Mage::helper('M2ePro/Module')->getRevision()
                 ),
                 'location' => array(
-                    'domain' => Mage::helper('M2ePro/Server')->getDomain(),
-                    'ip' => Mage::helper('M2ePro/Server')->getIp(),
-                    'directory' => Mage::helper('M2ePro/Server')->getBaseDirectory()
+                    'domain' => Mage::helper('M2ePro/Client')->getDomain(),
+                    'ip' => Mage::helper('M2ePro/Client')->getIp(),
+                    'directory' => Mage::helper('M2ePro/Client')->getBaseDirectory()
                 ),
                 'locale' => Mage::helper('M2ePro/Magento')->getLocale()
             ),
@@ -187,16 +209,36 @@ abstract class Ess_M2ePro_Model_Connector_Server_Protocol extends Ess_M2ePro_Mod
             'command' => $command
         );
 
-        $adminKey = Mage::helper('M2ePro/Connector_Server')->getAdminKey();
+        $adminKey = Mage::helper('M2ePro/Server')->getAdminKey();
         !is_null($adminKey) && $adminKey != '' && $request['auth']['admin_key'] = $adminKey;
 
-        $applicationKey = Mage::helper('M2ePro/Connector_Server')->getApplicationKey();
+        $applicationKey = Mage::helper('M2ePro/Server')->getApplicationKey();
         !is_null($applicationKey) && $applicationKey != '' && $request['auth']['application_key'] = $applicationKey;
 
-        $licenseKey = Mage::helper('M2ePro/License')->getKey();
+        $licenseKey = Mage::helper('M2ePro/Module_License')->getKey();
         !is_null($licenseKey) && $licenseKey != '' && $request['auth']['license_key'] = $licenseKey;
 
+        $installationKey = Mage::helper('M2ePro/Module')->getInstallationKey();
+        !is_null($installationKey) && $installationKey != '' && $request['auth']['installation_key'] = $installationKey;
+
         return $request;
+    }
+
+    protected function getRequestHeaders()
+    {
+        $commandTemp = $this->getCommand();
+
+        if (!is_array($commandTemp) || !isset($commandTemp[0]) ||
+            !isset($commandTemp[1]) || !isset($commandTemp[2])) {
+            throw new Exception('Requested command has invalid format.');
+        }
+
+        return array(
+            'M2EPRO-API-VERSION: '.self::API_VERSION,
+            'M2EPRO-API-COMPONENT: '.(string)$this->getComponent(),
+            'M2EPRO-API-COMPONENT-VERSION: '.(int)$this->getComponentVersion(),
+            'M2EPRO-API-COMMAND: /'.$commandTemp[0] .'/'.$commandTemp[1].'/'.$commandTemp[2].'/'
+        );
     }
 
     //----------------------------------------
@@ -223,105 +265,9 @@ abstract class Ess_M2ePro_Model_Connector_Server_Protocol extends Ess_M2ePro_Mod
 
     // ########################################
 
-    private function encodeData($data)
-    {
-        if (self::DATA_FORMAT == 'JSON') {
-            return @json_encode($data);
-        }
-        if (self::DATA_FORMAT == 'SERIALIZATION') {
-            return @serialize($data);
-        }
-
-        return $data;
-    }
-
-    private function decodeData($data)
-    {
-        if (self::DATA_FORMAT == 'JSON') {
-            return @json_decode($data,true);
-        }
-        if (self::DATA_FORMAT == 'SERIALIZATION') {
-            return @unserialize($data);
-        }
-
-        return $data;
-    }
-
-    // ---------------------------------------
-
-    private function sendRequestAsPost($params)
-    {
-        $curlObject = curl_init();
-
-        //set the server we are using
-        curl_setopt($curlObject, CURLOPT_URL, $this->serverScript);
-
-        // stop CURL from verifying the peer's certificate
-        curl_setopt($curlObject, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curlObject, CURLOPT_SSL_VERIFYHOST, false);
-
-        // disable http headers
-        curl_setopt($curlObject, CURLOPT_HEADER, false);
-
-        // set the data body of the request
-        curl_setopt($curlObject, CURLOPT_POST, true);
-        curl_setopt($curlObject, CURLOPT_POSTFIELDS, http_build_query($params,'','&'));
-
-        // set it to return the transfer as a string from curl_exec
-        curl_setopt($curlObject, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlObject, CURLOPT_CONNECTTIMEOUT, $this->getConnectionTimeout());
-
-        $response = curl_exec($curlObject);
-        curl_close($curlObject);
-
-        if ($response === false) {
-            throw new Exception('Server connection is failed. Please try again later.');
-        }
-
-        return $response;
-    }
-
-    private function sendRequestAsGet($params)
-    {
-        $curlObject = curl_init();
-
-        //set the server we are using
-        curl_setopt($curlObject, CURLOPT_URL, $this->serverScript.'?'.http_build_query($params,'','&'));
-
-        // stop CURL from verifying the peer's certificate
-        curl_setopt($curlObject, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curlObject, CURLOPT_SSL_VERIFYHOST, false);
-
-        // disable http headers
-        curl_setopt($curlObject, CURLOPT_HEADER, false);
-        curl_setopt($curlObject, CURLOPT_POST, false);
-
-        // set it to return the transfer as a string from curl_exec
-        curl_setopt($curlObject, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlObject, CURLOPT_CONNECTTIMEOUT, $this->getConnectionTimeout());
-
-        $response = curl_exec($curlObject);
-        curl_close($curlObject);
-
-        if ($response === false) {
-            throw new Exception('Server connection is failed. Please try again later.');
-        }
-
-        return $response;
-    }
-
-    //-----------------------------------------
-
-    private function getConnectionTimeout()
-    {
-        return 300;
-    }
-
-    // ########################################
-
     protected function printDebugData()
     {
-        if (!Mage::helper('M2ePro/Server')->isDeveloper()) {
+        if (!Mage::helper('M2ePro/Magento')->isDeveloper()) {
             return;
         }
 

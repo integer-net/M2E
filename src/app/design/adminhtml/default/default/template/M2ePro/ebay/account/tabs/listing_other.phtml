@@ -1,5 +1,5 @@
 <?php
-    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+    $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
 
     if (isset($formData['other_listings_mapping_settings'])) {
         $formData['other_listings_mapping_settings'] = (array)json_decode($formData['other_listings_mapping_settings'],true);
@@ -19,11 +19,6 @@
 ?>
 
 <script type="text/javascript">
-
-    // Data for current tab
-    //-----------------------------
-    M2ePro.text.need_select_attributes_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('If Yes is chosen, you must select at least one attribute for product mapping.')); ?>';
-    //-----------------------------
 
     Event.observe(window, 'load', function() {
         setTimeout(function() {
@@ -52,7 +47,7 @@
 
 <div id="block_notice_ebay_accounts_other_listings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('3rd Party Listings'); ?>">
     <?php
-        $menuLabel = Mage::helper('M2ePro/Module')->getMenuRootNodeLabel();
+        $menuLabel = Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
 
         echo Mage::helper('M2ePro')->__('The 3rd Party Listings are the items, which were listed on eBay without using M2E Pro
                 extension. <br/>
@@ -221,20 +216,17 @@
                     <td class="label">
                         <label for="other_listings_synchronization_mapped_items_mode"><?php echo Mage::helper('M2ePro')->__('Synchronization of Mapped Items'); ?>:</label>
                     </td>
-                    <td class="value" style="width: 305px;">
+                    <td class="value" style="width: auto;">
                         <select id="other_listings_synchronization_mapped_items_mode" name="other_listings_synchronization_mapped_items_mode">
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPED_SYNCHRONIZATION_YES; ?>" <?php if ($formData['other_listings_synchronization_mapped_items_mode'] == Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPED_SYNCHRONIZATION_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPED_SYNCHRONIZATION_NO; ?>" <?php if ($formData['other_listings_synchronization_mapped_items_mode'] == Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPED_SYNCHRONIZATION_NO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Enables / Disables synchronization of Mapped 3rd Party<br/>Listings for the current account.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Enables / Disables synchronization of Mapped 3rd Party<br/>Listings for the current account.<br /><br /><strong>Note: </strong>click "Synchronization Settings" button for configure settings.'); ?></span>
                         </p>
                     </td>
-                    <td class="value" id="settings_button">
+                    <td class="value" id="settings_button" style="width: auto;">
                         <?php echo $this->getChildHtml('ebay_other_listings_synchronization_settings'); ?>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Settings for 3rd Party Listings Synchronization.'); ?></span>
-                        </p>
                     </td>
                 </tr>
 
@@ -255,11 +247,9 @@
         <div class="hor-scroll">
 
             <div id="block_notice_ebay_accounts_related_store_view" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Related Store View'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('This section displays all <i>Enabled</i> Marketplaces in eBay > Configuration > Marketplaces.
-And allows you to choose Store Views the items\' information for Synchronization processes has to be taken from depending on the 3rd Party Listing Marketplaces.
-<br/><br/>
-<b>Note:</b> If the product doesn\'t have information in specified Store View, then all necessary data will be taken from default values of this product.
-'); ?>
+                <?php echo Mage::helper('M2ePro')->__(
+                    'This section displays all enabled eBay sites and allows you to choose the Store Views the items information for Synchronization processes has to be taken from depending on the 3rd Party Listing Sites.'
+                ); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">

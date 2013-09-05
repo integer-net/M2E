@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Order_Item_Importer
@@ -156,6 +156,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         curl_setopt($curlHandler, CURLOPT_FILE, $fileHandler);
         curl_setopt($curlHandler, CURLOPT_REFERER, $url);
         curl_setopt($curlHandler, CURLOPT_AUTOREFERER, 1);
+        curl_setopt($curlHandler, CURLOPT_CONNECTTIMEOUT, 30);
 
         curl_exec($curlHandler);
         curl_close($curlHandler);

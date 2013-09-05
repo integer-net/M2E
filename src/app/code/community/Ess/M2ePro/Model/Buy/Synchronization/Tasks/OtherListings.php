@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePro_Model_Buy_Synchronization_Tasks
@@ -191,7 +191,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
 
         // Get all changes on Buy for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getDispatcher();
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
         $dispatcherObject->processConnector('tasks', 'otherListings' ,'requester',
                                             array(), $marketplaceObj, $accountObj,
                                             'Ess_M2ePro_Model_Buy_Synchronization');
@@ -384,6 +384,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
                 foreach ($listingsOthersWithEmptyTitles as $listingOtherModel) {
 
                     $listingOtherModel->setData('title',(string)$title);
+                    $listingOtherModel->getChildObject()->setData('title',(string)$title);
 
                     $mappingModel->initialize($marketplaceObj,$accountObj);
                     $mappingResult = $mappingModel->autoMapOtherListingProduct($listingOtherModel);
@@ -418,8 +419,8 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
     {
         $lastTime = strtotime($this->getCheckLastTime());
 
-        $tempGroup = '/buy/synchronization/settings/other_listings/';
-        $interval = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'interval');
+        $tempGroup = '/buy/other_listings/';
+        $interval = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'interval');
 
         $totalItems = (int)Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product')->getSize();
         $totalItems += (int)Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Other')->getSize();
@@ -434,8 +435,8 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
 
     private function getCheckLastTime()
     {
-        $tempGroup = '/buy/synchronization/settings/other_listings/';
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($tempGroup,'last_time');
+        $tempGroup = '/buy/other_listings/';
+        return Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue($tempGroup,'last_time');
     }
 
     private function setCheckLastTime($time)
@@ -449,8 +450,8 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
             $time = strftime('%Y-%m-%d %H:%M:%S', $time);
             date_default_timezone_set($oldTimezone);
         }
-        $tempGroup = '/buy/synchronization/settings/other_listings/';
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue($tempGroup,'last_time',$time);
+        $tempGroup = '/buy/other_listings/';
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue($tempGroup,'last_time',$time);
     }
 
     //------------------------------------
@@ -461,8 +462,8 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
 
-        $tempGroup = '/buy/synchronization/settings/other_listings/';
-        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getConfig()
+        $tempGroup = '/buy/other_listings/';
+        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                     ->getGroupValue($tempGroup,'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);
 

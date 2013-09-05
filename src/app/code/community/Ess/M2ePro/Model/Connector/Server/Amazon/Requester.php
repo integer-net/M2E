@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Amazon_Requester extends Ess_M2ePro_Model_Connector_Server_Requester
@@ -46,15 +46,8 @@ abstract class Ess_M2ePro_Model_Connector_Server_Amazon_Requester extends Ess_M2
 
     public function process()
     {
-        if (!is_null($this->account) && !is_null($this->marketplace)) {
-
-            /** @var $amazonAccount Ess_M2ePro_Model_Amazon_Account */
-            $amazonAccount = $this->account->getChildObject();
-            $marketplaceDataTemp = $amazonAccount->getMarketplaceItem($this->marketplace->getId());
-
-            if (!is_null($marketplaceDataTemp)) {
-                $this->requestExtraData['account'] = $marketplaceDataTemp['server_hash'];
-            }
+        if (!is_null($this->account)) {
+            $this->requestExtraData['account'] = $this->account->getChildObject()->getServerHash();
         }
 
         parent::process();

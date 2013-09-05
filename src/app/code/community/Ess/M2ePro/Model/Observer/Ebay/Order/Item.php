@@ -1,11 +1,13 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Observer_Ebay_Order_Item
 {
+    //####################################
+
     public function associateItemWithProduct(Varien_Event_Observer $observer)
     {
         try {
@@ -25,8 +27,10 @@ class Ess_M2ePro_Model_Observer_Ebay_Order_Item
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return;
         }
     }
+
+    //####################################
 }

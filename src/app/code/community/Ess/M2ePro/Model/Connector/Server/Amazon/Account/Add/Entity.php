@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Amazon_Account_Add_Entity
@@ -25,9 +25,6 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Account_Add_Entity
     {
         return array(
             'account_id' => $this->account->getId(),
-            'marketplace_id' => $this->params['marketplace_id'],
-            'user_merchant_id' => $this->params['user_merchant_id'],
-            'related_store_id' => $this->params['related_store_id']
         );
     }
 
@@ -51,7 +48,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Account_Add_Entity
 
         return array(
             'title' => $this->account->getTitle(),
-            'user_merchant_id' => $this->params['user_merchant_id'],
+            'user_merchant_id' => $this->params['merchant_id'],
             'marketplace_id' => $marketplaceObject->getNativeId()
         );
     }

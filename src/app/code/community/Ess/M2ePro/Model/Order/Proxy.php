@@ -1,10 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
+ * Provides all needed information for order creation in magento.
  */
 abstract class Ess_M2ePro_Model_Order_Proxy
 {
@@ -13,10 +14,12 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
+    /** @var $order Ess_M2ePro_Model_Ebay_Order|Ess_M2ePro_Model_Amazon_Order|Ess_M2ePro_Model_Buy_Order */
     protected $order = NULL;
 
     protected $items = NULL;
 
+    /** @var $store Mage_Core_Model_Store */
     protected $store = NULL;
 
     protected $addressData = array();
@@ -51,6 +54,9 @@ abstract class Ess_M2ePro_Model_Order_Proxy
     }
 
     /**
+     * Order may have multiple items ordered, but some of them may be mapped to single product in magento.
+     * We have to merge them to avoid qty and price calculation issues.
+     *
      * @param Ess_M2ePro_Model_Order_Item_Proxy[] $items
      * @return Ess_M2ePro_Model_Order_Item_Proxy[]
      */
@@ -204,6 +210,11 @@ abstract class Ess_M2ePro_Model_Order_Proxy
         return $this->getAddressData();
     }
 
+    /**
+     * Check whether the billing address information should be validated or not
+     *
+     * @return bool
+     */
     public function shouldIgnoreBillingAddressValidation()
     {
         return false;
@@ -269,22 +280,23 @@ abstract class Ess_M2ePro_Model_Order_Proxy
      */
     protected function getBaseShippingPrice()
     {
-        $price    = $this->getShippingPrice();
-        $currency = $this->getCurrency();
-        $store    = $this->getStore();
-
-        return Mage::getSingleton('M2ePro/Currency')->convertPriceToBaseCurrency($price, $currency, $store);
+        return $this->convertPrice($this->getShippingPrice());
     }
 
     // ########################################
 
+    /**
+     * Return comments, which should be added to the order history
+     *
+     * @return array
+     */
     public function getComments()
     {
         return array_merge($this->getGeneralComments(), $this->getChannelComments());
     }
 
     /**
-     * Return channel related order comments array
+     * Return channel related order comments
      *
      * @return array
      */
@@ -294,7 +306,7 @@ abstract class Ess_M2ePro_Model_Order_Proxy
     }
 
     /**
-     * Return general order comments array
+     * Return general order comments
      *
      * @return array
      */

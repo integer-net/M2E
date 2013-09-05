@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Search_Manual_Responser
@@ -47,7 +47,7 @@ class Ess_M2ePro_Model_Amazon_Search_Manual_Responser
 
     public function processSucceededResponseData($receivedItems)
     {
-        Mage::helper('M2ePro')->setGlobalValue('temp_amazon_manual_search_asin_result', $receivedItems);
+        Mage::helper('M2ePro/Data_Global')->setValue('temp_amazon_manual_search_asin_result', $receivedItems);
     }
 
     // ########################################

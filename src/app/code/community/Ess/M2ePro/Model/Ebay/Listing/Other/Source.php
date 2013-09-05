@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Listing_Other_Source
@@ -14,7 +14,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Source
     const PRICE_SOURCE_PRODUCT = 1;
     const PRICE_SOURCE_SPECIAL = 2;
     const PRICE_SOURCE_ATTRIBUTE = 3;
-    const PRICE_SOURCE_FINAL = 4;
 
     const TITLE_SOURCE_NONE = 0;
     const TITLE_SOURCE_PRODUCT = 1;
@@ -33,8 +32,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Source
     public function getSource($sourceId)
     {
         $value = Mage::helper('M2ePro/Module')
-                     ->getConfig()
-                     ->getGroupValue('/ebay/synchronization/settings/other_listing/source/', $sourceId);
+                     ->getSynchronizationConfig()
+                     ->getGroupValue('/ebay/other_listing/source/', $sourceId);
 
         return $value;
     }
@@ -42,8 +41,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Source
     public function getAttributes()
     {
         $attributes = Mage::helper('M2ePro/Module')
-            ->getConfig()
-            ->getAllGroupValues('/ebay/synchronization/settings/other_listing/source/attribute/');
+            ->getSynchronizationConfig()
+            ->getAllGroupValues('/ebay/other_listing/source/attribute/');
 
         return $attributes;
     }
@@ -95,11 +94,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Source
     public function isPriceSourceAttribute()
     {
         return $this->getPriceSource() == self::PRICE_SOURCE_ATTRIBUTE;
-    }
-
-    public function isPriceSourceFinal()
-    {
-        return $this->getPriceSource() == self::PRICE_SOURCE_FINAL;
     }
 
     //------------------------------------------
@@ -166,13 +160,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Source
     public function isDescriptionSourceAttribute()
     {
         return $this->getDescriptionSource() == self::DESCRIPTION_SOURCE_ATTRIBUTE;
-    }
-
-    //------------------------------------------
-
-    public function getCustomerGroupId()
-    {
-        return (int)$this->getSource('customer_group_id');
     }
 
     // ########################################

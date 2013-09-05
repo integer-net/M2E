@@ -1,12 +1,14 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Stop_Multiple
     extends Ess_M2ePro_Model_Connector_Server_Ebay_Item_MultipleAbstract
 {
+    protected $failedListingProductIds = array();
+
     // ########################################
 
     protected function getCommand()
@@ -45,6 +47,7 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Stop_Multiple
                                                           Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
                 }
 
+                $this->failedListingProductIds[] = $listingProduct->getId();
                 $countStoppedItems++;
             }
         }
@@ -74,12 +77,16 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Stop_Multiple
         foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            if ($listingProduct->isStoppable()) {
 
-                $requestData['items'][$listingProduct->getId()] =
-                            Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper')
-                                       ->getStopRequestData($listingProduct,$this->params);
+            if (in_array($listingProduct->getId(),$this->failedListingProductIds)) {
+                continue;
             }
+
+            $helper = Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper');
+            $tempRequestData = $helper->getStopRequestData($listingProduct, $this->params);
+            $this->logAdditionalWarningMessages($listingProduct);
+
+            $requestData['items'][$listingProduct->getId()] = $tempRequestData;
         }
 
         return $this->nativeRequestData = $requestData;
@@ -94,7 +101,7 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_Stop_Multiple
 
     protected function prepareResponseData($response)
     {
-        if (isset($response['result'])) {
+        if ($this->resultType != parent::MESSAGE_TYPE_ERROR && isset($response['result'])) {
 
             foreach ($response['result'] as $tempIdProduct=>$tempResultProduct) {
 

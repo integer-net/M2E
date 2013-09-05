@@ -1,13 +1,15 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
     const IS_MULTIVARIATION_NO  = 0;
     const IS_MULTIVARIATION_YES = 1;
+
+    private $info = NULL;
 
     // ########################################
 
@@ -48,6 +50,11 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     // ########################################
 
+    public function getCurrency()
+    {
+        return $this->getData('currency');
+    }
+
     public function getCategoriesVersion()
     {
         return (int)$this->getData('categories_version');
@@ -56,6 +63,56 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
     public function isMultivariationEnabled()
     {
         return (int)$this->getData('is_multivariation') == self::IS_MULTIVARIATION_YES;
+    }
+
+    public function isTaxEnabled()
+    {
+        return (bool)(int)$this->getData('is_tax');
+    }
+
+    public function isVatEnabled()
+    {
+        return (bool)(int)$this->getData('is_vat');
+    }
+
+    public function isLocalShippingRateTableEnabled()
+    {
+        return (bool)(int)$this->getData('is_local_shipping_rate_table');
+    }
+
+    public function isInternationalShippingRateTableEnabled()
+    {
+        return (bool)(int)$this->getData('is_international_shipping_rate_table');
+    }
+
+    public function isGetItFastEnabled()
+    {
+        return (bool)(int)$this->getData('is_get_it_fast');
+    }
+
+    public function isEnglishMeasurementSystemEnabled()
+    {
+        return (bool)(int)$this->getData('is_english_measurement_system');
+    }
+
+    public function isMetricMeasurementSystemEnabled()
+    {
+        return (bool)(int)$this->getData('is_metric_measurement_system');
+    }
+
+    public function isCashOnDeliveryEnabled()
+    {
+        return (bool)(int)$this->getData('is_cash_on_delivery');
+    }
+
+    public function isFreightShippingEnabled()
+    {
+        return (bool)(int)$this->getData('is_freight_shipping');
+    }
+
+    public function isCalculatedShippingEnabled()
+    {
+        return (bool)(int)$this->getData('is_calculated_shipping');
     }
 
     // ########################################
@@ -97,14 +154,14 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     // ########################################
 
-    public static function getMultivariationObjects()
+    public function getMultivariationObjects()
     {
         $collection = Mage::getModel('M2ePro/Ebay_Marketplace')->getCollection();
         $collection->addFieldToFilter('is_multivariation',self::IS_MULTIVARIATION_YES);
         return $collection->getItems();
     }
 
-    public static function getMultivariationIds()
+    public function getMultivariationIds()
     {
         $result = array();
         $tempMarketplaces = Mage::getModel('M2ePro/Ebay_Marketplace')->getMultivariationObjects();
@@ -116,15 +173,165 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     // ########################################
 
+    public function getInfo()
+    {
+        if (!is_null($this->info)) {
+            return $this->info;
+        }
+
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $coreResource = Mage::getSingleton('core/resource');
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        //------------------------------
+        $tableDictMarketplace = $coreResource->getTableName('m2epro_ebay_dictionary_marketplace');
+        $tableDictShipping = $coreResource->getTableName('m2epro_ebay_dictionary_shipping');
+        $tableDictShippingCategory = $coreResource->getTableName('m2epro_ebay_dictionary_shipping_category');
+        //------------------------------
+
+        // table m2epro_ebay_dictionary_marketplace
+        //------------------------------
+        $dbSelect = $connRead
+            ->select()
+                ->from($tableDictMarketplace,'*')
+                ->where('`marketplace_id` = ?',(int)$this->getId());
+        $data = $connRead->fetchRow($dbSelect);
+        //------------------------------
+
+        if (!$data) {
+            $this->info = array();
+
+            return $this->info;
+        }
+
+        // table m2epro_ebay_dictionary_shipping
+        //------------------------------
+        $dbSelect = $connRead
+            ->select()
+                ->from($tableDictShipping,'*')
+                ->where('`marketplace_id` = ?',(int)$this->getId())
+                ->order(array('title ASC'));
+        $shippingMethods = $connRead->fetchAll($dbSelect);
+        //------------------------------
+
+        if ($shippingMethods == false) {
+            $shippingMethods = array();
+        }
+
+        // table m2epro_ebay_dictionary_shipping_category
+        //------------------------------
+        $dbSelect = $connRead
+            ->select()
+                ->from($tableDictShippingCategory,'*')
+                ->where('`marketplace_id` = ?',(int)$this->getId())
+                ->order(array('title ASC'));
+        $shippingCategories = $connRead->fetchAll($dbSelect);
+
+        $categoryShippingMethods = array();
+        if (is_array($shippingCategories)) {
+            foreach ($shippingCategories as $category) {
+                $categoryShippingMethods[$category['ebay_id']] = array(
+                    'title'   => $category['title'],
+                    'methods' => array(),
+                );
+            }
+
+            foreach ($shippingMethods as $shippingMethod) {
+                $shippingMethod['data'] = json_decode($shippingMethod['data'], true);
+                $categoryShippingMethods[$shippingMethod['category']]['methods'][] = $shippingMethod;
+            }
+        }
+        //------------------------------
+
+        $this->info = array(
+            'dispatch'                   => json_decode($data['dispatch'], true),
+            'packages'                   => json_decode($data['packages'], true),
+            'return_policy'              => json_decode($data['return_policy'], true),
+            'listing_features'           => json_decode($data['listing_features'], true),
+            'payments'                   => json_decode($data['payments'], true),
+            'charities'                  => json_decode($data['charities'], true),
+            'shipping'                   => $categoryShippingMethods,
+            'shipping_locations'         => json_decode($data['shipping_locations'], true),
+            'shipping_locations_exclude' => json_decode($data['shipping_locations_exclude'], true),
+            'tax_categories'             => json_decode($data['tax_categories'], true)
+        );
+
+        return $this->info;
+    }
+
+    //-----------------------------------------
+
+    public function getDispatchInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['dispatch']) ? $info['dispatch'] : array();
+    }
+
+    public function getPackageInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['packages']) ? $info['packages'] : array();
+    }
+
+    public function getReturnPolicyInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['return_policy']) ? $info['return_policy'] : array();
+    }
+
+    public function getListingFeatureInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['listing_features']) ? $info['listing_features'] : array();
+    }
+
+    public function getPaymentInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['payments']) ? $info['payments'] : array();
+    }
+
+    public function getShippingInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['shipping']) ? $info['shipping'] : array();
+    }
+
+    public function getShippingLocationInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['shipping_locations']) ? $info['shipping_locations'] : array();
+    }
+
+    public function getShippingLocationExcludeInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['shipping_locations_exclude']) ? $info['shipping_locations_exclude'] : array();
+    }
+
+    public function getTaxCategoryInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['tax_categories']) ? $info['tax_categories'] : array();
+    }
+
+    public function getCharitiesInfo()
+    {
+        $info = $this->getInfo();
+        return isset($info['charities']) ? $info['charities'] : array();
+    }
+
+    // ########################################
+
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
         return parent::delete();
     }
 

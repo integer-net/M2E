@@ -1,0 +1,56 @@
+<script type="text/javascript">
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'formSubmit' => $this->getUrl('M2ePro/adminhtml_common_synchronization/save'),
+        'logViewUrl' => $this->getUrl('M2ePro/adminhtml_common_log/synchronization',array('back'=>Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_common_synchronization/index'))),
+
+        'runAllEnabledNow'    => $this->getUrl('M2ePro/adminhtml_common_synchronization/runAllEnabledNow'),
+        'runNowTemplates'     => $this->getUrl('M2ePro/adminhtml_common_synchronization/runNowTemplates'),
+        'runNowOrders'        => $this->getUrl('M2ePro/adminhtml_common_synchronization/runNowOrders'),
+        'runNowOtherListings' => $this->getUrl('M2ePro/adminhtml_common_synchronization/runNowOtherListings'),
+
+        'synchCheckProcessingNow' => $this->getUrl('M2ePro/adminhtml_common_synchronization/synchCheckProcessingNow')
+    )); ?>);
+
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'Synchronization settings have been saved.' => $this->__('Synchronization settings have been saved.'),
+        'Running All Enabled Tasks' => $this->__('Running All Enabled Tasks'),
+        'Stock Level Synchronization' => $this->__('Stock Level Synchronization'),
+        'Orders Synchronization' => $this->__('Orders Synchronization'),
+        '3rd Party Listings Synchronization' => $this->__('3rd Party Listings Synchronization'),
+
+        'Another Synchronization Is Already Running.' => $this->__('Another Synchronization Is Already Running.'),
+        'Getting information. Please wait ...' => $this->__('Getting information. Please wait ...'),
+        'Preparing to start. Please wait ...' => $this->__('Preparing to start. Please wait ...'),
+
+        'Synchronization has successfully ended.' => $this->__('Synchronization has successfully ended.'),
+        'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.'),
+        'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
+    )); ?>);
+
+    Event.observe(window, 'load', function() {
+        setTimeout(function() {
+            SynchronizationProgressHandlerObj = new SynchProgressHandler(SynchProgressBarObj, SynchWrapperObj );
+            SynchronizationHandlerObj = new SynchronizationHandler(SynchronizationProgressHandlerObj);
+            SynchronizationProgressHandlerObj.initPageCheckState();
+
+            editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+
+            <?php if (!is_null($this->getChildBlockId())) { ?>
+                <?php
+                    $childBlockId = Mage::helper('M2ePro')->escapeJs($this->getChildBlockId());
+                    $destinationBlockId = Mage::helper('M2ePro')->escapeJs($this->getForm()->getId());
+                ?>
+                SynchronizationHandlerObj.moveChildBlockContent('<?php echo $childBlockId; ?>', '<?php echo $destinationBlockId; ?>');
+            <?php } ?>
+
+        }, 350);
+    });
+
+</script>
+
+<form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
+
+<input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
+
+</form>

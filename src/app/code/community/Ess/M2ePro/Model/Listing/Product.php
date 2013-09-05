@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent_Abstract
@@ -140,38 +140,22 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         $this->magentoProductModel = $instance;
     }
 
-    //-----------------------------------------
+    // ########################################
 
     /**
-     * @return Ess_M2ePro_Model_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getListing()->getGeneralTemplate();
+        return $this->getListing()->getAccount();
     }
 
     /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
+     * @return Ess_M2ePro_Model_Marketplace
      */
-    public function getSellingFormatTemplate()
+    public function getMarketplace()
     {
-        return $this->getListing()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getListing()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getListing()->getSynchronizationTemplate();
+        return $this->getListing()->getMarketplace();
     }
 
     // ########################################
@@ -204,6 +188,11 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         return (int)$this->getData('product_id');
     }
 
+    public function isTriedToList()
+    {
+        return (bool)$this->getData('tried_to_list');
+    }
+
     //----------------------------------------
 
     public function getStatus()
@@ -214,6 +203,23 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
     public function getStatusChanger()
     {
         return (int)$this->getData('status_changer');
+    }
+
+    //----------------------------------------
+
+    public function isNeedSynchronize()
+    {
+        return (int)$this->getData('is_need_synchronize');
+    }
+
+    //----------------------------------------
+
+    public function getSynchReasons()
+    {
+        $reasons = $this->getData('synch_reasons');
+        $reasons = explode(',',$reasons);
+
+        return array_unique(array_filter($reasons));
     }
 
     // ########################################
@@ -478,9 +484,18 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
             'changed_to_value'=>'value_new',
         );
 
+        $limit = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/settings/product_change/', 'max_count_per_one_time'
+        );
         $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
                              ->select()
-                             ->from(array('pc' => $productsChangesTable),$fields)
+                             ->from($productsChangesTable,'*')
+                             ->order(array('id ASC'))
+                             ->limit($limit);
+
+        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+                             ->select()
+                             ->from(array('pc' => $dbSelect),$fields)
                              ->join(array('lp' => $listingsProductsTable),'`pc`.`product_id` = `lp`.`product_id`','id')
                              ->where('`pc`.`action` = ?',(string)Ess_M2ePro_Model_ProductChange::ACTION_UPDATE)
                              ->where("`pc`.`attribute` IN ('".implode("','",$attributes)."')");
@@ -528,9 +543,18 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
             'changed_to_value'=>'value_new',
         );
 
+        $limit = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/settings/product_change/', 'max_count_per_one_time'
+        );
         $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
                              ->select()
-                             ->from(array('pc' => $productsChangesTable),$fields)
+                             ->from($productsChangesTable,'*')
+                             ->order(array('id ASC'))
+                             ->limit($limit);
+
+        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+                             ->select()
+                             ->from(array('pc' => $dbSelect),$fields)
                              ->join(array('lpvo' => $optionsTable),'`pc`.`product_id` = `lpvo`.`product_id`',array())
                              ->join(array('lpv' => $variationsTable),
                                           '`lpvo`.`listing_product_variation_id` = `lpv`.`id`',array())
@@ -561,75 +585,11 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         return array_values($finalResults);
     }
 
-    // ----------------------------------------
+    // ########################################
 
-    public function getUniqueOptionsProductsIds()
+    public function getTrackingAttributes()
     {
-        $listingProductVariationTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation')
-            ->getMainTable();
-        $listingProductVariationOptionTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')
-            ->getMainTable();
-
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-            ->select()
-                ->from(array('lpv' => $listingProductVariationTable),array())
-                ->join(
-                    array('lpvo' => $listingProductVariationOptionTable),
-                    '`lpv`.`id` = `lpvo`.`listing_product_variation_id`',
-                    array('product_id')
-                )
-                ->where('`lpv`.`listing_product_id` = ?',(int)$this->getId());
-
-        $optionsProductsIds = (array)Mage::getResourceModel('core/config')
-                                            ->getReadConnection()
-                                            ->fetchCol($dbSelect);
-
-        if (count($optionsProductsIds) <= 0) {
-            return array();
-        }
-
-        foreach ($optionsProductsIds as &$temp) {
-            $temp = (int)$temp;
-        }
-
-        return array_unique($optionsProductsIds);
-    }
-
-    public function getUniqueOptionsProductsStatuses($uniqueOptionsProductsIds = NULL)
-    {
-        if (is_null($uniqueOptionsProductsIds)) {
-            $uniqueOptionsProductsIds = $this->getUniqueOptionsProductsIds();
-        }
-
-        if (count($uniqueOptionsProductsIds) <= 0) {
-            return array();
-        }
-
-        return Mage::getSingleton('M2ePro/Magento_Product_Status')
-                                    ->getProductStatus($uniqueOptionsProductsIds,
-                                                       $this->getListing()->getStoreId());
-    }
-
-    public function getUniqueOptionsProductsStockAvailability($uniqueOptionsProductsIds = NULL)
-    {
-        if (is_null($uniqueOptionsProductsIds)) {
-            $uniqueOptionsProductsIds = $this->getUniqueOptionsProductsIds();
-        }
-
-        if (count($uniqueOptionsProductsIds) <= 0) {
-            return array();
-        }
-
-        $catalogInventoryTable = Mage::getSingleton('core/resource')->getTableName('cataloginventory_stock_item');
-
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from(array('cisi' => $catalogInventoryTable),array('product_id','is_in_stock'))
-                             ->where('cisi.product_id IN ('.implode(',',$uniqueOptionsProductsIds).')');
-
-        return (array)Mage::getResourceModel('core/config')
-                                            ->getReadConnection()
-                                            ->fetchPairs($dbSelect);
+        return $this->getChildObject()->getTrackingAttributes();
     }
 
     // ########################################
@@ -658,7 +618,7 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     public function duplicate()
     {
-        $duplicatedListingProduct = $this->getListing()->addProduct($this->getProductId());
+        $duplicatedListingProduct = $this->getListing()->addProduct($this->getProductId(),false,false);
 
         //not for eBay hack
         if ($this->getComponentMode() == Ess_M2ePro_Helper_Component_Ebay::NICK) {
@@ -676,6 +636,118 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         $duplicatedListingProduct->getChildObject()->setMatchedVariation($variation->getOptions());
 
         return $duplicatedListingProduct;
+    }
+
+    // ########################################
+
+    public function getProductsIdsForEachVariation()
+    {
+        $listingProductVariationTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation')
+            ->getMainTable();
+        $listingProductVariationOptionTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')
+            ->getMainTable();
+
+        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+            ->select()
+                ->from(array('lpv' => $listingProductVariationTable),array('variation_id' => 'id'))
+                ->join(
+                    array('lpvo' => $listingProductVariationOptionTable),
+                    '`lpv`.`id` = `lpvo`.`listing_product_variation_id`',
+                    array('product_id')
+                )
+                ->where('`lpv`.`listing_product_id` = ?',(int)$this->getId());
+
+        $variationData = (array)Mage::getResourceModel('core/config')
+                                            ->getReadConnection()
+                                            ->fetchAll($dbSelect);
+
+        foreach ($variationData as $key => $value) {
+            $variationData[$value['variation_id']][] = $value['product_id'];
+            unset($variationData[$key]);
+        }
+
+        return $variationData;
+    }
+
+    public function getVariationsStatuses($productsIdsForEachVariation = NULL)
+    {
+        if (is_null($productsIdsForEachVariation)) {
+            $productsIdsForEachVariation = $this->getProductsIdsForEachVariation();
+        }
+
+        if (count($productsIdsForEachVariation) <= 0) {
+            return array();
+        }
+
+        $ids = array();
+        foreach ($productsIdsForEachVariation as $productsIds) {
+            foreach ($productsIds as $id) {
+                $ids[] = $id;
+            }
+        }
+        $ids = array_values(array_unique($ids));
+
+        $statuses = Mage::getSingleton('M2ePro/Magento_Product_Status')->getProductStatus(
+            $ids, $this->getListing()->getStoreId()
+        );
+
+        $productsStatusesForEachVariation = array();
+        foreach ($productsIdsForEachVariation as $key => $productsIds) {
+            foreach ($productsIds as $id) {
+                $productsStatusesForEachVariation[$key][] = $statuses[$id];
+            }
+        }
+
+        $variationsStatuses = array();
+        foreach ($productsStatusesForEachVariation as $key => $optionsStatuses) {
+            $variationsStatuses[$key] = max($optionsStatuses);
+        }
+
+        return $variationsStatuses;
+    }
+
+    public function getVariationsStockAvailabilities($productsIdsForEachVariation = NULL)
+    {
+        if (is_null($productsIdsForEachVariation)) {
+            $productsIdsForEachVariation = $this->getProductsIdsForEachVariation();
+        }
+
+        if (count($productsIdsForEachVariation) <= 0) {
+            return array();
+        }
+
+        $ids = array();
+        foreach ($productsIdsForEachVariation as $productsIds) {
+            foreach ($productsIds as $id) {
+                $ids[] = $id;
+            }
+        }
+        $ids = array_values(array_unique($ids));
+
+        $catalogInventoryTable = Mage::getSingleton('core/resource')->getTableName('cataloginventory_stock_item');
+
+        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+                             ->select()
+                             ->from(array('cisi' => $catalogInventoryTable),array('product_id','is_in_stock'))
+                             ->where('cisi.product_id IN ('.implode(',',$ids).')');
+
+        $stocks = Mage::getResourceModel('core/config')
+                                            ->getReadConnection()
+                                            ->fetchPairs($dbSelect);
+
+        $productsStocksForEachVariation = array();
+        foreach ($productsIdsForEachVariation as $key => $productsIds) {
+            foreach ($productsIds as $id) {
+                $productsStocksForEachVariation[$key][] = $stocks[$id];
+            }
+        }
+
+        $variationsStocks = array();
+        foreach ($productsStocksForEachVariation as $key => $optionsStatuses) {
+            $variationsStocks[$key] = min($optionsStatuses);
+        }
+
+        return $variationsStocks;
     }
 
     // ########################################

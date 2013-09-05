@@ -1,16 +1,30 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Adminhtml_MainController
+class Ess_M2ePro_Adminhtml_GeneralController
+    extends Ess_M2ePro_Controller_Adminhtml_BaseController
 {
     //#############################################
 
-    protected function _isAllowed()
+    public function getAccountsAction()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro');
+        $component = $this->getRequest()->getParam('component');
+
+        $collection = Mage::helper('M2ePro/Component')->getComponentCollection($component,'Account');
+
+        $accounts = array();
+        foreach ($collection->getItems() as $account) {
+            $accounts[] = array(
+                'id' => $account->getId(),
+                'title' => Mage::helper('M2ePro')->escapeHtml($account->getTitle())
+            );
+        }
+
+        $this->loadLayout();
+        $this->getResponse()->setBody(json_encode($accounts));
     }
 
     //#############################################
@@ -18,6 +32,8 @@ class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Admin
     public function validationCheckRepetitionValueAction()
     {
         $model = $this->getRequest()->getParam('model','');
+
+        $component = $this->getRequest()->getParam('component');
 
         $dataField = $this->getRequest()->getParam('data_field','');
         $dataValue = $this->getRequest()->getParam('data_value','');
@@ -39,7 +55,30 @@ class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Admin
             $collection->addFieldToFilter($idField, array('nin'=>array($idValue)));
         }
 
+        if ($component) {
+            $collection->addFieldToFilter('component_mode', $component);
+        }
+
         exit(json_encode(array('result'=>!(bool)$collection->getSize())));
+    }
+
+    public function magentoGetAttributesByAttributeSetsAction()
+    {
+        $attributeSets = $this->getRequest()->getParam('attribute_sets','');
+
+        if ($attributeSets == '') {
+            exit(json_encode(array()));
+        }
+
+        $attributeSets = explode(',',$attributeSets);
+
+        if (!is_array($attributeSets) || count($attributeSets) <= 0) {
+            exit(json_encode(array()));
+        }
+
+        exit(json_encode(
+            Mage::helper('M2ePro/Magento_Attribute')->getByAttributeSets($attributeSets)
+        ));
     }
 
     //#############################################
@@ -155,12 +194,6 @@ class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Admin
             case 'Template_SellingFormat':
                 $templateType = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT;
                 break;
-            case 'Template_Description':
-                $templateType = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_DESCRIPTION;
-                break;
-            case 'Template_General':
-                $templateType = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_GENERAL;
-                break;
         }
 
         $tasTable = Mage::getResourceModel('M2ePro/AttributeSet')->getMainTable();
@@ -202,178 +235,6 @@ class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Admin
 
     //#############################################
 
-    public function searchAutocompleteAction()
-    {
-        $model       = $this->getRequest()->getParam('model');
-        $component   = $this->getRequest()->getParam('component');
-        $queryString = $this->getRequest()->getParam('query');
-        $maxResults  = (int) $this->getRequest()->getParam('maxResults');
-
-        if (!$model || !$component || !$queryString || !$maxResults) {
-            exit(json_encode(array()));
-        }
-
-        $where = array();
-        $parts = explode(' ', $queryString);
-        foreach ($parts as $part) {
-            $part = trim($part);
-            if (!$part) {
-                continue;
-            }
-            $where[]['like'] = "%$part%";
-        }
-
-        if (empty($where)) {
-            exit(json_encode(array()));
-        }
-
-        $quotedQueryString = addslashes(trim($queryString));
-
-        $relevanceQueryString  = "IF( `main_table`.`title` LIKE '%". $quotedQueryString. "%', ";
-        $relevanceQueryString .= substr_count($quotedQueryString, " ") + 1;
-        $relevanceQueryString .= "*3, 0) + IF( `main_table`.`title` LIKE '%";
-        $relevanceQueryString .= str_replace(" ", "%', 1, 0) + IF( `main_table`.`title` LIKE '%", $quotedQueryString);
-        $relevanceQueryString .= "%', 1 , 0)";
-
-        $collection = Mage::helper('M2ePro/Component')
-            ->getComponentModel($component, $model)
-            ->getCollection()
-            ->addFieldToFilter("`main_table`.`title`", $where)
-            ->setOrder('relevance', 'DESC');
-
-        $collection->getSelect()->columns(array('relevance' => new Zend_Db_Expr($relevanceQueryString)));
-
-        $quantity = $collection->getSize();
-        $collection->getSelect()->limit($maxResults);
-        $results = $collection->getData();
-
-        $suggestions = array();
-        $ids         = array();
-
-        foreach ($results as $result) {
-            $suggestions[] = $result['title'];
-            $ids[] = $result['id'];
-        }
-        $array = array(
-            'query'       => $queryString,
-            'suggestions' => $suggestions,
-            'data'        => $ids,
-            'quantity'    => $quantity
-        );
-        exit(json_encode($array));
-    }
-
-    public function searchAutocompleteByAttributeSetIdAction()
-    {
-        $idField     = $this->getRequest()->getParam('id_field','id');
-        $model       = $this->getRequest()->getParam('model');
-        $component   = $this->getRequest()->getParam('component');
-        $queryString = $this->getRequest()->getParam('query');
-        $maxResults  = (int) $this->getRequest()->getParam('maxResults');
-        $attributeSets = $this->getRequest()->getParam('attribute_sets');
-
-        if (!$model || !$component || !$queryString || !$maxResults || !$attributeSets) {
-            exit(json_encode(array()));
-        }
-
-        $where = array();
-        $parts = explode(' ', $queryString);
-        foreach ($parts as $part) {
-            $part = trim($part);
-            if (!$part) {
-                continue;
-            }
-            $where[]['like'] = "%$part%";
-        }
-
-        if (empty($where)) {
-            exit(json_encode(array()));
-        }
-
-        $quotedQueryString = addslashes(trim($queryString));
-        $relevanceQueryString  = "IF( `main_table`.`title` LIKE '%". $quotedQueryString. "%', ";
-        $relevanceQueryString .= substr_count($quotedQueryString, " ") + 1;
-        $relevanceQueryString .= "*3, 0) + IF( `main_table`.`title` LIKE '%";
-        $relevanceQueryString .= str_replace(" ", "%', 1, 0) + IF( `main_table`.`title` LIKE '%", $quotedQueryString);
-        $relevanceQueryString .= "%', 1 , 0)";
-
-        $templateType = 0;
-        switch ($model) {
-            case 'Template_SellingFormat':
-                $templateType = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT;
-                break;
-            case 'Template_Description':
-                $templateType = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_DESCRIPTION;
-                break;
-            case 'Template_General':
-                $templateType = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_GENERAL;
-                break;
-        }
-
-        $tasTable = Mage::getResourceModel('M2ePro/AttributeSet')->getMainTable();
-
-        $collection = Mage::helper('M2ePro/Component')
-            ->getComponentModel($component, $model)
-            ->getCollection()
-            ->addFieldToFilter("`main_table`.`title`", $where);
-
-        $collection->getSelect()->columns(array('relevance' => new Zend_Db_Expr($relevanceQueryString)));
-
-        $collection->getSelect()
-            ->join(array('tas'=>$tasTable),'`main_table`.`'.$idField.'` = `tas`.`object_id`',array())
-            ->where('`tas`.`object_type` = ?',(int)$templateType);
-
-        $attributeSets = explode(',', $attributeSets);
-        $collection->addFieldToFilter('`tas`.`attribute_set_id`', array('in' => $attributeSets));
-
-        $collection->getSelect()
-                   ->group('main_table.'.$idField)
-                   ->having('COUNT(`main_table`.`'.$idField.'`) >= ?', count($attributeSets));
-
-        $results = $collection->setOrder('relevance', 'DESC')->getData();
-        $quantity = count($results);
-
-        $suggestions = array();
-        $ids         = array();
-
-        $results = array_slice($results,0,$maxResults);
-
-        foreach ($results as $result) {
-            $suggestions[] = $result['title'];
-            $ids[] = $result['id'];
-        }
-        $array = array(
-            'query'       => $queryString,
-            'suggestions' => $suggestions,
-            'data'        => $ids,
-            'quantity'    => $quantity
-        );
-        exit(json_encode($array));
-    }
-
-    //#############################################
-
-    public function magentoGetAttributesByAttributeSetsAction()
-    {
-        $attributeSets = $this->getRequest()->getParam('attribute_sets','');
-
-        if ($attributeSets == '') {
-            exit(json_encode(array()));
-        }
-
-        $attributeSets = explode(',',$attributeSets);
-
-        if (!is_array($attributeSets) || count($attributeSets) <= 0) {
-            exit(json_encode(array()));
-        }
-
-        exit(json_encode(
-            Mage::helper('M2ePro/Magento')->getAttributesByAttributeSets($attributeSets)
-        ));
-    }
-
-    //#############################################
-
     public function magentoRuleGetNewConditionHtmlAction()
     {
         $id = $this->getRequest()->getParam('id');
@@ -411,7 +272,7 @@ class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Admin
             $model->setAttribute($typeArr[1]);
         }
 
-        if ($model instanceof Mage_Rule_Model_Condition_Abstract) {
+        if ($model instanceof Mage_Rule_Model_Condition_Interface) {
             $model->setJsFormObject($prefix);
             $model->setStoreId($storeId);
             $html = $model->asHtmlRecursive();
@@ -469,6 +330,8 @@ class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Admin
         }
     }
 
+    //#############################################
+
     public function categoriesJsonAction()
     {
         if ($categoryId = (int) $this->getRequest()->getPost('id')) {
@@ -507,6 +370,13 @@ class Ess_M2ePro_Adminhtml_GeneralController extends Ess_M2ePro_Controller_Admin
         Mage::register('current_category', $category);
 
         return $category;
+    }
+
+    //#############################################
+
+    public function requirementsPopupCloseAction()
+    {
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/view/requirements/popup/', 'closed', 1);
     }
 
     //#############################################

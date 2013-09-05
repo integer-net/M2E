@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Observer_StockItem
@@ -23,10 +23,10 @@ class Ess_M2ePro_Model_Observer_StockItem
              }
 
              // Get listings, other listings where is product
-             $listingsArray = Mage::getResourceModel('M2ePro/Listing')->getListingsWhereIsProduct($productId);
+             $listingsProductsArray = Mage::getResourceModel('M2ePro/Listing_Product')->getItemsWhereIsProduct($productId);
              $otherListingsArray = Mage::getResourceModel('M2ePro/Listing_Other')->getItemsWhereIsProduct($productId);
 
-             if (count($listingsArray) > 0 || count($otherListingsArray) > 0) {
+             if (count($listingsProductsArray) > 0 || count($otherListingsArray) > 0) {
 
                     // Save global changes
                     //--------------------
@@ -47,14 +47,14 @@ class Ess_M2ePro_Model_Observer_StockItem
 
                     if ($rez !== false) {
 
-                          foreach ($listingsArray as $listingTemp) {
+                          foreach ($listingsProductsArray as $listingProductArray) {
 
                                  $tempLog = Mage::getModel('M2ePro/Listing_Log');
-                                 $tempLog->setComponentMode($listingTemp['component_mode']);
+                                 $tempLog->setComponentMode($listingProductArray['component_mode']);
                                  $tempLog->addProductMessage(
-                                    $listingTemp['id'],
+                                    $listingProductArray['object']->getListingId(),
                                     $productId,
-                                    NULL,
+                                    $listingProductArray['id'],
                                     Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_QTY,
@@ -102,14 +102,14 @@ class Ess_M2ePro_Model_Observer_StockItem
                           $stockAvailabilityOld = $stockAvailabilityOld ? 'IN Stock' : 'OUT of Stock';
                           $stockAvailabilityNew = $stockAvailabilityNew ? 'IN Stock' : 'OUT of Stock';
 
-                          foreach ($listingsArray as $listingTemp) {
+                          foreach ($listingsProductsArray as $listingProductArray) {
 
                                  $tempLog = Mage::getModel('M2ePro/Listing_Log');
-                                 $tempLog->setComponentMode($listingTemp['component_mode']);
+                                 $tempLog->setComponentMode($listingProductArray['component_mode']);
                                  $tempLog->addProductMessage(
-                                    $listingTemp['id'],
+                                    $listingProductArray['object']->getListingId(),
                                     $productId,
-                                    NULL,
+                                    $listingProductArray['id'],
                                     Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
@@ -151,7 +151,7 @@ class Ess_M2ePro_Model_Observer_StockItem
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return;
         }
     }
@@ -198,12 +198,13 @@ class Ess_M2ePro_Model_Observer_StockItem
         }
 
         /** @var $synchronizationLog Ess_M2ePro_Model_Synchronization_Log */
-        $synchronizationLog = Mage::helper('M2ePro')->getGlobalValue('synchLogs');
+        $synchronizationLog = Mage::helper('M2ePro/Data_Global')->getValue('synchLogs');
 
         if (!$reindexExecuted || !$synchronizationLog) {
             return;
         }
 
+        $synchronizationLog->unsetComponentMode();
         $synchronizationLog->addMessage(
             Mage::helper('M2ePro')->__('Product reindex was executed.'),
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProducts_Responser
@@ -92,7 +92,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
 
             $this->getSynchLogModel()->addMessage(Mage::helper('M2ePro')->__($exception->getMessage()),
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -116,8 +116,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
                 continue;
             }
 
-            if ((int)$existingItem['ignore_next_inventory_synch'] ==
-                Ess_M2ePro_Model_Play_Listing_Product::IGNORE_NEXT_INVENTORY_SYNCH_YES) {
+            if ((int)$existingItem['ignore_next_inventory_synch'] == 1) {
                 continue;
             }
 
@@ -245,19 +244,16 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         }
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $generalTemplateTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
         $listingProductMainTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
 
         /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
-        $collection->getSelect()->join(array('gt' => $generalTemplateTable), 'l.template_general_id = gt.id', array());
         $collection->getSelect()->joinLeft(array('api' => $tempTable),
                     '`second_table`.sku = `api`.sku AND `api`.`hash` = \''.$hash.'\'', array('sku'));
-        $collection->getSelect()->where('gt.marketplace_id = ?',(int)$this->getMarketplace()->getId());
-        $collection->getSelect()->where('gt.account_id = ?',(int)$this->getAccount()->getId());
-        $collection->getSelect()->where('second_table.ignore_next_inventory_synch != ?',
-                                        Ess_M2ePro_Model_Play_Listing_Product::IGNORE_NEXT_INVENTORY_SYNCH_YES);
+        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+        $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
+        $collection->getSelect()->where('second_table.ignore_next_inventory_synch != ?',1);
         $collection->getSelect()->where('`main_table`.`status` != ?',
             (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
         $collection->getSelect()->where('`main_table`.`status` != ?',
@@ -278,6 +274,12 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         while ($notReceivedItem = $stmtTemp->fetch()) {
 
             if (!in_array((int)$notReceivedItem['id'],$notReceivedIds)) {
+
+                Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
+                    $notReceivedItem['product_id'],
+                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
+                );
+
                 $tempLog->addProductMessage(
                     $notReceivedItem['listing_id'],
                     $notReceivedItem['product_id'],
@@ -314,16 +316,14 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $generalTemplateTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
 
         /** @var $collection Varien_Data_Collection_Db */
         $dbSelect = $connWrite->select();
         $dbSelect->from(array('lp' => $listingProductTable), array());
         $dbSelect->join(array('l' => $listingTable), 'lp.listing_id = l.id', array());
-        $dbSelect->join(array('gt' => $generalTemplateTable), 'l.template_general_id = gt.id', array());
-        $dbSelect->where('gt.marketplace_id = ?',(int)$this->getMarketplace()->getId());
-        $dbSelect->where('gt.account_id = ?',(int)$this->getAccount()->getId());
+        $dbSelect->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+        $dbSelect->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $dbSelect->where('lp.component_mode = ?',Ess_M2ePro_Helper_Component_Play::NICK);
 
         $dbSelect->reset(Zend_Db_Select::COLUMNS)->columns(array('lp.id'));
@@ -331,7 +331,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         $listingProductTable = Mage::getResourceModel('M2ePro/Play_Listing_Product')->getMainTable();
 
         $bind = array(
-            'ignore_next_inventory_synch' => Ess_M2ePro_Model_Play_Listing_Product::IGNORE_NEXT_INVENTORY_SYNCH_NO
+            'ignore_next_inventory_synch' => 0
         );
         $where = new Zend_Db_Expr('`listing_product_id` IN ('.$dbSelect->__toString().')');
 
@@ -346,14 +346,12 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $generalTemplateTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
 
         /** @var $collection Varien_Data_Collection_Db */
         $collection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
-        $collection->getSelect()->join(array('gt' => $generalTemplateTable), 'l.template_general_id = gt.id', array());
-        $collection->getSelect()->where('gt.marketplace_id = ?',(int)$this->getMarketplace()->getId());
-        $collection->getSelect()->where('gt.account_id = ?',(int)$this->getAccount()->getId());
+        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+        $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $collection->getSelect()->where('`main_table`.`status` != ?',
             (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
         $collection->getSelect()->where("`second_table`.`sku` is not null and `second_table`.`sku` != ''");

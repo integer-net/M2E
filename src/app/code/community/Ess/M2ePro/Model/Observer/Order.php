@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Observer_Order
@@ -25,16 +25,18 @@ class Ess_M2ePro_Model_Observer_Order
             /* @var $product Mage_Catalog_Model_Product */
             $product = $quoteItem->getProduct();
 
-            if (!($product instanceof Mage_Catalog_Model_Product)) {
+            if (!($product instanceof Mage_Catalog_Model_Product) ||
+                (int)$product->getId() <= 0) {
                 return;
             }
 
-            // Get listings, other listings where is product
-            $listingsArray = Mage::getResourceModel('M2ePro/Listing')->getListingsWhereIsProduct($product->getId());
+            // Get listings products, other listings where is product
+            $listingsProductsArray = Mage::getResourceModel('M2ePro/Listing_Product')
+                                                ->getItemsWhereIsProduct($product->getId());
             $otherListingsArray = Mage::getResourceModel('M2ePro/Listing_Other')
-                ->getItemsWhereIsProduct($product->getId());
+                                                ->getItemsWhereIsProduct($product->getId());
 
-            if (count($listingsArray) > 0 || count($otherListingsArray) > 0) {
+            if (count($listingsProductsArray) > 0 || count($otherListingsArray) > 0) {
 
                 $qtyOld = (int)Mage::getModel('cataloginventory/stock_item')->loadByProduct($product)->getQty();
 
@@ -60,14 +62,14 @@ class Ess_M2ePro_Model_Observer_Order
 
                 if ($rez !== false) {
 
-                      foreach ($listingsArray as $listingTemp) {
+                      foreach ($listingsProductsArray as $listingProductArray) {
 
                              $tempLog = Mage::getModel('M2ePro/Listing_Log');
-                             $tempLog->setComponentMode($listingTemp['component_mode']);
+                             $tempLog->setComponentMode($listingProductArray['component_mode']);
                              $tempLog->addProductMessage(
-                                $listingTemp['id'],
+                                $listingProductArray['object']->getListingId(),
                                 $product->getId(),
-                                NULL,
+                                $listingProductArray['id'],
                                 Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_QTY,
@@ -103,8 +105,9 @@ class Ess_M2ePro_Model_Observer_Order
                 // Save changes for stock Availability
                 //--------------------
                 $stockAvailabilityOld = (bool)Mage::getModel('cataloginventory/stock_item')
-                    ->loadByProduct($product)->getIsInStock();
-                $stockAvailabilityNew = !($qtyNew <= (int)Mage::getModel('cataloginventory/stock_item')->getMinQty());
+                                                    ->loadByProduct($product)->getIsInStock();
+                $stockAvailabilityNew = !($qtyNew <= (int)Mage::getModel('cataloginventory/stock_item')
+                                                    ->getMinQty());
 
                 $rez = Mage::getModel('M2ePro/ProductChange')
                                  ->updateAttribute( $product->getId(), 'stock_availability',
@@ -116,14 +119,14 @@ class Ess_M2ePro_Model_Observer_Order
                       $stockAvailabilityOld = $stockAvailabilityOld ? 'IN Stock' : 'OUT of Stock';
                       $stockAvailabilityNew = $stockAvailabilityNew ? 'IN Stock' : 'OUT of Stock';
 
-                      foreach ($listingsArray as $listingTemp) {
+                      foreach ($listingsProductsArray as $listingProductArray) {
 
                              $tempLog = Mage::getModel('M2ePro/Listing_Log');
-                             $tempLog->setComponentMode($listingTemp['component_mode']);
+                             $tempLog->setComponentMode($listingProductArray['component_mode']);
                              $tempLog->addProductMessage(
-                                $listingTemp['id'],
+                                $listingProductArray['object']->getListingId(),
                                 $product->getId(),
-                                NULL,
+                                $listingProductArray['id'],
                                 Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
@@ -165,7 +168,7 @@ class Ess_M2ePro_Model_Observer_Order
 
         } catch (Exception $exception) {
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return;
         }
     }

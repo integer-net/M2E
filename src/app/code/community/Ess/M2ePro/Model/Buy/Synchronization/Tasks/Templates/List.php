@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_List
@@ -10,8 +10,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_List
     const PERCENTS_START = 10;
     const PERCENTS_END = 20;
     const PERCENTS_INTERVAL = 10;
-
-    private $_synchronizations = array();
 
     /**
      * @var Ess_M2ePro_Model_Buy_Template_Synchronization_ProductInspector
@@ -23,8 +21,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_List
     public function __construct()
     {
         parent::__construct();
-
-        $this->_synchronizations = Mage::helper('M2ePro')->getGlobalValue('synchTemplatesArray');
 
         $tempParams = array('runner_actions'=>$this->_runnerActions);
         $this->_productInspector = Mage::getModel('M2ePro/Buy_Template_Synchronization_ProductInspector',
@@ -121,7 +117,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_List
 
             $this->_runnerActions->setProduct(
                 $listingProduct,
-                Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_LIST,
+                Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST,
                 array()
             );
         }
@@ -136,7 +132,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_List
 
         /** @var $collection Varien_Data_Collection_Db */
         $collection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product');
-        $collection->addFieldToFilter('tried_to_list',Ess_M2ePro_Model_Buy_Listing_Product::TRIED_TO_LIST_NO);
+        $collection->addFieldToFilter('tried_to_list',0);
 
         $collection->getSelect()->where(
             '`is_variation_product` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_NO.
@@ -154,12 +150,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_List
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
-                continue;
-            }
-
-            $listingProduct->setData('tried_to_list',Ess_M2ePro_Model_Buy_Listing_Product::TRIED_TO_LIST_YES)
-                           ->save();
+            $listingProduct->setData('tried_to_list',1)->save();
 
             if (!$this->_productInspector->isMeetListRequirements($listingProduct)) {
                 continue;
@@ -167,7 +158,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_List
 
             $this->_runnerActions->setProduct(
                 $listingProduct,
-                Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_LIST,
+                Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST,
                 array()
             );
         }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Model_Synchronization_Dispatcher_Abstract
@@ -12,8 +12,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Mode
     {
         // Check global mode
         //----------------------------------
-        if (!(bool)Mage::helper('M2ePro/Module')->getConfig()
-                                                ->getGroupValue('/amazon/synchronization/settings/','mode')
+        if (!(bool)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+                                                ->getGroupValue('/amazon/','mode')
         ) {
             return false;
         }
@@ -32,11 +32,11 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Mode
             //---------------------------
             $tempTask = $this->checkTask(Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS);
 
-            $synchGroup = '/synchronization/settings/defaults/';
-            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $synchGroup = '/defaults/';
+            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                       ->getGroupValue($synchGroup,'mode');
-            $amazonSynchGroup = '/amazon/synchronization/settings/defaults/';
-            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $amazonSynchGroup = '/amazon/defaults/';
+            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                      ->getGroupValue($amazonSynchGroup,
                                                                                      'mode');
             if ($tempTask && $tempGlobalMode && $tempLocalMode) {
@@ -55,12 +55,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Mode
             //---------------------------
             $tempTask = $this->checkTask(Ess_M2ePro_Model_Synchronization_Tasks::OTHER_LISTINGS);
 
-            $synchGroup = '/synchronization/settings/other_listings/';
-            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $synchGroup = '/other_listings/';
+            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                       ->getGroupValue($synchGroup,'mode');
 
-            $amazonSynchGroup = '/amazon/synchronization/settings/other_listings/';
-            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $amazonSynchGroup = '/amazon/other_listings/';
+            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                      ->getGroupValue($amazonSynchGroup,'mode');
             if ($tempTask && $tempGlobalMode && $tempLocalMode) {
                 $tempSynch = new Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings();
@@ -78,12 +78,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Mode
             //---------------------------
             $tempTask = $this->checkTask(Ess_M2ePro_Model_Synchronization_Tasks::ORDERS);
 
-            $synchGroup = '/synchronization/settings/orders/';
-            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $synchGroup = '/orders/';
+            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                       ->getGroupValue($synchGroup,
                                                                                       'mode');
-            $amazonSynchGroup = '/amazon/synchronization/settings/orders/';
-            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $amazonSynchGroup = '/amazon/orders/';
+            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                      ->getGroupValue($amazonSynchGroup,
                                                                                      'mode');
             if ($tempTask && $tempGlobalMode && $tempLocalMode) {
@@ -102,12 +102,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Mode
             //---------------------------
             $tempTask = $this->checkTask(Ess_M2ePro_Model_Synchronization_Tasks::TEMPLATES);
 
-            $synchGroup = '/synchronization/settings/templates/';
-            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $synchGroup = '/templates/';
+            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                       ->getGroupValue($synchGroup,'mode');
 
-            $amazonSynchGroup = '/amazon/synchronization/settings/templates/';
-            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $amazonSynchGroup = '/amazon/templates/';
+            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                      ->getGroupValue($amazonSynchGroup,'mode');
             if ($tempTask && $tempGlobalMode && $tempLocalMode) {
                 $tempSynch = new Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Templates();
@@ -125,12 +125,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Mode
             //---------------------------
             $tempTask = $this->checkTask(Ess_M2ePro_Model_Synchronization_Tasks::MARKETPLACES);
 
-            $synchGroup = '/synchronization/settings/marketplaces/';
-            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $synchGroup = '/marketplaces/';
+            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                       ->getGroupValue($synchGroup,'mode');
 
-            $amazonSynchGroup = '/amazon/synchronization/settings/marketplaces/';
-            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+            $amazonSynchGroup = '/amazon/marketplaces/';
+            $tempLocalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                      ->getGroupValue($amazonSynchGroup,'mode');
             if ($tempTask && $tempGlobalMode && $tempLocalMode) {
                 $tempSynch = new Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Marketplaces();
@@ -156,7 +156,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Dispatcher extends Ess_M2ePro_Mode
 
     private function beforeDispatch()
     {
-        Mage::helper('M2ePro')->getGlobalValue('synchLogs')->setComponentMode(Ess_M2ePro_Helper_Component_Amazon::NICK);
+        Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')->setComponentMode(Ess_M2ePro_Helper_Component_Amazon::NICK);
         return true;
     }
 

@@ -6,6 +6,12 @@
 
 class Ess_M2ePro_Block_Adminhtml_Listing_Product_Rule extends Mage_Adminhtml_Block_Widget_Form
 {
+    // #################################################
+
+    protected $_isShowHideProductsOption = false;
+
+    // #################################################
+
     public function __construct()
     {
         parent::__construct();
@@ -17,6 +23,21 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Product_Rule extends Mage_Adminhtml_Blo
 
         $this->setTemplate('M2ePro/listing/product/rule.phtml');
     }
+
+    // #################################################
+
+    public function setShowHideProductsOption($isShow = true)
+    {
+        $this->_isShowHideProductsOption = $isShow;
+        return $this;
+    }
+
+    public function isShowHideProductsOption()
+    {
+        return $this->_isShowHideProductsOption;
+    }
+
+    // #################################################
 
     protected function _prepareForm()
     {
@@ -34,7 +55,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Product_Rule extends Mage_Adminhtml_Blo
 
     protected function _beforeToHtml()
     {
-        $ruleModel = Mage::helper('M2ePro')->getGlobalValue('rule_model');
+        $ruleModel = Mage::helper('M2ePro/Data_Global')->getValue('rule_model');
         $ruleBlock = $this->getLayout()
                           ->createBlock('M2ePro/adminhtml_magento_product_rule')
                           ->setData(array('rule_model' => $ruleModel));
@@ -42,4 +63,6 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Product_Rule extends Mage_Adminhtml_Blo
 
         return parent::_beforeToHtml();
     }
+
+    // #################################################
 }

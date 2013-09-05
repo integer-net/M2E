@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Synchronization_Tasks
@@ -12,7 +12,9 @@ abstract class Ess_M2ePro_Model_Synchronization_Tasks
     const FEEDBACKS = 4;
     const MARKETPLACES = 5;
     const OTHER_LISTINGS = 6;
-    const MESSAGES = 7;
+    const POLICIES = 7;
+
+    //####################################
 
     /**
      * @var array
@@ -58,16 +60,16 @@ abstract class Ess_M2ePro_Model_Synchronization_Tasks
 
     public function __construct()
     {
-        $this->_tasks = Mage::helper('M2ePro')->getGlobalValue('synchTasks');
-        $this->_initiator = Mage::helper('M2ePro')->getGlobalValue('synchInitiator');
-        $this->_params = Mage::helper('M2ePro')->getGlobalValue('synchParams');
+        $this->_tasks = Mage::helper('M2ePro/Data_Global')->getValue('synchTasks');
+        $this->_initiator = Mage::helper('M2ePro/Data_Global')->getValue('synchInitiator');
+        $this->_params = Mage::helper('M2ePro/Data_Global')->getValue('synchParams');
 
-        $this->_synchId = Mage::helper('M2ePro')->getGlobalValue('synchId');
+        $this->_synchId = Mage::helper('M2ePro/Data_Global')->getValue('synchId');
 
-        $this->_profiler = Mage::helper('M2ePro')->getGlobalValue('synchProfiler');
-        $this->_runs = Mage::helper('M2ePro')->getGlobalValue('synchRun');
-        $this->_logs = Mage::helper('M2ePro')->getGlobalValue('synchLogs');
-        $this->_lockItem = Mage::helper('M2ePro')->getGlobalValue('synchLockItem');
+        $this->_profiler = Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler');
+        $this->_runs = Mage::helper('M2ePro/Data_Global')->getValue('synchRun');
+        $this->_logs = Mage::helper('M2ePro/Data_Global')->getValue('synchLogs');
+        $this->_lockItem = Mage::helper('M2ePro/Data_Global')->getValue('synchLockItem');
     }
 
     //####################################

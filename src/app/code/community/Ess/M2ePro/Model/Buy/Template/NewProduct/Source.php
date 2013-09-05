@@ -73,9 +73,8 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
                     break;
 
                 case Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute::ATTRIBUTE_MODE_CUSTOM_ATTRIBUTE:
-                    $value = $this->listingProduct
-                            ->getActualMagentoProduct()
-                            ->getAttributeValue($src['custom_attribute']);
+                    $value = $this->listingProduct->getActualMagentoProduct()
+                                                  ->getAttributeValue($src['custom_attribute']);
 
                     $value = str_replace(',','^',$value);
                     break;
@@ -150,11 +149,13 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
         $src = $this->coreTemplate->getMfgSource();
 
         if ($src['template'] != '') {
-            $mfgName = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+            $mfgName = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                 $src['template'],
-                $this->listingProduct->getActualMagentoProduct()->getProduct()
+                $this->listingProduct->getActualMagentoProduct()
             );
         }
+
+        is_string($mfgName) && trim($mfgName);
 
         return $mfgName;
     }
@@ -196,9 +197,9 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
                 break;
 
             case Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_CUSTOM_TEMPLATE:
-                $title = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+                $title = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                     $src['template'],
-                    $this->listingProduct->getActualMagentoProduct()->getProduct()
+                    $this->listingProduct->getActualMagentoProduct()
                 );
                 break;
 
@@ -206,6 +207,8 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
                 $title = $this->listingProduct->getActualMagentoProduct()->getName();
                 break;
         }
+
+        is_string($title) && trim($title);
 
         return $title;
     }
@@ -228,21 +231,21 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
                 break;
 
             case Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_CUSTOM_TEMPLATE:
-                $description = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+                $description = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                     $src['template'],
-                    $this->listingProduct->getActualMagentoProduct()->getProduct()
+                    $this->listingProduct->getActualMagentoProduct()
                 );
                 break;
 
             default:
-                return;
+                $description = '';
                 break;
         }
 
         $description = str_replace(array('<![CDATA[', ']]>'), '', $description);
         $description = preg_replace('/[^(\x20-\x7F)]*/','', $description);
 
-        return strip_tags($description);
+        return trim(strip_tags($description));
     }
 
     public function getMainImage()
@@ -258,7 +261,7 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
             $imageLink = $this->listingProduct->getActualMagentoProduct()->getImageLink($src['attribute']);
         }
 
-        return $imageLink;
+        return trim($imageLink);
     }
 
     public function getAdditionalImages()
@@ -268,7 +271,7 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
         $src = $this->coreTemplate->getAdditionalImageSource();
 
         if ($this->coreTemplate->isAdditionalImageNone()) {
-            return;
+            return NULL;
         }
 
         if ($this->coreTemplate->isAdditionalImageProduct()) {
@@ -296,7 +299,7 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
 
         $galleryImages = array_unique($galleryImages);
         if (count($galleryImages) <= 0) {
-            return;
+            return NULL;
         }
 
         $galleryImages = array_slice($galleryImages,0,$limitImages);
@@ -306,23 +309,23 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
 
     public function getFeatures()
     {
-        $src = $this->coreTemplate->getFeaturesSource();
+        $features = NULL;
 
-        if ($this->coreTemplate->isFeaturesNone()) {
-            return;
-        } else {
+        if ($this->coreTemplate->isFeaturesCustomTemplate()) {
+
+            $src = $this->coreTemplate->getFeaturesSource();
             foreach ($src['template'] as $feature) {
-                $features[] = strip_tags(
-                    Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+                $features[] = trim(strip_tags(
+                    Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                         $feature,
-                        $this->listingProduct->getActualMagentoProduct()->getProduct()
+                        $this->listingProduct->getActualMagentoProduct()
                     )
-                );
+                ));
             }
-        }
 
-        $features = implode('|',$features);
-        $features = preg_replace('/[^(\x20-\x7F)]*/','', $features);
+            $features = implode('|',$features);
+            $features = preg_replace('/[^(\x20-\x7F)]*/','', $features);
+        }
 
         return $features;
     }
@@ -332,7 +335,7 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
         $src = $this->coreTemplate->getKeywordsSource();
 
         if ($this->coreTemplate->isKeywordsNone()) {
-            return;
+            return NULL;
         } elseif ($this->coreTemplate->isKeywordsCustomValue()) {
             $keywords = $src['custom_value'];
         } elseif ($this->coreTemplate->isKeywordsCustomAttribute()) {

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Template_Synchronization_RunnerActions
@@ -51,30 +51,30 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization_RunnerActions
 
             do {
 
-                if ($action == Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_STOP) {
+                if ($action == Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_STOP) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_STOP) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_STOP) {
                     return false;
                 }
 
-                if ($action == Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_LIST) {
+                if ($action == Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_LIST) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST) {
                     return false;
                 }
 
-                if ($action == Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_RELIST) {
+                if ($action == Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_RELIST) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_RELIST) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_RELIST) {
                     return false;
                 }
 
@@ -190,7 +190,7 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization_RunnerActions
         $results = array();
 
         if ($totalCount == 0) {
-            $results[] = Ess_M2ePro_Model_Buy_Connector_Product_Requester::STATUS_SUCCESS;
+            $results[] = Ess_M2ePro_Model_Connector_Server_Buy_Product_Requester::STATUS_SUCCESS;
         } else {
 
             // Execute Buy actions
@@ -218,7 +218,7 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization_RunnerActions
                         // Set status for progress bar
                         //-----------------------------
                         if (!is_null($lockItem)) {
-                            $actionTitle= Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::getActionTitle($action);
+                            $actionTitle= Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::getActionTitle($action);
                             $statusProductsIds = array();
                             foreach ($itemsForStep as $item) {
                                 $statusProductsIds[] = $item->getData('product_id');
@@ -234,7 +234,7 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization_RunnerActions
                         }
                         //-----------------------------
 
-                        $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getProductDispatcher();
+                        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Product_Dispatcher');
                         $tempResult = $dispatcherObject->process($action, $itemsForStep, $combination['params']);
                         $results = array_merge($results,array($tempResult));
 
@@ -260,7 +260,7 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization_RunnerActions
             $lockItem->activate();
         }
 
-        return Ess_M2ePro_Model_Buy_Connector_Product_Requester::getMainStatus($results);
+        return Ess_M2ePro_Model_Connector_Server_Buy_Product_Requester::getMainStatus($results);
     }
 
     //-----------------------------------------
@@ -268,10 +268,10 @@ class Ess_M2ePro_Model_Buy_Template_Synchronization_RunnerActions
     private function makeActionsForExecute()
     {
         $actions = array(
-            Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_STOP => array(),
-            Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_RELIST => array(),
-            Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_REVISE => array(),
-            Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_LIST => array()
+            Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_STOP => array(),
+            Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_RELIST => array(),
+            Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_REVISE => array(),
+            Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST => array()
         );
 
         foreach ($this->_actionsProducts as $item) {

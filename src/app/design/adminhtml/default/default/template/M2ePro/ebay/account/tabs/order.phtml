@@ -1,6 +1,6 @@
 <div id="block_notice_ebay_accounts_orders" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Orders'); ?>">
     <?php
-        $menuLabel = Mage::helper('M2ePro/Module')->getMenuRootNodeLabel();
+        $menuLabel = Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
         echo Mage::helper('M2ePro')->__('
 This tab contains settings of eBay Orders, eBay Customers import; Magento Orders and Products creation.<br/>
 If you set Import eBay Orders to <i>Yes</i>, a new eBay order will be imported to the system and can be found in %1$s > Sales > eBay Orders.<br/><br/>
@@ -16,7 +16,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
 </div>
 
 <?php
-    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+    $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
     $formData['magento_orders_settings'] = !empty($formData['magento_orders_settings']) ? json_decode($formData['magento_orders_settings'], true) : array();
 
     $defaults = array(
@@ -92,12 +92,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
     M2ePro.formData.magento_orders_customer_new_group_id = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['customer']['group_id']); ?>';
 <!--    M2ePro.formData.magento_orders_customer_new_newsletter_mode = '--><?php //echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['customer']['subscription_mode']); ?><!--';-->
 
-    M2ePro.text.wrong_customer_id_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('No Customer entry is found for specified ID.')); ?>';
-    M2ePro.url.checkCustomerId = '<?php echo $this->getUrl('*/*/checkCustomerId'); ?>';
-
     Event.observe(window, 'load', function() {
-        EbayAccountHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Account'); ?>');
-
         setTimeout(function() {
             $('orders_mode').observe('change', EbayAccountHandlerObj.ordersModeChange);
 
@@ -138,7 +133,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::ORDERS_MODE_YES; ?>" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Ebay_Account::ORDERS_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Allows importing orders from eBay to M2E Pro.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose to import the orders placed on eBay.'); ?></span>
                         </p>
 
                     </td>
@@ -179,7 +174,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
 
                 <tr id="magento_orders_listings_store_mode_container" <?php if($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO) echo 'style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="magento_orders_listings_store_mode"><?php echo Mage::helper('M2ePro')->__('Store View Source'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_listings_store_mode"><?php echo Mage::helper('M2ePro')->__('Magento Store View Source'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="magento_orders_listings_store_mode" name="magento_orders_settings[listing][store_mode]" class="M2ePro-required-when-visible">
@@ -187,14 +182,18 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM; ?>" <?php if ($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Choose Store View Manually'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('If Store View has to be automatically taken from the listing or manually chosen from available Store View values.'); ?></span>
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Use the store view from your M2E Listing, or choose store view manually.'
+                                ); ?>
+                            </span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="magento_orders_listings_store_id_container" <?php if($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT) echo 'style="display: none;"'; ?>>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Store View'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Magento Store View'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <?php echo $this->getChildHtml('magento_orders_listings_store_id'); ?>
@@ -239,7 +238,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
 
                 <tr id="magento_orders_listings_other_store_id_container" <?php if($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) echo 'style="display: none;"'; ?>>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Store View'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Magento Store View'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <?php echo $this->getChildHtml('magento_orders_listings_other_store_id'); ?>
@@ -300,15 +299,15 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
 
             <div id="block_notice_ebay_accounts_orders_customers" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Customers'); ?>">
                 <?php echo Mage::helper('M2ePro')->__('There are several ways to specify a customer for which Magento Orders will be created:
-                <ul class="list">
-                    <li><b>Guest Account</b> - the system does not require a customer account to be created. Default Guest Account will be defined as a customer. <br/>
-                    <b>Note:</b> The Guest Checkout option must be enabled in Magento. (<i>Yes</i> must be chosen in the Allow Guest Checkout option in Magento > System > Configuration > Sales > Checkout tab). </li>
-                    <li><b>Predefined Customer</b> - the system uses one predefined customer for all eBay orders related to this account. You will be required
-                    to provide an ID of the existing Customer, which you can find in Magento > Customers > Manage Customers table.</li>
-                    <li><b>Create New</b> - a new customer will be created in Magento, using eBay customer data of eBay Order.
-                    <br/><b>Note:</b> A unique customer identifier is his e-mail address. If the one already exists among Magento customers e-mails,
-                    the system uses this customer as owner of order and links order to him. A new customer will not be created.</li>
-                </ul>'); ?>
+                    <br/>
+                    <br/><b>Guest Account</b> - the system does not require the creation of a customer account. Default Guest Account defined as a customer.
+                    To use this option, you must enable the Guest Checkout option in Magento.
+                    <br/><b>Predefined Customer</b> - the system uses one predefined customer for all eBay orders related to this account.
+                    You will be required to provide an ID of the existing customer.
+                    <br/><b>Create New</b> - a new customer created in Magento, using eBay customer data from the eBay Order.
+                    <br/>
+                    <br/><b>Note:</b> An example of a unique customer identifier is an email address.
+                    If one already exists in Magento, the system will link orders to it.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -406,12 +405,11 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
     <div class="fieldset">
         <div class="hor-scroll">
             <div id="block_notice_ebay_accounts_magento_orders_rules" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Order Creation Rules'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('In this block you can set eBay Orders settings at which Magento Orders have to be created.<br/><br/>
-                Use the <b>Reserve QTY</b> option to prevent the item being sold, before Magento Order created (as the Product Stock QTY only reduces after Magento Order creation). It removes items from Magento Stock at once eBay Order comes from eBay.
-                Reserve qty will be used when Magento Order is created or released when the term of qty reservation has expired.
-                <br/><br/>
-                <b>Note:</b> If Magento Order is created at Incomplete checkout (<i>Immediately</i> is chosen), Payment, shipping methods and shipping price may be incorrect or not specified.
-                '); ?>
+                <?php echo Mage::helper('M2ePro')->__('Set eBay Orders settings when Magento Orders have to be created.
+                <br/>
+                <br/>The Reserve Quantity option can prevent the item selling before the Magento Order is created.
+                This is because the Product Stock Quantity is reducedafter Magento Order creation.
+                It removes items from Magento Stock as soon as the order is receivedfrom eBay.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -420,7 +418,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="label">
                         <label for="magento_orders_creation_mode"><?php echo Mage::helper('M2ePro')->__('Create Magento Order When') ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value">
+                    <td class="value" style="width: auto;">
                         <select name="magento_orders_settings[creation][mode]" id="magento_orders_creation_mode">
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_IMMEDIATELY ?>" <?php if ($formData['magento_orders_settings']['creation']['mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_IMMEDIATELY): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Immediately') ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_CHECKOUT ?>" <?php if ($formData['magento_orders_settings']['creation']['mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_CHECKOUT): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Checkout Is Completed') ?></option>
@@ -435,7 +433,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="label">
                         <label for="magento_orders_creation_reservation_days"><?php echo Mage::helper('M2ePro')->__('Automatic Cancellation') ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value">
+                    <td class="value" style="width: auto;">
                         <select name="magento_orders_settings[creation][reservation_days]" id="magento_orders_creation_reservation_days">
                             <option value="0" <?php if ($formData['magento_orders_settings']['creation']['reservation_days'] == 0): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Never') ?></option>
                             <?php for ($day = 7; $day <= 10; $day++): ?>
@@ -453,7 +451,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="label">
                         <label for="magento_orders_qty_reservation_days"><?php echo Mage::helper('M2ePro')->__('Reserve QTY') ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value">
+                    <td class="value" style="width: auto;">
                         <select name="magento_orders_settings[qty_reservation][days]" id="magento_orders_qty_reservation_days">
                             <option value="0" <?php if ($formData['magento_orders_settings']['qty_reservation']['days'] == 0): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Never') ?></option>
                             <?php for ($day = 1; $day <= 14; $day++): ?>
@@ -466,8 +464,8 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                                 </option>
                             <?php endfor; ?>
                         </select>
-                            <p class="note">
-                                <?php echo Mage::helper('M2ePro')->__('For how many days reserve qty has to be kept while Magento Order is not created.') ?>
+                        <p class="note">
+                            <?php echo Mage::helper('M2ePro')->__('For how many days reserve qty has to be kept while Magento Order is not created.') ?>
                         </p>
                     </td>
                 </tr>
@@ -487,15 +485,14 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
     <div class="fieldset">
         <div class="hor-scroll">
             <div id="block_notice_ebay_accounts_magento_orders_tax" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Order Tax Settings'); ?>">
-            <?php echo Mage::helper('M2ePro')->__('This section allows you to choose tax settings for Magento Order:<br/>
-<ul class="list">
-    <li><b>eBay</b> - Magento Order(s) uses tax settings from eBay Listing(s).</li>
-    <li><b>Magento</b> - Magento Order(s) uses Magento tax settings.</li>
-    <li><b>eBay & Magento</b> - if there are tax settings in eBay Order, they are used in Magento Order(s), otherwise, Magento tax settings are used.</li>
-    <li><b>None</b> - eBay and Magento tax settings are ignored.</li>
-</ul>');
-            ?>
-        </div>
+            <?php echo Mage::helper('M2ePro')->__(
+                'Choose the tax settings for your Magento Order:
+                <br/>
+                <br/><b>eBay</b> - Magento Orders use tax settings from the eBay Listing.
+                <br/><b>Magento</b> - Magento Orders use Magento tax settings.
+                <br/><b>eBay & Magento</b> - Magento Orders use tax settings from the eBay Listing. If there are no tax settings set in eBay, Magento tax settings are used.
+                <br/><b>None</b> - No tax settings are set.'); ?>
+            </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
 
@@ -533,15 +530,11 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
         <div class="hor-scroll">
 
             <div id="block_notice_ebay_accounts_magento_orders_statuses" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Order Status Mapping'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('In this block you can configure mapping between eBay Order state and Magento Order statuses.
-                Depending on the state of eBay Order you can either manually determine certain statuses for Magento Order and enable automatic Shipment and Invoice
-                creation by selecting appropriate check-boxes, or use predefined default settings. (i.e. eBay: Order is Paid -> Magento Order is Processing).<br/>
-                <br/><b>Note:</b> The Order activity in Magento is automatically reflected in eBay Order:
-                <ul class="list">
-                    <li><b>Invoice is created</b> - the Payment status becomes Paid on eBay.</li>
-                    <li><b>Shipment is created</b> - the Shipment status becomes Shipped on eBay. If the Tracking Number(s) is specified, it also
-                    appears in eBay Order.</li>
-                </ul>'); ?>
+                <?php echo Mage::helper('M2ePro')->__(
+                'Configure mapping between your eBay Order state and Magento Order statuses.
+                <br/><b>Note: </b> The Order activity in Magento is automatically reflected in your eBay Order:
+                <br/>Choose to create automatic invoices and automatic notify the buyer when the item ships.'
+                ); ?>
             </div>
             <table class="form-list" cellspacing="0" cellpadding="0">
 
@@ -554,9 +547,6 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT; ?>" <?php if ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT) echo "selected='selected'"; ?>><?php echo Mage::helper('M2ePro')->__('Default Order Statuses'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_CUSTOM; ?>" <?php if ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_CUSTOM) echo "selected='selected'"; ?>><?php echo Mage::helper('M2ePro')->__('Custom Order Statuses'); ?></option>
                         </select>
-                        <p class="note">
-                            <span></span>
-                        </p>
                     </td>
                 </tr>
 
@@ -582,9 +572,6 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                                 <option value="<?php echo $statusKey; ?>" <?php if ($formData['magento_orders_settings']['status_mapping']['new'] == $statusKey) echo 'selected="selected"'; ?>><?php echo $statusValue; ?></option>
                             <?php } ?>
                         </select>
-                        <p class="note">
-                            <span></span>
-                        </p>
                     </td>
                 </tr>
 

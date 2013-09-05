@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks_Response extends Ess_M2ePro_Model_Ebay_Synchronization_Tasks
@@ -73,8 +73,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks_Response extends Ess
         /** @var $feedbacks Ess_M2ePro_Model_Ebay_Feedback[] */
         $feedbacks = Mage::getModel('M2ePro/Ebay_Feedback')->getLastUnanswered(5);
 
-        $responseInterval = (int)Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/ebay/synchronization/settings/feedbacks/response/', 'attempt_interval');
+        $responseInterval = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/ebay/feedbacks/response/', 'attempt_interval');
 
         $tempFeedbacks = array();
         foreach ($feedbacks as $feedback) {

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_Model_Ebay_Synchronization_Tasks
@@ -15,7 +15,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_M
     public function process()
     {
         /** @var $config Ess_M2ePro_Model_Config_Module */
-        $config = Mage::helper('M2ePro/Module')->getConfig();
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
 
         // PREPARE SYNCH
         //---------------------------
@@ -27,7 +27,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_M
         if ($this->canRunTask('receive')) {
             $currentGmtDate = Mage::helper('M2ePro')->getCurrentGmtDate();
             $config->setGroupValue(
-                '/ebay/synchronization/settings/feedbacks/receive/', 'last_access', $currentGmtDate
+                '/ebay/feedbacks/receive/', 'last_access', $currentGmtDate
             );
 
             $tempSynch = new Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks_Receive();
@@ -37,7 +37,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_M
         if ($this->canRunTask('response')) {
             $currentGmtDate = Mage::helper('M2ePro')->getCurrentGmtDate();
             $config->setGroupValue(
-                '/ebay/synchronization/settings/feedbacks/response/', 'last_access', $currentGmtDate
+                '/ebay/feedbacks/response/', 'last_access', $currentGmtDate
             );
 
             $tempSynch = new Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks_Response();
@@ -65,15 +65,15 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_M
         }
 
         $this->_profiler->addEol();
-        $this->_profiler->addTitle($componentName.'Feedbacks Synchronization');
+        $this->_profiler->addTitle($componentName.'Feedback Synchronization');
         $this->_profiler->addTitle('--------------------------');
         $this->_profiler->addTimePoint(__CLASS__,'Total time');
         $this->_profiler->increaseLeftPadding(5);
 
-        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($componentName.'Feedbacks Synchronization'));
+        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($componentName.'Feedback Synchronization'));
         $this->_lockItem->setPercents(self::PERCENTS_START);
         $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Feedbacks Synchronization" is started. Please wait...')
+            Mage::helper('M2ePro')->__('Task "Feedback Synchronization" is started. Please wait...')
         );
     }
 
@@ -81,7 +81,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_M
     {
         $this->_lockItem->setPercents(self::PERCENTS_END);
         $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Feedbacks Synchronization" is finished. Please wait...')
+            Mage::helper('M2ePro')->__('Task "Feedback Synchronization" is finished. Please wait...')
         );
 
         $this->_profiler->decreaseLeftPadding(5);
@@ -98,8 +98,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_M
     private function canRunTask($task)
     {
         /** @var $config Ess_M2ePro_Model_Config_Module */
-        $config = Mage::helper('M2ePro/Module')->getConfig();
-        $mode = (bool)$config->getGroupValue('/ebay/synchronization/settings/feedbacks/'.$task.'/', 'mode');
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+        $mode = (bool)$config->getGroupValue('/ebay/feedbacks/'.$task.'/', 'mode');
 
         if (!$mode) {
             return false;
@@ -111,8 +111,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks extends Ess_M2ePro_M
         }
 
         $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-        $interval = $config->getGroupValue('/ebay/synchronization/settings/feedbacks/'.$task.'/', 'interval');
-        $lastAccess = $config->getGroupValue('/ebay/synchronization/settings/feedbacks/'.$task.'/', 'last_access');
+        $interval = $config->getGroupValue('/ebay/feedbacks/'.$task.'/', 'interval');
+        $lastAccess = $config->getGroupValue('/ebay/feedbacks/'.$task.'/', 'last_access');
 
         if (is_null($lastAccess) || $currentTimeStamp > strtotime($lastAccess) + $interval) {
            return true;

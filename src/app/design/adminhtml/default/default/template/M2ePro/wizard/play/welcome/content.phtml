@@ -2,19 +2,12 @@
 
 <script type="text/javascript">
 
-    if (typeof M2eProPlayWelcomeTutorial == 'undefined') {
-        M2eProPlayWelcomeTutorial = {};
-        M2eProPlayWelcomeTutorial.url = {};
-        M2eProPlayWelcomeTutorial.formData = {};
-        M2eProPlayWelcomeTutorial.text = {};
-    }
-
 //    todo
 //    var isTutorialFinished = false;
     var isTutorialFinished = true;
 
     M2eProPlayWelcomeTutorialHandlerObj = new VideoTutorialHandler(
-        M2eProPlayWelcomeTutorial,'play_welcome_video_tutorial_pop_up',
+        'play_welcome_video_tutorial_pop_up',
         '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('M2E Pro - Play.com/Magento Integration : Configuration Wizard')); ?>',
         function() {}
     );

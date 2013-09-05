@@ -1,20 +1,17 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller_Adminhtml_MainController
+class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
 {
     //#############################################
 
     protected function _initAction()
     {
         $this->loadLayout()
-             ->_setActiveMenu('m2epro/communication')
-             ->_title(Mage::helper('M2ePro')->__('M2E Pro'))
-             ->_title(Mage::helper('M2ePro')->__('Communication'))
-             ->_title(Mage::helper('M2ePro')->__('Feedbacks'));
+             ->_title(Mage::helper('M2ePro')->__('Feedback'));
 
         $this->getLayout()->getBlock('head')
              ->addJs('M2ePro/Ebay/FeedbackHandler.js');
@@ -24,12 +21,16 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro/communication/feedback');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_ebay/accounts');
     }
     //#############################################
 
     public function indexAction()
     {
+        if (is_null($this->getRequest()->getParam('account'))) {
+            $this->_redirect('*/adminhtml_ebay_account/index');
+        }
+
         $this->_initAction();
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_feedback'));
         $this->renderLayout();
@@ -76,7 +77,7 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
 
         if (is_null($feedbackId)) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Feedback is not defined.'));
-            return $this->_redirect('*/adminhtml_order/index');
+            return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 
         /** @var $feedback Ess_M2ePro_Model_Ebay_Feedback */
@@ -85,7 +86,7 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
 
         if (is_null($order)) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Requested order was not found.'));
-            return $this->_redirect('*/adminhtml_order/index');
+            return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 
         $this->_redirect('*/adminhtml_ebay_order/view', array('id' => $order->getId()));
@@ -112,8 +113,8 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
         if (!is_null($listingProduct)) {
             $itemUrl = Mage::helper('M2ePro/Component_Ebay')->getItemUrl(
                 $itemId,
-                $listingProduct->getGeneralTemplate()->getAccount()->getChildObject()->getMode(),
-                $listingProduct->getGeneralTemplate()->getMarketplaceId()
+                $listingProduct->getListing()->getAccount()->getChildObject()->getMode(),
+                $listingProduct->getListing()->getMarketplaceId()
             );
 
             return $this->_redirectUrl($itemUrl);

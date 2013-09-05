@@ -1,0 +1,42 @@
+<table class="form-list" cellspacing="0" cellpadding="0">
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('APC'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php if (Mage::helper('M2ePro/Client_Cache')->isApcAvailable()) { ?>
+                <span>Installed</span><?php if (Mage::helper('M2ePro/Client_Cache')->isApcEnabled()) : echo '<span class="red"> <b>(Enabled)</b></span>'; endif; ?>
+            <?php } else { ?>
+                <span>Not Installed</span>
+            <?php } ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Memcached'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php if (Mage::helper('M2ePro/Client_Cache')->isMemchachedAvailable()) { ?>
+                <span>Installed</span><?php if (Mage::helper('M2ePro/Client_Cache')->isMemchachedEnabled()) : echo '<span class="red"> <b>(Enabled)</b></span>'; endif; ?>
+            <?php } else { ?>
+                <span>Not Installed</span>
+            <?php } ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Redis'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php if (Mage::helper('M2ePro/Client_Cache')->isRedisAvailable()) { ?>
+                <span>Installed</span><?php if (Mage::helper('M2ePro/Client_Cache')->isRedisEnabled()) : echo '<span class="red"> <b>(Enabled)</b></span>'; endif; ?>
+            <?php } else { ?>
+                <span>Not Installed</span>
+            <?php } ?>
+        </td>
+    </tr>
+
+</table>

@@ -1,14 +1,14 @@
-<div id="block_notice_ebay_accounts_feedbacks" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Feedbacks'); ?>">
+<div id="block_notice_ebay_accounts_feedbacks" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Feedback'); ?>">
     <?php
-        $menuLabel = Mage::helper('M2ePro/Module')->getMenuRootNodeLabel();
+        $menuLabel = Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
         echo Mage::helper('M2ePro')->__('
-This tab contains settings of receiving, saving buyers\' feedbacks and sending seller\'s Auto Responses to received feedbacks.<br/><br/>
-<b>Note:</b> To allow receiving feedbacks from eBay, Feedbacks Synchronization should be enabled in %s > Configuration > Synchronization.', $menuLabel);
+This tab contains settings of receiving, saving buyers\' feedback and sending seller\'s Auto Responses to received feedback.<br/><br/>
+<b>Note:</b> To allow receiving feedback from eBay, Feedback Synchronization should be enabled in %s > Configuration > Synchronization.', $menuLabel);
     ?>
 </div>
 
 <?php
-    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+    $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
     $defaults = array(
         'feedbacks_receive' => Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_NO,
         'feedbacks_auto_response' => Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_NONE,
@@ -23,14 +23,8 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
 
     // Data for current tab
     //-----------------------------
-    M2ePro.url.feedbackTemplateEdit = '<?php echo $this->getUrl('*/*/feedbackTemplateEdit'); ?>';
-    M2ePro.url.feedbackTemplateDelete = '<?php echo $this->getUrl('*/*/feedbackTemplateDelete'); ?>';
-    M2ePro.url.feedbackTemplateCheck = '<?php echo $this->getUrl('*/*/feedbackTemplateCheck'); ?>';
-
     M2ePro.formData.feedbacks_receive = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['feedbacks_receive']); ?>';
     M2ePro.formData.feedbacks_auto_response = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['feedbacks_auto_response']); ?>';
-
-    M2ePro.text.no_feedback_template_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('You should create at least one response template.')); ?>';
 
     Event.observe(window, 'load', function() {
         setTimeout(function() {
@@ -45,7 +39,7 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
 <div class="entry-edit" id="magento_block_ebay_accounts_feedbacks_receive">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Buyers Feedbacks'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Buyers Feedback'); ?></h4>
     </div>
 
     <div class="fieldset">
@@ -55,7 +49,7 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
 
                 <tr>
                     <td class="label">
-                        <label for="feedbacks_receive"><?php echo Mage::helper('M2ePro')->__('Import Feedbacks'); ?>: <span class="required">*</span></label>
+                        <label for="feedbacks_receive"><?php echo Mage::helper('M2ePro')->__('Import Feedback'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="feedbacks_receive" name="feedbacks_receive" class="required-entry">
@@ -63,7 +57,7 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_YES; ?>" <?php if ($formData['feedbacks_receive'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__("Allows importing customers' feedbacks from eBay."); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose to import feedback from eBay buyers into Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -78,18 +72,16 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
 <div class="entry-edit" id="magento_block_ebay_accounts_feedbacks_response" <?php if($formData['feedbacks_receive'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_NO): ?>style="display: none;"<?php endif; ?>>
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Seller Responses'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Seller Response'); ?></h4>
     </div>
 
     <div class="fieldset">
         <div class="hor-scroll">
 
             <div id="block_notice_ebay_accounts_feedbacks_auto" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Auto Response'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('The auto response to buyers\' feedbacks can operate in two modes:
-                <ul class="list">
-                    <li><b>Cycle Mode</b> - the system chooses existing response template according to the order and sends it out.</li>
-                    <li><b>Random Mode</b> - the system randomly chooses existing response template and sends it out.</li>
-                </ul>'); ?>
+                <?php echo Mage::helper('M2ePro')->__('There are two ways to set up your auto response to buyer feedback:
+                    <br/><b>Cycle Mode</b> - the system chooses an existing response template according to the sales order and sends it to the buyer.
+                    <br/><b>Random Mode</b> - the system randomly chooses an existing response template and sends it out.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -105,7 +97,7 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_RANDOM; ?>" <?php if ($formData['feedbacks_auto_response'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_RANDOM) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Random Mode'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose Disabled if you do not want to send automatic responses.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose between Cycle Mode, Random Mode, or to disable it completely.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -120,7 +112,7 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES; ?>" <?php if ($formData['feedbacks_auto_response_only_positive'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Positive'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Which feedbacks auto responses should be sent to: all or positive only.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Which feedback auto responses should be sent to: all or positive only.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -155,6 +147,12 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
         <div class="fieldset">
             <div class="hor-scroll">
 
+                <div id="block_notice_ebay_template_description_description" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Description'); ?>">
+                    <?php echo Mage::helper('M2ePro')->__(
+                        'Should be between 2 and 80 characters long.'
+                    ); ?>
+                </div>
+
                 <table class="form-list" cellspacing="0" cellpadding="0">
 
                     <tr>
@@ -164,9 +162,6 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
                         <td class="value" style="width: 100%;">
                             <input id="feedbacks_templates_id" name="feedbacks_templates_id" value="" type="hidden" />
                             <textarea id="feedbacks_templates_body" name="feedbacks_templates_body" style="height: 5em; width: 99%;" class="textarea"></textarea>
-                            <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Should be between 2 and 80 characters long.'); ?></span>
-                            </p>
                             <div id="feedbacks_templates_body_validate" class="validation-advice" style="display: none;"><?php echo Mage::helper('M2ePro')->__('Please enter correct number of characters.'); ?></div>
                         </td>
                     </tr>
@@ -186,7 +181,7 @@ This tab contains settings of receiving, saving buyers\' feedbacks and sending s
                             </div>
 
                             <div id="block_accounts_feedbacks_form_template_button_cancel" style="float: left;">
-                                <?php echo $this->getChildHtml('cancel_form'); ?>
+                                <a href="javascript:" onclick="EbayAccountHandlerObj.feedbacksCancelForm();"><?php echo Mage::helper('M2ePro')->__('Cancel'); ?></a>
                                 <div style="float: right; width: 10px;">&nbsp;</div>
                             </div>
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_ExternalTransaction extends Mage_Adminhtml_Block_Widget_Grid
@@ -24,7 +24,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_ExternalTransaction extends Mag
         //------------------------------
 
         /** @var $order Ess_M2ePro_Model_Order */
-        $this->order = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        $this->order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
     }
 
     protected function _prepareCollection()

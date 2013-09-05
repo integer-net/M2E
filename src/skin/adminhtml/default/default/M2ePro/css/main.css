@@ -298,3 +298,57 @@ a.wizard-close:hover {
 }
 
 /* ================================================ */
+
+/* Tool tip */
+/* ================================================ */
+.tool-tip-image {
+    cursor: help;
+}
+
+.notice-tool-tip-icon {
+    cursor: help;
+    background: url("../../images/fam_help.gif") no-repeat scroll 0 50% transparent;
+    padding-left: 20px;
+    margin-left: 5px;
+}
+
+.tool-tip-message {
+    position: absolute;
+    background: none repeat scroll 0 0 #D7E5EF;
+    border: 1px solid #2BB0D7;
+    border-radius: 3px;
+    padding: 0.8em 1em;
+    display: block;
+    margin-top: -5px;
+    margin-right: 20px;
+    cursor: default;
+    z-index: 9999;
+    word-wrap: normal;
+    font-weight: normal;
+}
+
+.tip-right {
+    margin-left: 17px;
+    margin-right: 15px;
+    padding-left: 10px;
+}
+
+.tip-left {
+    margin-right: 17px;
+    margin-left: 15px;
+}
+
+.tool-tip-message img {
+    border: 0;
+    margin-top: -17px;
+    width: 24px;
+    height: 24px;
+    margin-right: -25px;
+    float: right;
+}
+
+.tip-left img {
+    margin-left: -25px;
+    float: left;
+}
+/* ================================================ */

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_Feedback_Grid extends Mage_Adminhtml_Block_Widget_Grid
@@ -10,7 +10,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_Feedback_Grid extends Ma
     {
         parent::__construct();
 
-        $accountData = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        $accountData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         // Initialization block
         //------------------------------
@@ -30,7 +30,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_Feedback_Grid extends Ma
 
     protected function _prepareCollection()
     {
-        $accountData = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        $accountData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         // Get collection of synchronizations
         $collection = Mage::getModel('M2ePro/Ebay_Feedback_Template')
@@ -62,8 +62,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_Feedback_Grid extends Ma
             //'width'     => '200px',
             'type'      => 'text',
             'index'     => 'body',
-            'filter_index' => 'main_table.body',
-            'frame_callback' => array($this, 'callbackColumnTitle')
+            'escape'    => true,
+            'filter_index' => 'main_table.body'
         ));
 
         $this->addColumn('ft_create_date', array(
@@ -122,13 +122,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_Feedback_Grid extends Ma
         //--------------------------------
 
         return parent::_prepareMassaction();
-    }
-
-    // ####################################
-
-    public function callbackColumnTitle($value, $row, $column, $isExport)
-    {
-        return Mage::helper('M2ePro')->escapeHtml($value);
     }
 
     // ####################################

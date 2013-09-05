@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Single
@@ -37,6 +37,26 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Single
             return false;
         }
 
+        if ($this->params['status_changer'] != Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER &&
+            $this->isTheSameProductAlreadyListed($this->listingProduct)) {
+
+            return false;
+        }
+
+        if(!$this->listingProduct->getChildObject()->isSetCategoryTemplate()) {
+
+            $message = array(
+                // Parser hack -> Mage::helper('M2ePro')->__('Categories settings are not set');
+                parent::MESSAGE_TEXT_KEY => 'Categories settings are not set',
+                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
+            );
+
+            $this->addListingsProductsLogsMessage($this->listingProduct,$message,
+                                                  Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+
+            return false;
+        }
+
         return true;
     }
 
@@ -61,8 +81,11 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Single
         }
         $tempParams['logs_action'] = $this->getListingsLogsCurrentAction();
 
-        return $this->nativeRequestData = Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper')
-                                                ->getListRequestData($this->listingProduct,$tempParams);
+        $helper = Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper');
+        $tempRequestData = $helper->getListRequestData($this->listingProduct, $tempParams);
+        $this->logAdditionalWarningMessages($this->listingProduct);
+
+        return $this->nativeRequestData = $tempRequestData;
     }
 
     //----------------------------------------
@@ -74,29 +97,30 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Single
 
     protected function prepareResponseData($response)
     {
-        if ($this->resultType != parent::MESSAGE_TYPE_ERROR) {
-
-            $tempParams = array(
-                'ebay_item_id' => $response['ebay_item_id'],
-                'start_date_raw' => $response['ebay_start_date_raw'],
-                'end_date_raw' => $response['ebay_end_date_raw'],
-                'is_eps_ebay_images_mode' => $response['is_eps_ebay_images_mode'],
-                'ebay_item_fees' => $response['ebay_item_fees']
-            );
-
-            Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper')
-                                ->updateAfterListAction($this->listingProduct, $this->nativeRequestData,
-                                                        array_merge($this->params,$tempParams));
-
-            $message = array(
-                // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully listed');
-                parent::MESSAGE_TEXT_KEY => 'Item was successfully listed',
-                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
-            );
-
-            $this->addListingsProductsLogsMessage($this->listingProduct, $message,
-                                                  Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+        if ($this->resultType == parent::MESSAGE_TYPE_ERROR) {
+            return $response;
         }
+
+        $tempParams = array(
+            'ebay_item_id' => $response['ebay_item_id'],
+            'start_date_raw' => $response['ebay_start_date_raw'],
+            'end_date_raw' => $response['ebay_end_date_raw'],
+            'is_eps_ebay_images_mode' => $response['is_eps_ebay_images_mode'],
+            'ebay_item_fees' => $response['ebay_item_fees']
+        );
+
+        Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper')
+                            ->updateAfterListAction($this->listingProduct, $this->nativeRequestData,
+                                                    array_merge($this->params,$tempParams));
+
+        $message = array(
+            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully listed');
+            parent::MESSAGE_TEXT_KEY => 'Item was successfully listed',
+            parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
+        );
+
+        $this->addListingsProductsLogsMessage($this->listingProduct, $message,
+                                              Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
         return $response;
     }

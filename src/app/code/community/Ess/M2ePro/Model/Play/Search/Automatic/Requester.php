@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Search_Automatic_Requester
@@ -84,8 +84,8 @@ class Ess_M2ePro_Model_Play_Search_Automatic_Requester
     {
         if ($this->getCurrentStep() == self::STEP_GENERAL_ID) {
 
-            if ($this->listingProduct->getGeneralTemplate()->getChildObject()->isGeneralIdWorldwideMode() ||
-                $this->listingProduct->getGeneralTemplate()->getChildObject()->isGeneralIdIsbnMode()) {
+            if ($this->listingProduct->getListing()->getChildObject()->isGeneralIdWorldwideMode() ||
+                $this->listingProduct->getListing()->getChildObject()->isGeneralIdIsbnMode()) {
                 return array('product','search','byEanIsbn');
             }
         }
@@ -117,7 +117,7 @@ class Ess_M2ePro_Model_Play_Search_Automatic_Requester
             case self::STEP_MAGENTO_TITLE:
 
                     $tempQuery = '';
-                    if ($this->listingProduct->getGeneralTemplate()
+                    if ($this->listingProduct->getListing()
                              ->getChildObject()->isSearchByMagentoTitleModeEnabled()) {
                         $tempQuery = $this->listingProduct
                             ->getChildObject()

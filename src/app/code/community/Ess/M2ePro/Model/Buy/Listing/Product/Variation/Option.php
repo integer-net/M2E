@@ -1,13 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
  * @method Ess_M2ePro_Model_Listing_Product_Variation_Option getParentObject()
-*/
-
+ */
 class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_Model_Component_Child_Buy_Abstract
 {
     // ########################################
@@ -39,6 +38,16 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
     }
 
     /**
+     * @return Ess_M2ePro_Model_Buy_Listing
+     */
+    public function getBuyListing()
+    {
+        return $this->getListing()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
      * @return Ess_M2ePro_Model_Listing_Product
      */
     public function getListingProduct()
@@ -47,63 +56,21 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
     }
 
     /**
-     * @return Ess_M2ePro_Model_Listing_Product_Variation
-     */
-    public function getListingProductVariation()
-    {
-        return $this->getParentObject()->getListingProductVariation();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Template_General
-     */
-    public function getGeneralTemplate()
-    {
-        return $this->getParentObject()->getGeneralTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
-     */
-    public function getSellingFormatTemplate()
-    {
-        return $this->getParentObject()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getParentObject()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getParentObject()->getSynchronizationTemplate();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Buy_Listing
-     */
-    public function getBuyListing()
-    {
-        return $this->getListing()->getChildObject();
-    }
-
-    /**
      * @return Ess_M2ePro_Model_Buy_Listing_Product
      */
     public function getBuyListingProduct()
     {
         return $this->getListingProduct()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product_Variation
+     */
+    public function getListingProductVariation()
+    {
+        return $this->getParentObject()->getListingProductVariation();
     }
 
     /**
@@ -117,11 +84,47 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Buy_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getBuyGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getGeneralTemplate()->getChildObject();
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Buy_Account
+     */
+    public function getBuyAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Buy_Marketplace
+     */
+    public function getBuyMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_SellingFormat
+     */
+    public function getSellingFormatTemplate()
+    {
+        return $this->getBuyListingProductVariation()->getSellingFormatTemplate();
     }
 
     /**
@@ -132,12 +135,14 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
         return $this->getSellingFormatTemplate()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Buy_Template_Description
+     * @return Ess_M2ePro_Model_Template_Synchronization
      */
-    public function getBuyDescriptionTemplate()
+    public function getSynchronizationTemplate()
     {
-        return $this->getDescriptionTemplate()->getChildObject();
+        return $this->getBuyListingProductVariation()->getSynchronizationTemplate();
     }
 
     /**
@@ -152,13 +157,13 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
 
     public function getSku()
     {
-        $src = $this->getBuyGeneralTemplate()->getSkuSource();
+        $src = $this->getBuyListing()->getSkuSource();
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SKU_MODE_PRODUCT_ID) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SKU_MODE_PRODUCT_ID) {
             return (string)$this->getParentObject()->getProductId();
         }
 
-        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_General::SKU_MODE_CUSTOM_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Listing::SKU_MODE_CUSTOM_ATTRIBUTE) {
             return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
@@ -236,13 +241,13 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
                 break;
         }
 
-        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-            if (!$this->getMagentoProduct()->getStockAvailability() ||
-                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
-                // Out of stock or disabled Item? Set QTY = 0
-                $qty = 0;
-            }
-        }
+//        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
+//            if (!$this->getMagentoProduct()->getStockAvailability() ||
+//                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
+//                // Out of stock or disabled Item? Set QTY = 0
+//                $qty = 0;
+//            }
+//        }
 
         $qty < 0 && $qty = 0;
 
@@ -350,6 +355,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
                     $price = ($basePrice * (float)$configurableOption['pricing_value']) / 100;
                 } else {
                     $price = (float)$configurableOption['pricing_value'];
+                    $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                 }
 
                 break 2;
@@ -405,6 +411,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
                     $price = ($basePrice * (float)$tempOption->getData('selection_price_value')) / 100;
                 } else {
                     $price = (float)$tempOption->getData('selection_price_value');
+                    $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                 }
 
                 break 2;
@@ -470,6 +477,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
                             break;
                         case 'fixed':
                             $price = (float)$tempOption->getData('price');
+                            $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                             break;
                     }
                 }
@@ -500,20 +508,17 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
             case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_SPECIAL:
                 $price = $this->getMagentoProduct()->getSpecialPrice();
                 $price <= 0 && $price = $this->getMagentoProduct()->getPrice();
+                $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                 break;
 
             case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_ATTRIBUTE:
                 $price = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
                 break;
 
-            case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_FINAL:
-                $customerGroupId = $this->getBuySellingFormatTemplate()->getCustomerGroupId();
-                $price = $this->getMagentoProduct()->getFinalPrice($customerGroupId);
-                break;
-
             default:
             case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_PRODUCT:
                 $price = $this->getMagentoProduct()->getPrice();
+                $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                 break;
         }
 

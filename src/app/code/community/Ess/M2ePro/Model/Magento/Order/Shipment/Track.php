@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Magento_Order_Shipment_Track
@@ -64,8 +64,8 @@ class Ess_M2ePro_Model_Magento_Order_Shipment_Track
 
         // Skip shipment observer
         // -----------------
-        Mage::helper('M2ePro')->unsetGlobalValue('skip_shipment_observer');
-        Mage::helper('M2ePro')->setGlobalValue('skip_shipment_observer', true);
+        Mage::helper('M2ePro/Data_Global')->unsetValue('skip_shipment_observer');
+        Mage::helper('M2ePro/Data_Global')->setValue('skip_shipment_observer', true);
         // -----------------
 
         /** @var $shipment Mage_Sales_Model_Order_Shipment */

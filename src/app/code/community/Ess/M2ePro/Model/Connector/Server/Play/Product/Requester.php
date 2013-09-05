@@ -1,17 +1,21 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
     extends Ess_M2ePro_Model_Connector_Server_Play_Requester
 {
+    const STATUS_ERROR    = 1;
+    const STATUS_WARNING  = 2;
+    const STATUS_SUCCESS  = 3;
+
     protected $logsActionId = NULL;
     protected $neededRemoveLocks = array();
 
     protected $isProcessingItems = false;
-    protected $status = Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_SUCCESS;
+    protected $status = Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_SUCCESS;
 
     protected $listingsProducts = array();
     protected $listingProductRequestsData = array();
@@ -42,18 +46,15 @@ abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
             }
         }
 
-        /** @var $generalTemplate Ess_M2ePro_Model_Template_General */
-        $generalTemplate = $listingsProducts[0]->getGeneralTemplate();
-
-        $accountObj = $generalTemplate->getAccount();
-        $marketplaceObj = $generalTemplate->getMarketplace();
+        $accountObj = $listingsProducts[0]->getListing()->getAccount();
+        $marketplaceObj = $listingsProducts[0]->getListing()->getMarketplace();
 
         foreach($listingsProducts as $listingProduct) {
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            if ($accountObj->getId() != $listingProduct->getGeneralTemplate()->getAccountId()) {
+            if ($accountObj->getId() != $listingProduct->getListing()->getAccountId()) {
                 throw new Exception('Product connector has received products from different accounts');
             }
-            if ($marketplaceObj->getId() != $listingProduct->getGeneralTemplate()->getMarketplaceId()) {
+            if ($marketplaceObj->getId() != $listingProduct->getListing()->getMarketplaceId()) {
                 throw new Exception('Product connector has received products from different marketplaces');
             }
         }
@@ -75,7 +76,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
 
     public function process()
     {
-        $this->setStatus(Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_SUCCESS);
+        $this->setStatus(Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_SUCCESS);
         $this->setIsProcessingItems(false);
 
         if (count($this->listingsProducts) <= 0) {
@@ -90,7 +91,7 @@ abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
         // When all items are failed in response
         (isset($this->response['data']['messages'])) && $tempMessages = $this->response['data']['messages'];
         if (isset($tempMessages) && is_array($tempMessages) && count($tempMessages) > 0) {
-            $this->setStatus(Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_ERROR);
+            $this->setStatus(Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_ERROR);
         }
 
         $this->checkUnlockListings();
@@ -119,11 +120,9 @@ abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
             );
         }
 
-        $tempGeneralTemplate = $this->listingsProducts[0]->getGeneralTemplate();
-
         return array(
-            'account_id' => $tempGeneralTemplate->getAccountId(),
-            'marketplace_id' => $tempGeneralTemplate->getMarketplaceId(),
+            'account_id' => $this->listingsProducts[0]->getListing()->getAccountId(),
+            'marketplace_id' => $this->listingsProducts[0]->getListing()->getMarketplaceId(),
             'action_identifier' => $this->getActionIdentifier(),
             'listing_log_action' => $this->getListingsLogsCurrentAction(),
             'logs_action_id' => $this->logsActionId,
@@ -227,17 +226,17 @@ abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
 
         switch ($type) {
             case Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR:
-                    $this->setStatus(Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_ERROR);
+                    $this->setStatus(Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_ERROR);
                 break;
             case Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING:
-                    $this->setStatus(Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_WARNING);
+                    $this->setStatus(Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_WARNING);
                 break;
             case Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS:
             case Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE:
-                    $this->setStatus(Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_SUCCESS);
+                    $this->setStatus(Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_SUCCESS);
                 break;
             default:
-                    $this->setStatus(Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_ERROR);
+                    $this->setStatus(Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_ERROR);
                 break;
         }
 
@@ -286,31 +285,31 @@ abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
     protected function setStatus($status)
     {
         if (!in_array($status,array(
-            Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_ERROR,
-            Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_WARNING,
-            Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_SUCCESS))) {
+            Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_ERROR,
+            Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_WARNING,
+            Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_SUCCESS))) {
             return;
         }
 
-        if ($status == Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_ERROR) {
-            $this->status = Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_ERROR;
+        if ($status == Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_ERROR) {
+            $this->status = Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_ERROR;
             return;
         }
 
-        if ($this->status == Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_ERROR) {
+        if ($this->status == Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_ERROR) {
             return;
         }
 
-        if ($status == Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_WARNING) {
-            $this->status = Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_WARNING;
+        if ($status == Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_WARNING) {
+            $this->status = Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_WARNING;
             return;
         }
 
-        if ($this->status == Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_WARNING) {
+        if ($this->status == Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_WARNING) {
             return;
         }
 
-        $this->status = Ess_M2ePro_Model_Play_Connector_Product_Requester::STATUS_SUCCESS;
+        $this->status = Ess_M2ePro_Model_Connector_Server_Play_Product_Requester::STATUS_SUCCESS;
     }
 
     // ########################################
@@ -323,6 +322,19 @@ abstract class Ess_M2ePro_Model_Connector_Server_Play_Product_Requester
     protected function setIsProcessingItems($isProcessingItems)
     {
         $this->isProcessingItems = (bool)$isProcessingItems;
+    }
+
+    // ########################################
+
+    public static function getMainStatus($statuses)
+    {
+        foreach (array(self::STATUS_ERROR,self::STATUS_WARNING) as $status) {
+            if (in_array($status, $statuses)) {
+                return $status;
+            }
+        }
+
+        return self::STATUS_SUCCESS;
     }
 
     // ########################################

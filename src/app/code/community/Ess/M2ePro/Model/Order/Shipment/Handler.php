@@ -1,9 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * Handles shipments, created by seller in admin panel
+ */
 class Ess_M2ePro_Model_Order_Shipment_Handler
 {
     const HANDLE_RESULT_FAILED    = -1;

@@ -1,7 +1,7 @@
 <?php
 
 /*
-* @copyright  Copyright (c) 2011 by  ESS-UA.
+* @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Wizard_Amazon extends Ess_M2ePro_Model_Wizard
@@ -25,10 +25,10 @@ class Ess_M2ePro_Model_Wizard_Amazon extends Ess_M2ePro_Model_Wizard
 
     public function disableChildWizards()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Wizard');
+        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
+        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
 
-        $wizardHelper->setStatus('amazonNewAsin', Ess_M2ePro_Helper_Wizard::STATUS_SKIPPED);
+        $wizardHelper->setStatus('amazonNewAsin', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED);
 
         return true;
     }

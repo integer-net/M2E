@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Search_Automatic_ByAsin_Responser
@@ -119,11 +119,11 @@ class Ess_M2ePro_Model_Amazon_Search_Automatic_ByAsin_Responser
             $childListingProduct = $listingProduct->getChildObject();
             $generalId = $this->params['items'][$listingProduct->getId()];
 
-            $isAsin = Mage::helper('M2ePro/Component_Amazon')->isASIN($generalId);
+            $isAsin = Mage::helper('M2ePro/Component_Amazon_Validation')->isASIN($generalId);
 
             if (!$isAsin) {
 
-                $isIsbn = Mage::helper('M2ePro/Component_Amazon')->isISBN($generalId);
+                $isIsbn = Mage::helper('M2ePro/Component_Amazon_Validation')->isISBN($generalId);
 
                 if (!$isIsbn) {
 
@@ -141,7 +141,7 @@ class Ess_M2ePro_Model_Amazon_Search_Automatic_ByAsin_Responser
 
             $childListingProduct->setData('general_id',$generalId);
             $childListingProduct->setData('is_isbn_general_id',
-                                          (int)Mage::helper('M2ePro/Component_Amazon')->isISBN($generalId));
+                                          (int)Mage::helper('M2ePro/Component_Amazon_Validation')->isISBN($generalId));
 
             $temp = Ess_M2ePro_Model_Amazon_Listing_Product::GENERAL_ID_SEARCH_STATUS_SET_AUTOMATIC;
             $childListingProduct->setData('general_id_search_status', $temp);

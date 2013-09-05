@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -23,7 +23,6 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const PRICE_PRODUCT   = 1;
     const PRICE_SPECIAL   = 2;
     const PRICE_ATTRIBUTE = 3;
-    const PRICE_FINAL     = 4;
 
     const PRICE_VARIATION_MODE_PARENT   = 1;
     const PRICE_VARIATION_MODE_CHILDREN = 2;
@@ -38,9 +37,33 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     // ########################################
 
+    public function isLocked()
+    {
+        if (parent::isLocked()) {
+            return true;
+        }
+
+        return (bool)Mage::getModel('M2ePro/Play_Listing')
+                            ->getCollection()
+                            ->addFieldToFilter('template_selling_format_id', $this->getId())
+                            ->getSize();
+    }
+
+    // ########################################
+
+    public function getAttributeSets()
+    {
+        return $this->getParentObject()->getAttributeSets();
+    }
+
+    public function getAttributeSetsIds()
+    {
+        return $this->getParentObject()->getAttributeSetsIds();
+    }
+
     public function getListings($asObjects = false, array $filters = array())
     {
-        return $this->getParentObject()->getListings($asObjects,$filters);
+        return $this->getRelatedComponentItems('Listing','template_selling_format_id',$asObjects,$filters);
     }
 
     // ########################################
@@ -81,7 +104,8 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'mode'      => $this->getQtyMode(),
             'value'     => $this->getQtyNumber(),
             'attribute' => $this->getData('qty_custom_attribute'),
-            'qty_max_posted_value'   => $this->getQtyMaxPostedValue()
+            'qty_max_posted_value_mode' => $this->getQtyMaxPostedValueMode(),
+            'qty_max_posted_value'      => $this->getQtyMaxPostedValue()
         );
     }
 
@@ -95,6 +119,23 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         }
 
         return $attributes;
+    }
+
+    //-------------------------
+
+    public function getQtyMaxPostedValueMode()
+    {
+        return (int)$this->getData('qty_max_posted_value_mode');
+    }
+
+    public function isQtyMaxPostedValueModeOn()
+    {
+        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_ON;
+    }
+
+    public function isQtyMaxPostedValueModeOff()
+    {
+        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_OFF;
     }
 
     public function getQtyMaxPostedValue()
@@ -122,11 +163,6 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     public function isPriceGbrModeAttribute()
     {
         return $this->getPriceGbrMode() == self::PRICE_ATTRIBUTE;
-    }
-
-    public function isPriceGbrModeFinal()
-    {
-        return $this->getPriceGbrMode() == self::PRICE_FINAL;
     }
 
     public function getPriceGbrCoefficient()
@@ -177,11 +213,6 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         return $this->getPriceEuroMode() == self::PRICE_ATTRIBUTE;
     }
 
-    public function isPriceEuroModeFinal()
-    {
-        return $this->getPriceEuroMode() == self::PRICE_FINAL;
-    }
-
     public function getPriceEuroCoefficient()
     {
         return $this->getData('price_euro_coefficient');
@@ -208,7 +239,7 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         return $attributes;
     }
 
-    //-------------------------
+    // ########################################
 
     public function getPriceVariationMode()
     {
@@ -225,16 +256,18 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         return $this->getPriceVariationMode() == self::PRICE_VARIATION_MODE_CHILDREN;
     }
 
-    //-------------------------
-
-    public function getCustomerGroupId()
-    {
-        return (int)$this->getData('customer_group_id');
-    }
-
     // ########################################
 
     public function getTrackingAttributes()
+    {
+        return array_unique(array_merge(
+            $this->getQtyAttributes(),
+            $this->getPriceGbrAttributes(),
+            $this->getPriceEuroAttributes()
+        ));
+    }
+
+    public function getUsedAttributes()
     {
         return array_unique(array_merge(
             $this->getQtyAttributes(),
@@ -247,14 +280,86 @@ class Ess_M2ePro_Model_Play_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
         return parent::delete();
+    }
+
+    // ########################################
+
+    public function usesProductOrSpecialPrice($currency = null)
+    {
+        if ($currency == Ess_M2ePro_Helper_Component_Play::CURRENCY_EUR || is_null($currency)) {
+            if ($this->isPriceEuroModeProduct() || $this->isPriceEuroModeSpecial()) {
+                return true;
+            }
+        }
+
+        if ($currency == Ess_M2ePro_Helper_Component_Play::CURRENCY_GBP || is_null($currency)) {
+            if ($this->isPriceGbrModeProduct() || $this->isPriceGbrModeSpecial()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // ########################################
+
+    public function getAffectedListingProducts($asObjects = false)
+    {
+        if (is_null($this->getId())) {
+            throw new LogicException('Method require loaded instance first');
+        }
+
+        $listingCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing');
+        $listingCollection->addFieldToFilter('template_selling_format_id', $this->getId());
+        $listingCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+        $listingCollection->getSelect()->columns('id');
+
+        $listingProductCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('listing_id',array('in' => $listingCollection->getSelect()));
+
+        return $asObjects ? $listingProductCollection->getItems() : $listingProductCollection->getData();
+    }
+
+    // ########################################
+
+    public function setIsNeedSynchronize($newData, $oldData)
+    {
+        if (!$this->getResource()->isDifferent($newData,$oldData)) {
+            return;
+        }
+
+        $ids = array();
+        foreach ($this->getAffectedListingProducts() as $listingProduct) {
+            $ids[] = (int)$listingProduct['id'];
+        }
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $templates = array('sellingFormatTemplate');
+
+        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
+            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
+            array(
+                'is_need_synchronize' => 1,
+                'synch_reasons' => new Zend_Db_Expr(
+                    "IF(synch_reasons IS NULL,
+                        '".implode(',',$templates)."',
+                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
+                    )"
+                )
+            ),
+            array('id IN ('.implode(',', $ids).')')
+        );
     }
 
     // ########################################

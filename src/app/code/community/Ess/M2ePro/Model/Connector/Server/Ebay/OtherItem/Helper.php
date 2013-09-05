@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Ebay_OtherItem_Helper
@@ -177,7 +177,7 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_OtherItem_Helper
 
     protected function addIsM2eProListedItemData(Ess_M2ePro_Model_Listing_Other $listingOther, array &$requestData)
     {
-        $requestData['is_m2epro_listed_item'] = Ess_M2ePro_Model_Ebay_Listing_Product::IS_M2EPRO_LISTED_ITEM_NO;
+        $requestData['is_m2epro_listed_item'] = 0;
     }
 
     protected function addDescriptionData(Ess_M2ePro_Model_Listing_Other $listingOther,

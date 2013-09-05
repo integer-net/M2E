@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Listing_Category extends Ess_M2ePro_Model_Abstract
@@ -17,6 +17,15 @@ class Ess_M2ePro_Model_Listing_Category extends Ess_M2ePro_Model_Abstract
     {
         parent::_construct();
         $this->_init('M2ePro/Listing_Category');
+    }
+
+    // ########################################
+
+    public function deleteInstance()
+    {
+        $temp = parent::deleteInstance();
+        $temp && $this->listingModel = NULL;
+        return $temp;
     }
 
     // ########################################

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Relist
@@ -10,8 +10,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Relist
     const PERCENTS_START = 35;
     const PERCENTS_END = 50;
     const PERCENTS_INTERVAL = 15;
-
-    private $_synchronizations = array();
 
     /**
      * @var Ess_M2ePro_Model_Buy_Template_Synchronization_ProductInspector
@@ -23,8 +21,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Relist
     public function __construct()
     {
         parent::__construct();
-
-        $this->_synchronizations = Mage::helper('M2ePro')->getGlobalValue('synchTemplatesArray');
 
         $tempParams = array('runner_actions'=>$this->_runnerActions);
         $this->_productInspector = Mage::getModel('M2ePro/Buy_Template_Synchronization_ProductInspector',
@@ -89,21 +85,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Relist
 
     private function execute()
     {
-        // Relist immediatelied
-        //---------------------
-        $this->executeImmediately();
-        //---------------------
-
-        // Relist scheduled
-        //---------------------
-        $this->executeScheduled();
-        //---------------------
-    }
-
-    //------------------------------------
-
-    private function executeImmediately()
-    {
         $this->_profiler->addTimePoint(__METHOD__,'Immediately when product was changed');
 
         // Get changed listings products
@@ -118,151 +99,19 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Relist
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($changedListingsProducts as $listingProduct) {
 
-            if ($listingProduct->getSynchronizationTemplate()->getChildObject()->isRelistSchedule()) {
-                continue;
-            }
-
             if (!$this->_productInspector->isMeetRelistRequirements($listingProduct)) {
                 continue;
             }
 
             $this->_runnerActions->setProduct(
                 $listingProduct,
-                Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_RELIST,
+                Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_RELIST,
                 array()
             );
         }
         //------------------------------------
 
         $this->_profiler->saveTimePoint(__METHOD__);
-    }
-
-    private function executeScheduled()
-    {
-        $this->_profiler->addTimePoint(__METHOD__,'Synchronization templates with schedule');
-
-        foreach ($this->_synchronizations as &$synchronization) {
-
-            if (!$synchronization['instance']->getChildObject()->isRelistMode()) {
-                continue;
-            }
-
-            if (!$synchronization['instance']->getChildObject()->isRelistSchedule()) {
-                continue;
-            }
-
-            if ($synchronization['instance']->getChildObject()->getRelistScheduleType() ==
-                Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_SCHEDULE_TYPE_WEEK) {
-
-                if (!$synchronization['instance']->getChildObject()->isRelistScheduleWeekDayNow() ||
-                    !$synchronization['instance']->getChildObject()->isRelistScheduleWeekTimeNow()) {
-                    continue;
-                }
-            }
-
-            $this->scheduledListings($synchronization['listings']);
-            $this->_lockItem->activate();
-        }
-
-        $this->_profiler->saveTimePoint(__METHOD__);
-    }
-
-    //------------------------------------
-
-    private function scheduledListings(&$listings)
-    {
-        $listingsIds = array();
-
-        foreach ($listings as &$listing) {
-
-            /** @var $listing Ess_M2ePro_Model_Listing */
-
-            if (!$listing->isSynchronizationNowRun()) {
-                continue;
-            }
-
-            $listingsIds[] = (int)$listing->getId();
-        }
-
-        if (count($listingsIds) <= 0) {
-            return;
-        }
-
-        $listingsProductsCollection = Mage::helper('M2ePro/Component_Buy')->getModel('Listing_Product')
-                                                                             ->getCollection();
-
-        $listingsProductsCollection->getSelect()->where(
-            '`is_variation_product` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_NO.
-            ' OR ('.
-                '`is_variation_product` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_YES.
-                ' AND `is_variation_matched` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_MATCHED_YES.
-            ')'
-        );
-
-        $listingsProductsCollection->getSelect()->where(
-            '`status` != '.(int)Ess_M2ePro_Model_Listing_Product::STATUS_LISTED
-        );
-        $listingsProductsCollection->getSelect()->where('`listing_id` IN ('.implode(',',$listingsIds).')');
-
-        $listingsProductsArray = $listingsProductsCollection->toArray();
-
-        if ((int)$listingsProductsArray['totalRecords'] <= 0) {
-            return;
-        }
-
-        foreach ($listingsProductsArray['items'] as $listingProductArray) {
-
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            $listingProduct = Mage::helper('M2ePro/Component_Buy')->getObject('Listing_Product',
-                                                                                 $listingProductArray['id']);
-
-            if ($listingProduct->getSynchronizationTemplate()->getChildObject()->getRelistScheduleType() ==
-                Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_SCHEDULE_TYPE_THROUGH &&
-                !$this->isScheduleThroughNow($listingProduct)) {
-                continue;
-            }
-
-            if (!$this->_productInspector->isMeetRelistRequirements($listingProduct)) {
-                continue;
-            }
-
-            $this->_runnerActions->setProduct($listingProduct,
-                                              Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_RELIST,
-                                              array());
-        }
-    }
-
-    //####################################
-
-    private function isScheduleThroughNow(Ess_M2ePro_Model_Listing_Product $listingProduct)
-    {
-        $dateEnd = $listingProduct->getChildObject()->getEndDate();
-        if (is_null($dateEnd) || $dateEnd == '') {
-            return false;
-        }
-
-        $interval = 60;
-        $metric = $listingProduct->getSynchronizationTemplate()->getChildObject()->getRelistScheduleThroughMetric();
-        $value = (int)$listingProduct->getSynchronizationTemplate()->getChildObject()->getRelistScheduleThroughValue();
-
-        if ($metric == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_SCHEDULE_THROUGH_METRIC_DAYS) {
-            $interval = 60*60*24;
-        }
-        if ($metric == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_SCHEDULE_THROUGH_METRIC_HOURS) {
-            $interval = 60*60;
-        }
-        if ($metric == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_SCHEDULE_THROUGH_METRIC_MINUTES) {
-            $interval = 60;
-        }
-
-        $interval = $interval*$value;
-        $dateEnd = strtotime($dateEnd);
-
-        if (Mage::helper('M2ePro')->getCurrentGmtDate(true) < $dateEnd + $interval) {
-            return false;
-        }
-
-        return true;
     }
 
     //####################################

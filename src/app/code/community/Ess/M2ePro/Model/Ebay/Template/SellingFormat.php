@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -36,7 +36,12 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const PRICE_PRODUCT   = 1;
     const PRICE_SPECIAL   = 2;
     const PRICE_ATTRIBUTE = 3;
-    const PRICE_FINAL     = 4;
+
+    const PRICE_COEFFICIENT_NONE                = 0;
+    const PRICE_COEFFICIENT_ABSOLUTE_INCREASE   = 1;
+    const PRICE_COEFFICIENT_ABSOLUTE_DECREASE   = 2;
+    const PRICE_COEFFICIENT_PERCENTAGE_INCREASE = 3;
+    const PRICE_COEFFICIENT_PERCENTAGE_DECREASE = 4;
 
     const PRICE_VARIATION_MODE_PARENT        = 1;
     const PRICE_VARIATION_MODE_CHILDREN      = 2;
@@ -62,9 +67,24 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     // ########################################
 
-    public function getListings($asObjects = false, array $filters = array())
+    public function isLocked()
     {
-        return $this->getParentObject->getListings($asObjects,$filters);
+        if (parent::isLocked()) {
+            return true;
+        }
+
+        return (bool)Mage::getModel('M2ePro/Ebay_Listing')
+                            ->getCollection()
+                            ->addFieldToFilter('template_selling_format_mode',
+                                                Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE)
+                            ->addFieldToFilter('template_selling_format_id', $this->getId())
+                            ->getSize() ||
+               (bool)Mage::getModel('M2ePro/Ebay_Listing_Product')
+                            ->getCollection()
+                            ->addFieldToFilter('template_selling_format_mode',
+                                                Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE)
+                            ->addFieldToFilter('template_selling_format_id', $this->getId())
+                            ->getSize();
     }
 
     // ########################################
@@ -151,11 +171,6 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         return (bool)$this->getData('listing_is_private');
     }
 
-    public function getCurrency()
-    {
-        return $this->getData('currency');
-    }
-
     //-------------------------
 
     public function getQtyMode()
@@ -194,7 +209,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'mode'      => $this->getQtyMode(),
             'value'     => $this->getQtyNumber(),
             'attribute' => $this->getData('qty_custom_attribute'),
-            'qty_max_posted_value'   => $this->getQtyMaxPostedValue()
+            'qty_max_posted_value_mode' => $this->getQtyMaxPostedValueMode(),
+            'qty_max_posted_value'      => $this->getQtyMaxPostedValue()
         );
     }
 
@@ -208,6 +224,23 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         }
 
         return $attributes;
+    }
+
+    //-------------------------
+
+    public function getQtyMaxPostedValueMode()
+    {
+        return (int)$this->getData('qty_max_posted_value_mode');
+    }
+
+    public function isQtyMaxPostedValueModeOn()
+    {
+        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_ON;
+    }
+
+    public function isQtyMaxPostedValueModeOff()
+    {
+        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_OFF;
     }
 
     public function getQtyMaxPostedValue()
@@ -257,11 +290,6 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     public function isStartPriceModeAttribute()
     {
         return $this->getStartPriceMode() == self::PRICE_ATTRIBUTE;
-    }
-
-    public function isStartPriceModeFinal()
-    {
-        return $this->getStartPriceMode() == self::PRICE_FINAL;
     }
 
     public function getStartPriceCoefficient()
@@ -317,11 +345,6 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         return $this->getReservePriceMode() == self::PRICE_ATTRIBUTE;
     }
 
-    public function isReservePriceModeFinal()
-    {
-        return $this->getReservePriceMode() == self::PRICE_FINAL;
-    }
-
     public function getReservePriceCoefficient()
     {
         return $this->getData('reserve_price_coefficient');
@@ -373,11 +396,6 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     public function isBuyItNowPriceModeAttribute()
     {
         return $this->getBuyItNowPriceMode() == self::PRICE_ATTRIBUTE;
-    }
-
-    public function isBuyItNowPriceModeFinal()
-    {
-        return $this->getBuyItNowPriceMode() == self::PRICE_FINAL;
     }
 
     public function getBuyItNowPriceCoefficient()
@@ -511,9 +529,13 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     //-------------------------
 
-    public function getCustomerGroupId()
+    public function getCharity()
     {
-        return (int)$this->getData('customer_group_id');
+        if (is_null($this->getData('charity'))) {
+            return NULL;
+        }
+
+        return json_decode($this->getData('charity'), true);
     }
 
     // #######################################
@@ -528,18 +550,197 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         ));
     }
 
+    public function getUsedAttributes()
+    {
+        return array_unique(array_merge(
+            $this->getListingTypeAttributes(),
+            $this->getDurationAttributes(),
+            $this->getQtyAttributes(),
+            $this->getStartPriceAttributes(),
+            $this->getReservePriceAttributes(),
+            $this->getBuyItNowPriceAttributes(),
+            $this->getBestOfferAcceptAttributes(),
+            $this->getBestOfferRejectAttributes()
+        ));
+    }
+
+    // #######################################
+
+    public function getNick()
+    {
+        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT;
+    }
+
     // #######################################
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
         return parent::delete();
+    }
+
+    // #######################################
+
+    public function getDefaultSettingsSimpleMode()
+    {
+        return array(
+
+            'listing_type' => self::LISTING_TYPE_FIXED,
+            'listing_type_attribute' => '',
+
+            'listing_is_private' => self::LISTING_IS_PRIVATE_NO,
+
+            'duration_mode' => 3,
+            'duration_attribute' => '',
+
+            'qty_mode' => self::QTY_MODE_PRODUCT,
+            'qty_custom_value' => 1,
+            'qty_custom_attribute' => '',
+            'qty_max_posted_value_mode' => self::QTY_MAX_POSTED_MODE_OFF,
+            'qty_max_posted_value' => self::QTY_MAX_POSTED_DEFAULT_VALUE,
+
+            'price_variation_mode' => self::PRICE_VARIATION_MODE_PARENT,
+
+            'start_price_mode' => self::PRICE_PRODUCT,
+            'start_price_coefficient' => '',
+            'start_price_custom_attribute' => '',
+
+            'reserve_price_mode' => self::PRICE_NONE,
+            'reserve_price_coefficient' => '',
+            'reserve_price_custom_attribute' => '',
+
+            'buyitnow_price_mode' => self::PRICE_PRODUCT,
+            'buyitnow_price_coefficient' => '',
+            'buyitnow_price_custom_attribute' => '',
+
+            'best_offer_mode' => self::BEST_OFFER_MODE_NO,
+
+            'best_offer_accept_mode' => self::BEST_OFFER_ACCEPT_MODE_NO,
+            'best_offer_accept_value' => '',
+            'best_offer_accept_attribute' => '',
+
+            'best_offer_reject_mode' => self::BEST_OFFER_REJECT_MODE_NO,
+            'best_offer_reject_value' => '',
+            'best_offer_reject_attribute' => '',
+
+            'charity' => '',
+        );
+    }
+
+    public function getDefaultSettingsAdvancedMode()
+    {
+        $simpleSettings = $this->getDefaultSettingsSimpleMode();
+
+        $simpleSettings['qty_max_posted_value_mode'] = self::QTY_MAX_POSTED_MODE_ON;
+
+        return $simpleSettings;
+    }
+
+    // #######################################
+
+    public function usesProductOrSpecialPrice()
+    {
+        if ($this->isListingTypeFixed()) {
+            if ($this->isBuyItNowPriceModeProduct() || $this->isBuyItNowPriceModeSpecial()) {
+                return true;
+            }
+
+            return false;
+        }
+
+        if ($this->isStartPriceModeProduct() || $this->isStartPriceModeSpecial()) {
+            return true;
+        }
+
+        if ($this->isReservePriceModeProduct() || $this->isReservePriceModeSpecial()) {
+            return true;
+        }
+
+        if ($this->isBuyItNowPriceModeProduct() || $this->isBuyItNowPriceModeSpecial()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // #######################################
+
+    public function getAffectedListingProducts($asObjects = false)
+    {
+        if (is_null($this->getId())) {
+            throw new LogicException('Method require loaded instance first');
+        }
+
+        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT;
+
+        $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
+        $templateManager->setTemplate($template);
+
+        $listingProducts = $templateManager->getAffectedItems(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
+            $this->getId(),
+            array(), $asObjects
+        );
+
+        foreach ($listingProducts as $key => $listingProduct) {
+            unset($listingProducts[$key]);
+            $listingProducts[$listingProduct['id']] = $listingProduct;
+        }
+
+        $listings = $templateManager->getAffectedItems(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
+            $this->getId()
+        );
+
+        foreach ($listings as $listing) {
+            $tempListingProducts = $listing->getChildObject()->getAffectedListingProducts($template,$asObjects);
+
+            foreach ($tempListingProducts as $listingProduct) {
+                $listingProducts[$listingProduct['id']] = $listingProduct;
+            }
+        }
+
+        return $listingProducts;
+    }
+
+    // #######################################
+
+    public function setIsNeedSynchronize($newData, $oldData)
+    {
+        if (!$this->getResource()->isDifferent($newData,$oldData)) {
+            return;
+        }
+
+        $ids = array();
+        foreach ($this->getAffectedListingProducts() as $listingProduct) {
+            $ids[] = (int)$listingProduct['id'];
+        }
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $templates = array('sellingFormatTemplate');
+
+        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
+            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
+            array(
+                'is_need_synchronize' => 1,
+                'synch_reasons' => new Zend_Db_Expr(
+                    "IF(synch_reasons IS NULL,
+                        '".implode(',',$templates)."',
+                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
+                    )"
+                )
+            ),
+            array('id IN ('.implode(',', $ids).')')
+        );
     }
 
     // #######################################

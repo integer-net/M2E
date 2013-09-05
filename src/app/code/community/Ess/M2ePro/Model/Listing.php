@@ -1,74 +1,32 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstract
 {
-    const SYNCHRONIZATION_START_TYPE_NEVER       = 0;
-    const SYNCHRONIZATION_START_TYPE_IMMEDIATELY = 1;
-    const SYNCHRONIZATION_START_TYPE_THROUGH     = 2;
-    const SYNCHRONIZATION_START_TYPE_DATE        = 3;
-
-    const SYNCHRONIZATION_START_THROUGH_METRIC_NONE    = 0;
-    const SYNCHRONIZATION_START_THROUGH_METRIC_MINUTES = 1;
-    const SYNCHRONIZATION_START_THROUGH_METRIC_HOURS   = 2;
-    const SYNCHRONIZATION_START_THROUGH_METRIC_DAYS    = 3;
-
-    const SYNCHRONIZATION_STOP_TYPE_NEVER   = 0;
-    const SYNCHRONIZATION_STOP_TYPE_THROUGH = 1;
-    const SYNCHRONIZATION_STOP_TYPE_DATE    = 2;
-
-    const SYNCHRONIZATION_STOP_THROUGH_METRIC_NONE    = 0;
-    const SYNCHRONIZATION_STOP_THROUGH_METRIC_MINUTES = 1;
-    const SYNCHRONIZATION_STOP_THROUGH_METRIC_HOURS   = 2;
-    const SYNCHRONIZATION_STOP_THROUGH_METRIC_DAYS    = 3;
-
-    const SYNCHRONIZATION_STATUS_INACTIVE = 0;
-    const SYNCHRONIZATION_STATUS_ACTIVE   = 1;
-
-    const SYNCHRONIZATION_ALREADY_START_NO  = 0;
-    const SYNCHRONIZATION_ALREADY_START_YES = 1;
-
-    const SYNCHRONIZATION_ALREADY_STOP_NO  = 0;
-    const SYNCHRONIZATION_ALREADY_STOP_YES = 1;
-
     const SOURCE_PRODUCTS_CUSTOM     = 1;
     const SOURCE_PRODUCTS_CATEGORIES = 2;
 
     const CATEGORIES_ADD_ACTION_NONE     = 0;
     const CATEGORIES_ADD_ACTION_ADD      = 1;
-    const CATEGORIES_ADD_ACTION_ADD_LIST = 2;
 
     const CATEGORIES_DELETE_ACTION_NONE        = 0;
     const CATEGORIES_DELETE_ACTION_STOP        = 1;
     const CATEGORIES_DELETE_ACTION_STOP_REMOVE = 2;
 
-    const HIDE_PRODUCTS_OTHERS_LISTINGS_NO  = 0;
-    const HIDE_PRODUCTS_OTHERS_LISTINGS_YES = 1;
-
     // ########################################
 
     /**
-     * @var Ess_M2ePro_Model_Template_General
+     * @var Ess_M2ePro_Model_Account
      */
-    private $generalTemplateModel = NULL;
+    private $accountModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Template_SellingFormat
+     * @var Ess_M2ePro_Model_Marketplace
      */
-    private $sellingFormatTemplateModel = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Template_Description
-     */
-    private $descriptionTemplateModel = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Template_Synchronization
-     */
-    private $synchronizationTemplateModel = NULL;
+    private $marketplaceModel = NULL;
 
     // ########################################
 
@@ -125,10 +83,8 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH );
 
-        $this->generalTemplateModel = NULL;
-        $this->sellingFormatTemplateModel = NULL;
-        $this->descriptionTemplateModel = NULL;
-        $this->synchronizationTemplateModel = NULL;
+        $this->accountModel = NULL;
+        $this->marketplaceModel = NULL;
 
         $this->deleteChildInstance();
         $this->delete();
@@ -139,105 +95,49 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
     // ########################################
 
     /**
-     * @return Ess_M2ePro_Model_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getGeneralTemplate()
+    public function getAccount()
     {
-        if (is_null($this->generalTemplateModel)) {
-            $this->generalTemplateModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getComponentMode(),'Template_General',
-                $this->getData('template_general_id'),NULL,
-                array('template')
+        if (is_null($this->accountModel)) {
+            $this->accountModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+                $this->getComponentMode(),'Account',$this->getAccountId()
             );
         }
 
-        return $this->generalTemplateModel;
+        return $this->accountModel;
     }
 
     /**
-     * @param Ess_M2ePro_Model_Template_General $instance
+     * @param Ess_M2ePro_Model_Account $instance
      */
-    public function setGeneralTemplate(Ess_M2ePro_Model_Template_General $instance)
+    public function setAccount(Ess_M2ePro_Model_Account $instance)
     {
-         $this->generalTemplateModel = $instance;
+         $this->accountModel = $instance;
     }
 
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
+     * @return Ess_M2ePro_Model_Marketplace
      */
-    public function getSellingFormatTemplate()
+    public function getMarketplace()
     {
-        if (is_null($this->sellingFormatTemplateModel)) {
-            $this->sellingFormatTemplateModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getComponentMode(),'Template_SellingFormat',
-                $this->getData('template_selling_format_id'),NULL,
-                array('template')
+        if (is_null($this->marketplaceModel)) {
+            $this->marketplaceModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+                $this->getComponentMode(),'Marketplace',$this->getMarketplaceId()
             );
         }
 
-        return $this->sellingFormatTemplateModel;
+        return $this->marketplaceModel;
     }
 
     /**
-     * @param Ess_M2ePro_Model_Template_SellingFormat $instance
+     * @param Ess_M2ePro_Model_Marketplace $instance
      */
-    public function setSellingFormatTemplate(Ess_M2ePro_Model_Template_SellingFormat $instance)
+    public function setMarketplace(Ess_M2ePro_Model_Marketplace $instance)
     {
-         $this->sellingFormatTemplateModel = $instance;
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        if (is_null($this->descriptionTemplateModel)) {
-            $this->descriptionTemplateModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getComponentMode(),'Template_Description',
-                $this->getData('template_description_id'),NULL,
-                array('template')
-            );
-        }
-
-        return $this->descriptionTemplateModel;
-    }
-
-    /**
-     * @param Ess_M2ePro_Model_Template_Description $instance
-     */
-    public function setDescriptionTemplate(Ess_M2ePro_Model_Template_Description $instance)
-    {
-         $this->descriptionTemplateModel = $instance;
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        if (is_null($this->synchronizationTemplateModel)) {
-            $this->synchronizationTemplateModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getComponentMode(),'Template_Synchronization',
-                $this->getData('template_synchronization_id'),NULL,
-                array('template')
-            );
-        }
-
-        return $this->synchronizationTemplateModel;
-    }
-
-    /**
-     * @param Ess_M2ePro_Model_Template_Synchronization $instance
-     */
-    public function setSynchronizationTemplate(Ess_M2ePro_Model_Template_Synchronization $instance)
-    {
-         $this->synchronizationTemplateModel = $instance;
+         $this->marketplaceModel = $instance;
     }
 
     // ########################################
@@ -326,6 +226,18 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
         return $this->getData('title');
     }
 
+    //-----------------------------------------
+
+    public function getAccountId()
+    {
+        return (int)$this->getData('account_id');
+    }
+
+    public function getMarketplaceId()
+    {
+        return (int)$this->getData('marketplace_id');
+    }
+
     public function getStoreId()
     {
         return (int)$this->getData('store_id');
@@ -333,12 +245,17 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
 
     //-----------------------------------------
 
-    public function isHideProductsOthersListings()
+    public function getCreateDate()
     {
-        return (int)$this->getData('hide_products_others_listings') != self::HIDE_PRODUCTS_OTHERS_LISTINGS_NO;
+        return $this->getData('create_date');
     }
 
-    //-----------------------------------------
+    public function getUpdateDate()
+    {
+        return $this->getData('update_date');
+    }
+
+    // ########################################
 
     public function isSourceProducts()
     {
@@ -352,220 +269,70 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
 
     // ########################################
 
-    public function isSynchronizationNowRun()
+    public function isCategoriesAddActionNone()
     {
-        return $this->isSynchronizationAlreadyStart() && !$this->isSynchronizationAlreadyStop();
+        return (int)$this->getData('categories_add_action') == self::CATEGORIES_ADD_ACTION_NONE;
+    }
+
+    public function isCategoriesAddActionAdd()
+    {
+        return (int)$this->getData('categories_add_action') == self::CATEGORIES_ADD_ACTION_ADD;
     }
 
     //-----------------------------------------
 
-    public function isSynchronizationAlreadyStart()
+    public function isCategoriesDeleteActionNone()
     {
-        return (int)$this->getData('synchronization_already_start') == self::SYNCHRONIZATION_ALREADY_START_YES;
+        return (int)$this->getData('categories_delete_action') == self::CATEGORIES_DELETE_ACTION_NONE;
     }
 
-    public function isSynchronizationAlreadyStop()
+    public function isCategoriesDeleteActionStop()
     {
-        return (int)$this->getData('synchronization_already_stop') == self::SYNCHRONIZATION_ALREADY_STOP_YES;
+        return (int)$this->getData('categories_delete_action') == self::CATEGORIES_DELETE_ACTION_STOP;
     }
 
-    //-----------------------------------------
-
-    public function isSynchronizationOnlyStart()
+    public function isCategoriesDeleteActionStopRemove()
     {
-        if (is_null($this->getData('is_only_start')))
-            return false;
-
-        if (!$this->getData('is_only_start'))
-            return false;
-
-        return true;
-    }
-
-    public function isSynchronizationOnlyStop()
-    {
-        if (is_null($this->getData('is_only_stop')))
-            return false;
-
-        if (!$this->getData('is_only_stop'))
-            return false;
-
-        return true;
-    }
-
-    //-----------------------------------------
-
-    public function getSynchronizationTimestampStart()
-    {
-        if ($this->getData('synchronization_start_type') == self::SYNCHRONIZATION_START_TYPE_IMMEDIATELY) {
-            return strtotime($this->getData('create_date'));
-        }
-
-        if ($this->getData('synchronization_start_type') == self::SYNCHRONIZATION_START_TYPE_THROUGH) {
-
-            $interval = 60;
-            $temp = self::SYNCHRONIZATION_START_THROUGH_METRIC_DAYS;
-            if ($this->getData('synchronization_start_through_metric') == $temp) {
-                $interval = 60*60*24;
-            }
-            $temp = self::SYNCHRONIZATION_START_THROUGH_METRIC_HOURS;
-            if ($this->getData('synchronization_start_through_metric') == $temp) {
-                $interval = 60*60;
-            }
-            $temp = self::SYNCHRONIZATION_START_THROUGH_METRIC_MINUTES;
-            if ($this->getData('synchronization_start_through_metric') == $temp) {
-                $interval = 60;
-            }
-            $temp = ($interval * $this->getData('synchronization_start_through_value'));
-            return strtotime($this->getData('create_date')) + $temp;
-        }
-
-        if ($this->getData('synchronization_start_type') == self::SYNCHRONIZATION_START_TYPE_DATE) {
-            return strtotime($this->getData('synchronization_start_date'));
-        }
-
-        return Mage::helper('M2ePro')->getCurrentGmtDate(true) + 60*60*24*365*10;
-    }
-
-    public function getSynchronizationTimestampStop()
-    {
-        if ($this->getData('synchronization_stop_type') == self::SYNCHRONIZATION_STOP_TYPE_THROUGH) {
-            $interval = 60*60*24;
-            $temp = self::SYNCHRONIZATION_STOP_THROUGH_METRIC_HOURS;
-            if ($this->getData('synchronization_stop_through_metric') == $temp) {
-                $interval = 60*60;
-            }
-            if ($this->getData('synchronization_stop_through_metric') ==
-                self::SYNCHRONIZATION_STOP_THROUGH_METRIC_MINUTES) {
-                $interval = 60;
-            }
-            return $this->getSynchronizationTimestampStart() +
-                   ($interval * $this->getData('synchronization_stop_through_value'));
-        }
-
-        if ($this->getData('synchronization_stop_type') == self::SYNCHRONIZATION_STOP_TYPE_DATE) {
-            return strtotime($this->getData('synchronization_stop_date'));
-        }
-
-        return (Mage::helper('M2ePro')->getCurrentGmtDate(true)) + 60*60*24*365*10;
-    }
-
-    //-----------------------------------------
-
-    public function setSynchronizationAlreadyStart($value = true)
-    {
-        if (!in_array(
-            (int)$value,array(self::SYNCHRONIZATION_ALREADY_START_YES,self::SYNCHRONIZATION_ALREADY_START_NO)
-        )) {
-            return false;
-        }
-
-        $this->addData(array('synchronization_already_start'=>(int)$value))->save();
-        return true;
-    }
-
-    public function setSynchronizationAlreadyStop($value = true)
-    {
-        if (!in_array((int)$value,array(self::SYNCHRONIZATION_ALREADY_STOP_YES,self::SYNCHRONIZATION_ALREADY_STOP_NO)))
-            return false;
-
-        $this->addData(array('synchronization_already_stop'=>(int)$value))->save();
-        return true;
-    }
-
-    //-----------------------------------------
-
-    public function setSynchronizationOnlyStart($value = true)
-    {
-        $this->addData(array('is_only_start'=>$value));
-        return true;
-    }
-
-    public function setSynchronizationOnlyStop($value = true)
-    {
-        $this->addData(array('is_only_stop'=>$value));
-        return true;
+        return (int)$this->getData('categories_delete_action') == self::CATEGORIES_DELETE_ACTION_STOP_REMOVE;
     }
 
     // ########################################
 
-    public function hasProduct($productId)
-    {
-        if (count($this->getProducts(false,array('product_id'=>$productId))) > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    //-----------------------------------------
-
-    public function addProduct($product,$checkingMode = false)
+    public function addProduct($product,$checkingMode = false, $checkHasProduct = true)
     {
         $productId = $product instanceof Mage_Catalog_Model_Product ?
                         (int)$product->getId() : (int)$product;
 
-        //TODO buy&playtemporarily type simple filter
-        //----------------------------------
-        $magentoProduct = $product instanceof Mage_Catalog_Model_Product
-            ? Mage::getModel('M2ePro/Magento_Product')->setProduct($product)
-            : Mage::getModel('M2ePro/Magento_Product')->setProductId($productId);
-
-        if (($this->getComponentMode() == Ess_M2ePro_Helper_Component_Buy::NICK  ||
-             $this->getComponentMode() == Ess_M2ePro_Helper_Component_Play::NICK) &&
-            $magentoProduct->isProductWithVariations()) {
-            return false;
-        }
-
-        if ($this->getComponentMode() == Ess_M2ePro_Helper_Component_Ebay::NICK &&
-            $this->hasProduct($productId)) {
+        if ($checkHasProduct && $this->hasProduct($productId)) {
             return false;
         }
 
         // Add attribute set filter
         //----------------------------
-        if ($product instanceof Mage_Catalog_Model_Product) {
+        if (!$this->isComponentModeEbay()) {
 
-            if (!in_array((int)$product->getAttributeSetId(),$this->getAttributeSetsIds())) {
-                return false;
-            }
+            if ($product instanceof Mage_Catalog_Model_Product) {
 
-        } else {
+                if (!in_array((int)$product->getAttributeSetId(),$this->getAttributeSetsIds())) {
+                    return false;
+                }
 
-            $table = Mage::getSingleton('core/resource')->getTableName('catalog_product_entity');
-            $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                                 ->select()
-                                 ->from($table,new Zend_Db_Expr('DISTINCT `entity_id`'))
-                                 ->where('`entity_id` = ?',(int)$productId)
-                                 ->where('attribute_set_id IN('.implode(',',$this->getAttributeSetsIds()).')');
+            } else {
 
-            $productArray = Mage::getResourceModel('core/config')
-                                            ->getReadConnection()
-                                            ->fetchCol($dbSelect);
+                $table = Mage::getSingleton('core/resource')->getTableName('catalog_product_entity');
+                $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+                                     ->select()
+                                     ->from($table,new Zend_Db_Expr('DISTINCT `entity_id`'))
+                                     ->where('`entity_id` = ?',(int)$productId)
+                                     ->where('attribute_set_id IN('.implode(',',$this->getAttributeSetsIds()).')');
 
-            if (count($productArray) <= 0) {
-                return false;
-            }
-        }
-        //----------------------------
+                $productArray = Mage::getResourceModel('core/config')
+                                                ->getReadConnection()
+                                                ->fetchCol($dbSelect);
 
-        // Hide products others listings
-        //----------------------------
-        if ($this->isHideProductsOthersListings()) {
-
-            $table = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
-            $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                                         ->select()
-                                         ->from($table,new Zend_Db_Expr('DISTINCT `product_id`'))
-                                         ->where('`product_id` = ?',(int)$productId)
-                                         ->where('`component_mode` = ?',(string)$this->getComponentMode());
-
-            $productArray = Mage::getResourceModel('core/config')
-                                        ->getReadConnection()
-                                        ->fetchCol($dbSelect);
-
-            if (count($productArray) > 0) {
-                return false;
+                if (count($productArray) <= 0) {
+                    return false;
+                }
             }
         }
         //----------------------------
@@ -608,19 +375,17 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
         return $listingProductTemp;
     }
 
+    //-----------------------------------------
+
     public function addProductsFromCategory($categoryId)
     {
         $categoryProductsArray = $this->getProductsFromCategory($categoryId);
-
-        // Add categories products
-        //----------------------------
         foreach ($categoryProductsArray as $productTemp) {
             $this->addProduct($productTemp);
         }
-        //----------------------------
     }
 
-    public function getProductsFromCategory($categoryId)
+    public function getProductsFromCategory($categoryId, $hideProductsPresentedInAnotherListings = false)
     {
         // Make collection
         //----------------------------
@@ -634,7 +399,7 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
 
         // Hide products others listings
         //----------------------------
-        if ($this->isHideProductsOthersListings()) {
+        if ($hideProductsPresentedInAnotherListings) {
 
             $table = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
             $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
@@ -670,10 +435,60 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
 
     // ########################################
 
-    public static function removeDeletedProduct($product)
+    public function hasProduct($productId)
+    {
+        return count($this->getProducts(false,array('product_id'=>$productId))) > 0;
+    }
+
+    public function removeDeletedProduct($product)
     {
         $productId = $product instanceof Mage_Catalog_Model_Product ?
                         (int)$product->getId() : (int)$product;
+
+        $processedListings = array();
+
+        // Delete Products
+        //------------------
+        $listingsProducts = Mage::getModel('M2ePro/Listing_Product')
+                                    ->getCollection()
+                                    ->addFieldToFilter('product_id', $productId)
+                                    ->getItems();
+
+        $deletedListingsProductsIds = array();
+
+        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+        foreach ($listingsProducts as $listingProduct) {
+
+            if (!in_array($listingProduct->getId(),$deletedListingsProductsIds)) {
+                $listingProduct->deleteProcessingRequests();
+                $listingProduct->deleteObjectLocks();
+                $listingProduct->isStoppable() && Mage::getModel('M2ePro/StopQueue')->add($listingProduct);
+                $listingProduct->setStatus(Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED)->save();
+                $listingProduct->deleteInstance();
+                $deletedListingsProductsIds[] = $listingProduct->getId();
+            }
+
+            $listingId = $listingProduct->getListingId();
+            $componentMode = $listingProduct->getComponentMode();
+
+            if (isset($processedListings[$listingId.'_'.$componentMode])) {
+                continue;
+            }
+
+            $processedListings[$listingId.'_'.$componentMode] = 1;
+
+            Mage::getModel('M2ePro/Listing_Log')
+                ->setComponentMode($componentMode)
+                ->addProductMessage($listingId,
+                                    $productId,
+                                    $listingProduct->getId(),
+                                    Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                                    NULL,
+                                    Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_MAGENTO,
+                                    NULL,
+                                    Ess_M2ePro_Model_Listing_Log::TYPE_WARNING,
+                                    Ess_M2ePro_Model_Listing_Log::PRIORITY_HIGH );
+        }
 
         $processedListings = array();
 
@@ -696,7 +511,6 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
             $listingVariation = $variationOption->getListingProductVariation();
 
             if (!in_array($listingVariation->getId(),$deletedVariationsIds)) {
-                $listingVariation->setStatus(Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED)->save();
                 $listingVariation->deleteInstance();
                 $deletedVariationsIds[] = $listingVariation->getId();
             }
@@ -725,61 +539,26 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
         }
 
         //------------------
+    }
 
-        $processedListings = array();
+    // ########################################
 
-        // Delete Products
-        //------------------
-        $listingsProducts = Mage::getModel('M2ePro/Listing_Product')
-                                    ->getCollection()
-                                    ->addFieldToFilter('product_id', $productId)
-                                    ->getItems();
-
-        $deletedListingsProductsIds = array();
-
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-        foreach ($listingsProducts as $listingProduct) {
-
-            if (!in_array($listingProduct->getId(),$deletedListingsProductsIds)) {
-                $listingProduct->setStatus(Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED)->save();
-                $listingProduct->deleteInstance();
-                $deletedListingsProductsIds[] = $listingProduct->getId();
-            }
-
-            $listingId = $listingProduct->getListingId();
-            $componentMode = $listingProduct->getComponentMode();
-
-            if (isset($processedListings[$listingId.'_'.$componentMode])) {
-                continue;
-            }
-
-            $processedListings[$listingId.'_'.$componentMode] = 1;
-
-            Mage::getModel('M2ePro/Listing_Log')
-                ->setComponentMode($componentMode)
-                ->addProductMessage($listingId,
-                                    $productId,
-                                    $listingProduct->getId(),
-                                    Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
-                                    NULL,
-                                    Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_MAGENTO,
-                                    NULL,
-                                    Ess_M2ePro_Model_Listing_Log::TYPE_WARNING,
-                                    Ess_M2ePro_Model_Listing_Log::PRIORITY_HIGH );
-        }
+    public function getTrackingAttributes()
+    {
+        return $this->getChildObject()->getTrackingAttributes();
     }
 
     // ########################################
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('listing');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('listing');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
         return parent::delete();
     }
 

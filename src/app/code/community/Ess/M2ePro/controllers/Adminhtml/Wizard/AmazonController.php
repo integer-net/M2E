@@ -1,10 +1,11 @@
 <?php
 
 /*
-* @copyright  Copyright (c) 2011 by  ESS-UA.
+* @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
-class Ess_M2ePro_Adminhtml_Wizard_AmazonController extends Ess_M2ePro_Controller_Adminhtml_WizardController
+class Ess_M2ePro_Adminhtml_Wizard_AmazonController
+    extends Ess_M2ePro_Controller_Adminhtml_Common_WizardController
 {
     //#############################################
 
@@ -17,8 +18,8 @@ class Ess_M2ePro_Adminhtml_Wizard_AmazonController extends Ess_M2ePro_Controller
 
     public function welcomeAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Wizard');
+        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
+        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
 
         if (!$wizardHelper->isNotStarted($this->getNick())) {
             return $this->_redirect('*/*/index');
@@ -35,15 +36,15 @@ class Ess_M2ePro_Adminhtml_Wizard_AmazonController extends Ess_M2ePro_Controller
             '/component/amazon/', 'mode', 1
         );
 
-        Mage::helper('M2ePro/Wizard')->clearMenuCache();
+        Mage::helper('M2ePro/Magento')->clearMenuCache();
 
         parent::installationAction();
     }
 
     public function congratulationAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Wizard');
+        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
+        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
         $wizardHelper->getWizard($this->getNick())->disableChildWizards();
 
         parent::congratulationAction();

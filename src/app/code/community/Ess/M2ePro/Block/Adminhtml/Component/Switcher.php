@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 abstract class Ess_M2ePro_Block_Adminhtml_Component_Switcher extends Ess_M2ePro_Block_Adminhtml_Switcher
@@ -16,18 +16,11 @@ abstract class Ess_M2ePro_Block_Adminhtml_Component_Switcher extends Ess_M2ePro_
             return trim(preg_replace(array('/%component%/', '/\s{2,}/'), ' ', $label));
         }
 
+        $componentTitles = Mage::helper('M2ePro/Component')->getComponentsTitles();
+
         $component = '';
-        if ($this->getData('component_mode') == Ess_M2ePro_Helper_Component_Ebay::NICK) {
-            $component = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
-        }
-        if ($this->getData('component_mode') == Ess_M2ePro_Helper_Component_Amazon::NICK) {
-            $component = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
-        }
-        if ($this->getData('component_mode') == Ess_M2ePro_Helper_Component_Buy::NICK) {
-            $component = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
-        }
-        if ($this->getData('component_mode') == Ess_M2ePro_Helper_Component_Play::NICK) {
-            $component = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+        if (isset($componentTitles[$this->getData('component_mode')])) {
+            $component = $componentTitles[$this->getData('component_mode')];
         }
 
         if (strpos($label, '%component%') === false) {
@@ -50,30 +43,22 @@ abstract class Ess_M2ePro_Block_Adminhtml_Component_Switcher extends Ess_M2ePro_
 
     public function getSwitchUrl()
     {
-        $tab = NULL;
-        if (strtolower($this->getData('component_mode')) == Ess_M2ePro_Helper_Component_Ebay::NICK) {
-            $tab = Ess_M2ePro_Block_Adminhtml_Component_Abstract::TAB_ID_EBAY;
-        }
-        if (strtolower($this->getData('component_mode')) == Ess_M2ePro_Helper_Component_Amazon::NICK) {
-            $tab = Ess_M2ePro_Block_Adminhtml_Component_Abstract::TAB_ID_AMAZON;
-        }
-        if (strtolower($this->getData('component_mode')) == Ess_M2ePro_Helper_Component_Buy::NICK) {
-            $tab = Ess_M2ePro_Block_Adminhtml_Component_Abstract::TAB_ID_BUY;
-        }
-        if (strtolower($this->getData('component_mode')) == Ess_M2ePro_Helper_Component_Play::NICK) {
-            $tab = Ess_M2ePro_Block_Adminhtml_Component_Abstract::TAB_ID_PLAY;
+        $params = array(
+            '_current' => true,
+            $this->getParamName() => $this->getParamPlaceHolder()
+        );
+
+        $tabId = Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::getTabIdByComponent(
+            $this->getData('component_mode')
+        );
+
+        if (!is_null($tabId)) {
+            $params['tab'] = $tabId;
         }
 
         $controllerName = $this->getData('controller_name') ? $this->getData('controller_name') : '*';
 
-        return $this->getUrl(
-            "*/{$controllerName}/*",
-            array(
-                '_current' => true,
-                $this->getParamName() => $this->getParamPlaceHolder(),
-                'tab' => $tab
-            )
-        );
+        return $this->getUrl("*/{$controllerName}/*", $params);
     }
 
     public function getSwitchCallback()

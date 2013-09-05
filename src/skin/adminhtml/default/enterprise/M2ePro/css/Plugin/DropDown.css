@@ -29,4 +29,11 @@
     text-decoration: none !important;
 }
 
+.drop_down_header {
+    margin: 0;
+    padding: 0 15px 0 0;
+    display: inline-block;
+    background: url(../../images/drop_down_bg.png) no-repeat center right;
+}
+
 /* ================================================ */

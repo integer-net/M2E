@@ -1,0 +1,12 @@
+<div id="<?php echo $this->getContainerId(); ?>" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Orders'); ?>">
+    <?php
+        $menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
+        echo Mage::helper('M2ePro')->__(
+'This page contains all orders imported from Play.com.
+Use Play.com Accounts dropdown to filter Play.com orders by accounts.<br/>
+If Magento Order or Invoice was not created automatically,
+you can create them manually by using appropriate options in the Action dropdown.<br/><br/>
+<b>Note:</b> Automatic creation of Magento Orders and Invoices executes according to Play.com Accounts settings in %s > Configuration > Play.com Accounts > Orders.',
+        $menuLabel);
+    ?>
+</div>

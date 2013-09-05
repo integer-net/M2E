@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Amazon_VirtualRequester
@@ -54,6 +54,24 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_VirtualRequester
     protected function setLocks($hash) {}
 
     // ########################################
+
+    protected function getRequestInfo()
+    {
+        if (isset($this->cache['request_info'])) {
+            return $this->cache['request_info'];
+        }
+
+        if (!isset($this->params['__request_info__']) ||
+            !is_array($this->params['__request_info__']) ||
+            count($this->params['__request_info__']) <= 0) {
+            $this->cache['request_info'] = parent::getRequestInfo();
+        } else {
+            $this->cache['request_info'] = $this->params['__request_info__'];
+            unset($this->params['__request_info__']);
+        }
+
+        return $this->cache['request_info'];
+    }
 
     protected function getRequestData()
     {

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Play_Search_ItemsResponser
@@ -33,9 +33,12 @@ class Ess_M2ePro_Model_Connector_Server_Play_Search_ItemsResponser
                 $product = array(
                     'title' => $item['title'],
                     'image_url' => $item['image_url'],
-                    'category_code' => $item['category_code'],
                     'variations' => $item['variations']
                 );
+
+                if (!empty($item['category_code'])) {
+                    $product['category_code'] = $item['category_code'];
+                }
 
                 if (!empty($item['price_gbr'])) {
                     $product['price_gbr'] = $item['price_gbr'];
@@ -48,9 +51,16 @@ class Ess_M2ePro_Model_Connector_Server_Play_Search_ItemsResponser
             $product = array(
                 'general_id' => $item['general_id'],
                 'title' => $item['title'],
-                'image_url' => $item['image_url'],
-                'category_code' => $item['category_code'],
+                'image_url' => $item['image_url']
             );
+
+            if (!empty($item['product_url'])) {
+                $product['product_url'] = $item['product_url'];
+            }
+
+            if (!empty($item['category_code'])) {
+                $product['category_code'] = $item['category_code'];
+            }
 
             if (!empty($item['price_gbr'])) {
                 $product['price_gbr'] = $item['price_gbr'];

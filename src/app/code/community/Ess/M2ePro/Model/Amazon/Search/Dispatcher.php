@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Search_Dispatcher
@@ -22,25 +22,25 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
         );
 
         if (is_null($marketplace)) {
-            $marketplace = $listingProduct->getGeneralTemplate()->getMarketplace();
+            $marketplace = $listingProduct->getListing()->getMarketplace();
         }
 
         if (is_null($account)) {
-            $account = $listingProduct->getGeneralTemplate()->getAccount();
+            $account = $listingProduct->getListing()->getAccount();
         }
 
         try {
-            $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
             $dispatcherObject->processConnector('search', 'manual' ,'requester',
                                                 $params, $marketplace, $account,
                                                 'Ess_M2ePro_Model_Amazon');
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return false;
         }
 
-        $result = Mage::helper('M2ePro')->getGlobalValue('temp_amazon_manual_search_asin_result');
-        Mage::helper('M2ePro')->unsetGlobalValue('temp_amazon_manual_search_asin_result');
+        $result = Mage::helper('M2ePro/Data_Global')->getValue('temp_amazon_manual_search_asin_result');
+        Mage::helper('M2ePro/Data_Global')->unsetValue('temp_amazon_manual_search_asin_result');
 
         if (!is_array($result)) {
             return array();
@@ -87,11 +87,11 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
                     continue;
                 }
 
-                $isAsin = Mage::helper('M2ePro/Component_Amazon')->isASIN($tempGeneralId);
+                $isAsin = Mage::helper('M2ePro/Component_Amazon_Validation')->isASIN($tempGeneralId);
 
                 if (!$isAsin) {
 
-                    $isIsbn = Mage::helper('M2ePro/Component_Amazon')->isISBN($tempGeneralId);
+                    $isIsbn = Mage::helper('M2ePro/Component_Amazon_Validation')->isISBN($tempGeneralId);
 
                     if (!$isIsbn) {
 
@@ -123,7 +123,7 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
             $this->runAutomaticByAsin($listingsProductsByAsin);
             $this->runAutomaticByQuery($listingsProductsByQuery);
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return false;
         }
 
@@ -141,9 +141,9 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
             /** @var $account Ess_M2ePro_Model_Account */
-            $account = $listingProduct->getGeneralTemplate()->getAccount();
+            $account = $listingProduct->getListing()->getAccount();
             /** @var $marketplace Ess_M2ePro_Model_Marketplace */
-            $marketplace = $listingProduct->getGeneralTemplate()->getMarketplace();
+            $marketplace = $listingProduct->getListing()->getMarketplace();
 
             $identifier = $account->getId().'_'.$marketplace->getId();
 
@@ -177,7 +177,7 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
                     'listings_products' => $listingsProductsPart
                 );
 
-                $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
                 $dispatcherObject->processConnector('automatic', 'byAsin' ,'requester',
                                                     $params, $marketplace, $account,
                                                     'Ess_M2ePro_Model_Amazon_Search');
@@ -195,10 +195,10 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
                 'listing_product' => $listingProduct
             );
 
-            $marketplace = $listingProduct->getGeneralTemplate()->getMarketplace();
-            $account = $listingProduct->getGeneralTemplate()->getAccount();
+            $marketplace = $listingProduct->getListing()->getMarketplace();
+            $account = $listingProduct->getListing()->getAccount();
 
-            $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
             $dispatcherObject->processConnector('automatic', 'byQuery' ,'requester',
                                                 $params, $marketplace, $account,
                                                 'Ess_M2ePro_Model_Amazon_Search');

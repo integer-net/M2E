@@ -1,0 +1,25 @@
+<div id="pop_up_content" style="display: none;">
+    <div class="hor-scroll" style="padding-top: 15px; ">
+
+        <div style="float:left; padding: 10px; border: 1px solid #CDDDDD !important; background: none repeat scroll 0 0 #E7EFEF !important" >
+            <label for="product_id"><?php echo Mage::helper('M2ePro')->__('Enter Product ID'); ?></label>
+            <input id="product_id" type="text" name="product_id" class="input-text" style="margin: 0 10px 0 10px; width: 75px" />
+
+            <input id="other_product_id" type="hidden" name="other_product_id" />
+
+            <label for="sku"><?php echo Mage::helper('M2ePro')->__('Or SKU'); ?></label>
+            <input id="sku" type="text" name="sku" class="input-text" style="margin: 0 20px 0 10px" />
+
+            <?php echo $this->getChildHtml('mapping_submit_button'); ?>
+        </div>
+
+        <div style="clear: both; padding-top: 10px">
+            <?php echo $this->getChildHtml('mapping_advancedSearch_button'); ?>
+        </div>
+
+        <div id="help_grid" style="margin: 0 auto; padding-top: 10px; display: none;">
+            <?php echo $this->getChildHtml('mapping_grid') ?>
+        </div>
+
+    </div>
+</div>

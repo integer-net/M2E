@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -195,7 +195,7 @@ class Ess_M2ePro_Model_Play_Order extends Ess_M2ePro_Model_Component_Child_Play_
         }
 
         if ($storeId == 0) {
-            $storeId = Mage::helper('M2ePro/Magento')->getDefaultStoreId();
+            $storeId = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
         }
 
         return $storeId;
@@ -221,7 +221,7 @@ class Ess_M2ePro_Model_Play_Order extends Ess_M2ePro_Model_Component_Child_Play_
     {
         if ($this->isPending() || $this->isCanceled() || $this->isRefunded()) {
             throw new Exception(
-                'Magento Order creation is not allowed for Pending, Refunded and Canceled Play.com Orders.'
+                'Magento Order creation is not allowed for Pending, Canceled and Refunded Play.com Orders.'
             );
         }
     }

@@ -5,7 +5,7 @@
 </div>
 
 <?php
-$formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data') : array();
+$formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data') : array();
 $formData = $formData['relist'];
 
 $defaults = array(
@@ -24,8 +24,6 @@ $formData = array_merge($defaults, $formData);
 <script type="text/javascript">
 
     Event.observe(window, 'load', function() {
-        EbayListingOtherSynchronizationHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Listing_Other_Synchronization'); ?>')
-
         $('relist_mode')
                 .observe('change', EbayListingOtherSynchronizationHandlerObj.relist_mode_change)
                 .simulate('change');

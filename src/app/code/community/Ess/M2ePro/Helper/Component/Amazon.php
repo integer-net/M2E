@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
@@ -34,11 +34,6 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
         return $this->isEnabled() && $this->isAllowed();
     }
 
-    public function isDefault()
-    {
-        return Mage::helper('M2ePro/Component')->getDefaultComponent() == self::NICK;
-    }
-
     public function isObject($modelName, $value, $field = NULL)
     {
         $mode = Mage::helper('M2ePro/Component')->getComponentMode($modelName, $value, $field);
@@ -57,98 +52,16 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
         return Mage::helper('M2ePro/Component')->getComponentObject(self::NICK, $modelName, $value, $field);
     }
 
+    public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
+    {
+        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            self::NICK, $modelName, $value, $field, $tags
+        );
+    }
+
     public function getCollection($modelName)
     {
         return $this->getModel($modelName)->getCollection();
-    }
-
-    // ########################################
-
-    public static function isASIN($string)
-    {
-        return !empty($string) &&
-               $string{0} == 'B' &&
-               strlen($string) == 10;
-    }
-
-    public static function isISBN($string)
-    {
-        $string = (string)$string;
-
-        if (strlen($string) == 10) {
-
-            $subTotal = 0;
-            $mpBase = 10;
-            for ($x=0; $x<=8; $x++) {
-                $mp = $mpBase - $x;
-                $subTotal += ($mp * $string{$x});
-            }
-
-            $rest = $subTotal % 11;
-            $checkDigit = $string{9};
-            if (strtolower($checkDigit) == "x") {
-                $checkDigit = 10;
-            }
-
-            return $checkDigit == (11 - $rest);
-
-        } elseif (strlen($string) == 13) {
-
-            $subTotal = 0;
-            for ($x=0; $x<=11; $x++) {
-                $mp = ($x + 1) % 2 == 0 ? 3 : 1;
-                $subTotal += $mp * $string{$x};
-            }
-
-            $rest = $subTotal % 10;
-            $checkDigit = $string{12};
-            if (strtolower($checkDigit) == "x") {
-                $checkDigit = 10;
-            }
-
-            return $checkDigit == (10 - $rest);
-        }
-
-        return false;
-    }
-
-    //-----------------------------------------
-
-    public function isUPC($upc)
-    {
-        return $this->isWorldWideId($upc,'UPC');
-    }
-
-    public function isEAN($ean)
-    {
-        return $this->isWorldWideId($ean,'EAN');
-    }
-
-    private function isWorldWideId($worldWideId,$type)
-    {
-        $adapters = array(
-            'UPC' => array(
-                '8'  => 'Upce',
-                '12' => 'Upca'
-            ),
-            'EAN' => array(
-                '8'  => 'Ean8',
-                '13' => 'Ean13'
-            )
-        );
-
-        $length = strlen($worldWideId);
-
-        if (!isset($adapters[$type],$adapters[$type][$length])) {
-            return false;
-        }
-
-        try {
-            $validator = new Zend_Validate_Barcode($adapters[$type][$length]);
-            return $validator->isValid($worldWideId);
-        } catch (Zend_Validate_Exception $e) {
-            return true;
-        }
     }
 
     // ########################################
@@ -159,7 +72,7 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
         $marketplaceId <= 0 && $marketplaceId = self::MARKETPLACE_US;
 
         $domain = $this->getCachedObject('Marketplace',$marketplaceId)->getUrl();
-        $applicationName = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/amazon/', 'application_name');
+        $applicationName = Mage::helper('M2ePro/Component_Amazon')->getApplicationName();
 
         return 'https://sellercentral.'.
                 $domain.
@@ -190,9 +103,20 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function clearAllCache()
+    public function getApplicationName()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues(self::NICK);
+        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/amazon/', 'application_name');
+    }
+
+    // ########################################
+
+    public function getCurrencies()
+    {
+        return array (
+            'GBP' => 'British Pound',
+            'EUR' => 'Euro',
+            'USD' => 'US Dollar',
+        );
     }
 
     public function getCarriers()
@@ -219,11 +143,9 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
+    public function clearCache()
     {
-        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            self::NICK, $modelName, $value, $field, $tags
-        );
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);
     }
 
     // ########################################

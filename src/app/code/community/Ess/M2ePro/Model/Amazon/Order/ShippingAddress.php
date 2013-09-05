@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Order_ShippingAddress extends Ess_M2ePro_Model_Order_ShippingAddress
@@ -68,20 +68,15 @@ class Ess_M2ePro_Model_Amazon_Order_ShippingAddress extends Ess_M2ePro_Model_Ord
         return $phone;
     }
 
-    protected function getState()
+    public function isRegionValidationRequired()
     {
         if (!$this->getCountry()->getId() || strtoupper($this->getCountry()->getId()) != 'US') {
-            return parent::getState();
+            return false;
         }
 
-        $state = parent::getState();
+        $collection = Mage::getResourceModel('directory/region_collection');
+        $collection->addCountryFilter($this->getCountry()->getId());
 
-        preg_match('/[a-zA-Z]+/', $state, $matches);
-
-        if (empty($matches)) {
-            throw new LogicException('State in the Shipping Address is empty or invalid.');
-        }
-
-        return array_shift($matches);
+        return $collection->getSize() > 0;
     }
 }

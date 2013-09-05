@@ -53,6 +53,7 @@
                         <?php foreach ($transactions as $key => $transaction) { ?>
                             <tr class="<?php echo $key % 2 ? 'odd' : 'even' ?>">
                                 <td>
+                                    <?php // todo Ebay ?>
                                     <?php if (strtolower($this->getPaymentMethod()) == 'paypal') { ?>
                                         <a href="<?php echo Mage::helper('adminhtml')->getUrl('M2ePro/adminhtml_ebay_order/goToPaypal', array('transaction_id' => $transaction['transaction_id'])); ?>" target="_blank"><?php echo $transaction['transaction_id']; ?></a>
                                     <?php } else { ?>

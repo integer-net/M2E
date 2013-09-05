@@ -2,17 +2,10 @@
 
 <script type="text/javascript">
 
-    if (typeof M2eProBuyWelcomeTutorial == 'undefined') {
-        M2eProBuyWelcomeTutorial = {};
-        M2eProBuyWelcomeTutorial.url = {};
-        M2eProBuyWelcomeTutorial.formData = {};
-        M2eProBuyWelcomeTutorial.text = {};
-    }
-
     var isTutorialFinished = false;
 
     M2eProBuyWelcomeTutorialHandlerObj = new VideoTutorialHandler(
-        M2eProBuyWelcomeTutorial,'buy_welcome_video_tutorial_pop_up',
+        'buy_welcome_video_tutorial_pop_up',
         '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('M2E Pro - Rakuten.com/Magento Integration : Configuration Wizard')); ?>',
         function() {}
     );

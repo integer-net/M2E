@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Welcome_Content extends Mage_Adminhtml_Block_Widget
@@ -14,7 +14,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Welcome_Content extends Mage_Admi
 
         // Initialization block
         //------------------------------
-        $this->setId('wizardAmazonWelcomeContent');
+        $this->setId('wizardWelcomeContent');
         //------------------------------
 
         $this->setTemplate('M2ePro/wizard/amazon/welcome/content.phtml');
@@ -25,8 +25,8 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Welcome_Content extends Mage_Admi
     protected function _beforeToHtml()
     {
         //------------------------------
-        $step = $this->helper('M2ePro/Wizard')->getWizard($this->getNick())->getFirstStep();
-        $status = Ess_M2ePro_Helper_Wizard::STATUS_ACTIVE;
+        $step = $this->helper('M2ePro/Module_Wizard')->getWizard($this->getNick())->getFirstStep();
+        $status = Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE;
         $callback = 'function() { setLocation(\''.$this->getUrl('*/adminhtml_wizard_'.$this->getNick()).'\'); }';
         $callback = 'function() { WizardHandlerObj.setStep(\''.$step.'\', '.$callback.'); }';
 

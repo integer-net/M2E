@@ -5,7 +5,7 @@
 </div>
 
 <?php
-    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data')->toArray() : array();
+    $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
     $defaults = array(
         'ebay_store_title' => '',
         'ebay_store_url' => '',
@@ -35,10 +35,6 @@
     M2ePro.formData.ebay_store_url = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['ebay_store_url']); ?>';
     M2ePro.formData.ebay_store_subscription_level = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['ebay_store_subscription_level']); ?>';
     M2ePro.formData.ebay_store_description = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['ebay_store_description']); ?>';
-
-    Event.observe(window, 'load', function() {
-
-    });
     //-----------------------------
 
 </script>
@@ -83,14 +79,16 @@
                         </td>
                     </tr>
 
-                    <tr>
-                        <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>: </label>
-                        </td>
-                        <td class="value" style="width: auto;">
-                            <?php echo $formData['ebay_store_description']; ?>
-                        </td>
-                    </tr>
+                    <?php if (!empty($formData['ebay_store_description'])) : ?>
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>: </label>
+                            </td>
+                            <td class="value" style="width: auto;">
+                                <?php echo $formData['ebay_store_description']; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
 
                     <tr>
                         <td class="label"></td>
@@ -231,9 +229,13 @@
 
                     <tr>
                         <td class="value" style="width: auto; font-weight: bold;">
-                            <?php echo Mage::helper('M2ePro')->__('This eBay account does not have eBay Store subscription.'); ?>
+                            <?php echo Mage::helper('M2ePro')->__('This eBay account does not have an eBay Store subscription.'); ?>
                         </td>
                     </tr>
+
+                </table>
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
 
                     <tr>
                         <td class="value" style="width: auto;">

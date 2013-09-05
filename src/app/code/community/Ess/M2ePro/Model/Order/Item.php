@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
@@ -118,6 +118,11 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         return $this->getSetting('product_details', 'reserved_products', array());
     }
 
+    /**
+     * Checks whether an order item has the data (variation info, sku etc), by which variations can be repaired
+     *
+     * @return bool
+     */
     public function hasRepairInput()
     {
         $repairInput = $this->getChildObject()->getRepairInput();
@@ -127,6 +132,12 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
     // ########################################
 
+    /**
+     * Mark order item as one that requires user action
+     *
+     * @param $required
+     * @return $this
+     */
     public function setActionRequired($required)
     {
         $this->setData('state', $required ? self::STATE_ACTION_REQUIRED : self::STATE_NORMAL);
@@ -219,11 +230,34 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             return $this->getOrder()->getStoreId();
         }
 
-        return $channelItem->getStoreId();
+        $storeId = $channelItem->getStoreId();
+
+        if ($storeId != Mage_Core_Model_App::ADMIN_STORE_ID) {
+            return $storeId;
+        }
+
+        if (is_null($this->getProductId())) {
+            return Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
+        }
+
+        $storeIds = Mage::getModel('M2ePro/Magento_Product')
+            ->setProductId($this->getProductId())
+            ->getStoreIds();
+
+        if (empty($storeIds)) {
+            return Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
+        }
+
+        return array_shift($storeIds);
     }
 
     // ########################################
 
+    /**
+     * Associate order item with product in magento
+     *
+     * @throws Exception
+     */
     public function associateWithProduct()
     {
         if (is_null($this->getProductId()) || !$this->getMagentoProduct()->exists()) {
@@ -252,6 +286,12 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
     // ########################################
 
+    /**
+     * Associate order item variation with options of magento product
+     *
+     * @throws LogicException
+     * @throws Exception
+     */
     private function associateVariationWithOptions()
     {
         $variation = $this->getChildObject()->getVariation();

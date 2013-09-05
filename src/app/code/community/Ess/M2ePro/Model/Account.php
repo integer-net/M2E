@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstract
@@ -22,7 +22,7 @@ class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstrac
             return true;
         }
 
-        return (bool)Mage::getModel('M2ePro/Template_General')
+        return (bool)Mage::getModel('M2ePro/Listing')
                             ->getCollection()
                             ->addFieldToFilter('account_id', $this->getId())
                             ->getSize();
@@ -51,20 +51,6 @@ class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstrac
     }
 
     // ########################################
-
-    public function getGeneralTemplates($asObjects = false, array $filters = array())
-    {
-        $generalTemplates = $this->getRelatedComponentItems('Template_General','account_id',$asObjects,$filters);
-
-        if ($asObjects) {
-            foreach ($generalTemplates as $generalTemplate) {
-                /** @var $generalTemplate Ess_M2ePro_Model_Template_General */
-                $generalTemplate->setAccount($this);
-            }
-        }
-
-        return $generalTemplates;
-    }
 
     public function getOtherListings($asObjects = false, array $filters = array())
     {
@@ -101,8 +87,6 @@ class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstrac
         return $this->getData('title');
     }
 
-    // ########################################
-
     public function isSingleAccountMode()
     {
         return Mage::getModel('M2ePro/Account')->getCollection()->getSize() <= 1;
@@ -112,13 +96,13 @@ class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstrac
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::delete();
     }
 

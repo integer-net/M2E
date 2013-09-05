@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Synchronization_Run extends Ess_M2ePro_Model_Abstract
@@ -83,7 +83,7 @@ class Ess_M2ePro_Model_Synchronization_Run extends Ess_M2ePro_Model_Abstract
 
     public function makeShutdownFunction()
     {
-        $functionCode = "Mage::helper('M2ePro')->getGlobalValue('synchRun')->stop();";
+        $functionCode = "Mage::helper('M2ePro/Data_Global')->getValue('synchRun')->stop();";
 
         $shutdownDeleteFunction = create_function('', $functionCode);
         register_shutdown_function($shutdownDeleteFunction);

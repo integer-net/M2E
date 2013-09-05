@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Mapping extends Mage_Adminhtml_Block_Widget_Container
@@ -16,26 +16,24 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Mapping extends Mage_Adminht
     protected function _beforeToHtml()
     {
         //------------------------------
-        $buttonBlock = $this->getLayout()
-                            ->createBlock('adminhtml/widget_button')
-                            ->setData( array(
-                                'id'    => 'product_mapping_submit_button',
-                                'label' => Mage::helper('M2ePro')->__('Confirm'),
-                                'class' => 'product_mapping_submit_button submit',
-                                'onclick' => 'OrderEditItemHandlerObj.assignProduct();'
-                            ) );
+        $data = array(
+            'id'      => 'product_mapping_submit_button',
+            'label'   => Mage::helper('M2ePro')->__('Confirm'),
+            'class'   => 'product_mapping_submit_button submit',
+            'onclick' => 'OrderEditItemHandlerObj.assignProduct();'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('product_mapping_submit_button',$buttonBlock);
         //------------------------------
 
         //------------------------------
-        $buttonBlock = $this->getLayout()
-                            ->createBlock('adminhtml/widget_button')
-                            ->setData( array(
-                                'id'    => 'product_mapping_advanced_search_button',
-                                'label' => Mage::helper('M2ePro')->__('Advanced Search'),
-                                'class' => 'product_mapping_advanced_search_button submit',
-                                'onclick' => '$(\'help_grid\').toggle()'
-                        ) );
+        $data = array(
+            'id'      => 'product_mapping_advanced_search_button',
+            'label'   => Mage::helper('M2ePro')->__('Advanced Search'),
+            'class'   => 'product_mapping_advanced_search_button submit',
+            'onclick' => '$(\'help_grid\').toggle()'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('product_mapping_advanced_search_button',$buttonBlock);
         //------------------------------
 

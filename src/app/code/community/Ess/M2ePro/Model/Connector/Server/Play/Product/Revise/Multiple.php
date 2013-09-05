@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Play_Product_Revise_Multiple
@@ -54,10 +54,10 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_Revise_Multiple
             $dispatchTo = $listingProduct->getChildObject()->getAddingDispatchTo();
             empty($dispatchTo) && $dispatchTo = $listingProduct->getChildObject()->getDispatchTo();
 
-            if ($dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_BOTH ||
-                $dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_UK) {
+            if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
+                $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK) {
 
-                $priceGbr = $listingProduct->getChildObject()->getPriceGbr();
+                $priceGbr = $listingProduct->getChildObject()->getPriceGbr(true);
 
                 if ($priceGbr <= 0) {
 
@@ -73,10 +73,10 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_Revise_Multiple
                 }
             }
 
-            if ($dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_BOTH ||
-                $dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_EUROPA) {
+            if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
+                $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA) {
 
-                $priceEuro = $listingProduct->getChildObject()->getPriceEuro();
+                $priceEuro = $listingProduct->getChildObject()->getPriceEuro(true);
 
                 if ($priceEuro <= 0) {
 
@@ -109,7 +109,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_Revise_Multiple
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            $nativeData = Mage::getModel('M2ePro/Play_Connector_Product_Helper')
+            $nativeData = Mage::getModel('M2ePro/Connector_Server_Play_Product_Helper')
                                          ->getReviseRequestData($listingProduct,$this->params);
 
             $sendedData = $nativeData;

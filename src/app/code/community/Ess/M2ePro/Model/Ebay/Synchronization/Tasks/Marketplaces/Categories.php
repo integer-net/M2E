@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Categories
@@ -74,10 +74,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Categories
     private function execute()
     {
         if (!empty($this->_params['marketplace_id'])) {
-            $markeptlaceObj = Mage::helper('M2ePro/Component')
+            $marketplaceObj = Mage::helper('M2ePro/Component')
                 ->getUnknownObject('Marketplace',$this->_params['marketplace_id']);
 
-            if ($markeptlaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Ebay::NICK) {
+            if ($marketplaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Ebay::NICK) {
                 return;
             }
         }
@@ -136,8 +136,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Categories
 
             $this->_profiler->addTimePoint(__METHOD__.'get'.$marketplace->getId(),'Get categories from eBay');
 
-            // ->__('The "Categories Synchronization" action for marketplace: "%s" is started. Please wait...')
-            $status = 'The "Categories Synchronization" action for marketplace: "%s" is started. Please wait...';
+            // ->__('The "Categories Synchronization" action for eBay Site: "%s" is started. Please wait...')
+            $status = 'The "Categories Synchronization" action for eBay Site: "%s" is started. Please wait...';
             $tempString =  Mage::helper('M2ePro')->__($status, Mage::helper('M2ePro')->__($marketplace->getTitle()));
             $this->_lockItem->setStatus($tempString);
 
@@ -164,7 +164,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Categories
             $this->_profiler->addTimePoint(__METHOD__.'save'.$marketplace->getId(),'Save categories to DB');
 
             $status = <<<STATUS
-The "Categories Synchronization" action for marketplace: "%s" is in data processing mode. Please wait...
+The "Categories Synchronization" action for eBay Site: "%s" - this shouldn't take too long...
 STATUS;
             $tempString = Mage::helper('M2ePro')->__($status, Mage::helper('M2ePro')->__($marketplace->getTitle()));
             $this->_lockItem->setStatus($tempString);
@@ -210,9 +210,9 @@ STATUS;
             $logMarketplacesString .= $marketplace->getTitle();
         }
 
-        // ->__('The "Categories Synchronization" action for marketplace: "%mrk%" has been successfully completed.');
+        // ->__('The "Categories Synchronization" action for eBay Site: "%mrk%" has been successfully completed.');
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Categories Synchronization" action for marketplace: "%mrk%" has been successfully completed.',
+            'The "Categories Synchronization" action for eBay Site: "%mrk%" has been successfully completed.',
             array('mrk'=>$logMarketplacesString)
         );
         $this->_logs->addMessage($tempString,

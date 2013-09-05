@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2ePro_Model_Ebay_Synchronization_Tasks
@@ -10,7 +10,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
     const PERCENTS_END = 100;
     const PERCENTS_INTERVAL = 100;
 
-    protected $_configGroup = '/synchronization/settings/orders/';
+    //####################################
+
+    // ->__('eBay Orders Receive Synchronization')
+    private $name = 'eBay Orders Receive Synchronization';
 
     //####################################
 
@@ -41,31 +44,21 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         $this->_lockItem->activate();
         $this->_logs->setSynchronizationTask(Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS);
 
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Ebay::TITLE.' ';
-        } else {
-            $componentName = '';
-        }
-
         $this->_profiler->addEol();
-        $this->_profiler->addTitle($componentName.'Orders Synchronization');
+        $this->_profiler->addTitle($this->name);
         $this->_profiler->addTitle('--------------------------');
         $this->_profiler->addTimePoint(__CLASS__, 'Total time');
         $this->_profiler->increaseLeftPadding(5);
 
-        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($componentName.'Orders Synchronization'));
+        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($this->name));
         $this->_lockItem->setPercents(self::PERCENTS_START);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Synchronization" is started. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is started. Please wait...', $this->name));
     }
 
     private function cancelSynch()
     {
         $this->_lockItem->setPercents(self::PERCENTS_END);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Synchronization" is finished. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is finished. Please wait...', $this->name));
 
         $this->_profiler->decreaseLeftPadding(5);
         $this->_profiler->addEol();
@@ -122,10 +115,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         $this->_profiler->addEol();
         $this->_profiler->addTimePoint(__METHOD__.'get'.$account->getId(),'Get orders from eBay');
 
-        // ->__('Task "Orders Synchronization" for eBay account: "%s" is started. Please wait...')
-        $status = 'Task "Orders Synchronization" for eBay account: "%s" is started. Please wait...';
-        $tempString = Mage::helper('M2ePro')->__($status, $account->getTitle());
-        $this->_lockItem->setStatus($tempString);
+        // ->__('Task "%s" for eBay account: "%s" is started. Please wait...')
+        $status = 'Task "%s" for eBay account: "%s" is started. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle());
+        $this->_lockItem->setStatus($status);
 
         $currentPercent = $this->_lockItem->getPercents();
 
@@ -144,8 +137,12 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
             $account->setData('orders_last_synchronization', $fromTime)->save();
         }
 
+        $entity = 'sales';
+        $type   = 'get';
+        $name   = 'list';
+
         $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-            ->processVirtualAbstract('sales', 'get', 'list', $request, NULL, NULL, $account, NULL);
+            ->processVirtualAbstract($entity, $type, $name, $request, NULL, NULL, $account);
 
         $ebayOrders = array();
         $toTime = $fromTime;
@@ -169,10 +166,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         $this->_profiler->addTitle('Total count orders received from eBay: '.count($ebayOrders));
         $this->_profiler->addTimePoint(__METHOD__.'process'.$account->getId(),'Processing received orders from eBay');
 
-        // ->__('Task "Orders Synchronization" for eBay account: "%acc%" is in data processing state. Please wait...')
-        $status = 'Task "Orders Synchronization" for eBay account: "%s" is in data processing state. Please wait...';
-        $tempString = Mage::helper('M2ePro')->__($status, $account->getTitle());
-        $this->_lockItem->setStatus($tempString);
+        // ->__('Task "%s" for eBay account: "%acc%" is in data processing state. Please wait...')
+        $status = 'Task "%s" for eBay account: "%s" is in data processing state. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle());
+        $this->_lockItem->setStatus($status);
 
         // Save eBay orders
         //---------------------------
@@ -205,10 +202,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         $this->_profiler->addEol();
         $this->_profiler->addTimePoint(__METHOD__.'magento_orders_process'.$account->getId(),'Creating magento orders');
 
-        // ->__('Task "Orders Synchronization" for eBay account: "%s" is in order creation state.. Please wait...')
-        $status = 'Task "Orders Synchronization" for eBay account: "%s" is in order creation state.. Please wait...';
-        $tempString = Mage::helper('M2ePro')->__($status, $account->getTitle());
-        $this->_lockItem->setStatus($tempString);
+        // ->__('Task "%s" for eBay account: "%s" is in order creation state.. Please wait...')
+        $status = 'Task "%s" for eBay account: "%s" is in order creation state.. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle());
+        $this->_lockItem->setStatus($status);
 
         // Create magento orders
         //---------------------------
@@ -224,7 +221,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
                     $order->createMagentoOrder();
                     $magentoOrders++;
                 } catch (Exception $e) {
-                    Mage::helper('M2ePro/Exception')->process($e);
+                    Mage::helper('M2ePro/Module_Exception')->process($e);
                 }
             }
 

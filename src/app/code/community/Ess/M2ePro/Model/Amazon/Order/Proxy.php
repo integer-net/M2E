@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
@@ -12,11 +12,11 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
     // ########################################
 
     /**
-     * @param array $items
+     * @param Ess_M2ePro_Model_Order_Item_Proxy[] $items
      * @return Ess_M2ePro_Model_Order_Item_Proxy[]
      * @throws Exception
      */
-    protected function mergeItems(array $items)
+    protected function mergeItems(array &$items)
     {
         foreach ($items as $key => $item) {
             if ($item->getPrice() <= 0) {
@@ -174,13 +174,19 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 
     public function getTaxRate()
     {
-        if ($this->order->getPaidAmount() == 0) {
+        $paidAmount = $this->order->getPaidAmount();
+        $taxAmount  = $this->order->getTaxAmount();
+
+        if ($paidAmount == 0 || $taxAmount == 0) {
             return 0;
         }
 
-        $taxRate = -1 / (($this->order->getTaxAmount() / $this->order->getPaidAmount()) - 1) - 1;
+        if ($paidAmount == $taxAmount) {
+            // impossible in real world, but this check is required to prevent possible division by zero
+            return 0;
+        }
 
-        return round($taxRate * 100, 2);
+        return round(100 / (($paidAmount - $taxAmount) / $taxAmount), 4);
     }
 
     public function hasVat()

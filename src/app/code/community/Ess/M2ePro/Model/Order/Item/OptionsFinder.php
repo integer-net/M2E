@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Order_Item_OptionsFinder
@@ -235,6 +235,16 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
     private function getGroupedAssociatedProduct()
     {
         $variationName = array_shift($this->variation);
+
+        //------------------------------
+        $configGroup = '/order/magento/settings/';
+        $configKey   = 'create_with_first_product_options_when_variation_unavailable';
+        $configValue = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue($configGroup, $configKey);
+
+        if ((is_null($variationName) || strlen(trim($variationName)) == 0) && !$configValue) {
+            return null;
+        }
+        //------------------------------
 
         $associatedProducts = $this->magentoProduct->getProductVariationsForOrder();
 

@@ -7,6 +7,39 @@ MagentoBlock.prototype = {
 
     // --------------------------------
 
+    getHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_mb_' + md5(id).substr(0, 10);
+        var notHashedCookie = getCookie(id);
+        var resultCookie = null;
+
+        if (notHashedCookie !== "") {
+            deleteCookie(id, '/', '');
+            this.setHashedCookie(id);
+            resultCookie = notHashedCookie;
+        } else {
+            resultCookie = getCookie(hashedCookieKey);
+        }
+
+        return resultCookie;
+    },
+
+    setHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_mb_' + md5(id).substr(0, 10);
+        setCookie(hashedCookieKey, 1, 3*365, '/');
+    },
+
+    deleteHashedCookie: function(id)
+    {
+        var hashedCookieKey = 'm2e_mb_' + md5(id).substr(0, 10);
+
+        deleteCookie(hashedCookieKey, '/', '');
+        deleteCookie(id, '/', '');
+    },
+
+    // --------------------------------
+
     show: function(blockClass,init)
     {
         blockClass = blockClass || '';
@@ -30,7 +63,7 @@ MagentoBlock.prototype = {
         tempHtml2 += '</div>';
         $$('div.'+blockClass)[0].select('div.entry-edit-head div.entry-edit-head-right')[0].innerHTML = tempHtml2 + tempHtml;
 
-        deleteCookie(blockClass, '/', '');
+        this.deleteHashedCookie(blockClass);
 
         if (init == '0') {
             $$('div.'+blockClass+' div.fieldset')[0].show();
@@ -67,7 +100,7 @@ MagentoBlock.prototype = {
         tempHtml2 += '</div>';
         $$('div.'+blockClass)[0].select('div.entry-edit-head div.entry-edit-head-right')[0].innerHTML = tempHtml2 + tempHtml;
 
-        setCookie( blockClass , 1 , 3*365 , '/' );
+        this.setHashedCookie(blockClass);
 
         if (init == '0') {
             $$('div.'+blockClass+' div.fieldset')[0].hide();
@@ -104,7 +137,7 @@ MagentoBlock.prototype = {
         var tempObj = blockObj.select('div.entry-edit-head div.entry-edit-head-left')[0];
         tempObj.setStyle({cursor: 'pointer'});
 
-        var isClosed = getCookie(blockClass);
+        var isClosed = this.getHashedCookie(blockClass);
 
         if (isClosed == '' || isClosed == '0') {
             self.show(blockClass,'1');

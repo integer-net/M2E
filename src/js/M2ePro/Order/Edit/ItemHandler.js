@@ -108,7 +108,7 @@ OrderEditItemHandler.prototype = Object.extend(new CommonHandler(), {
 
     getItemEditHtml: function(itemId, callback)
     {
-        new Ajax.Request(M2ePro.url.edit_item, {
+        new Ajax.Request(M2ePro.url.get('adminhtml_order/editItem'), {
             method: 'get',
             parameters: {
                 item_id : itemId
@@ -160,25 +160,25 @@ OrderEditItemHandler.prototype = Object.extend(new CommonHandler(), {
 
         if (sku == '' && productId == '') {
             $('product_id').focus();
-            alert(M2ePro.text.product_and_sku_not_defined);
+            alert(M2ePro.translator.translate('Please enter correct product ID or SKU.'));
             return;
         }
 
         if (((/^\s*(\d)*\s*$/i).test(productId) == false)) {
-            alert(M2ePro.text.product_not_defined);
+            alert(M2ePro.translator.translate('Please enter correct product ID.'));
             $('product_id').focus();
             $('product_id').value = '';
             $('sku').value = '';
             return;
         }
 
-        if (!confirm(CONFIRM)) {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
         }
 
         $('help_grid').hide();
 
-        new Ajax.Request(M2ePro.url.assign_product, {
+        new Ajax.Request(M2ePro.url.get('adminhtml_order/assignProduct'), {
             method: 'post',
             parameters: {
                 product_id : productId,
@@ -200,11 +200,11 @@ OrderEditItemHandler.prototype = Object.extend(new CommonHandler(), {
             return;
         }
 
-        if ($('save_repair') && $('save_repair').checked && !confirm(CONFIRM)) {
+        if ($('save_repair') && $('save_repair').checked && !confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
         }
 
-        new Ajax.Request(M2ePro.url.assign_product_details, {
+        new Ajax.Request(M2ePro.url.get('adminhtml_order/assignProductDetails'), {
             method: 'post',
             parameters: Form.serialize('modal_dialog_message'),
             onSuccess: self.afterActionCallback.bind(self)
@@ -217,14 +217,14 @@ OrderEditItemHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = this;
 
-        if (!confirm(CONFIRM)) {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
         }
 
         self.gridId = gridId;
         self.orderItemId = orderItemId;
 
-        new Ajax.Request(M2ePro.url.unassign_product, {
+        new Ajax.Request(M2ePro.url.get('adminhtml_order/unassignProduct'), {
             method: 'post',
             parameters: {
                 order_item_id: orderItemId

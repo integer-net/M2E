@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Grid extends Mage_Adminhtml_Block_Widget_Grid
@@ -26,6 +26,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Grid extends Mage_Adminhtml_Block
 
     protected function _prepareCollection()
     {
+        $accountId = $this->getRequest()->getParam('account');
+        if (is_null($accountId)) {
+            return parent::_prepareCollection();
+        }
+
         $collection = Mage::getModel('M2ePro/Ebay_Feedback')->getCollection();
 
         $dbExpr = new Zend_Db_Expr('if(`main_table`.`seller_feedback_text` = \'\', 0, 1)');
@@ -41,9 +46,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Grid extends Mage_Adminhtml_Block
                        array('have_seller_feedback' => $dbExpr)
                    );
 
-        if ($accountId = $this->getRequest()->getParam('ebayAccount')) {
-            $collection->addFieldToFilter('`main_table`.`account_id`', $accountId);
-        }
+        $collection->addFieldToFilter('`main_table`.`account_id`', $accountId);
 
         $this->setCollection($collection);
 
@@ -100,7 +103,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Grid extends Mage_Adminhtml_Block
             'type'   => 'text',
             'width'  => '185px',
             'index'  => 'ebay_item_title',
-            'frame_callback' => array($this, 'callbackColumnEbayItemTitle')
+            'escape' => true
         ));
 
         $this->addColumn('buyer_feedback_date', array(
@@ -138,14 +141,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Grid extends Mage_Adminhtml_Block
         ));
 
         $this->addColumn('feedbacks', array(
-            'header'       => Mage::helper('M2ePro')->__('Feedbacks'),
+            'header'       => Mage::helper('M2ePro')->__('Feedback'),
             'align'        => 'left',
             'type'         => 'options',
             'filter_index' => 'have_seller_feedback',
             'sortable'     => false,
             'options'      => array(
-                0 => Mage::helper('M2ePro')->__('Unresponded Feedbacks'),
-                1 => Mage::helper('M2ePro')->__('Responded Feedbacks')
+                0 => Mage::helper('M2ePro')->__('Unresponded Feedback'),
+                1 => Mage::helper('M2ePro')->__('Responded Feedback')
             ),
             'frame_callback' => array($this, 'callbackColumnFeedbacks')
         ));
@@ -168,11 +171,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Grid extends Mage_Adminhtml_Block
         $url = $this->getUrl('*/*/goToItem', array('feedback_id' => $row->getData('id')));
 
         return '<a href="'.$url.'" target="_blank">'.Mage::helper('M2ePro')->escapeHtml($value).'</a>';
-    }
-
-    public function callbackColumnEbayItemTitle($value, $row, $column, $isExport)
-    {
-        return Mage::helper('M2ePro')->escapeHtml($value);
     }
 
     public function callbackColumnBuyerFeedbackDate($value, $row, $column, $isExport)

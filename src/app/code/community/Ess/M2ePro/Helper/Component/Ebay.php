@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
@@ -12,6 +12,7 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
     const TITLE = 'eBay';
 
     const MARKETPLACE_US     = 1;
+    const MARKETPLACE_UK     = 3;
     const MARKETPLACE_DE     = 8;
     const MARKETPLACE_MOTORS = 9;
 
@@ -32,11 +33,6 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
         return $this->isEnabled() && $this->isAllowed();
     }
 
-    public function isDefault()
-    {
-        return Mage::helper('M2ePro/Component')->getDefaultComponent() == self::NICK;
-    }
-
     public function isObject($modelName, $value, $field = NULL)
     {
         $mode = Mage::helper('M2ePro/Component')->getComponentMode($modelName, $value, $field);
@@ -53,6 +49,13 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
     public function getObject($modelName, $value, $field = NULL)
     {
         return Mage::helper('M2ePro/Component')->getComponentObject(self::NICK, $modelName, $value, $field);
+    }
+
+    public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
+    {
+        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            self::NICK, $modelName, $value, $field, $tags
+        );
     }
 
     public function getCollection($modelName)
@@ -90,12 +93,26 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function clearAllCache()
+    public function getCurrencies()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues(self::NICK);
+        return array(
+            'AUD' => 'Australian Dollar',
+            'GBP' => 'British Pound',
+            'CAD' => 'Canadian Dollar',
+            'CNY' => 'Chinese Renminbi',
+            'EUR' => 'Euro',
+            'HKD' => 'Hong Kong Dollar',
+            'INR' => 'Indian Rupees',
+            'MYR' => 'Malaysian Ringgit',
+            'PHP' => 'Philippines Peso',
+            'PLN' => 'Polish Zloty',
+            'SGD' => 'Singapore Dollar',
+            'SEK' => 'Sweden Krona',
+            'CHF' => 'Swiss Franc',
+            'TWD' => 'Taiwanese Dollar',
+            'USD' => 'US Dollar',
+        );
     }
-
-    // ########################################
 
     public function getCarrierTitle($carrierCode, $title = null)
     {
@@ -123,13 +140,20 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
         );
     }
 
+    public function isCharityMarketplace($marketplaceId)
+    {
+        return in_array($marketplaceId, array(
+            self::MARKETPLACE_US,
+            self::MARKETPLACE_UK,
+            self::MARKETPLACE_MOTORS
+        ));
+    }
+
     // ########################################
 
-    public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
+    public function clearCache()
     {
-        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            self::NICK, $modelName, $value, $field, $tags
-        );
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);
     }
 
     // ########################################

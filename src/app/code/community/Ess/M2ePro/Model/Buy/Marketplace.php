@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Marketplace extends Ess_M2ePro_Model_Component_Child_Buy_Abstract
@@ -43,6 +43,15 @@ class Ess_M2ePro_Model_Buy_Marketplace extends Ess_M2ePro_Model_Component_Child_
         return true;
     }
 
+    // ########################################
+
+    public function getCurrency()
+    {
+        return Ess_M2ePro_Helper_Component_Buy::DEFAULT_CURRENCY;
+    }
+
+    // ########################################
+
     public function isSynchronized()
     {
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
@@ -60,13 +69,13 @@ class Ess_M2ePro_Model_Buy_Marketplace extends Ess_M2ePro_Model_Component_Child_
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
         return parent::delete();
     }
 

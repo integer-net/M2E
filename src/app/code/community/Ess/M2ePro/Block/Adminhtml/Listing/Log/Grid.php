@@ -1,22 +1,28 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
+abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
 {
+    protected $viewComponentHelper = NULL;
+
     // ####################################
 
     public function __construct()
     {
         parent::__construct();
 
-        $listingData = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        // Initialize view
+        //------------------------------
+        $view = Mage::helper('M2ePro/View')->getCurrentView();
+        $this->viewComponentHelper = Mage::helper('M2ePro/View')->getComponentHelper($view);
+        //------------------------------
 
         // Initialization block
         //------------------------------
-        $this->setId('listingLogGrid'.(isset($listingData['id'])?$listingData['id']:''));
+        $this->setId($view . 'ListingLogGrid' . $this->getEntityId());
         //------------------------------
 
         // Set default values
@@ -32,25 +38,26 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
 
     protected function _prepareCollection()
     {
-        $listingData = Mage::helper('M2ePro')->getGlobalValue('temp_data');
-
         // Get collection logs
         //--------------------------------
         $collection = Mage::getModel('M2ePro/Listing_Log')->getCollection();
         //--------------------------------
 
-        $components = Mage::helper('M2ePro/Component')->getActiveComponents();
-        $collection->getSelect()
-            ->where('component_mode IN(\''.implode('\',\'',$components).'\') OR component_mode IS NULL');
-
         // Set listing filter
         //--------------------------------
-        if (isset($listingData['id'])) {
-            $collection->addFieldToFilter('listing_id', $listingData['id']);
+        if ($this->getEntityId()) {
+            $collection->addFieldToFilter('listing_id', $this->getEntityId());
         }
         //--------------------------------
 
-        // we need sort by id also, because create_date may be same for some adjacents entries
+        // prepare components
+        //--------------------------------
+        $components = $this->viewComponentHelper->getActiveComponents();
+        $collection->getSelect()
+            ->where('component_mode IN(\''.implode('\',\'',$components).'\') OR component_mode IS NULL');
+        //--------------------------------
+
+        // we need sort by id also, because create_date may be same for some adjustment entries
         //--------------------------------
         if ($this->getRequest()->getParam('sort', 'create_date') == 'create_date') {
             $collection->setOrder('id', $this->getRequest()->getParam('dir', 'DESC'));
@@ -65,8 +72,6 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
 
     protected function _prepareColumns()
     {
-        $listingData = Mage::helper('M2ePro')->getGlobalValue('temp_data');
-
         $this->addColumn('create_date', array(
             'header'    => Mage::helper('M2ePro')->__('Creation Date'),
             'align'     => 'left',
@@ -76,7 +81,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
             'index'     => 'create_date'
         ));
 
-        if (!isset($listingData['id']) && count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
+        if (!$this->getEntityId() && !$this->viewComponentHelper->isSingleActiveComponent()) {
             $this->addColumn('component_mode', array(
                 'header'         => Mage::helper('M2ePro')->__('Channel'),
                 'align'          => 'right',
@@ -85,7 +90,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
                 'index'          => 'component_mode',
                 'filter_index'   => 'main_table.component_mode',
                 'sortable'       => false,
-                'options'        => $this->getComponentModeFilterOptions()
+                'options'        => $this->viewComponentHelper->getActiveComponentsTitles()
             ));
         }
 
@@ -97,10 +102,10 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
             'index'     => 'action',
             'sortable'  => false,
             'filter_index' => 'main_table.action',
-            'options' => Mage::getModel('M2ePro/Listing_Log')->getActionsTitles()
+            'options' => $this->getActionTitles()
         ));
 
-        if (!isset($listingData['id'])) {
+        if (!$this->getEntityId()) {
 
             $this->addColumn('listing_id', array(
                 'header'    => Mage::helper('M2ePro')->__('Listing ID'),
@@ -209,7 +214,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
                 '*/adminhtml_'.$row->getData('component_mode').'_listing/view',
                 array('id' => $row->getData('listing_id'))
             );
-            $value = '<a href="'.$url.'">'.
+            $value = '<a target="_blank" href="'.$url.'">'.
                      Mage::helper('M2ePro')->escapeHtml($value).
                      '</a>';
         }
@@ -225,7 +230,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
 
         if ($row->getData('product_id')) {
             $url = $this->getUrl('adminhtml/catalog_product/edit', array('id' => $row->getData('product_id')));
-            $value = '<a href="'.$url.'" target="_blank">'.
+            $value = '<a target="_blank" href="'.$url.'" target="_blank">'.
                         Mage::helper('M2ePro')->escapeHtml($value).
                      '</a>';
         }
@@ -244,6 +249,10 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Block_Admin
     {
         return false;
     }
+
+    // ####################################
+
+    abstract protected function getActionTitles();
 
     // ####################################
 }

@@ -1,15 +1,17 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Item
 {
-    public static function removeDeletedProduct($product, $component = null)
+    // ########################################
+
+    public function removeDeletedProduct($product, $component = null)
     {
         $productId = $product instanceof Mage_Catalog_Model_Product
-            ? (int)$product->getId() : (int)$product;
+                        ? (int)$product->getId() : (int)$product;
 
         /** @var $resource Mage_Core_Model_Resource */
         $resource = Mage::getSingleton('core/resource');
@@ -24,12 +26,12 @@ class Ess_M2ePro_Model_Item
 
         foreach ($components as $component) {
             $itemTable = $resource->getTableName("m2epro_{$component}_item");
-
             if (!in_array($itemTable, $existTables)) {
                 continue;
             }
-
             $connWrite->delete($itemTable, array('product_id = ?' => $productId));
         }
     }
+
+    // ########################################
 }

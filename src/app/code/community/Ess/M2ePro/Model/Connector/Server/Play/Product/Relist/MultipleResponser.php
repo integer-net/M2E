@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Play_Product_Relist_MultipleResponser
@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_Relist_MultipleResponser
                 'status_changer' => $this->getStatusChanger()
             );
 
-            Mage::getModel('M2ePro/Play_Connector_Product_Helper')
+            Mage::getModel('M2ePro/Connector_Server_Play_Product_Helper')
                         ->updateAfterRelistAction($listingProduct,$requestData,$tempParams);
 
             // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully relisted');

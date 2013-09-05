@@ -88,8 +88,8 @@ class Ess_M2ePro_Model_Servicing_Task_Exceptions implements Ess_M2ePro_Model_Ser
         $validatedFilters = array();
 
         $allowedFilterTypes = array(
-            Ess_M2ePro_Helper_Exception::FILTER_TYPE_TYPE,
-            Ess_M2ePro_Helper_Exception::FILTER_TYPE_INFO
+            Ess_M2ePro_Helper_Module_Exception::FILTER_TYPE_TYPE,
+            Ess_M2ePro_Helper_Module_Exception::FILTER_TYPE_INFO
         );
 
         foreach ($data['filters'] as $filter) {

@@ -1,0 +1,445 @@
+<div id="block_notice_amazon_template_new_product_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('This tab contains the main information on products you want to list: Attribute Set
+ (it must be the same as M2E Listing has to be assigned), UPC / EAN Settings and
+ Category in which the products have to be listed.<br/><br/>
+The category either can be chosen by <u>Browsing</u> all categories from the list or can be found with <u>Searching
+ tool</u> by entering keywords.'); ?>
+</div>
+
+<?php
+$formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data') : array();
+$default = array(
+    'category' => array(
+        'id' => '',
+        'attribute_sets' => array(),
+        'path' => '',
+        'xsd_hash' => '',
+
+        'title'    => '',
+
+        'node_title' => '',
+        'identifiers' => json_encode(array('item_types' => null, 'browsenode_id' => null)),
+        'registered_parameter' => '',
+        'worldwide_id_mode' => Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE,
+        'worldwide_id_custom_attribute' => ''
+    ),
+    'specifics' => array()
+);
+
+$formData = array_merge($default, $formData);
+
+$isEdit = !!$this->getRequest()->getParam('id');
+
+if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
+    $formData['category']['attribute_sets'] = $this->listingAttributeSetsIds;
+}
+
+$formData['category']['identifiers'] = Mage::helper('M2ePro')->escapeHtml($formData['category']['identifiers']);
+?>
+
+<script type="text/javascript">
+
+    Validation.add('M2ePro-validate-greater-than-1', '<?php echo Mage::helper('M2ePro')->__('Please enter a number 1 or greater in this field.'); ?>', function(value, el) {
+
+        if (!el.up('tr').visible()) {
+            return true;
+        }
+
+        value = str_replace(',','.',value);
+
+        var numValue = parseNumber(value);
+        if (isNaN(numValue)) {
+            return false;
+        }
+
+        return numValue >= 1;
+    });
+
+    // General for all tabs
+    //-----------------------------
+    M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Amazon_Template_NewProduct'); ?>,'Ess_M2ePro_Model_Amazon_Template_NewProduct');
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'adminhtml_common_amazon_template_newProduct/searchCategory' => $this->getUrl('M2ePro/adminhtml_common_amazon_template_newProduct/searchCategory',array('marketplace_id'=>$this->marketplaceId)),
+        'adminhtml_common_amazon_template_newProduct/getXsds' => $this->getUrl('M2ePro/adminhtml_common_amazon_template_newProduct/getXsds',array('marketplace_id'=>$this->marketplaceId)),
+        'adminhtml_common_amazon_template_newProduct/getCategories' => $this->getUrl('M2ePro/adminhtml_common_amazon_template_newProduct/getCategories',array('marketplace_id'=>$this->marketplaceId)),
+        'adminhtml_common_amazon_template_newProduct/getSpecifics' => $this->getUrl('M2ePro/adminhtml_common_amazon_template_newProduct/getSpecifics')
+    )); ?>);
+
+    M2ePro.url.helpIcon = '<?php echo $this->getSkinUrl('images').'/fam_help.gif'; ?>';
+
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'This category is not supported at the moment, as it contains variational items only. Please select another category.' => $this->__('This category is not supported at the moment, as it contains variational items only. Please select another category.'),
+
+        'Search For Category' => $this->__('Search For Category'),
+        'You should select Category first' => $this->__('You should select Category first'),
+        'This is a required field. Please press Choose button.' => $this->__('This is a required field. Please press Choose button.'),
+        'The specified title is already used for another New ASIN Template.' => $this->__('The specified title is already used for another New ASIN Template.'),
+        'Please enter at least 3 letters.' => $this->__('Please enter at least 3 letters.'),
+        'Internal Error. Please try again later.' => $this->__('Internal Error. Please try again later.'),
+        'Incorrect data.' => $this->__('Incorrect data.'),
+
+        'Add'       => $this->__('Add'),
+        'Duplicate' => $this->__('Duplicate'),
+        'Delete'    => $this->__('Delete'),
+        'Choose'    => $this->__('Choose'),
+
+        'Optional Specifics' => $this->__('Optional Specifics'),
+        'Recommended Values' => $this->__('Recommended Values'),
+        'Allowed Values'     => $this->__('Allowed Values'),
+        'Custom Attribute'   => $this->__('Custom Attribute'),
+        'Custom Value'       => $this->__('Custom Value'),
+
+        'Definition:'    => $this->__('Definition:'),
+        'Tips:'          => $this->__('Tips:'),
+        'Examples:'      => $this->__('Examples:'),
+        'Helpful Info:'  => $this->__('Helpful Info:'),
+        'Desired'        => $this->__('Desired')
+    )); ?>);
+
+    M2ePro.formData = <?php echo json_encode($formData); ?>;
+
+    M2ePro.customData.is_edit = <?php echo json_encode($isEdit); ?>;
+    M2ePro.customData.only_variation_xsd_hashes = <?php echo $this->onlyVariationXsdHashes; ?>;
+
+    Event.observe(window, 'load', function() {
+
+        AttributeSetHandlerObj = new AttributeSetHandler();
+
+        AmazonTemplateNewProductSpecificHandlerObj = new CommonAmazonTemplateNewProductSpecificHandler(M2ePro);
+        AmazonTemplateNewProductHandlerObj = new CommonAmazonTemplateNewProductHandler(M2ePro,AmazonTemplateNewProductSpecificHandlerObj);
+
+        $('attribute_sets').observe('change', AttributeSetHandlerObj.changeAttributeSets);
+
+        $('attribute_sets_confirm_button').observe('click',AttributeSetHandlerObj.confirmAttributeSets);
+        $('attribute_sets').value && AttributeSetHandlerObj.confirmAttributeSets();
+
+        $('attribute_sets_confirm_button').observe('click',AmazonTemplateNewProductHandlerObj.attribute_sets_confirm.bind(AmazonTemplateNewProductHandlerObj));
+        $('attribute_sets').value && AmazonTemplateNewProductHandlerObj.attribute_sets_confirm();
+
+        $('registered_parameter')
+            .observe('change', function() { AmazonTemplateNewProductHandlerObj.registered_parameter_change(this) })
+            .simulate('change');
+
+        $('worldwide_id_mode')
+            .observe('change', function() { AmazonTemplateNewProductHandlerObj.worldwide_id_mode_change(this) })
+            .simulate('change');
+
+        $('node_title').observe('change', function(event) {
+            AmazonTemplateNewProductHandlerObj.node_title_change(this);
+        });
+
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+    });
+
+    //-----------------------------
+
+</script>
+
+<input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
+<input name="category[id]" value="<?php echo $formData['category']['id']; ?>" type="hidden" />
+
+<div class="entry-edit" id="magento_block_category_edit_general_category_configuration">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="title"><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input id="title" name="category[title]" value="<?php echo $this->escapeHtml($formData['category']['title']); ?>" type="text" class="input-text required-entry M2ePro-new-asin-template-title"/>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful template title for your internal use.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="attribute_sets"><?php echo Mage::helper('M2ePro')->__('Product Attribute Set'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="attribute_sets_container" <?php if ($this->attribute_set_locked): ?>style="display: none;"<?php endif; ?>>
+                                <?php $this->attribute_set_locked ? $attributeSetPostfix = '_fake' : $attributeSetPostfix = ''; ?>
+                                <select id="attribute_sets<?php echo $attributeSetPostfix; ?>" name="category[attribute_sets<?php echo $attributeSetPostfix; ?>][]" multiple="multiple" class="<?php if (!$this->attribute_set_locked): ?>M2ePro-validate-attribute-sets<?php endif; ?>">
+                                    <?php foreach ($this->getData('attributes_sets') as $set): ?>
+                                        <option value="<?php echo $set['attribute_set_id']; ?>"<?php if (in_array($set['attribute_set_id'], $formData['category']['attribute_sets'])): echo ' selected="selected"'; endif;?>><?php echo $set['attribute_set_name'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <?php if ($this->attribute_set_locked): ?>
+                                <div id="attribute_sets_breadcrumb" style="width: 280px;">
+                                    <?php $breadcrumb = array(); foreach ($this->getData('attributes_sets') as $set): ?>
+                                        <?php if (in_array($set['attribute_set_id'], $formData['category']['attribute_sets'])): $breadcrumb[] = $set['attribute_set_name']; endif; ?>
+                                    <?php endforeach; ?>
+                                    <strong><?php echo implode(', ', $breadcrumb); ?></strong>
+                                </div>
+                                <input id="attribute_sets" name="category[attribute_sets]" value="<?php echo $this->escapeHtml(implode(',', $formData['category']['attribute_sets'])); ?>" type="hidden" />
+                            <?php endif; ?>
+
+                            <div id="attribute_sets_buttons_container" style="padding-top: 5px; <?php if ($this->attribute_set_locked): ?>display: none;<?php endif; ?>">
+                                <?php echo $this->getChildHtml('attribute_sets_select_all_button'); ?>
+                                <?php echo $this->getChildHtml('attribute_sets_confirm_button'); ?>
+                            </div>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Attribute Sets of products which will be listed on Amazon using this template.'); ?></span>
+                            </p>
+                        </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Category'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div <?php if ($isEdit) echo 'style="display: none"'?>>
+                            <span style="margin: 0 10px 0 0">
+                                <?php echo $this->getChildHtml('browse_category_button'); ?>
+                            </span>
+                            <strong><?php echo Mage::helper('M2ePro')->__('or'); ?></strong>
+                            <span style="margin: 0 0 0 10px">
+                                <?php echo $this->getChildHtml('search_category_button'); ?>
+                            </span>
+                        </div>
+                        <div>
+                            <p id="category_change_button_container" style="display: none; margin: 1px 0 0 0">
+                                <?php echo $this->getChildHtml('category_change_button'); ?>
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+
+            </table>
+
+            <div>
+                <?php if ($formData['category']['node_title']) { ?>
+                    <?php foreach ($this->nodes as $node) {
+                        if ($node['title'] == $formData['category']['node_title']) {
+                            echo '<input id="node_hash" name="node_hash" value="'.$node['hash'].'" type="hidden" />';
+                            break;
+                        }
+                    } ?>
+                    <input type="hidden" name="category[node_title]" value="<?php echo $formData['category']['node_title']; ?>"/>
+                <?php } else { ?>
+                    <input type="hidden" name="category[node_title]" value=""/>
+                <?php } ?>
+
+                <input type="hidden" name="category[xsd_hash]" id="xsd_hash" value="<?php echo $formData['category']['xsd_hash']; ?>" />
+                <input type="hidden" name="category[identifiers]" id="category_identifiers" value="<?php echo $formData['category']['identifiers']; ?>" />
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_category_edit_general_registered_parameter">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('UPC / EAN Settings'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <div id="block_notice_amazon_category_template_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('UPC / EAN Exemption'); ?>">
+                <?php echo Mage::helper('M2ePro')->__(
+                    'Most categories require sellers to use a standard product ID, such as a UPC or EAN, when creating new product pages or matching to existing pages in the Amazon catalog. In the case of private label brands or specialized products, some categories may allow sellers to request exemptions to list products that do not have standard product IDs.<br/>
+                     If you sell products that do not have UPCs, please contact Amazon to request an exemption.'
+                ); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="registered_parameter"><?php echo Mage::helper('M2ePro')->__('Product ID Override'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="registered_parameter" name="category[registered_parameter]">
+                            <option value="" <?php if ($formData['category']['registered_parameter'] == '') echo 'selected'; ?>>None</option>
+                            <option value="PrivateLabel" <?php if ($formData['category']['registered_parameter'] == 'PrivateLabel') echo 'selected'; ?>>Private Label</option>
+                            <option value="Specialized" <?php if ($formData['category']['registered_parameter'] == 'Specialized') echo 'selected'; ?>>Specialized</option>
+                            <option value="NonConsumer" <?php if ($formData['category']['registered_parameter'] == 'NonConsumer') echo 'selected'; ?>>Non Consumer</option>
+                            <option value="PreConfigured" <?php if ($formData['category']['registered_parameter'] == 'PreConfigured') echo 'selected'; ?>>Pre Configured</option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('The exemption option approved by Amazon. Should be set to None when not known.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="worldwide_id_mode_tr">
+                    <td class="label">
+                        <label for="worldwide_id_mode"><?php echo Mage::helper('M2ePro')->__('UPC / EAN') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <select name="category[worldwide_id_mode]" id="worldwide_id_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE ?>" <?php if ($formData['category']['worldwide_id_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($formData['category']['worldwide_id_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute') ?></option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="worldwide_id_custom_attribute_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <div id="worldwide_id_attribute_td"></div>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains products identifier.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div style="display: none">
+
+    <div class="entry-edit" id="browse_category" style="margin-top: 15px;">
+
+        <div style="height: 450px">
+            <div id="block_notice_amazon_template_newProduct_browse" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Browse'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('Choose the department your product belongs to and then choose the category you need.<br/>Press the Confirm button.'); ?>
+            </div>
+
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Category'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellpadding="0" cellspacing="0">
+
+                 <tr>
+                    <td class="label">
+                        <label for="node_title"><?php echo Mage::helper('M2ePro')->__('Department'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+
+                        <select id="node_title" name="category[node_title]" class="required-entry">
+                            <option style="display: none"></option>
+                            <?php foreach ($this->nodes as $node) { ?>
+                                <option value="<?php echo $node['title'] ;?>" node_hash="<?php echo $node['hash']; ?>"> <?php echo $node['title'] ;?></option>
+                            <?php } ?>
+                        </select>
+
+                    </td>
+                </tr>
+
+                <tr id="categories_tr" <?php if (empty($formData['category']['category_path'])) : ?> style="display: none;" <?php endif; ?>>
+
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Category'); ?>: <span class="required">*</span></label>
+                    </td>
+
+                    <td class="value" style="width: 300px">
+
+                        <table>
+                            <tr>
+                                <td>
+                                    <div id="categories_container"></div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p id="category_confirm_button_container" style="display: none; margin: 1px 0 0 0; float: left">
+                            <?php echo $this->getChildHtml('category_confirm_button'); ?>
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                <tr id="xsds_tr" style="display: none;">
+
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Subcategory'); ?>: <span class="required">*</span></label>
+                    </td>
+
+                    <td class="value" style="width: auto;">
+
+                        <div id="xsd_hash_container">
+
+                        </div>
+
+                    </td>
+
+                </tr>
+            </table>
+
+            </div>
+        </div>
+        </div>
+
+        <div class="right" style="margin-right: 15px">
+            <?php echo $this->getChildHtml('close_browse_popup_button'); ?>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="search_category" style="margin-top: 15px">
+
+        <div id="error_block" class="error-msg" style="margin-bottom: 10px; display: none">
+            <div style="margin: 10px 0px 10px 35px">
+                <div id="error_message" style="font-weight:bold"></div>
+            </div>
+        </div>
+
+        <div id="block_notice_amazon_template_newProduct_search" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Search'); ?>">
+            <?php echo Mage::helper('M2ePro')->__('Enter the words, which describe the best your product and click on the Search button.<br/>
+            Founded categories will be displayed for selection.'); ?>
+        </div>
+
+        <div style="padding: 10px; border: 1px solid rgb(205, 221, 221) !important; background-image: none !important; background-attachment: scroll !important; background-color: rgb(231, 239, 239) !important; background-position: 0px 0px !important; background-repeat: repeat repeat !important;">
+
+            <label for="search_keywords" style="margin-right: 10px"><?php echo Mage::helper('M2ePro')->__('Enter Keywords'); ?></label>
+            <input id="search_keywords" style="margin-right: 5px;padding: 4px; color: gray;" name="search_keywords" value="Example: mp3 player, baseball glove, DVD, guitar, etc" class="input-text" type="text" size="60"
+                   onblur="if (this.value.trim().length == 0) {
+                       this.value = 'Example: mp3 player, baseball glove, DVD, guitar, etc';
+                       this.style.color = 'gray';
+                   }"
+                   onfocus="if (this.value == 'Example: mp3 player, baseball glove, DVD, guitar, etc') {
+                       this.value = '';
+                       this.style.color = '';
+                   }"
+                   onkeypress="if (event.keyCode == 13) {
+                       AmazonTemplateNewProductHandlerObj.searchClick();
+                   }"
+            >
+
+            <?php echo $this->getChildHtml('search_category_popup_button'); ?>
+            &nbsp;
+            <?php echo $this->getChildHtml('reset_category_popup_button'); ?>
+
+        </div>
+
+        <div id="searchGrid" style="margin: 10px auto; height: 340px !important; overflow-y: auto; overflow-x: hidden;">
+        </div>
+
+        <div class="right" style="margin-right: 15px">
+            <?php echo $this->getChildHtml('close_search_popup_button'); ?>
+        </div>
+
+        <div style="clear:both;"></div>
+
+    </div>
+
+</div>

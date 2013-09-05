@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Form extends Mage_Adminhtml_Block_Widget_Form
@@ -36,25 +36,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Form extends Mage_Adminhtml_Block
     protected function _beforeToHtml()
     {
         //-------------------------------
-        $buttonBlock = $this->getLayout()
-                            ->createBlock('adminhtml/widget_button')
-                            ->setData( array(
-                                'label'   => Mage::helper('M2ePro')->__('Send'),
-                                'onclick' => 'EbayFeedbackHandlerObj.sendFeedback();',
-                                'class'   => 'send_feedback'
-                            ) );
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Send'),
+            'onclick' => 'EbayFeedbackHandlerObj.sendFeedback();',
+            'class'   => 'send_feedback'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('send_feedback',$buttonBlock);
-        //-------------------------------
-
-        //-------------------------------
-        $buttonBlock = $this->getLayout()
-                            ->createBlock('adminhtml/widget_button')
-                            ->setData( array(
-                                'label'   => Mage::helper('M2ePro')->__('Cancel'),
-                                'onclick' => 'EbayFeedbackHandlerObj.cancelFeedback();',
-                                'class'   => 'cancel_feedback'
-                            ) );
-        $this->setChild('cancel_feedback',$buttonBlock);
         //-------------------------------
 
         return parent::_beforeToHtml();

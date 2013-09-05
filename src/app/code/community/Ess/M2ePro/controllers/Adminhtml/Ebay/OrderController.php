@@ -1,23 +1,22 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Adminhtml_MainController
+class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
 {
     //#############################################
 
     protected function _initAction()
     {
         $this->loadLayout()
-             ->_setActiveMenu('m2epro/sales')
-             ->_title(Mage::helper('M2ePro')->__('M2E Pro'))
              ->_title(Mage::helper('M2ePro')->__('Sales'))
-             ->_title(Mage::helper('M2ePro')->__('eBay Orders'));
+             ->_title(Mage::helper('M2ePro')->__('Orders'));
 
         $this->getLayout()->getBlock('head')
-             ->addJs('M2ePro/OrderHandler.js')
+             ->addJs('M2ePro/Order/Debug.js')
+             ->addJs('M2ePro/Order/Handler.js')
              ->addJs('M2ePro/Order/Edit/ItemHandler.js')
              ->addJs('M2ePro/Order/Edit/ShippingAddressHandler.js');
 
@@ -26,7 +25,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro/sales/order');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_ebay/orders');
     }
 
     //#############################################
@@ -43,15 +42,10 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
     public function indexAction()
     {
-        if (!$this->getRequest()->isXmlHttpRequest()) {
-            return $this->_redirect('*/adminhtml_order/index');
-        }
-
-        /** @var $block Ess_M2ePro_Block_Adminhtml_Order */
-        $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_order');
-        $block->enableEbayTab();
-
-        $this->getResponse()->setBody($block->getEbayTabHtml());
+        $this->_initAction();
+        $this->_initPopUp();
+        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_order'));
+        $this->renderLayout();
     }
 
     public function gridAction()
@@ -67,7 +61,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         $id = $this->getRequest()->getParam('id');
         $order = Mage::helper('M2ePro/Component_Ebay')->getObject('Order', (int)$id);
 
-        Mage::helper('M2ePro')->setGlobalValue('temp_data', $order);
+        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $order);
 
         $this->_initAction();
         $this->_initPopUp();
@@ -83,7 +77,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         $id = $this->getRequest()->getParam('id');
         $order = Mage::helper('M2ePro/Component_Ebay')->getObject('Order', (int)$id);
 
-        Mage::helper('M2ePro')->setGlobalValue('temp_data', $order);
+        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $order);
 
         $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_order_view_item')->toHtml();
         $this->getResponse()->setBody($response);
@@ -96,7 +90,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         $id = $this->getRequest()->getParam('id');
         $order = Mage::helper('M2ePro/Component_Ebay')->getObject('Order', (int)$id);
 
-        Mage::helper('M2ePro')->setGlobalValue('temp_data', $order);
+        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $order);
 
         $this->_initAction()
              ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_order_edit_shippingAddress'))
@@ -106,7 +100,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
     public function saveShippingAddressAction()
     {
         if (!$post = $this->getRequest()->getPost()) {
-            return $this->_redirect('*/adminhtml_order/index');
+            return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 
         $id = $this->getRequest()->getParam('order_id');
@@ -155,19 +149,14 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
     private function processConnector($action, array $params = array())
     {
-        $id = $this->getRequest()->getParam('id');
-        $ids = $this->getRequest()->getParam('ids');
+        $ids = $this->getRequestIds();
 
-        if (is_null($id) && is_null($ids)) {
+        if (count($ids) == 0) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select order(s).'));
-            return $this->_redirect('*/adminhtml_order/index');
+            return false;
         }
 
-        $ordersIds = array();
-        !is_null($id) && $ordersIds[] = $id;
-        !is_null($ids) && $ordersIds = array_merge($ordersIds,(array)$ids);
-
-        return Mage::getModel('M2ePro/Connector_Server_Ebay_Order_Dispatcher')->process($action, $ordersIds, $params);
+        return Mage::getModel('M2ePro/Connector_Server_Ebay_Order_Dispatcher')->process($action, $ids, $params);
     }
 
     //--------------------
@@ -217,7 +206,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
                        'Press Create Order button to create new one.';
 
             $this->_getSession()->addWarning(
-                Mage::helper('M2ePro')->__($message, Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::NICK))
+                sprintf(Mage::helper('M2ePro')->__($message), Ess_M2ePro_Helper_Component_Ebay::TITLE)
             );
             $this->_redirect('*/*/view', array('id' => $id));
             return;
@@ -270,7 +259,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
         if (!$transactionId) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Transaction ID should be defined.'));
-            return $this->_redirect('*/adminhtml_order/index');
+            return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 
         /** @var $transaction Ess_M2ePro_Model_Ebay_Order_ExternalTransaction */
@@ -278,12 +267,12 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
         if (is_null($transaction->getId())) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('eBay order transaction does not exist.'));
-            return $this->_redirect('*/adminhtml_order/index');
+            return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 
         if (!$transaction->isPaypal()) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('This is not a PayPal transaction.'));
-            return $this->_redirect('*/adminhtml_order/index');
+            return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 
         return $this->_redirectUrl($transaction->getPaypalUrl());

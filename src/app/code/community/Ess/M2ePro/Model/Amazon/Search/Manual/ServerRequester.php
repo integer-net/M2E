@@ -1,11 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Amazon_Search_Manual_ServerRequester extends
-                                                        Ess_M2ePro_Model_Connector_Server_Amazon_Search_ByQuery_Items
+class Ess_M2ePro_Model_Amazon_Search_Manual_ServerRequester
+    extends Ess_M2ePro_Model_Connector_Server_Amazon_Search_ByQuery_Items
 {
     /**
      * @var Ess_M2ePro_Model_Amazon_Search_Manual_Requester

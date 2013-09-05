@@ -1,53 +1,58 @@
 <div id="block_notice_ebay_listing_other_synchronization_source" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Source'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This section includes settings where the values for synchronization have to be taken from.
-    <br/><br/>
-    <b>Note:</b> If you set <i>Not Set</i>, the auto revise will be turned off by this criteria.
-    '); ?>
+    <?php echo Mage::helper('M2ePro')->__('This section includes settings where the values for synchronization have to be taken from.<br>
+    In Attributes lists only common attributes (those which presented in all Attribute Sets) are available for selection.
+    <br><br>
+    <b>Note:</b> If you set <i>Not Set</i>, the auto revise will be turned off by this criteria.'); ?>
 </div>
 
 <?php
-    $formData = Mage::helper('M2ePro')->getGlobalValue('temp_data') ? Mage::helper('M2ePro')->getGlobalValue('temp_data') : array();
+    $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data') : array();
 
     $attributes = $formData['attributes'];
     $formData = $formData['source'];
 
-    $defaults = array(
-        'qty' => Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_PRODUCT,
-        'price' => Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_PRODUCT,
-        'title' => Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_PRODUCT,
-        'sub_title' => Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_NONE,
-        'description' => Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_PRODUCT_MAIN,
-        'customer_group_id' => ''
+    $formDataDefaults = array(
+        'qty'           => Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_PRODUCT,
+        'price'         => Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_PRODUCT,
+        'title'         => Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_PRODUCT,
+        'sub_title'     => Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_NONE,
+        'description'   => Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_PRODUCT_MAIN,
     );
-    $formData = array_merge($defaults, $formData);
+    $formData = array_merge($formDataDefaults, $formData);
+
+    $attributesDefaults = array(
+        'qty'           => '',
+        'price'         => '',
+        'title'         => '',
+        'sub_title'     => '',
+        'description'   => '',
+    );
+    $attributes = array_merge($attributesDefaults, $attributes);
 ?>
 
 <script type="text/javascript">
 
     Event.observe(window, 'load', function() {
-        EbayListingOtherSynchronizationHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Listing_Other_Source'); ?>');
-        EbayListingOtherSynchronizationHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Model_Ebay_Listing_Other_Synchronization'); ?>');
 
-        if (typeof M2ePro == 'undefined') {
-            M2ePro = {};
-            M2ePro.url = {};
-            M2ePro.formData = {};
-            M2ePro.customData = {};
-            M2ePro.text = {};
-        }
+        M2ePro.translator.add(<?php echo json_encode(array(
+            'The price will be calculated according to Catalog Price Rules (Magento > Promotions > Catalog Price Rules).' =>
+                $this->__('The price will be calculated according to Catalog Price Rules (Magento > Promotions > Catalog Price Rules).'),
+            'Updates price on eBay listing(s) when the source of price changes.' =>
+                $this->__('Updates price on eBay listing(s) when the source of price changes.'),
+        )); ?>);
 
-        M2ePro.url.formSubmit = '<?php echo $this->getUrl('*/*/save'); ?>';
+        M2ePro.url.add(<?php echo json_encode(array(
+            'formSubmit' => $this->getUrl('M2ePro/adminhtml_ebay_listing_other_synchronization/save'),
+            'adminhtml_ebay_listing_other_synchronization/save' => $this->getUrl('M2ePro/adminhtml_ebay_listing_other_synchronization/save')
+        )); ?>);
 
-        M2ePro.text.final_price_note = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The price will be calculated according to Catalog Price Rules (Magento > Promotions > Catalog Price Rules).')); ?>';
-        M2ePro.text.all_price_note = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Updates price on eBay listing(s) when the source of price changes.')); ?>';
+        M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Ebay_Listing_Other_Source') ?>, 'Ess_M2ePro_Model_Ebay_Listing_Other_Source');
+        M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization') ?>, 'Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization');
 
         $$('.source').each(function(elem) {
            elem.observe('change', EbayListingOtherSynchronizationHandlerObj.source_change)
                .simulate('change');
         });
-
-        $('customer_group_id')
-                .observe('change', function() { CommonHandlerObj.hideEmptyOption(this); });
     });
 
 </script>
@@ -62,88 +67,56 @@
         <div class="hor-scroll">
 
             <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <input type="hidden" id="qty" name="qty" value="<?php echo $formData['qty']; ?>">
+                <input type="hidden" id="qty_attribute" name="qty_attribute" value="<?php echo $attributes['qty']; ?>">
+
                 <tr>
                     <td class="label">
                         <label for="qty"><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="qty" name="qty" class="source">
+                        <select id="qty_source" class="source">
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_NONE ?>" <?php if ($formData['qty'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Not Set (not changeable on eBay)'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_PRODUCT ?>" <?php if ($formData['qty'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product QTY'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_ATTRIBUTE ?>" <?php if ($formData['qty'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            <optgroup label="<?php echo Mage::helper('M2ePro')->__('Magento Attributes'); ?>" qty_source="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_ATTRIBUTE; ?>">
+                                <?php foreach ($this->attributes as $attribute): ?>
+                                    <option value="<?php echo $attribute['code'] ?>" <?php if ($attributes['qty'] == $attribute['code'] && $formData['qty'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Updates quantity on eBay Listing with mapped Magento product quantity.'); ?></span>
                         </p>
                     </td>
                 </tr>
-                <tr id="qty_attribute_container" style="display: none;">
-                    <td class="label"></td>
-                    <td class="value">
-                        <?php $tempAttributeValue = isset($attributes['qty']) ? $attributes['qty'] : '' ?>
-                        <select name="qty_attribute">
-                            <?php foreach ($this->attributes as $attribute) { ?>
-                            <option value="<?php echo $attribute['code'] ?>" <?php if ($tempAttributeValue == $attribute['code']) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
-                            <?php } ?>
-                        </select>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Only common attributes (those which presented in all Attribute Sets) are available for selection.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
 
                 <tr>
                     <td class="value" colspan="2" style="width: auto;">
                         <hr style="border: 1px solid silver; border-bottom: none;"/>
                     </td>
                 </tr>
+
+                <input type="hidden" id="price" name="price" value="<?php echo $formData['price']; ?>">
+                <input type="hidden" id="price_attribute" name="price_attribute" value="<?php echo $attributes['price']; ?>">
 
                 <tr>
                     <td class="label">
                         <label for="price"><?php echo Mage::helper('M2ePro')->__('Price'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="price" name="price" class="source">
+                        <select id="price_source" class="source">
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_NONE ?>" <?php if ($formData['price'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Not Set (not changeable on eBay)'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_PRODUCT ?>" <?php if ($formData['price'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_SPECIAL ?>" <?php if ($formData['price'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_SPECIAL): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
-                            <!-- <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_FINAL ?>" <?php if ($formData['price'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_FINAL): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Final Price'); ?></option> -->
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_ATTRIBUTE ?>" <?php if ($formData['price'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            <optgroup label="<?php echo Mage::helper('M2ePro')->__('Magento Attributes'); ?>" price_source="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_ATTRIBUTE; ?>">
+                                <?php foreach ($this->attributes as $attribute): ?>
+                                    <option value="<?php echo $attribute['code'] ?>" <?php if ($attributes['price'] == $attribute['code'] && $formData['price'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::PRICE_SOURCE_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
-                            <span id="note_price"></span>
-                        </p>
-                    </td>
-                </tr>
-                <tr id="price_attribute_container" style="display: none;">
-                    <td class="label"></td>
-                    <td class="value">
-                        <?php $tempAttributeValue = isset($attributes['price']) ? $attributes['price'] : '' ?>
-                        <select name="price_attribute">
-                            <?php foreach ($this->attributes as $attribute) { ?>
-                            <option value="<?php echo $attribute['code'] ?>" <?php if ($tempAttributeValue == $attribute['code']) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
-                            <?php } ?>
-                        </select>
-                            <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Only common attributes (those which presented in all Attribute Sets) are available for selection.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
-                <tr id="customer_group_id_container" style="display: none;">
-                    <td class="label">
-                        <label for="customer_group_id"><?php echo Mage::helper('M2ePro')->__('Customer Group') ?>:</label>
-                    </td>
-                    <td class="value">
-                        <select name="customer_group_id" id="customer_group_id">
-                            <?php if ($formData['customer_group_id'] === ''): ?>
-                                <option class="empty"></option>
-                            <?php endif; ?>
-                            <?php foreach($this->customerGroups as $group): ?>
-                                <option value="<?php echo (int)$group['value'] ?>" <?php if ($formData['customer_group_id'] !== '' && $formData['customer_group_id'] == (int)$group['value']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($group['label']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Which customer group eBay buyers have to be associated to.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Updates price on eBay listing(s) when the source of price changes.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -153,68 +126,54 @@
                         <hr style="border: 1px solid silver; border-bottom: none;"/>
                     </td>
                 </tr>
+
+                <input type="hidden" id="title" name="title" value="<?php echo $formData['title']; ?>">
+                <input type="hidden" id="title_attribute" name="title_attribute" value="<?php echo $attributes['title']; ?>">
 
                 <tr>
                     <td class="label">
                         <label for="title"><?php echo Mage::helper('M2ePro')->__('Title'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="title" name="title" class="source">
+                        <select id="title_source" class="source">
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_NONE ?>" <?php if ($formData['title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Not Set (not changeable on eBay)'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_PRODUCT ?>" <?php if ($formData['title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Name'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_ATTRIBUTE ?>" <?php if ($formData['title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            <optgroup label="<?php echo Mage::helper('M2ePro')->__('Magento Attributes'); ?>" title_source="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_ATTRIBUTE; ?>">
+                                <?php foreach ($this->attributes as $attribute): ?>
+                                    <option value="<?php echo $attribute['code'] ?>" <?php if ($attributes['title'] == $attribute['code'] && $formData['title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::TITLE_SOURCE_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Updates title on eBay Listing with mapped Magento product title.'); ?></span>
                         </p>
                     </td>
                 </tr>
-                <tr id="title_attribute_container" style="display: none;">
-                    <td class="label"></td>
-                    <td class="value">
-                        <?php $tempAttributeValue = isset($attributes['title']) ? $attributes['title'] : '' ?>
-                        <select name="title_attribute">
-                            <?php foreach ($this->attributes as $attribute) { ?>
-                            <option value="<?php echo $attribute['code'] ?>" <?php if ($tempAttributeValue == $attribute['code']) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
-                            <?php } ?>
-                        </select>
-                            <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Only common attributes (those which presented in all Attribute Sets) are available for selection.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
 
                 <tr>
                     <td class="value" colspan="2" style="width: auto;">
                         <hr style="border: 1px solid silver; border-bottom: none;"/>
                     </td>
                 </tr>
+
+                <input type="hidden" id="sub_title" name="sub_title" value="<?php echo $formData['sub_title']; ?>">
+                <input type="hidden" id="sub_title_attribute" name="sub_title_attribute" value="<?php echo $attributes['sub_title']; ?>">
 
                 <tr>
                     <td class="label">
                         <label for="sub_title"><?php echo Mage::helper('M2ePro')->__('Subtitle'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="sub_title" name="sub_title" class="source">
+                        <select id="sub_title_source" class="source">
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_NONE ?>" <?php if ($formData['sub_title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Not Set (not changeable on eBay)'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_ATTRIBUTE ?>" <?php if ($formData['sub_title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            <optgroup label="<?php echo Mage::helper('M2ePro')->__('Magento Attributes'); ?>" sub_title_source="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_ATTRIBUTE; ?>">
+                                <?php foreach ($this->attributes as $attribute): ?>
+                                    <option value="<?php echo $attribute['code'] ?>" <?php if ($attributes['sub_title'] == $attribute['code'] && $formData['sub_title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::SUB_TITLE_SOURCE_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Updates eBay Listing subtitle.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
-                <tr id="sub_title_attribute_container" style="display: none;">
-                    <td class="label"></td>
-                    <td class="value">
-                        <?php $tempAttributeValue = isset($attributes['sub_title']) ? $attributes['sub_title'] : '' ?>
-                        <select name="sub_title_attribute">
-                            <?php foreach ($this->attributes as $attribute) { ?>
-                            <option value="<?php echo $attribute['code'] ?>" <?php if ($tempAttributeValue == $attribute['code']) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
-                            <?php } ?>
-                        </select>
-                            <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Only common attributes (those which presented in all Attribute Sets) are available for selection.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -225,33 +184,26 @@
                     </td>
                 </tr>
 
+                <input type="hidden" id="description" name="description" value="<?php echo $formData['description']; ?>">
+                <input type="hidden" id="description_attribute" name="description_attribute" value="<?php echo $attributes['description']; ?>">
+
                 <tr>
                     <td class="label">
                         <label for="description"><?php echo Mage::helper('M2ePro')->__('Description'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="description" name="description" class="source">
+                        <select id="description_source" class="source">
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_NONE ?>" <?php if ($formData['description'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Not Set (not changeable on eBay)'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_PRODUCT_MAIN ?>" <?php if ($formData['description'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_PRODUCT_MAIN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Description'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_PRODUCT_SHORT ?>" <?php if ($formData['description'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_PRODUCT_SHORT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Short Description'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_ATTRIBUTE ?>" <?php if ($formData['description'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                            <optgroup label="<?php echo Mage::helper('M2ePro')->__('Magento Attributes'); ?>" description_source="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_ATTRIBUTE; ?>">
+                                <?php foreach ($this->attributes as $attribute): ?>
+                                    <option value="<?php echo $attribute['code'] ?>" <?php if ($attributes['description'] == $attribute['code'] && $formData['description'] == Ess_M2ePro_Model_Ebay_Listing_Other_Source::DESCRIPTION_SOURCE_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Updates description on eBay Listing with mapped Magento product description.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
-                <tr id="description_attribute_container" style="display: none;">
-                    <td class="label"></td>
-                    <td class="value">
-                        <?php $tempAttributeValue = isset($attributes['description']) ? $attributes['description'] : '' ?>
-                        <select name="description_attribute">
-                            <?php foreach ($this->attributes as $attribute) { ?>
-                            <option value="<?php echo $attribute['code'] ?>" <?php if ($tempAttributeValue == $attribute['code']) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']) ?></option>
-                            <?php } ?>
-                        </select>
-                            <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Only common attributes (those which presented in all Attribute Sets) are available for selection.'); ?></span>
                         </p>
                     </td>
                 </tr>

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
@@ -23,7 +23,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
 
         // Set header text
         //------------------------------
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
+        if (!Mage::helper('M2ePro/View_Ebay_Component')->isSingleActiveComponent()) {
             $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
         } else {
             $componentName = '';
@@ -41,57 +41,32 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
         $this->removeButton('save');
         $this->removeButton('edit');
 
-        /* @var $wizardHelper Ess_M2ePro_Helper_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Wizard');
-
-        if (($wizardHelper->isActive('ebay') && $wizardHelper->getStep('ebay') == 'otherListing') ||
-            ($wizardHelper->isActive('ebayOtherListing') && $wizardHelper->getStep('ebayOtherListing')
-                == 'synchronization')) {
-
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-
-            $this->_addButton('complete_step', array(
-                'label'     => Mage::helper('M2ePro')->__('Save And Complete This Step'),
-                'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.completeStep()',
-                'class'     => 'save'
-            ));
-        } else {
-
-            $backUrl = Mage::helper('M2ePro')->getBackUrl('*/adminhtml_ebay_listingOther/index');
-
-            $this->_addButton('back', array(
-                'label'     => Mage::helper('M2ePro')->__('Back'),
-                'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.back_click(\''.$backUrl.'\')',
-                'class'     => 'back'
-            ));
-
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-
-            $backUrl = $this->getRequest()->getParam('back');
-            $this->_addButton('save', array(
-                'label'     => Mage::helper('M2ePro')->__('Save'),
-                'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.save_click(\''.$backUrl.'\')',
-                'class'     => 'save'
-            ));
-
-            $onClickAction = 'EbayListingOtherSynchronizationHandlerObj.'
-                             .'save_and_edit_click(\'\',\'ebayListingOtherSynchronizationEditTabs\')';
-            $this->_addButton('save_and_continue', array(
-                'label'     => Mage::helper('M2ePro')->__('Save And Continue Edit'),
-                'onclick'   => $onClickAction,
-                'class'     => 'save'
-            ));
-        }
+        //------------------------------
+        $this->_addButton('reset', array(
+            'label'     => Mage::helper('M2ePro')->__('Refresh'),
+            'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.reset_click()',
+            'class'     => 'reset'
+        ));
         //------------------------------
 
+        //------------------------------
+        $url = $this->getRequest()->getParam('back');
+        $this->_addButton('save', array(
+            'label'     => Mage::helper('M2ePro')->__('Save'),
+            'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.save_click(\''.$url.'\')',
+            'class'     => 'save'
+        ));
+        //------------------------------
+
+        //------------------------------
+        $back = $this->getRequest()->getParam('back');
+        $this->_addButton('save_and_continue', array(
+            'label'     => Mage::helper('M2ePro')->__('Save And Continue Edit'),
+            'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.' .
+                           'save_and_edit_click(\''.$back.'\',\'ebayListingOtherSynchronizationEditTabs\')',
+            'class'     => 'save'
+        ));
+        //------------------------------
     }
 
     protected function _toHtml()

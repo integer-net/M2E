@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Ebay_Dispatcher
@@ -92,6 +92,7 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Dispatcher
      * @param null|int|Ess_M2ePro_Model_Marketplace $marketplace
      * @param null|int|Ess_M2ePro_Model_Account $account
      * @param null|int $mode
+     * @param array|null $requestInfo
      * @return mixed
      */
     public function processVirtualAbstract($entity, $type, $name,
@@ -99,10 +100,12 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Dispatcher
                                            $responseDataKey = NULL,
                                            $marketplace = NULL,
                                            $account = NULL,
-                                           $mode = NULL)
+                                           $mode = NULL,
+                                           $requestInfo = NULL)
     {
         $params = array();
         $params['__command__'] = array($entity,$type,$name);
+        $params['__request_info__'] = $requestInfo;
         $params['__request_data__'] = $requestData;
         $params['__response_data_key__'] = $responseDataKey;
         return $this->processConnector('virtual','','',$params,$marketplace,$account,$mode);
@@ -119,6 +122,7 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Dispatcher
      * @param null|int|Ess_M2ePro_Model_Account $account
      * @param null|int $mode
      * @param null|string $ormPrefixToConnector
+     * @param array|null $requestInfo
      * @return mixed
      */
     public function processVirtualRequester($entity, $type, $name,
@@ -128,12 +132,14 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Dispatcher
                                             $marketplace = NULL,
                                             $account = NULL,
                                             $mode = NULL,
-                                            $ormPrefixToConnector = NULL)
+                                            $ormPrefixToConnector = NULL,
+                                            $requestInfo = NULL)
     {
         $params = array();
         $params['__command__'] = array($entity,$type,$name);
         $params['__responser_model__'] = $responserModel;
         $params['__responser_params__'] = $responserParams;
+        $params['__request_info__'] = $requestInfo;
         $params['__request_data__'] = $requestData;
         return $this->processConnector(
             'virtualRequester','','',$params,$marketplace,$account,$mode,$ormPrefixToConnector

@@ -1,19 +1,20 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Observer_Product
 {
+    private $_isFailedDuringUpdate = false;
+
     private $_productId = 0;
     private $_storeId = Mage_Core_Model_App::ADMIN_STORE_ID;
-
-    private $_listingsArray = array();
-    private $_otherListingsArray = array();
+    private $_isJustAddedProduct = false;
 
     private $_productNameOld = '';
-    private $_productCategoriesOld = array();
+    private $_productWebsiteIdsOld = array();
+    private $_productCategoryIdsOld = array();
 
     private $_productStatusOld = NULL;
     private $_productPriceOld = 0;
@@ -21,6 +22,9 @@ class Ess_M2ePro_Model_Observer_Product
     private $_productSpecialPriceFromDate = NULL;
     private $_productSpecialPriceToDate = NULL;
     private $_productCustomAttributes = array();
+
+    private $_listingsProductsArray = array();
+    private $_otherListingsArray = array();
 
     //####################################
 
@@ -31,6 +35,7 @@ class Ess_M2ePro_Model_Observer_Product
             $productOld = $observer->getEvent()->getProduct();
 
             if (!($productOld instanceof Mage_Catalog_Model_Product)) {
+                $this->_isFailedDuringUpdate = true;
                 return;
             }
 
@@ -45,34 +50,25 @@ class Ess_M2ePro_Model_Observer_Product
                                     ->setStoreId($this->_storeId)
                                     ->load($this->_productId);
 
-            // Save preview name
             $this->_productNameOld = $productOld->getName();
+            $this->_productWebsiteIdsOld = $productOld->getWebsiteIds();
+            $this->_productCategoryIdsOld = $productOld->getCategoryIds();
 
-            // Save preview categories
-            $this->_productCategoriesOld = $productOld->getCategoryIds();
-
-            // Get listings, other listings where is product
-            $this->_listingsArray = Mage::getResourceModel('M2ePro/Listing')
-                                        ->getListingsWhereIsProduct($this->_productId);
+            $this->_listingsProductsArray = Mage::getResourceModel('M2ePro/Listing_Product')
+                                              ->getItemsWhereIsProduct($this->_productId);
             $this->_otherListingsArray = Mage::getResourceModel('M2ePro/Listing_Other')
                                             ->getItemsWhereIsProduct($this->_productId);
 
-            if (count($this->_listingsArray) > 0 || count($this->_otherListingsArray) > 0) {
+            if (count($this->_listingsProductsArray) > 0 || count($this->_otherListingsArray) > 0) {
 
-                // Save preview status
                 $this->_productStatusOld = (int)$productOld->getStatus();
-
-                // Save preview prices
-                //--------------------
                 $this->_productPriceOld = (float)$productOld->getPrice();
                 $this->_productSpecialPriceOld = (float)$productOld->getSpecialPrice();
                 $this->_productSpecialPriceFromDate = $productOld->getSpecialFromDate();
                 $this->_productSpecialPriceToDate = $productOld->getSpecialToDate();
-                //--------------------
 
-                // Save preview attributes
                 //--------------------
-                $this->_productCustomAttributes = $this->getCustomAttributes($this->_listingsArray,
+                $this->_productCustomAttributes = $this->getCustomAttributes($this->_listingsProductsArray,
                                                                              $this->_otherListingsArray);
 
                 /** @var $magentoProductModel Ess_M2ePro_Model_Magento_Product */
@@ -85,14 +81,17 @@ class Ess_M2ePro_Model_Observer_Product
             }
 
         } catch (Exception $exception) {
-
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return;
         }
     }
 
     public function catalogProductSaveAfter(Varien_Event_Observer $observer)
     {
+        if ($this->_isFailedDuringUpdate) {
+            return;
+        }
+
         try {
 
             $productNew = $observer->getEvent()->getProduct();
@@ -103,39 +102,47 @@ class Ess_M2ePro_Model_Observer_Product
                 return;
             }
 
+            $this->_isJustAddedProduct = ($this->_productId <= 0);
             $this->_productId = (int)$productNew->getId();
 
-            $productNew = Mage::getModel('catalog/product')
-                                    ->setStoreId($this->_storeId)
-                                    ->load($this->_productId);
+            $productNew = Mage::helper('M2ePro/Magento_Product')
+                                ->getCachedAndLoadedProduct($this->_productId,$this->_storeId);
 
-            $this->tryToUpdateTheLogsNames($productNew);
+            if (count($this->_listingsProductsArray) > 0 || count($this->_otherListingsArray) > 0) {
 
-            if (count($this->_listingsArray) > 0 || count($this->_otherListingsArray) > 0) {
-
-                // Save global changes
-                //--------------------
                 Mage::getModel('M2ePro/ProductChange')
                                 ->addUpdateAction( $this->_productId,
                                                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
-                //--------------------
 
                 $this->tryToUpdateTheStatus($productNew);
-
                 $this->tryToUpdateThePrice($productNew);
                 $this->tryToUpdateTheSpecialPrice($productNew);
                 $this->tryToUpdateTheSpecialPriceFromDate($productNew);
                 $this->tryToUpdateTheSpecialPriceToDate($productNew);
-
                 $this->tryToUpdateTheCustomAttributes($productNew);
-                $this->updateListingsProductsVariations($productNew);
+
+                $this->updateListingsProductsVariations();
+            }
+
+            if (!$this->_isJustAddedProduct) {
+                $this->tryToUpdateTheLogsNames($productNew);
             }
 
             $this->tryToPerformCategoriesActions($productNew);
 
-        } catch (Exception $exception) {
+            /** @var Ess_M2ePro_Model_Observer_Ebay_Product $ebayObserver */
+            $ebayObserver = Mage::getModel('M2ePro/Observer_Ebay_Product');
 
-            Mage::helper('M2ePro/Exception')->process($exception);
+            if ($this->_isJustAddedProduct) {
+                $ebayObserver->tryToPerformGlobalProductActions($productNew);
+            }
+
+            $ebayObserver->tryToPerformWebsiteProductActions($productNew,
+                                                             $this->_isJustAddedProduct,
+                                                             $this->_productWebsiteIdsOld);
+
+        } catch (Exception $exception) {
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return;
         }
     }
@@ -148,171 +155,19 @@ class Ess_M2ePro_Model_Observer_Product
 
             $productDeleted = $observer->getEvent()->getProduct();
 
-            if (!($productDeleted instanceof Mage_Catalog_Model_Product)) {
+            if (!($productDeleted instanceof Mage_Catalog_Model_Product) ||
+                (int)$productDeleted->getId() <= 0) {
                 return;
             }
 
             Mage::getModel('M2ePro/Listing')->removeDeletedProduct($productDeleted);
             Mage::getModel('M2ePro/Listing_Other')->unmapDeletedProduct($productDeleted);
-            Mage::getModel('M2ePro/ProductChange')->removeDeletedProduct($productDeleted);
             Mage::getModel('M2ePro/Item')->removeDeletedProduct($productDeleted);
+            Mage::getModel('M2ePro/ProductChange')->removeDeletedProduct($productDeleted);
 
         } catch (Exception $exception) {
-
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return;
-        }
-    }
-
-    //####################################
-
-    private function getCustomAttributes($listingsArray,$otherListingsArray)
-    {
-        try {
-
-            $attributesWithListings = $this->getCustomAttributesWithListings($listingsArray);
-            $attributesWithOtherListings = $this->getCustomAttributesWithOtherListings($otherListingsArray);
-
-            foreach ($attributesWithOtherListings as $hash => $otherListingAttribute) {
-                if (isset($attributesWithListings[$hash])) {
-                    $attributesWithListings[$hash]['other_listings'] = $otherListingAttribute['other_listings'];
-                } else {
-                    $attributesWithListings[$hash] = $otherListingAttribute;
-                }
-            }
-
-        } catch (Exception $exception) {
-
-            Mage::helper('M2ePro/Exception')->process($exception);
-            return array();
-        }
-
-        return array_values($attributesWithListings);
-    }
-
-    private function cutAttributeTitleLength($attribute, $length = 50)
-    {
-        if (strlen($attribute) > $length) {
-            return substr($attribute, 0, $length) . ' ...';
-        }
-
-        return $attribute;
-    }
-
-    //-----------------------------------
-
-    private function getCustomAttributesWithListings($listingsArray)
-    {
-        $attributes = array();
-
-        foreach ($listingsArray as $listingTemp) {
-
-            /** @var $listingModel Ess_M2ePro_Model_Listing */
-            $listingModel = Mage::getModel('M2ePro/Listing')->loadInstance($listingTemp['id']);
-
-            $tempAttributesGeneralTemplate = $listingModel->getGeneralTemplate()->getTrackingAttributes();
-            $tempAttributesSellingFormatTemplate = $listingModel->getSellingFormatTemplate()->getTrackingAttributes();
-            $tempAttributesDescriptionTemplate = $listingModel->getDescriptionTemplate()->getTrackingAttributes();
-
-            $tempListingAttributes = array_merge(
-                $tempAttributesGeneralTemplate,$tempAttributesSellingFormatTemplate
-            );
-            $tempListingAttributes = array_merge(
-                $tempListingAttributes,$tempAttributesDescriptionTemplate
-            );
-            $tempListingAttributes = array_unique(
-                $tempListingAttributes
-            );
-
-            foreach ($tempListingAttributes as $attribute) {
-
-                $hash = md5($attribute);
-
-                if (!isset($attributes[$hash])) {
-                    $attributes[$hash] = array(
-                        'attribute' => $attribute,
-                        'listings' => array($listingTemp)
-                    );
-                } else {
-                    $attributes[$hash]['listings'][] = $listingTemp;
-                }
-            }
-        }
-
-        return $attributes;
-    }
-
-    private function getCustomAttributesWithOtherListings($otherListingsArray)
-    {
-        $attributes = array();
-
-        if (count($otherListingsArray) <= 0) {
-            return $attributes;
-        }
-
-        $tempOtherListingsAttributes = Mage::getModel('M2ePro/Ebay_Listing_Other_Source')
-                                                ->getTrackingAttributes();
-
-        foreach ($tempOtherListingsAttributes as $attribute) {
-            $attributes[md5($attribute)] = array(
-                'attribute' => $attribute,
-                'other_listings' => $otherListingsArray
-            );
-        }
-
-        return $attributes;
-    }
-
-    //####################################
-
-    private function tryToUpdateTheLogsNames($productNew)
-    {
-        if ($this->_storeId != Mage_Core_Model_App::ADMIN_STORE_ID) {
-            return;
-        }
-
-        $nameNew = $productNew->getName();
-
-        if ($this->_productNameOld == $nameNew) {
-            return;
-        }
-
-        Mage::getModel('M2ePro/Listing_Log')->updateProductTitle($this->_productId,$nameNew);
-    }
-
-    private function updateListingsProductsVariations($productNew)
-    {
-        foreach ($this->_listingsArray as $listingTemp) {
-
-            $listingsProductsTemp = Mage::getModel('M2ePro/Listing')
-                                            ->loadInstance($listingTemp['id'])
-                                            ->getProducts(true,array('product_id'=>$this->_productId));
-
-            foreach ($listingsProductsTemp as $listingProductTemp) {
-
-                $variationUpdaterModelPrefix = ucwords($listingProductTemp->getData('component_mode')).'_';
-                Mage::getModel('M2ePro/'.$variationUpdaterModelPrefix.'Listing_Product_Variation_Updater')
-                        ->updateVariations($listingProductTemp);
-            }
-        }
-    }
-
-    private function tryToPerformCategoriesActions($productNew)
-    {
-        $categoriesNew = $productNew->getCategoryIds();
-
-        $addedCategories = array_diff($categoriesNew,$this->_productCategoriesOld);
-        foreach ($addedCategories as $categoryId) {
-           Ess_M2ePro_Model_Observer_Category::synchChangesWithListings(
-               $categoryId,array($productNew),array()
-           );
-        }
-
-        $deletedCategories = array_diff($this->_productCategoriesOld,$categoriesNew);
-        foreach ($deletedCategories as $categoryId) {
-           Ess_M2ePro_Model_Observer_Category::synchChangesWithListings(
-               $categoryId,array(),array($productNew)
-           );
         }
     }
 
@@ -331,35 +186,33 @@ class Ess_M2ePro_Model_Observer_Product
         $statusNew = ($statusNew == Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             ? 'Enabled' : 'Disabled';
 
-        $attributeStoreIds = Mage::helper('M2ePro/Magento')
-                                        ->getStoreIdsByAttributeAndStore('status',$this->_storeId);
-
         $changedStores = array();
+        $attribute = 'status';
 
-        foreach ($this->_listingsArray as $listingTemp) {
+        foreach ($this->_listingsProductsArray as $listingProductArray) {
 
-            if (!in_array($listingTemp['store_id'],$attributeStoreIds)) {
+            if (!$this->isAffectChangedAttributeOnItemStoreId($attribute,$listingProductArray['store_id'])) {
                 continue;
             }
 
             $rez = Mage::getModel('M2ePro/ProductChange')
-                        ->updateAttribute( $this->_productId, 'status',
+                        ->updateAttribute( $this->_productId, $attribute,
                                            $statusOld, $statusNew,
                                            Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
-                                           $listingTemp['store_id'] );
+                                           $listingProductArray['store_id'] );
 
             if ($rez === false) {
                 continue;
             }
 
-            $changedStores[$listingTemp['store_id']] = true;
+            $changedStores[$listingProductArray['store_id']] = true;
 
             $tempLog = Mage::getModel('M2ePro/Listing_Log');
-            $tempLog->setComponentMode($listingTemp['component_mode']);
+            $tempLog->setComponentMode($listingProductArray['component_mode']);
             $tempLog->addProductMessage(
-                $listingTemp['id'],
+                $listingProductArray['object']->getListingId(),
                 $this->_productId,
-                NULL,
+                $listingProductArray['id'],
                 Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STATUS,
@@ -376,14 +229,14 @@ class Ess_M2ePro_Model_Observer_Product
 
         foreach ($this->_otherListingsArray as $otherListingTemp) {
 
-            if (!in_array($otherListingTemp['store_id'],$attributeStoreIds)) {
+            if (!$this->isAffectChangedAttributeOnItemStoreId($attribute,$otherListingTemp['store_id'])) {
                 continue;
             }
 
             if (!isset($changedStores[$otherListingTemp['store_id']])) {
 
                 $rez = Mage::getModel('M2ePro/ProductChange')
-                            ->updateAttribute( $this->_productId, 'status',
+                            ->updateAttribute( $this->_productId, $attribute,
                                                $statusOld, $statusNew,
                                                Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
                                                $otherListingTemp['store_id'] );
@@ -424,14 +277,14 @@ class Ess_M2ePro_Model_Observer_Product
             return;
         }
 
-        foreach ($this->_listingsArray as $listingTemp) {
+        foreach ($this->_listingsProductsArray as $listingProductArray) {
 
              $tempLog = Mage::getModel('M2ePro/Listing_Log');
-             $tempLog->setComponentMode($listingTemp['component_mode']);
+             $tempLog->setComponentMode($listingProductArray['component_mode']);
              $tempLog->addProductMessage(
-                $listingTemp['id'],
+                $listingProductArray['object']->getListingId(),
                 $this->_productId,
-                NULL,
+                $listingProductArray['id'],
                 Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_PRICE,
@@ -477,14 +330,14 @@ class Ess_M2ePro_Model_Observer_Product
             return;
         }
 
-        foreach ($this->_listingsArray as $listingTemp) {
+        foreach ($this->_listingsProductsArray as $listingProductArray) {
 
             $tempLog = Mage::getModel('M2ePro/Listing_Log');
-            $tempLog->setComponentMode($listingTemp['component_mode']);
+            $tempLog->setComponentMode($listingProductArray['component_mode']);
             $tempLog->addProductMessage(
-                $listingTemp['id'],
+                $listingProductArray['object']->getListingId(),
                 $this->_productId,
-                NULL,
+                $listingProductArray['id'],
                 Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE,
@@ -542,14 +395,14 @@ class Ess_M2ePro_Model_Observer_Product
             $specialPriceFromDateNew = 'None';
         }
 
-        foreach ($this->_listingsArray as $listingTemp) {
+        foreach ($this->_listingsProductsArray as $listingProductArray) {
 
             $tempLog = Mage::getModel('M2ePro/Listing_Log');
-            $tempLog->setComponentMode($listingTemp['component_mode']);
+            $tempLog->setComponentMode($listingProductArray['component_mode']);
             $tempLog->addProductMessage(
-                $listingTemp['id'],
+                $listingProductArray['object']->getListingId(),
                 $this->_productId,
-                NULL,
+                $listingProductArray['id'],
                 Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_FROM_DATE,
@@ -611,14 +464,14 @@ class Ess_M2ePro_Model_Observer_Product
             $specialPriceToDateNew = 'None';
         }
 
-        foreach ($this->_listingsArray as $listingTemp) {
+        foreach ($this->_listingsProductsArray as $listingProductArray) {
 
             $tempLog = Mage::getModel('M2ePro/Listing_Log');
-            $tempLog->setComponentMode($listingTemp['component_mode']);
+            $tempLog->setComponentMode($listingProductArray['component_mode']);
             $tempLog->addProductMessage(
-                $listingTemp['id'],
+                $listingProductArray['object']->getListingId(),
                 $this->_productId,
-                NULL,
+                $listingProductArray['id'],
                 Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE,
@@ -664,17 +517,13 @@ class Ess_M2ePro_Model_Observer_Product
             $customAttributeOld = $attribute['value_old'];
             $customAttributeNew = $magentoProductModel->getAttributeValue($attribute['attribute']);
 
-            $attributeStoreIds = Mage::helper('M2ePro/Magento')
-                                            ->getStoreIdsByAttributeAndStore($attribute['attribute'],
-                                                                             $this->_storeId);
-
             $changedStores = array();
 
-            if (isset($attribute['listings'])) {
+            if (isset($attribute['listings_products'])) {
 
-                foreach ($attribute['listings'] as $listingTemp) {
+                foreach ($attribute['listings_products'] as $listingProductArray) {
 
-                    if (!in_array($listingTemp['store_id'],$attributeStoreIds)) {
+                    if (!$this->isAffectChangedAttributeOnItemStoreId($attribute['attribute'],$listingProductArray['store_id'])) {
                         continue;
                     }
 
@@ -682,20 +531,20 @@ class Ess_M2ePro_Model_Observer_Product
                                 ->updateAttribute( $this->_productId, $attribute['attribute'],
                                                    $customAttributeOld, $customAttributeNew,
                                                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
-                                                   $listingTemp['store_id']);
+                                                   $listingProductArray['store_id']);
 
                     if ($rez === false) {
                         continue;
                     }
 
-                    $changedStores[$listingTemp['store_id']] = true;
+                    $changedStores[$listingProductArray['store_id']] = true;
 
                     $tempLog = Mage::getModel('M2ePro/Listing_Log');
-                    $tempLog->setComponentMode($listingTemp['component_mode']);
+                    $tempLog->setComponentMode($listingProductArray['component_mode']);
                     $tempLog->addProductMessage(
-                        $listingTemp['id'],
+                        $listingProductArray['object']->getListingId(),
                         $this->_productId,
-                        NULL,
+                        $listingProductArray['id'],
                         Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
                         NULL,
                         Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_CUSTOM_ATTRIBUTE,
@@ -718,7 +567,7 @@ class Ess_M2ePro_Model_Observer_Product
 
                 foreach ($this->_otherListingsArray as $otherListingTemp) {
 
-                    if (!in_array($otherListingTemp['store_id'],$attributeStoreIds)) {
+                    if (!$this->isAffectChangedAttributeOnItemStoreId($attribute['attribute'],$otherListingTemp['store_id'])) {
                         continue;
                     }
 
@@ -757,6 +606,161 @@ class Ess_M2ePro_Model_Observer_Product
                 }
             }
         }
+    }
+
+    //-----------------------------------
+
+    private function tryToUpdateTheLogsNames($productNew)
+    {
+        if ($this->_storeId != Mage_Core_Model_App::ADMIN_STORE_ID) {
+            return;
+        }
+
+        $nameNew = $productNew->getName();
+
+        if ($this->_productNameOld == $nameNew) {
+            return;
+        }
+
+        Mage::getModel('M2ePro/Listing_Log')->updateProductTitle($this->_productId,$nameNew);
+    }
+
+    private function tryToPerformCategoriesActions($productNew)
+    {
+        $categoryIdsNew = $productNew->getCategoryIds();
+
+        /** @var Ess_M2ePro_Model_Observer_Category $categoryObserverModel */
+        $categoryObserverModel = Mage::getModel('M2ePro/Observer_Category');
+
+        $addedCategoryIds = array_diff($categoryIdsNew,$this->_productCategoryIdsOld);
+        foreach ($addedCategoryIds as $categoryId) {
+           $categoryObserverModel->synchProductWithAddedCategoryId(
+               $productNew,$categoryId
+           );
+        }
+
+        $deletedCategoryIds = array_diff($this->_productCategoryIdsOld,$categoryIdsNew);
+        foreach ($deletedCategoryIds as $categoryId) {
+           $categoryObserverModel->synchProductWithDeletedCategoryId(
+               $productNew,$categoryId
+           );
+        }
+    }
+
+    //####################################
+
+    private function getCustomAttributes($listingsProductsArray,$otherListingsArray)
+    {
+        try {
+
+            $attributesWithListingsProducts = $this->getCustomAttributesWithListingsProducts($listingsProductsArray);
+            $attributesWithOtherListings = $this->getCustomAttributesWithOtherListings($otherListingsArray);
+
+            foreach ($attributesWithOtherListings as $hash => $otherListingAttribute) {
+                if (isset($attributesWithListingsProducts[$hash])) {
+                    $attributesWithListingsProducts[$hash]['other_listings'] = $otherListingAttribute['other_listings'];
+                } else {
+                    $attributesWithListingsProducts[$hash] = $otherListingAttribute;
+                }
+            }
+
+        } catch (Exception $exception) {
+
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
+            return array();
+        }
+
+        return array_values($attributesWithListingsProducts);
+    }
+
+    //-----------------------------------
+
+    private function getCustomAttributesWithListingsProducts($listingsProductsArray)
+    {
+        $attributes = array();
+
+        foreach ($listingsProductsArray as $listingProductArray) {
+
+            $tempAttributes = $listingProductArray['object']->getTrackingAttributes();
+
+            foreach ($tempAttributes as $attribute) {
+
+                $hash = md5($attribute);
+
+                if (!isset($attributes[$hash])) {
+                    $attributes[$hash] = array(
+                        'attribute' => $attribute,
+                        'listings_products' => array($listingProductArray)
+                    );
+                } else {
+                    $attributes[$hash]['listings_products'][] = $listingProductArray;
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
+    private function getCustomAttributesWithOtherListings($otherListingsArray)
+    {
+        $attributes = array();
+
+        if (count($otherListingsArray) <= 0) {
+            return $attributes;
+        }
+
+        $tempOtherListingsAttributes = Mage::getModel('M2ePro/Ebay_Listing_Other_Source')
+                                                ->getTrackingAttributes();
+
+        foreach ($tempOtherListingsAttributes as $attribute) {
+            $attributes[md5($attribute)] = array(
+                'attribute' => $attribute,
+                'other_listings' => $otherListingsArray
+            );
+        }
+
+        return $attributes;
+    }
+
+    //####################################
+
+    private function updateListingsProductsVariations()
+    {
+        foreach ($this->_listingsProductsArray as $listingProductArray) {
+            $variationUpdaterModelPrefix = ucwords($listingProductArray['component_mode']).'_';
+            Mage::getModel('M2ePro/'.$variationUpdaterModelPrefix.'Listing_Product_Variation_Updater')
+                    ->updateVariations($listingProductArray['object']);
+        }
+    }
+
+    private function cutAttributeTitleLength($attribute, $length = 50)
+    {
+        if (strlen($attribute) > $length) {
+            return substr($attribute, 0, $length) . ' ...';
+        }
+
+        return $attribute;
+    }
+
+    private function isAffectChangedAttributeOnItemStoreId($attribute, $itemStoreId)
+    {
+        $attributeStoreIds = Mage::helper('M2ePro/Magento_Store')
+                                    ->getStoreIdsByAttributeAndStore($attribute,$this->_storeId);
+
+        if (count($attributeStoreIds) > 0) {
+            return in_array($itemStoreId,$attributeStoreIds);
+        }
+
+        if ($itemStoreId == Mage_Core_Model_App::ADMIN_STORE_ID) {
+            return true;
+        }
+
+        /** @var Mage_Catalog_Model_Product $productTemp */
+        $productTemp = Mage::getModel('catalog/product')
+                            ->setStoreId($itemStoreId)
+                            ->load($this->_productId);
+
+        return $productTemp->getAttributeDefaultValue($attribute) === false;
     }
 
     //####################################

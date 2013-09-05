@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Order_View_Log_Grid extends Mage_Adminhtml_Block_Widget_Grid
@@ -24,7 +24,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_View_Log_Grid extends Mage_Adminhtml_Bloc
         //------------------------------
 
         /** @var $order Ess_M2ePro_Model_Order */
-        $this->order = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        $this->order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
     }
 
     protected function _prepareCollection()
@@ -141,6 +141,6 @@ class Ess_M2ePro_Block_Adminhtml_Order_View_Log_Grid extends Mage_Adminhtml_Bloc
 
     public function getGridUrl()
     {
-        return $this->getUrl('*/adminhtml_order/logGrid', array('_current' => true));
+        return $this->getUrl('*/adminhtml_order/viewLogGrid', array('_current' => true));
     }
 }

@@ -1,15 +1,13 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_AttributeSet extends Ess_M2ePro_Model_Abstract
 {
     const OBJECT_TYPE_LISTING                     = 1;
-    const OBJECT_TYPE_TEMPLATE_GENERAL            = 2;
     const OBJECT_TYPE_TEMPLATE_SELLING_FORMAT     = 3;
-    const OBJECT_TYPE_TEMPLATE_DESCRIPTION        = 4;
     const OBJECT_TYPE_AMAZON_TEMPLATE_NEW_PRODUCT = 5;
     const OBJECT_TYPE_BUY_TEMPLATE_NEW_PRODUCT    = 6;
 
@@ -45,19 +43,9 @@ class Ess_M2ePro_Model_AttributeSet extends Ess_M2ePro_Model_Abstract
         return $this->getObjectType() == self::OBJECT_TYPE_LISTING;
     }
 
-    public function isGeneralTemplate()
-    {
-        return $this->getObjectType() == self::OBJECT_TYPE_TEMPLATE_GENERAL;
-    }
-
     public function isSellingFormatTemplate()
     {
         return $this->getObjectType() == self::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT;
-    }
-
-    public function isDescriptionTemplate()
-    {
-        return $this->getObjectType() == self::OBJECT_TYPE_TEMPLATE_DESCRIPTION;
     }
 
     public function isAmazonTemplateNewProduct()

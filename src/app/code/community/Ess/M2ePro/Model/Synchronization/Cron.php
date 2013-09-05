@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Synchronization_Cron
@@ -10,8 +10,8 @@ class Ess_M2ePro_Model_Synchronization_Cron
 
     public function process()
     {
-        Mage::helper('M2ePro/Server')->setMemoryLimit(512);
-        Mage::helper('M2ePro/Exception')->setFatalErrorHandler();
+        Mage::helper('M2ePro/Client')->setMemoryLimit(512);
+        Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
 
         /** @var $synchDispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
         $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
@@ -27,7 +27,6 @@ class Ess_M2ePro_Model_Synchronization_Cron
             Ess_M2ePro_Model_Synchronization_Tasks::TEMPLATES,
             Ess_M2ePro_Model_Synchronization_Tasks::ORDERS,
             Ess_M2ePro_Model_Synchronization_Tasks::FEEDBACKS,
-            Ess_M2ePro_Model_Synchronization_Tasks::MESSAGES,
             Ess_M2ePro_Model_Synchronization_Tasks::OTHER_LISTINGS
         ));
         $synchDispatcher->setParams(array());

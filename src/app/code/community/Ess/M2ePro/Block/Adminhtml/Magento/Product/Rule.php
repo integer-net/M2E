@@ -4,8 +4,11 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule extends Mage_Adminhtml_Block_Widget_Form
+class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule
+    extends Mage_Adminhtml_Block_Widget_Form
 {
+    // ########################################
+
     protected function _prepareForm()
     {
         /** @var Ess_M2ePro_Model_Magento_Product_Rule $model */
@@ -45,4 +48,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule extends Mage_Adminhtml_Blo
 
         return parent::_prepareForm();
     }
+
+    // ########################################
 }

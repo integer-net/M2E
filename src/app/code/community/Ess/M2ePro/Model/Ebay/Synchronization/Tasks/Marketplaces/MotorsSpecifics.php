@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
@@ -11,8 +11,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
     const PERCENTS_END = 100;
     const PERCENTS_INTERVAL = 100;
 
-    private $configGroup = '/ebay/synchronization/settings/marketplaces/motors_specifics/';
-    private $synchName = 'Parts Compatibility Synchronization';
+    //####################################
+
+    // ->__('eBay Parts Compatibility Synchronization')
+    private $name = 'eBay Parts Compatibility Synchronization';
 
     //####################################
 
@@ -40,21 +42,15 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
     {
         $this->_lockItem->activate();
 
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Ebay::TITLE.' ';
-        } else {
-            $componentName = '';
-        }
-
         $this->_profiler->addEol();
-        $this->_profiler->addTitle($componentName.'Parts Compatibility Actions');
+        $this->_profiler->addTitle($this->name);
         $this->_profiler->addTitle('--------------------------');
         $this->_profiler->addTimePoint(__CLASS__,'Total time');
         $this->_profiler->increaseLeftPadding(5);
 
         $this->_lockItem->setPercents(self::PERCENTS_START);
         $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('The "Receive Parts Compatibility" action is started. Please wait...')
+            Mage::helper('M2ePro')->__('The "%s" action is started. Please wait...', $this->name)
         );
     }
 
@@ -62,7 +58,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
     {
         $this->_lockItem->setPercents(self::PERCENTS_END);
         $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('The "Receive Parts Compatibility" action is finished. Please wait...')
+            Mage::helper('M2ePro')->__('The "%s" action is finished. Please wait...', $this->name)
         );
 
         $this->_profiler->decreaseLeftPadding(5);
@@ -76,6 +72,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
 
     private function execute()
     {
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+
         /** @var $marketplace Ess_M2ePro_Model_Marketplace */
         $marketplace = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
             'Marketplace', Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_MOTORS
@@ -89,8 +87,6 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
         //-----------------------
         /** @var $marketplace Ess_M2ePro_Model_Marketplace */
         $this->_lockItem->setTitle($marketplaceTitle);
-        /** @var $config Ess_M2ePro_Model_Config_Module */
-        $config = Mage::helper('M2ePro/Module')->getConfig();
         //-----------------------
 
         //-----------------------
@@ -107,9 +103,9 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
         //-----------------------
 
         //-----------------------
-        $partNumber = (int)$config->getGroupValue($this->configGroup, 'part_next');
+        $partNumber = (int)$config->getGroupValue('/ebay/marketplaces/motors_specifics/', 'part_next');
         $partNumber <= 0 && $partNumber = 1;
-        $partSize = (int)$config->getGroupValue($this->configGroup, 'part_size');
+        $partSize = (int)$config->getGroupValue('/ebay/marketplaces/motors_specifics/', 'part_size');
         //-----------------------
 
         //-----------------------
@@ -121,9 +117,13 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
             //-----------------------
 
             //-----------------------
+            $entity = 'marketplace';
+            $type   = 'get';
+            $name   = 'motorsSpecifics';
             $params = array('part_number' => $partNumber, 'part_size' => $partSize);
+
             $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')->processVirtualAbstract(
-                'marketplace','get','motorsSpecifics', $params, null, $marketplace->getId(),NULL,NULL
+                $entity, $type, $name, $params, null, $marketplace
             );
 
             if (!isset($response['parts']) || !is_array($response['parts']) || count($response['parts']) == 0) {
@@ -184,19 +184,19 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
             //-----------------------
 
             if (is_null($response['next'])) {
-                $config->deleteGroupValue($this->configGroup, 'part_next');
+                $config->deleteGroupValue('/ebay/marketplaces/motors_specifics/', 'part_next');
                 break;
             }
 
             $partNumber = $response['next'];
-            $config->setGroupValue($this->configGroup, 'part_next', $partNumber);
+            $config->setGroupValue('/ebay/marketplaces/motors_specifics/', 'part_next', $partNumber);
         }
         //-----------------------
 
         //-----------------------
         $description = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Parts Compatibility Synchronization" action for marketplace "%mrk%" has been successfully completed.',
-            array('mrk'=>$marketplace->getTitle())
+            'The "%name%" action for eBay Site "%mrk%" has been successfully completed.',
+            array('name' => $this->name, 'mrk'=>$marketplace->getTitle())
         );
         $this->_logs->addMessage(
             $description,
@@ -205,6 +205,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
         );
         //-----------------------
     }
+
+    //####################################
 
     private function addPercent($percent)
     {
@@ -221,7 +223,9 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
     private function setLockItemStatus($status, $search, $replace)
     {
         $description = str_replace($search, $replace, Mage::helper('M2ePro')->__($status));
-        $description = str_replace('%synch_name%', $this->synchName, $description);
+        $description = str_replace('%synch_name%', $this->name, $description);
         $this->_lockItem->setStatus($description);
     }
+
+    //####################################
 }

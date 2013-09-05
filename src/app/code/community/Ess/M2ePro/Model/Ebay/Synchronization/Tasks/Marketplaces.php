@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces extends Ess_M2ePro_Model_Ebay_Synchronization_Tasks
@@ -16,12 +16,12 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces extends Ess_M2ePr
     {
         // Check tasks config mode
         //-----------------------------
-        $detailsMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/ebay/synchronization/settings/marketplaces/details/','mode');
-        $categoriesMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/ebay/synchronization/settings/marketplaces/categories/','mode');
-        $motorsSpecificsMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/ebay/synchronization/settings/marketplaces/motors_specifics/','mode');
+        $detailsMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/ebay/marketplaces/details/','mode');
+        $categoriesMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/ebay/marketplaces/categories/','mode');
+        $motorsSpecificsMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/ebay/marketplaces/motors_specifics/','mode');
         if (!$detailsMode && !$categoriesMode && !$motorsSpecificsMode) {
             return false;
         }

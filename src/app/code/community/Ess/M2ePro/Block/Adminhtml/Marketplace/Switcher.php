@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Marketplace_Switcher extends Ess_M2ePro_Block_Adminhtml_Component_Switcher
@@ -30,22 +30,17 @@ class Ess_M2ePro_Block_Adminhtml_Marketplace_Switcher extends Ess_M2ePro_Block_A
             return array();
         }
 
+        $componentTitles = Mage::helper('M2ePro/Component')->getComponentsTitles();
+
         $items = array();
 
         foreach ($collection as $marketplace) {
+            /** @var $marketplace Ess_M2ePro_Model_Marketplace */
+
             if (!isset($items[$marketplace->getComponentMode()]['label'])) {
                 $label = '';
-                if ($marketplace->isComponentModeEbay()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
-                }
-                if ($marketplace->isComponentModeAmazon()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
-                }
-                if ($marketplace->isComponentModeBuy()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
-                }
-                if ($marketplace->isComponentModePlay()) {
-                    $label = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+                if (isset($componentTitles[$marketplace->getComponentMode()])) {
+                    $label = $componentTitles[$marketplace->getComponentMode()];
                 }
                 $items[$marketplace->getComponentMode()]['label'] = $label;
             }

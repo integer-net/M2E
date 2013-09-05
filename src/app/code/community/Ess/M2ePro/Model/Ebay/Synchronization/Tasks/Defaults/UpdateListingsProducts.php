@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProducts
@@ -16,7 +16,6 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProduct
     const EBAY_STATUS_COMPLETED = 'Completed';
 
     private $tempToTime = NULL;
-
     protected $logActionId = NULL;
 
     //####################################
@@ -102,8 +101,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProduct
 
     private function getEbayCheckSinceTime()
     {
-        return Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/ebay/synchronization/settings/defaults/update_listings_products/','since_time');
+        return Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->getGroupValue('/ebay/defaults/update_listings_products/','since_time');
     }
 
     private function setEbayCheckSinceTime($time)
@@ -117,8 +116,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProduct
             $time = strftime('%Y-%m-%d %H:%M:%S', $time);
             date_default_timezone_set($oldTimezone);
         }
-        Mage::helper('M2ePro/Module')->getConfig()
-            ->setGroupValue('/ebay/synchronization/settings/defaults/update_listings_products/','since_time',$time);
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()
+            ->setGroupValue('/ebay/defaults/update_listings_products/','since_time',$time);
     }
 
     private function checkAndPrepareSinceTime()
@@ -278,6 +277,7 @@ STATUS;
 
             // Check exist listing product
             //--------------------------
+            /* @var $tempListingProductModel Ess_M2ePro_Model_Listing_Product */
             $tempListingProductModel = Mage::getModel('M2ePro/Ebay_Listing_Product')
                                                  ->getParentInstanceByEbayItem($changeItem['id']);
 
@@ -290,6 +290,10 @@ STATUS;
                 continue;
             }
             //--------------------------
+
+            if ($tempListingProductModel->getListing()->getAccountId() != $account['id']) {
+                continue;
+            }
 
             // Get prepared listings products
             //--------------------------

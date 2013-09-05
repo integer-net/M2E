@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Search_Dispatcher
@@ -22,25 +22,25 @@ class Ess_M2ePro_Model_Buy_Search_Dispatcher
         );
 
         if (is_null($marketplace)) {
-            $marketplace = $listingProduct->getGeneralTemplate()->getMarketplace();
+            $marketplace = $listingProduct->getListing()->getMarketplace();
         }
 
         if (is_null($account)) {
-            $account = $listingProduct->getGeneralTemplate()->getAccount();
+            $account = $listingProduct->getListing()->getAccount();
         }
 
         try {
-            $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getDispatcher();
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
             $dispatcherObject->processConnector('search', 'manual' ,'requester',
                                                 $params, $marketplace, $account,
                                                 'Ess_M2ePro_Model_Buy');
         } catch (Exception $exception) {
-            Mage::helper('M2ePro/Exception')->process($exception);
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
             return false;
         }
 
-        $result = Mage::helper('M2ePro')->getGlobalValue('temp_buy_manual_search_SKU_result');
-        Mage::helper('M2ePro')->unsetGlobalValue('temp_buy_manual_search_SKU_result');
+        $result = Mage::helper('M2ePro/Data_Global')->getValue('temp_buy_manual_search_SKU_result');
+        Mage::helper('M2ePro/Data_Global')->unsetValue('temp_buy_manual_search_SKU_result');
 
         if (!is_array($result)) {
             return array();
@@ -69,16 +69,16 @@ class Ess_M2ePro_Model_Buy_Search_Dispatcher
                 'listing_product' => $listingProduct
             );
 
-            $marketplace = $listingProduct->getGeneralTemplate()->getMarketplace();
-            $account = $listingProduct->getGeneralTemplate()->getAccount();
+            $marketplace = $listingProduct->getListing()->getMarketplace();
+            $account = $listingProduct->getListing()->getAccount();
 
             try {
-                $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getDispatcher();
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
                 $dispatcherObject->processConnector('search', 'automatic' ,'requester',
                                                     $params, $marketplace, $account,
                                                     'Ess_M2ePro_Model_Buy');
             } catch (Exception $exception) {
-                Mage::helper('M2ePro/Exception')->process($exception);
+                Mage::helper('M2ePro/Module_Exception')->process($exception);
                 return false;
             }
         }

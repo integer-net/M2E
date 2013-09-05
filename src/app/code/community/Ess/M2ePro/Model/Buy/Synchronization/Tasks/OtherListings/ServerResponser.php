@@ -1,11 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings_ServerResponser extends
-                                                Ess_M2ePro_Model_Connector_Server_Buy_Inventory_Get_ItemsResponser
+class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings_ServerResponser
+    extends Ess_M2ePro_Model_Connector_Server_Buy_Inventory_Get_ItemsResponser
 {
     // ########################################
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Play_Account extends Ess_M2ePro_Model_Component_Child_Play_Abstract
@@ -614,13 +614,13 @@ class Ess_M2ePro_Model_Play_Account extends Ess_M2ePro_Model_Component_Child_Pla
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::delete();
     }
 

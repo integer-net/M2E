@@ -10,7 +10,7 @@ ListingCategoryTreeHandler.prototype = Object.extend(new CommonHandler(), {
     tree_buildCategory: function(parent, config)
     {
         if (!config) {
-            return null;
+            return;
         }
 
         if (parent && config && config.length) {
@@ -24,6 +24,13 @@ ListingCategoryTreeHandler.prototype = Object.extend(new CommonHandler(), {
                     if (config[i].id == initTreeSelectedNodes[j][0]) {
                         initTreeSelectedNodes[j][1] = node;
                         initTreeSelectedNodes[j][1].attributes.checked = true;
+                        break;
+                    }
+                }
+
+                for (var k=0;k<initTreeHighlightedNodes.length;k++) {
+                    if (config[i].id == initTreeHighlightedNodes[k][0]) {
+                        initTreeHighlightedNodes[k][1] = node;
                         break;
                     }
                 }
@@ -54,27 +61,24 @@ ListingCategoryTreeHandler.prototype = Object.extend(new CommonHandler(), {
         return true;
     },
 
-    tree_categoryAdd: function(id, node)
+    tree_categoryAdd: function(id)
     {
         categories_selected_items.push(id);
         array_unique(categories_selected_items);
-
-        if (!node.isLeaf() && node.hasChildNodes()) {
-            ListingCategoryTreeHandlerObj.tree_processChildren(node, node.attributes.checked);
-        }
     },
 
-    tree_categoryRemove: function(id, node)
+    tree_categoryRemove: function(id)
     {
         while (categories_selected_items.indexOf(id) != -1) {
             categories_selected_items.splice(categories_selected_items.indexOf(id), 1);
         }
 
         array_unique(categories_selected_items);
+    },
 
-        if (!node.isLeaf() && node.hasChildNodes()) {
-            ListingCategoryTreeHandlerObj.tree_processChildren(node, node.attributes.checked);
-        }
+    getCategoryTitleById: function(id)
+    {
+        return tree.getNodeById(id).ui.getTextEl().innerHTML;
     }
 
     //----------------------------------

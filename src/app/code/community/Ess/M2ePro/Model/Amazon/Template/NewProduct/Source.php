@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
@@ -138,9 +138,7 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
             $value = $specific[$specific['mode']];
 
             if ($specific['mode'] == 'custom_attribute') {
-                $value = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
-                    $specific['custom_attribute']
-                );
+                $value = $this->listingProduct->getActualMagentoProduct()->getAttributeValue($specific['custom_attribute']);
             }
 
             $specific['type'] == 'int' && $value = (int)$value;
@@ -156,9 +154,7 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
 
                 $attributeValue = $attributeData['mode'] == 'custom_value'
                     ? $attributeData['custom_value']
-                    : $this->listingProduct
-                           ->getActualMagentoProduct()
-                           ->getAttributeValue($attributeData['custom_attribute']);
+                    : $this->listingProduct->getActualMagentoProduct()->getAttributeValue($attributeData['custom_attribute']);
 
                 $attributes[$i] = array(
                     'name' => str_replace(' ','',$attributeName),
@@ -285,9 +281,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
                 break;
 
             case Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::TITLE_MODE_CUSTOM:
-                $title = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+                $title = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                     $src['template'],
-                    $this->listingProduct->getActualMagentoProduct()->getProduct()
+                    $this->listingProduct->getActualMagentoProduct()
                 );
                 break;
 
@@ -305,9 +301,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         $src = $this->templateNewProductDescription->getBrandSource();
 
         if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::BRAND_MODE_CUSTOM) {
-            $brand = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+            $brand = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                 $src['template'],
-                $this->listingProduct->getActualMagentoProduct()->getProduct()
+                $this->listingProduct->getActualMagentoProduct()
             );
         }
 
@@ -332,9 +328,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
                 break;
 
             case Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_CUSTOM:
-                $description = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+                $description = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                     $src['template'],
-                    $this->listingProduct->getActualMagentoProduct()->getProduct()
+                    $this->listingProduct->getActualMagentoProduct()
                 );
                 break;
 
@@ -359,9 +355,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
 
             foreach ($src['template'] as $bullet) {
                 $bullets[] = strip_tags(
-                    Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+                    Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                         $bullet,
-                        $this->listingProduct->getActualMagentoProduct()->getProduct()
+                        $this->listingProduct->getActualMagentoProduct()
                     )
                 );
             }
@@ -379,9 +375,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::SEARCH_TERMS_MODE_CUSTOM) {
 
             foreach ($src['template'] as $searchTerm) {
-                $searchTerms[] = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+                $searchTerms[] = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                     $searchTerm,
-                    $this->listingProduct->getActualMagentoProduct()->getProduct()
+                    $this->listingProduct->getActualMagentoProduct()
                 );
             }
         }
@@ -395,9 +391,10 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         $src = $this->templateNewProductDescription->getManufacturerSource();
 
         if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::MANUFACTURER_MODE_CUSTOM) {
-            $manufacturer = Mage::getSingleton('M2ePro/Template_Description_Parser')->parseTemplate(
+            $manufacturer = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
                 $src['template'],
-                $this->listingProduct->getActualMagentoProduct()->getProduct());
+                $this->listingProduct->getActualMagentoProduct()
+            );
         }
 
         return $manufacturer;
@@ -430,9 +427,7 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         if ($this->templateNewProductDescription->isPackageWeightModeCustomValue()) {
             $packageWeight = $src['custom_value'];
         } else {
-            $packageWeight = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
-                $src['custom_attribute']
-            );
+            $packageWeight = $this->listingProduct->getActualMagentoProduct()->getAttributeValue($src['custom_attribute']);
         }
 
         $packageWeight = str_replace(',','.',$packageWeight);
@@ -449,9 +444,8 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         if ($this->templateNewProductDescription->isPackageWeightUnitOfMeasureModeCustomValue()) {
             $packageWeightUnitOfMeasure = $src['custom_value'];
         } else {
-            $packageWeightUnitOfMeasure = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
-                $src['custom_attribute']
-            );
+            $packageWeightUnitOfMeasure = $this->listingProduct->getActualMagentoProduct()
+                                                               ->getAttributeValue($src['custom_attribute']);
         }
 
         return trim($packageWeightUnitOfMeasure);
@@ -469,9 +463,8 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         if ($this->templateNewProductDescription->isShippingWeightModeCustomValue()) {
             $shippingWeight = $src['custom_value'];
         } else {
-            $shippingWeight = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
-                $src['custom_attribute']
-            );
+            $shippingWeight = $this->listingProduct->getActualMagentoProduct()
+                                                    ->getAttributeValue($src['custom_attribute']);
         }
 
         $shippingWeight = str_replace(',','.',$shippingWeight);
@@ -488,9 +481,8 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         if ($this->templateNewProductDescription->isShippingWeightUnitOfMeasureModeCustomValue()) {
             $shippingWeightUnitOfMeasure = $src['custom_value'];
         } else {
-            $shippingWeightUnitOfMeasure = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
-                $src['custom_attribute']
-            );
+            $shippingWeightUnitOfMeasure = $this->listingProduct->getActualMagentoProduct()
+                                                                ->getAttributeValue($src['custom_attribute']);
         }
 
         return trim($shippingWeightUnitOfMeasure);
@@ -508,9 +500,7 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
             return trim($src['custom_value']);
         }
 
-        return trim($this->listingProduct->getActualMagentoProduct()->getAttributeValue(
-            $src['custom_attribute'])
-        );
+        return trim($this->listingProduct->getActualMagentoProduct()->getAttributeValue($src['custom_attribute']));
     }
 
     // ########################################

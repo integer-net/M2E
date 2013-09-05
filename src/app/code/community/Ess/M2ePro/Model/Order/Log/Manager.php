@@ -1,9 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * Used to set the initiator of the actions, performed on orders.
+ */
 class Ess_M2ePro_Model_Order_Log_Manager
 {
     private $initiator = null;

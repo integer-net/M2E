@@ -2,19 +2,16 @@
 
     // General for all tabs
     //-----------------------------
-    if (typeof M2ePro == 'undefined') {
-        M2ePro = {};
-        M2ePro.url = {};
-        M2ePro.formData = {};
-        M2ePro.customData = {};
-        M2ePro.text = {};
-    }
+    M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_feedback')) ?>);
 
-    M2ePro.url.formSubmit = '<?php echo $this->getUrl('*/*/save'); ?>';
-    M2ePro.url.getFeedbackTemplates = '<?php echo $this->getUrl('*/*/getFeedbackTemplates'); ?>';
+    M2ePro.url.add(<?php echo json_encode(array(
+        'formSubmit' => $this->getUrl('M2ePro/adminhtml_ebay_feedback/save')
+    )); ?>);
 
-    M2ePro.text.response_text_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Should be between 2 and 80 characters long.')); ?>';
-    M2ePro.text.feedback_sent_successfully = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Feedback has been successfully sent.')); ?>';
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'Should be between 2 and 80 characters long.' => $this->__('Should be between 2 and 80 characters long.'),
+        'Feedback has been successfully sent.' => $this->__('Feedback has been successfully sent.')
+    )); ?>);
 
     Event.observe(window, 'load', function() {
         EbayFeedbackHandlerObj = new EbayFeedbackHandler();
@@ -98,7 +95,8 @@
                         <td class="label"></td>
                         <td class="value">
                             <?php echo $this->getChildHtml('send_feedback');?>
-                            <?php echo $this->getChildHtml('cancel_feedback');?>
+                            &nbsp;
+                            <a href="javascript:void(0);" onclick="EbayFeedbackHandlerObj.cancelFeedback();"><?php echo Mage::helper('M2ePro')->__('Cancel'); ?></a>
                         </td>
                     </tr>
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Magento_Product_Builder extends Mage_Core_Model_Abstract
@@ -68,7 +68,7 @@ class Ess_M2ePro_Model_Magento_Product_Builder extends Mage_Core_Model_Abstract
         }
 
         if (empty($websiteIds)) {
-            $websiteIds = array(Mage::helper('M2ePro/Magento')->getDefaultWebsiteId());
+            $websiteIds = array(Mage::helper('M2ePro/Magento_Store')->getDefaultWebsiteId());
         }
 
         $this->product->setWebsiteIds($websiteIds);

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
@@ -11,18 +11,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
     const PERCENTS_END = 35;
     const PERCENTS_INTERVAL = 15;
 
-    private $_synchronizations = array();
-
     private $_checkedQtyListingsProductsIds = array();
     private $_checkedPriceListingsProductsIds = array();
-
-    //####################################
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->_synchronizations = Mage::helper('M2ePro')->getGlobalValue('synchTemplatesArray');
-    }
 
     //####################################
 
@@ -84,44 +74,34 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
     {
         $this->executeQtyChanged();
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 1*self::PERCENTS_INTERVAL/8);
+        $this->_lockItem->setPercents(self::PERCENTS_START + 1*self::PERCENTS_INTERVAL/7);
         $this->_lockItem->activate();
 
         $this->executePriceChanged();
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 2*self::PERCENTS_INTERVAL/8);
+        $this->_lockItem->setPercents(self::PERCENTS_START + 2*self::PERCENTS_INTERVAL/7);
         $this->_lockItem->activate();
 
         //-------------------------
 
         $this->executeTitleChanged();
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 3*self::PERCENTS_INTERVAL/8);
+        $this->_lockItem->setPercents(self::PERCENTS_START + 3*self::PERCENTS_INTERVAL/7);
         $this->_lockItem->activate();
 
         $this->executeSubTitleChanged();
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 4*self::PERCENTS_INTERVAL/8);
+        $this->_lockItem->setPercents(self::PERCENTS_START + 4*self::PERCENTS_INTERVAL/7);
         $this->_lockItem->activate();
 
         $this->executeDescriptionChanged();
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 5*self::PERCENTS_INTERVAL/8);
+        $this->_lockItem->setPercents(self::PERCENTS_START + 5*self::PERCENTS_INTERVAL/7);
         $this->_lockItem->activate();
 
         //-------------------------
 
-        $this->executeSellingFormatTemplatesChanged();
-
-        $this->_lockItem->setPercents(self::PERCENTS_START + 6*self::PERCENTS_INTERVAL/8);
-        $this->_lockItem->activate();
-
-        $this->executeDescriptionsTemplatesChanged();
-
-        $this->_lockItem->setPercents(self::PERCENTS_START + 7*self::PERCENTS_INTERVAL/8);
-        $this->_lockItem->activate();
-
-        $this->executeGeneralsTemplatesChanged();
+        $this->executeIsNeedSynchronize();
     }
 
     //####################################
@@ -176,29 +156,18 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
     {
         $this->_profiler->addTimePoint(__METHOD__,'Update title');
 
+        $collection = Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection();
+        $templates = $collection->getItems();
+
         // Get attributes for products changes
         //------------------------------------
         $attributesForProductChange = array();
 
-        foreach ($this->_synchronizations as &$synchronization) {
-
-            if (!$synchronization['instance']->getChildObject()->isReviseWhenChangeTitle()) {
-                continue;
-            }
-
-            foreach ($synchronization['listings'] as &$listing) {
-
-                /** @var $listing Ess_M2ePro_Model_Listing */
-
-                if (!$listing->isSynchronizationNowRun()) {
-                    continue;
-                }
-
-                $attributesForProductChange = array_merge(
-                    $attributesForProductChange,
-                    $listing->getDescriptionTemplate()->getChildObject()->getTitleAttributes()
-                );
-            }
+        foreach ($templates as $template) {
+            $attributesForProductChange = array_merge(
+                $attributesForProductChange,
+                $template->getTitleAttributes()
+            );
         }
 
         $attributesForProductChange = array_unique($attributesForProductChange);
@@ -221,24 +190,20 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
                 continue;
             }
 
+            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeTitle()) {
+                continue;
+            }
+
+            if (!in_array($listingProduct->getData('changed_attribute'),
+                $listingProduct->getChildObject()->getDescriptionTemplate()->getTitleAttributes())) {
+                continue;
+            }
+
             if ($this->_runnerActions->isExistProductAction(
                 $listingProduct,
                 Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('title'=>true)))
             ) {
-                continue;
-            }
-
-            if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
-                continue;
-            }
-
-            if (!in_array($listingProduct->getData('changed_attribute'),
-                $listingProduct->getDescriptionTemplate()->getChildObject()->getTitleAttributes())) {
-                continue;
-            }
-
-            if (!$listingProduct->getSynchronizationTemplate()->getChildObject()->isReviseWhenChangeTitle()) {
                 continue;
             }
 
@@ -271,20 +236,15 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
                 continue;
             }
 
+            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeTitle()) {
+                continue;
+            }
+
             if ($this->_runnerActions->isExistProductAction(
                 $listingProduct,
                 Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('variations'=>true)))
             ) {
-                continue;
-            }
-
-            if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
-                continue;
-            }
-
-            $synchronizationTemplate = $listingProduct->getSynchronizationTemplate();
-            if (!$synchronizationTemplate->getChildObject()->isReviseWhenChangeTitle()) {
                 continue;
             }
 
@@ -307,29 +267,18 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
     {
         $this->_profiler->addTimePoint(__METHOD__,'Update subtitle');
 
+        $collection = Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection();
+        $templates = $collection->getItems();
+
         // Get attributes for products changes
         //------------------------------------
         $attributesForProductChange = array();
 
-        foreach ($this->_synchronizations as &$synchronization) {
-
-            if (!$synchronization['instance']->getChildObject()->isReviseWhenChangeSubTitle()) {
-                continue;
-            }
-
-            foreach ($synchronization['listings'] as &$listing) {
-
-                /** @var $listing Ess_M2ePro_Model_Listing */
-
-                if (!$listing->isSynchronizationNowRun()) {
-                    continue;
-                }
-
-                $attributesForProductChange = array_merge(
-                    $attributesForProductChange,
-                    $listing->getDescriptionTemplate()->getChildObject()->getSubTitleAttributes()
-                );
-            }
+        foreach ($templates as $template) {
+            $attributesForProductChange = array_merge(
+                $attributesForProductChange,
+                $template->getSubTitleAttributes()
+            );
         }
 
         $attributesForProductChange = array_unique($attributesForProductChange);
@@ -352,24 +301,20 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
                 continue;
             }
 
+            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeSubTitle()) {
+                continue;
+            }
+
+            if (!in_array($listingProduct->getData('changed_attribute'),
+                $listingProduct->getChildObject()->getDescriptionTemplate()->getSubTitleAttributes())) {
+                continue;
+            }
+
             if ($this->_runnerActions->isExistProductAction(
                 $listingProduct,
                 Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('subtitle'=>true)))
             ) {
-                continue;
-            }
-
-            if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
-                continue;
-            }
-
-            if (!in_array($listingProduct->getData('changed_attribute'),
-                $listingProduct->getDescriptionTemplate()->getChildObject()->getSubTitleAttributes())) {
-                continue;
-            }
-
-            if (!$listingProduct->getSynchronizationTemplate()->getChildObject()->isReviseWhenChangeSubTitle()) {
                 continue;
             }
 
@@ -392,29 +337,18 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
     {
         $this->_profiler->addTimePoint(__METHOD__,'Update description');
 
+        $collection = Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection();
+        $templates = $collection->getItems();
+
         // Get attributes for products changes
         //------------------------------------
         $attributesForProductChange = array();
 
-        foreach ($this->_synchronizations as &$synchronization) {
-
-            if (!$synchronization['instance']->getChildObject()->isReviseWhenChangeDescription()) {
-                continue;
-            }
-
-            foreach ($synchronization['listings'] as &$listing) {
-
-                /** @var $listing Ess_M2ePro_Model_Listing */
-
-                if (!$listing->isSynchronizationNowRun()) {
-                    continue;
-                }
-
-                $attributesForProductChange = array_merge(
-                    $attributesForProductChange,
-                    $listing->getDescriptionTemplate()->getChildObject()->getDescriptionAttributes()
-                );
-            }
+        foreach ($templates as $template) {
+            $attributesForProductChange = array_merge(
+                $attributesForProductChange,
+                $template->getDescriptionAttributes()
+            );
         }
 
         $attributesForProductChange = array_unique($attributesForProductChange);
@@ -437,24 +371,20 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
                 continue;
             }
 
+            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeDescription()) {
+                continue;
+            }
+
+            if (!in_array($listingProduct->getData('changed_attribute'),
+                $listingProduct->getChildObject()->getDescriptionTemplate()->getDescriptionAttributes())) {
+                continue;
+            }
+
             if ($this->_runnerActions->isExistProductAction(
                 $listingProduct,
                 Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('description'=>true)))
             ) {
-                continue;
-            }
-
-            if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
-                continue;
-            }
-
-            if (!in_array($listingProduct->getData('changed_attribute'),
-                $listingProduct->getDescriptionTemplate()->getChildObject()->getDescriptionAttributes())) {
-                continue;
-            }
-
-            if (!$listingProduct->getSynchronizationTemplate()->getChildObject()->isReviseWhenChangeDescription()) {
                 continue;
             }
 
@@ -475,233 +405,86 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
 
     //####################################
 
-    private function executeSellingFormatTemplatesChanged()
+    private function executeIsNeedSynchronize()
     {
-        $this->_profiler->addTimePoint(__METHOD__,'Update Selling Format Template');
+        $this->_profiler->addTimePoint(__METHOD__,'Execute is need synchronize');
 
-        // Get changed templates
-        //------------------------------------
-        $templatesCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Template_SellingFormat');
-        $templatesCollection->getSelect()->where('`main_table`.`update_date` != `main_table`.`synch_date`');
-        $templatesCollection->getSelect()->orWhere('`main_table`.`synch_date` IS NULL');
-        $templatesArray = $templatesCollection->toArray();
-        //------------------------------------
+        $listingProductCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
+        $listingProductCollection->addFieldToFilter('is_need_synchronize', 1);
 
-        // Set eBay actions for listed products
-        //------------------------------------
-        foreach ($templatesArray['items'] as $templateArray) {
+        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+        foreach ($listingProductCollection->getItems() as $listingProduct) {
 
-            /** @var $template Ess_M2ePro_Model_Template_SellingFormat */
-            $template = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
-                'Template_SellingFormat', $templateArray['id'], NULL, array('template')
-            );
+            /* @var $synchTemplate Ess_M2ePro_Model_Template_Synchronization */
+            $synchTemplate = $listingProduct->getListing()->getChildObject()->getSynchronizationTemplate();
 
-            $listings = $template->getListings(true);
+            $isRevise = false;
+            foreach ($listingProduct->getSynchReasons() as $reason) {
 
-            foreach ($listings as $listing) {
+                $neededSynchTemplate = $synchTemplate;
 
-                /** @var $listing Ess_M2ePro_Model_Listing */
+                if (in_array($reason, array(
+                    'categoryTemplate',
+                    'paymentTemplate',
+                    'returnTemplate',
+                    'shippingTemplate',
+                    'descriptionTemplate'
+                ))) {
+                    $neededSynchTemplate = $synchTemplate->getChildObject();
+                }
 
-                if (!$listing->isSynchronizationNowRun()) {
+                $method = 'isRevise' . ucfirst($reason);
+
+                if (!method_exists($neededSynchTemplate,$method)) {
                     continue;
                 }
 
-                $listing->setSellingFormatTemplate($template);
-
-                if (!$listing->getSynchronizationTemplate()->isReviseSellingFormatTemplate()) {
-                    continue;
-                }
-
-                $filters = array('status'=>array('in'=>array(Ess_M2ePro_Model_Listing_Product::STATUS_LISTED)));
-                $listingsProducts = $listing->getProducts(true,$filters);
-
-                foreach ($listingsProducts as $listingProduct) {
-
-                    /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-                    if (!$listingProduct->isListed()) {
-                        continue;
-                    }
-
-                    if ($this->_runnerActions->isExistProductAction(
-                        $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
-                        array('all_data'=>true))
-                    ) {
-                        continue;
-                    }
-
-                    $listingProduct->setListing($listing);
-
-                    if (!$listingProduct->isRevisable()) {
-                        continue;
-                    }
-
-                    $this->_runnerActions->setProduct(
-                        $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
-                        array('all_data'=>true)
-                    );
+                if ($neededSynchTemplate->$method()) {
+                    $isRevise = true;
+                    break;
                 }
             }
 
-            $template->addData(array('synch_date'=>$template->getData('update_date')))->save();
-        }
-        //------------------------------------
+            if (!$isRevise) {
+                continue;
+            }
 
-        $this->_profiler->saveTimePoint(__METHOD__);
-    }
+            if ($this->_runnerActions
+                     ->isExistProductAction(
+                            $listingProduct,
+                            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                            array('all_data'=>true))
+            ) {
+                continue;
+            }
 
-    private function executeDescriptionsTemplatesChanged()
-    {
-        $this->_profiler->addTimePoint(__METHOD__,'Update description template');
+            if (!$listingProduct->isRevisable()) {
+                continue;
+            }
 
-        // Get changed templates
-        //------------------------------------
-        $templatesCollection = Mage::helper('M2ePro/Component_Ebay')->getModel('Template_Description')->getCollection();
-        $templatesCollection->getSelect()->where('`main_table`.`update_date` != `main_table`.`synch_date`');
-        $templatesCollection->getSelect()->orWhere('`main_table`.`synch_date` IS NULL');
-        $templatesArray = $templatesCollection->toArray();
-        //------------------------------------
+            if (!$listingProduct->getChildObject()->isSetCategoryTemplate()) {
+                continue;
+            }
 
-        // Set eBay actions for listed products
-        //------------------------------------
-        foreach ($templatesArray['items'] as $templateArray) {
+            if ($listingProduct->isLockedObject(NULL) ||
+                $listingProduct->isLockedObject('in_action')) {
+                continue;
+            }
 
-            /** @var $template Ess_M2ePro_Model_Template_Description */
-            $template = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
-                'Template_Description', $templateArray['id'], NULL, array('template')
-            );
-
-            $listings = $template->getListings(true);
-
-            foreach ($listings as $listing) {
-
-                /** @var $listing Ess_M2ePro_Model_Listing */
-
-                if (!$listing->isSynchronizationNowRun()) {
-                    continue;
-                }
-
-                $listing->setDescriptionTemplate($template);
-
-                if (!$listing->getSynchronizationTemplate()->isReviseDescriptionTemplate()) {
-                    continue;
-                }
-
-                $filters = array('status'=>array('in'=>array(Ess_M2ePro_Model_Listing_Product::STATUS_LISTED)));
-                $listingsProducts = $listing->getProducts(true,$filters);
-
-                foreach ($listingsProducts as $listingProduct) {
-
-                    /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-                    if (!$listingProduct->isListed()) {
-                        continue;
-                    }
-
-                    if ($this->_runnerActions->isExistProductAction(
-                        $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
-                        array('all_data'=>true))
-                    ) {
-                        continue;
-                    }
-
-                    $listingProduct->setListing($listing);
-
-                    if (!$listingProduct->isRevisable()) {
-                        continue;
-                    }
-
-                    $this->_runnerActions->setProduct(
+            $this->_runnerActions
+                 ->setProduct(
                         $listingProduct,
                         Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
                         array('all_data'=>true)
-                    );
-                }
-            }
+                 );
 
-            $template->addData(array('synch_date'=>$template->getData('update_date')))->save();
-        }
-        //------------------------------------
-
-        $this->_profiler->saveTimePoint(__METHOD__);
-    }
-
-    private function executeGeneralsTemplatesChanged()
-    {
-        $this->_profiler->addTimePoint(__METHOD__,'Update general template');
-
-        // Get changed templates
-        //------------------------------------
-        $templatesCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Template_General');
-        $templatesCollection->getSelect()->where('`main_table`.`update_date` != `main_table`.`synch_date`');
-        $templatesCollection->getSelect()->orWhere('`main_table`.`synch_date` IS NULL');
-        $templatesArray = $templatesCollection->toArray();
-        //------------------------------------
-
-        // Set eBay actions for listed products
-        //------------------------------------
-        foreach ($templatesArray['items'] as $templateArray) {
-
-            /** @var $template Ess_M2ePro_Model_Template_General */
-            $template = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
-                'Template_General', $templateArray['id'], NULL, array('template')
+            $dataForUpdate = array(
+                'is_need_synchronize' => 0,
+                'synch_reasons' => null
             );
-
-            $listings = $template->getListings(true);
-
-            foreach ($listings as $listing) {
-
-                /** @var $listing Ess_M2ePro_Model_Listing */
-
-                if (!$listing->isSynchronizationNowRun()) {
-                    continue;
-                }
-
-                $listing->setGeneralTemplate($template);
-
-                if (!$listing->getSynchronizationTemplate()->isReviseGeneralTemplate()) {
-                    continue;
-                }
-
-                $filters = array('status'=>array('in'=>array(Ess_M2ePro_Model_Listing_Product::STATUS_LISTED)));
-                $listingsProducts = $listing->getProducts(true,$filters);
-
-                foreach ($listingsProducts as $listingProduct) {
-
-                    /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-                    if (!$listingProduct->isListed()) {
-                        continue;
-                    }
-
-                    if ($this->_runnerActions->isExistProductAction(
-                        $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
-                        array('all_data'=>true))
-                    ) {
-                        continue;
-                    }
-
-                    $listingProduct->setListing($listing);
-
-                    if (!$listingProduct->isRevisable()) {
-                        continue;
-                    }
-
-                    $this->_runnerActions->setProduct(
-                        $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
-                        array('all_data'=>true)
-                    );
-                }
-            }
-
-            $template->addData(array('synch_date'=>$template->getData('update_date')))->save();
+            $listingProduct->addData($dataForUpdate)->save();
         }
-        //------------------------------------
 
         $this->_profiler->saveTimePoint(__METHOD__);
     }
@@ -745,10 +528,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
 
         // Correct synchronization
         //--------------------
-        if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
+        if(!$listingProduct->getChildObject()->isSetCategoryTemplate()) {
             return false;
         }
-        if (!$listingProduct->getSynchronizationTemplate()->getChildObject()->isReviseWhenChangeQty()) {
+        if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeQty()) {
             return false;
         }
         //--------------------
@@ -757,8 +540,11 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
         //--------------------
         $isVariationProduct = $listingProduct->getMagentoProduct()->isProductWithVariations() &&
                               (bool)count($listingProduct->getVariations());
-        $maxAppliedValue = $listingProduct->getSynchronizationTemplate()
-                                                    ->getChildObject()->getReviseUpdateQtyMaxAppliedValue();
+
+        $isMaxAppliedValueModeOn = $listingProduct->getChildObject()->getEbaySynchronizationTemplate()
+                                                    ->isReviseUpdateQtyMaxAppliedValueModeOn();
+        $maxAppliedValue = $listingProduct->getChildObject()->getEbaySynchronizationTemplate()
+                                                    ->getReviseUpdateQtyMaxAppliedValue();
 
         if (!$isVariationProduct) {
 
@@ -768,7 +554,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
             $channelQty = $ebayListingProduct->getOnlineQty() - $ebayListingProduct->getOnlineQtySold();
 
             //-- Check ReviseUpdateQtyMaxAppliedValue
-            if ($maxAppliedValue > 0 && $productQty > $maxAppliedValue && $channelQty > $maxAppliedValue) {
+            if ($isMaxAppliedValueModeOn && $productQty > $maxAppliedValue && $channelQty > $maxAppliedValue) {
                 return false;
             }
 
@@ -799,7 +585,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
 
                 if ($productQty != $channelQty) {
                     //-- Check ReviseUpdateQtyMaxAppliedValue
-                    ($maxAppliedValue <= 0 || $productQty <= $maxAppliedValue || $channelQty <= $maxAppliedValue) &&
+                    (!$isMaxAppliedValueModeOn || $productQty <= $maxAppliedValue || $channelQty <= $maxAppliedValue) &&
                         $hasChange = true;
                 }
 
@@ -857,10 +643,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Revise
 
         // Correct synchronization
         //--------------------
-        if (!$listingProduct->getListing()->isSynchronizationNowRun()) {
+        if(!$listingProduct->getChildObject()->isSetCategoryTemplate()) {
             return false;
         }
-        if (!$listingProduct->getSynchronizationTemplate()->getChildObject()->isReviseWhenChangePrice()) {
+        if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangePrice()) {
             return false;
         }
         //--------------------

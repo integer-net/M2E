@@ -16,7 +16,7 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
             return;
         }
 
-        new Ajax.Request( M2ePro.url.getSearchResultsHtml ,
+        new Ajax.Request( M2ePro.url.get('adminhtml_support/getResultsHtml') ,
         {
             method: 'post',
             parameters: {
@@ -28,7 +28,7 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
                 $('support_results').style.cssText = '';
                 $('support_results_content').innerHTML = transport.responseText;
                 $('support_results').simulate('click');
-                $('support_container').show();
+                $('support_other_container').show();
             }
         });
     },

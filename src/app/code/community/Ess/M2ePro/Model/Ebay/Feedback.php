@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Feedback extends Ess_M2ePro_Model_Component_Abstract
@@ -109,7 +109,7 @@ class Ess_M2ePro_Model_Ebay_Feedback extends Ess_M2ePro_Model_Component_Abstract
                                                          $this->getAccount()
             );
         } catch (Exception $e) {
-            Mage::helper('M2ePro/Exception')->process($e);
+            Mage::helper('M2ePro/Module_Exception')->process($e);
             return;
         }
 
@@ -128,18 +128,18 @@ class Ess_M2ePro_Model_Ebay_Feedback extends Ess_M2ePro_Model_Component_Abstract
     public static function haveNew($onlyNegative = false)
     {
         $showFeedbacksNotification = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/feedbacks/notification/', 'mode');
+            ->getGroupValue('/view/ebay/feedbacks/notification/', 'mode');
 
         if (!$showFeedbacksNotification) {
             return false;
         }
 
         $lastCheckDate = Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/feedbacks/notification/', 'last_check');
+            ->getGroupValue('/view/ebay/feedbacks/notification/', 'last_check');
 
         if (is_null($lastCheckDate)) {
             Mage::helper('M2ePro/Module')->getConfig()
-                ->setGroupValue('/feedbacks/notification/', 'last_check', Mage::helper('M2ePro')->getCurrentGmtDate());
+                ->setGroupValue('/view/ebay/feedbacks/notification/', 'last_check', Mage::helper('M2ePro')->getCurrentGmtDate());
             return false;
         }
 
@@ -154,7 +154,7 @@ class Ess_M2ePro_Model_Ebay_Feedback extends Ess_M2ePro_Model_Component_Abstract
 
         if ($newFeedbacksCount > 0) {
             Mage::helper('M2ePro/Module')->getConfig()
-                ->setGroupValue('/feedbacks/notification/', 'last_check', Mage::helper('M2ePro')->getCurrentGmtDate());
+                ->setGroupValue('/view/ebay/feedbacks/notification/', 'last_check', Mage::helper('M2ePro')->getCurrentGmtDate());
         }
 
         return $newFeedbacksCount > 0;

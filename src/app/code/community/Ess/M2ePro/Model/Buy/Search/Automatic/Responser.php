@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Buy_Search_Automatic_Responser
@@ -77,7 +77,7 @@ class Ess_M2ePro_Model_Buy_Search_Automatic_Responser
                 'step' => $this->currentStep + 1
             );
 
-            $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getDispatcher();
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
             $dispatcherObject->processConnector('search', 'automatic' ,'requester',
                                                 $params,
                                                 $this->getMarketplace(),

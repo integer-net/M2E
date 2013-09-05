@@ -1,9 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * @method Ess_M2ePro_Model_Listing_Other getParentObject()
+ */
 class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
     // ########################################
@@ -130,16 +133,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
 
         if ($this->getSourceModel()->isPriceSourceProduct()) {
             $price = $this->getMagentoProduct()->getPrice();
-        }
-
-        if ($this->getSourceModel()->isPriceSourceFinal()) {
-            $customerGroupId = $this->getSourceModel()->getCustomerGroupId();
-            $price = $this->getMagentoProduct()->getFinalPrice($customerGroupId);
+            $price = $this->convertPriceFromStoreToMarketplace($price);
         }
 
         if ($this->getSourceModel()->isPriceSourceSpecial()) {
             $price = $this->getMagentoProduct()->getSpecialPrice();
             $price <= 0 && $price = $this->getMagentoProduct()->getPrice();
+            $price = $this->convertPriceFromStoreToMarketplace($price);
         }
 
         if ($this->getSourceModel()->isPriceSourceAttribute()) {
@@ -247,6 +247,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
     public function getRelatedStoreId()
     {
         return $this->getAccount()->getChildObject()->getRelatedStoreId($this->getParentObject()->getMarketplaceId());
+    }
+
+    public function convertPriceFromStoreToMarketplace($price)
+    {
+        return Mage::getSingleton('M2ePro/Currency')->convertPrice(
+            $price,
+            $this->getMarketplace()->getChildObject()->getCurrency(),
+            $this->getRelatedStoreId()
+        );
     }
 
     // ########################################

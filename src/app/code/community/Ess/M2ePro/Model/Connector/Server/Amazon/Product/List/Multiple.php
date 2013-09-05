@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
@@ -66,7 +66,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
 
             if ($this->isSkuExistsInM2ePro($addingSku,$listingProduct)) {
 
-                if ($listingProduct->getChildObject()->getAmazonGeneralTemplate()->isGenerateSkuModeNo()) {
+                if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
                     unset($listingProducts[$key]);
                     continue;
                 }
@@ -160,7 +160,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            $nativeData = Mage::getModel('M2ePro/Amazon_Connector_Product_Helper')
+            $nativeData = Mage::getModel('M2ePro/Connector_Server_Amazon_Product_Helper')
                                          ->getListRequestData($listingProduct,$this->params);
 
             $sendedData = $nativeData;
@@ -196,7 +196,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                 );
                 return false;
             }
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_GENERAL_ID;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_GENERAL_ID;
         }
 
         $worldWideId = $listingProduct->getChildObject()->getWorldWideId();
@@ -212,7 +212,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                 );
                 return false;
             }
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
         }
 
         $templateNewProductId = $listingProduct->getChildObject()->getTemplateNewProductId();
@@ -232,7 +232,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
         $isWorldWideIdValid = !empty($worldWideId) && $this->validateWorldWideId($worldWideId);
 
         if ($isWorldWideIdValid && $this->isWorldWideIdAlreadyExists($worldWideId,$listingProduct)) {
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT_WORLDWIDE_ID;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT_WORLDWIDE_ID;
         }
 
         $registeredParameter = $listingProduct->getChildObject()->getTemplateNewProduct()->getRegisteredParameter();
@@ -259,7 +259,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
             return false;
         }
 
-        return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT;
+        return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT;
     }
 
     private function getListTypeChangerAutomatic(Ess_M2ePro_Model_Listing_Product $listingProduct)
@@ -277,7 +277,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                 );
                 return false;
             }
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_GENERAL_ID;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_GENERAL_ID;
         }
 
         $worldWideId = $listingProduct->getChildObject()->getWorldWideId();
@@ -293,7 +293,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                 );
                 return false;
             }
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
         }
 
         $templateNewProductId = $listingProduct->getChildObject()->getTemplateNewProductId();
@@ -304,7 +304,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
             $isWorldWideIdValid = !empty($worldWideId) && $this->validateWorldWideId($worldWideId);
 
             if ($isWorldWideIdValid && $this->isWorldWideIdAlreadyExists($worldWideId,$listingProduct)) {
-                return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT_WORLDWIDE_ID;
+                return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT_WORLDWIDE_ID;
             }
 
             $registeredParameter = $listingProduct->getChildObject()->getTemplateNewProduct()->getRegisteredParameter();
@@ -331,7 +331,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                 return false;
             }
 
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT;
         }
 
         $generalId = $listingProduct->getChildObject()->getAddingGeneralId();
@@ -347,7 +347,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                 );
                 return false;
             }
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_GENERAL_ID;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_GENERAL_ID;
         }
 
         $worldWideId = $listingProduct->getChildObject()->getAddingWorldWideId();
@@ -363,7 +363,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                 );
                 return false;
             }
-            return Ess_M2ePro_Model_Amazon_Connector_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
+            return Ess_M2ePro_Model_Connector_Server_Amazon_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
         }
 
         // ->__('ASIN/ISBN or New ASIN template is required.');
@@ -381,11 +381,11 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
 
     private function validateGeneralId($generalId)
     {
-        $isAsin = Mage::helper('M2ePro/Component_Amazon')->isASIN($generalId);
+        $isAsin = Mage::helper('M2ePro/Component_Amazon_Validation')->isASIN($generalId);
 
         if (!$isAsin) {
 
-            $isIsbn = Mage::helper('M2ePro/Component_Amazon')->isISBN($generalId);
+            $isIsbn = Mage::helper('M2ePro/Component_Amazon_Validation')->isISBN($generalId);
 
             if (!$isIsbn) {
                 return false;
@@ -397,11 +397,11 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
 
     private function validateWorldWideId($worldWideId)
     {
-        $isUpc = Mage::helper('M2ePro/Component_Amazon')->isUPC($worldWideId);
+        $isUpc = Mage::helper('M2ePro/Component_Amazon_Validation')->isUPC($worldWideId);
 
         if (!$isUpc) {
 
-            $isEan = Mage::helper('M2ePro/Component_Amazon')->isEAN($worldWideId);
+            $isEan = Mage::helper('M2ePro/Component_Amazon_Validation')->isEAN($worldWideId);
 
             if (!$isEan) {
                 return false;
@@ -414,7 +414,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
     private function validateConditions(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         $addingCondition = $listingProduct->getChildObject()->getCondition();
-        $validConditions = $listingProduct->getGeneralTemplate()->getChildObject()->getConditionValues();
+        $validConditions = $listingProduct->getListing()->getChildObject()->getConditionValues();
 
         if (empty($addingCondition) || !in_array($addingCondition,$validConditions)) {
 
@@ -465,8 +465,8 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
             return false;
         }
 
-        $marketplaceObj = $listingProduct->getGeneralTemplate()->getMarketplace();
-        $accountObj = $listingProduct->getGeneralTemplate()->getAccount();
+        $marketplaceObj = $listingProduct->getListing()->getMarketplace();
+        $accountObj = $listingProduct->getListing()->getAccount();
 
         /** @var $dispatcher Ess_M2ePro_Model_Amazon_Search_Dispatcher */
         $dispatcher = Mage::getModel('M2ePro/Amazon_Search_Dispatcher');
@@ -535,7 +535,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
                     $countTriedTemp != 0 && sleep(3);
 
                     /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Amazon_Dispatcher */
-                    $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+                    $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
                     $response = $dispatcherObject->processVirtualAbstract('product','search','asinBySku',
                         array('items' => $skus),'items', $this->marketplace->getId(), $this->account->getId());
 
@@ -547,7 +547,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
 
             } catch (Exception $exception) {
 
-                Mage::helper('M2ePro/Exception')->process($exception,true);
+                Mage::helper('M2ePro/Module_Exception')->process($exception,true);
 
                 foreach ($listingProductsPack as $listingProduct) {
 
@@ -588,7 +588,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
 
         if ($listingOtherCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getAmazonGeneralTemplate()->isGenerateSkuModeNo()) {
+            if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
 
                 $message = Mage::helper('M2ePro')->__('The same Merchant SKU was found among 3rd Party Listings. ');
                 $message.= Mage::helper('M2ePro')->__('Merchant SKU must be unique for each Amazon item.');
@@ -610,12 +610,10 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
             ->getCollection('Listing_Product');
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $templateGeneralTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
 
         $listingProductCollection
             ->getSelect()
-            ->join(array('l'=>$listingTable),'`main_table`.`listing_id` = `l`.`id`',array())
-            ->join(array('tg'=>$templateGeneralTable),'`l`.`template_general_id` = `tg`.`id`',array());
+            ->join(array('l'=>$listingTable),'`main_table`.`listing_id` = `l`.`id`',array());
 
         $listingProductCollection
             ->addFieldToFilter('sku',$sku)
@@ -624,7 +622,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
 
         if ($listingProductCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getAmazonGeneralTemplate()->isGenerateSkuModeNo()) {
+            if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
 
                 $message = Mage::helper('M2ePro')->__('The same Merchant SKU was found among M2E Listings. ');
                 $message.= Mage::helper('M2ePro')->__('Merchant SKU must be unique for each Amazon item.');
@@ -645,7 +643,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
         $queue = $this->getQueueOfSkus();
         if (in_array($sku,$queue) || isset($this->skusToCheck[$sku])) {
 
-            if ($listingProduct->getChildObject()->getAmazonGeneralTemplate()->isGenerateSkuModeNo()) {
+            if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
     // ->__('The product with the same Merchant SKU is being listed now. SKU must be unique for each Amazon item.');
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
@@ -691,7 +689,7 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
     {
         $data = array(
             'general_id' => $listingProduct->getData('general_id'),
-            'is_isbn_general_id' => Ess_M2ePro_Helper_Component_Amazon::isISBN($listingProduct->getData('general_id')),
+            'is_isbn_general_id' => Ess_M2ePro_Helper_Component_Amazon_Validation::isISBN($listingProduct->getData('general_id')),
             'sku' => $listingProduct->getData('sku'),
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED
         );
@@ -699,8 +697,8 @@ class Ess_M2ePro_Model_Connector_Server_Amazon_Product_List_Multiple
         $listingProduct->addData($data)->save();
 
         $dataForAdd = array(
-            'account_id' => $listingProduct->getListing()->getGeneralTemplate()->getAccountId(),
-            'marketplace_id' => $listingProduct->getListing()->getGeneralTemplate()->getMarketplaceId(),
+            'account_id' => $listingProduct->getListing()->getAccountId(),
+            'marketplace_id' => $listingProduct->getListing()->getMarketplaceId(),
             'sku' => $listingProduct->getData('sku'),
             'product_id' => $listingProduct->getProductId(),
             'store_id' => $listingProduct->getListing()->getStoreId()

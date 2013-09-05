@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Marketplaces extends Ess_M2ePro_Model_Amazon_Synchronization_Tasks
@@ -16,16 +16,16 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Marketplaces extends Ess_M2e
     {
         // Check tasks config mode
         //-----------------------------
-        $amazonSynchGroup = '/amazon/synchronization/settings/marketplaces/details/';
-        $detailsMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+        $amazonSynchGroup = '/amazon/marketplaces/details/';
+        $detailsMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                ->getGroupValue($amazonSynchGroup,'mode');
 
-        $amazonSynchGroup = '/amazon/synchronization/settings/marketplaces/categories/';
-        $categoriesMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+        $amazonSynchGroup = '/amazon/marketplaces/categories/';
+        $categoriesMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                   ->getGroupValue($amazonSynchGroup,'mode');
 
-        $amazonSynchGroup = '/amazon/synchronization/settings/marketplaces/specifics/';
-        $specificsMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+        $amazonSynchGroup = '/amazon/marketplaces/specifics/';
+        $specificsMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                                                  ->getGroupValue($amazonSynchGroup,'mode');
         if (!$detailsMode && !$categoriesMode && !$specificsMode) {
             return false;

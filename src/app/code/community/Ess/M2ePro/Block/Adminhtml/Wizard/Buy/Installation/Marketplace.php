@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation_Marketplace extends Mage_Adminhtml_Block_Template
@@ -14,7 +14,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation_Marketplace extends Mag
 
         // Initialization block
         //------------------------------
-        $this->setId('wizardBuyInstallationMarketplace');
+        $this->setId('wizardInstallationMarketplace');
         //------------------------------
 
         $this->setTemplate('M2ePro/wizard/buy/installation/marketplace.phtml');
@@ -25,8 +25,8 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation_Marketplace extends Mag
     protected function _beforeToHtml()
     {
         //-------------------------------
-        $url = $this->getUrl('*/adminhtml_marketplace/index',array(
-            'hide_upgrade_notification'=>'yes'
+        $url = $this->getUrl('*/adminhtml_common_marketplace/index',array(
+            'wizard'=>true
         ));
         $step = 'marketplace';
         $buttonBlock = $this->getLayout()

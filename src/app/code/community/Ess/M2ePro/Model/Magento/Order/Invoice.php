@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Magento_Order_Invoice
@@ -40,8 +40,8 @@ class Ess_M2ePro_Model_Magento_Order_Invoice
     {
         // Skip invoice observer
         // -----------------
-        Mage::helper('M2ePro')->unsetGlobalValue('skip_invoice_observer');
-        Mage::helper('M2ePro')->setGlobalValue('skip_invoice_observer', true);
+        Mage::helper('M2ePro/Data_Global')->unsetValue('skip_invoice_observer');
+        Mage::helper('M2ePro/Data_Global')->setValue('skip_invoice_observer', true);
         // -----------------
 
         $qtys = array();
@@ -59,7 +59,7 @@ class Ess_M2ePro_Model_Magento_Order_Invoice
         // -----------------
         $this->invoice = $this->magentoOrder->prepareInvoice($qtys);
         $this->invoice->register();
-        // this is need for updating qty_invoiced field in sales_flat_order_item table
+        // it is necessary for updating qty_invoiced field in sales_flat_order_item table
         $this->invoice->getOrder()->setIsInProcess(true);
 
         Mage::getModel('core/resource_transaction')

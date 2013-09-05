@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Servicing_Dispatcher
@@ -25,8 +25,14 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
 
     public function processTasks(array $allowedTasks = array())
     {
-        Mage::helper('M2ePro/Server')->setMemoryLimit(256);
-        Mage::helper('M2ePro/Exception')->setFatalErrorHandler();
+        Mage::helper('M2ePro/Client')->setMemoryLimit(256);
+        Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
+
+        // todo change when new server will be in production
+
+//        $responseData = Mage::getModel('M2ePro/Connector_Server_M2ePro_Dispatcher')
+//                                    ->processVirtual('servicing','update','data',
+//                                                     $this->getRequestData($allowedTasks));
 
         $responseData = Mage::getModel('M2ePro/Connector_Server_Api_Dispatcher')
                                     ->processVirtual('servicing','update','data',
@@ -89,7 +95,8 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
             'messages',
             'settings',
             'backups',
-            'exceptions'
+            'exceptions',
+            'analytic'
         );
     }
 
@@ -97,8 +104,8 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
 
     private function getLastUpdateTimestamp()
     {
-        $lastUpdateDate = Mage::helper('M2ePro/Module')->getConfig()
-                            ->getGroupValue('/cache/servicing/','last_update_time');
+        $lastUpdateDate = Mage::helper('M2ePro/Module')->getCacheConfig()
+                            ->getGroupValue('/servicing/','last_update_time');
 
         if (is_null($lastUpdateDate)) {
             return Mage::helper('M2ePro')->getCurrentGmtDate(true) - 3600*24*30;
@@ -109,8 +116,8 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
 
     private function setLastUpdateDateTime()
     {
-        Mage::helper('M2ePro/Module')->getConfig()
-            ->setGroupValue('/cache/servicing/', 'last_update_time',
+        Mage::helper('M2ePro/Module')->getCacheConfig()
+            ->setGroupValue('/servicing/', 'last_update_time',
                             Mage::helper('M2ePro')->getCurrentGmtDate());
     }
 

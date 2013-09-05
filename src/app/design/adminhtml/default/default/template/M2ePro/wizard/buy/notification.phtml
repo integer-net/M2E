@@ -21,7 +21,7 @@ $startWizardLink = $this->getUrl("*/adminhtml_wizard_buy");
             'javascript:',
             'setLocation(\''.$startWizardLink.'\')',
             'javascript:',
-            'confirm(M2ePro.text.skip_confirm) && setLocation(\''.$skipWizardLink.'\')'
+            'confirm(M2ePro.translator.translate(\'Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.\')) && setLocation(\''.$skipWizardLink.'\')'
         );
 
         ?>

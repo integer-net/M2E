@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
@@ -87,6 +87,13 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
 
     // ########################################
 
+    /**
+     * @var Ess_M2ePro_Model_Marketplace
+     */
+    private $marketplaceModel = NULL;
+
+    // ########################################
+
     public function _construct()
     {
         parent::_construct();
@@ -106,9 +113,70 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
             $item->deleteInstance();
         }
 
+        $this->marketplaceModel = NULL;
+
         $this->delete();
 
         return true;
+    }
+
+    // ########################################
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        if (is_null($this->marketplaceModel)) {
+            $this->marketplaceModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+                $this->getComponentMode(),'Marketplace',$this->getMarketplaceId()
+            );
+        }
+
+        return $this->marketplaceModel;
+    }
+
+    /**
+     * @param Ess_M2ePro_Model_Marketplace $instance
+     */
+    public function setMarketplace(Ess_M2ePro_Model_Marketplace $instance)
+    {
+         $this->marketplaceModel = $instance;
+    }
+
+    // ########################################
+
+    public function getServerHash()
+    {
+        return $this->getData('server_hash');
+    }
+
+    public function getMarketplaceId()
+    {
+        return (int)$this->getData('marketplace_id');
+    }
+
+    public function getMerchantId()
+    {
+        return $this->getData('merchant_id');
+    }
+
+    public function getRelatedStoreId()
+    {
+        return (int)$this->getData('related_store_id');
+    }
+
+    //------------------------------------------
+
+    public function getInfo()
+    {
+        return $this->getData('info');
+    }
+
+    public function getDecodedInfo()
+    {
+        $tempInfo = $this->getInfo();
+        return is_null($tempInfo) ? NULL : json_decode($tempInfo,true);
     }
 
     // ########################################
@@ -313,169 +381,6 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
             'other_listings_move_settings', 'synch', self::OTHER_LISTINGS_MOVE_TO_LISTINGS_SYNCH_MODE_NONE
         );
         return $setting == self::OTHER_LISTINGS_MOVE_TO_LISTINGS_SYNCH_MODE_PRICE;
-    }
-
-    // ########################################
-
-    public function getMarketplacesItems()
-    {
-        $marketplacesResults = array();
-
-        $marketplacesCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Marketplace');
-
-        foreach ($marketplacesCollection->getItems() as $marketplaceObj) {
-
-            /** @var $marketplaceObj Ess_M2ePro_Model_Marketplace */
-
-            $tempMarketplaceData = $this->getMarketplaceItem($marketplaceObj->getId());
-
-            if (is_null($tempMarketplaceData)) {
-                continue;
-            }
-
-            $tempMarketplaceData['object'] = $marketplaceObj;
-
-            $marketplacesResults[] = $tempMarketplaceData;
-        }
-
-        return $marketplacesResults;
-    }
-
-    public function isExistMarketplaceItem($marketplaceId)
-    {
-        return !is_null($this->getMarketplaceIdData($marketplaceId));
-    }
-
-    public function getMarketplaceItem($marketplaceId)
-    {
-        return $this->getMarketplaceIdData($marketplaceId);
-    }
-
-    //-----------------------------------------
-
-    public function addMarketplaceItem($marketplaceId,
-                                       $serverHash,
-                                       $accountMerchantId,
-                                       $relatedStoreId = 0,
-                                       array $info = array())
-    {
-        $newData = $this->createMarketplaceData($serverHash, $accountMerchantId, $relatedStoreId, $info);
-        $this->setMarketplaceIdData($marketplaceId,$newData);
-        $this->save();
-    }
-
-    public function updateMarketplaceItem($marketplaceId,
-                                          $relatedStoreId = 0,
-                                          array $info = array())
-    {
-        $data = $this->getMarketplaceIdData($marketplaceId);
-
-        if (is_null($data)) {
-            return;
-        }
-
-        $newData = $this->createMarketplaceData($data['server_hash'], $data['merchant_id'], $relatedStoreId, $info);
-
-        $this->setMarketplaceIdData($marketplaceId,$newData);
-        $this->save();
-    }
-
-    public function deleteMarketplaceItem($marketplaceId)
-    {
-        $this->setMarketplaceIdData($marketplaceId,NULL);
-        $this->save();
-    }
-
-    //-----------------------------------------
-
-    public function getRelatedStoreId($marketplaceId = null)
-    {
-        if (is_null($marketplaceId)) {
-            $marketplacesData = $this->getMarketplacesData();
-            if (!is_array($marketplacesData)) {
-                return Mage_Core_Model_App::ADMIN_STORE_ID;
-            }
-            $marketplaceId = array_shift($marketplacesData);
-        }
-
-        $marketplaceItem = $this->getMarketplaceItem($marketplaceId);
-
-        return !is_null($marketplaceItem)
-            ? (int)$marketplaceItem['related_store_id']
-            : Mage_Core_Model_App::ADMIN_STORE_ID;
-    }
-
-    //-----------------------------------------
-
-    private function getMarketplaceIdData($marketplaceId)
-    {
-        $marketplaceId = (int)$marketplaceId;
-
-        $data = $this->getMarketplacesData();
-
-        if (is_null($data)) {
-            return NULL;
-        }
-
-        if (!isset($data[$marketplaceId])) {
-            return NULL;
-        }
-
-        return $data[$marketplaceId];
-    }
-
-    private function setMarketplaceIdData($marketplaceId, $data = NULL)
-    {
-        $marketplaceId = (int)$marketplaceId;
-
-        $allData = $this->getMarketplacesData();
-        is_null($allData) && $allData = array();
-
-        if (is_null($data)) {
-            unset($allData[$marketplaceId]);
-        } else {
-            $allData[$marketplaceId] = $data;
-        }
-
-        $this->setMarketplacesData($allData);
-
-        return true;
-    }
-
-    private function createMarketplaceData($serverHash, $accountMerchantId, $relatedStoreId = 0, array $info = array())
-    {
-        return array(
-            'server_hash' => (string)$serverHash,
-            'merchant_id' => (string)$accountMerchantId,
-            'related_store_id' => (int)$relatedStoreId,
-            'info' => $info
-        );
-    }
-
-    //-----------------------------------------
-
-    private function getMarketplacesData()
-    {
-        $data = $this->getData('marketplaces_data');
-
-        if (is_null($data) || $data == '') {
-            return NULL;
-        }
-
-        return json_decode($data,true);
-    }
-
-    private function setMarketplacesData($data = NULL)
-    {
-        if (!is_array($data) || count($data) <= 0) {
-            $data = NULL;
-        } else {
-            $data = json_encode($data);
-        }
-
-        $this->setData('marketplaces_data',$data);
-
-        return true;
     }
 
     // ########################################
@@ -740,13 +645,13 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
 
     public function save()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro')->removeTagCacheValues('account');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
         return parent::delete();
     }
 

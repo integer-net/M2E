@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Synchronization_Tasks_Defaults extends Ess_M2ePro_Model_Synchronization_Tasks
@@ -16,16 +16,17 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults extends Ess_M2ePro_Model_S
     {
         // Check tasks config mode
         //-----------------------------
-        $processingMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/synchronization/settings/defaults/processing/','mode'
+        $processingMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/defaults/processing/','mode'
         );
-        $deletedProductsMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/synchronization/settings/defaults/deleted_products/','mode'
+        $deletedProductsMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/defaults/deleted_products/','mode'
         );
-        $inspectorMode = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/synchronization/settings/defaults/inspector/','mode'
+        $stopQueueMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/defaults/stop_queue/','mode'
         );
-        if (!$deletedProductsMode && !$inspectorMode && !$processingMode) {
+
+        if (!$processingMode && !$deletedProductsMode && !$stopQueueMode) {
             return false;
         }
         //-----------------------------
@@ -47,10 +48,13 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults extends Ess_M2ePro_Model_S
             $tempSynch->process();
         }
 
-        if ($inspectorMode) {
-            $tempSynch = new Ess_M2ePro_Model_Synchronization_Tasks_Defaults_Inspector();
+        if ($stopQueueMode) {
+            $tempSynch = new Ess_M2ePro_Model_Synchronization_Tasks_Defaults_StopQueue();
             $tempSynch->process();
         }
+
+        $tempSynch = new Ess_M2ePro_Model_Synchronization_Tasks_Defaults_Inspector();
+        $tempSynch->process();
         //---------------------------
 
         // CANCEL SYNCH

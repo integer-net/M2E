@@ -1,13 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 /**
  * @method Ess_M2ePro_Model_Listing_Product_Variation getParentObject()
-*/
-
+ */
 class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Component_Child_Buy_Abstract
 {
     // ########################################
@@ -29,53 +28,21 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Co
     }
 
     /**
-     * @return Ess_M2ePro_Model_Listing_Product
-     */
-    public function getListingProduct()
-    {
-        return $this->getParentObject()->getListingProduct();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_General
-     */
-    public function getGeneralTemplate()
-    {
-        return $this->getParentObject()->getGeneralTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_SellingFormat
-     */
-    public function getSellingFormatTemplate()
-    {
-        return $this->getParentObject()->getSellingFormatTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Description
-     */
-    public function getDescriptionTemplate()
-    {
-        return $this->getParentObject()->getDescriptionTemplate();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Template_Synchronization
-     */
-    public function getSynchronizationTemplate()
-    {
-        return $this->getParentObject()->getSynchronizationTemplate();
-    }
-
-    //-----------------------------------------
-
-    /**
      * @return Ess_M2ePro_Model_Buy_Listing
      */
     public function getBuyListing()
     {
         return $this->getListing()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product
+     */
+    public function getListingProduct()
+    {
+        return $this->getParentObject()->getListingProduct();
     }
 
     /**
@@ -86,12 +53,50 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Co
         return $this->getListingProduct()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Buy_Template_General
+     * @return Ess_M2ePro_Model_Account
      */
-    public function getBuyGeneralTemplate()
+    public function getAccount()
     {
-        return $this->getGeneralTemplate()->getChildObject();
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Buy_Account
+     */
+    public function getBuyAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Buy_Marketplace
+     */
+    public function getBuyMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_SellingFormat
+     */
+    public function getSellingFormatTemplate()
+    {
+        return $this->getBuyListingProduct()->getSellingFormatTemplate();
     }
 
     /**
@@ -102,12 +107,14 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Co
         return $this->getSellingFormatTemplate()->getChildObject();
     }
 
+    //-----------------------------------------
+
     /**
-     * @return Ess_M2ePro_Model_Buy_Template_Description
+     * @return Ess_M2ePro_Model_Template_Synchronization
      */
-    public function getBuyDescriptionTemplate()
+    public function getSynchronizationTemplate()
     {
-        return $this->getDescriptionTemplate()->getChildObject();
+        return $this->getBuyListingProduct()->getSynchronizationTemplate();
     }
 
     /**
@@ -215,7 +222,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Co
 
         //-- Check max posted QTY on channel
         $src = $this->getBuySellingFormatTemplate()->getQtySource();
-        if ($src['qty_max_posted_value'] > 0 && $qty > $src['qty_max_posted_value']) {
+        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
             $qty = $src['qty_max_posted_value'];
         }
 
@@ -283,7 +290,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Co
 
         $price < 0 && $price = 0;
 
-        return $this->getSellingFormatTemplate()->parsePrice($price, $src['coefficient']);
+        return Mage::helper('M2ePro')->parsePrice($price, $src['coefficient']);
     }
 
     // ########################################

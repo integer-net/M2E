@@ -5,34 +5,25 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
 
     initialize: function(AddListingHandlerObj)
     {
-        this.addListingHandlerObj = AddListingHandlerObj;
+        this.addListingHandlerObj = AddListingHandlerObj || null;
     },
 
     //----------------------------------
 
-    save_click: function(url)
+    save_click: function(back)
     {
         var selected = this.getSelectedProducts();
         if (selected) {
-            var back = '';
-            var isList = '';
-            if (url.indexOf('/back/list/') + 1) {
-                back = 'list';
-            }
-
-            this.addListingHandlerObj.add(selected, false, back, isList);
+            this.addListingHandlerObj.add(selected, false, back, '');
         }
     },
 
     //----------------------------------
 
-    save_and_list_click: function(url)
+    save_and_list_click: function(back)
     {
         if (this.getSelectedProducts()) {
-            var back = 'view';
-            var isList = 'yes';
-
-            this.addListingHandlerObj.add(this.getSelectedProducts(), false, back, isList);
+            this.addListingHandlerObj.add(this.getSelectedProducts(), false, back, 'yes');
         }
     },
 
@@ -57,10 +48,19 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
                 numParams++;
             }
 
-            if (numParams > 4) {
-                this.reloadParams = ruleParams;
+            for (var reloadParam in this.reloadParams) {
+                reloadParam.match('^rule|^hide') && delete this.reloadParams[reloadParam];
+            }
+
+            if (numParams > 5) {
+                this.reloadParams = Object.extend(this.reloadParams, ruleParams);
             } else {
-                this.reloadParams = {rule: ""};
+
+                if (ruleParams['hide_products_others_listings'] == 1) {
+                    this.reloadParams.hide_products_others_listings = 1;
+                }
+
+                this.reloadParams.rule = "";
             }
 
             this.reload(this.addVarToUrl(this.filterVar, encode_base64(Form.serializeElements(elements))));
@@ -69,7 +69,11 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
 
     resetFilter: function()
     {
-        this.reloadParams = {rule: ""};
+        for (var reloadParam in this.reloadParams) {
+            reloadParam.match('^rule|^hide') && delete this.reloadParams[reloadParam];
+        }
+        this.reloadParams.rule = "";
+
         this.reload(this.addVarToUrl(this.filterVar, ''));
     },
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Magento_Shipping
@@ -12,7 +12,7 @@ class Ess_M2ePro_Model_Magento_Shipping
 
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
-        $shippingData = Mage::helper('M2ePro')->getGlobalValue('shipping_data');
+        $shippingData = Mage::helper('M2ePro/Data_Global')->getValue('shipping_data');
 
         if (!$shippingData) {
             return false;
@@ -38,7 +38,7 @@ class Ess_M2ePro_Model_Magento_Shipping
 
     public function checkAvailableShipCountries(Mage_Shipping_Model_Rate_Request $request)
     {
-        if (!Mage::helper('M2ePro')->getGlobalValue('shipping_data')) {
+        if (!Mage::helper('M2ePro/Data_Global')->getValue('shipping_data')) {
             return false;
         }
 

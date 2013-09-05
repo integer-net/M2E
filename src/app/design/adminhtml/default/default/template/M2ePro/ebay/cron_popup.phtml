@@ -1,0 +1,47 @@
+<script type="text/javascript">
+
+    function cronPopupConfirm()
+    {
+        new Ajax.Request('<?php echo $this->getUrl('M2ePro/adminhtml_ebay_general/cronPopupConfirm'); ?>',
+        {
+            method: 'post',
+            asynchronous : false
+        });
+
+        cronConfirmPopup.close();
+    }
+
+    Event.observe(window, 'load', function() {
+
+        cronConfirmPopup = Dialog.info(null, {
+            //draggable: true,
+            //resizable: true,
+            //closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: '<?php echo $this->__('Cron Is Not Running'); ?>',
+            top: 100,
+            width: 500,
+            height: 300,
+            zIndex: 100,
+            recenterAuto: false,
+            hideEffect: Element.hide,
+            showEffect: Element.show
+        });
+
+        cronConfirmPopup.options.destroyOnClose = false;
+        $('modal_dialog_message').insert($('cron_popup_confirm_content').show());
+    });
+
+</script>
+
+<div id="cron_popup_confirm_content" style="display:none;">
+
+    <p style="padding: 20px;"><b>Attention! Automatic Synchronization tasks are not being performed.</b>
+            <br/><br/>
+            The Cron job has to be set up the synchronization works properly.<br/><br/>
+            To find out how to do it, please check this
+<a target="_blank" href="http://support.m2epro.com/knowledgebase/articles/42054-how-to-set-up-cron-job-for-m2e-pro-">article</a>.</p>
+    <?php echo $this->getChildHtml('cron_popup_confirm'); ?>
+
+</div>

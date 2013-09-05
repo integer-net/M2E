@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks_Receive extends Ess_M2ePro_Model_Ebay_Synchronization_Tasks
@@ -134,8 +134,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Feedbacks_Receive extends Ess_
 
             $resultReceive = Mage::getModel('M2ePro/Ebay_Feedback')->receiveFromEbay($account,$paramsConnector);
 
-            $this->_profiler->addTitle('Total received feedbacks from eBay: '.$resultReceive['total']);
-            $this->_profiler->addTitle('Total only new feedbacks from eBay: '.$resultReceive['new']);
+            $this->_profiler->addTitle('Total received feedback from eBay: '.$resultReceive['total']);
+            $this->_profiler->addTitle('Total only new feedback from eBay: '.$resultReceive['new']);
             //-----------------------
 
             $this->_profiler->saveTimePoint(__METHOD__.'get'.$account->getId());

@@ -1,9 +1,12 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * Configures the store settings to match account settings and order information
+ */
 class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
 {
     /** @var $quote Mage_Sales_Model_Quote */
@@ -26,6 +29,11 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
 
     // ########################################
 
+    /**
+     * Get original store settings before any changes were made
+     *
+     * @return array
+     */
     public function getOriginalStoreConfig()
     {
         $keys = array(
@@ -51,7 +59,7 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
     // ########################################
 
     /**
-     * Prepare store config according to channel tax information and account settings
+     * Prepare store config according to order information and account settings
      */
     public function prepareStoreConfigForOrder()
     {

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Order_Debug extends Mage_Adminhtml_Block_Widget_Container
@@ -18,7 +18,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Debug extends Mage_Adminhtml_Block_Widget
     protected function _beforeToHtml()
     {
         /** @var $order Ess_M2ePro_Model_Order */
-        $order = Mage::helper('M2ePro')->getGlobalValue('temp_data');
+        $order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
         /** @var $store Mage_Core_Model_Store */
         $store = Mage::getModel('core/store')->load($order->getStoreId());
 

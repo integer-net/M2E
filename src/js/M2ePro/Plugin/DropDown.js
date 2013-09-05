@@ -3,7 +3,12 @@ DropDown.prototype = {
 
     // --------------------------------
 
-    initialize : function() {},
+    initialize : function()
+    {
+        $$('.tab-item-link').each(function(el){
+            el.observe('click', this.hideItems);
+        }.bind(this));
+    },
 
     // --------------------------------
 
@@ -19,12 +24,18 @@ DropDown.prototype = {
 
     prepare : function(node)
     {
+        // we can't use just $(node) here, as we can have multiple elements with the same ID on the page because of floating toolbar
+        // and we have to put the drop down only for that element, which is under the #anchor-content element
+        var realNode = $$('#anchor-content #' + node.id)[0];
+
         var ulObj = $(node).select('ul')[0];
         if (typeof ulObj == 'undefined') {
             return;
         }
 
         var tempHtml = '<ul>';
+        var tempStyle = ulObj.readAttribute('style') || '';
+
         $(ulObj).childElements().each(function(object) {
             tempHtml += '<li><a href="'+$(object).readAttribute('href')+'"';
             if ($(object).readAttribute('target') != null) {
@@ -40,16 +51,16 @@ DropDown.prototype = {
         $(ulObj).remove();
 
         if (tempHtml != '') {
-            tempHtml = '<div id="'+node.id+'_drop_down" class="drop_down_menu">' + tempHtml + '</div>';
-            $(node).insert({ after: tempHtml });
+            tempHtml = '<div id="'+node.id+'_drop_down" class="drop_down_menu" style="'+tempStyle+'">' + tempHtml + '</div>';
+            $(realNode).insert({ after: tempHtml });
         }
 
-        $(node).observe('click', DropDownObj.toggleItems);
+        $(realNode).observe('click', DropDownObj.toggleItems);
     },
 
     // --------------------------------
 
-    toggleItems : function()
+    toggleItems : function(event)
     {
         var tempId = this.id + '_drop_down';
         if ($(tempId).getStyle('display') == 'none') {
@@ -73,20 +84,21 @@ DropDown.prototype = {
             }
 
             setTimeout(function() {
-                $$('body')[0].observe('click', DropDownObj.hideItems);
+                $(document).observe('click', DropDownObj.hideItems);
             }, 100);
+
+            Event.stop(event);
         } else {
             $(tempId).hide();
-            $$('body')[0].stopObserving('click', DropDownObj.hideItems);
+            $(document).stopObserving('click', DropDownObj.hideItems);
         }
     },
 
     hideItems : function()
     {
-        $$('.drop_down_menu').each(function(object) {
-            $(object).hide();
-            $$('body')[0].stopObserving('click', DropDownObj.hideItems);
-        });
+        $$('.drop_down_menu').each(Element.hide);
+
+        $(document).stopObserving('click', DropDownObj.hideItems);
     }
 
     // --------------------------------

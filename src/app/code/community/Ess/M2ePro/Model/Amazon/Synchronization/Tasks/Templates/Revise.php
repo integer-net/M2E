@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Templates_Revise
@@ -10,8 +10,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Templates_Revise
     const PERCENTS_START = 20;
     const PERCENTS_END = 35;
     const PERCENTS_INTERVAL = 15;
-
-    private $_synchronizations = array();
 
     /**
      * @var Ess_M2ePro_Model_Amazon_Template_Synchronization_ProductInspector
@@ -23,8 +21,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Templates_Revise
     public function __construct()
     {
         parent::__construct();
-
-        $this->_synchronizations = Mage::helper('M2ePro')->getGlobalValue('synchTemplatesArray');
 
         $tempParams = array('runner_actions'=>$this->_runnerActions);
         $this->_productInspector = Mage::getModel('M2ePro/Amazon_Template_Synchronization_ProductInspector',
@@ -101,12 +97,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Templates_Revise
 
         //-------------------------
 
-        $this->executeSellingFormatTemplatesChanged();
-
-        $this->_lockItem->setPercents(self::PERCENTS_START + 3*self::PERCENTS_INTERVAL/4);
-        $this->_lockItem->activate();
-
-        $this->executeGeneralsTemplatesChanged();
+        $this->executeIsNeedSynchronize();
     }
 
     //####################################
@@ -157,195 +148,77 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Templates_Revise
 
     //####################################
 
-    private function executeSellingFormatTemplatesChanged()
+    private function executeIsNeedSynchronize()
     {
-        $this->_profiler->addTimePoint(__METHOD__,'Update Selling Format Template');
+        $this->_profiler->addTimePoint(__METHOD__,'Execute is need synchronize');
 
-        // Get changed templates
-        //------------------------------------
-        $templatesCollection = Mage::helper('M2ePro/Component_Amazon')->getModel('Template_SellingFormat')
-                                                                      ->getCollection();
-        $templatesCollection->getSelect()->where('`main_table`.`update_date` != `main_table`.`synch_date`');
-        $templatesCollection->getSelect()->orWhere('`main_table`.`synch_date` IS NULL');
-        $templatesArray = $templatesCollection->toArray();
-        //------------------------------------
+        $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
+        $listingProductCollection->addFieldToFilter('is_need_synchronize', 1);
 
-        // Set Amazon actions for listed products
-        //------------------------------------
-        foreach ($templatesArray['items'] as $templateArray) {
+        $listingProductCollection->getSelect()->where(
+            '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_NO.
+            ' OR ('.
+                '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_YES.
+                ' AND `is_variation_matched` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_MATCHED_YES.
+            ')'
+        );
 
-            /** @var $template Ess_M2ePro_Model_Template_SellingFormat */
-            $template = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
-                'Template_SellingFormat', $templateArray['id'], NULL, array('template')
-            );
+        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+        foreach ($listingProductCollection->getItems() as $listingProduct) {
 
-            $listings = $template->getListings(true);
+            /* @var $synchTemplate Ess_M2ePro_Model_Template_Synchronization */
+            $synchTemplate = $listingProduct->getListing()->getChildObject()->getSynchronizationTemplate();
 
-            foreach ($listings as $listing) {
+            $isRevise = false;
+            foreach ($listingProduct->getSynchReasons() as $reason) {
+                $method = 'isRevise' . ucfirst($reason);
 
-                /** @var $listing Ess_M2ePro_Model_Listing */
-
-                if (!$listing->isSynchronizationNowRun()) {
+                if (!method_exists($synchTemplate,$method)) {
                     continue;
                 }
 
-                $listing->setSellingFormatTemplate($template);
-
-                if (!$listing->getSynchronizationTemplate()->isReviseSellingFormatTemplate()) {
-                    continue;
-                }
-
-                $tempFilter =
-                '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_NO.
-                ' OR ('.
-                    '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_YES.
-                    ' AND `is_variation_matched` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_MATCHED_YES.
-                ')';
-
-                $listingsProducts = $listing->getProducts(
-                    true,
-                    array(
-                        'status' => array('in' => array(Ess_M2ePro_Model_Listing_Product::STATUS_LISTED)),
-                        'is_variation_and_is_not_matched' => new Zend_Db_Expr($tempFilter)
-                    )
-                );
-
-                foreach ($listingsProducts as $listingProduct) {
-
-                    /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-                    if (!$listingProduct->isListed() || $listingProduct->isBlocked()) {
-                        continue;
-                    }
-
-                    if ($this->_runnerActions
-                             ->isExistProductAction(
-                                    $listingProduct,
-                                    Ess_M2ePro_Model_Amazon_Connector_Product_Dispatcher::ACTION_REVISE,
-                                    array('all_data'=>true))
-                    ) {
-                        continue;
-                    }
-
-                    $listingProduct->setListing($listing);
-
-                    if (!$listingProduct->isRevisable()) {
-                        continue;
-                    }
-
-                    if ($listingProduct->isLockedObject(NULL) ||
-                        $listingProduct->isLockedObject('in_action')) {
-                        continue;
-                    }
-
-                    $this->_runnerActions
-                         ->setProduct(
-                                $listingProduct,
-                                Ess_M2ePro_Model_Amazon_Connector_Product_Dispatcher::ACTION_REVISE,
-                                array('all_data'=>true)
-                         );
+                if ($synchTemplate->$method()) {
+                    $isRevise = true;
+                    break;
                 }
             }
 
-            $template->addData(array('synch_date'=>$template->getData('update_date')))->save();
-        }
-        //------------------------------------
-
-        $this->_profiler->saveTimePoint(__METHOD__);
-    }
-
-    private function executeGeneralsTemplatesChanged()
-    {
-        $this->_profiler->addTimePoint(__METHOD__,'Update general template');
-
-        // Get changed templates
-        //------------------------------------
-        $templatesCollection = Mage::helper('M2ePro/Component_Amazon')->getModel('Template_General')->getCollection();
-        $templatesCollection->getSelect()->where('`main_table`.`update_date` != `main_table`.`synch_date`');
-        $templatesCollection->getSelect()->orWhere('`main_table`.`synch_date` IS NULL');
-        $templatesArray = $templatesCollection->toArray();
-        //------------------------------------
-
-        // Set Amazon actions for listed products
-        //------------------------------------
-        foreach ($templatesArray['items'] as $templateArray) {
-
-            /** @var $template Ess_M2ePro_Model_Template_General */
-            $template = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
-                'Template_General', $templateArray['id'], NULL, array('template')
-            );
-
-            $listings = $template->getListings(true);
-
-            foreach ($listings as $listing) {
-
-                /** @var $listing Ess_M2ePro_Model_Listing */
-
-                if (!$listing->isSynchronizationNowRun()) {
-                    continue;
-                }
-
-                $listing->setGeneralTemplate($template);
-
-                if (!$listing->getSynchronizationTemplate()->isReviseGeneralTemplate()) {
-                    continue;
-                }
-
-                $tempFilter =
-                '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_NO.
-                ' OR ('.
-                    '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_YES.
-                    ' AND `is_variation_matched` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_MATCHED_YES.
-                ')';
-
-                $listingsProducts = $listing->getProducts(
-                    true,
-                    array(
-                        'status' => array('in' => array(Ess_M2ePro_Model_Listing_Product::STATUS_LISTED)),
-                        'is_variation_and_is_not_matched' => new Zend_Db_Expr($tempFilter)
-                    )
-                );
-
-                foreach ($listingsProducts as $listingProduct) {
-
-                    /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-                    if (!$listingProduct->isListed() || $listingProduct->isBlocked()) {
-                        continue;
-                    }
-
-                    if ($this->_runnerActions
-                             ->isExistProductAction(
-                                    $listingProduct,
-                                    Ess_M2ePro_Model_Amazon_Connector_Product_Dispatcher::ACTION_REVISE,
-                                    array('all_data'=>true))
-                    ) {
-                        continue;
-                    }
-
-                    $listingProduct->setListing($listing);
-
-                    if (!$listingProduct->isRevisable()) {
-                        continue;
-                    }
-
-                    if ($listingProduct->isLockedObject(NULL) ||
-                        $listingProduct->isLockedObject('in_action')) {
-                        continue;
-                    }
-
-                    $this->_runnerActions
-                         ->setProduct(
-                                $listingProduct,
-                                Ess_M2ePro_Model_Amazon_Connector_Product_Dispatcher::ACTION_REVISE,
-                                array('all_data'=>true)
-                         );
-                }
+            if (!$isRevise) {
+                continue;
             }
 
-            $template->addData(array('synch_date'=>$template->getData('update_date')))->save();
+            if ($this->_runnerActions
+                     ->isExistProductAction(
+                            $listingProduct,
+                            Ess_M2ePro_Model_Connector_Server_Amazon_Product_Dispatcher::ACTION_REVISE,
+                            array('all_data'=>true))
+            ) {
+                continue;
+            }
+
+            if (!$listingProduct->isRevisable()) {
+                continue;
+            }
+
+            if ($listingProduct->isLockedObject(NULL) ||
+                $listingProduct->isLockedObject('in_action')) {
+                continue;
+            }
+
+            $this->_runnerActions
+                 ->setProduct(
+                        $listingProduct,
+                        Ess_M2ePro_Model_Connector_Server_Amazon_Product_Dispatcher::ACTION_REVISE,
+                        array('all_data'=>true)
+                 );
+
+            $dataForUpdate = array(
+                'is_need_synchronize' => 0,
+                'synch_reasons' => null
+            );
+            $listingProduct->addData($dataForUpdate)->save();
         }
-        //------------------------------------
 
         $this->_profiler->saveTimePoint(__METHOD__);
     }

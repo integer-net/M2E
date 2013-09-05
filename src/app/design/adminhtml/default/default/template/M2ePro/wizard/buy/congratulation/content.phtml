@@ -2,15 +2,8 @@
 
 <script type="text/javascript">
 
-    if (typeof M2eProBuyCongratulationTutorial == 'undefined') {
-        M2eProBuyCongratulationTutorial = {};
-        M2eProBuyCongratulationTutorial.url = {};
-        M2eProBuyCongratulationTutorial.formData = {};
-        M2eProBuyCongratulationTutorial.text = {};
-    }
-
     M2eProBuyCongratulationTutorialHandlerObj = new VideoTutorialHandler(
-        M2eProBuyCongratulationTutorial,'buy_congratulation_video_tutorial_pop_up',
+        'buy_congratulation_video_tutorial_pop_up',
         '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('M2E Pro - Rakuten.com/Magento Integration : Listings')); ?>',
         function() {}
     );
@@ -18,14 +11,13 @@
 </script>
 
 <?php
-$listingTemplatesUrl = $this->getUrl('*/adminhtml_template_general/index');
-$synchronizationTemplatesUrl = $this->getUrl('*/adminhtml_template_synchronization/index');
-$sellingFormatTemplatesUrl = $this->getUrl('*/adminhtml_template_sellingFormat/index');
+$synchronizationTemplatesUrl = $this->getUrl('*/adminhtml_common_template_synchronization/index');
+$sellingFormatTemplatesUrl = $this->getUrl('*/adminhtml_common_template_sellingFormat/index');
 
-$listingsUrl = $this->getUrl('*/adminhtml_listing/index',array('tab'=>'buy'));
-$docsLink = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/documentation/', 'baseurl');
+$listingsUrl = $this->getUrl('*/adminhtml_common_listing/index',array('tab'=>'buy'));
+$docsLink = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
 
-$menuLabel = Mage::helper('M2ePro/Module')->getMenuRootNodeLabel();
+$menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
 ?>
 
 <div id="block_notice_wizard_congratulation" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">

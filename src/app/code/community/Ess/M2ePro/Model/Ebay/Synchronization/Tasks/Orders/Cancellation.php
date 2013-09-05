@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Cancellation
@@ -10,6 +10,9 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Cancellation
     const PERCENTS_START = 0;
     const PERCENTS_END = 100;
     const PERCENTS_INTERVAL = 100;
+
+    // ->__('eBay Orders Cancellation Synchronization')
+    private $name = 'eBay Orders Cancellation Synchronization';
 
     private $totalOpenedUnpaidItemProcesses = 0;
     private $totalCanceledMagentoOrders = 0;
@@ -41,31 +44,21 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Cancellation
         $this->_lockItem->activate();
         $this->_logs->setSynchronizationTask(Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS);
 
-        if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Ebay::TITLE.' ';
-        } else {
-            $componentName = '';
-        }
-
         $this->_profiler->addEol();
-        $this->_profiler->addTitle($componentName.'Orders Cancellation Synchronization');
+        $this->_profiler->addTitle($this->name);
         $this->_profiler->addTitle('--------------------------');
         $this->_profiler->addTimePoint(__CLASS__, 'Total time');
         $this->_profiler->increaseLeftPadding(5);
 
-        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($componentName.'Orders Cancellation Synchronization'));
+        $this->_lockItem->setTitle(Mage::helper('M2ePro')->__($this->name));
         $this->_lockItem->setPercents(self::PERCENTS_START);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Cancellation Synchronization" is started. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is started. Please wait...', $this->name));
     }
 
     private function cancelSynch()
     {
         $this->_lockItem->setPercents(self::PERCENTS_END);
-        $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__('Task "Orders Cancellation Synchronization" is finished. Please wait...')
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__('Task "%s" is finished. Please wait...', $this->name));
 
         $this->_profiler->decreaseLeftPadding(5);
         $this->_profiler->addEol();
@@ -375,7 +368,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Cancellation
             try {
                 $order->createMagentoOrder();
             } catch (Exception $e) {
-                Mage::helper('M2ePro/Exception')->process($e);
+                Mage::helper('M2ePro/Module_Exception')->process($e);
             }
         }
         if ($order->getChildObject()->canCreatePaymentTransaction()) {

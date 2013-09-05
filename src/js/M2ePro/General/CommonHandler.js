@@ -9,7 +9,7 @@ CommonHandler.prototype = {
 
     initCommonValidators: function()
     {
-        Validation.add('M2ePro-required-when-visible', REQUIRED_FIELD_ERROR, function(value, el) {
+        Validation.add('M2ePro-required-when-visible', M2ePro.translator.translate('This is a required field.'), function(value, el) {
             var hidden = false;
             hidden = !$(el).visible();
 
@@ -24,7 +24,7 @@ CommonHandler.prototype = {
             return hidden ? true : !!value;
         });
 
-        Validation.add('M2ePro-required-when-visible-and-enabled', REQUIRED_FIELD_ERROR, function(value, el) {
+        Validation.add('M2ePro-required-when-visible-and-enabled', M2ePro.translator.translate('This is a required field.'), function(value, el) {
             var hidden = false;
             var disabled = false;
             hidden = !$(el).visible();
@@ -73,7 +73,7 @@ CommonHandler.prototype = {
     save_click: function(url)
     {
         if (typeof url == 'undefined' || url == '') {
-            url = M2ePro.url.formSubmit + 'back/'+base64_encode('list')+'/';
+            url = M2ePro.url.get('formSubmit',{'back': base64_encode('list')});
         }
         this.submitForm(url);
     },
@@ -87,22 +87,23 @@ CommonHandler.prototype = {
                 tabsUrl = '|tab=' + $$('#' + tabsId + ' a.active')[0].name;
             }
 
-            url = M2ePro.url.formSubmit + 'back/'+base64_encode('edit'+tabsUrl) + '/';
+            url = M2ePro.url.get('formSubmit',{'back': base64_encode('edit' + tabsUrl)});
         }
         this.submitForm(url);
     },
 
     //----------------------------------
 
-    duplicate_click: function($headId)
+    duplicate_click: function($headId, chapter_when_duplicate_text)
     {
         $('loading-mask').show();
-        M2ePro.url.formSubmit = M2ePro.url.formSubmitNew;
+
+        M2ePro.url.add({'formSubmit': M2ePro.url.get('formSubmitNew')});
         M2ePro.formData.id = 0;
 
         $('title').value = '';
 
-        $$('.head-adminhtml-'+$headId).each(function(o) { o.innerHTML = M2ePro.text.chapter_when_duplicate; });
+        $$('.head-adminhtml-'+$headId).each(function(o) { o.innerHTML = chapter_when_duplicate_text; });
         $$('.M2ePro_duplicate_button').each(function(o) { o.hide(); });
         $$('.M2ePro_delete_button').each(function(o) { o.hide(); });
 
@@ -113,10 +114,10 @@ CommonHandler.prototype = {
 
     delete_click: function()
     {
-        if (!confirm(CONFIRM)) {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
         }
-        setLocation(M2ePro.url.deleteAction);
+        setLocation(M2ePro.url.get('deleteAction'));
     },
 
     //----------------------------------
@@ -127,10 +128,14 @@ CommonHandler.prototype = {
             newWindow = false;
         }
 
+        var oldAction = $('edit_form').action;
+
         $('edit_form').action = url;
         $('edit_form').target = newWindow ? '_blank' : '_self';
 
         editForm.submit();
+
+        $('edit_form').action = oldAction;
     },
 
     postForm: function(url, params)
@@ -184,13 +189,15 @@ CommonHandler.prototype = {
         }
     },
 
-    setValidationCheckRepetitionValue: function(idInput, textError, model, dataField, idField, idValue)
+    setValidationCheckRepetitionValue: function(idInput, textError, model, dataField, idField, idValue, component)
     {
+        component = component || null;
+
         Validation.add(idInput, textError, function(value) {
 
             var checkResult = false;
 
-            new Ajax.Request( VALIDATION_CHECK_REPETITION_URL ,
+            new Ajax.Request( M2ePro.url.get('adminhtml_general/validationCheckRepetitionValue') ,
             {
                 method: 'post',
                 asynchronous : false,
@@ -199,7 +206,8 @@ CommonHandler.prototype = {
                     data_field : dataField,
                     data_value : value,
                     id_field : idField,
-                    id_value : idValue
+                    id_value : idValue,
+                    component : component
                 },
                 onSuccess: function (transport)
                 {

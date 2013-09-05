@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates
@@ -22,14 +22,14 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates
     {
         // Check tasks config mode
         //-----------------------------
-        $config = Mage::helper('M2ePro/Module')->getConfig();
+        $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
 
         $reviseMode = (bool)(int)$config
-                ->getGroupValue('/ebay/synchronization/settings/other_listings/templates/revise/','mode');
+                ->getGroupValue('/ebay/other_listings/templates/revise/','mode');
         $relistMode = (bool)(int)$config
-                ->getGroupValue('/ebay/synchronization/settings/other_listings/templates/relist/','mode');
+                ->getGroupValue('/ebay/other_listings/templates/relist/','mode');
         $stopMode = (bool)(int)$config
-                ->getGroupValue('/ebay/synchronization/settings/other_listings/templates/stop/','mode');
+                ->getGroupValue('/ebay/other_listings/templates/stop/','mode');
 
         if (!$reviseMode && !$relistMode && !$stopMode) {
             return false;
@@ -113,7 +113,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates
     {
         $runnerActionsModel = Mage::getModel('M2ePro/Ebay_Listing_Other_RunnerActions');
         $runnerActionsModel->removeAllProducts();
-        Mage::helper('M2ePro')->setGlobalValue('synchRunnerActions',$runnerActionsModel);
+        Mage::helper('M2ePro/Data_Global')->setValue('synchRunnerActions',$runnerActionsModel);
         $this->_runnerActions = $runnerActionsModel;
     }
 
@@ -126,7 +126,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates
                                                  self::PERCENTS_START + 30,
                                                  self::PERCENTS_END);
 
-        $startLink = '<a href="route:*/adminhtml_log/listingOther/tab/ebay;back:*/adminhtml_log/synchronization">';
+        $startLink = '<a target="_blank" href="route:*/adminhtml_ebay_log/listingOther/;';
+        $startLink .= 'back:*/adminhtml_ebay_log/synchronization/;">';
         $endLink = '</a>';
 
         if ($result == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_ERROR) {
@@ -154,7 +155,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates
         }
 
         $this->_runnerActions->removeAllProducts();
-        Mage::helper('M2ePro')->unsetGlobalValue('synchRunnerActions');
+        Mage::helper('M2ePro/Data_Global')->unsetValue('synchRunnerActions');
         $this->_runnerActions = NULL;
 
         $this->_profiler->saveTimePoint(__METHOD__);

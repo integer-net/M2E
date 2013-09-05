@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Amazon_Search_Automatic_ByQuery_Responser
@@ -120,7 +120,7 @@ class Ess_M2ePro_Model_Amazon_Search_Automatic_ByQuery_Responser
                 'step' => $this->currentStep + 1
             );
 
-            $dispatcherObject = Mage::getModel('M2ePro/Amazon_Connector')->getDispatcher();
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
             $dispatcherObject->processConnector('automatic', 'byQuery' ,'requester',
                                                 $params,
                                                 $this->getMarketplace(),
@@ -133,7 +133,7 @@ class Ess_M2ePro_Model_Amazon_Search_Automatic_ByQuery_Responser
 
             $childListingProduct->setData('general_id',$receivedItems[0]['general_id']);
             $childListingProduct->setData('is_isbn_general_id',
-                                          (int)Mage::helper('M2ePro/Component_Amazon')
+                                          (int)Mage::helper('M2ePro/Component_Amazon_Validation')
                                                                             ->isISBN($receivedItems[0]['general_id']));
             $temp = Ess_M2ePro_Model_Amazon_Listing_Product::GENERAL_ID_SEARCH_STATUS_SET_AUTOMATIC;
             $childListingProduct->setData('general_id_search_status',

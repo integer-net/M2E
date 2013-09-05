@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Buy_Product_NewSku_MultipleResponser
@@ -45,7 +45,7 @@ class Ess_M2ePro_Model_Connector_Server_Buy_Product_NewSku_MultipleResponser
                 'general_id' => $this->responseBody['skus'][$listingProduct->getId().'-id']
             );
 
-            Mage::getModel('M2ePro/Buy_Connector_Product_Helper')
+            Mage::getModel('M2ePro/Connector_Server_Buy_Product_Helper')
                         ->updateAfterNewSkuAction($listingProduct,$requestData,$tempParams);
 
             // Parser hack -> Mage::helper('M2ePro')->__('New SKU was successfully added');
@@ -58,8 +58,8 @@ class Ess_M2ePro_Model_Connector_Server_Buy_Product_NewSku_MultipleResponser
 
         $this->unsetLocks();
 
-        $dispatcherObject = Mage::getModel('M2ePro/Buy_Connector')->getProductDispatcher();
-        $dispatcherObject->process(Ess_M2ePro_Model_Buy_Connector_Product_Dispatcher::ACTION_LIST,
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Product_Dispatcher');
+        $dispatcherObject->process(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST,
                                    $needListListingsProducts, $this->params['params']);
     }
 

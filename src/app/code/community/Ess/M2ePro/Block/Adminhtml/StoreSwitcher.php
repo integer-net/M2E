@@ -1,13 +1,17 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_StoreSwitcher extends Mage_Adminhtml_Block_Template
 {
+    // ########################################
+
     protected $_storeIds;
     protected $_hasDefaultOption = true;
+
+    // ########################################
 
     public function __construct()
     {
@@ -17,6 +21,8 @@ class Ess_M2ePro_Block_Adminhtml_StoreSwitcher extends Mage_Adminhtml_Block_Temp
         $this->setUseAjax(true);
         $this->setDefaultStoreName($this->__('Admin (Default Values)'));
     }
+
+    // ########################################
 
     public function getWebsiteCollection()
     {
@@ -42,6 +48,8 @@ class Ess_M2ePro_Block_Adminhtml_StoreSwitcher extends Mage_Adminhtml_Block_Temp
         }
         return $websites;
     }
+
+    // ########################################
 
     public function getGroupCollection($website)
     {
@@ -132,4 +140,6 @@ class Ess_M2ePro_Block_Adminhtml_StoreSwitcher extends Mage_Adminhtml_Block_Temp
         }
         return $this->_hasDefaultOption;
     }
+
+    // ########################################
 }

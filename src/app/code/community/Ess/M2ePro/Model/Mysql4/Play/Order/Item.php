@@ -1,12 +1,17 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2012 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Mysql4_Play_Order_Item extends Ess_M2ePro_Model_Mysql4_Abstract
+class Ess_M2ePro_Model_Mysql4_Play_Order_Item
+    extends Ess_M2ePro_Model_Mysql4_Abstract
 {
+    // ########################################
+
     protected $_isPkAutoIncrement = false;
+
+    // ########################################
 
     public function _construct()
     {
@@ -14,20 +19,17 @@ class Ess_M2ePro_Model_Mysql4_Play_Order_Item extends Ess_M2ePro_Model_Mysql4_Ab
         $this->_isPkAutoIncrement = false;
     }
 
+    // ########################################
+
     public function getShippingPriceFromListingProduct(Ess_M2ePro_Model_Play_Order_Item $item)
     {
         $collection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
         $collection->addFieldToFilter('sku', $item->getSku());
         $collection->getSelect()->join(
             array('ml' => Mage::getResourceModel('M2ePro/Listing')->getMainTable()),
-            'main_table.listing_id = ml.id',
-            ''
-        );
-        $collection->getSelect()->join(
-            array('mtg' => Mage::getResourceModel('M2ePro/Template_General')->getMainTable()),
-            'ml.template_general_id = mtg.id'
-                . ' AND mtg.account_id = ' . (int)$item->getParentObject()->getOrder()->getAccountId()
-                . ' AND mtg.marketplace_id = ' . (int)$item->getParentObject()->getOrder()->getMarketplaceId(),
+            'main_table.listing_id = ml.id'
+                . ' AND ml.account_id = ' . (int)$item->getParentObject()->getOrder()->getAccountId()
+                . ' AND ml.marketplace_id = ' . (int)$item->getParentObject()->getOrder()->getMarketplaceId(),
             ''
         );
 
@@ -49,4 +51,6 @@ class Ess_M2ePro_Model_Mysql4_Play_Order_Item extends Ess_M2ePro_Model_Mysql4_Ab
 
         return $shippingPrice;
     }
+
+    // ########################################
 }

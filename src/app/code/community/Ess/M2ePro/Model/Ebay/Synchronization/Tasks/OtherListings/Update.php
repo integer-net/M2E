@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
 */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update
@@ -164,7 +164,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update
 
         if (is_null($sinceTime) || empty($sinceTime)) {
 
-            $marketplaceCollection = Mage::getModel('M2ePro/Marketplace')->getCollection();
+            $marketplaceCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Marketplace');
             $marketplaceCollection->addFieldToFilter('status',Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
             $marketplace = $marketplaceCollection->getFirstItem();
 
@@ -336,8 +336,8 @@ STATUS;
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
-        $tempGroup = '/ebay/synchronization/settings/other_listings/update/';
-        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getConfig()
+        $tempGroup = '/ebay/other_listings/update/';
+        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                     ->getGroupValue($tempGroup,'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);
 

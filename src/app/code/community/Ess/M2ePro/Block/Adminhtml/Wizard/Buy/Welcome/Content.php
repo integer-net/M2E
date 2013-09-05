@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Welcome_Content extends Mage_Adminhtml_Block_Widget
@@ -14,7 +14,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Welcome_Content extends Mage_Adminht
 
         // Initialization block
         //------------------------------
-        $this->setId('wizardBuyWelcomeContent');
+        $this->setId('wizardWelcomeContent');
         //------------------------------
 
         $this->setTemplate('M2ePro/wizard/buy/welcome/content.phtml');
@@ -25,14 +25,14 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Welcome_Content extends Mage_Adminht
     protected function _beforeToHtml()
     {
         //------------------------------
-        $step = $this->helper('M2ePro/Wizard')->getWizard($this->getNick())->getFirstStep();
-        $status = Ess_M2ePro_Helper_Wizard::STATUS_ACTIVE;
+        $step = $this->helper('M2ePro/Module_Wizard')->getWizard($this->getNick())->getFirstStep();
+        $status = Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE;
         $callback = 'function() { setLocation(\''.$this->getUrl('*/adminhtml_wizard_'.$this->getNick()).'\'); }';
         $callback = 'function() { WizardHandlerObj.setStep(\''.$step.'\', '.$callback.'); }';
 
         $confirmMessage = Mage::helper('M2ePro')->escapeJs(
             Mage::helper('M2ePro')->__(
-'It is strongly recommended to watch 5 min. video tutorial before starting configuration.
+'It is strongly recommended to watch 6 min. video tutorial before starting configuration.
 Would you like to watch the video?'
             )
         );

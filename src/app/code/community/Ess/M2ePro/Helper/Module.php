@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
@@ -14,8 +14,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
     const SERVER_MESSAGE_TYPE_WARNING = 2;
     const SERVER_MESSAGE_TYPE_SUCCESS = 3;
 
-    const MAINTENANCE_COOKIE_KEY = 'M2ePro_maintenance';
-    const MAINTENANCE_COOKIE_DURATION = 3600;
+    const MIGRATION_WIZARD_NICK = 'migrationToV6';
 
     // ########################################
 
@@ -25,6 +24,22 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
     public function getConfig()
     {
         return Mage::getSingleton('M2ePro/Config_Module');
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Config_Cache
+     */
+    public function getCacheConfig()
+    {
+        return Mage::getSingleton('M2ePro/Config_Cache');
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Config_Synchronization
+     */
+    public function getSynchronizationConfig()
+    {
+        return Mage::getSingleton('M2ePro/Config_Synchronization');
     }
 
     // ########################################
@@ -39,11 +54,11 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         $version = (string)Mage::getConfig()->getNode('modules/Ess_M2ePro/version');
         $version = strtolower($version);
 
-        if (Mage::helper('M2ePro')->getCacheValue('MODULE_VERSION_UPDATER') === false) {
-            Mage::helper('M2ePro/Ess')->getConfig()->setGroupValue(
+        if (Mage::helper('M2ePro/Data_Cache')->getValue('MODULE_VERSION_UPDATER') === false) {
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                 '/modules/',$this->getName(),$version.'.r'.$this->getRevision()
             );
-            Mage::helper('M2ePro')->setCacheValue('MODULE_VERSION_UPDATER',array(),array(),60*60*24);
+            Mage::helper('M2ePro/Data_Cache')->setValue('MODULE_VERSION_UPDATER',array(),array(),60*60*24);
         }
 
         return $version;
@@ -51,9 +66,9 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '5006';
+        $revision = '5285';
 
-        if ($revision == str_replace('|','#','|REVISION_VERSION|')) {
+        if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
             $revision == 0 && $revision = 'N/A';
             $revision .= '-dev';
@@ -71,36 +86,18 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function getMenuRootNodeLabel()
+    public function getInstallationKey()
     {
-        $componentsLabels = array();
-
-        if (Mage::helper('M2ePro/Component_Ebay')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
-        }
-
-        if (Mage::helper('M2ePro/Component_Amazon')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
-        }
-
-        if (Mage::helper('M2ePro/Component_Buy')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
-        }
-
-        if (Mage::helper('M2ePro/Component_Play')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
-        }
-
-        if (count($componentsLabels) <= 0 || count($componentsLabels) > 2) {
-            return Mage::helper('M2ePro')->__('Sell On Multi-Channels');
-        }
-
-        return implode(' / ', $componentsLabels);
+        return Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue(
+            '/'.$this->getName().'/server/', 'installation_key'
+        );
     }
+
+    // ########################################
 
     public function isLockedByServer()
     {
-        $lock = (int)Mage::helper('M2ePro/Ess')->getConfig()->getGroupValue(
+        $lock = (int)Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue(
             '/'.$this->getName().'/server/', 'lock'
         );
 
@@ -115,7 +112,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getServerMessages()
     {
-        $messages = Mage::helper('M2ePro/Ess')->getConfig()->getGroupValue(
+        $messages = Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue(
             '/'.$this->getName().'/server/', 'messages'
         );
 
@@ -138,235 +135,171 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         return $messages;
     }
 
-    // ########################################
-
-    public function getMySqlTables()
+    public function isPossibleToRunCron()
     {
-        return array(
-            'ess_config',
-            'm2epro_config',
-            'm2epro_exceptions_filters',
-
-            'm2epro_lock_item',
-            'm2epro_locked_object',
-            'm2epro_product_change',
-            'm2epro_processing_request',
-
-            'm2epro_account',
-            'm2epro_marketplace',
-            'm2epro_attribute_set',
-
-            'm2epro_order',
-            'm2epro_order_change',
-            'm2epro_order_item',
-            'm2epro_order_log',
-            'm2epro_order_repair',
-
-            'm2epro_synchronization_log',
-            'm2epro_synchronization_run',
-
-            'm2epro_listing',
-            'm2epro_listing_category',
-            'm2epro_listing_log',
-            'm2epro_listing_other',
-            'm2epro_listing_other_log',
-            'm2epro_listing_product',
-            'm2epro_listing_product_variation',
-            'm2epro_listing_product_variation_option',
-
-            'm2epro_template_description',
-            'm2epro_template_general',
-            'm2epro_template_selling_format',
-            'm2epro_template_synchronization',
-
-            'm2epro_translation_custom_suggestion',
-            'm2epro_translation_language',
-            'm2epro_translation_text',
-
-            'm2epro_amazon_account',
-            'm2epro_amazon_dictionary_category',
-            'm2epro_amazon_dictionary_marketplace',
-            'm2epro_amazon_dictionary_specific',
-            'm2epro_amazon_item',
-            'm2epro_amazon_listing',
-            'm2epro_amazon_listing_other',
-            'm2epro_amazon_listing_product',
-            'm2epro_amazon_listing_product_variation',
-            'm2epro_amazon_listing_product_variation_option',
-            'm2epro_amazon_marketplace',
-            'm2epro_amazon_order',
-            'm2epro_amazon_order_item',
-            'm2epro_amazon_processed_inventory',
-            'm2epro_amazon_template_description',
-            'm2epro_amazon_template_general',
-            'm2epro_amazon_template_new_product',
-            'm2epro_amazon_template_new_product_description',
-            'm2epro_amazon_template_new_product_specific',
-            'm2epro_amazon_template_selling_format',
-            'm2epro_amazon_template_synchronization',
-
-            'm2epro_ebay_account',
-            'm2epro_ebay_account_store_category',
-            'm2epro_ebay_dictionary_category',
-            'm2epro_ebay_dictionary_marketplace',
-            'm2epro_ebay_dictionary_shipping',
-            'm2epro_ebay_dictionary_shipping_category',
-            'm2epro_ebay_feedback',
-            'm2epro_ebay_feedback_template',
-            'm2epro_ebay_item',
-            'm2epro_ebay_listing',
-            'm2epro_ebay_listing_other',
-            'm2epro_ebay_listing_product',
-            'm2epro_ebay_listing_product_variation',
-            'm2epro_ebay_listing_product_variation_option',
-            'm2epro_ebay_marketplace',
-            'm2epro_ebay_message',
-            'm2epro_ebay_motor_specific',
-            'm2epro_ebay_order',
-            'm2epro_ebay_order_item',
-            'm2epro_ebay_order_external_transaction',
-            'm2epro_ebay_template_description',
-            'm2epro_ebay_template_general',
-            'm2epro_ebay_template_general_calculated_shipping',
-            'm2epro_ebay_template_general_payment',
-            'm2epro_ebay_template_general_shipping',
-            'm2epro_ebay_template_general_specific',
-            'm2epro_ebay_template_selling_format',
-            'm2epro_ebay_template_synchronization',
-
-            'm2epro_buy_account',
-            'm2epro_buy_dictionary_category',
-            'm2epro_buy_item',
-            'm2epro_buy_listing',
-            'm2epro_buy_listing_other',
-            'm2epro_buy_listing_product',
-            'm2epro_buy_listing_product_variation',
-            'm2epro_buy_listing_product_variation_option',
-            'm2epro_buy_marketplace',
-            'm2epro_buy_order',
-            'm2epro_buy_order_item',
-            'm2epro_buy_template_description',
-            'm2epro_buy_template_general',
-            'm2epro_buy_template_new_product',
-            'm2epro_buy_template_new_product_core',
-            'm2epro_buy_template_new_product_attribute',
-            'm2epro_buy_template_selling_format',
-            'm2epro_buy_template_synchronization',
-
-            'm2epro_play_account',
-            'm2epro_play_item',
-            'm2epro_play_listing',
-            'm2epro_play_listing_other',
-            'm2epro_play_listing_product',
-            'm2epro_play_listing_product_variation',
-            'm2epro_play_listing_product_variation_option',
-            'm2epro_play_marketplace',
-            'm2epro_play_order',
-            'm2epro_play_order_item',
-            'm2epro_play_processed_inventory',
-            'm2epro_play_template_description',
-            'm2epro_play_template_general',
-            'm2epro_play_template_selling_format',
-            'm2epro_play_template_synchronization'
+        $migrationFinished = Mage::helper('M2ePro/Module_Wizard')->isFinished(
+            self::MIGRATION_WIZARD_NICK
         );
+
+        $ebayFinished = Mage::helper('M2ePro/Module_Wizard')->isFinished(
+            Ess_M2ePro_Helper_View_Ebay::WIZARD_INSTALLATION_NICK
+        );
+        $commonFinished = Mage::helper('M2ePro/Module_Wizard')->isFinished(
+            Ess_M2ePro_Helper_View_Common::WIZARD_INSTALLATION_NICK
+        );
+
+        return $migrationFinished && ($ebayFinished || $commonFinished);
     }
 
-    public function getHorizontalTables()
+    // ########################################
+
+    public function getFoldersAndFiles()
     {
-        $components = Mage::helper('M2ePro/Component')->getComponents();
-        $mySqlTables = Mage::helper('M2ePro/Module')->getMySqlTables();
+        $paths = array(
+            'app/code/community/Ess/',
+            'app/code/community/Ess/M2ePro/*',
 
-        $result = array();
+            'app/locale/*/Ess_M2ePro.csv',
+            'app/etc/modules/Ess_M2ePro.xml',
+            'app/design/adminhtml/default/default/layout/M2ePro.xml',
 
-        foreach ($mySqlTables as $mySqlTable) {
+            'js/M2ePro/*',
+            'skin/adminhtml/default/default/M2ePro/*',
+            'skin/adminhtml/default/enterprise/M2ePro/*',
+            'app/design/adminhtml/default/default/template/M2ePro/*'
+        );
 
-            $tempComponentTables = array();
-            $mySqlTableCropped = str_replace('m2epro_','',$mySqlTable);
+        return $paths;
+    }
 
-            foreach ($components as $component) {
+    public function getRequirementsInfo()
+    {
+        $clientPhpData = Mage::helper('M2ePro/Client')->getPhpSettings();
 
-                $needComponentTable = 'm2epro_'.$component.'_'.$mySqlTableCropped;
+        $requirements = array (
 
-                if (in_array($needComponentTable, $mySqlTables)) {
-                    $tempComponentTables[$component] = $needComponentTable;
-                } else {
-                    break;
+            'php_version' => array(
+                'title' => Mage::helper('M2ePro')->__('PHP Version'),
+                'condition' => array(
+                    'sign' => '>=',
+                    'value' => '5.3.0'
+                ),
+                'current' => array(
+                    'value' => Mage::helper('M2ePro/Client')->getPhpVersion(),
+                    'status' => true
+                )
+            ),
+
+            'memory_limit' => array(
+                'title' => Mage::helper('M2ePro')->__('Memory Limit'),
+                'condition' => array(
+                    'sign' => '>=',
+                    'value' => '256 MB'
+                ),
+                'current' => array(
+                    'value' => (int)$clientPhpData['memory_limit'] . ' MB',
+                    'status' => true
+                )
+            ),
+
+            'magento_version' => array(
+                'title' => Mage::helper('M2ePro')->__('Magento Version'),
+                'condition' => array(
+                    'sign' => '>=',
+                    'value' => (Mage::helper('M2ePro/Magento')->isGoEdition()           ? '1.9.0.0' :
+                               (Mage::helper('M2ePro/Magento')->isEnterpriseEdition()   ? '1.7.0.0' :
+                               (Mage::helper('M2ePro/Magento')->isProfessionalEdition() ? '1.7.0.0' : '1.4.0.0')))
+                ),
+                'current' => array(
+                    'value' => Mage::helper('M2ePro/Magento')->getVersion(false),
+                    'status' => true
+                )
+            ),
+
+            'max_execution_time' => array(
+                'title' => Mage::helper('M2ePro')->__('Max Execution Time'),
+                'condition' => array(
+                    'sign' => '>=',
+                    'value' => '360 sec'
+                ),
+                'current' => array(
+                    'value' => (int)$clientPhpData['max_execution_time'] . ' sec',
+                    'status' => true
+                )
+            )
+        );
+
+        foreach ($requirements as &$requirement) {
+            $requirement['current']['status'] = version_compare(
+                $requirement['current']['value'],
+                $requirement['condition']['value'],
+                $requirement['condition']['sign']
+            );
+        }
+
+        return $requirements;
+    }
+
+    // ########################################
+
+    public function getUnWritableDirectories()
+    {
+        $itemsToCheck = $this->getFoldersAndFiles();
+
+        $unWritableDirs = array();
+        foreach ($itemsToCheck as $item) {
+
+            $item = Mage::getBaseDir() . '/' . $item;
+
+            $items = glob($item);
+
+            if (preg_match('/\*$/',$item)) {
+                $item = preg_replace('/\*$/','',$item);
+                $items = array_merge($items,$this->getDirectories($item));
+            }
+
+            foreach ($items as $path) {
+                if (is_file($path)) {
+                    $path = explode('/',$path);
+                    array_pop($path);
+                    $path = implode('/',$path);
                 }
-            }
+                $path = rtrim($path,'/');
 
-            if (count($tempComponentTables) == count($components)) {
-                $result[$mySqlTable] = $tempComponentTables;
+                !is_dir_writeable($path) && $unWritableDirs[] = $path;
             }
         }
 
-        return $result;
+        return array_values(array_unique($unWritableDirs));
+    }
+
+    private function getDirectories($baseDir)
+    {
+        $baseDir = rtrim($baseDir,'/') . '/';
+        $directories = array();
+
+        foreach (scandir($baseDir) as $item) {
+            if (is_file($baseDir . $item) || in_array($item,array('.','..','.svn'))) {
+                continue;
+            }
+
+            $directories = array_merge($directories, $this->getDirectories($baseDir . $item));
+            $directories[] = $baseDir . $item;
+        }
+
+        return $directories;
     }
 
     // ########################################
 
-    public function isMaintenanceEnabled()
+    public function clearConfigCache()
     {
-        return (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/debug/maintenance/', 'mode');
+        $this->getCacheConfig()->clear();
     }
-
-    public function isMaintenanceOwner()
-    {
-        return (bool)Mage::app()->getCookie()->get(self::MAINTENANCE_COOKIE_KEY);
-    }
-
-    //-----------------------------------------
-
-    public function isMaintenanceExpired()
-    {
-        $restoreDate = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/debug/maintenance/', 'restore_date'
-        );
-
-        if (!$restoreDate) {
-            return true;
-        }
-
-        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-
-        if ($currentTimeStamp >= strtotime($restoreDate)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function prolongMaintenanceRestoreDate()
-    {
-        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-        $restoreDate = Mage::helper('M2ePro')->getDate($currentTimeStamp + self::MAINTENANCE_COOKIE_DURATION);
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/debug/maintenance/', 'restore_date', $restoreDate);
-    }
-
-    //-----------------------------------------
-
-    public function enableMaintenance()
-    {
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/debug/maintenance/', 'mode', 1);
-
-        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-        $restoreDate = Mage::helper('M2ePro')->getDate($currentTimeStamp + self::MAINTENANCE_COOKIE_DURATION);
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/debug/maintenance/', 'restore_date', $restoreDate);
-
-        Mage::app()->getCookie()->set(Ess_M2ePro_Helper_Module::MAINTENANCE_COOKIE_KEY, 'true', 60*60*24);
-    }
-
-    public function disableMaintenance()
-    {
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/debug/maintenance/', 'mode', 0);
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/debug/maintenance/', 'restore_date', null);
-        Mage::app()->getCookie()->set(Ess_M2ePro_Helper_Module::MAINTENANCE_COOKIE_KEY, '', 0);
-    }
-
-    // ########################################
 
     public function clearCache()
     {
-        Mage::helper('M2ePro')->removeAllCacheValues();
+        Mage::helper('M2ePro/Data_Cache')->removeAllValues();
     }
 
     // ########################################

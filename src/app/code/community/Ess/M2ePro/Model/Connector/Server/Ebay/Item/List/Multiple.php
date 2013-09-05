@@ -1,12 +1,14 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Multiple
     extends Ess_M2ePro_Model_Connector_Server_Ebay_Item_MultipleAbstract
 {
+    protected $failedListingProductIds = array();
+
     // ########################################
 
     protected function getCommand()
@@ -39,6 +41,29 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Multiple
                 $this->addListingsProductsLogsMessage($listingProduct, $message,
                                                       Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
+                $this->failedListingProductIds[] = $listingProduct->getId();
+                $countListedItems++;
+            }
+
+            if ($this->params['status_changer'] != Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER &&
+                $this->isTheSameProductAlreadyListed($listingProduct)) {
+
+                $this->failedListingProductIds[] = $listingProduct->getId();
+                $countListedItems++;
+            }
+
+            if(!$listingProduct->getChildObject()->isSetCategoryTemplate()) {
+
+                $message = array(
+                    // Parser hack -> Mage::helper('M2ePro')->__('Categories settings are not set');
+                    parent::MESSAGE_TEXT_KEY => 'Categories settings are not set',
+                    parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
+                );
+
+                $this->addListingsProductsLogsMessage($listingProduct, $message,
+                                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+
+                $this->failedListingProductIds[] = $listingProduct->getId();
                 $countListedItems++;
             }
         }
@@ -70,20 +95,23 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Multiple
         foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            if ($listingProduct->isListable()) {
 
-                $productVariations = $listingProduct->getVariations(true);
-
-                foreach ($productVariations as $variation) {
-                    /** @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
-                    $variation->deleteInstance();
-                }
-
-                $requestData['products'][$listingProduct->getId()] =
-                    Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper')->getListRequestData(
-                        $listingProduct, $tempParams
-                    );
+            if (in_array($listingProduct->getId(),$this->failedListingProductIds)) {
+                continue;
             }
+
+            $productVariations = $listingProduct->getVariations(true);
+
+            foreach ($productVariations as $variation) {
+                /** @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
+                $variation->deleteInstance();
+            }
+
+            $helper = Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Helper');
+            $tempRequestData = $helper->getListRequestData($listingProduct, $tempParams);
+            $this->logAdditionalWarningMessages($listingProduct);
+
+            $requestData['products'][$listingProduct->getId()] = $tempRequestData;
         }
 
         return $this->nativeRequestData = $requestData;
@@ -98,7 +126,7 @@ class Ess_M2ePro_Model_Connector_Server_Ebay_Item_List_Multiple
 
     protected function prepareResponseData($response)
     {
-        if (isset($response['result'])) {
+        if ($this->resultType != parent::MESSAGE_TYPE_ERROR && isset($response['result'])) {
 
             foreach ($response['result'] as $tempIdProduct=>$tempResultProduct) {
 

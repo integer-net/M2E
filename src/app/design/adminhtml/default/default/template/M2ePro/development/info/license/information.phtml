@@ -1,0 +1,45 @@
+<table class="form-list" cellspacing="0" cellpadding="0">
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('License Key'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->licenseKey; ?>
+        </td>
+    </tr>
+
+    <?php if ($this->licenseDomain != ''): ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Valid Domain'); ?>: </label>
+            </td>
+            <td class="value">
+                <?php echo $this->licenseDomain; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+
+    <?php if ($this->licenseIp != ''): ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Valid IP'); ?>: </label>
+            </td>
+            <td class="value">
+                <?php echo $this->licenseIp; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+
+    <?php if ($this->licenseDirectory != ''): ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Valid Directory'); ?>: </label>
+            </td>
+            <td class="value">
+                <?php echo $this->licenseDirectory; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+
+</table>

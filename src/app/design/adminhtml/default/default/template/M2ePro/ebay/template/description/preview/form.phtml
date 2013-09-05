@@ -23,10 +23,10 @@
                     <br /><br />
                 <?php endif; ?>
 
-                <?php echo Mage::helper('M2ePro')->__('Enter Product Id'); ?>: <input id="product_id" type="text" name="id" value="" class="input-text" />
+                <?php echo Mage::helper('M2ePro')->__('Enter Product Id'); ?>:&nbsp;&nbsp;<input id="product_id" type="text" name="id" value="<?php echo $this->getData('product_id'); ?>" class="input-text" />
 
-                <?php echo $this->getChildHtml('display_product_description') ?>
-                <?php echo Mage::helper('M2ePro')->__('or') ?>
+                &nbsp;&nbsp;<?php echo $this->getChildHtml('display_product_description') ?>
+                &nbsp;&nbsp;<?php echo Mage::helper('M2ePro')->__('or') ?>&nbsp;&nbsp;
                 <?php echo $this->getChildHtml('display_random_product_description') ?>
 
             </form>

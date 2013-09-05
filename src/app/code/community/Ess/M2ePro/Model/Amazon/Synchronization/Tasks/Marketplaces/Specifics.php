@@ -1,11 +1,11 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Marketplaces_Specifics extends
-                                                                        Ess_M2ePro_Model_Amazon_Synchronization_Tasks
+class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Marketplaces_Specifics
+    extends Ess_M2ePro_Model_Amazon_Synchronization_Tasks
 {
     const PERCENTS_START = 75;
     const PERCENTS_END = 100;
@@ -73,9 +73,9 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Marketplaces_Specifics exten
 
     private function execute()
     {
-        $markeptlaceObj = Mage::helper('M2ePro/Component')->getUnknownObject('Marketplace',
+        $marketplaceObj = Mage::helper('M2ePro/Component')->getUnknownObject('Marketplace',
                                                                              $this->_params['marketplace_id']);
-        if ($markeptlaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Amazon::NICK) {
+        if ($marketplaceObj->getComponentMode() != Ess_M2ePro_Helper_Component_Amazon::NICK) {
             return;
         }
 

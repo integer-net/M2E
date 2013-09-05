@@ -45,7 +45,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
 
             if (!$listingProduct->isNotListed()) {
 
-                // Parser hack -> Mage::helper('M2ePro')->__('Item is already on Rakuten.com, or not available.');
+                // Parser hack -> Mage::helper('M2ePro')->__('Item is already on Play.com, or not available.');
                 $this->addListingsProductsLogsMessage($listingProduct,
                                                       'Item is already on Play.com, or not available.',
                                                       Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -65,7 +65,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
 
             if ($this->isSkuExistsInM2ePro($addingSku,$listingProduct)) {
 
-                if ($listingProduct->getChildObject()->getPlayGeneralTemplate()->isGenerateSkuModeNo()) {
+                if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
                     unset($listingProducts[$key]);
                     continue;
                 }
@@ -130,7 +130,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            $nativeData = Mage::getModel('M2ePro/Play_Connector_Product_Helper')
+            $nativeData = Mage::getModel('M2ePro/Connector_Server_Play_Product_Helper')
                                          ->getListRequestData($listingProduct,$this->params);
 
             $sendedData = $nativeData;
@@ -189,7 +189,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
         $addingCondition = $listingProduct->getChildObject()->getCondition();
         empty($addingCondition) && $addingCondition = $listingProduct->getChildObject()->getAddingCondition();
 
-        $validConditions = $listingProduct->getGeneralTemplate()->getChildObject()->getConditionValues();
+        $validConditions = $listingProduct->getListing()->getChildObject()->getConditionValues();
 
         if (empty($addingCondition) || !in_array($addingCondition,$validConditions)) {
 
@@ -236,9 +236,9 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
         empty($dispatchTo) && $dispatchTo = $listingProduct->getChildObject()->getDispatchTo();
 
         $validDispatchTo = array(
-            Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_BOTH,
-            Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_UK,
-            Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_EUROPA,
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH,
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK,
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA,
         );
 
         if (empty($dispatchTo) || !in_array($dispatchTo,$validDispatchTo)) {
@@ -268,10 +268,10 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
             return false;
         }
 
-        if ($dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_BOTH ||
-            $dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_UK) {
+        if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
+            $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK) {
 
-            $priceGbr = $listingProduct->getChildObject()->getPriceGbr();
+            $priceGbr = $listingProduct->getChildObject()->getPriceGbr(true);
 
             if ($priceGbr <= 0) {
 
@@ -287,10 +287,10 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
             }
         }
 
-        if ($dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_BOTH ||
-            $dispatchTo == Ess_M2ePro_Model_Play_Template_General::DISPATCH_TO_EUROPA) {
+        if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
+            $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA) {
 
-            $priceEuro = $listingProduct->getChildObject()->getPriceEuro();
+            $priceEuro = $listingProduct->getChildObject()->getPriceEuro(true);
 
             if ($priceEuro <= 0) {
 
@@ -359,13 +359,13 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
             try {
 
                 /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Play_Dispatcher */
-                $dispatcherObject = Mage::getModel('M2ePro/Play_Connector')->getDispatcher();
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
                 $response = $dispatcherObject->processVirtualAbstract('product','search','generalIdBySku',
                     array('items' => $skus),'items', $this->marketplace->getId(), $this->account->getId());
 
             } catch (Exception $exception) {
 
-                Mage::helper('M2ePro/Exception')->process($exception);
+                Mage::helper('M2ePro/Module_Exception')->process($exception);
 
                 $this->addListingsLogsMessage(
                     reset($listingProductsPack), Mage::helper('M2ePro')->__($exception->getMessage()),
@@ -404,7 +404,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
 
         if ($listingOtherCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getPlayGeneralTemplate()->isGenerateSkuModeNo()) {
+            if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
 'The same Reference Code was found among 3rd Party Listings. Reference Code must be unique the product to be listed.',
@@ -422,12 +422,10 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
             ->getCollection('Listing_Product');
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $templateGeneralTable = Mage::getResourceModel('M2ePro/Template_General')->getMainTable();
 
         $listingProductCollection
             ->getSelect()
-            ->join(array('l'=>$listingTable),'`main_table`.`listing_id` = `l`.`id`',array())
-            ->join(array('tg'=>$templateGeneralTable),'`l`.`template_general_id` = `tg`.`id`',array());
+            ->join(array('l'=>$listingTable),'`main_table`.`listing_id` = `l`.`id`',array());
 
         $listingProductCollection
             ->addFieldToFilter('sku',$sku)
@@ -436,7 +434,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
 
         if ($listingProductCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getPlayGeneralTemplate()->isGenerateSkuModeNo()) {
+            if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
 //->__('The same Reference Code was found among M2E Listings. Reference Code must be unique the product to be listed.');
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
@@ -454,7 +452,7 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
         $queue = $this->getQueueOfSkus();
         if (in_array($sku,$queue) || isset($this->skusToCheck[$sku])) {
 
-            if ($listingProduct->getChildObject()->getPlayGeneralTemplate()->isGenerateSkuModeNo()) {
+            if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
 'The product with the same Reference Code is being listed now. Reference Code must be unique the product to be listed.',
@@ -507,8 +505,8 @@ class Ess_M2ePro_Model_Connector_Server_Play_Product_List_Multiple
         $listingProduct->addData($data)->save();
 
         $dataForAdd = array(
-            'account_id' => $listingProduct->getListing()->getGeneralTemplate()->getAccountId(),
-            'marketplace_id' => $listingProduct->getListing()->getGeneralTemplate()->getMarketplaceId(),
+            'account_id' => $listingProduct->getListing()->getAccountId(),
+            'marketplace_id' => $listingProduct->getListing()->getMarketplaceId(),
             'sku' => $listingProduct->getData('sku'),
             'product_id' => $listingProduct->getProductId(),
             'store_id' => $listingProduct->getListing()->getStoreId()

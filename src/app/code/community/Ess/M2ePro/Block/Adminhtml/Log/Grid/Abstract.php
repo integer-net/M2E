@@ -1,11 +1,25 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract extends Ess_M2ePro_Block_Adminhtml_Component_Grid
+abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
+    extends Mage_Adminhtml_Block_Widget_Grid
 {
+    //####################################
+
+    protected function getEntityId()
+    {
+        $entityData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
+
+        if (isset($entityData['id'])) {
+            return $entityData['id'];
+        }
+
+        return NULL;
+    }
+
     //####################################
 
     protected function _getLogTypeList()

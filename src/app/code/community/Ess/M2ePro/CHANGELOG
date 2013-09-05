@@ -1,25 +1,108 @@
-* 5.2.5 (r5006)
+* 6.0.3 (r5285) (04/09/2013)
+
+* Added: separated documentation and video tutorials links for eBay and Other integrations
+* Improvement: [eBay] all attributes are shown in Description policy and Category specifics
+* Fix: pop up css not loaded when package or theme are not default
+* Fix: products in orders were loaded with wrong store
+* Fix: [eBay] Schedule "Time To/From" validator did not work in the Firefox/IE browser's
+* Fix: [eBay] eBay categories settings are not saved during editing process
+* Fix: [eBay] SQLSTATE[HY000]: General error: 1116 Too many tables; MySQL can only use 61 tables in a join
+* Fix: [eBay] Category tree. Expand icon was not showing, when child_count < 0 in db.
+* Fix: [eBay] Motors specifics grid display bug (was not displayed after products grid reload)
+* Fix: [eBay] Shipping & Payment, Ess_M2ePro_Model_Ebay_Template_Shipping constant not found
+* Fix: [Amazon] fix error during order creation "Please specify a shipping method"
+
+* 6.0.2 (r5237) (30/08/2013)
+
+* Added: [eBay] Implementation of the charity/donation through eBay
+* Added: [eBay] ability to select products by magento categories
+* Improvement: [eBay] images and watermark settings were combined in description policy
+* Improvement: [eBay] Listing Grid in "eBay Mode" shows "online_title" and "online_sku"
+* Fix: Advanced Products filter doesn't work
+* Fix: Critical issue(s) during upgrade process from v3.x.x - 5.x.x to 6.x.x
+* Fix: [eBay] "Product Price" option of "Price" is selected automatically, when "Listing Type" is "Fixed"
+* Fix: [Amazon] wrong state in magento order, if buyer supplied full state name
+
+* 6.0.1 (r5105) (06/08/2013) [Beta Testing]
+
+* Improvement: [eBay] Display sku for 3rd party listings on search page like at 3rd party listing view page
+* Improvement: [Amazon] Sale price start & end date is now taken from main product if variation price source = main
+* Fix: Numerous issues with urls in orders
+* Fix: eBay listing products were showing in common listing search grid
+* Fix: Wrong state in magento order, if buyer supplied the whole state name instead of abbreviation
+
+* 6.0.0 (r5036) (31/07/2013) [Beta Testing / New Users]
+
+* Total new extension "M2E Pro eBay Integration"
+* Added: Separation of M2E Pro main menu to "Sell On eBay" and "Sell On Multi-Channels" (Amazon, Rakuten.com, Play.com)
+* Added: Two different layouts for eBay and other integrations (Amazon, Rakuten.com, Play.com)
+* Added: "M2E PRO" tab was added to Magento -> System -> Configuration
+* Added: Currency rate conversion will be performed if Product Price or Special Price is selected as price source
+* Added: [eBay] Two interface modes: "Simple" (for beginners) and "Advanced" (for advanced users)
+* Added: [eBay] Extension automatically calculates which attributes must be shown in the certain place
+* Added: [eBay] Quick listings navigation (drop down beside Listing title)
+* Added: [eBay] Three different views of items are available (eBay, Magento, Settings)
+* Added: [eBay] Ability to set custom options of the policy for each listing separately
+* Added: [eBay] Ability to set custom options of the policy for each product separately
+* Added: [eBay] Ability to create new policy from any settings page
+* Added: [eBay] eBay Fee estimation and summary of items fees
+* Added: [eBay] Automatic actions of products adding settings (three different variants: Global, Website, )
+* Improvement: "Templates Synchronization" renamed to "Stock Level Synchronization"
+* Improvement: "Hide products presented in other listings" option is shown only when you select products manually during "add new products" process
+* Improvement: [eBay] Completely new listings conception
+* Improvement: [eBay] Management of feedback was moved for each account
+* Improvement: [eBay] Help blocks and tips changes (help icon instead of text below inputs)
+* Improvement: [eBay] "Account Title" was renamed and changed to "eBay User ID"
+* Improvement: [eBay] "Marketplace" was renamed to "eBay Site"
+* Improvement: [eBay] "Selling Format" template was renamed to "Price, Quantity and Format" policy
+* Improvement: [eBay] Synchronization template option "Full Revise -> General Template" was divided to 4 different options (Payment,Shipping,Return,Category/Specifics)
+* Improvement: [eBay] Synchronization template Relist -> Schedule option was moved to "Schedule" tab
+* Improvement: [eBay] "Schedule" tab settings are applicable for Relist and List rules at the same time
+* Improvement: [eBay] Ability to add a separate time range for each day of the week in the Synchronization template schedule
+* Improvement: [eBay] Price coefficient(s) like 1.22 was converted to +20% and etc. in the selling format template
+* Improvement: [eBay] Listing Upgrades, Product Details and Condition settings were moved from general template to description template
+* Improvement: [eBay] Fixed range of values for condition option in the description template
+* Improvement: [eBay] General template was split as Shipping, Return and Payment policies
+* Improvement: [eBay] Categories settings, Tax Category and Item Specifics were combined and directly joined to the products
+* Improvement: [eBay] Account and Marketplace settings were moved to the listing settings from general template
+* Improvement: [eBay] Different modes for primary category, secondary category and tax categories
+* Improvement: [eBay] Items are searched among M2E Pro and 3rd party listings together
+* Improvement: [eBay] List of 3rd party listings is grouped by account and marketplace
+* Improvement: [eBay] Categories settings can be set when user is adding products to the listing
+* Improvement: [eBay] Policies are grouped to three groups (Payment and shipping, Selling, Synchronization)
+* Removed: Sell On Multi-Channels -> Help -> About page
+* Removed: Activation and deactivation options for synchronization template from listing settings
+* Removed: [eBay] Schedule option "Delay After End" from synchronization template
+* Removed: [eBay] Currency option from selling format template
+* Removed: [eBay] Custom Value from Product Details option from description template
+* Removed: [eBay] Custom label SKU option from general template
+* Removed: [eBay] Ignore Variation option from general template
+* Removed: [eBay] Option None was removed from Required Item Specifics
+* Removed: [eBay] Selection of the attribute sets were removed from templates and listings settings
+* Removed: [Amazon] Currency option from selling format template
+
+* 5.2.5 (r5006) (30/07/2013)
 
 * Fix: [Amazon] fix error during order creation "Please specify a shipping method"
 
-* 5.2.4 (r4983)
+* 5.2.4 (r4983) (29/07/2013)
 
 * Fix: grouped product in magento order had only one option selected, even if buyer ordered multiple items with different options selected
 * Fix: [eBay] wrongly shown message "number of values for each option more than 30" for configurable products
 * Improvement: [eBay] ability to set the "Same Day" as "Handling Time" in the shipping settings
 
-* 5.2.3 (r4567)
+* 5.2.3 (r4564) (01/07/2013)
 
 * Improvement: [eBay] don't send item duration and private listing during revise if it has a bid(s) or bestoffer is enabled
 * Improvement: [Amazon] added new option in account settings for handling order's billing address
 * Fix: [Amazon] do not clear the billing address information if buyer name and recipient name are identical
 * Fix: tax calculation based on something different from shipping address didn't work even if tax source has been set to magento
 
-* 5.2.2 (r4468)
+* 5.2.2 (r4468) (24/06/2013)
 
 * Added: [Play] basic support of refunded orders
 
-* 5.2.1 (r4422)
+* 5.2.1 (r4422) (19/06/2013)
 
 * Added: [Play] implementation for working with merchanttoolbox.play.com
 * Improvement: [Play] some improvements for working with playtrade.com
@@ -34,18 +117,18 @@
 * Fix: [Play] critical issue with orders synchronizations
 * Fix: [Amazon] wrong product(s) mapping when order is being created
 
-* 5.2.0 (r4138)
+* 5.2.0 (r4138) (21/05/2013)
 
 * Added: [Amazon] ability to fill the "Shipping Service" field in order at Amazon with the title of the tracking number
 * Added: [Amazon] ability to work with configurable, bundle, grouped, simple with custom options products
 
-* 5.1.1 (r4021)
+* 5.1.1 (r4021) (15/05/2013)
 
 * Added: [Amazon] ability to add title for New ASIN Template
 * Added: [Buy] ability to add title for New SKU Template
 * Fix: cron job working issue (parallel running)
 
-* 5.1.0 (r3975)
+* 5.1.0 (r3975) (08/05/2013)
 
 * Added: cron job working issue (parallel running)
 * Added: [Play] Play.com / Rakuten.co.uk integration has been added
@@ -54,12 +137,12 @@
 * Fix: [Buy] major inventory synchronization issue, wrong statuses changing
 * Removed: [Amazon/Buy] wrong linking to the existed inventory product
 
-* 5.0.9 (r3897)
+* 5.0.9 (r3897) (26/04/2013)
 
 * Added: [eBay] locale translations for: German, French, Italian, Spanish
 * Added: general locale translations for: German, French, Italian, Spanish
 
-* 5.0.8 (r3867)
+* 5.0.8 (r3867) (23/04/2013)
 
 * Improvement: [eBay] total amount of sold items in the listings grid
 * Fix: Fatal error: Call to a member function getId() on a non-object in app/code/core/Mage/Tax/Model/Calculation.php
@@ -67,7 +150,7 @@
 * Fix: [Amazon] orders status updates and tracking details were not sent to the channel
 * Fix: wrong set of some templates selected by attribute set(s) id(s) during new listing creation
 
-* 5.0.7 (r3845)
+* 5.0.7 (r3845) (22/04/2013)
 
 * Added: advanced magento attributes filter
 * Added: [Amazon] account option for FBA orders importing
@@ -78,11 +161,11 @@
 * Fix: [eBay] 3rd party auto actions synchronization bug fix
 * Fix: [Amazon] wrong magento order totals for orders with discounts
 
-* 5.0.6 (r3745)
+* 5.0.6 (r3745) (11/04/2013)
 
 * Fix: Synchronization critical issue on php < 5.3
 
-* 5.0.5 (r3721)
+* 5.0.5 (r3721) (10/04/2013)
 
 * Added: a maximum quantity value which will be posted to the channel (Selling Format Template)
 * Added: a minimum affected quantity for revise action (Synchronization Template)
@@ -99,7 +182,7 @@
 * Fix: [Buy] critical issue with orders shipment confirmation
 * Removed: customer creation notification and newsletter subscription were removed because of policy violation
 
-* 5.0.4 (r3503)
+* 5.0.4 (r3503) (21/03/2013)
 
 * Added: [Buy] New SKU Creation
 * Added: [eBay] token expiration messages
@@ -110,7 +193,7 @@
 * Fix: [Amazon] custom status was not set for magento orders
 * Fix: move to listing grid showing only 20 listings
 
-* 5.0.3 (r3345)
+* 5.0.3 (r3345) (06/03/2013)
 
 * Added: [Amazon / Buy] Manual moving, offer a listing creation when no listings found.
 * Improvement: [Amazon] listing search settings, UPC/EAN was added to New Product Template
@@ -120,7 +203,7 @@
 * Fix: critical interface issue if PHP < 5.3 (Parse error: syntax error, unexpected T_PAAMAYIM_NEKUDOTAYIM)
 * Fix: Base table or view not found during installation: 1146 Table '[prefix_]m2epro_amazon_category' doesn't exist
 
-* 5.0.2 (r3298)
+* 5.0.2 (r3298) (28/02/2013)
 
 * Added: [Amazon] New ASIN Creation
 * Added: [Amazon] link to order in seller central
@@ -141,14 +224,14 @@
 * Fix: incomplete magento orders for downloadable products
 * Fix: invalid qty in magento order if product was purchased several times
 
-* 5.0.1 (r3179) [Beta Testing]
+* 5.0.1 (r3179) (14/02/2013) [Beta Testing]
 
 * Improvement: [Buy] Rakuten.com SKU lookup supports the multi-variations products
 * Improvement: [eBay] ability to disable required eBay specifics (multi-variation conflict)
 * Fix: [Buy] marketplace was disabled after installation or upgrade
 * Fix: [Buy] listings, synchronizations logs filters and sorts did not work properly
 
-* 5.0.0 (r3066) [Beta Testing]
+* 5.0.0 (r3066) (04/02/2013) [Beta Testing]
 
 * Added: [Buy] Rakuten.com / Buy.com integration has been added
 * Fix: [eBay] Fatal error: Call to a member function getListingId() on a non-object

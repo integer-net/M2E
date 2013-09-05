@@ -9,27 +9,40 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
 
     save_click: function(redirectUrl)
     {
-        var url = M2ePro.url.formSubmit + 'back/'+redirectUrl+'/';
+        var url = M2ePro.url.get('adminhtml_ebay_listing_other_synchronization/save', {"back": redirectUrl});
+        this.submitForm(url);
+    },
+
+    save_and_edit_click: function(back, tabsId)
+    {
+        var params = 'tab=' + $$('#' + tabsId + ' a.active')[0].name + '&back=' + back;
+
+        var url = M2ePro.url.get('formSubmit',{'back': base64_encode('edit|' + params)});
         this.submitForm(url);
     },
 
     source_change: function()
     {
         var self = EbayListingOtherSynchronizationHandlerObj;
-        var id = this.id;
-        var attributeContainerId = id + '_attribute_container';
+        var id = this.id.replace('_source', '');
+        var sourceMode = this.options[this.selectedIndex].up().getAttribute(id + '_source');
 
-        eval('var constAttribute = self.' + id.toUpperCase() + '_SOURCE_ATTRIBUTE');
-        eval('var constNone = self.' + id.toUpperCase() + '_SOURCE_NONE');
+        if (sourceMode === null) {
+            sourceMode = this.value;
+        }
 
-        if (this.value == constAttribute) {
-            $(attributeContainerId).show();
-        } else {
-            $(attributeContainerId).hide();
+        $(id + '_attribute').value = '';
+        $(id).value = sourceMode;
+
+        var constAttribute = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Listing_Other_Source::'+id.toUpperCase()+'_SOURCE_ATTRIBUTE');
+        var constNone = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Listing_Other_Source::'+id.toUpperCase()+'_SOURCE_NONE');
+
+        if (sourceMode == constAttribute) {
+            $(id + '_attribute').value = this.value;
         }
 
         if (this.value == constNone) {
-            eval('var constReviseNone = self.REVISE_UPDATE_' + id.toUpperCase() + '_NONE');
+            var constReviseNone = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_'+id.toUpperCase()+'_NONE');
 
             $('revise_update_' + id).selectedIndex = constReviseNone;
             $('revise_update_' + id).disabled = true;
@@ -50,24 +63,6 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
                 $('relist_qty').disabled = false;
                 $('stop_qty').disabled = false;
             }
-        }
-
-        if (id == 'price') {
-            self.price_mode_change();
-        }
-    },
-
-    price_mode_change: function()
-    {
-        var self = EbayListingOtherSynchronizationHandlerObj;
-
-        if ($('price').value == self.PRICE_SOURCE_FINAL) {
-            $('customer_group_id_container').show();
-            $('note_price').innerHTML = M2ePro.text.final_price_note;
-        } else {
-            $('customer_group_id').value = '';
-            $('customer_group_id_container').hide();
-            $('note_price').innerHTML = M2ePro.text.all_price_note;
         }
     },
 

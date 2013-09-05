@@ -2,17 +2,10 @@
 
 <script type="text/javascript">
 
-    if (typeof M2eProAmazonWelcomeTutorial == 'undefined') {
-        M2eProAmazonWelcomeTutorial = {};
-        M2eProAmazonWelcomeTutorial.url = {};
-        M2eProAmazonWelcomeTutorial.formData = {};
-        M2eProAmazonWelcomeTutorial.text = {};
-    }
-
     var isTutorialFinished = false;
 
     M2eProAmazonWelcomeTutorialHandlerObj = new VideoTutorialHandler(
-        M2eProAmazonWelcomeTutorial,'amazon_welcome_video_tutorial_pop_up',
+        'amazon_welcome_video_tutorial_pop_up',
         '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('M2E Pro - Amazon/Magento Integration : Configuration Wizard')); ?>',
         function() {}
     );

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
@@ -216,25 +216,32 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
             }
 
             /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
-            $collection = Mage::getModel('M2ePro/Ebay_Item')->getCollection();
-            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns(array('item_id'));
+            $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns(array());
 
-            $method = 'where';
-            $partReceivedItemsByItemId = array();
-            foreach ($partReceivedItems as $partReceivedItem) {
-                $collection->getSelect()->$method('item_id = ?',(string)$partReceivedItem['id']);
-                $partReceivedItemsByItemId[(string)$partReceivedItem['id']] = $partReceivedItem;
-                $method = 'orWhere';
-            }
+            $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
+            $ebayItemTable = Mage::getResourceModel('M2ePro/Ebay_Item')->getMainTable();
+
+            $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
+            $collection->getSelect()->where('l.account_id = ?', (int)$this->getAccount()->getId());
+
+            $collection->getSelect()->join(array(
+                'i' => $ebayItemTable), 'second_table.ebay_item_id = i.id', array('item_id')
+            );
 
             /** @var $stmtTemp Zend_Db_Statement_Pdo */
             $stmtTemp = $connWrite->query($collection->getSelect()->__toString());
+
+            $partReceivedItemsByItemId = array();
+            foreach ($partReceivedItems as $partReceivedItem) {
+                $partReceivedItemsByItemId[(string)$partReceivedItem['id']] = $partReceivedItem;
+            }
 
             while ($existItem = $stmtTemp->fetch()) {
                 unset($partReceivedItemsByItemId[(string)$existItem['item_id']]);
             }
 
-            $resultItems = array_merge($resultItems,$partReceivedItemsByItemId);
+            $resultItems = array_merge($resultItems, $partReceivedItemsByItemId);
         }
 
         return array_values($resultItems);

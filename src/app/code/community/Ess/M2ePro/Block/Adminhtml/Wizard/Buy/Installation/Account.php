@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2011 by  ESS-UA.
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
 class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation_Account extends Mage_Adminhtml_Block_Template
@@ -14,7 +14,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation_Account extends Mage_Ad
 
         // Initialization block
         //------------------------------
-        $this->setId('wizardBuyInstallationAccount');
+        $this->setId('wizardInstallationAccount');
         //------------------------------
 
         $this->setTemplate('M2ePro/wizard/buy/installation/account.phtml');
@@ -23,10 +23,10 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation_Account extends Mage_Ad
     protected function _beforeToHtml()
     {
         //-------------------------------
-        $url = $this->getUrl('*/adminhtml_buy_account/new',array('hide_upgrade_notification'=>'yes'));
+        $url = $this->getUrl('*/adminhtml_common_buy_account/new',array('wizard'=>true));
         $step = 'account';
         $callback = 'function() {
-            $(\'wizard_buy_complete\').show()
+            $(\'wizard_complete\').show()
         }';
         //-------------------------------
 
