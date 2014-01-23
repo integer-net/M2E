@@ -160,6 +160,7 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler,{
         $('productSearch_buttons').show();
         $('productSearch_error_block').hide();
         $('productSearch_grid').hide();
+        $('query').value = '';
     },
 
     showSearchGeneralIdAutoPrompt: function ()
@@ -394,6 +395,56 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler,{
                 }
             }
         });
+    },
+
+    //----------------------------------
+
+    specificsChange: function(select)
+    {
+        var self = this;
+
+        var idParts = explode('_', select.id);
+        var id = idParts[2];
+        var specifics = [];
+        var selectedAsin = '';
+
+        var asins = JSON.parse($('asins_' + id).innerHTML);
+
+        $$('.specifics_' + id).each(function(el) {
+            var specificName = explode('_', el.id);
+            specificName = specificName[1];
+
+            specifics[specificName] = el.value;
+        });
+
+        for (var spec in asins) {
+            var productSpecifics = asins[spec].specifics;
+
+            var found = true;
+            for (var sName in productSpecifics) {
+
+                if (productSpecifics[sName] != specifics[sName]) {
+                    found = false;
+                    break;
+                }
+            }
+
+            if (found) {
+                selectedAsin = spec;
+                break;
+            }
+        }
+
+        if (selectedAsin === '') {
+            $('asin_link_'+id).innerHTML = $('parent_asin_'+id).innerHTML;
+            return $('map_link_' + id).innerHTML = '<span style="color: #808080">' + self.options.text.assign + '</span>';
+        }
+
+        $('asin_link_'+id).innerHTML = selectedAsin;
+
+        var mapLinkTemplate = $('template_map_link_' + id).innerHTML;
+        mapLinkTemplate = mapLinkTemplate.replace('%general_id%', selectedAsin);
+        $('map_link_' + id).innerHTML = mapLinkTemplate;
     }
 
     //----------------------------------

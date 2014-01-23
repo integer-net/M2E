@@ -114,132 +114,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Grid extends Mage_Adminhtml_Block_
             'frame_callback' => array($this, 'callbackColumnSoldQTY')
         ));
 
-        //------------------------------
-        $backUrl = Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_ebay_listing/index',array(
-            'tab' => Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings::TAB_ID_LISTING
-        ));
-
-        $actions = array(
-            'manage_products' => array(
-                'caption' => Mage::helper('M2ePro')->__('Manage Products'),
-                'url'     => array(
-                    'base' => '*/adminhtml_ebay_listing/view'
-                ),
-                'field'   => 'id'
-            ),
-            'add_products_source_products' => array(
-                'caption' => Mage::helper('M2ePro')->__('Add Products from Products List'),
-                'url'     => array(
-                    'base'   => '*/adminhtml_ebay_listing_productAdd/index',
-                    'params' => array(
-                        'source' => 'products',
-                        'clear' => true,
-                        'back'  => $backUrl
-                    )
-                ),
-                'field'   => 'listing_id'
-            ),
-            'add_products_source_categories' => array(
-                'caption' => Mage::helper('M2ePro')->__('Add Products from Categories'),
-                'url'     => array(
-                    'base'   => '*/adminhtml_ebay_listing_productAdd/index',
-                    'params' => array(
-                        'source' => 'categories',
-                        'clear' => true,
-                        'back'  => $backUrl
-                    )
-                ),
-                'field'   => 'listing_id'
-            ),
-            'auto_actions' => array(
-                'caption' => Mage::helper('M2ePro')->__('Automatic Actions'),
-                'url'     => array(
-                    'base'   => '*/adminhtml_ebay_listing/view',
-                    'params' => array(
-                        'auto_actions' => 1,
-                    )
-                ),
-                'field'   => 'id'
-            ),
-            'view_logs' => array(
-                'caption' => Mage::helper('M2ePro')->__('View Logs'),
-                'url'     => array(
-                    'base' => '*/adminhtml_ebay_log/listing'
-                ),
-                'field'   => 'id'
-            ),
-            'delete' => array(
-                'caption' => Mage::helper('M2ePro')->__('Delete Listing'),
-                'url'     => array(
-                    'base' => '*/adminhtml_ebay_listing/delete'
-                ),
-                'field'   => 'id',
-                'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-            ),
-            'edit_settings' => array(
-                'caption' => Mage::helper('M2ePro')->__('Edit Listing Settings'),
-                'url'     => array(
-                    'base'   => '*/adminhtml_ebay_template/editListing',
-                    'params' => array(
-                        'back' => $backUrl
-                    )
-                ),
-                'field'   => 'id'
-            ),
-            'edit_payment_and_shipping' => array(
-                'caption' => Mage::helper('M2ePro')->__(' - Payment And Shipping'),
-                'url'     => array(
-                    'base'   => '*/adminhtml_ebay_template/editListing',
-                    'params' => array(
-                        'back' => $backUrl,
-                        'tab'  => 'general'
-                    )
-                ),
-                'field'   => 'id'
-            ),
-            'edit_selling' => array(
-                'caption' => Mage::helper('M2ePro')->__(' - Selling'),
-                'url'     => array(
-                    'base'   => '*/adminhtml_ebay_template/editListing',
-                    'params' => array(
-                        'back' => $backUrl,
-                        'tab'  => 'selling'
-                    )
-                ),
-                'field'   => 'id'
-            ),
-            'edit_synchronization' => array(
-                'caption'   => Mage::helper('M2ePro')->__(' - Synchronization'),
-                'url'       => array(
-                    'base'=> '*/adminhtml_ebay_template/editListing',
-                    'params' => array(
-                        'back' => $backUrl,
-                        'tab'  => 'synchronization'
-                    )
-                ),
-                'field'     => 'id'
-            )
-        );
-
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            unset($actions['auto_actions']);
-            unset($actions['edit_synchronization']);
-        }
-
-        $data = array(
+        $this->addColumn('actions', array(
             'header'    => Mage::helper('M2ePro')->__('Actions'),
             'align'     => 'left',
-            'width'     => '150px',
-            'type'      => 'action',
-            'index'     => 'actions',
+            'width'     => '50px',
             'filter'    => false,
             'sortable'  => false,
-            'getter'    => 'getId',
-            'actions'   => $actions
-        );
-        //------------------------------
-
-        $this->addColumn('actions', $data);
+            'frame_callback' => array($this, 'callbackColumnActions')
+        ));
 
         return parent::_prepareColumns();
     }
@@ -283,7 +165,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Grid extends Mage_Adminhtml_Block_
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
-        $value = Mage::helper('M2ePro')->escapeHtml($value);
+        $value = '<span id="listing_title_'.$row->getId().'">' .
+                    Mage::helper('M2ePro')->escapeHtml($value) .
+                 '</span>';
 
         /* @var $row Ess_M2ePro_Model_Listing */
         $accountTitle = $row->getData('account_title');
@@ -357,6 +241,29 @@ HTML;
         return $value;
     }
 
+    public function callbackColumnActions($value, $row, $column, $isExport)
+    {
+        $id = (int)$row->getData('listing_id');
+
+        $optionsHtml = '<option></option>';
+
+        foreach ($this->getActionColumnOptions() as $optionId => $label) {
+            $optionsHtml .= <<<HTML
+            <option value="{$optionId}">{$label}</option>
+HTML;
+        }
+
+        return <<<HTML
+<div style="padding: 5px;">
+    <select
+        style="width: 100px;"
+        onchange="this.value && EbayListingGridHandlerObj[this.value + 'Action']({$id}); this.value = -1;">
+        {$optionsHtml}
+    </select>
+</div>
+HTML;
+    }
+
     // ####################################
 
     public function getGridUrl()
@@ -385,6 +292,71 @@ HTML;
             'main_table.title LIKE ? OR a.title LIKE ? OR m.title LIKE ?',
             '%'.$value.'%'
         );
+    }
+
+    protected function getActionColumnOptions()
+    {
+        $helper = Mage::helper('M2ePro');
+
+        $actions = array(
+            'manageProducts' => $helper->__('Manage Products'),
+            'addProductsSourceProducts' => $helper->__('Add Products from Products List'),
+            'addProductsSourceCategories' => $helper->__('Add Products from Categories'),
+            'autoActions' => $helper->__('Automatic Actions'),
+            'viewLogs' => $helper->__('View Logs'),
+            'delete' => $helper->__('Delete Listing'),
+            'editTitle' => $helper->__('Edit Listing Title'),
+            'editSettings' => $helper->__('Edit Listing Settings'),
+            'editPaymentAndShipping' => $helper->__('&nbsp;- Payment And Shipping'),
+            'editSelling' => $helper->__('&nbsp;- Selling'),
+            'editSynchronization' => $helper->__('&nbsp;- Synchronization'),
+        );
+
+        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
+            unset($actions['auto_actions']);
+            unset($actions['edit_synchronization']);
+        }
+
+        return $actions;
+    }
+
+    // ####################################
+
+    protected function _toHtml()
+    {
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            return parent::_toHtml();
+        }
+
+        $urls = json_encode(array_merge(
+            Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_listing'),
+            Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_listing_productAdd'),
+            Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_log'),
+            Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_template')
+        ));
+
+        $translations = json_encode(array(
+            'Cancel' => Mage::helper('M2ePro')->__('Cancel'),
+            'Save' => Mage::helper('M2ePro')->__('Save'),
+            'Edit Listing Title' => Mage::helper('M2ePro')->__('Edit Listing Title'),
+        ));
+
+        $javascriptsMain = <<<HTML
+
+<script type="text/javascript">
+
+    Event.observe(window, 'load', function() {
+        M2ePro.url.add({$urls});
+        M2ePro.translator.add({$translations});
+
+        EbayListingGridHandlerObj = new EbayListingGridHandler('{$this->getId()}');
+    });
+
+</script>
+
+HTML;
+
+        return parent::_toHtml().$javascriptsMain;
     }
 
     // ####################################

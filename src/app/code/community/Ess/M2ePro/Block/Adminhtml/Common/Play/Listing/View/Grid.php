@@ -203,6 +203,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_View_Grid extends Mage_Admi
                 'index'     => 'value',
                 'filter'    => false,
                 'sortable'  => false,
+                'js_handler' => 'ListingGridHandlerObj'
             ));
         }
 

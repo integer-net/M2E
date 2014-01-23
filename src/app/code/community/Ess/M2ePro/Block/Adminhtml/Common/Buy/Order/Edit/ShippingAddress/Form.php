@@ -38,10 +38,16 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Edit_ShippingAddress_Form exte
 
     protected function _beforeToHtml()
     {
+        try {
+            $regionCode = $this->order->getShippingAddress()->getRegionCode();
+        } catch (Exception $e) {
+            $regionCode = null;
+        }
+
         $this->setData('buyer_name', $this->order->getData('buyer_name'));
         $this->setData('buyer_email', $this->order->getData('buyer_email'));
         $this->setData('address', $this->order->getShippingAddress()->getData());
-        $this->setData('region_code', $this->order->getShippingAddress()->getRegionCode());
+        $this->setData('region_code', $regionCode);
         $this->setData('company', $this->order->getChildObject()->getBillingAddress()->getData('company'));
         $this->setData('phone', $this->order->getChildObject()->getBillingAddress()->getData('phone'));
 

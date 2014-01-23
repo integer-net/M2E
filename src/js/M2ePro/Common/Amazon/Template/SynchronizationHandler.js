@@ -31,6 +31,97 @@ CommonAmazonTemplateSynchronizationHandler.prototype = Object.extend(new CommonH
 
             return true;
         });
+
+        //-----------------
+        Validation.add('M2ePro-validate-conditions-between', M2ePro.translator.translate('Must be greater than "Min".'), function(value, el)
+        {
+            var minValue = $(el.id.replace('_max','')).value;
+
+            if (!el.up('tr').visible()) {
+                return true;
+            }
+
+            return parseInt(value) > parseInt(minValue);
+        });
+        //-----------------
+
+        //-----------------
+        Validation.add('M2ePro-validate-stop-relist-conditions-product-status', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
+        {
+            if (AmazonTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
+                return true;
+            }
+
+            if ($('stop_status_disabled').value == 1 && $('relist_status_enabled').value == 0) {
+                return false;
+            }
+
+            return true;
+        });
+
+        Validation.add('M2ePro-validate-stop-relist-conditions-stock-availability', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
+        {
+            if (AmazonTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
+                return true;
+            }
+
+            if ($('stop_out_off_stock').value == 1 && $('relist_is_in_stock').value == 0) {
+                return false;
+            }
+
+            return true;
+        });
+
+        Validation.add('M2ePro-validate-stop-relist-conditions-item-qty', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
+        {
+            if (AmazonTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
+                return true;
+            }
+
+            var stopMaxQty = 0,
+                relistMinQty = 0;
+
+            switch (parseInt($('stop_qty').value)) {
+
+                case M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_NONE'):
+                    return true;
+                    break;
+
+                case M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_LESS'):
+                    stopMaxQty = parseInt($('stop_qty_value').value);
+                    break;
+
+                case M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_BETWEEN'):
+                    stopMaxQty = parseInt($('stop_qty_value_max').value);
+                    break;
+            }
+
+            switch (parseInt($('relist_qty').value)) {
+
+                case M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_QTY_NONE'):
+                    return false;
+                    break;
+
+                case M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_QTY_MORE'):
+                case M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_QTY_BETWEEN'):
+                    relistMinQty = parseInt($('relist_qty_value').value);
+                    break;
+            }
+
+            if (relistMinQty <= stopMaxQty) {
+                return false;
+            }
+
+            return true;
+        });
+        //-----------------
+    },
+
+    //----------------------------------
+
+    isRelistModeDisabled : function()
+    {
+        return $('relist_mode').value == 0;
     },
 
     //----------------------------------

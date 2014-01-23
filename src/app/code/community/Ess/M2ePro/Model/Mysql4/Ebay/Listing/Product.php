@@ -35,5 +35,19 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing_Product
         return array_unique($ids);
     }
 
+    public function getTemplateOtherCategoryIds(array $listingProductIds)
+    {
+        $select = $this->getReadConnection()->select();
+        $select->from(array('elp' => $this->getMainTable()));
+        $select->reset(Zend_Db_Select::COLUMNS);
+        $select->columns(array('template_other_category_id'));
+        $select->where('listing_product_id IN (?)', $listingProductIds);
+        $select->where('template_other_category_id IS NOT NULL');
+
+        $ids = $select->query()->fetchAll(PDO::FETCH_COLUMN);
+
+        return array_unique($ids);
+    }
+
     // ########################################
 }

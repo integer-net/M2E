@@ -70,6 +70,10 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
             $prepared['duration_attribute'] = $data['duration_attribute'];
         }
 
+        if (isset($data['out_of_stock_control'])) {
+            $prepared['out_of_stock_control'] = (int)$data['out_of_stock_control'];
+        }
+
         if (isset($data['qty_mode'])) {
             $prepared['qty_mode'] = (int)$data['qty_mode'];
         }
@@ -90,63 +94,100 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
             $prepared['qty_max_posted_value'] = (int)$data['qty_max_posted_value'];
         }
 
+        if (isset($data['vat_percent'])) {
+            $prepared['vat_percent'] = (float)str_replace(',', '.', $data['vat_percent']);
+        }
+
+        if (isset($data['tax_table_mode'])) {
+            $prepared['tax_table_mode'] = (int)$data['tax_table_mode'];
+        }
+
+        if (isset($data['tax_category_mode'])) {
+            $prepared['tax_category_mode'] = (int)$data['tax_category_mode'];
+        }
+
+        if (isset($data['tax_category_value'])) {
+            $prepared['tax_category_value'] = $data['tax_category_value'];
+        }
+
+        if (isset($data['tax_category_attribute'])) {
+            $prepared['tax_category_attribute'] = $data['tax_category_attribute'];
+        }
+
+        if (isset($data['price_increase_vat_percent'])) {
+            $prepared['price_increase_vat_percent'] = (int)$data['price_increase_vat_percent'];
+        }
+
         if (isset($data['price_variation_mode'])) {
             $prepared['price_variation_mode'] = (int)$data['price_variation_mode'];
         }
+
+        //------------------------------
 
         if (isset($data['start_price_mode'])) {
             $prepared['start_price_mode'] = (int)$data['start_price_mode'];
         }
 
-        //------------------------------
-        if (isset($data['start_price_coefficient']) && isset($data['start_price_coefficient_mode'])) {
+        if (isset($data['start_price_coefficient'], $data['start_price_coefficient_mode'])) {
 
             $prepared['start_price_coefficient'] = $this->getFormattedPriceCoefficient(
-                $data['start_price_coefficient'],
-                $data['start_price_coefficient_mode']
+                $data['start_price_coefficient'], $data['start_price_coefficient_mode']
             );
         }
-        //------------------------------
 
         if (isset($data['start_price_custom_attribute'])) {
             $prepared['start_price_custom_attribute'] = $data['start_price_custom_attribute'];
         }
 
+        //------------------------------
+
         if (isset($data['reserve_price_mode'])) {
             $prepared['reserve_price_mode'] = (int)$data['reserve_price_mode'];
         }
 
-        //------------------------------
-        if (isset($data['reserve_price_coefficient']) && isset($data['reserve_price_coefficient_mode'])) {
+        if (isset($data['reserve_price_coefficient'], $data['reserve_price_coefficient_mode'])) {
 
             $prepared['reserve_price_coefficient'] = $this->getFormattedPriceCoefficient(
-                $data['reserve_price_coefficient'],
-                $data['reserve_price_coefficient_mode']
+                $data['reserve_price_coefficient'], $data['reserve_price_coefficient_mode']
             );
         }
-        //------------------------------
 
         if (isset($data['reserve_price_custom_attribute'])) {
             $prepared['reserve_price_custom_attribute'] = $data['reserve_price_custom_attribute'];
         }
 
+        //------------------------------
+
         if (isset($data['buyitnow_price_mode'])) {
             $prepared['buyitnow_price_mode'] = (int)$data['buyitnow_price_mode'];
         }
 
-        //------------------------------
-        if (isset($data['buyitnow_price_coefficient']) && isset($data['buyitnow_price_coefficient_mode'])) {
+        if (isset($data['buyitnow_price_coefficient'], $data['buyitnow_price_coefficient_mode'])) {
 
             $prepared['buyitnow_price_coefficient'] = $this->getFormattedPriceCoefficient(
-                $data['buyitnow_price_coefficient'],
-                $data['buyitnow_price_coefficient_mode']
+                $data['buyitnow_price_coefficient'], $data['buyitnow_price_coefficient_mode']
             );
         }
-        //------------------------------
 
         if (isset($data['buyitnow_price_custom_attribute'])) {
             $prepared['buyitnow_price_custom_attribute'] = $data['buyitnow_price_custom_attribute'];
         }
+
+        //------------------------------
+
+        if (isset($data['price_discount_stp_mode'])) {
+            $prepared['price_discount_stp_mode'] = (int)$data['price_discount_stp_mode'];
+        }
+
+        if (isset($data['price_discount_stp_attribute'])) {
+            $prepared['price_discount_stp_attribute'] = $data['price_discount_stp_attribute'];
+        }
+
+        if (isset($data['price_discount_stp_type'])) {
+            $prepared['price_discount_stp_type'] = (int)$data['price_discount_stp_type'];
+        }
+
+        //------------------------------
 
         if (isset($data['best_offer_mode'])) {
             $prepared['best_offer_mode'] = (int)$data['best_offer_mode'];
@@ -186,36 +227,33 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
             $prepared['charity'] = json_encode($src);
         }
 
+        if (isset($data['ignore_variations'])) {
+            $prepared['ignore_variations'] = (int)$data['ignore_variations'];
+        }
+
         return $prepared;
     }
 
     // ########################################
 
-    private function getFormattedPriceCoefficient($priceCoefficient, $priceCoefficientMode)
+    private function getFormattedPriceCoefficient($priceCoeff, $priceCoeffMode)
     {
-        if ($priceCoefficientMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_NONE) {
+        if ($priceCoeffMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_NONE) {
             return '';
         }
 
-        if ($priceCoefficientMode ==
-                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_DECREASE ||
-            $priceCoefficientMode ==
-                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE) {
+        $isCoefficientModeDecrease =
+            $priceCoeffMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_DECREASE ||
+            $priceCoeffMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE;
 
-            $priceCoefficient = '-'.$priceCoefficient;
-        } else {
-            $priceCoefficient = '+'.$priceCoefficient;
-        }
+        $isCoefficientModePercentage =
+            $priceCoeffMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE ||
+            $priceCoeffMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE;
 
-        if ($priceCoefficientMode ==
-                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE ||
-            $priceCoefficientMode ==
-                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE) {
+        $sign = $isCoefficientModeDecrease ? '-' : '+';
+        $measuringSystem = $isCoefficientModePercentage ? '%' : '';
 
-            $priceCoefficient .= '%';
-        }
-
-        return $priceCoefficient;
+        return $sign . $priceCoeff . $measuringSystem;
     }
 
     // ########################################

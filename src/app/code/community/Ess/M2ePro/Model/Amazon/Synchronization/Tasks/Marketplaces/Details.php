@@ -142,8 +142,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Marketplaces_Details
 
             // Create connector
             //-----------------------
-            $details = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher')
-                                ->processVirtualAbstract('marketplace','get','info',
+            $details = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher')
+                                ->processVirtual('marketplace','get','info',
                                                          array('include_details' => true,
                                                                'marketplace' => $marketplace->getNativeId()),
                                                          'info',

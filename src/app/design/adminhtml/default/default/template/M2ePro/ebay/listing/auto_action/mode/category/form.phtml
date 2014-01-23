@@ -85,7 +85,7 @@
 
                 <tr>
                     <td class="label" style="width: 200px;">
-                        <label for="adding_mode"><?php echo Mage::helper('M2ePro')->__('New Product Added to Magento') ?>:</label>
+                        <label for="adding_mode"><?php echo Mage::helper('M2ePro')->__('Product Assigned to Categories') ?>:</label>
                     </td>
                     <td class="value">
                         <select name="adding_mode" id="adding_mode" style="width: 275px;">
@@ -103,19 +103,6 @@
                     </td>
                 </tr>
 
-                <tr style="display: none;">
-                    <td class="label">
-                        <label for="adding_duplicate"><?php echo Mage::helper('M2ePro')->__('Create duplicate if Product already exist in this Listing.') ?>:</label>
-                    </td>
-                    <td class="value">
-                        <input
-                            type="checkbox"
-                            id="adding_duplicate"
-                            name="adding_duplicate"
-                            <?php if ($formData['adding_duplicate']): ?>checked="checked"<?php endif; ?>
-                        />
-                    </td>
-                </tr>
             </table>
 
             <div style="padding-top: 20px;"></div>
@@ -123,7 +110,7 @@
             <table class="form-list">
                 <tr>
                     <td class="label" style="width: 200px;">
-                        <label for=""><?php echo Mage::helper('M2ePro')->__('Product Deleted from Magento') ?>:</label>
+                        <label for=""><?php echo Mage::helper('M2ePro')->__('Product Deleted from Categories') ?>:</label>
                     </td>
                     <td class="value">
                         <select name="deleting_mode" id="deleting_mode" style="width: 275px;">

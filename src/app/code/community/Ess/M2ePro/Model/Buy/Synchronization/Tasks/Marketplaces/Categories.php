@@ -143,8 +143,8 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Marketplaces_Categories
 
             // Create connector
             //-----------------------
-            $categories = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher')
-                                ->processVirtualAbstract('marketplace','get','info',
+            $categories = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
+                                ->processVirtual('marketplace','get','info',
                                                           array('include_categories' => true),
                                                           'info',
                                                           NULL,NULL);

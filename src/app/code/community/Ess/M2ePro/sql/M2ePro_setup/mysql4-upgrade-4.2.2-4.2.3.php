@@ -36,7 +36,7 @@ foreach ($existsMarketplaces as $marketplace) {
     $tempMarketplacesData[$marketplace['marketplace_id']]['related_store_id'] = (int)$marketplace['related_store_id'];
 }
 
-$tempMarketplacesDataMySql = $installer->getConnection()->quote(json_encode($tempMarketplacesData));
+$tempMarketplacesDataMySql = $connection->quote(json_encode($tempMarketplacesData));
 
 $tempTable = $installer->getTable('m2epro_ebay_account');
 $connection->query(
@@ -159,7 +159,6 @@ foreach ($tempAccounts as $account) {
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

@@ -32,11 +32,20 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
 
     // ########################################
 
+    static public function isAllowedUpcExemption()
+    {
+        return (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/buy/template/new_sku/','upc_exemption'
+        );
+    }
+
+    // ########################################
+
     public function getCoreData()
     {
-        $msrp = $this->getPriceMsrp();
+        $msrpPrice = $this->getPriceMsrp();
 
-        return array(
+        $coreData = array(
             'seller_sku' => $this->getSellerSku(),
             'gtin' => $this->getGtin(),
             'isbn' => $this->getIsbn(),
@@ -51,10 +60,17 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
             'keywords' => $this->getKeywords(),
             'features' => $this->getFeatures(),
             'weight' => $this->getWeight(),
-            'listing_price' => $msrp,
-            'msrp' => $msrp,
+            'listing_price' => $msrpPrice,
+            'msrp' => $msrpPrice,
             'category_id' => $this->getCategoryId(),
         );
+
+        if (self::isAllowedUpcExemption() && is_null($coreData['gtin'])) {
+            unset($coreData['gtin']);
+            $coreData['upc_exemption'] = '1';
+        }
+
+        return $coreData;
     }
 
     public function getAttributesData()
@@ -115,8 +131,14 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
 
     public function getGtin()
     {
+        $gtin = NULL;
         $src = $this->coreTemplate->getGtinSource();
-        return $this->listingProduct->getActualMagentoProduct()->getAttributeValue($src['custom_attribute']);
+
+        if ($this->coreTemplate->isGtinCustomAttribute()) {
+            $gtin = $this->listingProduct->getActualMagentoProduct()->getAttributeValue($src['custom_attribute']);
+        }
+
+        return $gtin;
     }
 
     public function getIsbn()

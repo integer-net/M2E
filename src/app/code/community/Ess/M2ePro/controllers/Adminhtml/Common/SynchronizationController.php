@@ -23,6 +23,8 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
              ->addJs('M2ePro/SynchProgressHandler.js')
              ->addJs('M2ePro/SynchronizationHandler.js');
 
+        $this->_initPopUp();
+
         return $this;
     }
 
@@ -96,8 +98,6 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
                                                                         ->getParam('play_other_listings_mode'));
             }
         }
-
-        exit();
     }
 
     public function clearLogAction()
@@ -226,9 +226,31 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
             );
         }
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'messages' => $warningMessages
         )));
+    }
+
+    //#############################################
+
+    public function runReviseAllAction()
+    {
+        $startDate = Mage::helper('M2ePro')->getCurrentGmtDate();
+        $component = $this->getRequest()->getParam('component');
+
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
+            "/{$component}/templates/revise/total/", 'start_date', $startDate
+        );
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
+            "/{$component}/templates/revise/total/", 'last_listing_product_id', 0
+        );
+
+        $format = Mage::app()->getLocale()->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM);
+
+        $this->getResponse()->setBody(json_encode(array(
+            'start_date' => Mage::app()->getLocale()->date(strtotime($startDate))->toString($format)
+        )));
+
     }
 
     //#############################################

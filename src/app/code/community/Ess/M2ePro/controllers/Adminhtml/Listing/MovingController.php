@@ -32,8 +32,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
         $block = $this->loadLayout()->getLayout()->createBlock(
             'M2ePro/adminhtml_listing_moving_grid','',
             array(
-                'mode' => 'listing',
-                'grid_url' => $this->getUrl('*/adminhtml_listing_moving/moveToListingGrid', array('_current'=>true))
+                'grid_url' => $this->getUrl('*/adminhtml_listing_moving/moveToListingGrid', array('_current'=>true)),
+                'moving_handler_js' => 'ListingGridHandlerObj.movingHandler',
             )
         );
         $this->getResponse()->setBody($block->toHtml());
@@ -93,7 +93,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
             $attributeSets[] = $data['attribute_set_id'];
         }
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'accountId' => $tempData[0]['account_id'],
             'marketplaceId' => $tempData[0]['marketplace_id'],
             'attrSetId' => $attributeSets
@@ -123,11 +123,11 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
             }
         }
 
-        count($failedProducts) == 0 && exit(json_encode(array(
-            'result' => 'success'
-        )));
+        if (count($failedProducts) == 0) {
+            return $this->getResponse()->setBody(json_encode(array('result' => 'success')));
+        }
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'result' => 'fail',
             'failed_products' => $failedProducts
         )));
@@ -234,10 +234,11 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
             //---------------------------------
         };
 
-        ($errors == 0)
-            ? exit(json_encode(array('result'=>'success')))
-            : exit(json_encode(array('result'=>'error',
-                                     'errors'=>$errors)));
+        if ($errors == 0) {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'success')));
+        } else {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'error', 'errors'=>$errors)));
+        }
     }
 
     //#############################################

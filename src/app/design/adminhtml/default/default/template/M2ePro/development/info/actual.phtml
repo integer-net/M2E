@@ -1,0 +1,78 @@
+<table class="form-list" cellspacing="0" cellpadding="0">
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Magento'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->magentoInfo ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Module'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->moduleVersion ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('PHP'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->phpVersion . ' (' . $this->phpApi . ')'?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Memory Limit'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->memoryLimit . ' Mb'?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Max Execution Time'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->maxExecutionTime . ' sec'?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('MySQL'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->mySqlVersion . ' (' . $this->mySqlDatabaseName .')' ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Cron'); if ($this->cronLastGMT) { echo ' ('.Mage::helper('M2ePro')->__('GMT').')'; } ?>: </label>
+        </td>
+        <?php
+            $style = '';
+            if ($this->cronLastRunHighlight == 'error') {
+                $style = ' style="color: red"';
+            } else if ($this->cronLastRunHighlight == 'warning') {
+                $style = ' style="color: #EB5E00"';
+            }
+        ?>
+        <td class="value">
+            <span<?php echo $style; ?>><?php echo $this->cronLastRun ?></span>
+            <?php
+            if ($this->cronLastRunHighlight == 'error') {
+                echo ' (' . Mage::helper('M2ePro')->__('not working') . ')';
+            }
+            ?>
+        </td>
+    </tr>
+</table>

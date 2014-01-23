@@ -55,7 +55,7 @@ class Ess_M2ePro_Model_Play_Order_Builder extends Varien_Object
         // Init general data
         // ------------------
         $this->setData('account_id', $this->account->getId());
-        $this->setData('marketplace_id', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID);
+        $this->setData('marketplace_id', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID);
 
         $this->setData('play_order_id', $data['order_id']);
         $this->setData('purchase_create_date', $data['purchase_create_date']);

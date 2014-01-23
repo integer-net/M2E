@@ -55,8 +55,6 @@ class Ess_M2ePro_Adminhtml_Common_MarketplaceController
             }
             $marketplace->setData('status', $newStatus)->save();
         }
-
-        exit();
     }
 
     //#############################################

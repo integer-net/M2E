@@ -56,21 +56,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_Grid extends Mage_Adminhtml
         }
         //------------------------------
 
-        // Add Filter By Items State
+        // Add Not Created Magento Orders Filter
         //------------------------------
-        if ($state = $this->getRequest()->getParam('amazonState')) {
-            $state = (int)$state;
-
-            $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                ->select()
-                ->from(
-                    Mage::getResourceModel('M2ePro/Order_Item')->getMainTable(),
-                    new Zend_Db_Expr('DISTINCT `order_id`')
-                )
-                ->where('`component_mode` = ?', Ess_M2ePro_Helper_Component_Amazon::NICK)
-                ->where('`state` = ?', $state);
-
-            $collection->getSelect()->where('`main_table`.`state` = '.$state.' OR `main_table`.`id` IN ?', $dbSelect);
+        if ($this->getRequest()->getParam('not_created_only')) {
+            $collection->addFieldToFilter('magento_order_id', array('null' => true));
         }
         //------------------------------
 
@@ -255,6 +244,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_Grid extends Mage_Adminhtml
         $this->getMassactionBlock()->addItem('ship', array(
              'label'    => Mage::helper('M2ePro')->__('Mark Order(s) as Shipped'),
              'url'      => $this->getUrl('*/adminhtml_common_amazon_order/updateShippingStatus'),
+             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
+        ));
+
+        $this->getMassactionBlock()->addItem('resend_shipping', array(
+             'label'    => Mage::helper('M2ePro')->__('Resend Shipping Information'),
+             'url'      => $this->getUrl('*/adminhtml_order/resubmitShippingInfo'),
              'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
         //--------------------------------

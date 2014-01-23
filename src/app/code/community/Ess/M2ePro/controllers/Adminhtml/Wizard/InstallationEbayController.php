@@ -233,7 +233,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             );
 
             if (!$licenseResult) {
-                exit(json_encode(array(
+                return $this->getResponse()->setBody(json_encode(array(
                     'url' => null
                 )));
             }
@@ -242,26 +242,26 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         $accountMode = $this->getRequest()->getParam('account_mode');
 
         try {
-            $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')->processVirtualAbstract(
+            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')->processVirtual(
                     'account','get','authUrl',
                     array('back_url'=>$this->getUrl('*/*/afterToken', array('mode' => $accountMode))),
                     NULL,NULL,NULL,$accountMode
             );
         } catch (Exception $exception) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'url' => null
             )));
         }
 
         if (!$response || !isset($response['url'],$response['session_id'])) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'url' => null
             )));
         }
 
         Mage::helper('M2ePro/Data_Session')->setValue('token_session_id', $response['session_id']);
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'url' => $response['url']
         )));
 
@@ -283,8 +283,8 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             'mode' => $accountMode,
             'token_session' => $tokenSessionId
         );
-        $response = array_filter(Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-            ->processVirtualAbstract('account','add','entity',
+        $response = array_filter(Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+            ->processVirtual('account','add','entity',
                              $requestParams,NULL,
                              NULL,NULL,$accountMode));
 
@@ -293,7 +293,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             return $this->_redirect('*/*/installation');
         }
 
-        if ($accountMode == Ess_M2ePro_Model_Connector_Server_Ebay_Abstract::MODE_SANDBOX) {
+        if ($accountMode == Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_SANDBOX) {
             $accountMode = Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX;
         } else {
             $accountMode = Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION;
@@ -334,7 +334,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
                 Ess_M2ePro_Helper_View_Ebay::MODE_ADVANCED
             )
         )) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'result' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Unknown Mode "%s"', $mode)
             )));
@@ -350,7 +350,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             ->addData(Mage::getModel('M2ePro/Ebay_Account')->$method())
             ->save();
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'result' => 'success'
         )));
     }
@@ -362,7 +362,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         $accountId = (int)$this->getRequest()->getParam('account_id');
 
         if (!$accountId) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'result' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Account id is not defined')
             )));
@@ -373,7 +373,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         $yes = Mage::helper('M2ePro')->__('Yes');
         $no  = Mage::helper('M2ePro')->__('No');
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'result' => 'success',
             'text' => array(
                 'orders'        => $account->getChildObject()->isOrdersModeEnabled() ? $yes : $no,

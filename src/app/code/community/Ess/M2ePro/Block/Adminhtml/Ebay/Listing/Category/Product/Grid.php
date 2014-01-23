@@ -139,37 +139,53 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Product_Grid
             'filter_condition_callback' => array($this, 'callbackColumnCategoryFilterCallback')
         ));
 
-        $this->addColumn('actions', array(
+        $actionsColumn = array(
             'header'    => Mage::helper('M2ePro')->__('Actions'),
-            'align'     => 'left',
+            'align'     => 'center',
             'width'     => '100px',
-            'filter'    => false,
-            'sortable'  => false,
             'type'      => 'text',
-            'actions'   => array(
-                array(
-                    'label' => Mage::helper('catalog')->__('Get Suggested Primary Category'),
-                    'value' => 'getSuggestedCategories'
-                ),
-                array(
-                    'label' => Mage::helper('catalog')->__('Edit Primary Category'),
-                    'value' => 'editPrimaryCategories'
-                ),
-                array(
-                    'label' => Mage::helper('catalog')->__('Edit Categories'),
-                    'value' => 'editCategories'
-                ),
-                array(
-                    'label' => Mage::helper('catalog')->__('Reset Categories'),
-                    'value' => 'resetCategories'
-                ),
-                array(
-                    'label' => Mage::helper('catalog')->__('Remove Item'),
-                    'value' => 'removeItem'
-                ),
-            ),
+            'sortable'  => false,
+            'filter'    => false,
             'frame_callback' => array($this, 'callbackColumnActions'),
+            'actions'   => array()
+        );
+
+        $actions = array(
+            array(
+                'label' => Mage::helper('catalog')->__('Get Suggested Primary Category'),
+                'value' => 'getSuggestedCategories'
+            ),
+            array(
+                'label' => Mage::helper('catalog')->__('Edit Primary Category'),
+                'value' => 'editPrimaryCategories'
+            )
+        );
+
+        if ($this->listing->getAccount()->getChildObject()->getEbayStoreCategories()) {
+            $actions[] = array(
+                'label' => Mage::helper('catalog')->__('Edit Store Primary Category'),
+                'value'   => 'editStorePrimaryCategories'
+            );
+        }
+
+        $actions = array_merge($actions, array(
+            array(
+                'label' => Mage::helper('catalog')->__('Edit Categories'),
+                'value' => 'editCategories'
+            ),
+            array(
+                'label' => Mage::helper('catalog')->__('Reset Categories'),
+                'value' => 'resetCategories'
+            ),
+            array(
+                'label' => Mage::helper('catalog')->__('Remove Item'),
+                'value' => 'removeItem'
+            ),
         ));
+
+        $actionsColumn['actions'] = $actions;
+
+        $this->addColumn('actions', $actionsColumn);
 
         return parent::_prepareColumns();
     }
@@ -189,6 +205,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Product_Grid
             'label' => Mage::helper('M2ePro')->__('Edit Primary Categories'),
             'url'   => '',
         ));
+
+        if ($this->listing->getAccount()->getChildObject()->getEbayStoreCategories()) {
+            $this->getMassactionBlock()->addItem('editStorePrimaryCategories', array(
+                'label' => Mage::helper('M2ePro')->__('Edit Store Primary Categories'),
+                'url'   => '',
+            ));
+        }
 
         $this->getMassactionBlock()->addItem('editCategories', array(
             'label' => Mage::helper('M2ePro')->__('Edit Categories'),
@@ -282,7 +305,7 @@ HTML;
         $html = '';
 
         if ($sessionData[$productId]['category_main_mode']) {
-            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_MAIN;
+            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN;
             $categoryMode = $sessionData[$productId]['category_main_mode'];
             $categoryAttribute = $sessionData[$productId]['category_main_attribute'];
             $categoryId = $sessionData[$productId]['category_main_id'];
@@ -298,7 +321,7 @@ HTML;
         }
 
         if ($sessionData[$productId]['category_secondary_mode']) {
-            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_SECONDARY;
+            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY;
             $categoryMode = $sessionData[$productId]['category_secondary_mode'];
             $categoryAttribute = $sessionData[$productId]['category_secondary_attribute'];
             $categoryId = $sessionData[$productId]['category_secondary_id'];
@@ -318,7 +341,7 @@ HTML;
         }
 
         if ($sessionData[$productId]['store_category_main_mode']) {
-            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_MAIN;
+            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN;
             $categoryMode = $sessionData[$productId]['store_category_main_mode'];
             $categoryAttribute = $sessionData[$productId]['store_category_main_attribute'];
             $categoryId = $sessionData[$productId]['store_category_main_id'];
@@ -338,7 +361,7 @@ HTML;
         }
 
         if ($sessionData[$productId]['store_category_secondary_mode']) {
-            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_SECONDARY;
+            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY;
             $categoryMode = $sessionData[$productId]['store_category_secondary_mode'];
             $categoryAttribute = $sessionData[$productId]['store_category_secondary_attribute'];
             $categoryId = $sessionData[$productId]['store_category_secondary_id'];
@@ -353,26 +376,6 @@ HTML;
                 $categoryMode,
                 $categoryAttribute,
                 $categoryId,
-                $categoryPath
-            );
-        }
-
-        if ($sessionData[$productId]['tax_category_mode']
-            && Ess_M2ePro_Model_Ebay_Template_Category::isTaxCategoryShow()
-        ) {
-            $categoryType = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_TAX;
-            $categoryMode = $sessionData[$productId]['tax_category_mode'];
-            $categoryAttribute = $sessionData[$productId]['tax_category_attribute'];
-            $categoryPath = $sessionData[$productId]['tax_category_value'];
-
-            if ($html != '') {
-                $html .= '<br />';
-            }
-
-            $html .= $this->renderTaxCategory(
-                $categoryType,
-                $categoryMode,
-                $categoryAttribute,
                 $categoryPath
             );
         }
@@ -394,20 +397,17 @@ HTML;
         $name = '';
 
         switch ($categoryType) {
-            case Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_MAIN:
+            case Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN:
                 $name = Mage::helper('M2ePro')->__('Primary eBay Category');
                 break;
-            case Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_SECONDARY:
+            case Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY:
                 $name = Mage::helper('M2ePro')->__('Secondary eBay Category');
                 break;
-            case Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_MAIN:
+            case Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN:
                 $name = Mage::helper('M2ePro')->__('Primary eBay Store Category');
                 break;
-            case Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_SECONDARY:
+            case Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY:
                 $name = Mage::helper('M2ePro')->__('Secondary eBay Store Category');
-                break;
-            case Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_TAX:
-                $name = Mage::helper('M2ePro')->__('Tax Category');
                 break;
         }
 
@@ -444,35 +444,10 @@ HTML;
         $info = '';
 
         switch ($mode) {
-            case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_EBAY:
+            case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY:
                 $info = $this->getCategoryPathLabel($path, $id);
                 break;
-            case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_ATTRIBUTE:
-                $info = $this->getCategoryAttributeLabel($attribute);
-                break;
-        }
-
-        if (!$info) {
-            return '';
-        }
-
-        $categoryTypeName = $this->getCategoryTypeName($categoryType);
-
-        return <<<HTML
-{$categoryTypeName}<br />
-{$info}
-HTML;
-    }
-
-    private function renderTaxCategory($categoryType, $mode, $attribute, $path)
-    {
-        $info = '';
-
-        switch ($mode) {
-            case Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_VALUE:
-                $info = $this->getCategoryPathLabel($path);
-                break;
-            case Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_ATTRIBUTE:
+            case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE:
                 $info = $this->getCategoryAttributeLabel($attribute);
                 break;
         }
@@ -631,8 +606,8 @@ HTML;
         $text = 'Are you sure?';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
 
-        // ->__('eBay could not assign categories for {X} products.')
-        $text = 'eBay could not assign categories for {X} products.';
+        // ->__('eBay could not assign categories for %s products.')
+        $text = 'eBay could not assign categories for %s products.';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
 
         // ->__('Suggested Categories were successfully received for %s product(s).')
@@ -654,13 +629,14 @@ HTML;
         $translations = json_encode($translations);
         //------------------------------
 
+        //------------------------------
+        $constants = Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Ebay_Category');
+        //------------------------------
+
         $getSuggested = json_encode((bool)Mage::helper('M2ePro/Data_Global')->getValue('get_suggested'));
-        $showTaxCategory = json_encode((bool)Mage::getModel('M2ePro/Ebay_Template_Category')->isTaxCategoryShow());
 
         $commonJs = <<<HTML
 <script type="text/javascript">
-    M2ePro.translator.add({$translations});
-
     EbayListingCategoryProductGridHandlerObj.afterInitPage();
     EbayListingCategoryProductGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
 </script>
@@ -670,13 +646,15 @@ HTML;
         if (!$this->getRequest()->isXmlHttpRequest()) {
             $additionalJs = <<<HTML
 <script type="text/javascript">
+
     M2ePro.url.add({$urls});
+    M2ePro.translator.add({$translations});
+    M2ePro.php.setConstants({$constants},'Ess_M2ePro_Helper_Component_Ebay_Category');
 
     WrapperObj = new AreaWrapper('products_container');
     ProgressBarObj = new ProgressBar('products_progress_bar');
 
     EbayListingCategoryProductGridHandlerObj = new EbayListingCategoryProductGridHandler('{$this->getId()}');
-    EbayListingCategoryProductGridHandlerObj.showTaxCategory = {$showTaxCategory};
     EbayListingCategoryProductSuggestedSearchHandlerObj = new EbayListingCategoryProductSuggestedSearchHandler();
 
     if ({$getSuggested}) {

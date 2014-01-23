@@ -560,15 +560,17 @@ SQL
 
                 foreach ($oldData as $oldRow) {
 
-                    $oldRow['id'] = NULL;
-
                     if ($oldRow['group'] != $oldGroup ||
                         $oldRow['key']   != $keyData['key']) {
                         continue;
                     }
 
-                    $newRow = $oldRow;
-                    $newRow['group'] = $data['group'];
+                    $newRow = array(
+                        'id' => NULL,
+                        'group' => $data['group'],
+                        'key'   => $oldRow['key'],
+                        'value' => $oldRow['value']
+                    );
 
                     $newData[] = $newRow;
 
@@ -578,7 +580,8 @@ SQL
                 }
 
                 if (!$found) {
-                    $newData[] = array('group' => $data['group'],
+                    $newData[] = array('id'    => NULL,
+                                       'group' => $data['group'],
                                        'key'   => $keyData['key'],
                                        'value' => $keyData['default']);
                 }
@@ -838,12 +841,6 @@ SQL
 
         //----------------------------------------
 
-        $step = $this->installer->getConnection()->fetchOne(
-            $this->installer->getConnection()
-                 ->select()
-                 ->from($configTable,'value')
-                 ->where("`group` = '/wizard/ebay/' AND `key` = 'step'")
-        );
         $status = $this->installer->getConnection()->fetchOne(
             $this->installer->getConnection()
                  ->select()
@@ -854,7 +851,7 @@ SQL
         $this->installer->getConnection()->insert($newWizardTable,array(
             'nick' => 'installationEbay',
             'view' => 'ebay',
-            'step' => $step,
+            'step' => NULL,
             'status' => $status,
             'type' => 1,
             'priority' => 2
@@ -3148,6 +3145,19 @@ SQL
         }
 
         !empty($listingsRows) && $this->installer->getConnection()->insertMultiple($newEbayListingTable,$listingsRows);
+
+        $watermarksFolder = Mage::getBaseDir('var').'/M2ePro/ebay/template/description/watermarks/';
+        if (!is_writable($watermarksFolder)) {
+            return;
+        }
+
+        foreach (@scandir($watermarksFolder) as $folderItem) {
+            if (!is_file($watermarksFolder.$folderItem)) {
+                continue;
+            }
+
+            @unlink($watermarksFolder.$folderItem);
+        }
     }
 
     private function processAmazonListingTable()
@@ -4068,11 +4078,13 @@ CREATE TABLE {$newTable} (
   `is_international_shipping_rate_table` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `is_get_it_fast` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `is_english_measurement_system` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `is_metric_measurement_system` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `is_cash_on_delivery` tinyint(2) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`marketplace_id`),
   KEY `is_calculated_shipping` (`is_calculated_shipping`),
   KEY `is_cash_on_delivery` (`is_cash_on_delivery`),
   KEY `is_english_measurement_system` (`is_english_measurement_system`),
+  KEY `is_metric_measurement_system` (`is_metric_measurement_system`),
   KEY `is_freight_shipping` (`is_freight_shipping`),
   KEY `is_get_it_fast` (`is_get_it_fast`),
   KEY `is_international_shipping_rate_table` (`is_international_shipping_rate_table`),
@@ -4090,29 +4102,29 @@ SQL
         $this->installer->getConnection()->multi_query(<<<SQL
 
 INSERT INTO {$newTable} VALUES
-  (1, 'USD', 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0),
-  (2, 'CAD', 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0),
-  (3, 'GBP', 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0),
-  (4, 'AUD', 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0),
-  (5, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0),
-  (6, 'EUR', 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0),
-  (7, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0),
-  (8, 'EUR', 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0),
-  (9, 'USD', 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0),
-  (10, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1),
-  (11, 'EUR', 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0),
-  (12, 'EUR', 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0),
-  (13, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0),
-  (14, 'CHF', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0),
-  (15, 'HKD', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-  (16, 'USD', 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0),
-  (17, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0),
-  (18, 'MYR', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-  (19, 'CAD', 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0),
-  (20, 'PHP', 0, 1,  0, 0, 0, 0, 0, 0, 0, 0, 0),
-  (21, 'PLN', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0),
-  (22, 'SGD', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0),
-  (23, 'SEK', 0, 0,  0, 0, 0, 0, 0, 0, 1, 0, 0);
+  (1, 'USD', 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0),
+  (2, 'CAD', 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0),
+  (3, 'GBP', 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0),
+  (4, 'AUD', 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0),
+  (5, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0),
+  (6, 'EUR', 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0),
+  (7, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0),
+  (8, 'EUR', 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0),
+  (9, 'USD', 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0),
+  (10, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1),
+  (11, 'EUR', 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0),
+  (12, 'EUR', 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0),
+  (13, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0),
+  (14, 'CHF', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0),
+  (15, 'HKD', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+  (16, 'INR', 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0),
+  (17, 'EUR', 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0),
+  (18, 'MYR', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+  (19, 'CAD', 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0),
+  (20, 'PHP', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+  (21, 'PLN', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0),
+  (22, 'SGD', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0),
+  (23, 'SEK', 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0);
 
 SQL
 );

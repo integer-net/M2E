@@ -1,3 +1,5 @@
+<?php echo $this->getChildHtml('item_edit'); ?>
+
 <!-- ########################################################################################### -->
 
 <script type="text/javascript">
@@ -9,8 +11,6 @@
 </script>
 
 <!-- ########################################################################################### -->
-
-<?php echo $this->getChildHtml('item_edit'); ?>
 
 <div class="box-left">
     <div class="entry-edit" id="magento_block_amazon_orders_general" collapseable="no" magento_block="no">
@@ -315,6 +315,15 @@
                                 </strong>
                             </td>
                         </tr>
+
+                        <?php if ($this->getChild('resubmit_shipping_info')): ?>
+                            <tr>
+                                <td></td>
+                                <td class="value">
+                                    <?php echo $this->getChildHtml('resubmit_shipping_info') ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
 
                     </tbody>
                 </table>

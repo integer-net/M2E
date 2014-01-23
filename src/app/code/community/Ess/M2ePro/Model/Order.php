@@ -520,7 +520,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
             /** @var $magentoOrderBuilder Ess_M2ePro_Model_Magento_Order */
             $magentoOrderBuilder = Mage::getModel('M2ePro/Magento_Order', $magentoQuoteBuilder->getQuote());
             $magentoOrderBuilder->buildOrder();
-            $magentoOrderBuilder->addComments($proxy->getComments());
 
             $this->magentoOrder = $magentoOrderBuilder->getOrder();
 
@@ -555,6 +554,15 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     public function afterCreateMagentoOrder()
     {
+        // add history comments
+        //------------------------------
+        /** @var $magentoOrderUpdater Ess_M2ePro_Model_Magento_Order_Updater */
+        $magentoOrderUpdater = Mage::getModel('M2ePro/Magento_Order_Updater');
+        $magentoOrderUpdater->setMagentoOrder($this->getMagentoOrder());
+        $magentoOrderUpdater->updateComments($this->getProxy()->getComments());
+        $magentoOrderUpdater->finishUpdate();
+        //------------------------------
+
         Mage::dispatchEvent('m2epro_order_place_success', array('order' => $this));
 
         $this->addSuccessLog('Magento Order #%order_id% was created.', array(

@@ -18,9 +18,7 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Template_Policy
 
     public function isDifferent($newData, $oldData)
     {
-        $ignoreFields = array(
-            'id'
-        );
+        $ignoreFields = array($this->getIdFieldName());
 
         foreach ($ignoreFields as $ignoreField) {
             unset($newData[$ignoreField],$oldData[$ignoreField]);

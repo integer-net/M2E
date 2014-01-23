@@ -39,7 +39,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $dataValue = $this->getRequest()->getParam('data_value','');
 
         if ($model == '' || $dataField == '' || $dataValue == '') {
-            exit(json_encode(array('result'=>false)));
+            return $this->getResponse()->setBody(json_encode(array('result'=>false)));
         }
 
         $collection = Mage::getModel('M2ePro/'.$model)->getCollection();
@@ -59,7 +59,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
             $collection->addFieldToFilter('component_mode', $component);
         }
 
-        exit(json_encode(array('result'=>!(bool)$collection->getSize())));
+        return $this->getResponse()->setBody(json_encode(array('result'=>!(bool)$collection->getSize())));
     }
 
     public function magentoGetAttributesByAttributeSetsAction()
@@ -67,16 +67,16 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $attributeSets = $this->getRequest()->getParam('attribute_sets','');
 
         if ($attributeSets == '') {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
         $attributeSets = explode(',',$attributeSets);
 
         if (!is_array($attributeSets) || count($attributeSets) <= 0) {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
-        exit(json_encode(
+        return $this->getResponse()->setBody(json_encode(
             Mage::helper('M2ePro/Magento_Attribute')->getByAttributeSets($attributeSets)
         ));
     }
@@ -88,10 +88,10 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $lockItemModel = Mage::getModel('M2ePro/Synchronization_LockItem');
 
         if ($lockItemModel->isExist()) {
-            exit('executing');
+            return $this->getResponse()->setBody('executing');
         }
 
-        exit('inactive');
+        return $this->getResponse()->setBody('inactive');
     }
 
     public function synchGetLastResultAction()
@@ -104,7 +104,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $tempCollection->addFieldToFilter('type', array('in' => array(Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR)));
 
         if ($tempCollection->getSize() > 0) {
-            exit('error');
+            return $this->getResponse()->setBody('error');
         }
 
         $tempCollection = $logsModel->getCollection();
@@ -112,10 +112,10 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $tempCollection->addFieldToFilter('type', array('in' => array(Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING)));
 
         if ($tempCollection->getSize() > 0) {
-            exit('warning');
+            return $this->getResponse()->setBody('warning');
         }
 
-        exit('success');
+        return $this->getResponse()->setBody('success');
     }
 
     public function synchGetExecutingInfoAction()
@@ -128,7 +128,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
 
         if (!$lockItemModel->isExist()) {
             $response['mode'] = 'inactive';
-            exit(json_encode($response));
+            return $this->getResponse()->setBody(json_encode($response));
         }
 
         $response['title'] = $lockItemModel->getContentData('info_title');
@@ -138,7 +138,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
 
         $response['status'] = $lockItemModel->getContentData('info_status');
 
-        exit(json_encode($response));
+        return $this->getResponse()->setBody(json_encode($response));
     }
 
     //#############################################
@@ -152,7 +152,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $dataField = $this->getRequest()->getParam('data_field','');
 
         if ($model == '' || $idField == '' || $dataField == '') {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
         $collection = Mage::getModel('M2ePro/'.$model)->getCollection();
@@ -173,7 +173,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
 
         $data = $collection->toArray();
 
-        exit(json_encode($data['items']));
+        return $this->getResponse()->setBody(json_encode($data['items']));
     }
 
     public function modelGetAllByAttributeSetIdAction()
@@ -186,7 +186,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $dataField = $this->getRequest()->getParam('data_field','');
 
         if ($model == '' || $attributeSets == '' || $idField == '' || $dataField == '') {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
         $templateType = 0;
@@ -230,7 +230,7 @@ class Ess_M2ePro_Adminhtml_GeneralController
             $data['items'][$key]['title'] = Mage::helper('M2ePro')->escapeHtml($data['items'][$key]['title']);
         }
 
-        exit(json_encode($data['items']));
+        return $this->getResponse()->setBody(json_encode($data['items']));
     }
 
     //#############################################
@@ -240,36 +240,29 @@ class Ess_M2ePro_Adminhtml_GeneralController
         $id = $this->getRequest()->getParam('id');
         $prefix = $this->getRequest()->getParam('prefix');
         $storeId = $this->getRequest()->getParam('store', 0);
-        $attributeCriteria = $this->getRequest()->getParam(
-            'attribute_criteria', Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_ALL
-        );
-        $attributeSets = $this->getRequest()->getParam('attribute_sets');
-        if (empty($attributeSets)) {
-            $attributeSets = array();
-        } else {
-            $attributeSets = explode(',', $attributeSets);
-        }
 
         $typeArr = explode('|', str_replace('-', '/', $this->getRequest()->getParam('type')));
         $type = $typeArr[0];
 
-        $rule = Mage::getModel('M2ePro/Magento_Product_Rule')->setData(array(
-            'attribute_criteria' => $attributeCriteria,
-            'attribute_sets' => $attributeSets
-        ));
+        $ruleModelPrefix = '';
+        $attributeCode = !empty($typeArr[1]) ? $typeArr[1] : '';
+        if (count($typeArr) == 3) {
+            $ruleModelPrefix = ucfirst($typeArr[1]) . '_';
+            $attributeCode = !empty($typeArr[2]) ? $typeArr[2] : '';
+        }
 
         $model = Mage::getModel($type)
             ->setId($id)
             ->setType($type)
-            ->setRule($rule)
+            ->setRule(Mage::getModel('M2ePro/'.$ruleModelPrefix.'Magento_Product_Rule'))
             ->setPrefix($prefix);
 
-        if ($type == 'M2ePro/Magento_Product_Rule_Condition_Combine') {
+        if ($type == 'M2ePro/'.$ruleModelPrefix.'Magento_Product_Rule_Condition_Combine') {
             $model->setData($prefix, array());
         }
 
-        if (!empty($typeArr[1])) {
-            $model->setAttribute($typeArr[1]);
+        if (!empty($attributeCode)) {
+            $model->setAttribute($attributeCode);
         }
 
         if ($model instanceof Mage_Rule_Model_Condition_Interface) {

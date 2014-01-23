@@ -88,6 +88,7 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
 
         foreach ($collection->getItems() as $processingRequest) {
             /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
+            //->__('Request was deleted during account deleting.')
             $processingRequest->executeAsFailed('Request was deleted during account deleting.');
         }
     }

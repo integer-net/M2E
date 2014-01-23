@@ -7,6 +7,9 @@
         'runSynchNow' => $this->getUrl('M2ePro/adminhtml_ebay_marketplace/runSynchNow')
     )); ?>);
 
+    M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_marketplace')) ?>);
+    M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_category')) ?>);
+
     M2ePro.translator.add(<?php echo json_encode(array(
         'Marketplaces settings have been saved.' => $this->__('Marketplaces settings have been saved.'),
         'You must select at least one marketplace you will work with.' => $this->__('You must select at least one marketplace you will work with.'),
@@ -17,7 +20,8 @@
 
         'Synchronization has successfully ended.' => $this->__('Synchronization has successfully ended.'),
         'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.'),
-        'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
+        'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.'),
+        'Some eBay categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.' => $this->__('Some eBay categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.')
     )); ?>);
 
     Event.observe(window, 'load', function() {
@@ -26,7 +30,7 @@
         MarketplaceProgressBarObj = new ProgressBar('marketplaces_progress_bar');
         MarketplaceWrapperObj = new AreaWrapper('marketplaces_content_container');
 
-        MarketplaceProgressHandlerObj = new SynchProgressHandler(MarketplaceProgressBarObj, MarketplaceWrapperObj );
+        MarketplaceProgressHandlerObj = new EbayMarketplaceSynchProgressHandler(MarketplaceProgressBarObj, MarketplaceWrapperObj );
         MarketplaceHandlerObj = new MarketplaceHandler(MarketplaceProgressHandlerObj);
         MarketplaceProgressHandlerObj.initPageCheckState();
 
@@ -102,7 +106,7 @@
                                     </select>
                                 <?php } else { ?>
 
-                                    <select id="status_<?php echo $marketplace['instance']->getId(); ?>" name="status_<?php echo $marketplace['instance']->getId(); ?>" marketplace_id="<?php echo $marketplace['instance']->getId(); ?>" markeptlace_component_name="<?php echo $componentName; ?>" onchange="MarketplaceHandlerObj.changeStatus(this);" <?php if (Ess_M2ePro_Model_Marketplace::STATUS_ENABLE == $marketplace['instance']->getStatus()) echo ' class="hightlight_selected marketplace_status_select"'; else echo ' class="lacklustre_selected marketplace_status_select"'; ?>>
+                                    <select id="status_<?php echo $marketplace['instance']->getId(); ?>" name="status_<?php echo $marketplace['instance']->getId(); ?>" marketplace_id="<?php echo $marketplace['instance']->getId(); ?>" markeptlace_component_name="<?php echo $componentName; ?>" onchange="MarketplaceHandlerObj.changeStatus(this, '<?php echo $marketplace['instance']->getId(); ?>');" <?php if (Ess_M2ePro_Model_Marketplace::STATUS_ENABLE == $marketplace['instance']->getStatus()) echo ' class="hightlight_selected marketplace_status_select"'; else echo ' class="lacklustre_selected marketplace_status_select"'; ?>>
                                         <option value="<?php echo Ess_M2ePro_Model_Marketplace::STATUS_DISABLE; ?>"<?php if (Ess_M2ePro_Model_Marketplace::STATUS_DISABLE == $marketplace['instance']->getStatus()) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
                                         <option value="<?php echo Ess_M2ePro_Model_Marketplace::STATUS_ENABLE; ?>"<?php if (Ess_M2ePro_Model_Marketplace::STATUS_ENABLE == $marketplace['instance']->getStatus()) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                                     </select>

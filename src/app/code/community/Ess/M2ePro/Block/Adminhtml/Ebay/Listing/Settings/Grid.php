@@ -69,20 +69,21 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         $collection = $this->getData('listing_product_collection');
 
         if (is_null($collection)) {
-            $listingId = $this->getRequest()->getParam('listing_id');
-            $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing',$listingId);
 
-            $listingProductIds = $listing->getData('product_add_ids');
+            $listingProductIds = $this->getListing()->getData('product_add_ids');
             $listingProductIds = array_filter((array)json_decode($listingProductIds));
 
+            /* @var $collection Ess_M2ePro_Model_Mysql4_Listing_Product_Collection */
             $collection = Mage::helper('M2ePro/Component_Ebay')
                 ->getCollection('Listing_Product')
                 ->addFieldToFilter('id',array('in' => $listingProductIds));
 
+            $collection->setPageSize($this->getParam($this->getVarNameLimit(), $this->_defaultLimit));
+            $collection->setCurPage($this->getParam($this->getVarNamePage(), $this->_defaultPage));
+
             $this->setData('listing_product_collection',$collection);
         }
 
-        /* @var $collection Ess_M2ePro_Model_Mysql4_Listing_Product_Collection */
         return $collection;
     }
 
@@ -90,10 +91,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
 
     protected function _prepareCollection()
     {
-        $listingId = $this->getRequest()->getParam('listing_id');
-        $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing',$listingId);
-
-        $listingProductIds = $listing->getData('product_add_ids');
+        $listingProductIds = $this->getListing()->getData('product_add_ids');
         $listingProductIds = array_filter((array)json_decode($listingProductIds));
         $listingProductIds = empty($listingProductIds) ? 0 : implode(',',$listingProductIds);
 
@@ -199,7 +197,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         $urls = Mage::helper('M2ePro')->getControllerActions(
             'adminhtml_ebay_listing_autoAction',
             array(
-                'listing_id' => $this->getRequest()->getParam('listing_id')
+                'listing_id' => $this->getListing()->getId()
             )
         );
 
@@ -234,6 +232,22 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
 HTML;
 
         return parent::_toHtml() . $js;
+    }
+
+    // ####################################
+
+    /**
+     * @inheritdoc
+    **/
+    protected function getListing()
+    {
+        if (is_null($this->listing)) {
+            $this->listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
+                'Listing', $this->getRequest()->getParam('listing_id')
+            );
+        }
+
+        return $this->listing;
     }
 
     // ####################################

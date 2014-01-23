@@ -156,6 +156,10 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
             $prepared['reserve_price_custom_attribute'] = $data['reserve_price_custom_attribute'];
         }
 
+        if (isset($data['default_image_url'])) {
+            $prepared['default_image_url'] = $data['default_image_url'];
+        }
+
         if (isset($data['variation_configurable_images'])) {
             $prepared['variation_configurable_images'] = $data['variation_configurable_images'];
         }
@@ -204,16 +208,13 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
 
             $prepared['watermark_image'] = file_get_contents($_FILES['watermark_image']['tmp_name']);
 
-            if (isset($data['id'])) {
+            $varDir = new Ess_M2ePro_Model_General_VariablesDir(
+                array('child_folder' => 'ebay/template/description/watermarks')
+            );
 
-                $varDir = new Ess_M2ePro_Model_General_VariablesDir(
-                    array('child_folder' => 'ebay/template/description/watermarks')
-                );
-
-                $watermarkPath = $varDir->getPath().(int)$data['id'].'.png';
-                if (is_file($watermarkPath)) {
-                    @unlink($watermarkPath);
-                }
+            $watermarkPath = $varDir->getPath().(int)$data['id'].'.png';
+            if (is_file($watermarkPath)) {
+                @unlink($watermarkPath);
             }
         } elseif (!empty($data['old_watermark_image']) && !isset($data['id'])) {
             $prepared['watermark_image'] = base64_decode($data['old_watermark_image']);

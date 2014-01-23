@@ -43,6 +43,9 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     const REVISE_UPDATE_SUB_TITLE_NONE = 0;
     const REVISE_UPDATE_SUB_TITLE_YES  = 1;
 
+    const REVISE_UPDATE_IMAGES_NONE = 0;
+    const REVISE_UPDATE_IMAGES_YES  = 1;
+
     const REVISE_CHANGE_PAYMENT_TEMPLATE_NONE = 0;
     const REVISE_CHANGE_PAYMENT_TEMPLATE_YES  = 1;
 
@@ -95,6 +98,11 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     {
         parent::_construct();
         $this->_init('M2ePro/Ebay_Template_Synchronization');
+    }
+
+    public function getNick()
+    {
+        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
     }
 
     // ########################################
@@ -190,6 +198,11 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     public function isReviseWhenChangeDescription()
     {
         return $this->getData('revise_update_description') != self::REVISE_UPDATE_DESCRIPTION_NONE;
+    }
+
+    public function isReviseWhenChangeImages()
+    {
+        return $this->getData('revise_update_images') != self::REVISE_UPDATE_IMAGES_NONE;
     }
 
     //------------------------
@@ -362,7 +375,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
             return false;
         }
 
-        $todayDayOfWeek = getdate(Mage::helper('M2ePro')->getCurrentGmtDate(true));
+        $todayDayOfWeek = getdate(Mage::helper('M2ePro')->getCurrentTimezoneDate(true));
         $todayDayOfWeek = strtolower($todayDayOfWeek['weekday']);
 
         if (!isset($weekSettings[$todayDayOfWeek])) {
@@ -373,7 +386,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
             return false;
         }
 
-        $now = Mage::helper('M2ePro')->getCurrentGmtDate(true);
+        $now = Mage::helper('M2ePro')->getCurrentTimezoneDate(true);
 
         list($fromHour,$fromMinute,$fromSecond) = explode(':',$weekSettings[$todayDayOfWeek]['time_from']);
         $from = mktime($fromHour,$fromMinute,$fromSecond, date('m',$now),date('d',$now),date('Y',$now));
@@ -385,27 +398,6 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     }
 
     // #######################################
-
-    public function getNick()
-    {
-        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
-    }
-
-    // #######################################
-
-    public function save()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
-        return parent::save();
-    }
-
-    public function delete()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
-        return parent::delete();
-    }
-
-    // ########################################
 
     public function getDefaultSettingsSimpleMode()
     {
@@ -453,6 +445,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
             'revise_update_title'                      => self::REVISE_UPDATE_TITLE_YES,
             'revise_update_sub_title'                  => self::REVISE_UPDATE_SUB_TITLE_YES,
             'revise_update_description'                => self::REVISE_UPDATE_DESCRIPTION_YES,
+            'revise_update_images'                     => self::REVISE_UPDATE_IMAGES_YES,
 
             'revise_change_selling_format_template'    =>
                     Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES,
@@ -541,7 +534,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
     // #######################################
 
-    public function getAffectedListingProducts($asObjects = false)
+    public function getAffectedListingProducts($asObjects = false, $key = NULL)
     {
         if (is_null($this->getId())) {
             throw new LogicException('Method require loaded instance first');
@@ -554,14 +547,15 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
         $listingProducts = $templateManager->getAffectedItems(
             Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
-            $this->getId(),
-            array(), $asObjects
+            $this->getId(), array(), $asObjects, $key
         );
 
-        foreach ($listingProducts as $key => $listingProduct) {
-            unset($listingProducts[$key]);
-            $listingProducts[$listingProduct['id']] = $listingProduct;
+        $ids = array();
+        foreach ($listingProducts as $listingProduct) {
+            $ids[] = is_null($key) ? $listingProduct['id'] : $listingProduct;
         }
+
+        $listingProducts && $listingProducts = array_combine($ids, $listingProducts);
 
         $listings = $templateManager->getAffectedItems(
             Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
@@ -569,15 +563,60 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
         );
 
         foreach ($listings as $listing) {
-            $tempListingProducts = $listing->getChildObject()->getAffectedListingProducts($template,$asObjects);
+
+            $tempListingProducts = $listing->getChildObject()
+                                           ->getAffectedListingProducts($template,$asObjects,$key);
 
             foreach ($tempListingProducts as $listingProduct) {
-                $listingProducts[$listingProduct['id']] = $listingProduct;
+                $id = is_null($key) ? $listingProduct['id'] : $listingProduct;
+                !isset($listingProducts[$id]) && $listingProducts[$id] = $listingProduct;
             }
         }
 
-        return $listingProducts;
+        return array_values($listingProducts);
     }
 
     // #######################################
+
+    public function setSynchStatusNeed($newData, $oldData)
+    {
+        $this->getParentObject()->setSynchStatusNeed(
+            $newData, $oldData,
+            array('sellingFormatTemplate' => 'revise_change_selling_format_template',
+                  'descriptionTemplate'   => 'revise_change_description_template',
+                  'categoryTemplate'      => 'revise_change_category_template',
+                  'paymentTemplate'       => 'revise_change_payment_template',
+                  'shippingTemplate'      => 'revise_change_shipping_template',
+                  'returnTemplate'        => 'revise_change_return_template')
+        );
+    }
+
+    public function getFullReviseSettingWhichWereEnabled($newData, $oldData)
+    {
+        return $this->getParentObject()->getFullReviseSettingWhichWereEnabled(
+            $newData, $oldData,
+            array('sellingFormatTemplate' => 'revise_change_selling_format_template',
+                  'descriptionTemplate'   => 'revise_change_description_template',
+                  'categoryTemplate'      => 'revise_change_category_template',
+                  'paymentTemplate'       => 'revise_change_payment_template',
+                  'shippingTemplate'      => 'revise_change_shipping_template',
+                  'returnTemplate'        => 'revise_change_return_template')
+        );
+    }
+
+    // #######################################
+
+    public function save()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
+        return parent::save();
+    }
+
+    public function delete()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
+        return parent::delete();
+    }
+
+    // ########################################
 }

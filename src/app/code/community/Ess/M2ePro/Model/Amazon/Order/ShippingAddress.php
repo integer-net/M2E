@@ -79,4 +79,15 @@ class Ess_M2ePro_Model_Amazon_Order_ShippingAddress extends Ess_M2ePro_Model_Ord
 
         return $collection->getSize() > 0;
     }
+
+    protected function getState()
+    {
+        $state = $this->getData('state');
+
+        if (!$this->getCountry()->getId() || strtoupper($this->getCountry()->getId()) != 'US') {
+            return $state;
+        }
+
+        return preg_replace('/[^ \w]+/', '', $state);
+    }
 }

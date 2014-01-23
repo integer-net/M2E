@@ -209,15 +209,15 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
                 break;
             case Ess_M2ePro_Helper_Component_Amazon::NICK:
                 $channelOrderId = $order->getData('amazon_order_id');
-                $url = $this->getUrl('*/adminhtml_amazon_order/view', array('id' => $row->getData('order_id')));
+                $url = $this->getUrl('*/adminhtml_common_amazon_order/view', array('id' => $row->getData('order_id')));
                 break;
             case Ess_M2ePro_Helper_Component_Buy::NICK:
                 $channelOrderId = $order->getData('buy_order_id');
-                $url = $this->getUrl('*/adminhtml_buy_order/view', array('id' => $row->getData('order_id')));
+                $url = $this->getUrl('*/adminhtml_common_buy_order/view', array('id' => $row->getData('order_id')));
                 break;
             case Ess_M2ePro_Helper_Component_Play::NICK:
                 $channelOrderId = $order->getData('play_order_id');
-                $url = $this->getUrl('*/adminhtml_play_order/view', array('id' => $row->getData('order_id')));
+                $url = $this->getUrl('*/adminhtml_common_play_order/view', array('id' => $row->getData('order_id')));
                 break;
             default:
                 $channelOrderId = Mage::helper('M2ePro')->__('N/A');

@@ -118,16 +118,22 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
         }
 
         if ($data['sale_price_start_date_value'] === '') {
-            $data['sale_price_start_date_value'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+            $data['sale_price_start_date_value'] = Mage::helper('M2ePro')->getCurrentGmtDate(
+                false,'Y-m-d 00:00:00'
+            );
         } else {
-            $data['sale_price_start_date_value'] = Mage::helper('M2ePro')
-                                                     ->timezoneDateToGmt($data['sale_price_start_date_value']);
+            $data['sale_price_start_date_value'] = Mage::helper('M2ePro')->getDate(
+                $data['sale_price_start_date_value'],false,'Y-m-d 00:00:00'
+            );
         }
         if ($data['sale_price_end_date_value'] === '') {
-            $data['sale_price_end_date_value'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+            $data['sale_price_end_date_value'] = Mage::helper('M2ePro')->getCurrentGmtDate(
+                false,'Y-m-d 00:00:00'
+            );
         } else {
-            $data['sale_price_end_date_value'] = Mage::helper('M2ePro')
-                                                    ->timezoneDateToGmt($data['sale_price_end_date_value']);
+            $data['sale_price_end_date_value'] = Mage::helper('M2ePro')->getDate(
+                $data['sale_price_end_date_value'],false,'Y-m-d 00:00:00'
+            );
         }
 
         $data['title'] = strip_tags($data['title']);
@@ -144,7 +150,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
         $model->addData($data)->save();
         $newData = $model->getDataSnapshot();
 
-        $model->getChildObject()->setIsNeedSynchronize($newData,$oldData);
+        $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
 
         $id = $model->getId();
         //--------------------

@@ -9,109 +9,84 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
 {
     //#############################################
 
+    protected function _initAction()
+    {
+        $this->loadLayout()->getLayout()->getBlock('head')
+            ->addJs('M2ePro/GridHandler.js')
+            ->addJs('M2ePro/Development/DatabaseGridHandler.js');
+
+        $this->_initPopUp();
+
+        return $this;
+    }
+
+    //#############################################
+
     public function manageTableAction()
     {
-        $mainTable = $this->getRequest()->getParam('table');
+        $this->_initAction();
 
-        if (is_null($mainTable)) {
+        $table = $this->getRequest()->getParam('table');
+
+        if (is_null($table)) {
             $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
             return;
         }
 
-        $mainModel = NULL;
-
-        $tempModels = Mage::getConfig()->getNode('global/models/M2ePro_mysql4/entities');
-        foreach ($tempModels->asArray() as $tempModel => $tempTable) {
-            if ($tempTable['table'] == $mainTable) {
-                $mainModel = $tempModel;
-                break;
-            }
-        }
-
-        if (is_null($mainModel)) {
-            $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
-            return;
-        }
-
-        Mage::helper('M2ePro/Data_Global')->setValue('data_table', $mainTable);
-        Mage::helper('M2ePro/Data_Global')->setValue('data_model', $mainModel);
-
-        $this->loadLayout()
-             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_development_tabs_database_table'))
+        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_development_tabs_database_table'))
              ->renderLayout();
     }
 
     public function manageTablesAction()
     {
-        $tables = $this->getRequest()->getParam('tables',array());
-        $backUrl = Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl();
-
-        $tempModels = Mage::getConfig()->getNode('global/models/M2ePro_mysql4/entities');
+        $tables = $this->getRequest()->getParam('tables', array());
 
         $response = '';
         foreach ($tables as $table) {
 
-            $isModelFound = false;
-            foreach ($tempModels->asArray() as $tempTable) {
-                if ($tempTable['table'] == $table) {
-                    $isModelFound = true;
-                    break;
-                }
-            }
-
-            if (!$isModelFound) {
+            if (is_null($model = Mage::helper('M2ePro/Module_Database')->getTableModel($table))) {
                 continue;
             }
 
             $url = $this->getUrl(
-                '*/adminhtml_development_database/manageTable',
-                array('table' => $table)
+                '*/adminhtml_development_database/manageTable', array('table' => $table, 'model' => $model)
             );
+
             $response .= "window.open('{$url}');";
         }
 
+        $backUrl = Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl();
+
         $response = "<script>
                         {$response}
-                        setLocation('{$backUrl}');
+                        window.location = '{$backUrl}';
                      </script>";
 
         $this->getResponse()->setBody($response);
     }
 
-    //#############################################
+    //---------------------------------------------
 
-    public function deleteTableRowAction()
+    public function deleteTableRowsAction()
     {
-        $id = $this->getRequest()->getParam('id');
         $table = $this->getRequest()->getParam('table');
         $model = $this->getRequest()->getParam('model');
 
-        if (is_null($id) || is_null($table) || is_null($model)) {
-            $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
-        }
-
-        Mage::getModel('M2ePro/'.$model)->load((int)$id)->delete();
-
-        $this->afterTableAction($model);
-
-        exit();
-    }
-
-    public function deleteTableSelectedRowsAction()
-    {
-        $ids   = $this->getRequest()->getParam('ids',array());
-        !is_array($ids) && $ids = array($ids);
-
-        $table = $this->getRequest()->getParam('table');
-        $model = $this->getRequest()->getParam('model');
+        $ids = $this->getRequest()->getParam('ids');
+        $ids = explode(',', $ids);
 
         if (is_null($table) || is_null($model)) {
             $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
+            return;
         }
 
-        $modelInstance = Mage::getModel('M2ePro/'.$model);
-        if (!$modelInstance) {
-            return $this->_redirect('*/*/manageTable',array('table'=>$table));
+        if (empty($ids)) {
+            $this->redirectToTablePage($table, $model);
+        }
+
+        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
+            $this->_getSession()->addError("Failed to get model {$model}.");
+            $this->redirectToTablePage($table, $model);
         }
 
         $collection = $modelInstance->getCollection();
@@ -120,7 +95,7 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $collection->addFieldToFilter($idFieldName, array('in' => $ids));
 
         if ($collection->getSize() == 0) {
-            return $this->_redirect('*/*/manageTable',array('table'=>$table));
+            $this->redirectToTablePage($table, $model);
         }
 
         foreach ($collection as $item) {
@@ -128,8 +103,7 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         }
 
         $this->afterTableAction($model);
-
-        $this->_redirect('*/*/manageTable',array('table'=>$table));
+        $this->redirectToTablePage($table, $model);
     }
 
     public function truncateTablesAction()
@@ -137,24 +111,15 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $tables = $this->getRequest()->getParam('tables',array());
         !is_array($tables) && $tables = array($tables);
 
-        $tempModels = Mage::getConfig()->getNode('global/models/M2ePro_mysql4/entities');
-
         $countTruncatedTables = 0;
         foreach ($tables as $table) {
-            $model = NULL;
-            foreach ($tempModels->asArray() as $tempModel => $tempTable) {
-                if ($tempTable['table'] == $table) {
-                    $model = $tempModel;
-                    break;
-                }
-            }
 
-            if (is_null($model)) {
+            if (is_null($model = Mage::helper('M2ePro/Module_Database')->getTableModel($table))) {
                 continue;
             }
 
-            $tableAction  = Mage::getSingleton('core/resource')->getTableName($table);
-            Mage::getSingleton('core/resource')->getConnection('core_write')->delete($tableAction);
+            $tableName  = Mage::getSingleton('core/resource')->getTableName($table);
+            Mage::getSingleton('core/resource')->getConnection('core_write')->delete($tableName);
 
             $this->afterTableAction($model);
             $countTruncatedTables++;
@@ -165,37 +130,61 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
             $this->_getSession()->addError('Some tables was not truncated. (Resource model are missing.)');
 
         if (count($tables) == 1) {
-            $this->_redirect('*/*/manageTable',array('table'=>array_shift($tables)));
+            $tableName = array_shift($tables);
+            $this->redirectToTablePage($tableName, Mage::helper('M2ePro/Module_Database')->getTableModel($tableName));
         }
+
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
     }
 
-    //#############################################
-
-    public function updateTableCellAction()
+    public function updateTableCellsAction()
     {
-        $id = $this->getRequest()->getParam('id');
+        $ids = $this->getRequest()->getParam('ids');
+        $ids = explode(',', $ids);
+
         $table = $this->getRequest()->getParam('table');
         $model = $this->getRequest()->getParam('model');
 
-        $column = $this->getRequest()->getParam('column');
-        $value = $this->getRequest()->getParam('value');
+        $cells = $this->getRequest()->getParam('cells', array());
+        is_string($cells) && $cells = array($cells);
 
-        if (is_null($id) || is_null($table) || is_null($model)) {
+        $bindArray = array();
+        foreach ($cells as $columnName) {
+
+            if (is_null($columnValue = $this->getRequest()->getParam('value_'.$columnName))) {
+                continue;
+            }
+
+            if (strtolower($columnValue) == 'null') {
+                $columnValue = NULL;
+            }
+
+            $bindArray[$columnName] = $columnValue;
+        }
+
+        if (is_null($table) || is_null($model) || empty($cells) || empty($ids) || empty($bindArray)) {
             $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
             return;
         }
 
-        if (strtolower($value) == 'null') {
-            $value = NULL;
+        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
+            $this->_getSession()->addError("Failed to get model {$model}.");
+            $this->redirectToTablePage($table, $model);
         }
 
-        Mage::getModel('M2ePro/'.$model)->load((int)$id)->setData($column,$value)->save();
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
+        $tableName  = Mage::getSingleton('core/resource')->getTableName($table);
+
+        $connWrite->update(
+            $tableName, $bindArray, "`{$modelInstance->getIdFieldName()}` IN (".implode(',', $ids).")"
+        );
 
         $this->afterTableAction($model);
-
-        exit();
     }
+
+    //#############################################
 
     private function afterTableAction($model)
     {
@@ -217,24 +206,27 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
 
     public function databaseTableGridAction()
     {
-        $mainTable = $this->getRequest()->getParam('table');
-        $mainModel = NULL;
-
-        $tempModels = Mage::getConfig()->getNode('global/models/M2ePro_mysql4/entities');
-        foreach ($tempModels->asArray() as $tempModel => $tempTable) {
-            if ($tempTable['table'] == $mainTable) {
-                $mainModel = $tempModel;
-                break;
-            }
-        }
-
-        Mage::helper('M2ePro/Data_Global')->setValue('data_table', $mainTable);
-        Mage::helper('M2ePro/Data_Global')->setValue('data_model', $mainModel);
-
         $response = $this->loadLayout()
             ->getLayout()
             ->createBlock('M2ePro/adminhtml_development_tabs_database_table_grid')->toHtml();
+
         $this->getResponse()->setBody($response);
+    }
+
+    public function getUpdateCellsPopupHtmlAction()
+    {
+        $response = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_development_tabs_database_table_UpdateCellsPopup')->toHtml();
+
+        $this->getResponse()->setBody($response);
+    }
+
+    //#############################################
+
+    public function redirectToTablePage($tableName, $modelName)
+    {
+        $this->_redirect('*/*/manageTable', array('table' => $tableName, 'model' => $modelName));
     }
 
     //#############################################

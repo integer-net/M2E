@@ -34,7 +34,7 @@
         <div class="entry-edit" id="magento_block_development_inspection_caches">
 
             <div class="development_head_container">
-                <h4><?php echo Mage::helper('M2ePro')->__('Caches'); ?></h4>
+                <h4><?php echo Mage::helper('M2ePro')->__('Caches / Compilation'); ?></h4>
             </div>
 
             <div class="fieldset">
@@ -107,6 +107,24 @@
 
         </div>
     <?php } ?>
+
+    <?php if ($this->getChild('database_broken')->isShown()) { ?>
+        <div class="entry-edit" id="magento_block_development_inspection_database_broken">
+
+            <div class="development_head_container">
+                <h4><?php echo Mage::helper('M2ePro')->__('Database Broken Tables'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+                <div class="hor-scroll">
+
+                    <?php echo $this->getChildHtml('database_broken') ?>
+
+                </div>
+            </div>
+
+        </div>
+    <?php }?>
 
 </div>
 

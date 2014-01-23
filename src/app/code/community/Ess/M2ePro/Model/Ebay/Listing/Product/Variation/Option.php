@@ -237,10 +237,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
             }
         }
 
-        return $tempSku;
+        return trim($tempSku);
     }
 
-    public function getQty()
+    public function getQty($productMode = false)
     {
         $qty = 0;
 
@@ -248,11 +248,19 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
 
         switch ($src['mode']) {
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_SINGLE:
-                $qty = 1;
+                if ($productMode) {
+                    $qty = (int)$this->getMagentoProduct()->getQty();
+                } else {
+                    $qty = 1;
+                }
                 break;
 
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_NUMBER:
-                $qty = (int)$src['value'];
+                if ($productMode) {
+                    $qty = (int)$this->getMagentoProduct()->getQty();
+                } else {
+                    $qty = (int)$src['value'];
+                }
                 break;
 
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE:
@@ -280,7 +288,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
 
     // ########################################
 
-    public function getPrice()
+    public function getPrice($src)
     {
         $price = 0;
 
@@ -288,36 +296,34 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
         if ($this->getListingProduct()->getMagentoProduct()->isConfigurableType()) {
 
             if ($this->getEbaySellingFormatTemplate()->isPriceVariationModeParent()) {
-                $price = $this->getConfigurablePriceParent();
+                $price = $this->getConfigurablePriceParent($src);
             } else {
-                $price = $this->getBaseProductPrice();
+                $price = $this->getBaseProductPrice($src);
             }
 
         // Bundle product
         } else if ($this->getListingProduct()->getMagentoProduct()->isBundleType()) {
 
             if ($this->getEbaySellingFormatTemplate()->isPriceVariationModeParent()) {
-                $price = $this->getBundlePriceParent();
+                $price = $this->getBundlePriceParent($src);
             } else {
-                $price = $this->getBaseProductPrice();
+                $price = $this->getBaseProductPrice($src);
             }
 
         // Simple with custom options
         } else if ($this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-            $price = $this->getSimpleWithCustomOptionsPrice();
+            $price = $this->getSimpleWithCustomOptionsPrice($src);
         // Grouped product
         } else if ($this->getListingProduct()->getMagentoProduct()->isGroupedType()) {
-            $price = $this->getBaseProductPrice();
+            $price = $this->getBaseProductPrice($src);
         }
-
-        $price < 0 && $price = 0;
 
         return $price;
     }
 
     //-----------------------------------------
 
-    protected function getConfigurablePriceParent()
+    protected function getConfigurablePriceParent($src)
     {
         $price = 0;
 
@@ -371,8 +377,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
 
                 if ((bool)(int)$configurableOption['is_percent']) {
                     // Base Price of Main product.
-                    $src = $this->getEbaySellingFormatTemplate()->getBuyItNowPriceSource();
-                    $basePrice = $this->getEbayListingProduct()->getBaseProductPrice($src['mode'],$src['attribute']);
+                    $basePrice = $this->getEbayListingProduct()->getBaseProductPrice($src);
                     $price = ($basePrice * (float)$configurableOption['pricing_value']) / 100;
                 } else {
                     $price = (float)$configurableOption['pricing_value'];
@@ -383,12 +388,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
             }
         }
 
-        $price < 0 && $price = 0;
-
         return $price;
     }
 
-    protected function getBundlePriceParent()
+    protected function getBundlePriceParent($src)
     {
         $price = 0;
 
@@ -423,8 +426,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
 
                 if ((bool)(int)$tempOption->getData('selection_price_type')) {
                     // Base Price of Main product.
-                    $src = $this->getEbaySellingFormatTemplate()->getBuyItNowPriceSource();
-                    $basePrice = $this->getEbayListingProduct()->getBaseProductPrice($src['mode'],$src['attribute']);
+                    $basePrice = $this->getEbayListingProduct()->getBaseProductPrice($src);
                     $price = ($basePrice * (float)$tempOption->getData('selection_price_value')) / 100;
                 } else {
                     $price = (float)$tempOption->getData('selection_price_value');
@@ -435,12 +437,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
             }
         }
 
-        $price < 0 && $price = 0;
-
         return $price;
     }
 
-    protected function getSimpleWithCustomOptionsPrice()
+    protected function getSimpleWithCustomOptionsPrice($src)
     {
         $price = 0;
 
@@ -487,10 +487,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
 
                     switch ($tempOption->getData('price_type')) {
                         case 'percent':
-                            $src = $this->getEbaySellingFormatTemplate()->getBuyItNowPriceSource();
-                            $basePrice = $this->getEbayListingProduct()->getBaseProductPrice(
-                                $src['mode'], $src['attribute']
-                            );
+                            $basePrice = $this->getEbayListingProduct()->getBaseProductPrice($src);
                             $price = ($basePrice * (float)$tempOption->getData('price')) / 100;
                             break;
                         case 'fixed':
@@ -504,18 +501,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
             }
         }
 
-        $price < 0 && $price = 0;
-
         return $price;
     }
 
     //-----------------------------------------
 
-    protected function getBaseProductPrice()
+    protected function getBaseProductPrice($src)
     {
         $price = 0;
-
-        $src = $this->getEbaySellingFormatTemplate()->getBuyItNowPriceSource();
 
         switch ($src['mode']) {
 

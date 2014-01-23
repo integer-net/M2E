@@ -36,7 +36,7 @@
             <div class="hor-scroll">
 
                 <div id="block_notice_configuration_interface" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Interface'); ?>">
-                    <?php echo Mage::helper('M2ePro')->__('Choose visual interface preferences and Save configuration, the new settings to take effect.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Set visual interface preferences and Save configuration.'); ?>
                 </div>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -56,7 +56,7 @@
                                 <option value="1" <?php if ($this->products_show_thumbnails): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Show'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Shows / Hides products thumbnails on Add Products and View Listing pages.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Shows / does not show products thumbnails on Add Products and View Listing pages.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -71,7 +71,7 @@
                                 <option value="1" <?php if ($this->block_notices_show): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Show'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Shows / Hides all Help blocks.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Shows / does not show Help blocks.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -81,7 +81,7 @@
                         <td class="value">
                             <?php echo $this->getChildHtml('restore_block_notices'); ?>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Restores all manually closed Help blocks.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Restores manually closed Help blocks.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -107,9 +107,9 @@
             <div class="hor-scroll">
 
                 <div id="block_notice_configuration_advanced_settings" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Global'); ?>">
-                    <?php echo Mage::helper('M2ePro')->__('This option allows synchronizing price and quantity for products which changes are made directly in database.
-                    <br>
-                    <b>Note:</b> Depending of the number of products, products update can be fully completed, after several synchronization cycles have been finished.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Has to be enabled if product price and quantity changes are made directly to database.  Data update depends on the number of products and can be fully completed after several synchronization cycles finish.
+                    <br><br>
+                    <b>Note:</b> Enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance.'); ?>
                 </div>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -126,7 +126,7 @@
                                     <option value="1"<?php if ($this->inspectorMode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                                 </select>
                                 <p class="note">
-                                    <span><?php echo Mage::helper('M2ePro')->__("Has to be enabled if changes in catalog are being made directly to database.<br/><b>Note:</b> It is strongly recommended to enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance."); ?></span>
+                                    <span><?php echo Mage::helper('M2ePro')->__("<b>Note:</b> Enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance."); ?></span>
                                 </p>
                             </td>
                         </tr>

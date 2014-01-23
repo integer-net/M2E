@@ -5,71 +5,66 @@
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProducts_Responser
+    extends Ess_M2ePro_Model_Connector_Play_Inventory_Get_ItemsResponser
 {
-    protected $params = array();
     protected $synchronizationLog = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Account|null
-     */
-    protected $account = NULL;
 
     protected $logActionId = NULL;
 
     // ########################################
 
-    public function initialize(array $params = array(),
-                               Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
-    {
-        $this->params = $params;
-        $this->marketplace = $marketplace;
-        $this->account = $account;
-    }
-
-    // ########################################
-
-    public function unsetLocks($hash, $fail = false, $message = NULL)
+    protected function unsetLocks($fail = false, $message = NULL)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
 
         $tempNick = Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProducts::LOCK_ITEM_PREFIX;
-        $tempNick .= '_'.$this->params['account_id'].'_'.$this->params['marketplace_id'];
+        $tempNick .= '_'.$this->params['account_id'];
 
         $lockItem->setNick($tempNick);
         $lockItem->remove();
 
-        $this->getAccount()->deleteObjectLocks(NULL,$hash);
-        $this->getAccount()->deleteObjectLocks('synchronization',$hash);
-        $this->getAccount()->deleteObjectLocks('synchronization_play',$hash);
-        $this->getAccount()->deleteObjectLocks(
-            Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProducts::LOCK_ITEM_PREFIX,$hash
+        // ---------------------------------
+
+        $tempObjects = array(
+            $this->getAccount(),
+            Mage::helper('M2ePro/Component_Play')->getMarketplace()
         );
 
-        $this->getMarketplace()->deleteObjectLocks(NULL,$hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization',$hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization_play',$hash);
-        $this->getMarketplace()->deleteObjectLocks(
-            Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProducts::LOCK_ITEM_PREFIX,$hash
+        $tempLocks = array(
+            NULL,
+            'synchronization', 'synchronization_play',
+            Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProducts::LOCK_ITEM_PREFIX
         );
+
+        /* @var $object Ess_M2ePro_Model_Abstract */
+        foreach ($tempObjects as $object) {
+            foreach ($tempLocks as $lock) {
+                $object->deleteObjectLocks($lock, $this->hash);
+            }
+        }
 
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tempTable = Mage::getSingleton('core/resource')->getTableName('m2epro_play_processed_inventory');
-        $connWrite->delete($tempTable,array('`hash` = ?'=>(string)$hash));
+        $connWrite->delete($tempTable,array('`hash` = ?'=>(string)$this->hash));
 
         $fail && $this->getSynchLogModel()->addMessage(Mage::helper('M2ePro')->__($message),
                                                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                                                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
     }
 
-    public function processSucceededResponseData($receivedItems, $hash, $nextPart)
+    // ########################################
+
+    protected function processResponseData($response)
+    {
+        $receivedItems = parent::processResponseData($response);
+        $this->processSucceededResponseData($receivedItems['data'], $receivedItems['next_part']);
+    }
+
+    // ----------------------------------------
+
+    private function processSucceededResponseData($receivedItems, $nextPart)
     {
         //----------------------
         $tempItems = array();
@@ -86,7 +81,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         try {
 
             $this->updateReceivedListingsProducts($receivedItems);
-            $this->updateNotReceivedListingsProducts($receivedItems,$hash,$nextPart);
+            $this->updateNotReceivedListingsProducts($receivedItems, $nextPart);
 
             is_null($nextPart) && $this->resetIgnoreNextInventorySynch();
 
@@ -175,12 +170,14 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
 
             $newData['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
 
-            if ($newData['status'] != $existingItem['status']) {
-
+            if ($newData['status'] != $existingItem['status'] ||
+                $newData['online_qty'] != $existingItem['online_qty']) {
                 Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
-                    $existingItem['product_id'],
-                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
+                    $existingItem['product_id'], Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
                 );
+            }
+
+            if ($newData['status'] != $existingItem['status']) {
 
                 $tempLogMessage = '';
                 switch ($newData['status']) {
@@ -216,7 +213,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         }
     }
 
-    protected function updateNotReceivedListingsProducts($receivedItems,$hash,$nextPart)
+    protected function updateNotReceivedListingsProducts($receivedItems,$nextPart)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
@@ -231,7 +228,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
             foreach ($partReceivedItems as $partReceivedItem) {
                 $inserts[] = array(
                     'sku' => $partReceivedItem['sku'],
-                    'hash' => $hash
+                    'hash' => $this->hash
                 );
             }
 
@@ -250,8 +247,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         $collection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
         $collection->getSelect()->joinLeft(array('api' => $tempTable),
-                    '`second_table`.sku = `api`.sku AND `api`.`hash` = \''.$hash.'\'', array('sku'));
-        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+                    '`second_table`.sku = `api`.sku AND `api`.`hash` = \''.$this->hash.'\'', array('sku'));
         $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $collection->getSelect()->where('second_table.ignore_next_inventory_synch != ?',1);
         $collection->getSelect()->where('`main_table`.`status` != ?',
@@ -322,7 +318,6 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         $dbSelect = $connWrite->select();
         $dbSelect->from(array('lp' => $listingProductTable), array());
         $dbSelect->join(array('l' => $listingTable), 'lp.listing_id = l.id', array());
-        $dbSelect->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
         $dbSelect->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $dbSelect->where('lp.component_mode = ?',Ess_M2ePro_Helper_Component_Play::NICK);
 
@@ -350,7 +345,6 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         /** @var $collection Varien_Data_Collection_Db */
         $collection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
-        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
         $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $collection->getSelect()->where('`main_table`.`status` != ?',
             (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
@@ -387,15 +381,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
      */
     protected function getAccount()
     {
-        return $this->account;
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Marketplace
-     */
-    protected function getMarketplace()
-    {
-        return $this->marketplace;
+        return $this->getObjectByParam('Account','account_id');
     }
 
     //-----------------------------------------

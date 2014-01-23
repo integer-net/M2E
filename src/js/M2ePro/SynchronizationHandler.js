@@ -62,7 +62,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
     runNowTemplates : function(components)
     {
         this.synchProgressObj.runTask(
-            M2ePro.translator.translate('Stock Level Synchronization'),
+            M2ePro.translator.translate('Inventory Synchronization'),
             M2ePro.url.get('runNowTemplates'),
             components
         );
@@ -101,10 +101,14 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var value = $(component + '_templates_mode').value;
 
+        var reviseAllNotification = $('block_notice_'+component+'_synchronization_revise_all');
+
         if (value == '1') {
             $(component + '_templates_run_now_container').show();
+            reviseAllNotification && reviseAllNotification.show();
         } else {
             $(component + '_templates_run_now_container').hide();
+            reviseAllNotification && reviseAllNotification.hide();
         }
     },
 
@@ -158,6 +162,59 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         }
 
         $(destinationBlockId).appendChild($(childBlockId));
+    },
+
+    //----------------------------------
+
+    showReviseAllConfirmPopup: function(component)
+    {
+        this.reviseAllConfirmPopUp = Dialog.info(null, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: M2ePro.translator.translate('Revise All'),
+            top: 160,
+            height: 80,
+            width: 650,
+            zIndex: 100,
+            recenterAuto: false,
+            hideEffect: Element.hide,
+            showEffect: Element.show
+        });
+
+        this.reviseAllConfirmPopUp.options.destroyOnClose = false;
+        $('modal_dialog_message').insert($(component + '_revise_all_confirm_popup').show());
+    },
+
+    runReviseAll: function(component)
+    {
+        new Ajax.Request(M2ePro.url.get('runReviseAll'), {
+            parameters: {component: component},
+            onSuccess: function(transport)
+            {
+                this.initReviseAllInfo(
+                    true, transport.responseText.evalJSON()['start_date'],
+                    null, component
+                );
+            }.bind(this)
+        });
+    },
+
+    initReviseAllInfo: function(inProgress, startDate, endDate, component)
+    {
+        $(component + '_revise_all_end').hide();
+        if (inProgress) {
+            $(component + '_revise_all_start').show();
+            $(component + '_revise_all_start_date').update(startDate);
+        } else {
+            $(component + '_revise_all_start').hide();
+            if (endDate) {
+                $(component + '_revise_all_end').show();
+                $(component + '_revise_all_end_date').update(endDate);
+            }
+        }
     }
 
     //----------------------------------

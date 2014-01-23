@@ -161,7 +161,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="label">
                         <label for="magento_orders_listings_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_mode" name="magento_orders_settings[listing][mode]" class="M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO; ?>" <?php if ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES; ?>" <?php if ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
@@ -176,7 +176,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="label">
                         <label for="magento_orders_listings_store_mode"><?php echo Mage::helper('M2ePro')->__('Store View Source'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_store_mode" name="magento_orders_settings[listing][store_mode]" class="M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT; ?>" <?php if ($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Use Store View from Listing'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM; ?>" <?php if ($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Choose Store View Manually'); ?></option>
@@ -221,7 +221,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="label">
                         <label for="magento_orders_listings_other_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_other_mode" name="magento_orders_settings[listing_other][mode]" class="required-entry">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
@@ -248,7 +248,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="label">
                         <label for="magento_orders_listings_other_product_mode"><?php echo Mage::helper('M2ePro')->__('Product Not Found'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_other_product_mode" name="magento_orders_settings[listing_other][product_mode]" class="M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Do Not Create Order'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT) echo ' selected="selected"';?>><?php echo Mage::helper('M2ePro')->__('Create Product and Order'); ?></option>
@@ -497,7 +497,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
 You should select the appropriate option how to handle billing address for imported customer:<br />
 <ul class="list">
 <li><strong>Always</strong> - the shipping address is always used as billing address.</li>
-<li><strong>Buyer & Recipient have the same name</strong> - the shipping address is used as billing address, only when Buyer\'s name and Recipient\'s name are the same. Otherwise, billing address fields will be empty and next message will appear in the city field: "The Amazon does not supply the complete billing buyer information.".</li>
+<li><strong>Buyer & Recipient have the same name</strong> - the shipping address is used as billing address, only when Buyer\'s name and Recipient\'s name are the same. Otherwise, billing address fields will be empty and next message will appear in the city field: "The Amazon does not supply the complete billing buyer information".</li>
 </ul>'); ?>
             </div>
 
@@ -513,7 +513,7 @@ You should select the appropriate option how to handle billing address for impor
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_BILLING_ADDRESS_MODE_SHIPPING_IF_SAME_CUSTOMER_AND_RECIPIENT; ?>" <?php if ($formData['magento_orders_settings']['customer']['billing_address_mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_BILLING_ADDRESS_MODE_SHIPPING_IF_SAME_CUSTOMER_AND_RECIPIENT) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Buyer & Recipient have the same name'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('When use shipping address as billing.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('When to use shipping address as billing.'); ?></span>
                         </p>
                     </td>
                 </tr>

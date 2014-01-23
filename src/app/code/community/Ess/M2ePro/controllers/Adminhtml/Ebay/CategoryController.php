@@ -8,6 +8,172 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 {
     //#############################################
 
+    protected function _initAction()
+    {
+        $this->loadLayout()
+            ->_title(Mage::helper('M2ePro')->__('Configuration'));
+
+        $this->getLayout()->getBlock('head')
+            ->addJs('M2ePro/Ebay/Configuration/CategoryHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Category/ChooserHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Category/SpecificHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Category/Chooser/BrowseHandler.js');
+
+        $this->_initPopUp();
+
+        return $this;
+    }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_ebay/configuration');
+    }
+
+    //#############################################
+
+    public function indexAction()
+    {
+        $this->_initAction()
+            ->_addContent($this->getLayout()->createBlock(
+                    'M2ePro/adminhtml_ebay_configuration', '',
+                    array('active_tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_CATEGORY)
+                )
+            )->renderLayout();
+    }
+
+    public function gridAction()
+    {
+        $response = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_ebay_configuration_category_grid')
+            ->toHtml();
+
+        $this->getResponse()->setBody($response);
+    }
+
+    //#############################################
+
+    public function editAction()
+    {
+        $categoryValue = $this->getRequest()->getParam('value');
+        $categoryMode = $this->getRequest()->getParam('mode');
+        $categoryType = $this->getRequest()->getParam('type');
+        $marketplaceId = $this->getRequest()->getParam('marketplace');
+        $accountId = $this->getRequest()->getParam('account');
+
+        $categoryPath = '';
+        if ($categoryMode == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
+            $categoryPath = $this->getSavedCategoryPath($categoryType, $categoryValue);
+        }
+
+        Mage::helper('M2ePro/Data_Global')->setValue('chooser_data', array(
+            'value' => $categoryValue,
+            'mode' => $categoryMode,
+            'type' => $categoryType,
+            'path' => $categoryPath,
+            'marketplace' => $marketplaceId,
+            'account' => $accountId,
+        ));
+
+        $this->_initAction();
+
+        $blockType = 'other';
+        if ($categoryType == Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN) {
+            $blockType = 'primary';
+        }
+
+        $this->_addContent(
+            $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_configuration_category_edit_'.$blockType)
+        );
+        $this->renderLayout();
+    }
+
+    public function saveAction()
+    {
+        $post = $this->getRequest()->getPost();
+
+        $categoryModelName = 'Category';
+        if ($post['category_type'] != Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN) {
+            $categoryModelName = 'OtherCategory';
+        }
+
+        $categoryTypePrefixes = array(
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN => 'category_main_',
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY => 'category_secondary_',
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN => 'store_category_main_',
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY => 'store_category_secondary_',
+        );
+        $typePrefix = $categoryTypePrefixes[(int)$post['category_type']];
+
+        $templateIds = $this->getTemplateCategoryIds($post, $typePrefix, $categoryModelName);
+        $oldSnapshots = array();
+        foreach ($templateIds as $templateId) {
+            $oldSnapshots[$templateId] = Mage::getModel('M2ePro/Ebay_Template_' . $categoryModelName)
+                ->loadInstance((int)$templateId)
+                ->getDataSnapshot();
+        }
+
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $connWrite->update(
+            Mage::getModel('M2ePro/Ebay_Template_' . $categoryModelName)->getResource()->getMainTable(),
+            $this->prepareCategoryUpdateBind($post, $typePrefix),
+            array('id IN (?)' => $templateIds)
+        );
+
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_othercategory');
+
+        if (empty($post['specifics_data'])) {
+            $this->setSynchStatusNeed($oldSnapshots, $categoryModelName);
+            return;
+        }
+
+        $specificsData = json_decode($post['specifics_data'], true);
+        if (empty($specificsData)) {
+            $this->setSynchStatusNeed($oldSnapshots, $categoryModelName);
+            return;
+        }
+
+        foreach ($specificsData as $templateId => $specifics) {
+            if (!is_array($specifics)) {
+                continue;
+            }
+
+            $templateId = (int)$templateId;
+
+            $connWrite->delete(
+                Mage::getModel('M2ePro/Ebay_Template_Category_Specific')->getResource()->getMainTable(),
+                array('template_category_id = ?' => $templateId)
+            );
+
+            foreach ($specifics as $specific) {
+                $specificData = array(
+                    'mode' => (int)$specific['mode'],
+                    'mode_relation_id' => (int)$specific['mode_relation_id'],
+                    'attribute_id' => $specific['attribute_id'],
+                    'attribute_title' => $specific['attribute_title'],
+                    'value_mode' => (int)$specific['value_mode'],
+                    'value_ebay_recommended' => $specific['value_ebay_recommended'],
+                    'value_custom_value' => $specific['value_custom_value'],
+                    'value_custom_attribute' => $specific['value_custom_attribute']
+                );
+
+                $specificData['template_category_id'] = $templateId;
+
+                $specific = Mage::getModel('M2ePro/Ebay_Template_Category_Specific');
+                $specific->setData($specificData)->save();
+            }
+        }
+
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_othercategory');
+
+        $this->setSynchStatusNeed($oldSnapshots, $categoryModelName);
+    }
+
+    //#############################################
+
     public function getChooserHtmlAction()
     {
         //------------------------------
@@ -15,20 +181,16 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         $marketplaceId = $this->getRequest()->getParam('marketplace_id');
         $accountId = $this->getRequest()->getParam('account_id');
         $divId = $this->getRequest()->getParam('div_id');
-        $attributesString = $this->getRequest()->getParam('attributes');
         $interfaceMode = $this->getRequest()->getParam('interface_mode');
         $isShowEditLinks = $this->getRequest()->getParam('is_show_edit_links');
+        $isSingleCategoryMode = $this->getRequest()->getParam('is_single_category_mode');
+        $singleCategoryType = $this->getRequest()->getParam('single_category_type');
         $selectCallback = $this->getRequest()->getParam('select_callback');
         $unSelectCallback = $this->getRequest()->getParam('unselect_callback');
 
         $selectedCategories = array();
         if (!is_null($selectedCategoriesJson)) {
             $selectedCategories = json_decode($selectedCategoriesJson, true);
-        }
-
-        $attributes = array();
-        if (!is_null($attributesString)) {
-            $attributes = explode(',', $attributesString);
         }
         //------------------------------
 
@@ -42,11 +204,9 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 
             switch ($selectedCategory['mode']) {
                 case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY:
-                case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_EBAY:
-                case Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_VALUE:
                     if (in_array($type, $ebayCategoryTypes)) {
-                        $selectedCategory['path'] = Mage::helper('M2ePro/Component_Ebay_Category')
-                            ->getPathById(
+                        $selectedCategory['path'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
+                            ->getPath(
                                 $selectedCategory['value'],
                                 $marketplaceId
                             );
@@ -57,12 +217,11 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                             ->addRecent(
                                 $selectedCategory['value'],
                                 $marketplaceId,
-                                $type,
-                                $selectedCategory['path']
+                                $type
                             );
                     } elseif (in_array($type, $storeCategoryTypes)) {
-                        $selectedCategory['path'] = Mage::helper('M2ePro/Component_Ebay_Category')
-                            ->getStorePathById(
+                        $selectedCategory['path'] = Mage::helper('M2ePro/Component_Ebay_Category_Store')
+                            ->getPath(
                                 $selectedCategory['value'],
                                 $accountId
                             );
@@ -73,18 +232,13 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                             ->addRecent(
                                 $selectedCategory['value'],
                                 $accountId,
-                                $type,
-                                $selectedCategory['path']
+                                $type
                             );
-                    } else {
-                        // tax category
-                        break;
                     }
 
                     break;
 
                 case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE:
-                case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_ATTRIBUTE:
                     $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')
                         ->getAttributeLabel($selectedCategory['value']);
 
@@ -98,20 +252,22 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Chooser $chooserBlock */
         $chooserBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_category_chooser');
         $chooserBlock->setMarketplaceId($marketplaceId);
-        $chooserBlock->setAccountId($accountId);
         $chooserBlock->setDivId($divId);
-
+        if (!empty($accountId)) {
+            $chooserBlock->setAccountId($accountId);
+        }
         if (!empty($selectedCategories)) {
             $chooserBlock->setConvertedInternalData($selectedCategories);
-        }
-        if (!empty($attributes)) {
-            $chooserBlock->setAttributes($attributes);
         }
         if (!empty($interfaceMode)) {
             $chooserBlock->setInterfaceMode($interfaceMode);
         }
         if (!empty($isShowEditLinks)) {
             $chooserBlock->setShowEditLinks($isShowEditLinks);
+        }
+        if ($isSingleCategoryMode === 'true') {
+            $chooserBlock->setSingleCategoryMode();
+            $chooserBlock->setSingleCategoryType($singleCategoryType);
         }
         if (!empty($selectCallback)) {
             $chooserBlock->setSelectCallback($selectCallback);
@@ -133,36 +289,29 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         );
         $selectedValue = $this->getRequest()->getParam('selected_value');
         $selectedPath = $this->getRequest()->getParam('selected_path');
-        $attributesString = $this->getRequest()->getParam('attributes');
         $marketplaceId = $this->getRequest()->getParam('marketplace_id');
         $accountId = $this->getRequest()->getParam('account_id');
-
-        $attributes = array();
-        if (!is_null($attributesString)) {
-            $attributes = explode(',', $attributesString);
-        }
         //------------------------------
+
+        Mage::helper('M2ePro/Data_Global')->setValue('chooser_category_type', $categoryType);
 
         //------------------------------
         $editBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_category_chooser_edit');
         $editBlock->setCategoryType($categoryType);
-
-        if (!empty($attributes)) {
-            $editBlock->setAttributes(explode(',', $attributes));
-        }
         //------------------------------
 
         $ebayCategoryTypes = Mage::helper('M2ePro/Component_Ebay_Category')->getEbayCategoryTypes();
 
         if (in_array($categoryType, $ebayCategoryTypes)) {
             $recentCategories = Mage::helper('M2ePro/Component_Ebay_Category')->getRecent(
-                $marketplaceId, $categoryType
+                $marketplaceId, $categoryType, $selectedValue
             );
         } else {
             $recentCategories = Mage::helper('M2ePro/Component_Ebay_Category')->getRecent(
-                $accountId, $categoryType
+                $accountId, $categoryType, $selectedValue
             );
         }
+
         if (empty($recentCategories)) {
             Mage::helper('M2ePro/Data_Global')->setValue('category_chooser_hide_recent', true);
         }
@@ -171,22 +320,20 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             if (empty($selectedPath)) {
                 switch ($selectedMode) {
                     case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY:
-                    case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_EBAY:
                         if (in_array($categoryType, $ebayCategoryTypes)) {
-                            $selectedPath = Mage::helper('M2ePro/Component_Ebay_Category')->getPathById(
+                            $selectedPath = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
                                 $selectedValue, $marketplaceId
                             );
 
                             $selectedPath .= ' (' . $selectedValue . ')';
                         } else {
-                            $selectedPath = Mage::helper('M2ePro/Component_Ebay_Category')->getStorePathById(
+                            $selectedPath = Mage::helper('M2ePro/Component_Ebay_Category_Store')->getPath(
                                 $selectedValue, $accountId
                             );
                         }
 
                         break;
                     case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE:
-                    case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_ATTRIBUTE:
                         $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($selectedValue);
                         $selectedPath = Mage::helper('M2ePro')->__('Magento Attribute') . ' -> ' . $attributeLabel;
 
@@ -271,18 +418,16 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 
         switch ($mode) {
             case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY:
-            case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_EBAY:
                 if (in_array($categoryType, $ebayCategoryTypes)) {
-                    $path = Mage::helper('M2ePro/Component_Ebay_Category')->getPathById($value, $marketplaceId);
+                    $path = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath($value, $marketplaceId);
                 } else {
-                    $path = Mage::helper('M2ePro/Component_Ebay_Category')->getStorePathById($value, $accountId);
+                    $path = Mage::helper('M2ePro/Component_Ebay_Category_Store')->getPath($value, $accountId);
                 }
 
                 $path .= ' (' . $value . ')';
 
                 break;
             case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE:
-            case Ess_M2ePro_Model_Ebay_Template_Category::STORE_CATEGORY_MODE_ATTRIBUTE:
                 $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($value);
                 $path = Mage::helper('M2ePro')->__('Magento Attribute') . ' -> ' . $attributeLabel;
 
@@ -346,11 +491,11 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 
         foreach ($ids as $categoryId) {
             if (in_array($categoryType, $ebayCategoryTypes)) {
-                $treePath = Mage::helper('M2ePro/Component_Ebay_Category')->getPathById(
+                $treePath = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
                     $categoryId['category_id'], $marketplaceId
                 );
             } else {
-                $treePath = Mage::helper('M2ePro/Component_Ebay_Category')->getStorePathById(
+                $treePath = Mage::helper('M2ePro/Component_Ebay_Category_Store')->getPath(
                     $categoryId['category_id'], $accountId
                 );
             }
@@ -386,19 +531,26 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         $selectedCategory = $this->getRequest()->getParam('selected_category');
 
         if (in_array($categoryType, Mage::helper('M2ePro/Component_Ebay_Category')->getEbayCategoryTypes())) {
-            $categories = Mage::helper('M2ePro/Component_Ebay_Category')->getRecent($marketplaceId, $categoryType);
+            $categories = Mage::helper('M2ePro/Component_Ebay_Category')->getRecent(
+                $marketplaceId, $categoryType, $selectedCategory
+            );
         } else {
-            $categories = Mage::helper('M2ePro/Component_Ebay_Category')->getRecent($accountId, $categoryType);
-        }
-
-        if (!is_null($selectedCategory) && isset($categories[(int)$selectedCategory])) {
-            unset($categories[(int)$selectedCategory]);
+            $categories = Mage::helper('M2ePro/Component_Ebay_Category')->getRecent(
+                $accountId, $categoryType, $selectedCategory
+            );
         }
 
         $this->getResponse()->setBody(json_encode($categories));
     }
 
     //#############################################
+
+    public function refreshStoreCategoriesAction()
+    {
+        $accountId = (int)$this->getRequest()->getParam('account_id');
+
+        Mage::getModel('M2ePro/Ebay_Account')->loadInstance($accountId)->updateEbayStoreInfo();
+    }
 
     public function getAttributeTypeAction()
     {
@@ -429,12 +581,6 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         $marketplaceId = $this->getRequest()->getParam('marketplace_id');
         $divId = $this->getRequest()->getParam('div_id');
 
-        //--------------------
-        $internalData = array();
-        $internalData['motors_specifics_attribute'] = isset($post['motors_specifics_attribute'])
-            ? $post['motors_specifics_attribute'] : '';
-        //--------------------
-
         $categoryBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_category_specific');
 
         $categoryBlock->setMarketplaceId($marketplaceId);
@@ -444,6 +590,31 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         $categoryBlock->setSelectedSpecifics($specifics);
 
         $this->getResponse()->setBody($categoryBlock->toHtml());
+    }
+
+    public function getConfigurationCategorySpecificHtmlAction()
+    {
+        $categoryValue = $this->getRequest()->getParam('category_value');
+        $categoryMode = $this->getRequest()->getParam('category_mode');
+        $marketplaceId = $this->getRequest()->getParam('marketplace');
+
+        $templates = $this->getRequest()->getParam('templates');
+        if (is_string($templates) && !empty($templates)) {
+            $templates = json_decode($templates, true);
+        }
+
+        Mage::helper('M2ePro/Data_Global')->setValue('chooser_data', array(
+            'value' => $categoryValue,
+            'mode' => $categoryMode,
+            'marketplace' => $marketplaceId,
+            'templates' => $templates,
+        ));
+
+        $specificBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_ebay_configuration_category_edit_primary_tabs_specific'
+        );
+
+        $this->getResponse()->setBody($specificBlock->toHtml());
     }
 
     //#############################################
@@ -473,8 +644,11 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             $attributeValue = '';
             $customAttribute = '';
 
-            $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS;
-            if ($post['item_specifics_mode_'.$i] == $temp) {
+            $itemSpecificsConst = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS;
+            $attributeSetSpecificsConst = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ATTRIBUTE_SET;
+            if ($post['item_specifics_mode_'.$i] == $itemSpecificsConst
+                || $post['item_specifics_mode_'.$i] == $attributeSetSpecificsConst
+            ) {
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_VALUE;
                 if ((int)$post['item_specifics_value_mode_' . $i] == $temp) {
                     $attributeValue = $post['item_specifics_value_custom_value_'.$i];
@@ -511,8 +685,8 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                 );
             }
 
-            $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS;
-            if ($post['item_specifics_mode_'.$i] == $temp) {
+            $customSpecificsConst = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS;
+            if ($post['item_specifics_mode_'.$i] == $customSpecificsConst) {
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_VALUE;
                 if ((int)$post['custom_item_specifics_value_mode_' . $i] == $temp) {
                     $attributeTitle = $post['custom_item_specifics_label_custom_value_'.$i];
@@ -522,7 +696,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_ATTRIBUTE;
                 if ((int)$post['custom_item_specifics_value_mode_'.$i] == $temp) {
-                    $attributeTitle = $post['item_specifics_value_custom_attribute_'.$i];;
+                    $attributeTitle = $post['item_specifics_value_custom_attribute_'.$i];
                     $attributeValue = '';
                     $customAttribute = $post['item_specifics_value_custom_attribute_'.$i];
                 }
@@ -548,6 +722,112 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         }
 
         return $itemSpecifics;
+    }
+
+    //#############################################
+
+    private function prepareCategoryUpdateBind($post, $typePrefix)
+    {
+        $updateBind = array(
+            $typePrefix.'mode' => $post['category_mode'],
+        );
+        if ($post['category_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
+            $updateBind[$typePrefix.'id'] = $post['category_value'];
+            $updateBind[$typePrefix.'attribute'] = '';
+
+            if (
+                in_array($post['category_type'], Mage::helper('M2ePro/Component_Ebay_Category')->getEbayCategoryTypes())
+            ) {
+                $updateBind[$typePrefix.'path'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
+                    $post['category_value'], $post['marketplace']
+                );
+            } else {
+                $updateBind[$typePrefix.'path'] = Mage::helper('M2ePro/Component_Ebay_Category_Store')->getPath(
+                    $post['category_value'], $post['account']
+                );
+            }
+        } elseif ($post['category_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
+            $updateBind[$typePrefix.'id'] = '';
+            $updateBind[$typePrefix.'attribute'] = $post['category_value'];
+
+            $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($post['category_value']);
+            $updateBind[$typePrefix.'path'] = Mage::helper('M2ePro')->__('Magento Attribute').' -> '.$attributeLabel;
+        } else {
+            $updateBind[$typePrefix.'id'] = '';
+            $updateBind[$typePrefix.'attribute'] = '';
+            $updateBind[$typePrefix.'path'] = '';
+        }
+
+        return $updateBind;
+    }
+
+    private function getTemplateCategoryIds($post, $typePrefix, $categoryModelName)
+    {
+        $categoryTemplateTable = Mage::getModel('M2ePro/Ebay_Template_' . $categoryModelName)
+            ->getResource()
+            ->getMainTable();
+
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $dbSelect = $connRead->select();
+
+        $dbSelect->from($categoryTemplateTable, 'id')->where($typePrefix.'mode = ?', $post['old_category_mode']);
+        if (
+            in_array($post['category_type'], Mage::helper('M2ePro/Component_Ebay_Category')->getEbayCategoryTypes())
+        ) {
+            $dbSelect->where('marketplace_id = ?', (int)$post['marketplace']);
+        } else {
+            $dbSelect->where('account_id = ?', (int)$post['account']);
+        }
+
+        if ($post['old_category_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
+            $dbSelect->where($typePrefix.'id = ?', $post['old_category_value']);
+        } else {
+            $dbSelect->where($typePrefix.'attribute = ?', $post['old_category_value']);
+        }
+
+        $templateIds = array();
+        foreach ($connRead->query($dbSelect)->fetchAll() as $row) {
+            $templateIds[] = $row['id'];
+        }
+
+        return $templateIds;
+    }
+
+    private function setSynchStatusNeed($oldSnapshots, $categoryModelName)
+    {
+        if (empty($oldSnapshots)) {
+            return;
+        }
+
+        foreach ($oldSnapshots as $templateId => $oldSnapshot) {
+            $model = Mage::getModel('M2ePro/Ebay_Template_' . $categoryModelName)->loadInstance((int)$templateId);
+            $model->setSynchStatusNeed($model->getDataSnapshot(), $oldSnapshot);
+        }
+    }
+
+    private function getSavedCategoryPath($type, $id)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $dbSelect = $connRead->select();
+
+        $tableName = Mage::getModel('M2ePro/Ebay_Template_OtherCategory')->getResource()->getMainTable();
+        if ($type == Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN) {
+            $tableName = Mage::getModel('M2ePro/Ebay_Template_Category')->getResource()->getMainTable();
+        }
+
+        $categoryTypePrefixes = array(
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN => 'category_main_',
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY => 'category_secondary_',
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN => 'store_category_main_',
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY => 'store_category_secondary_',
+        );
+        $typePrefix = $categoryTypePrefixes[$type];
+
+        $dbSelect->from($tableName, $typePrefix . 'path')->where($typePrefix.'id = ?', $id);
+
+        return $connRead->fetchOne($dbSelect);
     }
 
     //#############################################

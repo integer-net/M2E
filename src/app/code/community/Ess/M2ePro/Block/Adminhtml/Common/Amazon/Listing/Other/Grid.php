@@ -169,36 +169,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_Grid extends Mage_A
             'getter'    => 'getId',
             'actions'   => array(
                 array(
-                    'caption'   => Mage::helper('M2ePro')->__('Remove Item'),
-                    'url'       => array(
-                        'base'=> '*/adminhtml_common_listing_other/delete',
-                        'params' => array(
-                            'component' => Ess_M2ePro_Helper_Component_Amazon::NICK,
-                        )
-                    ),
-                    'field'   => 'id',
-                    'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-                ),
-                array(
-                    'caption'   => Mage::helper('M2ePro')->__('Unmap'),
-                    'confirm'  => Mage::helper('M2ePro')->__('Are you sure?'),
-                    'field'     => 'id',
-                    'url'       => array(
-                        'base'=> '*/adminhtml_listing_other_mapping/unmap',
-                        'params' => array(
-                            'componentMode' => Ess_M2ePro_Helper_Component_Amazon::NICK,
-                            'redirect' => base64_encode(
-                                $this->getUrl(
-                                    '*/adminhtml_common_listing_other/index',
-                                    array(
-                                        'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON
-                                    )
-                                )
-                            )
-                        )
-                    )
-                ),
-                array(
                     'caption' => Mage::helper('M2ePro')->__('View Log'),
                     'field'   => 'id',
                     'url'     => array(
@@ -242,6 +212,16 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_Grid extends Mage_A
         ));
         $this->getMassactionBlock()->addItem('moving', array(
             'label'   => Mage::helper('M2ePro')->__('Move Item(s) to Listing'),
+            'url'     => '',
+            'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
+        ));
+        $this->getMassactionBlock()->addItem('removing', array(
+            'label'   => Mage::helper('M2ePro')->__('Remove Item(s)'),
+            'url'     => '',
+            'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
+        ));
+        $this->getMassactionBlock()->addItem('unmapping', array(
+            'label'   => Mage::helper('M2ePro')->__('Unmap Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
         ));

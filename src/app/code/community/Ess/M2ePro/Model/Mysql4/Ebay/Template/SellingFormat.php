@@ -24,8 +24,8 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Template_SellingFormat
     public function isDifferent($newData, $oldData)
     {
         $ignoreFields = array(
-            'id', 'template_selling_format_id',
-            'title', 'component_mode',
+            $this->getIdFieldName(),
+            'id', 'title', 'component_mode',
             'is_custom_template',
             'create_date', 'update_date'
         );

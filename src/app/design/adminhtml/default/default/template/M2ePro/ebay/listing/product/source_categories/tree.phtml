@@ -127,7 +127,7 @@ var categoryClick = function(node, event)
 var updateInfo = function()
 {
     $$('span[category_id]').each(function(element) {
-        element.update('('+treeInfo['category_products'][element.readAttribute('category_id')]+')');
+        element.update('('+treeInfo['category_products'][element.readAttribute('category_id')]);
     });
 
     $('total_products_count').update(treeInfo['total_products_count']);
@@ -186,7 +186,7 @@ var showCategoriesSummary = function()
         hideEffect: Element.hide,
         showEffect: Element.show,
         onClose: function() {
-            var url = '<?php echo $this->getUrl('*/*/getTreeInfo'); ?>';
+            var url = '<?php echo $this->getUrl('*/*/getTreeInfo', array('_current' => true)); ?>';
             new Ajax.Request(url, {
                 method: 'get',
                 onSuccess: function(transport) {

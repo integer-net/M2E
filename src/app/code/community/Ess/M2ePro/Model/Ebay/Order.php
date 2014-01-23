@@ -177,6 +177,33 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         return $trackingDetails;
     }
 
+    public function getGlobalShippingDetails()
+    {
+        return $this->getSettings('global_shipping_details');
+    }
+
+    public function isUseGlobalShippingProgram()
+    {
+        return count($this->getGlobalShippingDetails()) != 0;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Order_ShippingAddress
+     */
+    public function getGlobalShippingWarehouseAddress()
+    {
+        if (!$this->isUseGlobalShippingProgram()) {
+            return null;
+        }
+
+        $globalShippingData = $this->getGlobalShippingDetails();
+        $warehouseAddress = isset($globalShippingData['warehouse_address']) ? $globalShippingData['warehouse_address'] :
+            array();
+
+        return Mage::getModel('M2ePro/Ebay_Order_ShippingAddress', $this->getParentObject())
+            ->setData($warehouseAddress);
+    }
+
     public function getCurrency()
     {
         return $this->getData('currency');
@@ -644,8 +671,8 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     private function processConnector($action, array $params = array())
     {
-        /** @var $dispatcher Ess_M2ePro_Model_Connector_Server_Ebay_Order_Dispatcher */
-        $dispatcher = Mage::getModel('M2ePro/Connector_Server_Ebay_Order_Dispatcher');
+        /** @var $dispatcher Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Connector_Ebay_Order_Dispatcher');
 
         return $dispatcher->process($action, $this->getParentObject(), $params);
     }
@@ -662,7 +689,7 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         if (!$this->canUpdatePaymentStatus()) {
             return false;
         }
-        return $this->processConnector(Ess_M2ePro_Model_Connector_Server_Ebay_Order_Dispatcher::ACTION_PAY, $params);
+        return $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_PAY, $params);
     }
 
     //-----------------------------------------
@@ -682,15 +709,11 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     public function updateShippingStatus(array $trackingDetails = array())
     {
-        if (!$this->canUpdateShippingStatus($trackingDetails)) {
-            return false;
-        }
-
         $params = array();
-        $action = Ess_M2ePro_Model_Connector_Server_Ebay_Order_Dispatcher::ACTION_SHIP;
+        $action = Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_SHIP;
 
         if (!empty($trackingDetails['tracking_number'])) {
-            $action = Ess_M2ePro_Model_Connector_Server_Ebay_Order_Dispatcher::ACTION_SHIP_TRACK;
+            $action = Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_SHIP_TRACK;
 
             // Prepare tracking information
             // -------------

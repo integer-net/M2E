@@ -18,8 +18,8 @@
                 <input type="hidden" name="show" value="1" />
                 <input type="hidden" name="form_key" value="<?php echo $this->getFormKey(); ?>" />
 
-                <?php if ($errorTxt = $this->getData('error_txt')): ?>
-                    <span style="color: red; font-weight: bold;"><?php echo Mage::helper('M2ePro')->escapeHtml($errorTxt); ?></span>
+                <?php if ($errorMessage = $this->getData('error_message')): ?>
+                    <span style="color: red; font-weight: bold;"><?php echo Mage::helper('M2ePro')->escapeHtml($errorMessage); ?></span>
                     <br /><br />
                 <?php endif; ?>
 

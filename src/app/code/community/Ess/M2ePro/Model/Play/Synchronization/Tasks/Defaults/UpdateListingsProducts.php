@@ -98,24 +98,19 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
             $percentsForAccount = self::PERCENTS_INTERVAL/(int)$accountsCollection->getSize();
         }
 
-        $marketplaceObj = Mage::helper('M2ePro/Component_Play')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID
-        );
-
         foreach ($accountsCollection->getItems() as $accountObj) {
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
 
-            if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplaceObj->getId())) {
+            if (!$this->isLockedAccount($accountObj->getId())) {
 
                 /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
                 $collection = Mage::getModel('M2ePro/Listing')->getCollection();
                 $collection->addFieldToFilter('component_mode',Ess_M2ePro_Helper_Component_Play::NICK);
-                $collection->addFieldToFilter('marketplace_id',(int)$marketplaceObj->getId());
                 $collection->addFieldToFilter('account_id',(int)$accountObj->getId());
 
                 if ($collection->getSize()) {
-                    $this->updateAccountMarketplace($accountObj,$marketplaceObj);
+                    $this->updateAccount($accountObj);
                 }
             }
 
@@ -127,24 +122,22 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
         $this->setCheckLastTime(Mage::helper('M2ePro')->getCurrentGmtDate(true));
     }
 
-    private function updateAccountMarketplace(Ess_M2ePro_Model_Account $accountObj,
-                                              Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function updateAccount(Ess_M2ePro_Model_Account $accountObj)
     {
         $this->_profiler->addTitle(
-            'Starting account "'.$accountObj->getTitle().'" and marketplace "'.$marketplaceObj->getTitle().'"'
+            'Starting account "'.$accountObj->getTitle().'"'
         );
         $this->_profiler->addTimePoint(__METHOD__.'send'.$accountObj->getId(),'Get inventory from Play');
-        $status = 'Task "Update Listings Products" for Play.com account: "%s" and marketplace "%s" ';
-        $status .= 'is started. Please wait...';
+        $status = 'Task "Update Listings Products" for Play.com account: "%s" is started. Please wait...';
         $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__($status, $accountObj->getTitle(), $marketplaceObj->getTitle())
+            Mage::helper('M2ePro')->__($status, $accountObj->getTitle())
         );
 
         // Get all changes on Play for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Dispatcher');
         $dispatcherObject->processConnector('defaults', 'updateListingsProducts' ,'requester',
-                                            array(), $marketplaceObj, $accountObj,
+                                            array(), $accountObj,
                                             'Ess_M2ePro_Model_Play_Synchronization_Tasks');
         //---------------------------
 
@@ -205,11 +198,11 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_UpdateListingsProduct
 
     //------------------------------------
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $tempGroup = '/play/defaults/update_listings_products/';
         $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()

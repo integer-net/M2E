@@ -29,10 +29,10 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_MovingController
         $block = $this->loadLayout()->getLayout()->createBlock(
             'M2ePro/adminhtml_ebay_listing_moving_grid','',
             array(
-                'mode' => 'listing',
                 'grid_url' => $this->getUrl(
                     '*/adminhtml_ebay_listing_moving/moveToListingGrid', array('_current'=>true)
                 ),
+                'moving_handler_js' => 'EbayListingEbayGridHandlerObj.movingHandler',
             )
         );
         $this->getResponse()->setBody($block->toHtml());

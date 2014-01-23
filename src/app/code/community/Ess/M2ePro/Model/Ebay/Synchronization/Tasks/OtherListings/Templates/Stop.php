@@ -89,7 +89,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Stop
 
             $this->_runnerActions->setProduct(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,
                 array()
             );
         }
@@ -118,7 +118,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Stop
 
         if ($this->_runnerActions->isExistProductAction(
             $listingOther,
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP,
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,
             array())
         ) {
             return false;
@@ -151,7 +151,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Stop
 
         if ($listingOther->getChildObject()->getSynchronizationModel()->isStopWhenQtyHasValue()) {
 
-            $productQty = (int)$listingOther->getChildObject()->getMappedQty();
+            $productQty = $listingOther->getChildObject()->getMappedQty();
 
             if (!is_null($productQty)) {
 

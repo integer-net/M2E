@@ -5,73 +5,65 @@
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
+    extends Ess_M2ePro_Model_Connector_Amazon_Inventory_Get_ItemsResponser
 {
-    protected $params = array();
     protected $synchronizationLog = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Account|null
-     */
-    protected $account = NULL;
 
     protected $logActionId = NULL;
 
     // ########################################
 
-    public function initialize(array $params = array(),
-                               Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
-    {
-        $this->params = $params;
-        $this->marketplace = $marketplace;
-        $this->account = $account;
-    }
-
-    // ########################################
-
-    public function unsetLocks($hash, $fail = false, $message = NULL)
+    protected function unsetLocks($fail = false, $message = NULL)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
 
         $tempNick = Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings::LOCK_ITEM_PREFIX;
-        $tempNick .= '_'.$this->params['account_id'].'_'.$this->params['marketplace_id'];
+        $tempNick .= '_'.$this->params['account_id'];
 
         $lockItem->setNick($tempNick);
         $lockItem->remove();
 
-        $this->getAccount()->deleteObjectLocks(NULL,$hash);
-        $this->getAccount()->deleteObjectLocks('synchronization',$hash);
-        $this->getAccount()->deleteObjectLocks('synchronization_amazon',$hash);
-        $this->getAccount()->deleteObjectLocks(
-            Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings::LOCK_ITEM_PREFIX,
-            $hash
+        // --------------------------
+
+        $tempObjects = array(
+            $this->getAccount(), $this->getMarketplace()
         );
 
-        $this->getMarketplace()->deleteObjectLocks(NULL,$hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization',$hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization_amazon',$hash);
-        $this->getMarketplace()->deleteObjectLocks(
-            Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings::LOCK_ITEM_PREFIX,
-            $hash
+        $tempLocks = array(
+            NULL,
+            'synchronization', 'synchronization_amazon',
+            Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings::LOCK_ITEM_PREFIX
         );
+
+        /* @var $object Ess_M2ePro_Model_Abstract */
+        foreach ($tempObjects as $object) {
+            foreach ($tempLocks as $lock) {
+                $object->deleteObjectLocks($lock, $this->hash);
+            }
+        }
 
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tempTable = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_processed_inventory');
-        $connWrite->delete($tempTable,array('`hash` = ?'=>(string)$hash));
+        $connWrite->delete($tempTable,array('`hash` = ?'=>(string)$this->hash));
 
         $fail && $this->getSynchLogModel()->addMessage(Mage::helper('M2ePro')->__($message),
                                                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                                                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
     }
 
-    public function processSucceededResponseData($receivedItems, $hash, $nextPart)
+    // ########################################
+
+    protected function processResponseData($response)
+    {
+        $receivedItems = parent::processResponseData($response);
+        $this->processSucceededResponseData($receivedItems['data'], $receivedItems['next_part']);
+    }
+
+    // ---------------------------------------
+
+    private function processSucceededResponseData($receivedItems, $nextPart)
     {
         //--------------------
         $tempItems = array();
@@ -92,7 +84,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
             $this->updateReceivedOtherListings($receivedItems);
             $this->createNotExistedOtherListings($receivedItems);
 
-            $this->updateNotReceivedOtherListings($receivedItems,$hash,$nextPart);
+            $this->updateNotReceivedOtherListings($receivedItems,$this->hash,$nextPart);
 
         } catch (Exception $exception) {
 
@@ -234,8 +226,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
             }
 
             $newData = array(
-                'account_id' => (int)$this->params['account_id'],
-                'marketplace_id' => (int)$this->params['marketplace_id'],
+                'account_id' => $this->getAccount()->getId(),
+                'marketplace_id' => $this->getMarketplace()->getId(),
                 'product_id' => NULL,
 
                 'general_id' => (string)$receivedItem['identifiers']['general_id'],
@@ -284,7 +276,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
                 continue;
             }
 
-            $mappingModel->initialize($this->getMarketplace(),$this->getAccount());
+            $mappingModel->initialize($this->getAccount());
             $mappingResult = $mappingModel->autoMapOtherListingProduct($listingOtherModel);
 
             if ($mappingResult) {
@@ -293,7 +285,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
                     continue;
                 }
 
-                $movingModel->initialize($this->getMarketplace(),$this->getAccount());
+                $movingModel->initialize($this->getAccount());
                 $movingModel->autoMoveOtherListingProduct($listingOtherModel);
             }
         }
@@ -301,7 +293,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
 
     //-----------------------------------------
 
-    protected function updateNotReceivedOtherListings($receivedItems,$hash,$nextPart)
+    protected function updateNotReceivedOtherListings($receivedItems,$nextPart)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
@@ -316,7 +308,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
             foreach ($partReceivedItems as $partReceivedItem) {
                 $inserts[] = array(
                     'sku' => $partReceivedItem['identifiers']['sku'],
-                    'hash' => $hash
+                    'hash' => $this->hash
                 );
             }
 
@@ -333,8 +325,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
         /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other');
         $collection->getSelect()->joinLeft(array('api' => $tempTable),
-                 '`second_table`.sku = `api`.sku AND `api`.`hash` = \''.$hash.'\'', array('sku'));
-        $collection->getSelect()->where('`main_table`.marketplace_id = ?',(int)$this->getMarketplace()->getId());
+                 '`second_table`.sku = `api`.sku AND `api`.`hash` = \''.$this->hash.'\'', array('sku'));
         $collection->getSelect()->where('`main_table`.account_id = ?',(int)$this->getAccount()->getId());
         $collection->getSelect()->where('`main_table`.`status` != ?',
             (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
@@ -397,7 +388,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
 
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
-        $collection->getSelect()->where('l.marketplace_id = ?',(int)$this->getMarketplace()->getId());
         $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
 
         /** @var $stmtTemp Zend_Db_Statement_Pdo */
@@ -423,7 +413,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
         /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other');
         $collection->getSelect()->where('`main_table`.`account_id` = ?',(int)$this->params['account_id']);
-        $collection->getSelect()->where('`main_table`.`marketplace_id` = ?',(int)$this->params['marketplace_id']);
 
         $tempColumns = array('second_table.sku');
 
@@ -450,7 +439,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
      */
     protected function getAccount()
     {
-        return $this->account;
+        return $this->getObjectByParam('Account','account_id');
     }
 
     /**
@@ -458,7 +447,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings_Responser
      */
     protected function getMarketplace()
     {
-        return $this->marketplace;
+        return $this->getAccount()->getChildObject()->getMarketplace();
     }
 
     //-----------------------------------------

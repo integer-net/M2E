@@ -25,7 +25,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_System extends Mage_Adminhtml_
     protected function _beforeToHtml()
     {
         $this->systemName = Mage::helper('M2ePro/Client')->getSystem();
-        $this->systemTime =Mage::helper('M2ePro')->getCurrentGmtDate();
+        $this->systemTime = Mage::helper('M2ePro')->getCurrentGmtDate();
 
         return parent::_beforeToHtml();
     }

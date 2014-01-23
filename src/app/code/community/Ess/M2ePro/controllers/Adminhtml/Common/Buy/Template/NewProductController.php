@@ -174,6 +174,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         $keys = array(
             'seller_sku_custom_attribute',
 
+            'gtin_mode',
             'gtin_custom_attribute',
 
             'isbn_mode',
@@ -411,7 +412,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
         $table = Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category');
 
-        exit(json_encode(
+        return $this->getResponse()->setBody(json_encode(
             $connRead->select()
                 ->from($table,'*')
                 ->where('node_id = ?', $nodeId)
@@ -428,7 +429,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
         $table = Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category');
 
-        exit(json_encode(
+        return $this->getResponse()->setBody(json_encode(
             $connRead->select()
                 ->from($table,'attributes')
                 ->where('category_id = ?', (int)$category_id)
@@ -442,7 +443,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         $keywords = $this->getRequest()->getParam('keywords','');
 
         if ($keywords == '' || strlen($keywords) < 3) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'result' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Each keyword should be at least three characters.')
             )));
@@ -462,7 +463,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
             if ($part == '') {
                 continue;
             } elseif (strlen($part) < 3) {
-                exit(json_encode(array(
+                return $this->getResponse()->setBody(json_encode(array(
                     'result' => 'error',
                     'message' => Mage::helper('M2ePro')->__('Each keyword should be at least three characters.')
                 )));

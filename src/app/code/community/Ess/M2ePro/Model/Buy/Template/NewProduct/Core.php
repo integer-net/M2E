@@ -8,6 +8,9 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
 {
     // ########################################
 
+    const GTIN_MODE_NONE = 0;
+    const GTIN_MODE_CUSTOM_ATTRIBUTE = 2;
+
     const ISBN_MODE_NONE = 0;
     const ISBN_MODE_CUSTOM_ATTRIBUTE = 2;
 
@@ -83,6 +86,21 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
 
     // ########################################
 
+    public function getGtinMode()
+    {
+        return (int)$this->getData('gtin_mode');
+    }
+
+    public function isGtinNone()
+    {
+        return $this->getGtinMode() == self::GTIN_MODE_NONE;
+    }
+
+    public function isGtinCustomAttribute()
+    {
+        return $this->getGtinMode() == self::GTIN_MODE_CUSTOM_ATTRIBUTE;
+    }
+
     public function getGtinCustomAttribute()
     {
         return $this->getData('gtin_custom_attribute');
@@ -91,6 +109,7 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
     public function getGtinSource()
     {
         return array(
+            'mode' => $this->getGtinMode(),
             'custom_attribute' => $this->getGtinCustomAttribute(),
         );
     }

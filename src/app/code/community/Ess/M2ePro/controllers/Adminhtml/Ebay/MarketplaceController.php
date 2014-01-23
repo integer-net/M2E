@@ -16,6 +16,7 @@ class Ess_M2ePro_Adminhtml_Ebay_MarketplaceController extends Ess_M2ePro_Control
         $this->getLayout()->getBlock('head')
             ->addJs('M2ePro/Plugin/ProgressBar.js')
             ->addJs('M2ePro/SynchProgressHandler.js')
+            ->addJs('M2ePro/Ebay/MarketplaceSynchProgressHandler.js')
             ->addJs('M2ePro/Plugin/AreaWrapper.js')
             ->addJs('M2ePro/MarketplaceHandler.js')
             ->addCss('M2ePro/css/Plugin/ProgressBar.css')
@@ -57,8 +58,6 @@ class Ess_M2ePro_Adminhtml_Ebay_MarketplaceController extends Ess_M2ePro_Control
             }
             $marketplace->setData('status', $newStatus)->save();
         }
-
-        exit();
     }
 
     //#############################################
@@ -76,6 +75,15 @@ class Ess_M2ePro_Adminhtml_Ebay_MarketplaceController extends Ess_M2ePro_Control
         $synchDispatcher->setTasks(array(Ess_M2ePro_Model_Synchronization_Tasks::MARKETPLACES));
         $synchDispatcher->setParams(array('marketplace_id' => $marketplaceId));
         $synchDispatcher->process();
+    }
+
+    public function isExistDeletedCategoriesAction()
+    {
+        if (Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->isExistDeletedCategories()) {
+            return $this->getResponse()->setBody('1');
+        }
+
+        return $this->getResponse()->setBody('0');
     }
 
     //#############################################

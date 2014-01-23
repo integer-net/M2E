@@ -76,8 +76,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Mode extends Mage_Adminht
     {
         parent::_beforeToHtml();
 
-        // --------------------------------------
-
         $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
             'Listing', $this->getRequest()->getParam('listing_id')
         );
@@ -89,20 +87,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Mode extends Mage_Adminht
 
         $this->setChild('view_header', $viewHeaderBlock);
 
-        // --------------------------------------
-
-        $this->setData('mode', 'product');
-
-        if ($this->getRequest()->getParam('source') == 'categories' &&
-            Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
-            $this->setData('mode', 'category');
-        }
-
-        $categorySettingsSessionData = Mage::helper('M2ePro/Data_Session')->getValue('ebay_listing_category_settings');
-        if (isset($categorySettingsSessionData['mode'])) {
-            $this->setData('mode', $categorySettingsSessionData['mode']);
-        }
-
+        // ------------------------------------------------
+        $buttonBlock = $this->getLayout()
+            ->createBlock('adminhtml/widget_button')
+            ->setData( array(
+                'label'   => Mage::helper('M2ePro')->__('Continue'),
+                'onclick' => '',
+            ) );
+        $this->setChild('mode_same_remember_pop_up_confirm_button',$buttonBlock);
     }
 
     // ####################################

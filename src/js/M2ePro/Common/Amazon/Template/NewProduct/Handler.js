@@ -96,7 +96,7 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
         this.confirmButton.hide();
         this.xsdsTr.hide();
 
-        this.getCategories(element.down('option[value=' + element.value + ']').getAttribute('node_hash'),function(transport) {
+        this.getCategories(element.down('option[value="' + element.value + '"]').getAttribute('node_hash'),function(transport) {
             this.categories = transport.responseText.evalJSON();
 
             if (!this.isAllowedCategory(this.categories[0].xsd_hash)) {
@@ -216,7 +216,7 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
         this.changeButton.show();
         this.categoriesTr.hide();
 
-        $$('input[name=category[node_title]]').shift().value = this.nodeTitleEl.value;
+        $$('input[name="category[node_title]"]').shift().value = this.nodeTitleEl.value;
 
         this.nodeTitleEl.value = '';
         this.categoryXsdHashHiddenInput.value = categoryInfo.xsd_hash;
@@ -285,7 +285,7 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
             self.categoryXsdHashHiddenInput.value = this.value;
             self.categoryPathHiddenInput.value = categoryPath;
 
-            $$('input[name=category[node_title]]').shift().value = self.nodeTitleEl.value;
+            $$('input[name="category[node_title]"]').shift().value = self.nodeTitleEl.value;
 
             self.nodeTitleEl.value = '';
             self.categoriesTr.hide();
@@ -344,6 +344,7 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
     initPopUp: function(contentId,width,height,title)
     {
         this[contentId] = new Window({
+            id: 'window_' + contentId,
             draggable: true,
             resizable: true,
             closable: true,
@@ -429,7 +430,7 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
 
         this.categoriesTr.hide();
 
-        $$('input[name=category[node_title]]').shift().value = this.nodeTitleEl.select('option[node_hash='+ categoryInfo.node_hash +']').shift().getAttribute('value');
+        $$('input[name="category[node_title]"]').shift().value = this.nodeTitleEl.select('option[node_hash="'+ categoryInfo.node_hash +'"]').shift().getAttribute('value');
 
         this.categoryXsdHashHiddenInput.value = categoryInfo.xsd_hash;
         this.categoryIdentifiersHiddenInput.value = Object.toJSON({
@@ -458,14 +459,14 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
         var worldwide_id_mode_element = $('worldwide_id_mode');
 
         if (element.value) {
-            worldwide_id_mode_element.down('option[value=' + M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE') + ']').show();
+            worldwide_id_mode_element.down('option[value="' + M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE') + '"]').show();
             if (!M2ePro.customData.is_edit) {
                 worldwide_id_mode_element.value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE');
             }
             worldwide_id_mode_element.removeClassName('M2ePro-required-when-visible');
             worldwide_id_mode_element.simulate('change');
         } else {
-            worldwide_id_mode_element.down('option[value=' + M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE') + ']').hide();
+            worldwide_id_mode_element.down('option[value="' + M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_NONE') + '"]').hide();
             worldwide_id_mode_element.value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_NewProduct::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE');
             worldwide_id_mode_element.addClassName('M2ePro-required-when-visible');
             worldwide_id_mode_element.simulate('change');

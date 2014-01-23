@@ -1,17 +1,14 @@
 <div id="block_notice_ebay_accounts_orders" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Orders'); ?>">
     <?php
         $menuLabel = Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
-        echo Mage::helper('M2ePro')->__('
-This tab contains settings of eBay Orders, eBay Customers import; Magento Orders and Products creation.<br/>
-If you set Import eBay Orders to <i>Yes</i>, a new eBay order will be imported to the system and can be found in %1$s > Sales > eBay Orders.<br/><br/>
-It is possible to allow auto creation of Magento Orders based on imported eBay Orders for products listed by:
-<ul class="list">
-    <li>M2E Pro;</li>
-    <li>Any Other Software.</li>
-</ul>
-<b>Note:</b> The Product Stock QTY only reduces after Magento Order creation.<br/>
-These type of orders can be managed as typical Magento Orders in Magento > Sales > Orders.<br/><br/>
-<b>Note:</b> To receive orders from eBay, Order Synchronization must be enabled in %1$s > Configuration > Synchronization.', $menuLabel);
+        echo Mage::helper('M2ePro')->__('For each eBay account M2E Pro allows import orders coming from eBay and setting up automatic Magento orders creation.
+                                         Using appropriate settings you can create Magento orders for the items listed by the 3rd party software and by M2E Pro.
+                                         <br>
+                                         <br>
+                                         <b>Note:</b> The Product Stock QTY only reduces after Magento Order creation.<br/>
+                                         The Order Synchronization must be enabled in %1$s > Configuration > Synchronization.',
+                                         $menuLabel
+        );
     ?>
 </div>
 
@@ -198,7 +195,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="value">
                         <?php echo $this->getChildHtml('magento_orders_listings_store_id'); ?>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Store in which orders will be placed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The store the orders will be placed in.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -243,7 +240,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                     <td class="value">
                         <?php echo $this->getChildHtml('magento_orders_listings_other_store_id'); ?>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Store in which orders will be placed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The store the orders will be placed in.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -298,16 +295,13 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
         <div class="hor-scroll">
 
             <div id="block_notice_ebay_accounts_orders_customers" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Customers'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('There are several ways to specify a customer for which Magento Orders will be created:
-                    <br/>
-                    <br/><b>Guest Account</b> - the system does not require the creation of a customer account. Default Guest Account defined as a customer.
-                    To use this option, you must enable the Guest Checkout option in Magento.
-                    <br/><b>Predefined Customer</b> - the system uses one predefined customer for all eBay orders related to this account.
-                    You will be required to provide an ID of the existing customer.
-                    <br/><b>Create New</b> - a new customer created in Magento, using eBay customer data from the eBay Order.
-                    <br/>
-                    <br/><b>Note:</b> An example of a unique customer identifier is an email address.
-                    If one already exists in Magento, the system will link orders to it.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('There are several ways to specify a customer Magento Orders will be assigned to:
+                <br>
+                    <br/><b>Guest Account</b> - the system does not require a customer account to be created. Default guest account will be used instead.
+                    <br><b>Note:</b> To use this option, Magento Guest Checkout option must be enabled.
+                <br><br/><b>Predefined Customer</b> - the system uses predefined customer.
+                <br><br/><b>Create New</b> - a new customer will be created in Magento.
+                    <br/><b>Note:</b> If a customer already exists in Magento, the system assigns orders to him.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -323,7 +317,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW; ?>" <?php if ($formData['magento_orders_settings']['customer']['mode'] == Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Create New'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Customer for which Magento Orders will be created.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Customer Magento Orders will be created for.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -352,7 +346,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                             <?php } ?>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Website in which a customer account will be created.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Website a customer account will be created for.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -369,7 +363,7 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                             <?php } ?>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Customer Group to which a customer will be assigned.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Customer Group a customer will be assigned to.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -408,8 +402,8 @@ These type of orders can be managed as typical Magento Orders in Magento > Sales
                 <?php echo Mage::helper('M2ePro')->__('Set eBay Orders settings when Magento Orders have to be created.
                 <br/>
                 <br/>The Reserve Quantity option can prevent the item selling before the Magento Order is created.
-                This is because the Product Stock Quantity is reducedafter Magento Order creation.
-                It removes items from Magento Stock as soon as the order is receivedfrom eBay.'); ?>
+                This is because the Product Stock Quantity is reduced after Magento Order creation.
+                It removes items from Magento Stock as soon as the order is received from eBay.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">

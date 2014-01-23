@@ -53,6 +53,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces extends Ess_M2ePr
         }
         //---------------------------
 
+        //---------------------------
+        $this->clearMarketplacesCache();
+        //---------------------------
+
         // CANCEL SYNCH
         //---------------------------
         $this->cancelSynch();
@@ -99,6 +103,13 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces extends Ess_M2ePr
 
         $this->_logs->setSynchronizationTask(Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_UNKNOWN);
         $this->_lockItem->activate();
+    }
+
+    //####################################
+
+    private function clearMarketplacesCache()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
     }
 
     //####################################

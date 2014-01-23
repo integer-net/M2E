@@ -21,7 +21,7 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
 
     public function getMenuRootNodeLabel()
     {
-        return self::TITLE;
+        return $this->__(self::TITLE);
     }
 
     public function getWizardInstallationNick()

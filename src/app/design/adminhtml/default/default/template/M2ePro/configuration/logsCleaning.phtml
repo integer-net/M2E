@@ -1,12 +1,12 @@
 <div id="block_notice_configuration_logs_cleaning" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Logs Clearing'); ?>">
     <?php
         $menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
-        echo Mage::helper('M2ePro')->__('
-This section allows you to set preferences of Auto Logs Clearing for different Logs.<br/>Set settings and press <span style="text-decoration: underline;">Save Config</span>. Enabled tasks will be automatically
-performed according to your Cron job.<br/><br/>
-It is also possible to launch the certain task manually by pressing the <span style="text-decoration: underline;">Run Now</span> button in appropriate section.<br/>
-Log records will be deleted according to the <i>Keep For</i> setting.<br/><br/>
-To clear all log records of the certain Log, press <span style="text-decoration: underline;">Clear All</span> in appropriate section.', $menuLabel);
+        echo Mage::helper('M2ePro')->__('Set preferences for automatic logs clearing and Save configuration.
+        <br>
+        To launch a task manually press Run Now. To clear all log records of the certain Log press Clear All button.
+        <br><br>
+        <b>Note:</b> Autoclearing is performed by cron.
+       ', $menuLabel);
     ?>
 </div>
 
@@ -38,6 +38,15 @@ To clear all log records of the certain Log, press <span style="text-decoration:
     .columns .form-list td.value {
         width: 280px;
     }
+
+    .columns .form-list td:nth-child(3) {
+        width: 16px;
+    }
+
+    .columns .form-list td:nth-child(4) {
+        width: 90px;
+    }
+
 </style>
 
 <form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
@@ -71,16 +80,16 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                                 <option value="1"<?php if ($mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Performs automatic log records clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
                             </p>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_button_run_now_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('run_now_'.Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS); ?>
                             </div>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_button_clear_all_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('clear_all_'.Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS); ?>
@@ -95,7 +104,7 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Time interval for which log records should be kept.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">
@@ -139,16 +148,16 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                                 <option value="1"<?php if (1 == $mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Performs automatic log records clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
                             </p>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_button_run_now_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('run_now_'.Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS); ?>
                             </div>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_button_clear_all_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('clear_all_'.Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS); ?>
@@ -163,7 +172,7 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Time interval for which log records should be kept.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">
@@ -207,16 +216,16 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                                 <option value="1"<?php if (1 == $mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Performs automatic log records clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
                             </p>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_button_run_now_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('run_now_'.Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS); ?>
                             </div>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_button_clear_all_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('clear_all_'.Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS); ?>
@@ -231,7 +240,7 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Time interval for which log records should be kept.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">
@@ -275,16 +284,16 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                                 <option value="1"<?php if (1 == $mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Performs automatic log records clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
                             </p>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_button_run_now_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('run_now_'.Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS); ?>
                             </div>
                         </td>
-                        <td>
+                        <td class="value">
                             <div id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_button_clear_all_container">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <?php echo $this->getChildHtml('clear_all_'.Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS); ?>
@@ -299,7 +308,7 @@ To clear all log records of the certain Log, press <span style="text-decoration:
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS]; ?>" type="text" disabled="disabled" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Time interval for which log records should be kept.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">

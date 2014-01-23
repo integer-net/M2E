@@ -75,6 +75,26 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_SourceCategories_Tree
 
     // #############################################
 
+    public function getCategoryCollection()
+    {
+        $collection = $this->getData('category_collection');
+
+        if (!$collection) {
+            $collection = Mage::getModel('catalog/category')
+                ->getCollection()
+                ->addAttributeToSelect('name')
+                ->addAttributeToSelect('is_active');
+
+            $this->loadProductsCount($collection);
+
+            $this->setData('category_collection', $collection);
+        }
+
+        return $collection;
+    }
+
+    // #############################################
+
     public function __construct()
     {
         parent::__construct();
@@ -110,6 +130,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_SourceCategories_Tree
         $item = array();
         $item['text'] = $this->buildNodeName($node);
         $item['id']  = $node->getId();
+        $item['cls'] = 'folder ' . ($node->getIsActive() ? 'active-category' : 'no-active-category');
         $item['path'] = $node->getData('path');
         $item['allowDrop'] = false;
         $item['allowDrag'] = false;
@@ -154,8 +175,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_SourceCategories_Tree
 
     public function buildNodeName($node)
     {
+        $helper = Mage::helper('M2ePro');
+
         return $this->escapeHtml($node->getName()) . <<<HTML
-<span category_id="{$node->getId()}">(0)</span>
+<span category_id="{$node->getId()}">(0</span>{$helper->__('of')} {$node->getProductCount()})
 HTML;
     }
 
@@ -175,19 +198,17 @@ HTML;
             return $this->getData('affected_categories_count');
         }
 
-        /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
-        $collection = Mage::getModel('catalog/category')->getCollection();
-        $collection->addAttributeToSelect('name');
-
         $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
                              ->select()
                              ->from(Mage::getSingleton('core/resource')->getTableName('catalog/category_product'),
                                     'category_id')
                              ->where('`product_id` IN(?)',$this->getSelectedIds());
 
-        $collection->getSelect()->where('entity_id IN ('.$dbSelect->__toString().')');
-
-        $affectedCategoriesCount = $collection->getSize();
+        $affectedCategoriesCount = $this->getCategoryCollection()
+            ->getSelectCountSql()
+            ->where('entity_id IN ('.$dbSelect->__toString().')')
+            ->query()
+            ->fetchColumn();
 
         $this->setData('affected_categories_count', (int)$affectedCategoriesCount);
 
@@ -250,6 +271,50 @@ HTML;
             'total_products_count' => count($this->getSelectedIds()),
             'total_categories_count' => $this->getAffectedCategoriesCount()
         ));
+    }
+
+    // #############################################
+
+    protected function loadProductsCount($collection)
+    {
+        $items = $collection->getItems();
+
+        if (!$items) {
+            return;
+        }
+
+        $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
+            'Listing',$this->getRequest()->getParam('listing_id')
+        );
+
+        $readConnection = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        //----------------------------
+        $excludeProductsSelect = $readConnection->select()->from(
+                Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable(),
+                new Zend_Db_Expr('DISTINCT `product_id`')
+        );
+
+        $excludeProductsSelect->where('`listing_id` = ?',(int)$listing['id']);
+
+        $select = $readConnection->select();
+        $select->from(
+                array('main_table' => $collection->getTable('catalog/category_product')),
+                array('category_id', new Zend_Db_Expr('COUNT(main_table.product_id)'))
+            )
+            ->where($readConnection->quoteInto('main_table.category_id IN(?)', array_keys($items)))
+            ->where('main_table.product_id NOT IN ('.$excludeProductsSelect.')')
+            ->group('main_table.category_id');
+
+        $counts = $readConnection->fetchPairs($select);
+
+        foreach ($items as $item) {
+            if (isset($counts[$item->getId()])) {
+                $item->setProductCount($counts[$item->getId()]);
+            } else {
+                $item->setProductCount(0);
+            }
+        }
     }
 
     // #############################################

@@ -86,14 +86,10 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
             $percentsForAccount = $percentsForAccount/$accountsTotalCount;
         }
 
-        $marketplaceObj = Mage::helper('M2ePro/Component_Play')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID
-        );
-
         foreach ($accountsCollection->getItems() as $accountObj) {
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
-            $this->processAccountMarketplaceLinks($accountObj,$marketplaceObj);
+            $this->processAccountLinks($accountObj);
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount * $accountIteration);
             $this->_lockItem->activate();
@@ -105,8 +101,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
 
     //####################################
 
-    private function processAccountMarketplaceLinks(Ess_M2ePro_Model_Account $accountObj,
-                                                    Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function processAccountLinks(Ess_M2ePro_Model_Account $accountObj)
     {
         $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
 
@@ -128,13 +123,13 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
         }
 
         $this->_profiler->addTitle(
-            'Starting account "'.$accountObj->getTitle().'" and marketplace "'.$marketplaceObj->getTitle().'"'
+            'Starting account "'.$accountObj->getTitle().'"'
         );
         $this->_profiler->addTimePoint(__METHOD__.'send'.$accountObj->getId(),'Get Product Links from Play');
-        $status = 'Task "Getting Products Links" for Play.com account: "%s" and marketplace "%s" ';
-        $status .= 'is started. Please wait...';
+        $status = 'Task "Getting Products Links" for Play.com account: "%s" is started. Please wait...';
+        $status .= '';
         $this->_lockItem->setStatus(
-            Mage::helper('M2ePro')->__($status, $accountObj->getTitle(), $marketplaceObj->getTitle())
+            Mage::helper('M2ePro')->__($status, $accountObj->getTitle())
         );
 
         $updateByPagesSettings = $accountObj->getChildObject()->getDecodedListingsUpdateLinksSettings();
@@ -143,9 +138,9 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
             (int)$updateByPagesSettings['next_status'] <= 3 &&
             (int)$updateByPagesSettings['next_page'] < 10000)) {
 
-            $this->updateInventoryLinksByPages($accountObj,$marketplaceObj);
+            $this->updateInventoryLinksByPages($accountObj);
         } else {
-            $this->updateInventoryLinksByListingsIds($accountObj,$marketplaceObj);
+            $this->updateInventoryLinksByListingsIds($accountObj);
         }
 
         $this->_profiler->saveTimePoint(__METHOD__.'send'.$accountObj->getId());
@@ -154,8 +149,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
 
     //####################################
 
-    private function updateInventoryLinksByPages(Ess_M2ePro_Model_Account $accountObj,
-                                                 Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function updateInventoryLinksByPages(Ess_M2ePro_Model_Account $accountObj)
     {
         // get server data
         $inputData = array(
@@ -170,10 +164,9 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
             $inputData['necessary_page'] = (int)$updateByPagesSettings['next_page'];
         }
 
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher')
-                                ->processVirtualAbstract('inventory','get','pagesProductsLinks',
-                                                         $inputData,NULL,
-                                                         NULL,$accountObj->getId(),NULL);
+        $responseData = Mage::getModel('M2ePro/Connector_Play_Dispatcher')
+                                ->processVirtual('inventory','get','pagesProductsLinks',
+                                                         $inputData,NULL,$accountObj->getId());
 
         if (!isset($responseData['items']) || !is_array($responseData['items'])) {
             return;
@@ -207,15 +200,14 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
             ->save();
     }
 
-    private function updateInventoryLinksByListingsIds(Ess_M2ePro_Model_Account $accountObj,
-                                                       Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function updateInventoryLinksByListingsIds(Ess_M2ePro_Model_Account $accountObj)
     {
-        $listingsForUpdate = $this->getListingsProductForUpdate($accountObj,$marketplaceObj);
+        $listingsForUpdate = $this->getListingsProductForUpdate($accountObj);
         $listingsCollectionSize = $listingsForUpdate->getSize();
 
         if (!$listingsCollectionSize || $listingsCollectionSize <= 0) {
 
-            $listingsForUpdate = $this->getListingsOtherForUpdate($accountObj,$marketplaceObj);
+            $listingsForUpdate = $this->getListingsOtherForUpdate($accountObj);
             $listingsCollectionSize = $listingsForUpdate->getSize();
 
             if (!$listingsCollectionSize || $listingsCollectionSize <= 0) {
@@ -232,10 +224,10 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
             return;
         }
 
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher')
-                                ->processVirtualAbstract('inventory','get','listingsIdsProductsLinks',
+        $responseData = Mage::getModel('M2ePro/Connector_Play_Dispatcher')
+                                ->processVirtual('inventory','get','listingsIdsProductsLinks',
                                                          array('items'=>$neededItems),NULL,
-                                                         NULL,$accountObj->getId(),NULL);
+                                                         $accountObj->getId());
 
         if (!isset($responseData['items']) || !is_array($responseData['items'])) {
             return;
@@ -288,8 +280,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
 
     //####################################
 
-    private function getListingsProductForUpdate(Ess_M2ePro_Model_Account $accountObj,
-                                                 Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function getListingsProductForUpdate(Ess_M2ePro_Model_Account $accountObj)
     {
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
 
@@ -298,7 +289,6 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
         $listingsCollection->getSelect()->join(array('l' => $listingTable),
                                                      'main_table.listing_id = l.id',
                                                      array());
-        $listingsCollection->getSelect()->where('l.marketplace_id = ?',$marketplaceObj->getId());
         $listingsCollection->getSelect()->where('l.account_id = ?',$accountObj->getId());
         $listingsCollection->getSelect()->where('`second_table`.`link_info` IS NULL');
         $listingsCollection->getSelect()->where('`second_table`.`play_listing_id` IS NOT NULL');
@@ -307,8 +297,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Defaults_GettingProductsLinks
         return $listingsCollection;
     }
 
-    private function getListingsOtherForUpdate(Ess_M2ePro_Model_Account $accountObj,
-                                               Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function getListingsOtherForUpdate(Ess_M2ePro_Model_Account $accountObj)
     {
         /** @var $listingsOtherCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $listingsOtherCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Other');

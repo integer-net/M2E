@@ -28,13 +28,7 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
         Mage::helper('M2ePro/Client')->setMemoryLimit(256);
         Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
 
-        // todo change when new server will be in production
-
-//        $responseData = Mage::getModel('M2ePro/Connector_Server_M2ePro_Dispatcher')
-//                                    ->processVirtual('servicing','update','data',
-//                                                     $this->getRequestData($allowedTasks));
-
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Api_Dispatcher')
+        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
                                     ->processVirtual('servicing','update','data',
                                                      $this->getRequestData($allowedTasks));
 
@@ -96,7 +90,8 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
             'settings',
             'backups',
             'exceptions',
-            'analytic'
+            'analytic',
+            'marketplaces'
         );
     }
 

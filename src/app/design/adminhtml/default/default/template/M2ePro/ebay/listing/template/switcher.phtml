@@ -40,7 +40,7 @@
 
                         <?php
                             $value = base64_encode(json_encode(array(
-                                'id' => null,
+                                'id' => $this->isTemplateModeCustom() ? $this->getTemplateId() : null,
                                 'mode' => Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM,
                                 'nick' => $this->getTemplateNick()
                             )));

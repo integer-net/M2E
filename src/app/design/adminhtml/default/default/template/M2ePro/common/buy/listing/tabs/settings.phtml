@@ -107,7 +107,7 @@ $isEdit = (bool)$this->getRequest()->getParam('id');
 
         <?php if ($this->getRequest()->getParam('id')): ?>
             BuyListingSettingsHandlerObj.storeId = <?php echo (int)$formData['store_id']; ?>;
-            BuyListingSettingsHandlerObj.marketplaceId = <?php echo Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_VIRTUAL_ID; ?>;
+            BuyListingSettingsHandlerObj.marketplaceId = <?php echo Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_ID; ?>;
         <?php endif; ?>
 
         AutoCompleteHandler = new AutoComplete();

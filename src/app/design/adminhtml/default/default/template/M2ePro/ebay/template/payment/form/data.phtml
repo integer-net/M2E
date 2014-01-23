@@ -148,7 +148,13 @@
                                         value="<?php echo $service['ebay_id'] ?>"
                                         class="M2ePro-validate-payment-methods additional-payment-service"
                                         <?php if (in_array($service['ebay_id'], $formData['services'])): ?>checked="checked"<?php endif; ?>
-                                    />&nbsp;<?php echo Mage::helper('M2ePro')->escapeHtml($service['title']) ?>
+                                    />&nbsp;
+                                    <?php if ((int)$marketplaceData['id'] == Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_AUSTRALIA &&
+                                                $service['title'] == 'CIP') : ?>
+                                        <?php echo 'Bank Deposit Express'; ?>
+                                    <?php else: ?>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($service['title']) ?>
+                                    <?php endif; ?>
                                 </label>
                             </div>
                         <?php endforeach; ?>

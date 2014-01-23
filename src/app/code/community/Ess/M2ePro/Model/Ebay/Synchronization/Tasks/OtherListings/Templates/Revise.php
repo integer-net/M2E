@@ -181,7 +181,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
             if ($this->_runnerActions->isExistProductAction(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('title'=>true)))
             ) {
                 return false;
@@ -200,7 +200,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
             $this->_runnerActions->setProduct(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('title'=>true))
             );
         }
@@ -246,7 +246,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
             if ($this->_runnerActions->isExistProductAction(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('subtitle'=>true)))
             ) {
                 return false;
@@ -265,7 +265,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
             $this->_runnerActions->setProduct(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('subtitle'=>true))
             );
         }
@@ -315,7 +315,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
             if ($this->_runnerActions->isExistProductAction(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('description'=>true)))
             ) {
                 return false;
@@ -334,7 +334,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
             $this->_runnerActions->setProduct(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 array('only_data'=>array('description'=>true))
             );
         }
@@ -368,7 +368,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
         if ($this->_runnerActions->isExistProductAction(
             $listingOther,
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
             $actionParams)
         ) {
             return false;
@@ -400,7 +400,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
         if ($productQty > 0 && $productQty != $channelQty) {
             $this->_runnerActions->setProduct(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 $actionParams
             );
             return true;
@@ -433,7 +433,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
 
         if ($this->_runnerActions->isExistProductAction(
             $listingOther,
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
             $actionParams)
         ) {
             return false;
@@ -465,7 +465,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Revise
         if ($currentPrice != $onlinePrice) {
             $this->_runnerActions->setProduct(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,
                 $actionParams
             );
             return true;

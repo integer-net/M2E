@@ -22,6 +22,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View_Item extends Mage_Adminht
         $this->setPagerVisibility(false);
         $this->setFilterVisibility(false);
         $this->setUseAjax(true);
+        $this->_defaultLimit = 200;
         //------------------------------
 
         /** @var $order Ess_M2ePro_Model_Order */

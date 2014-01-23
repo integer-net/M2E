@@ -213,7 +213,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
             }
         }
 
-        return $tempSku;
+        return trim($tempSku);
     }
 
     public function getQty()
@@ -285,8 +285,6 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
         } else if ($this->getListingProduct()->getMagentoProduct()->isGroupedType()) {
             $price = $this->getBaseProductPrice($src, $currency);
         }
-
-        $price < 0 && $price = 0;
 
         return $price;
     }
@@ -363,8 +361,6 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
             }
         }
 
-        $price < 0 && $price = 0;
-
         return $price;
     }
 
@@ -417,8 +413,6 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                 break 2;
             }
         }
-
-        $price < 0 && $price = 0;
 
         return $price;
     }
@@ -485,8 +479,6 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                 break 2;
             }
         }
-
-        $price < 0 && $price = 0;
 
         return $price;
     }

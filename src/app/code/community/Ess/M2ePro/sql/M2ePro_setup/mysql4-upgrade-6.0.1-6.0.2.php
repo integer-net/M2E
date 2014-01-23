@@ -83,7 +83,7 @@ $tempQuery = <<<SQL
     WHERE `group` = '/view/requirements/popup/'
     AND   `key` = 'closed'
 SQL;
-$tempRow = $installer->getConnection()->query($tempQuery)->fetch();
+$tempRow = $connection->query($tempQuery)->fetch();
 
 if ($tempRow === false) {
 
@@ -133,7 +133,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

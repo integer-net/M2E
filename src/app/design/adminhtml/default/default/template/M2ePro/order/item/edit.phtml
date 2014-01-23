@@ -8,14 +8,14 @@
 
 <script type="text/javascript">
 
+    M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_order')) ?>);
+
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'Please enter correct product ID or SKU.' => $this->__('Please enter correct product ID or SKU.'),
+        'Please enter correct product ID.' => $this->__('Please enter correct product ID.')
+    )); ?>);
+
     Event.observe(window, 'load', function() {
-
-        M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_order')) ?>);
-
-        M2ePro.translator.add(<?php echo json_encode(array(
-            'Please enter correct product ID or SKU.' => $this->__('Please enter correct product ID or SKU.'),
-            'Please enter correct product ID.' => $this->__('Please enter correct product ID.')
-        )); ?>);
 
         OrderEditItemHandlerObj = new OrderEditItemHandler();
 

@@ -60,24 +60,17 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Synchronization_Edit_Form_Tabs_Sc
             $parsedSettings = array();
             foreach ($scheduleWeekSettings as $day => $scheduleDaySettings) {
 
-                $convertedTimeFrom = Mage::helper('M2ePro')->gmtDateToTimezone(
-                    $scheduleDaySettings['time_from'], false, 'g:i:a'
-                );
-                $convertedTimeTo = Mage::helper('M2ePro')->gmtDateToTimezone(
-                    $scheduleDaySettings['time_to'], false, 'g:i:a'
-                );
-
-                $convertedTimeFrom = explode(':',$convertedTimeFrom);
-                $convertedTimeTo = explode(':',$convertedTimeTo);
+                $fromTimestamp = strtotime($scheduleDaySettings['time_from']);
+                $toTimestamp   = strtotime($scheduleDaySettings['time_to']);
 
                 $parsedSettings[$day] = array(
-                    'hours_from'   => $convertedTimeFrom[0],
-                    'minutes_from' => $convertedTimeFrom[1],
-                    'appm_from'    => $convertedTimeFrom[2],
+                    'hours_from'   => date('g', $fromTimestamp),
+                    'minutes_from' => date('i', $fromTimestamp),
+                    'appm_from'    => date('a', $fromTimestamp),
 
-                    'hours_to'   => $convertedTimeTo[0],
-                    'minutes_to' => $convertedTimeTo[1],
-                    'appm_to'    => $convertedTimeTo[2],
+                    'hours_to'   => date('g', $toTimestamp),
+                    'minutes_to' => date('i', $toTimestamp),
+                    'appm_to'    => date('a', $toTimestamp),
                 );
             }
 

@@ -82,6 +82,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_ProductSearch_Grid extends M
             'align'        => 'left',
             'type'         => 'text',
             'width'        => '375px',
+            'string_limit' => 10000,
             'index'        => 'title',
             'filter'       => false,
             'sortable'     => false,
@@ -134,10 +135,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_ProductSearch_Grid extends M
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
         $value = '<div style="margin-left: 3px; margin-bottom: 10px;">'.
                         Mage::helper('M2ePro')->escapeHtml($value)."</div>";
 

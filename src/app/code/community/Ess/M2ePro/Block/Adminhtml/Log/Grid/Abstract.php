@@ -116,8 +116,25 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
 
     public function callbackDescription($value, $row, $column, $isExport)
     {
-        $value = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($value);
-        return Mage::helper('M2ePro')->escapeHtml($value);
+        $fullDescription = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row->getData('description'));
+        $row->setData('description', $fullDescription);
+        $value = $column->getRenderer()->render($row);
+
+        return $this->prepareLongText($fullDescription, $value);
+    }
+
+    //####################################
+
+    protected function prepareLongText($fullText, $renderedText)
+    {
+        if (strlen($fullText) == strlen($renderedText)) {
+            return $renderedText;
+        }
+
+        $renderedText .= '&nbsp;(<a href="javascript:void(0)" onclick="LogHandlerObj.showFullText(this);">more</a>)
+                          <div style="display: none;"><br />'.$fullText.'<br /><br /></div>';
+
+        return $renderedText;
     }
 
     //####################################

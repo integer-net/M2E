@@ -262,17 +262,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
 
     public function reviseAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,$params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,$params);
     }
 
     public function relistAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST,$params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST,$params);
     }
 
     public function stopAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP,$params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,$params);
     }
 
     //-----------------------------------------
@@ -283,7 +283,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
              throw new Exception('Method require loaded instance first');
         }
 
-        $dispatcher = Mage::getModel('M2ePro/Connector_Server_Ebay_OtherItem_Dispatcher');
+        $dispatcher = Mage::getModel('M2ePro/Connector_Ebay_OtherItem_Dispatcher');
 
         return $dispatcher->process($action, $this->getId(), $params);
     }
@@ -293,6 +293,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
     public function afterMapProduct()
     {
         $dataForAdd = array(
+            'account_id' => $this->getAccount()->getId(),
+            'marketplace_id' => $this->getMarketplace()->getId(),
             'item_id' => $this->getItemId(),
             'product_id' => $this->getParentObject()->getProductId(),
             'store_id' => $this->getRelatedStoreId()
@@ -307,7 +309,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
             ->delete(Mage::getResourceModel('M2ePro/Ebay_Item')->getMainTable(),
                     array(
                         '`item_id` = ?' => $this->getItemId(),
-                        '`product_id` = ?' => $this->getParentObject()->getProductId()
+                        '`product_id` = ?' => $this->getParentObject()->getProductId(),
+                        '`account_id` = ?' => $this->getAccount()->getId()
                     ));
     }
 

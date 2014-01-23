@@ -162,7 +162,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $listingProductId = (int)$this->getRequest()->getParam('listing_product_id');
 
         if (!$listingProductId || !$component) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Component and Listing Product must be specified.')
             )));
@@ -176,7 +176,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             )
         );
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
             'text' => $variationEditBlock->toHtml()
         )));
@@ -190,7 +190,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $listingProductId = (int)$this->getRequest()->getParam('listing_product_id');
 
         if (!$listingProductId || !$component) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Component and Listing Product must be specified.')
             )));
@@ -204,7 +204,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             )
         );
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
             'text' => $variationManageBlock->toHtml()
         )));
@@ -219,7 +219,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $variationData = $this->getRequest()->getParam('variation_data');
 
         if (!$listingProductId || !$component || !$variationData) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
                 'message' => Mage::helper('M2ePro')->__(
                     'Component, Listing Product and Variation Data must be specified.'
@@ -246,7 +246,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         }
 
         if (count($magentoVariations) != 1) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Only 1 variation must leave.')
             )));
@@ -255,7 +255,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $listingProduct->getChildObject()->unsetMatchedVariation();
         $listingProduct->getChildObject()->setMatchedVariation(reset($magentoVariations));
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
             'message' => Mage::helper('M2ePro')->__('Variation has been successfully edited.')
         )));
@@ -268,7 +268,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $variationsData = $this->getRequest()->getParam('variation_data');
 
         if (!$listingProductId || !$component || !$variationsData) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
                 'message' => Mage::helper('M2ePro')->__(
                     'Component, Listing Product and Variation Data must be specified.'
@@ -309,7 +309,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             }
 
             if (count($tempMagentoVariations) != 1) {
-                exit(json_encode(array(
+                return $this->getResponse()->setBody(json_encode(array(
                     'type' => 'error',
                     'message' => Mage::helper('M2ePro')->__('Only 1 variation must leave.')
                 )));
@@ -319,7 +319,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             $listingProduct->getChildObject()->setMatchedVariation(reset($tempMagentoVariations));
         }
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
             'message' => Mage::helper('M2ePro')->__('Variation(s) has been successfully saved.')
         )));
@@ -333,7 +333,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $listingProductId = (int)$this->getRequest()->getParam('listing_product_id');
 
         if (!$listingProductId || !$component) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
                 'message' => Mage::helper('M2ePro')->__(
                     'Component and Listing Product must be specified.'
@@ -350,7 +350,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $magentoVariations = $magentoVariations['variations'];
 
         if (!$this->getRequest()->getParam('unique',false)) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'success',
                 'text' => $magentoVariations
             )));
@@ -391,7 +391,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             }
         }
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
             'text' => array_values($magentoVariations)
         )));
@@ -408,7 +408,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         $listingProductsIds = array_filter($listingProductsIds);
 
         if (empty($listingProductsIds) || !$component) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Component and Listing Products must be specified.')
             )));
@@ -424,7 +424,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             $listingProduct->duplicate();
         }
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
             'message' => Mage::helper('M2ePro')->__('The items were successfully duplicated.')
         )));

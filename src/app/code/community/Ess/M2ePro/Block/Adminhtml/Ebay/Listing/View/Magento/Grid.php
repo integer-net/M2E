@@ -84,6 +84,45 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
             );
         //----------------------------
 
+        //----------------------------
+        $collection->joinTable(
+            array('lp' => 'M2ePro/Listing_Product'),
+            'product_id=entity_id',
+            array(
+                'listing_product_id' => 'id',
+                'status' => 'status',
+                'additional_data' => 'additional_data'
+            ),
+            '{{table}}.listing_id='.(int)$listing->getId()
+        );
+        $collection->joinTable(
+            array('elp' => 'M2ePro/Ebay_Listing_Product'),
+            'listing_product_id=listing_product_id',
+            array(
+                'end_date'              => 'end_date',
+                'start_date'            => 'start_date',
+                'online_title'          => 'online_title',
+                'online_sku'            => 'online_sku',
+                'available_qty'         => new Zend_Db_Expr('(online_qty - online_qty_sold)'),
+                'ebay_item_id'          => 'ebay_item_id',
+                'online_category'       => 'online_category',
+                'online_qty_sold'       => 'online_qty_sold',
+                'online_buyitnow_price' => 'online_buyitnow_price',
+            ),
+            NULL,
+            'left'
+        );
+        $collection->joinTable(
+            array('ei' => 'M2ePro/Ebay_Item'),
+            'id=ebay_item_id',
+            array(
+                'item_id' => 'item_id',
+            ),
+            NULL,
+            'left'
+        );
+        //----------------------------
+
         // Set filter store
         //----------------------------
         $store = $this->_getStore();
@@ -107,18 +146,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
             $collection->addAttributeToSelect('visibility');
             $collection->addAttributeToSelect('thumbnail');
         }
-        //----------------------------
-
-        //----------------------------
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                ->select()
-                ->from(
-                    Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable(),
-                    new Zend_Db_Expr('DISTINCT `product_id`')
-                )
-                ->where('`listing_id` = ?', (int)$listing->getId());
-
-        $collection->getSelect()->where('`e`.`entity_id` IN ('.$dbSelect->__toString().')');
         //----------------------------
 
 //        exit($collection->getSelect()->__toString());

@@ -80,7 +80,7 @@ class Ess_M2ePro_Model_StopQueue extends Ess_M2ePro_Model_Abstract
 
     private function getItemDataByListingProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $connectorClassName = 'Ess_M2ePro_Model_Connector_Server_'.ucfirst($listingProduct->getComponentMode()).'_';
+        $connectorClassName = 'Ess_M2ePro_Model_Connector_'.ucfirst($listingProduct->getComponentMode()).'_';
         $connectorClassName .= $listingProduct->isComponentModeEbay() ? 'Item' : 'Product';
         $connectorClassName .= '_Stop_Multiple';
 

@@ -29,7 +29,10 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_OtherController extends Ess_M2ePro_Contr
              ->addJs('M2ePro/Listing/MovingHandler.js')
 
              ->addJs('M2ePro/Listing/Other/MappingHandler.js')
-             ->addJs('M2ePro/Listing/Other/AutoMappingHandler.js');
+             ->addJs('M2ePro/Listing/Other/AutoMappingHandler.js')
+
+            ->addJs('M2ePro/Listing/Other/RemovingHandler.js')
+            ->addJs('M2ePro/Listing/Other/UnmappingHandler.js');
 
         $this->_initPopUp();
 
@@ -63,77 +66,80 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_OtherController extends Ess_M2ePro_Contr
     protected function processConnector($action, array $params = array())
     {
         if (!$ebayProductsIds = $this->getRequest()->getParam('selected_products')) {
-            exit('You should select products');
+            return $this->getResponse()->setBody('You should select products');
         }
 
         $params['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER;
 
         $ebayProductsIds = explode(',', $ebayProductsIds);
 
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Ebay_OtherItem_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_OtherItem_Dispatcher');
         $result = (int)$dispatcherObject->process($action, $ebayProductsIds, $params);
         $actionId = (int)$dispatcherObject->getLogsActionId();
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_ERROR) {
-            exit(json_encode(array('result'=>'error','action_id'=>$actionId)));
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_ERROR) {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'error','action_id'=>$actionId)));
         }
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_WARNING) {
-            exit(json_encode(array('result'=>'warning','action_id'=>$actionId)));
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_WARNING) {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'warning','action_id'=>$actionId)));
         }
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_SUCCESS) {
-            exit(json_encode(array('result'=>'success','action_id'=>$actionId)));
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_SUCCESS) {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'success','action_id'=>$actionId)));
         }
 
-        exit(json_encode(array('result'=>'error','action_id'=>$actionId)));
+        return $this->getResponse()->setBody(json_encode(array('result'=>'error','action_id'=>$actionId)));
     }
 
     //-------------------------------------------
 
     public function runReviseProductsAction()
     {
-        $this->processConnector(Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE,array());
+        $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,array());
     }
 
     public function runRelistProductsAction()
     {
-        $this->processConnector(Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST,array());
+        $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST,array());
     }
 
     public function runStopProductsAction()
     {
-        $this->processConnector(Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP,array());
+        $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,array());
     }
 
     //#############################################
 
-    public function deleteAction()
+    public function removingAction()
     {
         $component = Ess_M2ePro_Helper_Component_Ebay::NICK;
+        $productIds = $this->getRequest()->getParam('product_ids');
 
-        $listingOtherId = $this->getRequest()->getParam('id');
-
-        /* @var $listingOther Ess_M2ePro_Model_Listing_Other */
-        $listingOther = Mage::helper('M2ePro/Component')->getComponentObject(
-            $component,'Listing_Other',$listingOtherId
-        );
-
-        if (!is_null($listingOther->getProductId())) {
-            $listingOther->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+        if (!$productIds) {
+            return $this->getResponse()->setBody('0');
         }
 
-        $listingOther->deleteInstance();
+        $productArray = explode(',', $productIds);
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__(
-            'The item was successfully removed.'
-        ));
-        return $this->_redirect('*/*/view',array(
-            'tab' => Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings::TAB_ID_LISTING_OTHER,
-            'account' => $this->getRequest()->getParam('account'),
-            'marketplace' => $this->getRequest()->getParam('marketplace'),
-            'back' => $this->getRequest()->getParam('back'),
-        ));
+        if (empty($productArray)) {
+            return $this->getResponse()->setBody('0');
+        }
+
+        foreach ($productArray as $productId) {
+            /* @var $listingOther Ess_M2ePro_Model_Listing_Other */
+            $listingOther = Mage::helper('M2ePro/Component')->getComponentObject(
+                $component, 'Listing_Other', $productId
+            );
+
+            if (!is_null($listingOther->getProductId())) {
+                $listingOther->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+            }
+
+            $listingOther->deleteInstance();
+        }
+
+        return $this->getResponse()->setBody('1');
     }
 
     //#############################################

@@ -102,6 +102,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
 
         $mapAutoToProductUrl = $this->getUrl('*/adminhtml_listing_other_mapping/autoMap');
 
+        $removingProductsUrl = $this->getUrl('*/adminhtml_common_listing_other/removing');
+        $unmappingProductsUrl = $this->getUrl('*/adminhtml_listing_other_mapping/unmapping');
+
         $someProductsWereNotMappedMessage = 'No matches were found. Please change the mapping attributes in <strong>';
         $someProductsWereNotMappedMessage .= 'Configuration > Account > 3rd Party Listings</strong> ';
         $someProductsWereNotMappedMessage .= 'or try to map manually.';
@@ -125,6 +128,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
         $someProductsWereNotMovedMessage = $helper->escapeJs(
             $helper->__('Some of the products were not moved. <a target="_blank" href="%s">View log</a> for details.')
         );
+
+        $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
+        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
+        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
@@ -163,6 +170,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
 
     M2eProAmazon.url.mapAutoToProduct = '{$mapAutoToProductUrl}';
 
+    M2eProAmazon.url.removingProducts = '{$removingProductsUrl}';
+    M2eProAmazon.url.unmappingProducts = '{$unmappingProductsUrl}';
+
     M2eProAmazon.text.create_listing = '{$createListing}';
     M2eProAmazon.text.popup_title = '{$popupTitle}';
     M2eProAmazon.text.failed_products_popup_title = '{$failedProductsPopupTitle}';
@@ -170,6 +180,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
     M2eProAmazon.text.successfully_moved = '{$successfullyMovedMessage}';
     M2eProAmazon.text.products_were_not_moved = '{$productsWereNotMovedMessage}';
     M2eProAmazon.text.some_products_were_not_moved = '{$someProductsWereNotMovedMessage}';
+    M2eProAmazon.text.not_enough_data = '{$notEnoughDataMessage}';
+    M2eProAmazon.text.successfully_unmapped = '{$successfullyUnmappedMessage}';
+    M2eProAmazon.text.successfully_removed = '{$successfullyRemovedMessage}';
 
     M2eProAmazon.text.select_items_message = '{$selectItemsMessage}';
     M2eProAmazon.text.select_action_message = '{$selectActionMessage}';
@@ -203,6 +216,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
         // todo next (temp solution)
         AmazonListingOtherGridHandlerObj.movingHandler.setOptions(M2eProAmazon);
         AmazonListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProAmazon);
+        AmazonListingOtherGridHandlerObj.removingHandler.setOptions(M2eProAmazon);
+        AmazonListingOtherGridHandlerObj.unmappingHandler.setOptions(M2eProAmazon);
     }
 
     {$this->isAjax} ? init()
@@ -272,6 +287,9 @@ JAVASCRIPT;
 
         $mapAutoToProductUrl = $this->getUrl('*/adminhtml_listing_other_mapping/autoMap');
 
+        $removingProductsUrl = $this->getUrl('*/adminhtml_common_listing_other/removing');
+        $unmappingProductsUrl = $this->getUrl('*/adminhtml_listing_other_mapping/unmapping');
+
         $someProductsWereNotMappedMessage = 'No matches were found. Please change the mapping attributes in <strong>';
         $someProductsWereNotMappedMessage .= 'Configuration > Account > 3rd Party Listings</strong> ';
         $someProductsWereNotMappedMessage .= 'or try to map manually.';
@@ -295,6 +313,10 @@ JAVASCRIPT;
         $someProductsWereNotMovedMessage = $helper->escapeJs(
             $helper->__('Some of the products were not moved. <a target="_blank" href="%s">View log</a> for details.')
         );
+
+        $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data.'));
+        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
+        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
@@ -332,6 +354,8 @@ JAVASCRIPT;
     M2eProBuy.url.tryToMoveToListing = '{$tryToMoveToListing}';
     M2eProBuy.url.moveToListing = '{$moveToListing}';
     M2eProBuy.url.mapAutoToProduct = '{$mapAutoToProductUrl}';
+    M2eProBuy.url.removingProducts = '{$removingProductsUrl}';
+    M2eProBuy.url.unmappingProducts = '{$unmappingProductsUrl}';
 
     M2eProBuy.text.create_listing = '{$createListing}';
     M2eProBuy.text.popup_title = '{$popupTitle}';
@@ -340,6 +364,9 @@ JAVASCRIPT;
     M2eProBuy.text.successfully_moved = '{$successfullyMovedMessage}';
     M2eProBuy.text.products_were_not_moved = '{$productsWereNotMovedMessage}';
     M2eProBuy.text.some_products_were_not_moved = '{$someProductsWereNotMovedMessage}';
+    M2eProBuy.text.not_enough_data = '{$notEnoughDataMessage}';
+    M2eProBuy.text.successfully_unmapped = '{$successfullyUnmappedMessage}';
+    M2eProBuy.text.successfully_removed = '{$successfullyRemovedMessage}';
 
     M2eProBuy.text.select_items_message = '{$selectItemsMessage}';
     M2eProBuy.text.select_action_message = '{$selectActionMessage}';
@@ -373,6 +400,8 @@ JAVASCRIPT;
         // todo next (temp solution)
         BuyListingOtherGridHandlerObj.movingHandler.setOptions(M2eProBuy);
         BuyListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProBuy);
+        BuyListingOtherGridHandlerObj.removingHandler.setOptions(M2eProBuy);
+        BuyListingOtherGridHandlerObj.unmappingHandler.setOptions(M2eProBuy);
     }
 
     {$this->isAjax} ? init()
@@ -447,6 +476,9 @@ JAVASCRIPT;
 
         $mapAutoToProductUrl = $this->getUrl('*/adminhtml_listing_other_mapping/autoMap');
 
+        $removingProductsUrl = $this->getUrl('*/adminhtml_common_listing_other/removing');
+        $unmappingProductsUrl = $this->getUrl('*/adminhtml_listing_other_mapping/unmapping');
+
         $someProductsWereNotMappedMessage = 'No matches were found. Please change the mapping attributes in <strong>';
         $someProductsWereNotMappedMessage .= 'Configuration > Account > 3rd Party Listings</strong> ';
         $someProductsWereNotMappedMessage .= 'or try to map manually.';
@@ -471,7 +503,11 @@ JAVASCRIPT;
             $helper->__('Some of the products were not moved. <a target="_blank" href="%s">View log</a> for details.')
         );
 
-        $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
+        $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
+        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
+        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
+
+        $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log'));
 
         $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
@@ -507,6 +543,8 @@ JAVASCRIPT;
     M2eProPlay.url.tryToMoveToListing = '{$tryToMoveToListing}';
     M2eProPlay.url.moveToListing = '{$moveToListing}';
     M2eProPlay.url.mapAutoToProduct = '{$mapAutoToProductUrl}';
+    M2eProPlay.url.removingProducts = '{$removingProductsUrl}';
+    M2eProPlay.url.unmappingProducts = '{$unmappingProductsUrl}';
 
     M2eProPlay.text.create_listing = '{$createListing}';
     M2eProPlay.text.popup_title = '{$popupTitle}';
@@ -515,6 +553,9 @@ JAVASCRIPT;
     M2eProPlay.text.successfully_moved = '{$successfullyMovedMessage}';
     M2eProPlay.text.products_were_not_moved = '{$productsWereNotMovedMessage}';
     M2eProPlay.text.some_products_were_not_moved = '{$someProductsWereNotMovedMessage}';
+    M2eProPlay.text.not_enough_data = '{$notEnoughDataMessage}';
+    M2eProPlay.text.successfully_unmapped = '{$successfullyUnmappedMessage}';
+    M2eProPlay.text.successfully_removed = '{$successfullyRemovedMessage}';
 
     M2eProPlay.text.select_items_message = '{$selectItemsMessage}';
     M2eProPlay.text.select_action_message = '{$selectActionMessage}';
@@ -548,6 +589,8 @@ JAVASCRIPT;
         // todo next (temp solution)
         PlayListingOtherGridHandlerObj.movingHandler.setOptions(M2eProPlay);
         PlayListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProPlay);
+        PlayListingOtherGridHandlerObj.removingHandler.setOptions(M2eProPlay);
+        PlayListingOtherGridHandlerObj.unmappingHandler.setOptions(M2eProPlay);
     }
 
     {$this->isAjax} ? init()

@@ -44,7 +44,7 @@ $tempQuery = <<<SQL
     WHERE `group` = '/ebay/policies/receive/'
     AND   `key` = 'mode'
 SQL;
-$tempRow = $installer->getConnection()->query($tempQuery)->fetch();
+$tempRow = $connection->query($tempQuery)->fetch();
 
 if ($tempRow === false) {
 
@@ -64,7 +64,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

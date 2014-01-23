@@ -247,7 +247,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Item Title'); ?>: </label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>: </label>
                     </td>
                     <td class="value">
                         <select id="title_mode" name="description[title_mode]" class="select">
@@ -273,7 +273,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Item Brand'); ?>:</label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Brand'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="brand_mode" name="description[brand_mode]" class="select">
@@ -302,7 +302,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Item Manufacturer'); ?>:</label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="manufacturer_mode" name="description[manufacturer_mode]" class="select">
@@ -328,7 +328,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Item Manufacturer Part Number'); ?>:</label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Part Number'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="manufacturer_part_number_mode" name="description[manufacturer_part_number_mode]" class="select">
@@ -368,7 +368,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="item_package_quantity_mode_tr">
                     <td class="label">
-                        <label for="item_package_quantity_mode"><?php echo Mage::helper('M2ePro')->__('Item Package Quantity') ?>: </label>
+                        <label for="item_package_quantity_mode"><?php echo Mage::helper('M2ePro')->__('Package Quantity') ?>: </label>
                     </td>
                     <td class="value">
                         <select name="category[item_package_quantity_mode]" id="item_package_quantity_mode">
@@ -399,7 +399,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value">
                         <div id="item_package_quantity_attribute_td"></div>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Item Package Quantity.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Package Quantity.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -420,7 +420,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                                 <br>
                                 <strong>For ex.</strong>, if you are selling a case of 10 packages of socks,
                                 and each package contains
-                                <br>3 pairs of socks, the case would have Item Package Quantity = 10 and Number of Items = 30.
+                                <br>3 pairs of socks, the case would have Package Quantity = 10 and Number of Items = 30.
                             '); ?>
                         </p>
                     </td>
@@ -718,7 +718,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr class="requirie-attribute-set">
                     <td class="label">
-                        <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Item Image'); ?>:</label>
+                        <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="image_main_mode" name="description[image_main_mode]">
@@ -883,7 +883,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                                 <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_CUSTOM; ?>" <?php if ($formData['description']['description_mode'] == Ess_M2ePro_Model_Amazon_Template_NewProduct_Description::DESCRIPTION_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Description'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Item description is limited to 2\'000 characters.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Description is limited to 2\'000 characters.'); ?></span>
                             </p>
                         </td>
                     </tr>

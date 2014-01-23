@@ -1,3 +1,8 @@
+<?php
+    /** @var $this Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form */
+    echo $this->getChildHtml('item_edit');
+?>
+
 <!-- ########################################################################################### -->
 
 <script type="text/javascript">
@@ -9,8 +14,6 @@
 </script>
 
 <!-- ########################################################################################### -->
-
-<?php echo $this->getChildHtml('item_edit'); ?>
 
 <div class="box-left">
     <div class="entry-edit" id="magento_block_ebay_orders_general" collapseable="no">
@@ -337,6 +340,9 @@
                                         <?php echo Mage::helper('M2ePro')->__('N/A'); ?>
                                     <?php } else { ?>
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($this->order->getData('shipping_method')); ?>
+                                        <?php if ($this->order->getChildObject()->isUseGlobalShippingProgram()): ?>
+                                            <span style="font-weight: normal; color: grey;"> (<?php echo Mage::helper('M2ePro')->__('Global Shipping Program'); ?>)</span>
+                                        <?php endif; ?>
                                     <?php } ?>
                                 </strong>
                             </td>
@@ -391,6 +397,94 @@
                             </tr>
 
                         <?php } ?>
+
+                        <?php if ($this->order->getChildObject()->isUseGlobalShippingProgram()): ?>
+                            <tr>
+                                <td colspan="2">
+                                    <br />
+                                    <h4><?php echo Mage::helper('M2ePro')->__('Global Shipping Details'); ?></h4>
+                                </td>
+                            </tr>
+
+                            <?php if (!empty($this->ebayWarehouseAddress['reference_id'])): ?>
+
+                                <tr>
+                                    <td class="label"><?php echo Mage::helper('M2ePro')->__('Reference ID'); ?></td>
+                                    <td class="value">
+                                        <strong><?php echo $this->ebayWarehouseAddress['reference_id']; ?></strong>
+                                    </td>
+                                </tr>
+
+                            <?php endif; ?>
+
+                            <tr>
+                                <td class="label"><?php echo Mage::helper('M2ePro')->__('eBay Warehouse Address'); ?></td>
+                                <td class="value">
+                                    <strong>
+
+                                        <?php if (!empty($this->ebayWarehouseAddress['street'][0])): ?>
+                                            <?php echo Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['street'][0]); ?>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($this->ebayWarehouseAddress['street'][1])): ?>
+                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['street'][1]); ?>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($this->ebayWarehouseAddress['city'])): ?>
+                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml(implode(', ', array($this->ebayWarehouseAddress['city'], $this->ebayWarehouseAddress['state'], $this->ebayWarehouseAddress['postal_code']))) ?>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($this->ebayWarehouseAddress['country_name'])): ?>
+                                            <br />
+                                            <?php
+                                            if (!empty($this->ebayWarehouseAddress['country_name'])) {
+                                                echo Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['country_name']);
+                                            } else {
+                                                echo Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['country_code']);
+                                            }
+                                            ?>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($this->ebayWarehouseAddress['phone']) && stripos($this->ebayWarehouseAddress['phone'], 'Invalid Request') === false): ?>
+                                            <br /><?php echo 'T: ' . Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['phone']); ?>
+                                        <?php endif; ?>
+
+                                    </strong>
+                                </td>
+                            </tr>
+
+                            <?php if (!empty($this->globalShippingServiceDetails)): ?>
+
+                                <tr>
+                                    <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Service');?></td>
+                                    <td class="value">
+                                        <strong>
+                                            <?php echo Mage::helper('M2ePro')->escapeHtml($this->globalShippingServiceDetails['service']); ?>
+                                        </strong>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Cost');?></td>
+                                    <td class="value">
+                                        <strong>
+                                            <?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getCurrency(), $this->globalShippingServiceDetails['price']); ?>
+                                        </strong>
+                                    </td>
+                                </tr>
+
+                            <?php endif; ?>
+
+                        <?php endif; ?>
+
+                        <?php if ($this->getChild('resubmit_shipping_info')): ?>
+                            <tr>
+                                <td></td>
+                                <td class="value">
+                                    <?php echo $this->getChildHtml('resubmit_shipping_info') ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
 
                     </tbody>
                 </table>

@@ -339,8 +339,10 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
                 break;
         }
 
+        $allowedTags = array('<p>', '<br>', '<ul>', '<li>');
+
         $description = str_replace(array('<![CDATA[', ']]>'), '', $description);
-        $description = strip_tags($description);
+        $description = strip_tags($description,implode($allowedTags));
 
         return $description;
     }

@@ -153,7 +153,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="label">
                         <label for="magento_orders_listings_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_mode" name="magento_orders_settings[listing][mode]" class="M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO; ?>" <?php if ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES; ?>" <?php if ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
@@ -168,7 +168,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="label">
                         <label for="magento_orders_listings_store_mode"><?php echo Mage::helper('M2ePro')->__('Store View Source'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_store_mode" name="magento_orders_settings[listing][store_mode]" class="M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT; ?>" <?php if ($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Use Store View from Listing'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM; ?>" <?php if ($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Choose Store View Manually'); ?></option>
@@ -213,7 +213,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="label">
                         <label for="magento_orders_listings_other_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_other_mode" name="magento_orders_settings[listing_other][mode]" class="required-entry">
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
@@ -240,7 +240,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="label">
                         <label for="magento_orders_listings_other_product_mode"><?php echo Mage::helper('M2ePro')->__('Product Not Found'); ?>: <span class="required">*</span></label>
                     </td>
-                    <td class="value" style="width: auto;">
+                    <td class="value">
                         <select id="magento_orders_listings_other_product_mode" name="magento_orders_settings[listing_other][product_mode]" class="M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Do Not Create Order'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT) echo ' selected="selected"';?>><?php echo Mage::helper('M2ePro')->__('Create Product and Order'); ?></option>

@@ -75,7 +75,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Marketplaces extends Ess_M2ePr
     private function execute()
     {
         $marketplaceObj = Mage::helper('M2ePro/Component_Play')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID
+            'Marketplace', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID
         );
 
         $logMarketplacesString = $marketplaceObj->getTitle();

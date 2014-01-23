@@ -59,9 +59,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Updater
             }
         }
 
-        // listing product variation option not found in magento product variation options
-        // todo do we need to log it?
-
         foreach ($listingProduct->getVariations(true) as $variation) {
             $variation->deleteInstance();
         }

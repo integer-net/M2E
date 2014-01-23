@@ -71,9 +71,20 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
 
     protected function _toHtml()
     {
+        $translations = array();
+
+        $text = 'Inconsistent settings in Revise and Stop rules.';
+        $translations[$text] = Mage::helper('M2ePro')->__($text);
+
+        $text = 'Must be greater than "Min".';
+        $translations[$text] = Mage::helper('M2ePro')->__($text);
+
+        $translations = json_encode($translations);
+
         $javascriptBefore =<<<JAVASCRIPT
 <script type="text/javascript">
-EbayListingOtherSynchronizationHandlerObj = new EbayListingOtherSynchronizationHandler();
+    M2ePro.translator.add({$translations});
+    EbayListingOtherSynchronizationHandlerObj = new EbayListingOtherSynchronizationHandler();
 </script>
 JAVASCRIPT;
 

@@ -40,8 +40,6 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
-        $resourceModels = Mage::getConfig()->getNode('global/models/M2ePro_mysql4/entities');
-
         $moduleTables = Mage::helper('M2ePro/Module_Database')->getGroupedMySqlTables();
         $magentoTables = Mage::helper('M2ePro/Magento')->getMySqlTables();
         $databaseName = Mage::helper('M2ePro/Magento')->getDatabaseName();
@@ -56,7 +54,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
                 'is_exist'   => false,
                 'records'    => 0,
                 'size'       => 0,
-                'has_model'  => false
+                'model'      => Mage::helper('M2ePro/Module_Database')->getTableModel($moduleTable)
             );
 
             // Set component
@@ -64,16 +62,6 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
             foreach (Mage::helper('M2ePro/Component')->getComponents() as $component) {
                 if (strpos(strtolower($moduleTable),strtolower($component)) !== false) {
                     $tableRow['component'] = $component;
-                    break;
-                }
-            }
-            //--------------------
-
-            // Find model
-            //--------------------
-            foreach ($resourceModels->asArray() as $tempTable) {
-                 if ($tempTable['table'] == $moduleTable) {
-                    $tableRow['has_model'] = true;
                     break;
                 }
             }
@@ -89,14 +77,16 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
             //--------------------
             if ($tableRow['is_exist']) {
 
-                $dbSelect = $connRead->select()->from('information_schema.tables',array('table_rows','data_length'))
+                $dbSelect = $connRead->select()->from('information_schema.tables',array('data_length'))
                                                ->where('`table_name` = ?',$moduleTable)
                                                ->where('`table_schema` = ?',$databaseName);
 
                 $tempRow = $connRead->fetchRow($dbSelect);
-
-                $tableRow['records'] = $tempRow['table_rows'];
                 $tableRow['size'] = round($tempRow['data_length'] / 1024 / 1024, 2);
+
+                $dbSelect = $connRead->select()->from($moduleTable, array('count' => 'COUNT(*)'));
+                $tempRow = $connRead->fetchRow($dbSelect);
+                $tableRow['records'] = $tempRow['count'];
             }
             //--------------------
 
@@ -115,6 +105,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
             'align'     => 'left',
             'index'     => 'table_name',
             'filter_index' => 'table_name',
+            'frame_callback' => array($this, 'callbackColumnTableName'),
             'filter_condition_callback' => array($this, '_customColumnFilter'),
         ));
 
@@ -160,19 +151,6 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
         ));
         //--------------------
 
-        $this->addColumn('status', array(
-            'header'    => Mage::helper('M2ePro')->__('Status'),
-            'align'     => 'right',
-            'width'     => '100px',
-            'index'     => 'is_exist',
-            'type'      => 'options',
-            'sortable'  => false,
-            'options'   => array(true=>'Yes', false=>'No'),
-            'filter_index' => 'is_exist',
-            'frame_callback' => array($this, 'callbackColumnStatus'),
-            'filter_condition_callback' => array($this, '_customColumnFilter'),
-        ));
-
         $this->addColumn('records', array(
             'header'    => Mage::helper('M2ePro')->__('Records'),
             'align'     => 'right',
@@ -190,62 +168,19 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
             'filter'    => false,
         ));
 
-        $this->addColumn('edit', array(
-            'header'    => Mage::helper('M2ePro')->__('Edit'),
-            'align'     => 'center',
-            'width'     => '80px',
-            'filter'    => false,
-            'sortable'  => false,
-            'frame_callback' => array($this, 'callbackColumnEdit')
-        ));
-
-        $this->addColumn('truncate', array(
-            'header'    => Mage::helper('M2ePro')->__('Truncate'),
-            'align'     => 'center',
-            'width'     => '80px',
-            'filter'    => false,
-            'sortable'  => false,
-            'frame_callback' => array($this, 'callbackColumnTruncate')
-        ));
-
         return parent::_prepareColumns();
     }
 
     // ########################################
 
-    public function callbackColumnStatus($value, $row, $column, $isExport)
+    public function callbackColumnTableName($value, $row, $column, $isExport)
     {
-        $color = 'green';
-        $value == 'No' && $color = 'red' ;
+        $style= '';
 
-        return "<p style=\"color: {$color};\">{$value}</p>";
-    }
+        is_null($row->getData('model')) && $style = 'color: #878787;';
+        !$row->getData('is_exist') && $style = 'color: red; font-weight: bold;';
 
-    public function callbackColumnEdit($value, $row, $column, $isExport)
-    {
-        $url = $this->getUrl(
-            '*/adminhtml_development_database/manageTable',
-            array('table'=>$row->getData('table_name'))
-        );
-
-        if ($row->getData('is_exist') && $row->getData('has_model')) {
-            return '<a href="'.$url.'">Edit</a>';
-        }
-        return '<p style="color: silver;">Edit</p>';
-    }
-
-    public function callbackColumnTruncate($value, $row, $column, $isExport)
-    {
-        $url = $this->getUrl(
-            '*/adminhtml_development_database/truncateTables',
-            array('tables' => $row->getData('table_name'))
-        );
-
-        $confirmMessage = Mage::helper('M2ePro')->__('Are you sure?');
-        if ($row->getData('is_exist') && $row->getData('has_model')) {
-            return '<a href="'.$url.'" onclick="return confirm(\''.$confirmMessage.'\');">Truncate</a>';
-        }
-        return '<p style="color: silver;">Truncate</p>';
+        return "<p style=\"{$style}\">{$value}</p>";
     }
 
     // ########################################
@@ -317,6 +252,14 @@ JAVASCRIPT;
 
     public function getRowUrl($row)
     {
+        if ($row->getData('is_exist') && $row->getData('model')) {
+            return $this->getUrl(
+                '*/adminhtml_development_database/manageTable',
+                array(
+                    'table' => $row->getData('table_name'),
+                )
+            );
+        }
         return false;
     }
 
@@ -340,9 +283,7 @@ JAVASCRIPT;
 
         if ($field && isset($condition)) {
             $field == 'table_name' && $this->_filterByTableNameField($field, $value);
-
-            ($field == 'is_exist' || $field == 'component' || $field == 'group') &&
-                $this->_filterByField($field, $value);
+            ($field == 'component' || $field == 'group') && $this->_filterByField($field, $value);
         }
 
         return $this;
@@ -378,7 +319,7 @@ JAVASCRIPT;
 
     protected function _setCollectionOrder($column)
     {
-        $field = ($column->getFilterIndex()) ? $column->getFilterIndex() : $column->getIndex();
+        $field = $column->getFilterIndex() ? $column->getFilterIndex() : $column->getIndex();
         $direction = $column->getDir();
 
         if ($field && isset($direction)) {

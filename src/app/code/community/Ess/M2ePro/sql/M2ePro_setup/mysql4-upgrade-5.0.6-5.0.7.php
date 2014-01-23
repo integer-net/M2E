@@ -130,7 +130,7 @@ foreach ($tempAccounts as $account) {
 //#############################################
 
 $tempTable = $installer->getTable('m2epro_config');
-$tempRow = $installer->getConnection()->query("
+$tempRow = $connection->query("
     SELECT * FROM `{$tempTable}`
     WHERE `group` = '/amazon/synchronization/settings/orders/update/'
     AND   `key` = 'mode'
@@ -154,7 +154,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

@@ -14,6 +14,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Auto_Category extends Ess_M2ePro_Model_Compo
     private $categoryTemplateModel = NULL;
 
     /**
+     * @var Ess_M2ePro_Model_Ebay_Template_OtherCategory
+     */
+    private $otherCategoryTemplateModel = NULL;
+
+    /**
      * @var Ess_M2ePro_Model_Magento_Product
      */
     private $magentoProductModel = NULL;
@@ -35,6 +40,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Auto_Category extends Ess_M2ePro_Model_Compo
         }
 
         $this->categoryTemplateModel = NULL;
+        $this->otherCategoryTemplateModel = NULL;
         $this->magentoProductModel = NULL;
 
         $this->delete();
@@ -77,6 +83,39 @@ class Ess_M2ePro_Model_Ebay_Listing_Auto_Category extends Ess_M2ePro_Model_Compo
     //------------------------------------------
 
     /**
+     * @return Ess_M2ePro_Model_Ebay_Template_OtherCategory
+     */
+    public function getOtherCategoryTemplate()
+    {
+        if (is_null($this->otherCategoryTemplateModel)) {
+
+            try {
+                $this->otherCategoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
+                    'Ebay_Template_OtherCategory', (int)$this->getAddingTemplateOtherCategoryId(), NULL, array('template')
+                );
+            } catch (Exception $exception) {
+                return $this->otherCategoryTemplateModel;
+            }
+
+            if (!is_null($this->getMagentoProduct())) {
+                $this->otherCategoryTemplateModel->setMagentoProduct($this->getMagentoProduct());
+            }
+        }
+
+        return $this->otherCategoryTemplateModel;
+    }
+
+    /**
+     * @param Ess_M2ePro_Model_Ebay_Template_OtherCategory $instance
+     */
+    public function setOtherCategoryTemplate(Ess_M2ePro_Model_Ebay_Template_OtherCategory $instance)
+    {
+         $this->otherCategoryTemplateModel = $instance;
+    }
+
+    //------------------------------------------
+
+    /**
      * @return Ess_M2ePro_Model_Magento_Product
      */
     public function getMagentoProduct()
@@ -109,9 +148,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Auto_Category extends Ess_M2ePro_Model_Compo
         return $this->getData('adding_template_category_id');
     }
 
-    public function isAddingDuplicate()
+    public function getAddingTemplateOtherCategoryId()
     {
-        return (bool)$this->getData('adding_duplicate');
+        return $this->getData('adding_template_other_category_id');
     }
 
     // #######################################

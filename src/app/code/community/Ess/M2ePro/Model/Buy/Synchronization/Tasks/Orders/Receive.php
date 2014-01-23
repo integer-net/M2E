@@ -108,14 +108,10 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Orders_Receive extends Ess_M2eP
             $percentsForAccount = $percentsForAccount/$accountsTotalCount;
         }
 
-        $marketplace = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_VIRTUAL_ID
-        );
-
         $accountIteration = 1;
         foreach ($accountsCollection->getItems() as $account) {
-            if (!$this->isLockedAccountMarketplace($account->getId(), $marketplace->getId())) {
-                $this->processAccountMarketplace($account, $marketplace);
+            if (!$this->isLockedAccount($account->getId())) {
+                $this->processAccount($account);
             }
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
@@ -129,16 +125,14 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Orders_Receive extends Ess_M2eP
 
     //####################################
 
-    private function processAccountMarketplace(
-        Ess_M2ePro_Model_Account $account,
-        Ess_M2ePro_Model_Marketplace $marketplace
-    ) {
-        $title = 'Starting account "'.$account->getTitle().'" and marketplace "'.$marketplace->getTitle().'"';
+    private function processAccount(Ess_M2ePro_Model_Account $account)
+    {
+        $title = 'Starting account "'.$account->getTitle().'"';
         $this->_profiler->addTitle($title);
         $this->_profiler->addTimePoint(__METHOD__.'send'.$account->getId(),'Get orders from Buy');
 
-        $status = 'Task "%s" for Rakuten.com "%s" Account and "%s" marketplace is started. Please wait...';
-        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle(), $marketplace->getTitle());
+        $status = 'Task "%s" for Rakuten.com "%s" Account is started. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle());
         $this->_lockItem->setStatus($status);
 
         // Get open orders from Rakuten.com for account
@@ -148,10 +142,10 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Orders_Receive extends Ess_M2eP
         $name   = 'requester';
         $prefix = 'Ess_M2ePro_Model_Buy_Synchronization';
 
-        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Buy_Dispatcher */
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
+        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Buy_Dispatcher */
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
         $dispatcherObject->processConnector(
-            $entity, $type, $name, array(), $marketplace, $account, $prefix
+            $entity, $type, $name, array(), $account, $prefix
         );
         //---------------------------
 
@@ -205,11 +199,11 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Orders_Receive extends Ess_M2eP
 
     //####################################
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $maxDeactivateTime = (int)$this->config->getGroupValue('/buy/orders/receive/', 'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);

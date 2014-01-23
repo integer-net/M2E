@@ -160,12 +160,14 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
 
     public function callbackDescription($value, $row, $column, $isExport)
     {
-        $value = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($value);
+        $fullDescription = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row->getData('description'));
+        $row->setData('description', $fullDescription);
+        $value = $column->getRenderer()->render($row);
 
-        preg_match_all('/href="([^"]*)"/', $value, $matches);
+        preg_match_all('/href="([^"]*)"/', $fullDescription, $matches);
 
         if (!count($matches[0])) {
-            return $value;
+            return $this->prepareLongText($fullDescription, $value);
         }
 
         foreach ($matches[1] as $key => $href) {
@@ -175,7 +177,9 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             preg_match_all('/filter:([^;]*)/', $href, $filterMatch);
 
             if (count($routeMatch[1]) == 0) {
+                $fullDescription = str_replace($matches[0][$key], '', $fullDescription);
                 $value = str_replace($matches[0][$key], '', $value);
+
                 continue;
             }
 
@@ -188,10 +192,11 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             }
 
             $url = $routeMatch[1][$key];
+            $fullDescription = str_replace($href, $this->getUrl($url, $params), $fullDescription);
             $value = str_replace($href, $this->getUrl($url, $params), $value);
         }
 
-        return $value;
+        return $this->prepareLongText($fullDescription, $value);
     }
 
     // ####################################

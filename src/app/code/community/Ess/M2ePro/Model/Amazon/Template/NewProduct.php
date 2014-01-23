@@ -104,6 +104,7 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct extends Ess_M2ePro_Model_Compo
         return Mage::getModel('M2ePro/Amazon_Template_NewProduct_Specific')
             ->getCollection()
             ->addFieldToFilter('template_new_product_id',$this->getId())
+            ->setOrder('id', Varien_Data_Collection::SORT_ORDER_ASC)
             ->getData();
     }
 

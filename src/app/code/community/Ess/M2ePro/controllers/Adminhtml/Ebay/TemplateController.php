@@ -210,9 +210,9 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         $newData = $template->getDataSnapshot();
 
         if ($templateManager->isHorizontalTemplate()) {
-            $template->getChildObject()->setIsNeedSynchronize($newData,$oldData);
+            $template->getChildObject()->setSynchStatusNeed($newData,$oldData);
         } else {
-            $template->setIsNeedSynchronize($newData,$oldData);
+            $template->setSynchStatusNeed($newData,$oldData);
         }
 
         return $template;
@@ -305,11 +305,12 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         //------------------------------
         $data = $this->getPostedTemplatesData();
         $model->addData($data);
+        $model->getChildObject()->setEstimatedFeesObtainAttemptCount(0);
         $model->getChildObject()->setEstimatedFeesObtainRequired(true);
         $model->save();
         //------------------------------
         $newData = $model->getChildObject()->getDataSnapshot();
-        $model->getChildObject()->setIsNeedSynchronize($newData,$oldData);
+        $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
         //------------------------------
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The listing was successfully saved.'));
@@ -413,7 +414,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         }
 
         foreach ($collection->getItems() as $listingProduct) {
-            $listingProduct->getChildObject()->setIsNeedSynchronize(
+            $listingProduct->getChildObject()->setSynchStatusNeed(
                 $listingProduct->getChildObject()->getDataSnapshot(),
                 $snapshots[$listingProduct->getId()]
             );
@@ -462,7 +463,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         $title = $this->getRequest()->getParam('title');
 
         if ($title == '') {
-            exit(json_encode(array('unique' => false)));
+            return $this->getResponse()->setBody(json_encode(array('unique' => false)));
         }
 
         $manager = Mage::getSingleton('M2ePro/Ebay_Template_Manager');
@@ -478,7 +479,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
             $collection->addFieldToFilter('id', array('neq' => $id));
         }
 
-        exit(json_encode(array('unique' => !(bool)$collection->getSize())));
+        return $this->getResponse()->setBody(json_encode(array('unique' => !(bool)$collection->getSize())));
     }
 
     //#############################################

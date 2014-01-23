@@ -65,21 +65,44 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order extends Mage_Adminhtml_Block_Widget_
 
     public function getGridHtml()
     {
+        //------------------------------
         $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_order_help');
+        $editItemBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_order_item_edit');
+        //------------------------------
 
+        //------------------------------
+        $marketplaceFilterBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_marketplace_switcher', '', array(
+            'component_mode' => Ess_M2ePro_Helper_Component_Ebay::NICK,
+            'controller_name' => 'adminhtml_ebay_order'
+        ));
+        $marketplaceFilterBlock->setUseConfirm(false);
+        //------------------------------
+
+        //------------------------------
+        $accountFilterBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_account_switcher', '', array(
+            'component_mode' => Ess_M2ePro_Helper_Component_Ebay::NICK,
+            'controller_name' => 'adminhtml_ebay_order'
+        ));
+        $accountFilterBlock->setUseConfirm(false);
+        //------------------------------
+
+        //------------------------------
         $orderStateSwitcherBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_order_actionRequiredFilter',
+            'M2ePro/adminhtml_order_notCreatedFilter',
             '',
             array(
                 'component_mode' => Ess_M2ePro_Helper_Component_Ebay::NICK,
                 'controller' => 'adminhtml_ebay_order'
             )
         );
-
-        $editItemBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_order_item_edit');
+        //------------------------------
 
         return $helpBlock->toHtml()
+            . '<div class="filter_block">'
+            . $marketplaceFilterBlock->toHtml()
+            . $accountFilterBlock->toHtml()
             . $orderStateSwitcherBlock->toHtml()
+            . '</div>'
             . $editItemBlock->toHtml()
             . parent::getGridHtml();
     }

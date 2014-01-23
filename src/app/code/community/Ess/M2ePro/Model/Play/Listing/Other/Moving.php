@@ -7,11 +7,6 @@
 class Ess_M2ePro_Model_Play_Listing_Other_Moving
 {
     /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
      * @var Ess_M2ePro_Model_Account|null
      */
     protected $account = NULL;
@@ -20,10 +15,8 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
 
     // ########################################
 
-    public function initialize(Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
+    public function initialize(Ess_M2ePro_Model_Account $account = NULL)
     {
-        $this->marketplace = $marketplace;
         $this->account = $account;
         $this->tempObjectsCache = array();
     }
@@ -49,24 +42,16 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
             return false;
         }
 
-        $accountsMarketplaces = array();
+        $sortedItems = array();
 
+        /** @var $otherListing Ess_M2ePro_Model_Listing_Other */
         foreach ($otherListingsFiltered as $otherListing) {
-
-            /** @var $otherListing Ess_M2ePro_Model_Listing_Other */
-
-            $identifier = $otherListing->getAccountId().'_'.$otherListing->getMarketplaceId();
-
-            if (!isset($accountsMarketplaces[$identifier])) {
-                $accountsMarketplaces[$identifier] = array();
-            }
-
-            $accountsMarketplaces[$identifier][] = $otherListing;
+            $sortedItems[$otherListing->getAccountId()][] = $otherListing;
         }
 
         $result = true;
 
-        foreach ($accountsMarketplaces as $otherListings) {
+        foreach ($sortedItems as $otherListings) {
             foreach ($otherListings as $otherListing) {
                 /** @var $otherListing Ess_M2ePro_Model_Listing_Other */
                 $temp = $this->autoMoveOtherListingProduct($otherListing);
@@ -80,7 +65,6 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
     public function autoMoveOtherListingProduct(Ess_M2ePro_Model_Listing_Other $otherListing)
     {
         $this->setAccountByOtherListingProduct($otherListing);
-        $this->setMarketplaceByOtherListingProduct($otherListing);
 
         if (!$this->getAccount()->getChildObject()->isOtherListingsMoveToListingsEnabled()) {
             return false;
@@ -131,7 +115,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
             'account_id', $otherListing->getChildObject()->getAccountId()
         );
         $itemsCollection->addFieldToFilter(
-            'marketplace_id', $otherListing->getChildObject()->getMarketplaceId()
+            'marketplace_id', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID
         );
         $itemsCollection->addFieldToFilter(
             'sku', $otherListing->getChildObject()->getSku()
@@ -144,7 +128,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         } else {
             $dataForAdd = array(
                 'account_id' => $otherListing->getChildObject()->getAccountId(),
-                'marketplace_id' => $otherListing->getChildObject()->getMarketplaceId(),
+                'marketplace_id' => Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID,
                 'sku' => $otherListing->getChildObject()->getSku(),
                 'product_id' => $otherListing->getProductId(),
                 'store_id' => $listing->getStoreId()
@@ -197,10 +181,9 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
     public function getDefaultListing(Ess_M2ePro_Model_Listing_Other $otherListing)
     {
         $accountId = $this->getAccount()->getId();
-        $marketplaceId = $this->getMarketplace()->getId();
 
-        if (isset($this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId])) {
-            return $this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId];
+        if (isset($this->tempObjectsCache['listing_'.$accountId])) {
+            return $this->tempObjectsCache['listing_'.$accountId];
         }
 
         $tempCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing');
@@ -209,7 +192,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         $tempItem = $tempCollection->getFirstItem();
 
         if (!is_null($tempItem->getId())) {
-            $this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId] = $tempItem;
+            $this->tempObjectsCache['listing_'.$accountId] = $tempItem;
             return $tempItem;
         }
 
@@ -218,7 +201,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         $dataForAdd = array(
             'title' => 'Default ('.$this->getAccount()->getTitle().')',
             'store_id' => $otherListing->getChildObject()->getRelatedStoreId(),
-            'marketplace_id' => $marketplaceId,
+            'marketplace_id' => Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID,
             'account_id' => $accountId,
 
             'template_selling_format_id'  => $this->getDefaultSellingFormatTemplate($otherListing)->getId(),
@@ -245,7 +228,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         );
 
         $tempModel->addData($dataForAdd)->save();
-        $this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId] = $tempModel;
+        $this->tempObjectsCache['listing_'.$accountId] = $tempModel;
 
         $attributesSets = Mage::helper('M2ePro/Magento_AttributeSet')->getAll();
         foreach ($attributesSets as $attributeSet) {
@@ -268,7 +251,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
      */
     protected function getDefaultSynchronizationTemplate(Ess_M2ePro_Model_Listing_Other $otherListing)
     {
-        $marketplaceId = $this->getMarketplace()->getId();
+        $marketplaceId = Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID;
 
         if (isset($this->tempObjectsCache['synchronization_'.$marketplaceId])) {
             return $this->tempObjectsCache['synchronization_'.$marketplaceId];
@@ -343,7 +326,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
      */
     protected function getDefaultSellingFormatTemplate(Ess_M2ePro_Model_Listing_Other $otherListing)
     {
-        $marketplaceId = $this->getMarketplace()->getId();
+        $marketplaceId = Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID;
 
         if (isset($this->tempObjectsCache['selling_format_'.$marketplaceId])) {
             return $this->tempObjectsCache['selling_format_'.$marketplaceId];
@@ -396,14 +379,6 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         return $this->account;
     }
 
-    /**
-     * @return Ess_M2ePro_Model_Marketplace
-     */
-    protected function getMarketplace()
-    {
-        return $this->marketplace;
-    }
-
     //-----------------------------------------
 
     protected function setAccountByOtherListingProduct(Ess_M2ePro_Model_Listing_Other $otherListing)
@@ -414,17 +389,6 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
 
         $this->account = Mage::helper('M2ePro/Component_Play')->getCachedObject(
             'Account',$otherListing->getAccountId()
-        );
-    }
-
-    protected function setMarketplaceByOtherListingProduct(Ess_M2ePro_Model_Listing_Other $otherListing)
-    {
-        if (!is_null($this->marketplace) && $this->marketplace->getId() == $otherListing->getMarketplaceId()) {
-            return;
-        }
-
-        $this->marketplace = Mage::helper('M2ePro/Component_Play')->getCachedObject(
-            'Marketplace', $otherListing->getMarketplaceId()
         );
     }
 

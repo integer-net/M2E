@@ -49,6 +49,8 @@
         'deleteAction' => $this->getUrl('M2ePro/adminhtml_ebay_account/delete', array('id' => $this->getRequest()->getParam('id')))
     )); ?>);
 
+    M2ePro.url.set('adminhtml_ebay_account/update_account_title','<?php echo $this->getUrl('*/adminhtml_ebay_account/updateTitle'); ?>');
+
     M2ePro.translator.add(<?php echo json_encode(array(
         'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => $this->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'),
         'No Customer entry is found for specified ID.' => $this->__('No Customer entry is found for specified ID.'),
@@ -85,6 +87,13 @@
 
 </script>
 
+<style>
+    .columns .form-list td.value
+    {
+        width: auto;
+    }
+</style>
+
 <div class="entry-edit" id="magento_block_ebay_accounts_general_general">
 
     <div class="entry-edit-head">
@@ -101,12 +110,15 @@
                         <label for="title"><?php echo Mage::helper('M2ePro')->__('eBay User ID'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <span>
+                        <span id="account_title">
                             <?php if (!is_null($ebayUserId)): ?>
                                 <a target="_blank" href="<?php echo Mage::helper('M2ePro/Component_Ebay')->getMemberUrl($ebayUserId, $formData['mode']); ?>"><?php echo $this->escapeHtml($formData['title']); ?></a>
                             <?php else: ?>
                                 <?php echo $this->escapeHtml($formData['title']); ?>
                             <?php endif; ?>
+                        </span>&nbsp&nbsp
+                        <span>
+                            <?php echo $this->getChildHtml('update_title_button'); ?>
                         </span>
                     </td>
                 </tr>

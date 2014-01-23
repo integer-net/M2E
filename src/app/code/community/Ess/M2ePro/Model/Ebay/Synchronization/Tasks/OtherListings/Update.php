@@ -172,7 +172,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update
                 $marketplace = Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_US;
             }
 
-            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher');
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
             $dispatcherObject->processConnector('otherListings', 'update' ,'requester',
                                                 array(), $marketplace, $account, NULL,
                                                 'Ess_M2ePro_Model_Ebay_Synchronization_Tasks');
@@ -181,8 +181,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update
 
         $tempSinceTime = $this->prepareSinceTime($sinceTime);
 
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                            ->processVirtualAbstract('item','get','changes',
+        $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                            ->processVirtual('item','get','changes',
                                                      array('since_time'=>$tempSinceTime),NULL,
                                                      NULL,$account->getId(),NULL);
 
@@ -192,8 +192,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update
             $tempSinceTime->modify("-1 day");
             $tempSinceTime = $tempSinceTime->format('Y-m-d H:i:s');
 
-            $responseData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                            ->processVirtualAbstract('item','get','changes',
+            $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                            ->processVirtual('item','get','changes',
                                                      array('since_time'=>$tempSinceTime),NULL,
                                                      NULL,$account->getId(),NULL);
 
@@ -202,8 +202,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update
                 $tempSinceTime = new DateTime('now', new DateTimeZone('UTC'));
                 $tempSinceTime = $tempSinceTime->format('Y-m-d H:i:s');
 
-                $responseData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                            ->processVirtualAbstract('item','get','changes',
+                $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                            ->processVirtual('item','get','changes',
                                                      array('since_time'=>$tempSinceTime),NULL,
                                                      NULL,$account->getId(),NULL);
             }
@@ -243,7 +243,7 @@ STATUS;
         $tempListingOther = $listingOtherCollection->getFirstItem();
 
         $sinceTime = new DateTime($tempListingOther->getData('start_date'),new DateTimeZone('UTC'));
-        $sinceTime->modify('-5 minutes');
+        $sinceTime->modify('-1 minute');
         $sinceTime = $sinceTime->format('Y-m-d H:i:s');
 
         $inputData = array(
@@ -252,8 +252,8 @@ STATUS;
             'only_one_page' => true
         );
 
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                            ->processVirtualAbstract('item','get','all',
+        $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                            ->processVirtual('item','get','all',
                                                      $inputData,NULL,
                                                      NULL,$account->getId(),NULL);
 

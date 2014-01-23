@@ -27,7 +27,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             ->addJs('M2ePro/Ebay/Listing/ProductAddHandler.js')
             ->addJs('M2ePro/Listing/ProductGridHandler.js')
 
+            ->addJs('M2ePro/ActionHandler.js')
+            ->addJs('M2ePro/Listing/ActionHandler.js')
             ->addJs('M2ePro/GridHandler.js')
+            ->addJs('M2ePro/Listing/GridHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/ViewGridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Settings/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ProductAdd/Settings/GridHandler.js')
 
@@ -130,7 +134,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
 
         // Set rule model
         // ---------------------------
-        $this->setRuleData('ebay_product_add_step_one_source_products');
+        $this->setRuleData('ebay_product_add_step_one');
         // ---------------------------
 
         // Set Hide Products In Other Listings
@@ -138,7 +142,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
         $prefix = $this->getHideProductsInOtherListingsPrefix();
 
         if ($this->getRequest()->isPost()) {
-            $hideProductsOtherParam = $this->getRequest()->getPost('hide_products_others_listings', 0);
+            $hideProductsOtherParam = $this->getRequest()->getPost('hide_products_others_listings', 1);
             Mage::helper('M2ePro/Data_Session')->setValue($prefix, $hideProductsOtherParam);
         }
 
@@ -169,7 +173,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
 
         // Set rule model
         // ---------------------------
-        $this->setRuleData('ebay_product_add_step_one_source_categories');
+        $this->setRuleData('ebay_product_add_step_one');
         // ---------------------------
 
         // Set Hide Products In Other Listings
@@ -177,7 +181,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
         $prefix = $this->getHideProductsInOtherListingsPrefix();
 
         if ($this->getRequest()->isPost()) {
-            $hideProductsOtherParam = $this->getRequest()->getPost('hide_products_others_listings', 0);
+            $hideProductsOtherParam = $this->getRequest()->getPost('hide_products_others_listings', 1);
             Mage::helper('M2ePro/Data_Session')->setValue($prefix, $hideProductsOtherParam);
         }
 
@@ -413,11 +417,6 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             array(
                 'prefix' => $prefix,
                 'store_id' => $storeId,
-                'attribute_criteria' =>
-                Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ATTRIBUTE_SETS,
-                'attribute_sets' => Mage::helper('M2ePro/Magento_AttributeSet')->getAll(
-                    Ess_M2ePro_Helper_Magento_AttributeSet::RETURN_TYPE_IDS
-                )
             )
         );
 

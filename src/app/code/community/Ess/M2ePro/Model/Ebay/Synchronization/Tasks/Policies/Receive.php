@@ -159,8 +159,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Policies_Receive
 
                 // Create connector
                 //-----------------------
-                $policies = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                    ->processVirtualAbstract(
+                $policies = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                    ->processVirtual(
                         'account', 'get', 'policies',
                         array(),
                         'policies',

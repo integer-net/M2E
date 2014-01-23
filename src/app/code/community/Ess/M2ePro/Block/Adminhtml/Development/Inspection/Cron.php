@@ -25,14 +25,28 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_Cron
 
     protected function _beforeToHtml()
     {
-        $this->cronPhp = 'php -q '. Mage::helper('M2ePro/Client')->getBaseDirectory() . DIRECTORY_SEPARATOR . 'cron.php';
+        $this->cronPhp = 'php -q '.
+                         Mage::helper('M2ePro/Client')->getBaseDirectory() .
+                         DIRECTORY_SEPARATOR .
+                         'cron.php -mdefault 1';
+
         $this->cronGet = 'GET ' . Mage::helper('M2ePro/Magento')->getBaseUrl() .'cron.php';
 
-        $cronLastAccessTime = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/cron/', 'last_access');
+        $this->cronLastRun = 'N/A';
+        $this->cronLastGMT = false;
 
-        $this->cronLastRun = !is_null($cronLastAccessTime)
-            ? Mage::helper('M2ePro')->gmtDateToTimezone($cronLastAccessTime)
-            : 'N/A';
+        $cronLastAccessTime = Mage::helper('M2ePro/Module')->getConfig()
+                                        ->getGroupValue('/cron/', 'last_access');
+
+        if (!is_null($cronLastAccessTime)) {
+
+            if ($this->getIsSupportMode()) {
+                $this->cronLastRun = Mage::helper('M2ePro')->gmtDateToTimezone($cronLastAccessTime);
+            } else {
+                $this->cronLastRun = $cronLastAccessTime;
+                $this->cronLastGMT = true;
+            }
+        }
 
         $modelCron = Mage::getModel('M2ePro/Cron');
 

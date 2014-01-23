@@ -68,11 +68,8 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Settings_Form extends Ess_M2ePro_
         //-------------------------------
 
         //-------------------------------
-        $temp = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+        $this->inspectorMode = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
             '/defaults/inspector/','mode'
-        );
-        $this->inspectorMode = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-            '/defaults/inspector/'.strtolower($temp).'/','mode'
         );
         //-------------------------------
 

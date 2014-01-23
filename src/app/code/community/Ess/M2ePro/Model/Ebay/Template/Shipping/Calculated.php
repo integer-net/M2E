@@ -24,9 +24,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
     const HANDLING_CUSTOM_VALUE     = 1;
     const HANDLING_CUSTOM_ATTRIBUTE = 2;
 
-    const EBAY_MEASUREMENT_SYSTEM_ENGLISH = 'English';
-    const EBAY_MEASUREMENT_SYSTEM_METRIC  = 'Metric';
-
     // ########################################
 
     /**

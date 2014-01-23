@@ -32,7 +32,10 @@ class Ess_M2ePro_Adminhtml_Common_Listing_OtherController
              ->addJs('M2ePro/Listing/MovingHandler.js')
              ->addJs('M2ePro/Listing/Other/AutoMappingHandler.js')
 
-             ->addJs('M2ePro/Listing/Other/MappingHandler.js');
+             ->addJs('M2ePro/Listing/Other/MappingHandler.js')
+
+             ->addJs('M2ePro/Listing/Other/RemovingHandler.js')
+             ->addJs('M2ePro/Listing/Other/UnmappingHandler.js');
 
         $this->_initPopUp();
 
@@ -78,34 +81,35 @@ class Ess_M2ePro_Adminhtml_Common_Listing_OtherController
 
     //#############################################
 
-    public function deleteAction()
+    public function removingAction()
     {
-        $component = $this->getRequest()->getParam('component');
+        $component = $this->getRequest()->getParam('componentMode');
+        $productIds = $this->getRequest()->getParam('product_ids');
 
-        if (!$component) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__(
-                'Component is not defined.'
-            ));
-            return $this->_redirect('*/*/index');
+        if (!$productIds || !$component) {
+            return $this->getResponse()->setBody('0');
         }
 
-        $listingOtherId = $this->getRequest()->getParam('id');
+        $productArray = explode(',', $productIds);
 
-        /* @var $listingOther Ess_M2ePro_Model_Listing_Other */
-        $listingOther = Mage::helper('M2ePro/Component')->getComponentObject(
-            $component,'Listing_Other',$listingOtherId
-        );
-
-        if (!is_null($listingOther->getProductId())) {
-            $listingOther->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+        if (empty($productArray)) {
+            return $this->getResponse()->setBody('0');
         }
 
-        $listingOther->deleteInstance();
+        foreach ($productArray as $productId) {
+            /* @var $listingOther Ess_M2ePro_Model_Listing_Other */
+            $listingOther = Mage::helper('M2ePro/Component')->getComponentObject(
+                $component, 'Listing_Other', $productId
+            );
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__(
-            'The item was successfully removed.'
-        ));
-        return $this->_redirect('*/*/index',array('tab' => $component));
+            if (!is_null($listingOther->getProductId())) {
+                $listingOther->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+            }
+
+            $listingOther->deleteInstance();
+        }
+
+        return $this->getResponse()->setBody('1');
     }
 
     //#############################################

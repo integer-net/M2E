@@ -41,7 +41,7 @@ class Ess_M2ePro_Model_Buy_Order_Builder extends Mage_Core_Model_Abstract
         // Init general data
         // ------------------
         $this->setData('account_id', $this->account->getId());
-        $this->setData('marketplace_id', Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_VIRTUAL_ID);
+        $this->setData('marketplace_id', Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_ID);
 
         $this->setData('seller_id', $data['seller_id']);
         $this->setData('buy_order_id', $data['order_id']);

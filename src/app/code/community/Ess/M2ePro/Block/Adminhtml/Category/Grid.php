@@ -50,7 +50,7 @@ class Ess_M2ePro_Block_Adminhtml_Category_Grid extends Mage_Adminhtml_Block_Widg
 
         $dbSelect1 = $connRead
             ->select()
-            ->from($tableName, new Zend_Db_Expr('MAX(`store_id`)'))
+            ->from(Mage::getSingleton('core/resource')->getTableName($tableName), new Zend_Db_Expr('MAX(`store_id`)'))
             ->where("`entity_id` = `ccev`.`entity_id`")
             ->where("`attribute_id` = `ccev`.`attribute_id`")
             ->where("`store_id` = 0 OR `store_id` = ?",$this->getStoreId());

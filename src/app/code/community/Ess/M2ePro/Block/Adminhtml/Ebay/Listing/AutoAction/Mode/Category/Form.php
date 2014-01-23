@@ -77,7 +77,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AutoAction_Mode_Category_Form exte
             'category_id' => NULL,
             'adding_mode' => Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE,
             'adding_template_category_id' => NULL,
-            'adding_duplicate' => 0,
             'deleting_mode' => Ess_M2ePro_Model_Ebay_Listing::DELETING_MODE_NONE
         );
     }

@@ -248,9 +248,16 @@ abstract class Ess_M2ePro_Model_Order_Proxy
      */
     abstract public function getCurrency();
 
-    protected function convertPrice($price)
+    public function convertPrice($price)
     {
-        return Mage::getSingleton('M2ePro/Currency')->convertPrice($price, $this->getCurrency(), $this->getStore());
+        return Mage::getSingleton('M2ePro/Currency')
+            ->convertPrice($price, $this->getCurrency(), $this->getStore());
+    }
+
+    public function convertPriceToBase($price)
+    {
+        return Mage::getSingleton('M2ePro/Currency')
+            ->convertPriceToBaseCurrency($price, $this->getCurrency(), $this->getStore());
     }
 
     // ########################################
@@ -280,7 +287,7 @@ abstract class Ess_M2ePro_Model_Order_Proxy
      */
     protected function getBaseShippingPrice()
     {
-        return $this->convertPrice($this->getShippingPrice());
+        return $this->convertPriceToBase($this->getShippingPrice());
     }
 
     // ########################################

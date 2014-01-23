@@ -35,6 +35,41 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
             ->getGroupValue('/ebay/other_listings/', 'mode');
         //----------------------------
 
+        //----------------------------
+        $format = Mage::app()->getLocale()->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM);
+
+        $this->reviseAllInProcessingState = !is_null(
+            Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+                '/ebay/templates/revise/total/', 'last_listing_product_id'
+            )
+        );
+
+        $this->reviseAllStartDate = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/ebay/templates/revise/total/', 'start_date'
+        );
+        $this->reviseAllStartDate && $this->reviseAllStartDate = Mage::app()->getLocale()
+            ->date(strtotime($this->reviseAllStartDate))
+            ->toString($format);
+
+        $this->reviseAllEndDate = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/ebay/templates/revise/total/', 'end_date'
+        );
+        $this->reviseAllEndDate && $this->reviseAllEndDate = Mage::app()->getLocale()
+            ->date(strtotime($this->reviseAllEndDate))
+            ->toString($format);
+        //----------------------------
+
+        //----------------------------
+        $component = Ess_M2ePro_Helper_Component_Ebay::NICK;
+        $data = array(
+            'class'   => 'ok_button',
+            'label'   => Mage::helper('M2ePro')->__('Confirm'),
+            'onclick' => "Windows.getFocusedWindow().close(); SynchronizationHandlerObj.runReviseAll('{$component}');",
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('revise_all_confirm_popup_ok_button', $buttonBlock);
+        //------------------------------
+
         //-------------------------------
         $data = array(
             'label'   => Mage::helper('M2ePro')->__('Run Now'),
@@ -221,7 +256,24 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $this->setChild('ebay_other_listings_synchronization_settings', $buttonBlock);
         //-------------------------------
 
+        //-------------------------------
+        $this->inspectorMode = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/defaults/inspector/','mode'
+        );
+        //-------------------------------
+
         return parent::_beforeToHtml();
+    }
+
+    // ########################################
+
+    public function isShowReviseAll()
+    {
+        $showSetting = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/view/synchronization/revise_total/','show'
+        );
+
+        return $showSetting && Mage::helper('M2ePro/View_Ebay')->isAdvancedMode();
     }
 
     // ########################################

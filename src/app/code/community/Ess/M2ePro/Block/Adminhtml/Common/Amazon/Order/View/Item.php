@@ -22,6 +22,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View_Item extends Mage_Admi
         $this->setPagerVisibility(false);
         $this->setFilterVisibility(false);
         $this->setUseAjax(true);
+        $this->_defaultLimit = 200;
         //------------------------------
 
         /** @var $order Ess_M2ePro_Model_Order */
@@ -159,7 +160,7 @@ HTML;
 <b>{$generalIdLabel}:</b> {$generalId}<br />
 HTML;
 
-        if ($row->getIsIsbnGeneralId() && Mage::helper('M2ePro/Component_Amazon_Validation')->isEAN($row->getGeneralId())) {
+        if ($row->getIsIsbnGeneralId() && Mage::helper('M2ePro')->isEAN($row->getGeneralId())) {
             $amazonLink = '';
         } else {
             $itemLinkText = Mage::helper('M2ePro')->__('View on Amazon');

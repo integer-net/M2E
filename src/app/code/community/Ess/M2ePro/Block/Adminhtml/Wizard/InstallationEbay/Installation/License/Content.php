@@ -90,7 +90,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_License_Co
         //-------------------------------
 
         //-------------------------------
-        // todo
         $url = 'https://scgi.ebay.com/ws/eBayISAPI.dll?RegisterEnterInfo&bizflow=2';
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')

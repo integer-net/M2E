@@ -8,15 +8,15 @@
         <ul>
             <?php foreach ($items as $messageType => $messageText): ?>
                 <li>
-                    <div style="display: inline-block; width: 92%;">
-                        <?php echo $messageText; ?>
-                    </div>
                     <?php if ($first): ?>
                         <?php $first = false; ?>
                         <div style="display: inline-block; float: right;">
                             <a href="javascript: void(0);" class="refresh-messages">[<?php echo Mage::helper('M2ePro')->__('Refresh') ?>]</a>
                         </div>
                     <?php endif; ?>
+                    <div style="display: inline-block; width: 92%;">
+                        <?php echo $messageText; ?>
+                    </div>
                 </li>
             <?php endforeach; ?>
         </ul>

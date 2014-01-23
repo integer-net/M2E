@@ -115,23 +115,30 @@ class Ess_M2ePro_Model_Magento_Product
 
     public function getStoreIds()
     {
+        $storeIds = array();
+        foreach ($this->getWebsiteIds() as $websiteId) {
+            try {
+                $websiteStores = Mage::app()->getWebsite($websiteId)->getStoreIds();
+                $storeIds = array_merge($storeIds, $websiteStores);
+            } catch (Exception $e) {
+                continue;
+            }
+        }
+        return $storeIds;
+    }
+
+    // ########################################
+
+    public function getWebsiteIds()
+    {
         $resource = Mage::getSingleton('core/resource');
         $select = $resource->getConnection('core_read')
             ->select()
             ->from($resource->getTableName('catalog/product_website'), 'website_id')
             ->where('product_id = ?', (int)$this->getProductId());
 
-        $storeIds = array();
         $websiteIds = $resource->getConnection('core_read')->fetchCol($select);
-
-        if ($websiteIds) {
-            foreach ($websiteIds as $websiteId) {
-                $websiteStores = Mage::app()->getWebsite($websiteId)->getStoreIds();
-                $storeIds = array_merge($storeIds, $websiteStores);
-            }
-        }
-
-        return $storeIds;
+        return $websiteIds ? $websiteIds : array();
     }
 
     // ########################################
@@ -216,6 +223,12 @@ class Ess_M2ePro_Model_Magento_Product
 
     public static function getNameByProductId($productId, $storeId = Mage_Core_Model_App::ADMIN_STORE_ID)
     {
+        $tempKey = 'product_id_' . (int)$productId . '_' . (int)$storeId . '_name';
+
+        if (!is_null($name = Mage::helper('M2ePro/Data_Global')->getValue($tempKey))) {
+            return $name;
+        }
+
         // Prepare tables names
         //-----------------------------
         $catalogProductEntityVarCharTable  = Mage::getSingleton('core/resource')->getTableName(
@@ -244,10 +257,12 @@ class Ess_M2ePro_Model_Magento_Product
         //-----------------------------
 
         if ($name) {
+            Mage::helper('M2ePro/Data_Global')->setValue($tempKey,$name);
             return $name;
         }
 
         if ($storeId == Mage_Core_Model_App::ADMIN_STORE_ID) {
+            Mage::helper('M2ePro/Data_Global')->setValue($tempKey,'');
             return '';
         }
 
@@ -273,14 +288,23 @@ class Ess_M2ePro_Model_Magento_Product
         //-----------------------------
 
         if ($name) {
+            Mage::helper('M2ePro/Data_Global')->setValue($tempKey,$name);
             return $name;
         }
+
+        Mage::helper('M2ePro/Data_Global')->setValue($tempKey,'');
 
         return '';
     }
 
     public static function getSkuByProductId($productId)
     {
+        $tempKey = 'product_id_' . (int)$productId . '_name';
+
+        if (!is_null($sku = Mage::helper('M2ePro/Data_Global')->getValue($tempKey))) {
+            return $sku;
+        }
+
         // Prepare tables names
         //-----------------------------
         $catalogProductEntityTable  = Mage::getSingleton('core/resource')->getTableName('catalog_product_entity');
@@ -296,40 +320,14 @@ class Ess_M2ePro_Model_Magento_Product
 
         // Get row of product sku
         //-----------------------------
-        $name = Mage::getResourceModel('core/config')
+        $sku = Mage::getResourceModel('core/config')
                         ->getReadConnection()
                         ->fetchOne($dbSelect);
         //-----------------------------
 
-        return $name;
-    }
+        Mage::helper('M2ePro/Data_Global')->setValue($tempKey,$sku);
 
-    public static function getQtyByProductId($productId)
-    {
-        return (int)Mage::getModel('cataloginventory/stock_item')
-                        ->loadByProduct($productId)
-                        ->getQty();
-    }
-
-    public static function getStockAvailabilityByProductId($productId)
-    {
-        return (int)Mage::getModel('cataloginventory/stock_item')
-                        ->loadByProduct($productId)
-                        ->getIsInStock();
-    }
-
-    public static function getStatusByProductId($productId, $storeId = Mage_Core_Model_App::ADMIN_STORE_ID)
-    {
-        $status = Mage::getSingleton('M2ePro/Magento_Product_Status')
-                        ->getProductStatus($productId,$storeId);
-
-        if (is_array($status) && isset($status[$productId])) {
-            $status = (int)$status[$productId];
-        } else {
-            $status = 0;
-        }
-
-        return $status;
+        return $sku;
     }
 
     // ########################################
@@ -449,23 +447,25 @@ class Ess_M2ePro_Model_Magento_Product
     public function getStatus()
     {
         if (!$this->_productModel && $this->_productId > 0) {
-            $temp = self::getStatusByProductId($this->_productId, $this->_storeId);
-            if ($temp == Mage_Catalog_Model_Product_Status::STATUS_DISABLED ||
-                $temp == Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
-                return $temp;
+
+            $status = Mage::getSingleton('M2ePro/Magento_Product_Status')
+                            ->getProductStatus($this->_productId, $this->_storeId);
+
+            if (is_array($status) && isset($status[$this->_productId])) {
+
+                $status = (int)$status[$this->_productId];
+                if ($status == Mage_Catalog_Model_Product_Status::STATUS_DISABLED ||
+                    $status == Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
+                    return $status;
+                }
             }
         }
+
         return (int)$this->getProduct()->getStatus();
     }
 
     public function getStockAvailability()
     {
-        if (!$this->_productModel && $this->_productId > 0) {
-            $temp = self::getStockAvailabilityByProductId($this->_productId);
-            if ($temp == 0 || $temp == 1) {
-                return $temp;
-            }
-        }
         return (int)$this->getStockItem()->getIsInStock();
     }
 
@@ -536,9 +536,6 @@ class Ess_M2ePro_Model_Magento_Product
 
     public function getQty()
     {
-        if (!$this->_productModel && $this->_productId > 0) {
-            return self::getQtyByProductId($this->_productId);
-        }
         return (int)$this->getStockItem()->getQty();
     }
 
@@ -567,6 +564,11 @@ class Ess_M2ePro_Model_Magento_Product
         }
 
         $value = $productObject->getData($attributeCode);
+
+        if ($attributeCode == 'media_gallery') {
+            return implode(',',$this->getGalleryImagesLinks(100));
+        }
+
         if (is_null($value) || is_bool($value) || is_array($value) || $value === '') {
             return '';
         }
@@ -624,7 +626,7 @@ class Ess_M2ePro_Model_Magento_Product
         return is_string($value) ? $value : '';
     }
 
-    public function saveAttribute($attributeCode, $attributeValue, $overwrite = false, $separator = '')
+    public function saveAttribute($attributeCode, $attributeValue)
     {
         if (!$attributeCode) {
             return;
@@ -638,15 +640,8 @@ class Ess_M2ePro_Model_Magento_Product
         }
 
         $product = $this->getProduct();
+        $product->setData($attributeCode, $attributeValue);
 
-        $oldValue = $product->getData($attributeCode);
-        $newValue = $attributeValue;
-
-        if ($oldValue && !$overwrite) {
-            $newValue = $oldValue . $separator . $newValue;
-        }
-
-        $product->setData($attributeCode, $newValue);
         $resource->saveAttribute($product, $attributeCode);
     }
 
@@ -849,7 +844,13 @@ class Ess_M2ePro_Model_Magento_Product
                 isset($tempInfo['variations']) && $variations = $tempInfo['variations'];
             }
 
-            if (count($variationsSet) > 5) {
+            $countOfCombinations = 1;
+
+            foreach ($variationsSet as $set) {
+                $countOfCombinations *= count($set);
+            }
+
+            if ($countOfCombinations > 100000) {
                 $variationsSet = array();
                 $variations = array();
             } else {

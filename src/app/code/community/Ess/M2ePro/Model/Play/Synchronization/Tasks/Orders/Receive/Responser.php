@@ -5,61 +5,53 @@
  */
 
 class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive_Responser
+    extends Ess_M2ePro_Model_Connector_Play_Orders_Get_ItemsResponser
 {
-    protected $params = array();
-
     protected $synchronizationLog = NULL;
 
-    /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Account|null
-     */
-    protected $account = NULL;
-
     // ########################################
 
-    public function initialize(array $params = array(),
-                               Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
-    {
-        $this->params = $params;
-        $this->marketplace = $marketplace;
-        $this->account = $account;
-    }
-
-    // ########################################
-
-    public function unsetLocks($hash, $fail = false, $message = NULL)
+    protected function unsetLocks($fail = false, $message = NULL)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItemPrefix = Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive::LOCK_ITEM_PREFIX;
 
-        $nick = $lockItemPrefix . '_' . $this->params['account_id'] . '_' . $this->params['marketplace_id'];
+        $nick = $lockItemPrefix . '_' . $this->params['account_id'];
         $lockItem->setNick($nick);
         $lockItem->remove();
 
-        $this->getAccount()->deleteObjectLocks(NULL, $hash);
-        $this->getAccount()->deleteObjectLocks('synchronization', $hash);
-        $this->getAccount()->deleteObjectLocks('synchronization_play', $hash);
-        $this->getAccount()->deleteObjectLocks($lockItemPrefix, $hash);
+        // --------------------
 
-        $this->getMarketplace()->deleteObjectLocks(NULL, $hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization', $hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization_play', $hash);
-        $this->getMarketplace()->deleteObjectLocks($lockItemPrefix, $hash);
+        $tempObjects = array(
+            $this->getAccount(),
+            Mage::helper('M2ePro/Component_Play')->getMarketplace()
+        );
+
+        $tempLocks = array(
+            NULL,
+            'synchronization', 'synchronization_play',
+            $lockItemPrefix
+        );
+
+        /* @var Ess_M2ePro_Model_Abstract $object */
+        foreach ($tempObjects as $object) {
+            foreach ($tempLocks as $lock) {
+                $object->deleteObjectLocks($lock,$this->hash);
+            }
+        }
 
         $fail && $this->getSynchLogModel()->addMessage(Mage::helper('M2ePro')->__($message),
                                                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                                                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
     }
 
-    public function processSucceededResponseData($receivedOrders)
+    // ########################################
+
+    protected function processResponseData($response)
     {
+        $response = parent::processResponseData($response);
+
         try {
 
             $account = $this->getAccount();
@@ -74,7 +66,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive_Responser
 
             // Create m2e orders
             //---------------------------
-            foreach ($receivedOrders as $orderData) {
+            foreach ($response as $orderData) {
                 $currentOrderDate = $orderData['purchase_create_date'];
 
                 if (strtotime($currentOrderDate) > strtotime($ordersLastSynchronization)) {
@@ -139,15 +131,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive_Responser
      */
     protected function getAccount()
     {
-        return $this->account;
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Marketplace
-     */
-    protected function getMarketplace()
-    {
-        return $this->marketplace;
+        return $this->getObjectByParam('Account','account_id');
     }
 
     //-----------------------------------------

@@ -20,11 +20,8 @@ class Ess_M2ePro_Adminhtml_Configuration_SettingsController
             (int)$this->getRequest()->getParam('block_notices_show')
         );
 
-        $temp = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-            '/defaults/inspector/','mode'
-        );
         Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
-            '/defaults/inspector/'.$temp.'/', 'mode',
+            '/defaults/inspector/', 'mode',
             (int)$this->getRequest()->getParam('inspector_mode')
         );
 

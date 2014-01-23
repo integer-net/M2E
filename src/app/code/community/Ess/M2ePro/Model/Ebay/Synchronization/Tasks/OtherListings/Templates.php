@@ -130,7 +130,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates
         $startLink .= 'back:*/adminhtml_ebay_log/synchronization/;">';
         $endLink = '</a>';
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_ERROR) {
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_ERROR) {
 
             $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                 'Task "Update 3rd Party Listings" has completed with errors. View %sl%listings log%el% for details.',
@@ -142,7 +142,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates
             $this->_profiler->addTitle('Updating products on eBay ended with errors.');
         }
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_WARNING) {
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_WARNING) {
 
             $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                 'Task "Update 3rd Party Listings" has completed with warnings. View %sl%listings log%el% for details.',

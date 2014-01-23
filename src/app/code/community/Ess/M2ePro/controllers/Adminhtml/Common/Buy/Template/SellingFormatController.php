@@ -117,7 +117,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SellingFormatController
         $model->addData($data)->save();
         $newData = $model->getDataSnapshot();
 
-        $model->getChildObject()->setIsNeedSynchronize($newData,$oldData);
+        $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
 
         $id = $model->getId();
         //--------------------

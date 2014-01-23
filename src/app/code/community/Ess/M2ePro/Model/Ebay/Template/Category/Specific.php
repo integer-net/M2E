@@ -60,9 +60,11 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
     public function getCategoryTemplate()
     {
         if (is_null($this->categoryTemplateModel)) {
+
             $this->categoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
                 'Ebay_Template_Category', $this->getTemplateCategoryId(), NULL, array('template')
             );
+
             if (!is_null($this->getMagentoProduct())) {
                 $this->categoryTemplateModel->setMagentoProduct($this->getMagentoProduct());
             }

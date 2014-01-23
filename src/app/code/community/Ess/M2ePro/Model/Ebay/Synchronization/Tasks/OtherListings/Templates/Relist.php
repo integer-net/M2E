@@ -96,7 +96,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Relist
 
             $this->_runnerActions->setProduct(
                 $listingOther,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST,
+                Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST,
                 $tempParams
             );
         }
@@ -125,7 +125,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Relist
 
         if ($this->_runnerActions->isExistProductAction(
             $listingOther,
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST,
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST,
             array())
         ) {
             return false;
@@ -167,7 +167,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Templates_Relist
 
         if($listingOther->getChildObject()->getSynchronizationModel()->isRelistWhenQtyHasValue()) {
 
-            $productQty = (int)$listingOther->getChildObject()->getMappedQty();
+            $productQty = $listingOther->getChildObject()->getMappedQty();
 
             if (!is_null($productQty)) {
 

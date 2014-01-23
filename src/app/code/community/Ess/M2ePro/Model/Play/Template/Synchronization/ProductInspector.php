@@ -85,7 +85,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
                 $tempResult = $this->isMeetListRequirements($listingProduct);
                 $tempResult && $this->_runnerActions
                                     ->setProduct($listingProduct,
-                                                 Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_LIST,
+                                                 Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_LIST,
                                                  array());
             }
 
@@ -102,7 +102,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
                 $tempResult = $this->isMeetStopRequirements($listingProduct);
                 $tempResult && $this->_runnerActions
                                     ->setProduct($listingProduct,
-                                                 Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_STOP,
+                                                 Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_STOP,
                                                  array());
             }
             //-------------------------------
@@ -140,7 +140,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
 
                 $this->_runnerActions
                          ->setProduct($listingProduct,
-                                      Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_RELIST,
+                                      Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_RELIST,
                                       array());
             }
             //-------------------------------
@@ -173,7 +173,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
         if ($this->_runnerActions
                  ->isExistProductAction(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_STOP,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_STOP,
                         array())
         ) {
             return false;
@@ -285,7 +285,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
         if ($this->_runnerActions
                  ->isExistProductAction(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_RELIST,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_RELIST,
                         array())
         ) {
             return false;
@@ -415,7 +415,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
         if ($this->_runnerActions
                  ->isExistProductAction(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_LIST,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_LIST,
                         array())
         ) {
             return false;
@@ -547,7 +547,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
         if ($this->_runnerActions
                  ->isExistProductAction(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_REVISE,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_REVISE,
                         $actionParams)
         ) {
             return false;
@@ -585,7 +585,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
             $this->_runnerActions
                  ->setProduct(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_REVISE,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_REVISE,
                         $actionParams
                  );
             return true;
@@ -624,7 +624,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
         if ($this->_runnerActions
                  ->isExistProductAction(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_REVISE,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_REVISE,
                         $actionParams)
         ) {
             return false;
@@ -653,7 +653,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
             $this->_runnerActions
                  ->setProduct(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_REVISE,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_REVISE,
                         $actionParams
                  );
             return true;
@@ -667,7 +667,7 @@ class Ess_M2ePro_Model_Play_Template_Synchronization_ProductInspector
             $this->_runnerActions
                  ->setProduct(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_REVISE,
+                        Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_REVISE,
                         $actionParams
                  );
             return true;

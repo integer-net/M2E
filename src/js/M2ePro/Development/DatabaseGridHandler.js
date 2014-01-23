@@ -1,0 +1,194 @@
+DatabaseGridHandler = Class.create(GridHandler, {
+
+    //----------------------------------
+
+    prepareActions: function()
+    {
+        this.actions = {
+            deleteTableRowsAction: function(id) { this.deleteTableRows(id); }.bind(this),
+            updateTableCellsAction: function() { this.openUpdateTableCellsPopup(); }.bind(this)
+        }
+    },
+
+    //----------------------------------
+
+    deleteTableRows: function(id)
+    {
+
+        var selectedIds = id ? id : DevelopmentDatabaseGridHandlerObj.getSelectedProductsString();
+
+        if (id && !confirm('Are you sure?')) {
+            return;
+        }
+
+        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/deleteTableRows') ,
+            {
+                method:'post',
+                parameters : {
+                    ids: selectedIds
+                },
+                onSuccess: function(transport)
+                {
+                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload()
+                }
+            });
+    },
+
+    openUpdateTableCellsPopup: function()
+    {
+        var self = DevelopmentDatabaseGridHandlerObj;
+
+        var popup = new Window({
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: 'Edit Table Records',
+            top: 50,
+            width: 635,
+            minHeight: 200,
+            maxHeight: 445,
+            zIndex: 100,
+            destroyOnClose: true,
+            recenterAuto: true,
+            hideEffect: Element.hide,
+            showEffect: Element.show
+        });
+
+        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/getUpdateCellsPopupHtml') ,
+            {
+                method: 'post',
+                parameters: {
+                    ids: self.getSelectedProductsString()
+                },
+                onSuccess: function(transport)
+                {
+                    popup.getContent().insert(transport.responseText);
+                }
+            });
+
+        popup.showCenter(true);
+    },
+
+    confirmUpdateTableCellsPopup: function()
+    {
+        if (!DevelopmentDatabaseGridHandlerObj.isAnySwitcherEnabled()) {
+            alert('You should select columns for update.');
+            return;
+        }
+
+        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/updateTableCells') ,
+            {
+                method: 'post',
+                asynchronous : false,
+                parameters : Form.serialize($('development_tabs_database_update_cells_popup_form')),
+                onSuccess: function(transport)
+                {
+                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
+                    Windows.getFocusedWindow().close();
+                }
+            });
+    },
+
+    //----------------------------------
+
+    mouseOverCell: function(cellId)
+    {
+        if ($(cellId + '_save_link').getStyle('display') != 'none') {
+            return;
+        }
+
+        $(cellId + '_edit_link').show();
+        $(cellId + '_view_link').hide();
+        $(cellId + '_save_link').hide();
+    },
+
+    mouseOutCell: function(cellId)
+    {
+        if ($(cellId + '_save_link').getStyle('display') != 'none') {
+            return;
+        }
+
+        $(cellId + '_edit_link').hide();
+        $(cellId + '_view_link').hide();
+        $(cellId + '_save_link').hide();
+    },
+
+    //----------------------------------
+
+    switchCellToView: function(cellId)
+    {
+        $(cellId + '_edit_link').show();
+        $(cellId + '_view_link').hide();
+        $(cellId + '_save_link').hide();
+
+        $(cellId + '_edit_container').hide();
+        $(cellId + '_view_container').show();
+    },
+
+    switchCellToEdit: function(cellId)
+    {
+        $(cellId + '_edit_link').hide();
+        $(cellId + '_view_link').show();
+        $(cellId + '_save_link').show();
+
+        $(cellId + '_edit_container').show();
+        $(cellId + '_view_container').hide();
+    },
+
+    saveTableCell: function(rowId, columnName)
+    {
+        var params = {
+            ids: rowId,
+            cells: columnName
+        };
+
+        var cellId = 'table_row_cell_' + columnName + '_' + rowId;
+        params['value_'+ columnName] = $(cellId + '_edit_input').value;
+
+        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/updateTableCells') ,
+            {
+                method: 'post',
+                asynchronous : false,
+                parameters : params,
+                onSuccess: function(transport)
+                {
+                    DevelopmentDatabaseGridHandlerObj.switchCellToView(cellId);
+                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
+                }
+            });
+
+    },
+
+    //----------------------------------
+
+    switcherStateChange: function()
+    {
+        var inputElement = $(this.id.replace('switcher','input'));
+
+        inputElement.removeAttribute('disabled');
+
+        if (!this.checked) {
+            inputElement.value = '';
+            inputElement.setAttribute('disabled', 'disabled');
+        }
+    },
+
+    isAnySwitcherEnabled: function()
+    {
+        var result = false;
+
+        $$('#development_tabs_database_update_cells_popup .input_switcher').each(function(el){
+            if (el.checked) {
+                result = true;
+                return;
+            }
+        });
+
+        return result;
+    }
+
+    //----------------------------------
+
+});

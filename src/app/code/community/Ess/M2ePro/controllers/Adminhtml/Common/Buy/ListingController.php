@@ -181,12 +181,12 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
                 $backUrl = $this->getUrl('*/*/view', array('id' => $listing->getId()));
             }
 
-            exit($backUrl);
+            return $this->getResponse()->setBody($backUrl);
         }
 
         //---------------
 
-        exit($listing->getId());
+        return $this->getResponse()->setBody($listing->getId());
     }
 
     public function addProductsAction()
@@ -234,16 +234,16 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             }
 
             $response = array('redirect' => $backUrl);
-            exit(json_encode($response));
+            return $this->getResponse()->setBody(json_encode($response));
         }
 
         $response = array('redirect' => '');
-        exit(json_encode($response));
+        return $this->getResponse()->setBody(json_encode($response));
     }
 
     public function getProductsFromCategoriesAction()
     {
-        $hideProductsOthersListings = (bool)$this->getRequest()->getParam('hide_products_others_listings', false);
+        $hideProductsOthersListings = (bool)$this->getRequest()->getParam('hide_products_others_listings', true);
         $listingId = $this->getRequest()->getParam('listing_id');
         $listing = Mage::helper('M2ePro/Component_Buy')->getCachedObject('Listing',$listingId);
 
@@ -277,8 +277,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         if (!empty($products)) {
             echo implode(',', $products);
         }
-
-        exit();
     }
 
     //#############################################
@@ -418,7 +416,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
 
             $temp = array(
                 'account_id' => $post['account_id'],
-                'marketplace_id' => Mage::helper('M2ePro/Component_Buy')->getVirtualMarketplaceId(),
+                'marketplace_id' => Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_ID,
                 'sku_mode' => $post['sku_mode'],
                 'sku_custom_attribute' => $post['sku_custom_attribute'],
                 'generate_sku_mode' => $post['generate_sku_mode'],
@@ -589,7 +587,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         // Set Hide Products In Other Listings
         // ---------------------------
         $prefix = $this->getHideProductsInOtherListingsPrefix();
-
         Mage::helper('M2ePro/Data_Global')->setValue('hide_products_others_listings_prefix', $prefix);
         // ---------------------------
 
@@ -627,7 +624,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         // Set Hide Products In Other Listings
         // ---------------------------
         $prefix = $this->getHideProductsInOtherListingsPrefix();
-
         Mage::helper('M2ePro/Data_Global')->setValue('hide_products_others_listings_prefix', $prefix);
         // ---------------------------
 
@@ -865,13 +861,13 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             }
         }
 
-        $templateData['marketplace_id'] = Mage::helper('M2ePro/Component_Buy')->getVirtualMarketplaceId();
+        $templateData['marketplace_id'] = Mage::helper('M2ePro/Component_Buy')->getMarketplaceId();
         //---------------
 
         $model->addData($templateData)->save();
         $newData = $model->getDataSnapshot();
 
-        $model->getChildObject()->setIsNeedSynchronize($newData,$oldData);
+        $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The listing was successfully saved.'));
 
@@ -977,7 +973,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         // Set Hide Products In Other Listings
         // ---------------------------
         $prefix = $this->getHideProductsInOtherListingsPrefix();
-
         Mage::helper('M2ePro/Data_Global')->setValue('hide_products_others_listings_prefix', $prefix);
         // ---------------------------
 
@@ -1038,7 +1033,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             // Set Hide Products In Other Listings
             // ---------------------------
             $prefix = $this->getHideProductsInOtherListingsPrefix();
-
             Mage::helper('M2ePro/Data_Global')->setValue('hide_products_others_listings_prefix', $prefix);
             // ---------------------------
 
@@ -1135,7 +1129,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         // ---------------------------
         $prefix = $this->getHideProductsInOtherListingsPrefix();
 
-        $hideProductsOtherParam = $this->getRequest()->getPost('hide_products_others_listings', 0);
+        $hideProductsOtherParam = $this->getRequest()->getPost('hide_products_others_listings', 1);
         Mage::helper('M2ePro/Data_Session')->setValue($prefix, $hideProductsOtherParam);
 
         Mage::helper('M2ePro/Data_Global')->setValue('hide_products_others_listings_prefix', $prefix);
@@ -1158,7 +1152,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
 
         $listingsProductsIds = explode(',', $listingsProductsIds);
 
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Product_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Product_Dispatcher');
         $result = (int)$dispatcherObject->process($action, $listingsProductsIds, $params);
         $actionId = (int)$dispatcherObject->getLogsActionId();
 
@@ -1172,19 +1166,19 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
                 ->isLockedObject('products_in_action');
         }
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Buy_Product_Requester::STATUS_ERROR) {
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_ERROR) {
             return json_encode(
                 array('result'=>'error','action_id'=>$actionId,'is_processing_items'=>$isProcessingItems)
             );
         }
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Buy_Product_Requester::STATUS_WARNING) {
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_WARNING) {
             return json_encode(
                 array('result'=>'warning','action_id'=>$actionId,'is_processing_items'=>$isProcessingItems)
             );
         }
 
-        if ($result == Ess_M2ePro_Model_Connector_Server_Buy_Product_Requester::STATUS_SUCCESS) {
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_SUCCESS) {
             return json_encode(
                 array('result'=>'success','action_id'=>$actionId,'is_processing_items'=>$isProcessingItems)
             );
@@ -1199,28 +1193,36 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
 
     public function runListProductsAction()
     {
-        exit($this->processConnector(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_LIST));
+        return $this->getResponse()->setBody(
+            $this->processConnector(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_LIST)
+        );
     }
 
     public function runReviseProductsAction()
     {
-        exit($this->processConnector(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_REVISE));
+        return $this->getResponse()->setBody(
+            $this->processConnector(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_REVISE)
+        );
     }
 
     public function runRelistProductsAction()
     {
-        exit($this->processConnector(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_RELIST));
+        return $this->getResponse()->setBody(
+            $this->processConnector(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_RELIST)
+        );
     }
 
     public function runStopProductsAction()
     {
-        exit($this->processConnector(Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_STOP));
+        return $this->getResponse()->setBody(
+            $this->processConnector(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_STOP)
+        );
     }
 
     public function runStopAndRemoveProductsAction()
     {
-        exit($this->processConnector(
-            Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_STOP, array('remove' => true)
+        return $this->getResponse()->setBody($this->processConnector(
+            Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_STOP, array('remove' => true)
         ));
     }
 
@@ -1231,12 +1233,12 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         $productId = $this->getRequest()->getParam('product_id');
 
         if (empty($productId)) {
-            exit('ERROR: No product id!');
+            return $this->getResponse()->setBody('ERROR: No product id!');
         }
 
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         $listingProduct = Mage::helper('M2ePro/Component_Buy')->getObject('Listing_Product',$productId);
-        $marketplaceId = Mage::helper('M2ePro/Component_Buy')->getVirtualMarketplaceId();
+        $marketplaceId = Mage::helper('M2ePro/Component_Buy')->getMarketplaceId();
 
         $suggestedData = $listingProduct->getData('general_id_search_suggest_data');
         if (!empty($suggestedData)) {
@@ -1261,7 +1263,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         $query = $this->getRequest()->getParam('query');
 
         if (empty($productId)) {
-            exit('No product_id!');
+            return $this->getResponse()->setBody('No product_id!');
         }
 
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
@@ -1274,23 +1276,20 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             null
         );
 
-        $temp = Ess_M2ePro_Model_Buy_Listing_Product::GENERAL_ID_SEARCH_STATUS_NONE;
         if ($listingProduct->isNotListed() &&
             !$listingProduct->isLockedObject('in_action') &&
-            !$listingProduct->getData('category_id') && !$listingProduct->getData('general_id') &&
-            $listingProduct->getData('general_id_search_status') == $temp) {
+            !$listingProduct->getData('category_id') && !$listingProduct->getData('general_id')) {
 
             $marketplaceObj = $listingProduct->getListing()->getMarketplace();
-            $accountObj = $listingProduct->getListing()->getAccount();
 
             /** @var $dispatcher Ess_M2ePro_Model_Buy_Search_Dispatcher */
             $dispatcher = Mage::getModel('M2ePro/Buy_Search_Dispatcher');
-            $result = $dispatcher->runManual($listingProduct,$query,$marketplaceObj,$accountObj);
+            $result = $dispatcher->runManual($listingProduct,$query);
 
             $message = Mage::helper('M2ePro')->__('Server is currently unavailable. Please try again later.');
             if ($result === false) {
                 $response = array('result' => 'error','data' => $message);
-                exit(json_encode($response));
+                return $this->getResponse()->setBody(json_encode($response));
             }
 
             Mage::helper('M2ePro/Data_Global')->setValue('temp_data',$result);
@@ -1308,7 +1307,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             'data' => $data
         );
 
-        exit(json_encode($response));
+        return $this->getResponse()->setBody(json_encode($response));
     }
 
     public function searchBuyComSkuAutoAction()
@@ -1316,7 +1315,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         $productIds = $this->getRequest()->getParam('product_ids');
 
         if (empty($productIds)) {
-            exit ('You should select one or more products');
+            return $this->getResponse()->setBody('You should select one or more products');
         }
 
         $productIds = explode(',', $productIds);
@@ -1327,11 +1326,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
             $listingProduct = Mage::helper('M2ePro/Component_Buy')->getObject('Listing_Product',$productId);
 
-            $temp = Ess_M2ePro_Model_Buy_Listing_Product::GENERAL_ID_SEARCH_STATUS_NONE;
             if ($listingProduct->isNotListed() &&
                 !$listingProduct->isLockedObject('in_action') &&
-                !$listingProduct->getData('category_id') && !$listingProduct->getData('general_id') &&
-                $listingProduct->getData('general_id_search_status') == $temp) {
+                !$listingProduct->getData('category_id') && !$listingProduct->getData('general_id')) {
 
                 $productsToSearch[] = $listingProduct;
             }
@@ -1343,11 +1340,11 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             $result = $dispatcher->runAutomatic($productsToSearch);
 
             if ($result === false) {
-                exit('1');
+                return $this->getResponse()->setBody('1');
             }
         }
 
-        exit('0');
+        return $this->getResponse()->setBody('0');
     }
 
     //--------------------------------------------
@@ -1358,17 +1355,15 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         $generalId = $this->getRequest()->getParam('general_id');
 
         if (empty($productId) || empty($generalId)) {
-            exit('You should provide correct parameters.');
+            return $this->getResponse()->setBody('You should provide correct parameters.');
         }
 
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         $listingProduct = Mage::helper('M2ePro/Component_Buy')->getObject('Listing_Product',$productId);
 
-        $temp = Ess_M2ePro_Model_Buy_Listing_Product::GENERAL_ID_SEARCH_STATUS_NONE;
         if ($listingProduct->isNotListed() &&
             !$listingProduct->isLockedObject('in_action') &&
-            !$listingProduct->getData('template_new_product_id') &&
-            $listingProduct->getData('general_id_search_status') == $temp) {
+            !$listingProduct->getData('template_new_product_id')) {
 
             $temp = Ess_M2ePro_Model_Buy_Listing_Product::GENERAL_ID_SEARCH_STATUS_SET_MANUAL;
             $listingProduct->setData('general_id',$generalId);
@@ -1378,7 +1373,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
 
             $listingProduct->save();
         }
-        exit('0');
+        return $this->getResponse()->setBody('0');
     }
 
     public function unmapFromBuyComSkuAction()
@@ -1386,7 +1381,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         $productIds = $this->getRequest()->getParam('product_ids');
 
         if (empty($productIds)) {
-            exit('You should provide correct parameters.');
+            return $this->getResponse()->setBody('You should provide correct parameters.');
         }
 
         $productIds = explode(',', $productIds);
@@ -1410,17 +1405,15 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
                 continue;
             }
 
-            $temp = Ess_M2ePro_Model_Buy_Listing_Product::GENERAL_ID_SEARCH_STATUS_NONE;
             $listingProduct->setData('general_id',NULL);
             $listingProduct->setData('template_new_product_id',NULL);
-            $listingProduct->setData('general_id_search_status',$temp);
             $listingProduct->setData('general_id_search_suggest_data',NULL);
 
             $listingProduct->save();
 
         }
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'type' => $type,
             'message' => $message
         )));
@@ -1440,9 +1433,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             array(
                 'prefix' => $prefix,
                 'store_id' => $storeId,
-                'attribute_criteria' =>
-                                Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ATTRIBUTE_SETS,
-                'attribute_sets' => $listingData['attribute_sets']
             )
         );
 

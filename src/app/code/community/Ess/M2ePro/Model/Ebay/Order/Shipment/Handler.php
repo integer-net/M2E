@@ -18,17 +18,38 @@ class Ess_M2ePro_Model_Ebay_Order_Shipment_Handler extends Ess_M2ePro_Model_Orde
             return self::HANDLE_RESULT_SKIPPED;
         }
 
-        $item = $this->getItemToShip($order, $shipment);
+        // collect change params
+        //------------------------------
+        $item   = $this->getItemToShip($order, $shipment);
+        $params = array('tracking_details' => $trackingDetails, 'item_id' => null);
 
-        if (!is_null($item) && !is_null($item->getId())) {
-            return $item->getChildObject()->updateShippingStatus($trackingDetails)
-                ? self::HANDLE_RESULT_SUCCEEDED
-                : self::HANDLE_RESULT_FAILED;
+        if (!is_null($item)) {
+            $params['item_id'] = $item->getId();
+        }
+        //------------------------------
+
+        $this->createChange($order, $params);
+
+        if (!is_null($item)) {
+            $succeeded = $item->getChildObject()->updateShippingStatus($trackingDetails);
+        } else {
+            $succeeded = $order->getChildObject()->updateShippingStatus($trackingDetails);
         }
 
-        return $order->getChildObject()->updateShippingStatus($trackingDetails)
-            ? self::HANDLE_RESULT_SUCCEEDED
-            : self::HANDLE_RESULT_FAILED;
+        return $succeeded ? self::HANDLE_RESULT_SUCCEEDED : self::HANDLE_RESULT_FAILED;
+    }
+
+    private function createChange(Ess_M2ePro_Model_Order $order, array $params)
+    {
+        // save change
+        //------------------------------
+        $orderId   = $order->getId();
+        $action    = Ess_M2ePro_Model_Order_Change::ACTION_UPDATE_SHIPPING;
+        $creator   = Ess_M2ePro_Model_Order_Change::CREATOR_TYPE_OBSERVER;
+        $component = Ess_M2ePro_Helper_Component_Ebay::NICK;
+
+        Mage::getModel('M2ePro/Order_Change')->create($orderId, $action, $creator, $component, $params);
+        //------------------------------
     }
 
     /**
@@ -80,11 +101,13 @@ class Ess_M2ePro_Model_Ebay_Order_Shipment_Handler extends Ess_M2ePro_Model_Orde
             return null;
         }
 
-        return Mage::helper('M2ePro/Component_Ebay')
+        $item = Mage::helper('M2ePro/Component_Ebay')
             ->getCollection('Order_Item')
                 ->addFieldToFilter('order_id', $order->getId())
                 ->addFieldToFilter('item_id', $itemId)
                 ->addFieldToFilter('transaction_id', $transactionId)
                 ->getFirstItem();
+
+        return $item->getId() ? $item : null;
     }
 }

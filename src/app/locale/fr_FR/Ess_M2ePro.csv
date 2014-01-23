@@ -2737,7 +2737,7 @@ Order item was successfully mapped.,L'objet de la commande a été mappé.
 Order item options were successfully mapped.,Les options de l'objet de la commande ont été mappées.
 Item was successfully unmapped.,L'objet a été démappé.
 Data has been sent on Rakuten.com. It is being processed now. You can continue working with M2E Pro.,Les données ont été envoyées sur Rakuten.com. Elles sont en cours de traitement. Vous pouvez continuer à utiliser M2E Pro.
-We recommend to set up your cron job to be run every 5 minutes (e.g. */5 * * * *).,Nous vous recommandons de programmer l'exécution d'une tâche cron toutes les 5 minutes (par ex. */5 * * * *).
+We recommend to set up your cron job to be run every 5 minutes (e.g. * * * * *).,Nous vous recommandons de programmer l'exécution d'une tâche cron toutes les 5 minutes (par ex. * * * * *).
 "<br/><b>Note:</b> M2E Pro v.5.x.x consists of %s.<br/>
     %s
     %s
@@ -2875,8 +2875,8 @@ Ils permettent de formater le texte affiché dans l'interface."
             Cliquez pour
             <a href=""%s"">commencer la configuration</a> ou
             <a href=""%s"">ignorer</a> l'Assistant.<br/>"
-"Set up a cron job to run every 5 minutes (e.g. */5 * * * *) to enable automatic work of the extension.<br/>
-            Otherwise, some processes will not work (i.e. synchronization tasks, logs cleaning).","Programmez l'exécution d'une tâche cron toutes les 5 minutes (par ex. */5 * * * *) pour activer le fonctionnement automatique de l'extension.<br/>
+"Set up a cron job to run every 5 minutes (e.g. * * * * *) to enable automatic work of the extension.<br/>
+            Otherwise, some processes will not work (i.e. synchronization tasks, logs cleaning).","Programmez l'exécution d'une tâche cron toutes les 5 minutes (par ex. * * * * *) pour activer le fonctionnement automatique de l'extension.<br/>
             Sinon, certains processus ne fonctionneront pas (tâches de synchronisation ou nettoyage des journaux, par exemple)."
 "You have successfully installed <strong>M2E Pro v. %s</strong>.<br/>
              Click

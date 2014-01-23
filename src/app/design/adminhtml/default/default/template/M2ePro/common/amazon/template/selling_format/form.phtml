@@ -12,8 +12,8 @@ If you want the price on Amazon to be multiplied by coefficient 1.2, you should 
 <br/>
 <i>Amazon Price = Magento Price * 1.2.</i>
 <br/><br/>
-<b>Note:</b> If the Special Price is chosen in the <span style="text-decoration: underline;">Item Price</span> option, but it is not set in Magento Product settings or it is set but it has already expired, the Product Price is used instead.
-<br/>If the Special Price is chosen in the <span style="text-decoration: underline;">Sale Price</span> option, its Magento <i>From</i>, <i>To</i> dates are ignored. Only the value is used. When the Sale Price has expired, the Item Price is used.
+<b>Note:</b> If the Special Price is chosen in the <span style="text-decoration: underline;">Price</span> option, but it is not set in Magento Product settings or it is set but it has already expired, the Product Price is used instead.
+<br/>If the Special Price is chosen in the <span style="text-decoration: underline;">Sale Price</span> option, its Magento <i>From</i>, <i>To</i> dates are ignored. Only the value is used. When the Sale Price has expired, the Price is used.
 <br/><br/>
 <b>Note:</b> Attributes must contain only numeric values.
 '); ?>
@@ -51,17 +51,21 @@ If you want the price on Amazon to be multiplied by coefficient 1.2, you should 
         'sale_price_start_date_custom_attribute' => '',
         'sale_price_end_date_custom_attribute' => '',
 
-        'sale_price_start_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate(),
-        'sale_price_end_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate()
+        'sale_price_start_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate(false, 'Y-m-d'),
+        'sale_price_end_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate(false, 'Y-m-d')
     );
 
     $formData = array_merge($default, $formData);
 
     if ($formData['sale_price_start_date_value'] != '') {
-        $formData['sale_price_start_date_value'] = Mage::helper('M2ePro')->gmtDateToTimezone($formData['sale_price_start_date_value']);
+        $formData['sale_price_start_date_value'] = Mage::helper('M2ePro')->getDate(
+            $formData['sale_price_start_date_value'],false,'Y-m-d'
+        );
     }
     if ($formData['sale_price_end_date_value'] != '') {
-        $formData['sale_price_end_date_value'] = Mage::helper('M2ePro')->gmtDateToTimezone($formData['sale_price_end_date_value']);
+        $formData['sale_price_end_date_value'] = Mage::helper('M2ePro')->getDate(
+            $formData['sale_price_end_date_value'],false,'Y-m-d'
+        );
     }
 
     $isEdit = !!$this->getRequest()->getParam('id');
@@ -245,7 +249,7 @@ If you want the price on Amazon to be multiplied by coefficient 1.2, you should 
 
                     <tr class="requirie-attribute-set">
                         <td class="label">
-                            <label for="qty_mode"><?php echo Mage::helper('M2ePro')->__('Item Quantity'); ?>: </label>
+                            <label for="qty_mode"><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: </label>
                         </td>
                         <td class="value" style="width: auto;">
                             <select id="qty_mode" name="qty_mode">
@@ -319,7 +323,7 @@ If you want the price on Amazon to be multiplied by coefficient 1.2, you should 
     <div class="entry-edit" id="magento_block_amazon_template_selling_format_prices">
 
         <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Item Price'); ?></h4>
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Price'); ?></h4>
         </div>
 
         <div class="fieldset">
@@ -382,7 +386,7 @@ If you want the price on Amazon to be multiplied by coefficient 1.2, you should 
     <div class="entry-edit" id="magento_block_amazon_template_selling_format_sale_price">
 
         <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Item Sale Price'); ?></h4>
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Sale Price'); ?></h4>
         </div>
 
         <div class="fieldset">
@@ -451,8 +455,8 @@ If you want the price on Amazon to be multiplied by coefficient 1.2, you should 
                             //<![CDATA[
                                 Calendar.setup({
                                     inputField: "sale_price_start_date_value",
-                                    ifFormat: "%Y-%m-%e %H:%M:%S",
-                                    showsTime: true,
+                                    ifFormat: "%Y-%m-%e",
+                                    showsTime: false,
                                     button: "sale_price_start_date",
                                     align: "Bl",
                                     singleClick : true
@@ -494,8 +498,8 @@ If you want the price on Amazon to be multiplied by coefficient 1.2, you should 
                             //<![CDATA[
                                 Calendar.setup({
                                     inputField: "sale_price_end_date_value",
-                                    ifFormat: "%Y-%m-%e %H:%M:%S",
-                                    showsTime: true,
+                                    ifFormat: "%Y-%m-%e",
+                                    showsTime: false,
                                     button: "sale_price_end_date",
                                     align: "Bl",
                                     singleClick : true

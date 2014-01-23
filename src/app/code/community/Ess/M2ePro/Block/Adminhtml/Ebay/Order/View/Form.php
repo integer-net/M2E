@@ -8,6 +8,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
 {
     public $shippingAddress = array();
 
+    public $ebayWarehouseAddress = array();
+
+    public $globalShippingServiceDetails = array();
+
     public $realMagentoOrderId = NULL;
 
     public function __construct()
@@ -36,6 +40,19 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
         }
         // ---------------
 
+        // ---------------
+        if (!is_null($magentoOrder) && $magentoOrder->hasShipments()) {
+            $url = $this->getUrl('*/adminhtml_order/resubmitShippingInfo', array('id' => $this->order->getId()));
+            $data = array(
+                'class'   => '',
+                'label'   => Mage::helper('M2ePro')->__('Resend Shipping Information'),
+                'onclick' => 'setLocation(\''.$url.'\');',
+            );
+            $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+            $this->setChild('resubmit_shipping_info', $buttonBlock);
+        }
+        // ---------------
+
         // Shipping data
         // ---------------
         /** @var $shippingAddress Ess_M2ePro_Model_Ebay_Order_ShippingAddress */
@@ -43,6 +60,15 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
 
         $this->shippingAddress = $shippingAddress->getData();
         $this->shippingAddress['country_name'] = $shippingAddress->getCountryName();
+        // ---------------
+
+        // Global Shipping data
+        // ---------------
+        $globalShippingDetails = $this->order->getChildObject()->getGlobalShippingDetails();
+        if (!empty($globalShippingDetails)) {
+            $this->ebayWarehouseAddress = $globalShippingDetails['warehouse_address'];
+            $this->globalShippingServiceDetails = $globalShippingDetails['service_details'];
+        }
         // ---------------
 
         $this->setChild('item', $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_order_view_item'));

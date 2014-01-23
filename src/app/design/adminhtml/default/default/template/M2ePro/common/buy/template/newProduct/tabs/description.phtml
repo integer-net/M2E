@@ -144,7 +144,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 <div class="entry-edit" id="magento_block_buy_template_description_title">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Item Details'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Details'); ?></h4>
     </div>
 
     <div class="fieldset">
@@ -155,7 +155,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <!-- title -->
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Item Title'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <select id="title_mode" name="category[title_mode]" class="select required-entry">
@@ -298,7 +298,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <!-- main image -->
                 <tr class="requirie-attribute-set">
                     <td class="label">
-                        <label for="main_image_mode"><?php echo Mage::helper('M2ePro')->__('Main Item Image'); ?>: <span class="required">*</span> (<a id="main_image_help" title="Help">?</a>)</label>
+                        <label for="main_image_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>: <span class="required">*</span> (<a id="main_image_help" title="Help">?</a>)</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="main_image_mode" name="category[main_image_mode]" class="select required-entry">

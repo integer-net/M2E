@@ -49,6 +49,16 @@ class Ess_M2ePro_Adminhtml_DevelopmentController
 
     //#############################################
 
+    public function summaryTabAction()
+    {
+        $blockHtml = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_development_tabs_summary')
+            ->toHtml();
+
+        $this->getResponse()->setBody($blockHtml);
+    }
+
     public function aboutTabAction()
     {
         $blockHtml = $this->loadLayout()

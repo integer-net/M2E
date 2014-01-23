@@ -38,17 +38,22 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Edit_ShippingAddress_Form extends Ma
 
     protected function _beforeToHtml()
     {
-        //------------------------------
-        $this->setData('countries', Mage::helper('M2ePro/Magento')->getCountries());
-        //------------------------------
-
         $buyerEmail = $this->order->getData('buyer_email');
-        stripos($buyerEmail, 'Invalid Request') !== false && $buyerEmail = '';
-        $this->setData('buyer_email', $buyerEmail);
+        if (stripos($buyerEmail, 'Invalid Request') !== false) {
+            $buyerEmail = '';
+        }
 
+        try {
+            $regionCode = $this->order->getShippingAddress()->getRegionCode();
+        } catch (Exception $e) {
+            $regionCode = null;
+        }
+
+        $this->setData('countries', Mage::helper('M2ePro/Magento')->getCountries());
+        $this->setData('buyer_email', $buyerEmail);
         $this->setData('buyer_name', $this->order->getData('buyer_name'));
         $this->setData('address', $this->order->getShippingAddress()->getData());
-        $this->setData('region_code', $this->order->getShippingAddress()->getRegionCode());
+        $this->setData('region_code', $regionCode);
 
         return parent::_beforeToHtml();
     }

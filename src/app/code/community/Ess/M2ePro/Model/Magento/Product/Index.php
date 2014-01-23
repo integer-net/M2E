@@ -8,91 +8,64 @@ class Ess_M2ePro_Model_Magento_Product_Index
     /** @var Mage_Index_Model_Indexer */
     private $indexer = null;
 
-    /** @var Ess_M2ePro_Model_Config_Module */
-    private $config = null;
-    private $configGroup = '/product/index/';
+    //####################################
 
-    private static $switchableIndexes = array(
-        'cataloginventory_stock'
-    );
-
-    private static $requiredIndexes = array(
-        'cataloginventory_stock',
-        'catalog_product_attribute',
-        'catalog_product_price'
-    );
-
-    public function __construct()
+    public function getIndexer()
     {
-        $this->indexer = Mage::getSingleton('index/indexer');
-        $this->config  = Mage::helper('M2ePro/Module')->getConfig();
-    }
-
-    public function getSwitchableIndexes()
-    {
-        return self::$switchableIndexes;
-    }
-
-    public function getRequiredIndexes()
-    {
-        return self::$requiredIndexes;
-    }
-
-    public function hasDisabledSwitchableIndexes()
-    {
-        foreach (self::$switchableIndexes as $code) {
-            $disabled = (bool)(int)$this->getCacheValue($code, 'disabled');
-
-            if ($disabled) {
-                return true;
-            }
+        if (is_null($this->indexer)) {
+            $this->indexer = Mage::getSingleton('index/indexer');
         }
-
-        return false;
+        return $this->indexer;
     }
 
-    public function disableAutomaticReindex($code)
+    public function getIndexes()
+    {
+        return array(
+            'cataloginventory_stock'
+        );
+    }
+
+    //####################################
+
+    public function disableReindex($code)
     {
         /** @var $process Mage_Index_Model_Process */
-        $process = $this->indexer->getProcessByCode($code);
+        $process = $this->getIndexer()->getProcessByCode($code);
 
         if ($process === false) {
-            return;
+            return false;
         }
 
         if ($process->getMode() == Mage_Index_Model_Process::MODE_MANUAL) {
-            return;
+            return false;
         }
 
         $process->setMode(Mage_Index_Model_Process::MODE_MANUAL)->save();
 
-        $this->setCacheValue($code, 'disabled', 1);
+        return true;
     }
 
-    public function enableAutomaticReindex($code)
+    public function enableReindex($code)
     {
-        $disabled = (bool)(int)$this->getCacheValue($code, 'disabled');
-
-        if (!$disabled) {
-            // mode was not disabled by M2E Pro, skip action
-            return;
-        }
-
         /** @var $process Mage_Index_Model_Process */
-        $process = $this->indexer->getProcessByCode($code);
+        $process = $this->getIndexer()->getProcessByCode($code);
 
         if ($process === false) {
-            return;
+            return false;
         }
 
-        if ($process->getMode() != Mage_Index_Model_Process::MODE_REAL_TIME) {
-            $process->setMode(Mage_Index_Model_Process::MODE_REAL_TIME)->save();
+        if ($process->getMode() == Mage_Index_Model_Process::MODE_REAL_TIME) {
+            return false;
         }
 
-        $this->setCacheValue($code, 'disabled', 0);
+        $process->setMode(Mage_Index_Model_Process::MODE_REAL_TIME)->save();
+
+        return true;
     }
 
-    public function reindex($code)
+    // -----------------------------------
+
+    public function requireReindex($code)
     {
         /** @var $process Mage_Index_Model_Process */
         $process = $this->indexer->getProcessByCode($code);
@@ -105,7 +78,15 @@ class Ess_M2ePro_Model_Magento_Product_Index
         $eventsCollection = Mage::getResourceModel('index/event_collection')
             ->addProcessFilter($process, Mage_Index_Model_Process::EVENT_STATUS_NEW);
 
-        if ($eventsCollection->getSize() == 0) {
+        return (bool)$eventsCollection->getSize();
+    }
+
+    public function executeReindex($code)
+    {
+        /** @var $process Mage_Index_Model_Process */
+        $process = $this->indexer->getProcessByCode($code);
+
+        if ($process === false || $process->getStatus() == Mage_Index_Model_Process::STATUS_RUNNING) {
             return false;
         }
 
@@ -114,14 +95,33 @@ class Ess_M2ePro_Model_Magento_Product_Index
         return true;
     }
 
-    private function setCacheValue($code, $key, $value)
+    //####################################
+
+    public function isIndexManagementEnabled()
     {
-        $this->config->setGroupValue($this->configGroup.$code.'/', $key, $value);
-        return $this;
+        return (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                            ->getGroupValue('/product/index/', 'mode');
     }
 
-    private function getCacheValue($code, $key)
+    public function isDisabledIndex($code)
     {
-        return $this->config->getGroupValue($this->configGroup.$code.'/', $key);
+        return (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                            ->getGroupValue('/product/index/'.$code.'/', 'disabled');
     }
+
+    // -----------------------------------
+
+    public function rememberDisabledIndex($code)
+    {
+        Mage::helper('M2ePro/Module')->getConfig()
+            ->setGroupValue('/product/index/'.$code.'/', 'disabled', 1);
+    }
+
+    public function forgetDisabledIndex($code)
+    {
+        Mage::helper('M2ePro/Module')->getConfig()
+            ->setGroupValue('/product/index/'.$code.'/', 'disabled', 0);
+    }
+
+    //####################################
 }

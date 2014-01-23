@@ -312,7 +312,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
 
         if ($this->isHorizontalTemplate()) {
             $object = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getOwnerObject()->getComponentMode(),
+                Ess_M2ePro_Helper_Component_Ebay::NICK,
                 $modelName, $id, NULL, array('template')
             );
         } else {
@@ -534,6 +534,10 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
 
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection($itemType);
 
+        if (!is_null($key)) {
+            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($key);
+        }
+
         foreach ($filters as $field => $filter) {
             $collection->addFieldToFilter($field, $filter);
         }
@@ -551,11 +555,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         /* @var $collection Mage_Core_Model_Resource_Db_Collection_Abstract */
         $collection->getSelect()->where($where);
 
-        if ($asObject) {
-            return $collection->getItems();
-        }
-
-        $items = $collection->getData();
+        $items = $asObject ? $collection->getItems() : $collection->getData();
 
         if (is_null($key)) {
             return $items;
@@ -571,86 +571,47 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
 
     // #######################################
 
-    public function getChangedTemplates($newData, $oldData)
+    public function getTemplatesFromData($data, $templates = array(self::TEMPLATE_PAYMENT,
+                                                                   self::TEMPLATE_SHIPPING,
+                                                                   self::TEMPLATE_RETURN,
+                                                                   self::TEMPLATE_SELLING_FORMAT,
+                                                                   self::TEMPLATE_DESCRIPTION,
+                                                                   self::TEMPLATE_SYNCHRONIZATION))
     {
-        $changedTemplates = array();
+        $templates = array_combine($templates,array_fill(0,count($templates),NULL));
 
-        $templates = array(
-            self::TEMPLATE_PAYMENT,
-            self::TEMPLATE_SHIPPING,
-            self::TEMPLATE_RETURN,
-            self::TEMPLATE_SELLING_FORMAT,
-            self::TEMPLATE_DESCRIPTION,
-        );
+        foreach (array_keys($templates) as $template) {
+            $this->setTemplate($template);
 
-        $templateManager = $this;
+            $templateMode = $data[$this->getModeColumnName()];
 
-        foreach ($templates as $template) {
-            $templateManager->setTemplate($template);
-
-            $newTemplateMode = $newData[$templateManager->getModeColumnName()];
-            $oldTemplateMode = $oldData[$templateManager->getModeColumnName()];
-
-            if ($newTemplateMode !== $oldTemplateMode &&
-                in_array(
-                    self::MODE_POLICY,
-                    array($newTemplateMode,$oldTemplateMode)
-                )) {
-                $changedTemplates[] = $template;
-                continue;
-            }
-
-            if ($newTemplateMode == self::MODE_PARENT) {
-                $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing',$newData['listing_id']);
-                $newTemplateMode = $listing->getData($templateManager->getModeColumnName());
-                $newTemplateId   = $listing->getData($templateManager->getIdColumnNameByMode($newTemplateMode));
+            if ($templateMode == self::MODE_PARENT) {
+                $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing',$data['listing_id']);
+                $templateMode = $listing->getData($this->getModeColumnName());
+                $templateId   = $listing->getData($this->getIdColumnNameByMode($templateMode));
             } else {
-                $newTemplateId = $newData[$templateManager->getIdColumnNameByMode($newTemplateMode)];
+                $templateId = $data[$this->getIdColumnNameByMode($templateMode)];
             }
 
-            if ($oldTemplateMode == self::MODE_PARENT) {
-                $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing',$oldData['listing_id']);
-                $oldTemplateMode = $listing->getData($templateManager->getModeColumnName());
-                $oldTemplateId   = $listing->getData($templateManager->getIdColumnNameByMode($oldTemplateMode));
-            } else {
-                $oldTemplateId = $oldData[$templateManager->getIdColumnNameByMode($oldTemplateMode)];
+            $templateModelName = $this->getTemplateModelName();
+            if ($templateMode == self::MODE_POLICY) {
+                $templateModelName = 'Ebay_Template_Policy';
             }
 
-            $newTemplateModelName = $templateManager->getTemplateModelName();
-            if ($newTemplateMode == self::MODE_POLICY) {
-                $newTemplateModelName = 'Ebay_Template_Policy';
-            }
-
-            $oldTemplateModelName = $templateManager->getTemplateModelName();
-            if ($oldTemplateMode == self::MODE_POLICY) {
-                $oldTemplateModelName = 'Ebay_Template_Policy';
-            }
-
-            if ($templateManager->isHorizontalTemplate()) {
-                $newTemplateModel = Mage::helper('M2ePro/Component')
-                    ->getCachedComponentObject('ebay', $newTemplateModelName, $newTemplateId, NULL, array('template'))
-                    ->getChildObject();
-
-                $oldTemplateModel = Mage::helper('M2ePro/Component')
-                    ->getCachedComponentObject('ebay', $oldTemplateModelName, $oldTemplateId, NULL, array('template'))
+            if ($this->isHorizontalTemplate()) {
+                $templateModel = Mage::helper('M2ePro/Component')
+                    ->getCachedComponentObject('ebay', $templateModelName, $templateId, NULL, array('template'))
                     ->getChildObject();
             } else {
-                $newTemplateModel = Mage::helper('M2ePro')
-                    ->getCachedObject($newTemplateModelName, $newTemplateId, NULL, array('template'));
-
-                $oldTemplateModel = Mage::helper('M2ePro')
-                    ->getCachedObject($oldTemplateModelName, $oldTemplateId, NULL, array('template'));
+                $templateModel = Mage::helper('M2ePro')->getCachedObject(
+                    $templateModelName, $templateId, NULL, array('template')
+                );
             }
 
-            $newTemplateData = $newTemplateModel->getDataSnapshot();
-            $oldTemplateData = $oldTemplateModel->getDataSnapshot();
-
-            if ($newTemplateModel->getResource()->isDifferent($newTemplateData,$oldTemplateData)) {
-                $changedTemplates[] = $template;
-            }
+            $templates[$template] = $templateModel;
         }
 
-        return $changedTemplates;
+        return $templates;
     }
 
     // #######################################

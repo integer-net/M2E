@@ -12,7 +12,7 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
     const SYNCH_TASK_DEFAULTS = 1;
     const _SYNCH_TASK_DEFAULTS = 'Default Synchronization';
     const SYNCH_TASK_TEMPLATES = 2;
-    const _SYNCH_TASK_TEMPLATES = 'Stock Level Synchronization';
+    const _SYNCH_TASK_TEMPLATES = 'Inventory Synchronization';
     const SYNCH_TASK_ORDERS = 3;
     const _SYNCH_TASK_ORDERS = 'Orders Synchronization';
     const SYNCH_TASK_FEEDBACKS = 4;

@@ -141,8 +141,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
         $type   = 'get';
         $name   = 'list';
 
-        $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-            ->processVirtualAbstract($entity, $type, $name, $request, NULL, NULL, $account);
+        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+            ->processVirtual($entity, $type, $name, $request, NULL, NULL, $account);
 
         $ebayOrders = array();
         $toTime = $fromTime;
@@ -279,7 +279,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Receive extends Ess_M2e
             $sinceTime = new DateTime($sinceTime, new DateTimeZone('UTC'));
         }
 
-        return Ess_M2ePro_Model_Connector_Server_Ebay_Abstract::ebayTimeToString($sinceTime);
+        return Ess_M2ePro_Model_Connector_Ebay_Abstract::ebayTimeToString($sinceTime);
     }
 
     //####################################

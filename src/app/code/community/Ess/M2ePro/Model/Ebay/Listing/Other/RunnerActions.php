@@ -50,21 +50,21 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_RunnerActions
 
             do {
 
-                if ($action == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP) {
+                if ($action == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP) {
                     return false;
                 }
 
-                if ($action == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST) {
+                if ($action == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST) {
                     return false;
                 }
 
@@ -175,7 +175,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_RunnerActions
         $results = array();
 
         if ($totalCount == 0) {
-            $results[] = Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_SUCCESS;
+            $results[] = Ess_M2ePro_Helper_Data::STATUS_SUCCESS;
         } else {
 
             // Execute eBay actions
@@ -186,7 +186,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_RunnerActions
             $waitMessage = Mage::helper('M2ePro')->__('Please wait...');
 
             foreach ($actions as $action=>$combinations) {
-                $actionTitle = Ess_M2ePro_Model_Connector_Server_Ebay_OtherItem_Dispatcher::getActionTitle($action);
+                $actionTitle = Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher::getActionTitle($action);
 
                 foreach ($combinations as $combination) {
 
@@ -214,7 +214,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_RunnerActions
                         $lockItem->setStatus($actionTitle.' '.$statusIdsString.' '.$waitMessage);
                         //-----------------------------
 
-                        $tempResult = Mage::getModel('M2ePro/Connector_Server_Ebay_OtherItem_Dispatcher')
+                        $tempResult = Mage::getModel('M2ePro/Connector_Ebay_OtherItem_Dispatcher')
                             ->process($action, $itemsForStep, $combination['params']);
                         $results  = array_merge($results,array($tempResult));
 
@@ -236,7 +236,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_RunnerActions
         $lockItem->setPercents($percentsTo);
         $lockItem->activate();
 
-        return Ess_M2ePro_Model_Connector_Server_Ebay_OtherItem_Abstract::getMainStatus($results);
+        return Mage::helper('M2ePro')->getMainStatus($results);
     }
 
     //-----------------------------------------
@@ -244,9 +244,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_RunnerActions
     private function makeActionsForExecute()
     {
         $actions = array(
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP => array(),
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST => array(),
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE => array()
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP => array(),
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST => array(),
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE => array()
         );
 
         foreach ($this->_actionsProducts as $item) {

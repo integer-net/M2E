@@ -96,7 +96,6 @@ class Ess_M2ePro_Helper_Module_Database extends Mage_Core_Helper_Abstract
             'm2epro_ebay_listing',
             'm2epro_ebay_listing_auto_category',
             'm2epro_ebay_listing_auto_category_group',
-            'm2epro_ebay_listing_auto_filter',
             'm2epro_ebay_listing_other',
             'm2epro_ebay_listing_product',
             'm2epro_ebay_listing_product_variation',
@@ -109,6 +108,7 @@ class Ess_M2ePro_Helper_Module_Database extends Mage_Core_Helper_Abstract
             'm2epro_ebay_template_category',
             'm2epro_ebay_template_category_specific',
             'm2epro_ebay_template_description',
+            'm2epro_ebay_template_other_category',
             'm2epro_ebay_template_payment',
             'm2epro_ebay_template_payment_service',
             'm2epro_ebay_template_policy',
@@ -215,6 +215,20 @@ class Ess_M2ePro_Helper_Module_Database extends Mage_Core_Helper_Abstract
         }
 
         return $result;
+    }
+
+    // ########################################
+
+    public function getTableModel($tableName)
+    {
+        $tableModels = Mage::getConfig()->getNode('global/models/M2ePro_mysql4/entities');
+        foreach ($tableModels->asArray() as $model => $infoData) {
+            if ($infoData['table'] == $tableName) {
+                return $model;
+            }
+        }
+
+        return null;
     }
 
     // ########################################

@@ -82,10 +82,12 @@ class Ess_M2ePro_Model_Magento_Quote_Item
         $taxRate = $this->proxyItem->getTaxRate();
         $hasRatesForCountry = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
             ->hasRatesForCountry($this->quote->getShippingAddress()->getCountryId());
+        $calculationBasedOnOrigin = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
+            ->isCalculationBasedOnOrigin($this->quote->getStore());
 
         if ($proxyOrder->isTaxModeNone()
             || ($proxyOrder->isTaxModeChannel() && $taxRate == 0)
-            || ($proxyOrder->isTaxModeMagento() && !$hasRatesForCountry)
+            || ($proxyOrder->isTaxModeMagento() && !$hasRatesForCountry && !$calculationBasedOnOrigin)
         ) {
             return Ess_M2ePro_Model_Magento_Product::TAX_CLASS_ID_NONE;
         }

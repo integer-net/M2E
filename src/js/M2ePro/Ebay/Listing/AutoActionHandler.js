@@ -501,7 +501,6 @@ EbayListingAutoActionHandler = Class.create(CommonHandler, {
                         auto_mode: $('auto_mode').value,
                         adding_mode: $('adding_mode').value,
                         adding_template_category_id: null,
-                        adding_duplicate: $('adding_duplicate').value,
                         deleting_mode: $('deleting_mode').value,
                         categories: categories_selected_items
                     };

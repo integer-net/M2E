@@ -62,7 +62,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AutoAction_Mode_Category_Group_Gri
 
         $collection = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group')->getCollection();
         $collection->addFieldToFilter('main_table.listing_id', $this->getRequest()->getParam('listing_id'));
-        $collection->getSelect()->columns(array('categories' => $categoriesCollection->getSelect()));
+        $collection->getSelect()->columns(
+            array('categories' => new Zend_Db_Expr('('.$categoriesCollection->getSelect().')'))
+        );
         //--------------------------------
 
         // we need sort by id also, because create_date may be same for some adjustment entries

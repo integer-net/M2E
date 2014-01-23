@@ -10,17 +10,12 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     const CATEGORY_MODE_EBAY       = 1;
     const CATEGORY_MODE_ATTRIBUTE  = 2;
 
-    const STORE_CATEGORY_MODE_NONE       = 0;
-    const STORE_CATEGORY_MODE_EBAY       = 1;
-    const STORE_CATEGORY_MODE_ATTRIBUTE  = 2;
-
-    const TAX_CATEGORY_MODE_NONE      = 0;
-    const TAX_CATEGORY_MODE_VALUE     = 1;
-    const TAX_CATEGORY_MODE_ATTRIBUTE = 2;
-
-    const MOTORS_SPECIFICS_VALUE_SEPARATOR = ',';
-
     // ########################################
+
+    /**
+     * @var Ess_M2ePro_Model_Marketplace
+     */
+    private $marketplaceModel = NULL;
 
     /**
      * @var Ess_M2ePro_Model_Magento_Product
@@ -48,37 +43,38 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
             $specific->deleteInstance();
         }
 
+        $this->marketplaceModel = NULL;
         $this->magentoProductModel = NULL;
 
         $this->delete();
         return true;
     }
 
-    public function duplicateInstance()
+    // #######################################
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
     {
-        $tempData = $this->getData();
-        unset($tempData['id']);
-
-        /** @var Ess_M2ePro_Model_Ebay_Template_Category $categoryTemplateDestination */
-        $categoryTemplateNew = Mage::getModel('M2ePro/Ebay_Template_Category')
-                                            ->setData($tempData)->save();
-
-        $categorySpecifics = $this->getSpecifics(true);
-        foreach ($categorySpecifics as $categorySpecific) {
-
-            /** @var Ess_M2ePro_Model_Ebay_Template_Category_Specific $categorySpecific */
-
-            $tempData = $categorySpecific->getData();
-            unset($tempData['id']);
-            $tempData['template_category_id'] = $categoryTemplateNew->getId();
-
-            Mage::getModel('M2ePro/Ebay_Template_Category_Specific')->setData($tempData)->save();
+        if (is_null($this->marketplaceModel)) {
+            $this->marketplaceModel = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
+                'Marketplace', $this->getMarketplaceId()
+            );
         }
 
-        return $categoryTemplateNew;
+        return $this->marketplaceModel;
     }
 
-    // #######################################
+    /**
+     * @param Ess_M2ePro_Model_Marketplace $instance
+     */
+    public function setMarketplace(Ess_M2ePro_Model_Marketplace $instance)
+    {
+         $this->marketplaceModel = $instance;
+    }
+
+    //---------------------------------------
 
     /**
      * @return Ess_M2ePro_Model_Magento_Product
@@ -117,6 +113,13 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
 
     // #######################################
 
+    public function getMarketplaceId()
+    {
+        return (int)$this->getData('marketplace_id');
+    }
+
+    //---------------------------------------
+
     public function getCreateDate()
     {
         return $this->getData('create_date');
@@ -125,25 +128,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     public function getUpdateDate()
     {
         return $this->getData('update_date');
-    }
-
-    // #######################################
-
-    public function isVariationEnabled()
-    {
-        return (bool)$this->getData('variation_enabled');
-    }
-
-    public function isVariationMode()
-    {
-        return $this->isVariationEnabled();
-    }
-
-    // #######################################
-
-    public function getMotorsSpecificsAttribute()
-    {
-        return $this->getData('motors_specifics_attribute');
     }
 
     // #######################################
@@ -158,67 +142,7 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
         );
     }
 
-    public function getCategorySecondarySource()
-    {
-        return array(
-            'mode'      => $this->getData('category_secondary_mode'),
-            'value'     => $this->getData('category_secondary_id'),
-            'path'     => $this->getData('category_secondary_path'),
-            'attribute' => $this->getData('category_secondary_attribute')
-        );
-    }
-
-    public function getStoreCategoryMainSource()
-    {
-        return array(
-            'mode'           => $this->getData('store_category_main_mode'),
-            'value'          => $this->getData('store_category_main_id'),
-            'path'          => $this->getData('store_category_main_path'),
-            'attribute'      => $this->getData('store_category_main_attribute')
-        );
-    }
-
-    public function getStoreCategorySecondarySource()
-    {
-        return array(
-            'mode'      => $this->getData('store_category_secondary_mode'),
-            'value'     => $this->getData('store_category_secondary_id'),
-            'path'     => $this->getData('store_category_secondary_path'),
-            'attribute' => $this->getData('store_category_secondary_attribute')
-        );
-    }
-
     //----------------------------------------
-
-    public function getTaxCategorySource()
-    {
-        return array(
-            'mode'      => $this->getData('tax_category_mode'),
-            'value'     => $this->getData('tax_category_value'),
-            'attribute' => $this->getData('tax_category_attribute')
-        );
-    }
-
-    // #######################################
-
-    public function getMotorsSpecifics()
-    {
-        $attributeCode  = $this->getMotorsSpecificsAttribute();
-        $attributeValue = $this->getMagentoProduct()->getAttributeValue($attributeCode);
-
-        if (empty($attributeValue)) {
-            return array();
-        }
-
-        $epids = explode(self::MOTORS_SPECIFICS_VALUE_SEPARATOR, $attributeValue);
-
-        return Mage::getModel('M2ePro/Ebay_Motor_Specific')
-            ->getCollection()
-            ->addFieldToFilter('epid', array('in' => $epids))
-            ->getItems();
-    }
-
-    // #######################################
 
     public function getMainCategory()
     {
@@ -231,141 +155,24 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
         return $src['value'];
     }
 
-    public function getSecondaryCategory()
-    {
-        $src = $this->getCategorySecondarySource();
-
-        if ($src['mode'] == self::CATEGORY_MODE_NONE) {
-            return 0;
-        }
-
-        if ($src['mode'] == self::CATEGORY_MODE_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
-    }
-
-    //----------------------------------------
-
-    public function getStoreCategoryMain()
-    {
-        $src = $this->getStoreCategoryMainSource();
-
-        if ($src['mode'] == self::STORE_CATEGORY_MODE_NONE) {
-            return 0;
-        }
-
-        if ($src['mode'] == self::STORE_CATEGORY_MODE_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
-    }
-
-    public function getStoreCategorySecondary()
-    {
-        $src = $this->getStoreCategorySecondarySource();
-
-        if ($src['mode'] == self::STORE_CATEGORY_MODE_NONE) {
-            return 0;
-        }
-
-        if ($src['mode'] == self::STORE_CATEGORY_MODE_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
-    }
-
-    //----------------------------------------
-
-    public function getTaxCategory()
-    {
-        $src = $this->getTaxCategorySource();
-
-        if ($src['mode'] == self::TAX_CATEGORY_MODE_NONE) {
-            return '';
-        }
-
-        if ($src['mode'] == self::TAX_CATEGORY_MODE_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
-    }
-
     // #######################################
 
-    public function fillCategoriesPaths(array &$data, $marketplaceId, $accountId)
+    public function getCategoryPath(Ess_M2ePro_Model_Listing $listing, $withId = true)
     {
-        if (isset($data['category_main_mode']) && empty($data['category_main_path'])) {
-            switch ($data['category_main_mode']) {
-                case self::CATEGORY_MODE_EBAY:
-                    $data['category_main_path'] = Mage::helper('M2ePro/Component_Ebay_Category')
-                        ->getPathById(
-                            $data['category_main_id'],
-                            $marketplaceId
-                        );
-                    break;
-                case self::CATEGORY_MODE_ATTRIBUTE:
-                    $attributeCode  = $data['category_main_attribute'];
-                    $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeCode);
-                    $data['category_main_path'] = 'Magento Attribute' . ' -> ' . $attributeLabel;
-                    break;
-            }
+        $data = array(
+            'category_main_id' => $this->getData('category_main_id'),
+            'category_main_mode' => $this->getData('category_main_mode'),
+            'category_main_path' => $this->getData('category_main_path'),
+            'category_main_attribute' => $this->getData('category_main_attribute'),
+        );
+
+        Mage::helper('M2ePro/Component_Ebay_Category')->fillCategoriesPaths($data,$listing);
+
+        if ($withId && $this->getData('category_main_mode') == self::CATEGORY_MODE_EBAY) {
+            $data['category_main_path'] .= ' ('.$data['category_main_id'].')';
         }
 
-        if (isset($data['category_secondary_mode']) && empty($data['category_secondary_path'])) {
-            switch ($data['category_secondary_mode']) {
-                case self::CATEGORY_MODE_EBAY:
-                    $data['category_secondary_path'] = Mage::helper('M2ePro/Component_Ebay_Category')
-                        ->getPathById(
-                            $data['category_secondary_id'],
-                            $marketplaceId
-                        );
-                    break;
-                case self::CATEGORY_MODE_ATTRIBUTE:
-                    $attributeCode  = $data['category_secondary_attribute'];
-                    $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeCode);
-                    $data['category_secondary_path'] = 'Magento Attribute' . ' -> ' . $attributeLabel;
-                    break;
-            }
-        }
-
-        if (isset($data['store_category_main_mode']) && empty($data['store_category_main_path'])) {
-            switch ($data['store_category_main_mode']) {
-                case self::STORE_CATEGORY_MODE_EBAY:
-                    $data['store_category_main_path'] = Mage::helper('M2ePro/Component_Ebay_Category')
-                        ->getStorePathById(
-                            $data['store_category_main_id'],
-                            $accountId
-                        );
-                    break;
-                case self::STORE_CATEGORY_MODE_ATTRIBUTE:
-                    $attributeCode  = $data['store_category_main_attribute'];
-                    $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeCode);
-                    $data['store_category_main_path'] = 'Magento Attribute' . ' -> ' . $attributeLabel;
-                    break;
-            }
-        }
-
-        if (isset($data['store_category_secondary_mode']) && empty($data['store_category_secondary_path'])) {
-            switch ($data['store_category_secondary_mode']) {
-                case self::STORE_CATEGORY_MODE_EBAY:
-                    $data['store_category_secondary_path'] = Mage::helper('M2ePro/Component_Ebay_Category')
-                        ->getStorePathById(
-                            $data['store_category_secondary_id'],
-                            $accountId
-                        );
-                    break;
-                case self::STORE_CATEGORY_MODE_ATTRIBUTE:
-                    $attributeCode  = $data['store_category_secondary_attribute'];
-                    $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeCode);
-                    $data['store_category_secondary_path'] = 'Magento Attribute' . ' -> ' . $attributeLabel;
-                    break;
-            }
-        }
+        return $data['category_main_path'];
     }
 
     // #######################################
@@ -373,81 +180,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     public function getTrackingAttributes()
     {
         return array();
-    }
-
-    // #######################################
-
-    public function save()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
-        return parent::save();
-    }
-
-    public function delete()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
-        return parent::delete();
-    }
-
-    // #######################################
-
-    public function getDefaultSettings()
-    {
-        return array(
-
-            'category_main_id' => 0,
-            'category_main_path' => '',
-            'category_main_mode' => self::CATEGORY_MODE_EBAY,
-            'category_main_attribute' => '',
-
-            'category_secondary_id' => 0,
-            'category_secondary_path' => '',
-            'category_secondary_mode' => self::CATEGORY_MODE_NONE,
-            'category_secondary_attribute' => '',
-
-            'store_category_main_id' => 0,
-            'store_category_main_path' => '',
-            'store_category_main_mode' => self::STORE_CATEGORY_MODE_NONE,
-            'store_category_main_attribute' => '',
-
-            'store_category_secondary_id' => 0,
-            'store_category_secondary_path' => '',
-            'store_category_secondary_mode' => self::STORE_CATEGORY_MODE_NONE,
-            'store_category_secondary_attribute' => '',
-
-            'tax_category_mode' => 0,
-            'tax_category_value' => '',
-            'tax_category_attribute' => '',
-
-            'variation_enabled' => 1,
-            'motors_specifics_attribute' => ''
-        );
-    }
-
-    // #######################################
-
-    public static function isTaxCategoryShow()
-    {
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            return false;
-        }
-
-        return Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/view/ebay/template/category/', 'show_tax_category');
-    }
-
-    // #######################################
-
-    public function getAffectedListingProducts($asObjects = false)
-    {
-        if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
-        }
-
-        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
-        $collection->addFieldToFilter('template_category_id', $this->getId());
-
-        return $asObjects ? $collection->getItems() : $collection->getData();
     }
 
     // #######################################
@@ -466,18 +198,53 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
         return $data;
     }
 
+    public function getDefaultSettings()
+    {
+        return array(
+
+            'category_main_id' => 0,
+            'category_main_path' => '',
+            'category_main_mode' => self::CATEGORY_MODE_EBAY,
+            'category_main_attribute' => ''
+        );
+    }
+
     // #######################################
 
-    public function setIsNeedSynchronize($newData, $oldData)
+    public function getAffectedListingProducts($asObjects = false, $key = NULL)
+    {
+        if (is_null($this->getId())) {
+            throw new LogicException('Method require loaded instance first');
+        }
+
+        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+        $collection->addFieldToFilter('template_category_id', $this->getId());
+
+        if (!is_null($key)) {
+            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($key);
+        }
+
+        $listingProducts = $asObjects ? $collection->getItems() : $collection->getData();
+
+        if (is_null($key)) {
+            return $listingProducts;
+        }
+
+        $return = array();
+        foreach ($listingProducts as $listingProduct) {
+            isset($listingProduct[$key]) && $return[] = $listingProduct[$key];
+        }
+
+        return $return;
+    }
+
+    public function setSynchStatusNeed($newData, $oldData)
     {
         if (!$this->getResource()->isDifferent($newData,$oldData)) {
             return;
         }
 
-        $ids = array();
-        foreach ($this->getAffectedListingProducts() as $listingProduct) {
-            $ids[] = (int)$listingProduct['id'];
-        }
+        $ids = $this->getAffectedListingProducts(false,'id');
 
         if (empty($ids)) {
             return;
@@ -488,7 +255,7 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
         Mage::getSingleton('core/resource')->getConnection('core_read')->update(
             Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
             array(
-                'is_need_synchronize' => 1,
+                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
                 'synch_reasons' => new Zend_Db_Expr(
                     "IF(synch_reasons IS NULL,
                         '".implode(',',$templates)."',
@@ -498,6 +265,20 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
             ),
             array('id IN ('.implode(',', $ids).')')
         );
+    }
+
+    // #######################################
+
+    public function save()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
+        return parent::save();
+    }
+
+    public function delete()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
+        return parent::delete();
     }
 
     // #######################################

@@ -11,6 +11,8 @@ class Ess_M2ePro_Model_Order_Change extends Ess_M2ePro_Model_Abstract
 
     const CREATOR_TYPE_OBSERVER = 1;
 
+    const MAX_ALLOWED_PROCESSING_ATTEMPTS = 3;
+
     //####################################
 
     public function _construct()
@@ -51,6 +53,18 @@ class Ess_M2ePro_Model_Order_Change extends Ess_M2ePro_Model_Abstract
     public function getHash()
     {
         return $this->getData('hash');
+    }
+
+    //####################################
+
+    public function isPaymentUpdateAction()
+    {
+        return $this->getAction() == self::ACTION_UPDATE_PAYMENT;
+    }
+
+    public function isShippingUpdateAction()
+    {
+        return $this->getAction() == self::ACTION_UPDATE_SHIPPING;
     }
 
     //####################################

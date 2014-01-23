@@ -11,6 +11,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
     private $attributeSets = array();
 
     public $attributes = array();
+    public $M2eProAttributes = array();
     public $attributesConfigurable = array();
 
     // ####################################
@@ -32,6 +33,36 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
 //        $this->attributesConfigurable = Mage::helper('M2ePro/Magento_Attribute')
 //            ->getAllConfigurableByAttributeSets($this->attributeSets);
         $this->attributesConfigurable = Mage::helper('M2ePro/Magento_Attribute')->getAllConfigurable();
+
+        $this->M2eProAttributes = array(
+            'title' => Mage::helper('M2ePro')->__('Title'),
+            'subtitle' => Mage::helper('M2ePro')->__('Subtitle'),
+            'condition' => Mage::helper('M2ePro')->__('Condition'),
+            'condition_description' => Mage::helper('M2ePro')->__('Condition Description'),
+            'buy_it_now_price' => Mage::helper('M2ePro')->__('Buy It Now Price'),
+            'start_price' => Mage::helper('M2ePro')->__('Start Price'),
+            'reserve_price' => Mage::helper('M2ePro')->__('Reserve Price'),
+            'qty' => Mage::helper('M2ePro')->__('QTY'),
+            'listing_type' => Mage::helper('M2ePro')->__('Listing Type'),
+            'listing_duration' => Mage::helper('M2ePro')->__('Listing Duration'),
+            'handling_time' => Mage::helper('M2ePro')->__('Dispatch Time'),
+            'primary_category_id' => Mage::helper('M2ePro')->__('Primary Category Id'),
+            'secondary_category_id' => Mage::helper('M2ePro')->__('Secondary Category Id'),
+            'store_primary_category_id' => Mage::helper('M2ePro')->__('Store Primary Category Id'),
+            'store_secondary_category_id' => Mage::helper('M2ePro')->__('Store Secondary Category Id'),
+            'primary_category_name' => Mage::helper('M2ePro')->__('Primary Category Name'),
+            'secondary_category_name' => Mage::helper('M2ePro')->__('Secondary Category Name'),
+            'store_primary_category_name' => Mage::helper('M2ePro')->__('Store Primary Category Name'),
+            'store_secondary_category_name' => Mage::helper('M2ePro')->__('Store Secondary Category Name'),
+            'domestic_shipping_method[1]' => Mage::helper('M2ePro')->__('Domestic Shipping First Method'),
+            'domestic_shipping_cost[1]' => Mage::helper('M2ePro')->__('Domestic Shipping First Cost'),
+            'domestic_shipping_additional_cost[1]' =>
+                                            Mage::helper('M2ePro')->__('Domestic Shipping First Additional Cost'),
+            'international_shipping_method[1]' => Mage::helper('M2ePro')->__('International Shipping First Method'),
+            'international_shipping_cost[1]' => Mage::helper('M2ePro')->__('International Shipping First Cost'),
+            'international_shipping_additional_cost[1]' =>
+                                            Mage::helper('M2ePro')->__('International Shipping First Additional Cost'),
+        );
     }
 
     protected function _beforeToHtml()
@@ -104,6 +135,18 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
                 'class' => 'add_product_attribute_button',
             ) );
         $this->setChild('add_product_attribute_button',$buttonBlock);
+        //------------------------------
+
+        //------------------------------
+        $buttonBlock = $this->getLayout()
+            ->createBlock('adminhtml/widget_button')
+            ->setData( array(
+                'label'   => Mage::helper('M2ePro')->__('Insert'),
+                'onclick' => "EbayTemplateDescriptionHandlerObj.appendToTextarea"
+                ."('#value[' + $('select_m2epro_attributes').value + ']#');",
+                'class' => 'add_product_attribute_button',
+            ) );
+        $this->setChild('add_m2epro_attribute_button',$buttonBlock);
         //------------------------------
 
         //------------------------------

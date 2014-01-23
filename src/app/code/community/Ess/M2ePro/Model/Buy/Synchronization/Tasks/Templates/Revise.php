@@ -85,19 +85,19 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Revise
 
     private function execute()
     {
-        $this->executeQtyChanged();
+        $tasks = array(
+            'executeQtyChanged',
+            'executePriceChanged',
+            'executeNeedSynchronize',
+            'executeTotal',
+        );
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 1*self::PERCENTS_INTERVAL/4);
-        $this->_lockItem->activate();
+        foreach ($tasks as $i => $task) {
+            $this->$task();
 
-        $this->executePriceChanged();
-
-        $this->_lockItem->setPercents(self::PERCENTS_START + 2*self::PERCENTS_INTERVAL/4);
-        $this->_lockItem->activate();
-
-        //-------------------------
-
-        $this->executeIsNeedSynchronize();
+            $this->_lockItem->setPercents(self::PERCENTS_START + ($i+1)*self::PERCENTS_INTERVAL/count($tasks));
+            $this->_lockItem->activate();
+        }
     }
 
     //####################################
@@ -148,13 +148,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Revise
 
     //####################################
 
-    private function executeIsNeedSynchronize()
+    private function executeNeedSynchronize()
     {
         $this->_profiler->addTimePoint(__METHOD__,'Execute is need synchronize');
 
         $listingProductCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
-        $listingProductCollection->addFieldToFilter('is_need_synchronize', 1);
+        $listingProductCollection->addFieldToFilter('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
 
         $listingProductCollection->getSelect()->where(
             '`is_variation_product` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_NO.
@@ -164,14 +164,19 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Revise
             ')'
         );
 
+        $listingProductCollection->getSelect()->limit(100);
+
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($listingProductCollection->getItems() as $listingProduct) {
+
+            $listingProduct->setData('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP)->save();
 
             /* @var $synchTemplate Ess_M2ePro_Model_Template_Synchronization */
             $synchTemplate = $listingProduct->getListing()->getChildObject()->getSynchronizationTemplate();
 
             $isRevise = false;
             foreach ($listingProduct->getSynchReasons() as $reason) {
+
                 $method = 'isRevise' . ucfirst($reason);
 
                 if (!method_exists($synchTemplate,$method)) {
@@ -191,7 +196,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Revise
             if ($this->_runnerActions
                      ->isExistProductAction(
                             $listingProduct,
-                            Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_REVISE,
+                            Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_REVISE,
                             array('all_data'=>true))
             ) {
                 continue;
@@ -209,16 +214,79 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Revise
             $this->_runnerActions
                  ->setProduct(
                         $listingProduct,
-                        Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_REVISE,
+                        Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_REVISE,
                         array('all_data'=>true)
                  );
-
-            $dataForUpdate = array(
-                'is_need_synchronize' => 0,
-                'synch_reasons' => null
-            );
-            $listingProduct->addData($dataForUpdate)->save();
         }
+
+        $this->_profiler->saveTimePoint(__METHOD__);
+    }
+
+    //####################################
+
+    private function executeTotal()
+    {
+        $this->_profiler->addTimePoint(__METHOD__,'Execute revise all');
+
+        $lastListingProductProcessed = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
+            '/buy/templates/revise/total/','last_listing_product_id'
+        );
+        if (is_null($lastListingProductProcessed)) {
+            return;
+        }
+
+        $itemsPerCycle = 100;
+
+        /* @var $collection Varien_Data_Collection_Db */
+        $collection = Mage::helper('M2ePro/Component_Buy')
+            ->getCollection('Listing_Product')
+            ->addFieldToFilter('id',array('gt' => $lastListingProductProcessed))
+            ->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
+
+        $collection->getSelect()->limit($itemsPerCycle);
+        $collection->getSelect()->order('id ASC');
+
+        /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+        foreach ($collection->getItems() as $listingProduct) {
+
+            if ($this->_runnerActions
+                     ->isExistProductAction(
+                            $listingProduct,
+                            Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_REVISE,
+                            array('all_data'=>true))
+            ) {
+                continue;
+            }
+
+            if (!$listingProduct->isRevisable()) {
+                continue;
+            }
+
+            if ($listingProduct->isLockedObject(NULL) ||
+                $listingProduct->isLockedObject('in_action')) {
+                continue;
+            }
+
+            $this->_runnerActions
+                 ->setProduct(
+                        $listingProduct,
+                        Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_REVISE,
+                        array('all_data'=>true)
+                 );
+        }
+
+        $lastListingProduct = $collection->getLastItem()->getId();
+        if ($collection->count() < $itemsPerCycle) {
+            Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
+                '/buy/templates/revise/total/','end_date', Mage::helper('M2ePro')->getCurrentGmtDate()
+            );
+
+            $lastListingProduct = NULL;
+        }
+
+        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
+            '/buy/templates/revise/total/','last_listing_product_id', $lastListingProduct
+        );
 
         $this->_profiler->saveTimePoint(__METHOD__);
     }

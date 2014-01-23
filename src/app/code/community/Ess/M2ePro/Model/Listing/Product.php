@@ -13,12 +13,17 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
     const STATUS_FINISHED = 4;
     const STATUS_UNKNOWN = 5;
     const STATUS_BLOCKED = 6;
+    const STATUS_HIDDEN = 7;
 
     const STATUS_CHANGER_UNKNOWN = 0;
     const STATUS_CHANGER_SYNCH = 1;
     const STATUS_CHANGER_USER = 2;
     const STATUS_CHANGER_COMPONENT = 3;
     const STATUS_CHANGER_OBSERVER = 4;
+
+    const SYNCH_STATUS_OK    = 0;
+    const SYNCH_STATUS_NEED  = 1;
+    const SYNCH_STATUS_SKIP  = 2;
 
     // ########################################
 
@@ -207,9 +212,33 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     //----------------------------------------
 
-    public function isNeedSynchronize()
+    public function getAdditionalData()
     {
-        return (int)$this->getData('is_need_synchronize');
+        $additionalData = $this->getData('additional_data');
+        is_string($additionalData) && $additionalData = json_decode($additionalData,true);
+        return is_array($additionalData) ? $additionalData : array();
+    }
+
+    //----------------------------------------
+
+    public function getSynchStatus()
+    {
+        return (int)$this->getData('synch_status');
+    }
+
+    public function isSynchStatusOk()
+    {
+        return $this->getSynchStatus() == self::SYNCH_STATUS_OK;
+    }
+
+    public function isSynchStatusNeed()
+    {
+        return $this->getSynchStatus() == self::SYNCH_STATUS_NEED;
+    }
+
+    public function isSynchStatusSkip()
+    {
+        return $this->getSynchStatus() == self::SYNCH_STATUS_SKIP;
     }
 
     //----------------------------------------
@@ -224,28 +253,43 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     // ########################################
 
-    public function _getOnlyVariationProductQty()
+    public function getQty()
     {
         $qty = 0;
 
-        if ($this->getMagentoProduct()->isBundleType()) {
-            $qty = $this->_getBundleProductQty();
-        }
-        if ($this->getMagentoProduct()->isGroupedType()) {
-            $qty = $this->_getGroupedProductQty();
-        }
-        if ($this->getMagentoProduct()->isConfigurableType()) {
-            $qty = $this->_getConfigurableProductQty();
+        if ($this->getMagentoProduct()->isStrictVariationProduct()) {
+            $qty = $this->getVariationProductQty();
+        } else {
+            $qty = $this->getMagentoProduct()->getQty();
         }
 
         $qty < 0 && $qty = 0;
 
-        return $qty;
+        return (int)floor($qty);
     }
 
     //-----------------------------------------
 
-    protected function _getConfigurableProductQty()
+    protected function getVariationProductQty()
+    {
+        $qty = 0;
+
+        if ($this->getMagentoProduct()->isBundleType()) {
+            $qty = $this->getBundleProductQty();
+        }
+        if ($this->getMagentoProduct()->isGroupedType()) {
+            $qty = $this->getGroupedProductQty();
+        }
+        if ($this->getMagentoProduct()->isConfigurableType()) {
+            $qty = $this->getConfigurableProductQty();
+        }
+
+        $qty < 0 && $qty = 0;
+
+        return (int)floor($qty);
+    }
+
+    protected function getConfigurableProductQty()
     {
         $totalQty = 0;
         $product = $this->getMagentoProduct()->getProduct();
@@ -268,7 +312,7 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         return (int)floor($totalQty);
     }
 
-    protected function _getGroupedProductQty()
+    protected function getGroupedProductQty()
     {
         $totalQty = 0;
         $product = $this->getMagentoProduct()->getProduct();
@@ -291,7 +335,7 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         return (int)floor($totalQty);
     }
 
-    protected function _getBundleProductQty()
+    protected function getBundleProductQty()
     {
         $product = $this->getMagentoProduct()->getProduct();
 
@@ -359,6 +403,11 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         return $this->getStatus() == self::STATUS_LISTED;
     }
 
+    public function isHidden()
+    {
+        return $this->getStatus() == self::STATUS_HIDDEN;
+    }
+
     public function isSold()
     {
         return $this->getStatus() == self::STATUS_SOLD;
@@ -393,13 +442,13 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     public function isRevisable()
     {
-        return ($this->isListed() || $this->isUnknown()) &&
+        return ($this->isListed() || $this->isHidden() || $this->isUnknown()) &&
                 !$this->isBlocked();
     }
 
     public function isStoppable()
     {
-        return ($this->isListed() || $this->isUnknown()) &&
+        return ($this->isListed() || $this->isHidden() || $this->isUnknown()) &&
                 !$this->isBlocked();
     }
 

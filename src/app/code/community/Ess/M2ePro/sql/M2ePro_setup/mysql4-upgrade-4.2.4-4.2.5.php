@@ -400,7 +400,7 @@ foreach ($tempAccounts as $account) {
 
 //#############################################
 
-$tempStatus = Mage::registry('M2ePro_IS_INSTALLATION') === true ? '3' : '0';
+$tempStatus = Mage::registry('M2EPRO_IS_INSTALLATION') === true ? '3' : '0';
 
 $installer->run(<<<SQL
 
@@ -419,7 +419,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

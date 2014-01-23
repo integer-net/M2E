@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Synchronization_Log extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    // ########################################
+
     public function __construct()
     {
         parent::__construct();
@@ -72,9 +74,36 @@ class Ess_M2ePro_Block_Adminhtml_Common_Synchronization_Log extends Mage_Adminht
         }
     }
 
+    // ########################################
+
     public function getGridHtml()
     {
         $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_synchronization_log_help');
         return $helpBlock->toHtml() . parent::getGridHtml();
     }
+
+    protected function _toHtml()
+    {
+        $translations = json_encode(array(
+            'Description' => Mage::helper('M2ePro')->__('Description')
+        ));
+
+        $javascript = <<<JAVASCIRPT
+
+<script type="text/javascript">
+
+    M2ePro.translator.add({$translations});
+
+    Event.observe(window, 'load', function() {
+        LogHandlerObj = new LogHandler();
+    });
+
+</script>
+
+JAVASCIRPT;
+
+        return $javascript . parent::_toHtml();
+    }
+
+    // ########################################
 }

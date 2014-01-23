@@ -244,13 +244,14 @@ HTML;
         //------------------------------
 
         //------------------------------
-        $urls = Mage::helper('M2ePro')->getControllerActions(
-            'adminhtml_ebay_listing_autoAction',
-            array(
-                'listing_id' => $this->getRequest()->getParam('id')
+        $urls = json_encode(array_merge(
+            Mage::helper('M2ePro')->getControllerActions(
+                'adminhtml_ebay_listing', array('_current' => true)
+            ),
+            Mage::helper('M2ePro')->getControllerActions(
+                'adminhtml_ebay_listing_autoAction', array('listing_id' => $this->getRequest()->getParam('id'))
             )
-        );
-        $urls = json_encode($urls);
+        ));
         //------------------------------
 
         //------------------------------
@@ -259,6 +260,7 @@ HTML;
             'Based on Magento Categories' => $this->__('Based on Magento Categories'),
             'You must select at least 1 category.' => $this->__('You must select at least 1 category.'),
             'Rule with the same title already exists.' => $this->__('Rule with the same title already exists.'),
+            'Compatibility Attribute' => $this->__('Compatibility Attribute'),
         ));
         //------------------------------
 
@@ -268,6 +270,8 @@ HTML;
     M2ePro.translator.add({$translations});
 </script>
 HTML;
+
+        $javascript = '';
 
         if (!$this->getRequest()->isXmlHttpRequest()) {
             $html .= <<<HTML
@@ -280,7 +284,8 @@ HTML;
 
         return $html .
                $addProductsDropDownBlock->toHtml() .
-               parent::getGridHtml();
+               parent::getGridHtml() .
+               $javascript;
     }
 
     // ########################################

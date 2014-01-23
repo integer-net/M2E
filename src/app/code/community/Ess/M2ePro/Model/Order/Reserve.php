@@ -148,7 +148,13 @@ class Ess_M2ePro_Model_Order_Reserve
         $stockItems = array();
 
         foreach ($this->order->getItemsCollection()->getItems() as $item) {
-            $qty = $item->getChildObject()->getQtyPurchased();
+            if ($action == self::ACTION_SUB) {
+                $qty = $item->getChildObject()->getQtyPurchased();
+                $item->setData('qty_reserved', $qty);
+            } else {
+                $qty = $item->getQtyReserved();
+            }
+
             $products = $this->getItemProductsByAction($item, $action);
 
             if (count($products) == 0) {

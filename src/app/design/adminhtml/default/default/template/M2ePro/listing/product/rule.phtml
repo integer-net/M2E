@@ -2,11 +2,11 @@
     $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
     $suffix = isset($listingData['listing_id']) ? $listingData['listing_id'] : '';
-    $gridJsObjectName = $listingData['component_mode'] . 'ListingProductGrid' . $suffix . 'JsObject';
+    $gridJsObjectName = $this->getGridJsObjectName();
 
     $prefix = Mage::helper('M2ePro/Data_Global')->getValue('hide_products_others_listings_prefix');
-
     $hideParam = Mage::helper('M2ePro/Data_Session')->getValue($prefix);
+    is_null($hideParam) && $hideParam = true;
 ?>
 
 <div class="entry-edit" id="listing_product_rules" style="display: none;" collapseable="no">

@@ -288,6 +288,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         $errorWord = $helper->escapeJs($helper->__('Error'));
         $closeWord = $helper->escapeJs($helper->__('Close'));
 
+        $assignString = Mage::helper('M2ePro')->__('Assign ASIN/ISBN');
         $textConfirm = $helper->escapeJs($helper->__('Are you sure?'));
 
         $searchAsinManual = $this->getUrl('*/adminhtml_common_amazon_listing/searchAsinManual');
@@ -408,6 +409,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
     M2ePro.text.error_word = '{$errorWord}';
     M2ePro.text.close_word = '{$closeWord}';
 
+    M2ePro.text.assign = '{$assignString}';
     M2ePro.text.confirm = '{$textConfirm}';
 
     M2ePro.text.enter_productSearch_query = '{$enterProductSearchQueryMessage}';

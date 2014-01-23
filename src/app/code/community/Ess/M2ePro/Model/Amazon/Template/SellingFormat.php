@@ -339,6 +339,21 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         return $attributes;
     }
 
+    //-------------------------
+
+    public function usesProductOrSpecialPrice()
+    {
+        if ($this->isPriceModeProduct() || $this->isPriceModeSpecial()) {
+            return true;
+        }
+
+        if ($this->isSalePriceModeProduct() || $this->isSalePriceModeSpecial()) {
+            return true;
+        }
+
+        return false;
+    }
+
     // ########################################
 
     public function getPriceVariationMode()
@@ -380,38 +395,9 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         ));
     }
 
-    // #######################################
-
-    public function save()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
-        return parent::save();
-    }
-
-    public function delete()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
-        return parent::delete();
-    }
-
     // ########################################
 
-    public function usesProductOrSpecialPrice()
-    {
-        if ($this->isPriceModeProduct() || $this->isPriceModeSpecial()) {
-            return true;
-        }
-
-        if ($this->isSalePriceModeProduct() || $this->isSalePriceModeSpecial()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    // ########################################
-
-    public function getAffectedListingProducts($asObjects = false)
+    public function getAffectedListingProducts($asObjects = false, $key = NULL)
     {
         if (is_null($this->getId())) {
             throw new LogicException('Method require loaded instance first');
@@ -425,41 +411,41 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id',array('in' => $listingCollection->getSelect()));
 
-        return $asObjects ? $listingProductCollection->getItems() : $listingProductCollection->getData();
+        if (!is_null($key)) {
+            $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($key);
+        }
+
+        $listingProducts = $asObjects ? $listingProductCollection->getItems() : $listingProductCollection->getData();
+
+        if (is_null($key)) {
+            return $listingProducts;
+        }
+
+        $return = array();
+        foreach ($listingProducts as $listingProduct) {
+            isset($listingProduct[$key]) && $return[] = $listingProduct[$key];
+        }
+
+        return $return;
+    }
+
+    public function setSynchStatusNeed($newData, $oldData)
+    {
+        $this->getParentObject()->setSynchStatusNeed($newData, $oldData);
     }
 
     // ########################################
 
-    public function setIsNeedSynchronize($newData, $oldData)
+    public function save()
     {
-        if (!$this->getResource()->isDifferent($newData,$oldData)) {
-            return;
-        }
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
+        return parent::save();
+    }
 
-        $ids = array();
-        foreach ($this->getAffectedListingProducts() as $listingProduct) {
-            $ids[] = (int)$listingProduct['id'];
-        }
-
-        if (empty($ids)) {
-            return;
-        }
-
-        $templates = array('sellingFormatTemplate');
-
-        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
-            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
-            array(
-                'is_need_synchronize' => 1,
-                'synch_reasons' => new Zend_Db_Expr(
-                    "IF(synch_reasons IS NULL,
-                        '".implode(',',$templates)."',
-                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
-                    )"
-                )
-            ),
-            array('id IN ('.implode(',', $ids).')')
-        );
+    public function delete()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
+        return parent::delete();
     }
 
     // ########################################

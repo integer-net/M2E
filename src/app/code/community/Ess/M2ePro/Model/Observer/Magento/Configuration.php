@@ -12,6 +12,12 @@ class Ess_M2ePro_Model_Observer_Magento_Configuration
     {
         try {
 
+            $request = Mage::app()->getRequest();
+
+            if ($request->getParam('M2ePro_already_forwarded')) {
+                return;
+            }
+
             $section = Mage::app()->getRequest()->getParam('section');
             $action = 'save';
 
@@ -39,8 +45,8 @@ class Ess_M2ePro_Model_Observer_Magento_Configuration
                     break;
             }
 
-            $request = Mage::app()->getRequest();
             $request->initForward()
+                ->setParam('M2ePro_already_forwarded', true)
                 ->setModuleName('M2ePro')
                 ->setControllerName($controllerName)
                 ->setActionName($action)

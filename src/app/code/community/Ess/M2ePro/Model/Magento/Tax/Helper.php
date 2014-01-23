@@ -29,4 +29,9 @@ class Ess_M2ePro_Model_Magento_Tax_Helper
 
         return Mage::getSingleton('tax/calculation')->getStoreRate($request, $store);
     }
+
+    public function isCalculationBasedOnOrigin($store)
+    {
+        return Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_BASED_ON, $store) == 'origin';
+    }
 }

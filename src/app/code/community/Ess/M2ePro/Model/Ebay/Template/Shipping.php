@@ -16,14 +16,12 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     const CASH_ON_DELIVERY_COST_MODE_CUSTOM_VALUE     = 1;
     const CASH_ON_DELIVERY_COST_MODE_CUSTOM_ATTRIBUTE = 2;
 
-    const EBAY_SHIPPING_TYPE_FLAT       = "flat";
-    const EBAY_SHIPPING_TYPE_CALCULATED = "calculated";
-    const EBAY_SHIPPING_TYPE_FREIGHT    = "freight";
-    const EBAY_SHIPPING_TYPE_LOCAL      = "local";
-
     const INTERNATIONAL_TRADE_NONE           = 0;
     const INTERNATIONAL_TRADE_NORTH_AMERICA  = 1;
     const INTERNATIONAL_TRADE_UNITED_KINGDOM = 2;
+
+    const DISPATCH_TIME_CUSTOM_VALUE     = 0;
+    const DISPATCH_TIME_CUSTOM_ATTRIBUTE = 1;
 
     // ########################################
 
@@ -48,6 +46,11 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     {
         parent::_construct();
         $this->_init('M2ePro/Ebay_Template_Shipping');
+    }
+
+    public function getNick()
+    {
+        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING;
     }
 
     // ########################################
@@ -239,27 +242,17 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
     //---------------------------------------
 
-    public function getVatPercent()
-    {
-        return (float)$this->getData('vat_percent');
-    }
-
-    public function getDispatchTime()
-    {
-        return (int)$this->getData('dispatch_time');
-    }
-
     public function isGetItFastEnabled()
     {
         return (bool)$this->getData('get_it_fast');
     }
 
-    //---------------------------------------
-
-    public function isTaxTableEnabled()
+    public function isGlobalShippingProgramEnabled()
     {
-        return (bool)$this->getData('tax_table_mode');
+        return (bool)$this->getData('global_shipping_program');
     }
+
+    //---------------------------------------
 
     public function isLocalShippingRateTableEnabled()
     {
@@ -269,6 +262,28 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     public function isInternationalShippingRateTableEnabled()
     {
         return (bool)$this->getData('international_shipping_rate_table_mode');
+    }
+
+    // #######################################
+
+    public function getDispatchTime()
+    {
+        $src = $this->getDispatchTimeSource();
+
+        if ($src['mode'] == self::DISPATCH_TIME_CUSTOM_ATTRIBUTE) {
+            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
+        }
+
+        return (int)$src['value'];
+    }
+
+    public function getDispatchTimeSource()
+    {
+        return array(
+            'mode'      => $this->getData('dispatch_time_mode'),
+            'value'     => $this->getData('dispatch_time_value'),
+            'attribute' => $this->getData('dispatch_time_attribute')
+        );
     }
 
     // #######################################
@@ -300,9 +315,17 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
         return (bool)$this->getData('local_shipping_discount_mode');
     }
 
-    public function getLocalShippingCombinedDiscountProfileId()
+    public function getLocalShippingCombinedDiscountProfileId($accountId)
     {
-        return $this->getData('local_shipping_combined_discount_profile_id');
+        $data = $this->getData('local_shipping_combined_discount_profile_id');
+
+        if (is_null($data)) {
+            return NULL;
+        }
+
+        $data = json_decode($data, true);
+
+        return !isset($data[$accountId]) ? NULL : $data[$accountId];
     }
 
     // #######################################
@@ -360,9 +383,26 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
         return (bool)$this->getData('international_shipping_discount_mode');
     }
 
-    public function getInternationalShippingCombinedDiscountProfileId()
+    public function getInternationalShippingCombinedDiscountProfileId($accountId)
     {
-        return $this->getData('international_shipping_combined_discount_profile_id');
+        $data = $this->getData('international_shipping_combined_discount_profile_id');
+
+        if (is_null($data)) {
+            return NULL;
+        }
+
+        $data = json_decode($data, true);
+
+        return !isset($data[$accountId]) ? NULL : $data[$accountId];
+    }
+
+    //---------------------------------------
+
+    public function getExcludedLocations()
+    {
+        $excludedLocations = $this->getData('excluded_locations');
+        is_string($excludedLocations) && $excludedLocations = json_decode($excludedLocations,true);
+        return is_array($excludedLocations) ? $excludedLocations : array();
     }
 
     //---------------------------------------
@@ -484,12 +524,26 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
     // #######################################
 
-    public function getNick()
+    public function getDataSnapshot()
     {
-        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING;
-    }
+        $data = parent::getDataSnapshot();
 
-    // #######################################
+        $data['services'] = $this->getServices();
+        $data['calculated_shipping'] = $this->getCalculatedShipping()?$this->getCalculatedShipping()->getData():array();
+
+        foreach ($data['services'] as &$serviceData) {
+            foreach ($serviceData as &$value) {
+                !is_null($value) && !is_array($value) && $value = (string)$value;
+            }
+        }
+        unset($value);
+
+        foreach ($data['calculated_shipping'] as &$value) {
+            !is_null($value) && !is_array($value) && $value = (string)$value;
+        }
+
+        return $data;
+    }
 
     public function getDefaultSettingsSimpleMode()
     {
@@ -505,12 +559,13 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
             'local_shipping_rate_table_mode' => 0,
             'international_shipping_rate_table_mode' => 0,
-            'tax_table_mode' => 0,
-            'vat_percent' => 0,
 
             'get_it_fast' => 0,
-            'dispatch_time' => 1,
+            'dispatch_time_mode' => self::DISPATCH_TIME_CUSTOM_VALUE,
+            'dispatch_time_value' => 1,
+            'dispatch_time_attribute' => '',
 
+            'global_shipping_program' => 0,
             'local_shipping_mode' =>  self::SHIPPING_TYPE_FLAT,
             'local_shipping_discount_mode' => 0,
             'local_shipping_combined_discount_profile_id' => '',
@@ -553,12 +608,87 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
             'international_handling_cost_value' => '',
             'international_handling_cost_attribute' => '',
 
+            'excluded_locations' => json_encode(array()),
+
             'international_trade' => self::INTERNATIONAL_TRADE_NONE,
             //----------------------------------
 
             //----------------------------------
             'services' => array()
             //----------------------------------
+        );
+    }
+
+    // #######################################
+
+    public function getAffectedListingProducts($asObjects = false, $key = NULL)
+    {
+        if (is_null($this->getId())) {
+            throw new LogicException('Method require loaded instance first');
+        }
+
+        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING;
+
+        $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
+        $templateManager->setTemplate($template);
+
+        $listingProducts = $templateManager->getAffectedItems(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
+            $this->getId(), array(), $asObjects, $key
+        );
+
+        $ids = array();
+        foreach ($listingProducts as $listingProduct) {
+            $ids[] = is_null($key) ? $listingProduct['id'] : $listingProduct;
+        }
+
+        $listingProducts && $listingProducts = array_combine($ids, $listingProducts);
+
+        $listings = $templateManager->getAffectedItems(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
+            $this->getId()
+        );
+
+        foreach ($listings as $listing) {
+
+            $tempListingProducts = $listing->getChildObject()
+                                           ->getAffectedListingProducts($template,$asObjects,$key);
+
+            foreach ($tempListingProducts as $listingProduct) {
+                $id = is_null($key) ? $listingProduct['id'] : $listingProduct;
+                !isset($listingProducts[$id]) && $listingProducts[$id] = $listingProduct;
+            }
+        }
+
+        return array_values($listingProducts);
+    }
+
+    public function setSynchStatusNeed($newData, $oldData)
+    {
+        if (!$this->getResource()->isDifferent($newData,$oldData)) {
+            return;
+        }
+
+        $ids = $this->getAffectedListingProducts(false, 'id');
+
+        if (empty($ids)) {
+            return;
+        }
+
+        $templates = array('shippingTemplate');
+
+        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
+            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
+            array(
+                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
+                'synch_reasons' => new Zend_Db_Expr(
+                    "IF(synch_reasons IS NULL,
+                        '".implode(',',$templates)."',
+                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
+                    )"
+                )
+            ),
+            array('id IN ('.implode(',', $ids).')')
         );
     }
 
@@ -574,103 +704,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     {
         Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_shipping');
         return parent::delete();
-    }
-
-    // #######################################
-
-    public function getAffectedListingProducts($asObjects = false)
-    {
-        if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
-        }
-
-        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING;
-
-        $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
-        $templateManager->setTemplate($template);
-
-        $listingProducts = $templateManager->getAffectedItems(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
-            $this->getId(),
-            array(), $asObjects
-        );
-
-        foreach ($listingProducts as $key => $listingProduct) {
-            unset($listingProducts[$key]);
-            $listingProducts[$listingProduct['id']] = $listingProduct;
-        }
-
-        $listings = $templateManager->getAffectedItems(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
-            $this->getId()
-        );
-
-        foreach ($listings as $listing) {
-            $tempListingProducts = $listing->getChildObject()->getAffectedListingProducts($template,$asObjects);
-
-            foreach ($tempListingProducts as $listingProduct) {
-                $listingProducts[$listingProduct['id']] = $listingProduct;
-            }
-        }
-
-        return $listingProducts;
-    }
-
-    // #######################################
-
-    public function getDataSnapshot()
-    {
-        $data = parent::getDataSnapshot();
-
-        $data['services'] = $this->getServices();
-        $data['calculated_shipping'] = $this->getCalculatedShipping()?$this->getCalculatedShipping()->getData():array();
-
-        foreach ($data['services'] as &$serviceData) {
-            foreach ($serviceData as &$value) {
-                !is_null($value) && !is_array($value) && $value = (string)$value;
-            }
-        }
-        unset($value);
-
-        foreach ($data['calculated_shipping'] as &$value) {
-            !is_null($value) && !is_array($value) && $value = (string)$value;
-        }
-
-        return $data;
-    }
-
-    // #######################################
-
-    public function setIsNeedSynchronize($newData, $oldData)
-    {
-        if (!$this->getResource()->isDifferent($newData,$oldData)) {
-            return;
-        }
-
-        $ids = array();
-        foreach ($this->getAffectedListingProducts() as $listingProduct) {
-            $ids[] = (int)$listingProduct['id'];
-        }
-
-        if (empty($ids)) {
-            return;
-        }
-
-        $templates = array('shippingTemplate');
-
-        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
-            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
-            array(
-                'is_need_synchronize' => 1,
-                'synch_reasons' => new Zend_Db_Expr(
-                    "IF(synch_reasons IS NULL,
-                        '".implode(',',$templates)."',
-                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
-                    )"
-                )
-            ),
-            array('id IN ('.implode(',', $ids).')')
-        );
     }
 
     // #######################################

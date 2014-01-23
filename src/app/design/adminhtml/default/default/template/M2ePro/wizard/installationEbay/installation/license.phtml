@@ -285,8 +285,8 @@
             });
         };
 
-        $('sign_into_ebay_button').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Server_Ebay_Abstract::MODE_PRODUCTION; ?>') });
-        $('sign_into_ebay_sandbox').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Server_Ebay_Abstract::MODE_SANDBOX; ?>') });
+        $('sign_into_ebay_button').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_PRODUCTION; ?>') });
+        $('sign_into_ebay_sandbox').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_SANDBOX; ?>') });
     };
 
     var checkRequiredFields = function()

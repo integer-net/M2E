@@ -65,6 +65,14 @@ class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
         return Mage::getBaseDir();
     }
 
+    public function isBrowserIE()
+    {
+        if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false) {
+            return true;
+        }
+        return false;
+    }
+
     //-----------------------------------------
 
     public function updateBackupConnectionData($forceUpdate = false)

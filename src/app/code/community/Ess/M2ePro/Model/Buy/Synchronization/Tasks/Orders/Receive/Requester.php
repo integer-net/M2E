@@ -5,51 +5,46 @@
  */
 
 class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Orders_Receive_Requester
+    extends Ess_M2ePro_Model_Connector_Buy_Orders_Get_Items
 {
-    protected $params = array();
-
-    /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Account|null
-     */
-    protected $account = NULL;
-
     // ########################################
 
-    public function initialize(array $params = array(),
-                               Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
+    protected function makeResponserModel()
     {
-        $this->params = $params;
-        $this->marketplace = $marketplace;
-        $this->account = $account;
+        return 'M2ePro/Buy_Synchronization_Tasks_Orders_Receive_Responser';
     }
 
     // ########################################
 
-    public function setLocks($hash)
+    protected function setLocks($hash)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItemPrefix = Ess_M2ePro_Model_Buy_Synchronization_Tasks_Orders_Receive::LOCK_ITEM_PREFIX;
 
-        $nick = $lockItemPrefix . '_' . $this->account->getId() . '_' . $this->marketplace->getId();
+        $nick = $lockItemPrefix . '_' . $this->account->getId();
         $lockItem->setNick($nick);
         $lockItem->create();
 
-        $this->account->addObjectLock(NULL,$hash);
-        $this->account->addObjectLock('synchronization',$hash);
-        $this->account->addObjectLock('synchronization_buy',$hash);
-        $this->account->addObjectLock($lockItemPrefix,$hash);
+        // --------------------
 
-        $this->marketplace->addObjectLock(NULL,$hash);
-        $this->marketplace->addObjectLock('synchronization',$hash);
-        $this->marketplace->addObjectLock('synchronization_buy',$hash);
-        $this->marketplace->addObjectLock($lockItemPrefix,$hash);
+        $tempObjects = array(
+            $this->account,
+            Mage::helper('M2ePro/Component_Buy')->getMarketplace()
+        );
+
+        $tempLocks = array(
+            NULL,
+            'synchronization', 'synchronization_buy',
+            $lockItemPrefix
+        );
+
+        /* @var Ess_M2ePro_Model_Abstract $object */
+        foreach ($tempObjects as $object) {
+            foreach ($tempLocks as $lock) {
+                $object->addObjectLock($lock,$hash);
+            }
+        }
     }
 
     // ########################################

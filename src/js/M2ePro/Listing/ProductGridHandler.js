@@ -56,8 +56,8 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
                 this.reloadParams = Object.extend(this.reloadParams, ruleParams);
             } else {
 
-                if (ruleParams['hide_products_others_listings'] == 1) {
-                    this.reloadParams.hide_products_others_listings = 1;
+                if (ruleParams['hide_products_others_listings'] == 0) {
+                    this.reloadParams.hide_products_others_listings = 0;
                 }
 
                 this.reloadParams.rule = "";

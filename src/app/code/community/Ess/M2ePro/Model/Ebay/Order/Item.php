@@ -21,8 +21,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     // ########################################
 
-    /** @var $ebayItem Ess_M2ePro_Model_Ebay_Item */
-    private $ebayItem = NULL;
+    /** @var $channelItem Ess_M2ePro_Model_Ebay_Item */
+    private $channelItem = NULL;
 
     // ########################################
 
@@ -56,16 +56,17 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     // ########################################
 
-    public function getEbayItem()
+    public function getChannelItem()
     {
-        if (is_null($this->ebayItem)) {
-            $this->ebayItem = Mage::getModel('M2ePro/Ebay_Item')->getCollection()
+        if (is_null($this->channelItem)) {
+            $this->channelItem = Mage::getModel('M2ePro/Ebay_Item')->getCollection()
                 ->addFieldToFilter('item_id', $this->getItemId())
+                ->addFieldToFilter('account_id', $this->getEbayAccount()->getId())
                 ->setOrder('create_date', Varien_Data_Collection::SORT_ORDER_DESC)
                 ->getFirstItem();
         }
 
-        return !is_null($this->ebayItem->getId()) ? $this->ebayItem : NULL;
+        return !is_null($this->channelItem->getId()) ? $this->channelItem : NULL;
     }
 
     // ########################################
@@ -155,10 +156,10 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
     {
         // Item was listed by M2E
         // ----------------
-        if (!is_null($this->getEbayItem())) {
+        if (!is_null($this->getChannelItem())) {
             return $this->getEbayAccount()->isMagentoOrdersListingsStoreCustom()
                 ? $this->getEbayAccount()->getMagentoOrdersListingsStoreId()
-                : $this->getEbayItem()->getStoreId();
+                : $this->getChannelItem()->getStoreId();
         }
         // ----------------
 
@@ -173,8 +174,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
         // Item was listed by M2E
         // ----------------
-        if (!is_null($this->getEbayItem())) {
-            return $this->getEbayItem()->getProductId();
+        if (!is_null($this->getChannelItem())) {
+            return $this->getChannelItem()->getProductId();
         }
         // ----------------
 
@@ -203,7 +204,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     private function validate()
     {
-        $ebayItem = $this->getEbayItem();
+        $ebayItem = $this->getChannelItem();
 
         if (!is_null($ebayItem) && !$this->getEbayAccount()->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
@@ -295,9 +296,9 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
             );
         }
 
-        /** @var $dispatcher Ess_M2ePro_Model_Connector_Server_Ebay_OrderItem_Dispatcher */
-        $dispatcher = Mage::getModel('M2ePro/Connector_Server_Ebay_OrderItem_Dispatcher');
-        $action = Ess_M2ePro_Model_Connector_Server_Ebay_OrderItem_Dispatcher::ACTION_UPDATE_STATUS;
+        /** @var $dispatcher Ess_M2ePro_Model_Connector_Ebay_OrderItem_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Connector_Ebay_OrderItem_Dispatcher');
+        $action = Ess_M2ePro_Model_Connector_Ebay_OrderItem_Dispatcher::ACTION_UPDATE_STATUS;
 
         return $dispatcher->process($action, $this, $params);
     }

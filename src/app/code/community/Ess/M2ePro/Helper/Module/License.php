@@ -199,7 +199,7 @@ class Ess_M2ePro_Helper_Module_License extends Mage_Core_Helper_Abstract
             'components' => Mage::helper('M2ePro/Component')->getComponents()
         );
 
-        $response = Mage::getModel('M2ePro/Connector_Server_Api_Dispatcher')
+        $response = Mage::getModel('M2ePro/Connector_Api_Dispatcher')
                             ->processVirtual('license','get','feeStatus',
                                               $requestParams);
 
@@ -232,7 +232,7 @@ class Ess_M2ePro_Helper_Module_License extends Mage_Core_Helper_Abstract
             $requestParams[strtolower($component).'_access'] = 1;
         }
 
-        $response = Mage::getModel('M2ePro/Connector_Server_M2ePro_Dispatcher')
+        $response = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
                             ->processVirtual('license','add','freeRecord',
                                               $requestParams);
 

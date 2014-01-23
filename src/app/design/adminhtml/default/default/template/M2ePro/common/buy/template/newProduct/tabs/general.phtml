@@ -20,6 +20,8 @@ $default = array(
         'title' => '',
 
         'seller_sku_custom_attribute' => '',
+
+        'gtin_mode' => Ess_M2ePro_Model_Buy_Template_NewProduct_Core::GTIN_MODE_CUSTOM_ATTRIBUTE,
         'gtin_custom_attribute' => '',
 
         'isbn_mode' => '',
@@ -96,26 +98,29 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
         }
 
         $('attribute_sets_confirm_button')
-                .observe('click',BuyTemplateNewProductHandlerObj.attribute_sets_confirm.bind(BuyTemplateNewProductHandlerObj))
-                .observe('click',BuyTemplateNewProductHandlerObj.confirmAttributeSets);
+            .observe('click',BuyTemplateNewProductHandlerObj.attribute_sets_confirm.bind(BuyTemplateNewProductHandlerObj))
+            .observe('click',BuyTemplateNewProductHandlerObj.confirmAttributeSets);
 
         $('rakuten_category_id')
-                .observe('change', BuyTemplateNewProductHandlerObj.rakuten_category_change)
-                .simulate('change');
+            .observe('change', BuyTemplateNewProductHandlerObj.rakuten_category_change)
+            .simulate('change');
 
         $('node_title').observe('change', function(event) {
             BuyTemplateNewProductHandlerObj.node_title_change(this)
         });
 
+        $('gtin_mode')
+            .observe('change', BuyTemplateNewProductHandlerObj.gtin_mode_change)
+            .simulate('change');
         $('isbn_mode')
-                .observe('change', BuyTemplateNewProductHandlerObj.isbn_mode_change)
-                .simulate('change');
+            .observe('change', BuyTemplateNewProductHandlerObj.isbn_mode_change)
+            .simulate('change');
         $('asin_mode')
-                .observe('change', BuyTemplateNewProductHandlerObj.asin_mode_change)
-                .simulate('change');
+            .observe('change', BuyTemplateNewProductHandlerObj.asin_mode_change)
+            .simulate('change');
         $('product_set_id_mode')
-                .observe('change', BuyTemplateNewProductHandlerObj.product_set_id_mode_change)
-                .simulate('change');
+            .observe('change', BuyTemplateNewProductHandlerObj.product_set_id_mode_change)
+            .simulate('change');
 
         editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
     });
@@ -281,10 +286,24 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                 </tr>
 
                 <!-- GTIN -->
-
+                <tr <?php if(!$this->isAllowedUpcExemption($formData)) : echo 'style="display: none;"'; endif; ?>>
+                    <td class="label">
+                        <label for="gtin_mode"><?php echo Mage::helper('M2ePro')->__('GTIN (UPC or EAN)'); ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select id="gtin_mode" name="category[gtin_mode]" class="select">
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::GTIN_MODE_NONE; ?>" <?php if ($formData['category']['gtin_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::GTIN_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::GTIN_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['gtin_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::GTIN_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('To sell without UPC code you have to get permission from Rakuten.com.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
                 <tr id="gtin_custom_attribute_tr">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('GTIN (UPC or EAN)'); ?>: <span class="required">*</span></label>
+                        <?php $labelText = $this->isAllowedUpcExemption($formData) ? 'Custom Attribute' : 'GTIN (UPC or EAN)'; ?>
+                        <label><?php echo Mage::helper('M2ePro')->__($labelText); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <div id="gtin_custom_attribute_td"></div>

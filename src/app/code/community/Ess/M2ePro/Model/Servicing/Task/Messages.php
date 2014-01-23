@@ -30,20 +30,7 @@ class Ess_M2ePro_Model_Servicing_Task_Messages implements Ess_M2ePro_Model_Servi
 
     private function updateMagentoMessages(array $messages)
     {
-        function updateMagentoMessagesFilterMagentoMessages($message) {
-
-            if (!isset($message['title']) || !isset($message['text']) || !isset($message['type'])) {
-                return false;
-            }
-
-            if (!isset($message['is_global']) || !(bool)$message['is_global']) {
-                return false;
-            }
-
-            return true;
-        }
-
-        $messages = array_filter($messages,'updateMagentoMessagesFilterMagentoMessages');
+        $messages = array_filter($messages,array($this,'updateMagentoMessagesFilterMagentoMessages'));
         !is_array($messages) && $messages = array();
 
         $magentoTypes = array(
@@ -66,27 +53,42 @@ class Ess_M2ePro_Model_Servicing_Task_Messages implements Ess_M2ePro_Model_Servi
         }
     }
 
-    private function updateModuleMessages(array $messages)
+    public function updateMagentoMessagesFilterMagentoMessages($message)
     {
-        function updateModuleMessagesFilterModuleMessages($message) {
-
-            if (!isset($message['title']) || !isset($message['text']) || !isset($message['type'])) {
-                return false;
-            }
-
-            if (isset($message['is_global']) && (bool)$message['is_global']) {
-                return false;
-            }
-
-            return true;
+        if (!isset($message['title']) || !isset($message['text']) || !isset($message['type'])) {
+            return false;
         }
 
-        $messages = array_filter($messages,'updateModuleMessagesFilterModuleMessages');
+        if (!isset($message['is_global']) || !(bool)$message['is_global']) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // ########################################
+
+    private function updateModuleMessages(array $messages)
+    {
+        $messages = array_filter($messages,array($this,'updateModuleMessagesFilterModuleMessages'));
         !is_array($messages) && $messages = array();
 
         Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
             '/'.Mage::helper('M2ePro/Module')->getName().'/server/','messages',json_encode($messages)
         );
+    }
+
+    public function updateModuleMessagesFilterModuleMessages($message)
+    {
+        if (!isset($message['text']) || !isset($message['type'])) {
+            return false;
+        }
+
+        if (isset($message['is_global']) && (bool)$message['is_global']) {
+            return false;
+        }
+
+        return true;
     }
 
     // ########################################

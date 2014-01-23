@@ -17,7 +17,6 @@ $migrationInstance->migrate();
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

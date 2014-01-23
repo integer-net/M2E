@@ -108,19 +108,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit extends Mage_Adminhtml_
             if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data') &&
                 Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getId()
             ) {
-
-                /** @var $accountObj Ess_M2ePro_Model_Account */
-                $accountObj = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
-
-                if (!$accountObj->isLockedObject(NULL)) {
-                    //------------------------------
-                    $this->_addButton('delete', array(
-                        'label'     => Mage::helper('M2ePro')->__('Delete'),
-                        'onclick'   => 'BuyAccountHandlerObj.delete_click()',
-                        'class'     => 'delete M2ePro_delete_button'
-                    ));
-                    //------------------------------
-                }
+                //------------------------------
+                $this->_addButton('delete', array(
+                    'label'     => Mage::helper('M2ePro')->__('Delete'),
+                    'onclick'   => 'BuyAccountHandlerObj.delete_click()',
+                    'class'     => 'delete M2ePro_delete_button'
+                ));
+                //------------------------------
             }
 
             //------------------------------

@@ -1,8 +1,7 @@
 <div id="block_notice_ebay_listing_other_synchronization_source" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Source'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This section includes settings where the values for synchronization have to be taken from.<br>
-    In Attributes lists only common attributes (those which presented in all Attribute Sets) are available for selection.
+    <?php echo Mage::helper('M2ePro')->__('Specifies Magento product data to be synchronized with eBay.
     <br><br>
-    <b>Note:</b> If you set <i>Not Set</i>, the auto revise will be turned off by this criteria.'); ?>
+    <b>Note:</b> If you set \'Not Set\' in an option, the synchronization will not be performed for it.'); ?>
 </div>
 
 <?php
@@ -86,7 +85,9 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Updates quantity on eBay Listing with mapped Magento product quantity.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('<b>Product QTY</b> - eBay listing quantity will be synchronized with Magento product quantity.
+    <br><b>Magento Attribute</b> - eBay listing quantity will be synchronized with attribute value.
+'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -116,7 +117,11 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Updates price on eBay listing(s) when the source of price changes.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('
+    <b>Product Price</b> - eBay Listing price will be synchronized with the original Magento product price.<br>
+    <b>Special Price</b> - eBay Listing price will be synchronized with the special price of Magento product.<br>
+    <b>Magento Attribute</b> - eBay listing price will be synchronized with attribute value.
+'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -145,7 +150,10 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Updates title on eBay Listing with mapped Magento product title.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('
+    <b>Product Name</b> - eBay listing title will be synchronized with the original Magento product name.<br>
+    <b>Magento Attribute</b> - eBay listing title will be synchronized with attribute value.
+    '); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -173,7 +181,7 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Updates eBay Listing subtitle.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose Magento attribute that will be synchronized with subtitle on eBay.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -203,7 +211,11 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Updates description on eBay Listing with mapped Magento product description.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('
+    <b>Product Description</b> - eBay listing description will be synchronized with the original description of Magento product.<br>
+    <b>Product Short Description</b> - eBay listing description will be synchronized with the original short Magento product description.<br>
+    <b>Magento Attribute</b> - eBay listing description will be synchronized with attribute value.
+    '); ?></span>
                         </p>
                     </td>
                 </tr>

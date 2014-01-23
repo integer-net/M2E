@@ -40,8 +40,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
                 Mage::helper('M2ePro/Module_Wizard')->getActiveWizard(Ess_M2ePro_Helper_View_Common::NICK)
             );
 
-            // todo next (fix hard dependency between wizard and tab)
-            $this->setEnabledTab($this->activeWizardNick);
+            $this->setEnabledTab($this->getTabIdByWizardNick($this->activeWizardNick));
 
             //------------------------------
             $this->_addButton('reset', array(
@@ -185,6 +184,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
     protected function getTabsContainerDestinationHtml()
     {
         return '';
+    }
+
+    protected function getTabIdByWizardNick($wizardNick)
+    {
+        if ($wizardNick == Ess_M2ePro_Helper_Component_Amazon::NICK) {
+            return self::TAB_ID_AMAZON;
+        }
+
+        return self::TAB_ID_RAKUTEN;
     }
 
     // ########################################

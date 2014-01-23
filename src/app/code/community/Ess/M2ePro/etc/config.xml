@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>6.0.3</version>
+            <version>6.1.0</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -80,11 +80,11 @@
                         <action>M2ePro/adminhtml_ebay_order/index</action>
                     </orders>
 
-                    <accounts module="M2ePro">
+                    <logs module="M2ePro">
                         <title>Logs</title>
                         <sort_order>3</sort_order>
                         <action>M2ePro/adminhtml_ebay_log/listing</action>
-                    </accounts>
+                    </logs>
 
                     <configuration module="M2ePro">
                         <title>Configuration</title>
@@ -192,6 +192,11 @@
                                 <sort_order>3</sort_order>
                                 <action>M2ePro/adminhtml_common_synchronization/index</action>
                             </synchronization>
+                            <global module="M2ePro">
+                                <title>Global Settings</title>
+                                <sort_order>4</sort_order>
+                                <action>M2ePro/adminhtml_common_configuration/index</action>
+                            </global>
                         </children>
                     </configuration>
 
@@ -341,6 +346,10 @@
                                             <title>Synchronization</title>
                                             <sort_order>3</sort_order>
                                         </synchronization>
+                                        <global>
+                                            <title>Global Settings</title>
+                                            <sort_order>4</sort_order>
+                                        </global>
                                     </children>
                                 </configuration>
 
@@ -844,9 +853,6 @@
                     <Ebay_Listing_Auto_Category_Group>
                         <table>m2epro_ebay_listing_auto_category_group</table>
                     </Ebay_Listing_Auto_Category_Group>
-                    <Ebay_Listing_Auto_Filter>
-                        <table>m2epro_ebay_listing_auto_filter</table>
-                    </Ebay_Listing_Auto_Filter>
 
                     <Ebay_Template_Payment>
                         <table>m2epro_ebay_template_payment</table>
@@ -878,6 +884,9 @@
                     <Ebay_Template_Category_Specific>
                         <table>m2epro_ebay_template_category_specific</table>
                     </Ebay_Template_Category_Specific>
+                    <Ebay_Template_OtherCategory>
+                        <table>m2epro_ebay_template_other_category</table>
+                    </Ebay_Template_OtherCategory>
 
                     <!-- AMAZON -->
 

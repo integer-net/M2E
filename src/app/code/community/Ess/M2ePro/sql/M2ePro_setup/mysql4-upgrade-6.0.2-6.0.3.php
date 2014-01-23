@@ -16,7 +16,7 @@ $tempQuery = <<<SQL
     WHERE `group` = '/M2ePro/server/'
     AND   `key` = 'installation_key'
 SQL;
-$tempRow = $installer->getConnection()->query($tempQuery)->fetch();
+$tempRow = $connection->query($tempQuery)->fetch();
 
 if ($tempRow === false) {
 
@@ -38,7 +38,7 @@ $tempQuery = <<<SQL
     WHERE `group` = '/view/ebay/support/'
     AND   `key` = 'video_tutorials_url'
 SQL;
-$tempRow = $installer->getConnection()->query($tempQuery)->fetch();
+$tempRow = $connection->query($tempQuery)->fetch();
 
 if ($tempRow === false) {
 
@@ -75,7 +75,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

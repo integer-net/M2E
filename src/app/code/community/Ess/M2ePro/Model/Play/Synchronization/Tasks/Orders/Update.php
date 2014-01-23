@@ -97,30 +97,33 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Update extends Ess_M2eP
             return;
         }
 
+        // delete changes, which were processed 3 or more times
+        //------------------------------
+        Mage::getResourceModel('M2ePro/Order_Change')
+            ->deleteByProcessingAttemptCount(
+                Ess_M2ePro_Model_Order_Change::MAX_ALLOWED_PROCESSING_ATTEMPTS,
+                Ess_M2ePro_Helper_Component_Play::NICK
+            );
+        //------------------------------
+
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Account');
         $accountsCollection->addFieldToFilter('orders_mode', Ess_M2ePro_Model_Play_Account::ORDERS_MODE_YES);
+        $accountsTotalCount = (int)$accountsCollection->getSize();
+        $accountIteration = 1;
 
         $percentsForAccount = self::PERCENTS_INTERVAL;
-        $accountsTotalCount = (int)$accountsCollection->getSize();
-
         if ($accountsTotalCount > 0) {
             $percentsForAccount = $percentsForAccount/$accountsTotalCount;
         }
 
-        $marketplace = Mage::helper('M2ePro/Component_Play')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID
-        );
-
-        $accountIteration = 1;
         foreach ($accountsCollection->getItems() as $account) {
-            if (!$this->isLockedAccountMarketplace($account->getId(), $marketplace->getId())) {
-                $this->processAccountMarketplace($account, $marketplace);
+            if (!$this->isLockedAccount($account->getId())) {
+                $this->processAccount($account);
             }
 
-            $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
+            $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration++);
             $this->_lockItem->activate();
-            $accountIteration++;
         }
 
         $this->setSynchLastTime(Mage::helper('M2ePro')->getCurrentGmtDate(true));
@@ -129,28 +132,32 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Update extends Ess_M2eP
 
     //####################################
 
-    private function processAccountMarketplace(
-        Ess_M2ePro_Model_Account $account,
-        Ess_M2ePro_Model_Marketplace $marketplace
-    ) {
-        $title = 'Starting account "%s" and marketplace "%s"';
-        $title = sprintf($title, $account->getTitle(), $marketplace->getTitle());
+    private function processAccount(Ess_M2ePro_Model_Account $account)
+    {
+        $title = 'Starting account "%s"';
+        $title = sprintf($title, $account->getTitle());
 
         $this->_profiler->addTitle($title);
         $this->_profiler->addTimePoint(__METHOD__.'send'.$account->getId(),'Update orders on Play');
 
-        $status = 'Task "%s" for Play.com "%s" Account and "%s" marketplace is started. Please wait...';
-        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle(), $marketplace->getTitle());
+        $status = 'Task "%s" for Play.com "%s" Account is started. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle());
         $this->_lockItem->setStatus($status);
+
+        Mage::getResourceModel('M2ePro/Order_Change')
+            ->deleteByProcessingAttemptCount(Ess_M2ePro_Model_Order_Change::MAX_ALLOWED_PROCESSING_ATTEMPTS);
 
         $changesCollection = Mage::getModel('M2ePro/Order_Change')->getCollection();
         $changesCollection->addAccountFilter($account->getId());
+        $changesCollection->addProcessingAttemptDateFilter();
         $changesCollection->addFieldToFilter('action', Ess_M2ePro_Model_Order_Change::ACTION_UPDATE_SHIPPING);
         $changesCollection->getSelect()->group(array('order_id'));
 
         if ($changesCollection->getSize() == 0) {
             return;
         }
+
+        Mage::getResourceModel('M2ePro/Order_Change')->incrementAttemptCount($changesCollection->getAllIds());
 
         // Update orders shipping status on Rakuten.com
         //---------------------------
@@ -160,6 +167,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Update extends Ess_M2eP
             $changeParams = $change->getParams();
 
             $params[] = array(
+                'change_id'       => $change->getId(),
                 'order_id'        => $change->getOrderId(),
                 'play_order_id'   => $changeParams['play_order_id'],
                 'carrier_name'    => $changeParams['carrier_name'],
@@ -167,13 +175,11 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Update extends Ess_M2eP
             );
         }
 
-        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Play_Dispatcher */
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
+        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Play_Dispatcher */
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Dispatcher');
         $dispatcherObject->processConnector(
-            'orders', 'update', 'shipping', $params, $marketplace, $account
+            'orders', 'update', 'shipping', $params, $account
         );
-
-        $changesCollection->walk('deleteInstance');
         //---------------------------
 
         $this->_profiler->saveTimePoint(__METHOD__.'send'.$account->getId());
@@ -226,11 +232,11 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Update extends Ess_M2eP
 
     //####################################
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $maxDeactivateTime = (int)$this->config->getGroupValue('/play/orders/update/', 'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);

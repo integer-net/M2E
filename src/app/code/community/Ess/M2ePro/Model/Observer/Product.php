@@ -7,6 +7,7 @@
 class Ess_M2ePro_Model_Observer_Product
 {
     private $_isFailedDuringUpdate = false;
+    private $affectedStoreIdAttributeCache = array();
 
     private $_productId = 0;
     private $_storeId = Mage_Core_Model_App::ADMIN_STORE_ID;
@@ -629,21 +630,67 @@ class Ess_M2ePro_Model_Observer_Product
     {
         $categoryIdsNew = $productNew->getCategoryIds();
 
-        /** @var Ess_M2ePro_Model_Observer_Category $categoryObserverModel */
-        $categoryObserverModel = Mage::getModel('M2ePro/Observer_Category');
+        $addedCategories = array_diff($categoryIdsNew,$this->_productCategoryIdsOld);
+        $deletedCategories = array_diff($this->_productCategoryIdsOld,$categoryIdsNew);
 
-        $addedCategoryIds = array_diff($categoryIdsNew,$this->_productCategoryIdsOld);
-        foreach ($addedCategoryIds as $categoryId) {
-           $categoryObserverModel->synchProductWithAddedCategoryId(
-               $productNew,$categoryId
-           );
+        $websiteIdsNew  = $productNew->getWebsiteIds();
+
+        $addedWebsites = array_diff($websiteIdsNew, $this->_productWebsiteIdsOld);
+        $deletedWebsites = array_diff($this->_productWebsiteIdsOld, $websiteIdsNew);
+
+        $websitesChanges = array(
+            // website for default store view
+            0 => array(
+                'added' => $addedCategories,
+                'deleted' => $deletedCategories
+            )
+        );
+
+        foreach (Mage::app()->getWebsites() as $website) {
+
+            $websiteId = (int)$website->getId();
+
+            $websiteChanges = array(
+                'added' => array(),
+                'deleted' => array()
+            );
+
+            // website has been enabled
+            if (in_array($websiteId,$addedWebsites)) {
+                $websiteChanges['added'] = $categoryIdsNew;
+            // website is enabled
+            } else if (in_array($websiteId,$websiteIdsNew)) {
+                $websiteChanges['added'] = $addedCategories;
+            }
+
+            // website has been disabled
+            if (in_array($websiteId,$deletedWebsites)) {
+                $websiteChanges['deleted'] = $this->_productCategoryIdsOld;
+                // website is enabled
+            } else if (in_array($websiteId,$websiteIdsNew)) {
+                $websiteChanges['deleted'] = $deletedCategories;
+            }
+
+            $websitesChanges[$websiteId] = $websiteChanges;
         }
 
-        $deletedCategoryIds = array_diff($this->_productCategoryIdsOld,$categoryIdsNew);
-        foreach ($deletedCategoryIds as $categoryId) {
-           $categoryObserverModel->synchProductWithDeletedCategoryId(
-               $productNew,$categoryId
-           );
+        /** @var Ess_M2ePro_Model_Observer_Category $categoryObserverModel */
+        $categoryObserver = Mage::getModel('M2ePro/Observer_Category');
+
+        /** @var Ess_M2ePro_Model_Observer_Ebay_Category $ebayCategoryObserver */
+        $ebayCategoryObserver = Mage::getModel('M2ePro/Observer_Ebay_Category');
+
+        foreach ($websitesChanges as $websiteId => $changes) {
+
+            foreach ($changes['added'] as $categoryId) {
+                $categoryObserver->synchProductWithAddedCategoryId($productNew,$categoryId,$websiteId);
+                $ebayCategoryObserver->synchProductWithAddedCategoryId($productNew,$categoryId,$websiteId);
+            }
+
+            foreach ($changes['deleted'] as $categoryId) {
+                $categoryObserver->synchProductWithDeletedCategoryId($productNew,$categoryId,$websiteId);
+                $ebayCategoryObserver->synchProductWithDeletedCategoryId($productNew,$categoryId,$websiteId);
+            }
         }
     }
 
@@ -742,25 +789,76 @@ class Ess_M2ePro_Model_Observer_Product
         return $attribute;
     }
 
-    private function isAffectChangedAttributeOnItemStoreId($attribute, $itemStoreId)
+    //####################################
+
+    private function isAffectChangedAttributeOnItemStoreId($attributeCode, $itemStoreId)
     {
-        $attributeStoreIds = Mage::helper('M2ePro/Magento_Store')
-                                    ->getStoreIdsByAttributeAndStore($attribute,$this->_storeId);
+        $cacheKey = $attributeCode.'_'.$itemStoreId;
 
-        if (count($attributeStoreIds) > 0) {
-            return in_array($itemStoreId,$attributeStoreIds);
+        if (isset($this->affectedStoreIdAttributeCache[$cacheKey])) {
+            return $this->affectedStoreIdAttributeCache[$cacheKey];
         }
 
-        if ($itemStoreId == Mage_Core_Model_App::ADMIN_STORE_ID) {
-            return true;
+        $attributeInstance = Mage::getModel('eav/config')->getAttribute('catalog_product',$attributeCode);
+
+        if (!($attributeInstance instanceof Mage_Catalog_Model_Resource_Eav_Attribute)) {
+            return $this->affectedStoreIdAttributeCache[$cacheKey] = false;
         }
 
-        /** @var Mage_Catalog_Model_Product $productTemp */
-        $productTemp = Mage::getModel('catalog/product')
-                            ->setStoreId($itemStoreId)
-                            ->load($this->_productId);
+        $storeIds = array();
 
-        return $productTemp->getAttributeDefaultValue($attribute) === false;
+        $attributeType = (int)$attributeInstance->getData('is_global');
+        switch ($attributeType) {
+
+            case Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_GLOBAL:
+
+                if ($itemStoreId == Mage_Core_Model_App::ADMIN_STORE_ID) {
+                    $storeIds = array($itemStoreId);
+                } else {
+                    foreach (Mage::app()->getWebsites() as $website) {
+                        /** @var $website Mage_Core_Model_Website */
+                        $storeIds = array_merge($storeIds,$website->getStoreIds());
+                    }
+                }
+
+                break;
+
+            case Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_WEBSITE:
+            case Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_STORE:
+
+                if ($this->_storeId == Mage_Core_Model_App::ADMIN_STORE_ID) {
+
+                    if ($itemStoreId == Mage_Core_Model_App::ADMIN_STORE_ID) {
+                        $storeIds = array($itemStoreId);
+                    } else {
+
+                        /** @var Mage_Catalog_Model_Product $productTemp */
+                        $productTemp = Mage::getModel('catalog/product')
+                                            ->setStoreId($itemStoreId)
+                                            ->load($this->_productId);
+
+                        if ($productTemp->getAttributeDefaultValue($attributeCode) === false) {
+                            $storeIds = array($itemStoreId);
+                        }
+                    }
+
+                } else {
+
+                    if ($attributeType == Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_WEBSITE) {
+                        $storeIds = Mage::getModel('core/store')->load($this->_storeId)->getWebsite()->getStoreIds();
+                    } else {
+                        $storeIds = array($this->_storeId);
+                    }
+                }
+                break;
+        }
+
+        $storeIds = array_values(array_unique($storeIds));
+        foreach ($storeIds as &$storeIdTemp) {
+            $storeIdTemp = (int)$storeIdTemp;
+        }
+
+        return $this->affectedStoreIdAttributeCache[$cacheKey] = in_array($itemStoreId,$storeIds);
     }
 
     //####################################

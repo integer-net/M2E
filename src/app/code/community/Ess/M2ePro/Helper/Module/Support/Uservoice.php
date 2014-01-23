@@ -70,7 +70,8 @@ class Ess_M2ePro_Helper_Module_Support_Uservoice extends Mage_Core_Helper_Abstra
 
         // set it to return the transfer as a string from curl_exec
         curl_setopt($curlObject, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlObject, CURLOPT_CONNECTTIMEOUT, 300);
+        curl_setopt($curlObject, CURLOPT_CONNECTTIMEOUT, 15);
+        curl_setopt($curlObject, CURLOPT_TIMEOUT, 30);
 
         $response = curl_exec($curlObject);
         curl_close($curlObject);

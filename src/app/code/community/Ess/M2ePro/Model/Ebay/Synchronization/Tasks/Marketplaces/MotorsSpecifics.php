@@ -122,7 +122,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_MotorsSpecifics
             $name   = 'motorsSpecifics';
             $params = array('part_number' => $partNumber, 'part_size' => $partSize);
 
-            $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')->processVirtualAbstract(
+            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')->processVirtual(
                 $entity, $type, $name, $params, null, $marketplace
             );
 

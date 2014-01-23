@@ -35,7 +35,7 @@ class Ess_M2ePro_Model_Observer_Shipment
 
             // -------------
             /** @var $shipmentHandler Ess_M2ePro_Model_Order_Shipment_Handler */
-            $shipmentHandler = $this->getShipmentHandler($order);
+            $shipmentHandler = Mage::getModel('M2ePro/Order_Shipment_Handler')->factory($order->getComponentMode());
             $result = $shipmentHandler->handle($order, $shipment);
             // -------------
 
@@ -60,33 +60,6 @@ class Ess_M2ePro_Model_Observer_Shipment
     }
 
     //####################################
-
-    private function getShipmentHandler(Ess_M2ePro_Model_Order $order)
-    {
-        $handler = null;
-
-        switch ($order->getComponentMode()) {
-            case Ess_M2ePro_Helper_Component_Buy::NICK:
-                $handler = Mage::getModel('M2ePro/Order_Shipment_Handler');
-                break;
-            case Ess_M2ePro_Helper_Component_Amazon::NICK:
-                $handler = Mage::getModel('M2ePro/Amazon_Order_Shipment_Handler');
-                break;
-            case Ess_M2ePro_Helper_Component_Ebay::NICK:
-                $handler = Mage::getModel('M2ePro/Ebay_Order_Shipment_Handler');
-                break;
-
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $handler = Mage::getModel('M2ePro/Play_Order_Shipment_Handler');
-                break;
-        }
-
-        if (!$handler) {
-            throw new LogicException('Shipment handler not found.');
-        }
-
-        return $handler;
-    }
 
     private function addSessionSuccessMessage(Ess_M2ePro_Model_Order $order)
     {
@@ -114,8 +87,13 @@ class Ess_M2ePro_Model_Observer_Shipment
 
     private function addSessionErrorMessage(Ess_M2ePro_Model_Order $order)
     {
-        // todo adminhtml_log
-        $url = Mage::helper('adminhtml')->getUrl('M2ePro/adminhtml_log/order', array('order_id' => $order->getId()));
+        if ($order->isComponentModeEbay()) {
+            $url = Mage::helper('adminhtml')
+                ->getUrl('M2ePro/adminhtml_ebay_log/order', array('order_id' => $order->getId()));
+        } else {
+            $url = Mage::helper('adminhtml')
+                ->getUrl('M2ePro/adminhtml_common_log/order', array('order_id' => $order->getId()));
+        }
 
         $startLink = '<a href="' . $url . '" target="_blank">';
         $endLink = '</a>';

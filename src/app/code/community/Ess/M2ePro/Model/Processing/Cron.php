@@ -99,8 +99,8 @@ class Ess_M2ePro_Model_Processing_Cron
         foreach ($processingIdsParts as $processingIds) {
 
             // send parts to the server
-            $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_'.ucfirst($component).'_Dispatcher');
-            $results = $dispatcherObject->processVirtualAbstract('processing','get','results',
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_'.ucfirst($component).'_Dispatcher');
+            $results = $dispatcherObject->processVirtual('processing','get','results',
                                                                   array('processing_ids'=>$processingIds),
                                                                  'results', NULL, NULL);
 
@@ -169,8 +169,8 @@ class Ess_M2ePro_Model_Processing_Cron
         );
 
         // send parts to the server
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_'.ucfirst($component).'_Dispatcher');
-        $results = $dispatcherObject->processVirtualAbstract('processing','get','results',
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_'.ucfirst($component).'_Dispatcher');
+        $results = $dispatcherObject->processVirtual('processing','get','results',
                                                               $params, 'results', NULL, NULL);
 
         if (empty($results)) {
@@ -200,7 +200,7 @@ class Ess_M2ePro_Model_Processing_Cron
         foreach ($processingRequests as $processingRequest) {
 
             /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-            /** @var $responserObject Ess_M2ePro_Model_Connector_Server_Responser */
+            /** @var $responserObject Ess_M2ePro_Model_Connector_Responser */
             $responserObject = $processingRequest->getResponserObject();
             $results[$processingId]['data']['next_part'] = $nextPart;
 

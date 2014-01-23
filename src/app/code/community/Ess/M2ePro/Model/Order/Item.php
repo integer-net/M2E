@@ -85,6 +85,11 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         return (int)$this->getData('state');
     }
 
+    public function getQtyReserved()
+    {
+        return (int)$this->getData('qty_reserved');
+    }
+
     public function setAssociatedOptions(array $options)
     {
         $this->setSetting('product_details', 'associated_options', $options);
@@ -245,7 +250,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             ->getStoreIds();
 
         if (empty($storeIds)) {
-            return Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
+            return Mage_Core_Model_App::ADMIN_STORE_ID;
         }
 
         return array_shift($storeIds);

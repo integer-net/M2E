@@ -5,34 +5,13 @@
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update_Responser
+    extends Ess_M2ePro_Model_Connector_Ebay_Inventory_Get_ItemsResponser
 {
-    protected $params = array();
     protected $synchronizationLog = NULL;
 
-    /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Account|null
-     */
-    protected $account = NULL;
-
     // ########################################
 
-    public function initialize(array $params = array(),
-                               Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
-    {
-        $this->params = $params;
-        $this->marketplace = $marketplace;
-        $this->account = $account;
-    }
-
-    // ########################################
-
-    public function unsetLocks($hash, $fail = false, $message = NULL)
+    protected function unsetLocks($fail = false, $message = NULL)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
@@ -43,20 +22,20 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update_Responser
         $lockItem->setNick($tempNick);
         $lockItem->remove();
 
-        $this->getAccount()->deleteObjectLocks(NULL,$hash);
-        $this->getAccount()->deleteObjectLocks('synchronization',$hash);
-        $this->getAccount()->deleteObjectLocks('synchronization_ebay',$hash);
+        $this->getAccount()->deleteObjectLocks(NULL,$this->hash);
+        $this->getAccount()->deleteObjectLocks('synchronization',$this->hash);
+        $this->getAccount()->deleteObjectLocks('synchronization_ebay',$this->hash);
         $this->getAccount()->deleteObjectLocks(
             Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update::LOCK_ITEM_PREFIX,
-            $hash
+            $this->hash
         );
 
-        $this->getMarketplace()->deleteObjectLocks(NULL,$hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization',$hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization_ebay',$hash);
+        $this->getMarketplace()->deleteObjectLocks(NULL,$this->hash);
+        $this->getMarketplace()->deleteObjectLocks('synchronization',$this->hash);
+        $this->getMarketplace()->deleteObjectLocks('synchronization_ebay',$this->hash);
         $this->getMarketplace()->deleteObjectLocks(
             Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update::LOCK_ITEM_PREFIX,
-            $hash
+            $this->hash
         );
 
         $fail && $this->getSynchLogModel()->addMessage(Mage::helper('M2ePro')->__($message),
@@ -64,14 +43,18 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update_Responser
                                                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
     }
 
-    public function processSucceededResponseData($receivedItems)
+    // ########################################
+
+    protected function processResponseData($response)
     {
+        $response = parent::processResponseData($response);
+
         try {
 
             /** @var $updatingModel Ess_M2ePro_Model_Ebay_Listing_Other_Updating */
             $updatingModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Updating');
             $updatingModel->initialize($this->getAccount());
-            $updatingModel->processResponseData($receivedItems);
+            $updatingModel->processResponseData($response);
 
         } catch (Exception $exception) {
 
@@ -90,7 +73,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update_Responser
      */
     protected function getAccount()
     {
-        return $this->account;
+        return $this->getObjectByParam('Account','account_id');
     }
 
     /**
@@ -98,7 +81,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update_Responser
      */
     protected function getMarketplace()
     {
-        return $this->marketplace;
+        return $this->getObjectByParam('Marketplace','marketplace_id');
     }
 
     //-----------------------------------------

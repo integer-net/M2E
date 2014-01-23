@@ -28,6 +28,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Item extends Mage_Adminhtml_Blo
         $this->setPagerVisibility(false);
         $this->setFilterVisibility(false);
         $this->setUseAjax(true);
+        $this->_defaultLimit = 200;
         //------------------------------
 
         $this->order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');

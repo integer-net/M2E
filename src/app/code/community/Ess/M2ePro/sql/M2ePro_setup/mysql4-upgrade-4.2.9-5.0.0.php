@@ -396,10 +396,10 @@ SQL
 //#############################################
 
 $tempTable = $installer->getTable('ess_config');
-$tempRow = $installer->getConnection()->query("SELECT * FROM `{$tempTable}`
-                                               WHERE `group` = '/M2ePro/license/buy/'
-                                               AND   `key` = 'mode'")
-                                      ->fetch();
+$tempRow = $connection->query("SELECT * FROM `{$tempTable}`
+                               WHERE `group` = '/M2ePro/license/buy/'
+                               AND   `key` = 'mode'")
+                      ->fetch();
 
 if ($tempRow === false) {
 
@@ -420,10 +420,10 @@ SQL
 //--------------------------------------------
 
 $tempTable = $installer->getTable('m2epro_config');
-$tempRow = $installer->getConnection()->query("SELECT * FROM `{$tempTable}`
-                                               WHERE `group` = '/buy/connector/'
-                                               AND   `key` = 'mode'")
-                                      ->fetch();
+$tempRow = $connection->query("SELECT * FROM `{$tempTable}`
+                               WHERE `group` = '/buy/connector/'
+                               AND   `key` = 'mode'")
+                      ->fetch();
 
 if ($tempRow === false) {
 
@@ -499,9 +499,9 @@ SQL
 //--------------------------------------------
 
 $tempTable = $installer->getTable('m2epro_marketplace');
-$tempRow = $installer->getConnection()->query("SELECT * FROM `{$tempTable}`
-                                               WHERE `url` = 'rakuten.com'")
-                                      ->fetch();
+$tempRow = $connection->query("SELECT * FROM `{$tempTable}`
+                               WHERE `url` = 'rakuten.com'")
+                      ->fetch();
 
 if ($tempRow === false) {
 
@@ -517,7 +517,7 @@ SQL
 //--------------------------------------------
 
 $tempTable = $installer->getTable('m2epro_buy_marketplace');
-$stmt = $installer->getConnection()->query("SELECT count(*) FROM `{$tempTable}`");
+$stmt = $connection->query("SELECT count(*) FROM `{$tempTable}`");
 
 if ($stmt->fetchColumn() == 0) {
 
@@ -542,7 +542,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

@@ -21,8 +21,9 @@ class Ess_M2ePro_Model_Observer_Ebay_Product
 
         foreach ($listings as $listing) {
             /** @var Ess_M2ePro_Model_Listing $listing */
-            $this->addProductToListing($listing, $productNew, false,
-                                       $listing->getChildObject()->getAutoGlobalAddingTemplateCategoryId());
+            $this->addProductToListing($listing, $productNew,
+                                       $listing->getChildObject()->getAutoGlobalAddingTemplateCategoryId(),
+                                       $listing->getChildObject()->getAutoGlobalAddingTemplateOtherCategoryId());
         }
     }
 
@@ -76,8 +77,9 @@ class Ess_M2ePro_Model_Observer_Ebay_Product
 
         foreach ($listings as $listing) {
             /** @var Ess_M2ePro_Model_Listing $listing */
-            $this->addProductToListing($listing, $productNew, false,
-                                       $listing->getChildObject()->getAutoWebsiteAddingTemplateCategoryId());
+            $this->addProductToListing($listing, $productNew,
+                                       $listing->getChildObject()->getAutoWebsiteAddingTemplateCategoryId(),
+                                       $listing->getChildObject()->getAutoWebsiteAddingTemplateOtherCategoryId());
         }
     }
 
@@ -116,10 +118,10 @@ class Ess_M2ePro_Model_Observer_Ebay_Product
 
     public function addProductToListing(Ess_M2ePro_Model_Listing $listing,
                                         Mage_Catalog_Model_Product $productNew,
-                                        $duplicate, $templateCategoryId)
+                                        $templateCategoryId, $templateOtherCategoryId)
     {
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-        $listingProduct = $listing->addProduct($productNew,false,!$duplicate);
+        $listingProduct = $listing->addProduct($productNew);
 
         if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
             return;
@@ -129,7 +131,9 @@ class Ess_M2ePro_Model_Observer_Ebay_Product
             return;
         }
 
-        $listingProduct->setData('template_category_id',$templateCategoryId)->save();
+        $listingProduct->setData('template_category_id',$templateCategoryId)
+                       ->setData('template_other_category_id',$templateOtherCategoryId)
+                       ->save();
     }
 
     public function deleteProductFromListing(Ess_M2ePro_Model_Listing $listing,

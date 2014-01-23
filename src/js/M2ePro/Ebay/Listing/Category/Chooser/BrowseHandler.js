@@ -151,7 +151,7 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
         var childrenSelect = document.createElement('select');
         childrenSelect.id = self.getCategoriesSelectElementId(categoryId);
         childrenSelect.style.minWidth = '200px';
-        childrenSelect.size = 13;
+        childrenSelect.size = 10;
         childrenSelect.onchange = function() {EbayListingCategoryChooserBrowseHandlerObj.onSelectCategory(this);};
         childrenSelect.style.display = 'none';
         parentDiv.appendChild(childrenSelect);

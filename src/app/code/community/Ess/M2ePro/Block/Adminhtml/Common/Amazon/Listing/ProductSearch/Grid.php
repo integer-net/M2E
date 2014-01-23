@@ -43,7 +43,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Grid extend
                 'title' => $item['title'],
                 'image_url' => $item['image_url'],
                 'price' => isset($item['list_price']['amount']) ? $item['list_price']['amount'] : null,
+                'is_variation_product' => $item['is_variation_product'],
             );
+
+            if ($temp['is_variation_product']) {
+                $temp += array(
+                    'parentage' => $item['parentage'],
+                    'variations' => $item['variations']
+                );
+
+                if (!empty($item['requested_child_id'])) {
+                    $temp['requested_child_id'] = $item['requested_child_id'];
+                }
+            }
 
             $results->addItem(new Varien_Object($temp));
         }
@@ -81,6 +93,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Grid extend
             'header'       => Mage::helper('M2ePro')->__('Product Title'),
             'align'        => 'left',
             'type'         => 'text',
+            'string_limit' => 10000,
             'width'        => '375px',
             'index'        => 'title',
             'filter'       => false,
@@ -123,23 +136,74 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Grid extend
         $url = Mage::helper('M2ePro/Component_Amazon')
                                          ->getItemUrl($value, Mage::helper('M2ePro/Data_Global')->getValue('marketplace_id'));
 
-        return '<a href="'.$url.'" target="_blank">'.$value.'</a>';
+        return '<a id="asin_link_'.$product->getData('id').'" href="'.$url.'" target="_blank">'.$value.'</a>';
     }
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
+        $value = '<div style="margin-left: 3px; margin-bottom: 10px;">'.
+                        Mage::helper('M2ePro')->escapeHtml($value)."</div>";
+
+        $variations = $row->getData('variations');
+        if (is_null($variations)) {
+            return $value;
         }
 
-        $value = '<div style="margin-left: 3px">'.Mage::helper('M2ePro')->escapeHtml($value)."</div>";
+        $specificsJs = '<script type="text/javascript">';
+        $specificsHtml = '';
+        $id = $row->getId();
+        $requestedChildAsin = $row->getData('requested_child_id');
 
-        return $value;
+        $selectedOptions = array();
+        if ($requestedChildAsin) {
+            $selectedOptions = $variations['asins'][$requestedChildAsin]['specifics'];
+        }
+
+        foreach ($variations['set'] as $specificName => $specific) {
+            $specificsHtml .= '<span style="margin-left: 10px;
+                                            font-size: 11px;
+                                            color: #808080;
+                                            display: inline-block;
+                                            width: 100px;">'.
+                                    ucfirst(strtolower($specificName)).
+                              ':</span>';
+            $specificsHtml .= '<select class="specifics_'.$id.'"
+                                       onchange="ListingGridHandlerObj.productSearchHandler.specificsChange(this)"
+                                       style="width: 150px; margin-left: 5px; margin-bottom: 5px; font-size: 10px;"
+                                       id="specific_'.$specificName.'_'.$id.'">';
+            $specificsHtml .= '<option value=""></option>';
+            foreach ($specific as $option) {
+
+                $selected = '';
+                if ($requestedChildAsin && $selectedOptions[$specificName] == $option) {
+                    $selected = 'selected';
+                    $specificsJs .= <<<JS
+ListingGridHandlerObj.productSearchHandler.specificsChange({id:"specific_{$specificName}_{$id}"});
+JS;
+
+                }
+
+                $option = Mage::helper('M2ePro')->escapeHtml($option);
+                $specificsHtml .= '<option value="'.$option.'" '.$selected.'>'.$option.'</option>';
+            }
+            $specificsHtml .= '</select><br />';
+        }
+
+        $specificsJs .= '</script>';
+
+        $specificsJsonContainer = '<div id="parent_asin_'.$row->getId().'" style="display: none">'.
+                                  $row->getData('general_id').
+                                  '</div>'.
+                                  '<div id="asins_'.$id.'" style="display: none;">'.
+                                  json_encode($variations['asins']).
+                                  '</div>';
+
+        return $value . $specificsHtml . $specificsJsonContainer . $specificsJs;
     }
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        if (empty($value)) {
+        if (empty($value) || $row->getData('is_variation_product')) {
             $value = Mage::helper('M2ePro')->__('N/A');
         }
 
@@ -148,11 +212,23 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Grid extend
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
+        $assignText = Mage::helper('M2ePro')->__('Assign ASIN/ISBN');
+
+        if (!is_null($row->getData('variations'))) {
+            $templateMapHtml =
+                '<a href="javascript:void(0);" onclick="ListingGridHandlerObj.productSearchHandler.mapToGeneralId('
+                .$this->productId
+                .', \'%general_id%\');">'.$assignText.'</a>';
+
+            return '<span id="map_link_'.$row->getId().'"><span style="color: #808080">'.$assignText.'</span></span>
+                    <div id="template_map_link_'.$row->getId().'" style="display: none;">'.$templateMapHtml.'</div>';
+        }
+
         return '<a href="javascript:void(0);" onclick="ListingGridHandlerObj.productSearchHandler.mapToGeneralId('
-               .$this->productId
-               .', \''
-               .$row->getData('general_id')
-               .'\');">Assign ASIN/ISBN</a>';
+            .$this->productId
+            .', \''
+            .$row->getData('general_id')
+            .'\');">'.$assignText.'</a>';
     }
 
     // ####################################

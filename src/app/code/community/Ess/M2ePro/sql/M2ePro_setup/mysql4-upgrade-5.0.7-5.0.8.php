@@ -11,7 +11,7 @@ $connection = $installer->getConnection();
 //#############################################
 
 $tempTable = $installer->getTable('m2epro_config');
-$tempRow = $installer->getConnection()->query("
+$tempRow = $connection->query("
     SELECT * FROM `{$tempTable}`
     WHERE `group` = '/amazon/synchronization/settings/orders/update/'
     AND   `key` = 'max_deactivate_time'
@@ -31,7 +31,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

@@ -3,15 +3,16 @@
     <div class="entry-edit" id="magento_block_buy_synchronization_templates">
 
         <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Stock Level Synchronization'); ?></h4>
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Inventory Synchronization'); ?></h4>
         </div>
 
         <div class="fieldset">
             <div class="hor-scroll">
 
                 <div id="block_notice_buy_synchronization_stock_level" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+                    <?php $inspectorMode = ($this->inspectorMode == 1)?'<span style="color: green"> (enabled) </span>':''; ?>
                     <?php echo Mage::helper('M2ePro')->__('If catalog updates in your magento performed using import/export tools, custom scripts or direct changes in database,
-                    then, you can use <a target="_blank" href="%s#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> functionality to detect changes in products\' price and quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl()) ?>
+                    then, you can use <a target="_blank" href="%s#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> %s functionality to detect changes in products\' price and quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl(), $inspectorMode) ?>
                 </div>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -52,6 +53,46 @@
                     <?php } ?>
 
                 </table>
+
+                <div style="padding: 12px"></div>
+
+                <?php if ($this->isShowReviseAll()) { ?>
+                    <div id="block_notice_buy_synchronization_revise_all" style="<?php if (!$templates_mode) echo 'display: none'; ?>" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+
+                        <?php echo Mage::helper('M2ePro')->__(
+        'If your Rakuten.com listings for some reason were asynchronized with the products in Magento, <a href="javascript:" onclick="%s">turn on</a> the Revise All action to catch data up.
+        <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
+    <br><br>
+        ',
+    'SynchronizationHandlerObj.showReviseAllConfirmPopup(\''.Ess_M2ePro_Helper_Component_Buy::NICK.'\');'
+                        )?>
+
+                        <span id="buy_revise_all_start" style="display: none">
+
+                            <span style="color: blue">
+                                <?php echo Mage::helper('M2ePro')->__('In Progress, start date - ') ?>
+                            </span>
+
+                            <span id="buy_revise_all_start_date" style="color: blue">
+                                <?php echo $this->reviseAllStartDate; ?>
+                            </span>
+
+                        </span>
+
+                        <span id="buy_revise_all_end" style="display: none">
+
+                            <span style="color: green">
+                                <?php echo Mage::helper('M2ePro')->__('Finished, end date - ') ?>
+                            </span>
+
+                            <span id="buy_revise_all_end_date" style="color: green">
+                                <?php echo $this->reviseAllEndDate; ?>
+                            </span>
+
+                        </span>
+
+                    </div>
+                <?php } ?>
 
             </div>
         </div>
@@ -167,3 +208,41 @@
     </div>
 
 </div>
+
+<div id="buy_revise_all_confirm_popup" style="display: none;">
+    <div style="margin: 17px 0">
+
+        <?php echo Mage::helper('M2ePro')->__(
+            'Click \'Confirm\' and Revise will be performed by the Inventory Synchronization, 100 items per a cycle.'
+        ); ?>
+
+    </div>
+
+    <div class="clear"></div>
+
+    <div class="right">
+        <a href="javascript:void(0);" onclick="Windows.getFocusedWindow().close()"><?php echo Mage::helper('M2ePro')->__('Cancel') ?></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <?php echo $this->getChildHtml('revise_all_confirm_popup_ok_button'); ?>
+    </div>
+
+    <div class="clear"></div>
+
+</div>
+
+<?php if ($this->isShowReviseAll()) { ?>
+    <script type="text/javascript">
+
+        Event.observe(window, 'load', function() {
+            setTimeout(function() {
+                SynchronizationHandlerObj.initReviseAllInfo(
+                    <?php echo json_encode($this->reviseAllInProcessingState) ?>,
+                    '<?php echo $this->reviseAllStartDate ?>',
+                    '<?php echo $this->reviseAllEndDate ?>',
+                    '<?php echo Ess_M2ePro_Helper_Component_Buy::NICK ?>'
+                );
+            }, 400);
+        });
+
+    </script>
+<?php } ?>

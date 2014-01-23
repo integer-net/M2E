@@ -257,9 +257,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
                     $src['mode'],$src['attribute'],$returnSalePrice
                 );
 
-                foreach ($options as $option) {
-                    /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                    $price += $option->getChildObject()->getPrice($returnSalePrice);
+                if ($price <= 0 && $returnSalePrice &&
+                    $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_SPECIAL) {
+                    $price = 0;
+                } else {
+
+                    foreach ($options as $option) {
+                        /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
+                        $price += $option->getChildObject()->getPrice($returnSalePrice);
+                    }
+
                 }
 
             } else {
@@ -270,12 +277,20 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
 
                     /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
 
+                    $tempPrice = $option->getChildObject()->getPrice($returnSalePrice);
+
+                    if ($tempPrice <= 0 && $returnSalePrice &&
+                        $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_SPECIAL) {
+                        $price = 0;
+                        break;
+                    }
+
                     if ($isBundle) {
-                        $price += $option->getChildObject()->getPrice($returnSalePrice);
+                        $price += $tempPrice;
                         continue;
                     }
 
-                    $price = $option->getChildObject()->getPrice($returnSalePrice);
+                    $price = $tempPrice;
                     break;
                 }
             }

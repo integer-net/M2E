@@ -1,9 +1,70 @@
+<?php
+
+$translations = array();
+
+// ->__('Synchronization settings have been saved.')
+$text = 'Synchronization settings have been saved.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Running All Enabled Tasks')
+$text = 'Running All Enabled Tasks';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Inventory Synchronization')
+$text = 'Inventory Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Orders Synchronization')
+$text = 'Orders Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('3rd Party Listings Synchronization')
+$text = '3rd Party Listings Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Feedback Synchronization')
+$text = 'Feedback Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Another Synchronization Is Already Running.')
+$text = 'Another Synchronization Is Already Running.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Getting information. Please wait ...')
+$text = 'Getting information. Please wait ...';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Preparing to start. Please wait ...')
+$text = 'Preparing to start. Please wait ...';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Synchronization has successfully ended.')
+$text = 'Synchronization has successfully ended.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.')
+$text = 'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
+$text = 'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Revise All')
+$text = 'Revise All';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+$translations = json_encode($translations);
+
+?>
+
 <script type="text/javascript">
 
     M2ePro.url.add(<?php echo json_encode(array(
         'formSubmit' => $this->getUrl('M2ePro/adminhtml_common_synchronization/save'),
         'logViewUrl' => $this->getUrl('M2ePro/adminhtml_common_log/synchronization',array('back'=>Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_common_synchronization/index'))),
 
+        'runReviseAll'        => $this->getUrl('M2ePro/adminhtml_common_synchronization/runReviseAll'),
         'runAllEnabledNow'    => $this->getUrl('M2ePro/adminhtml_common_synchronization/runAllEnabledNow'),
         'runNowTemplates'     => $this->getUrl('M2ePro/adminhtml_common_synchronization/runNowTemplates'),
         'runNowOrders'        => $this->getUrl('M2ePro/adminhtml_common_synchronization/runNowOrders'),
@@ -12,21 +73,7 @@
         'synchCheckProcessingNow' => $this->getUrl('M2ePro/adminhtml_common_synchronization/synchCheckProcessingNow')
     )); ?>);
 
-    M2ePro.translator.add(<?php echo json_encode(array(
-        'Synchronization settings have been saved.' => $this->__('Synchronization settings have been saved.'),
-        'Running All Enabled Tasks' => $this->__('Running All Enabled Tasks'),
-        'Stock Level Synchronization' => $this->__('Stock Level Synchronization'),
-        'Orders Synchronization' => $this->__('Orders Synchronization'),
-        '3rd Party Listings Synchronization' => $this->__('3rd Party Listings Synchronization'),
-
-        'Another Synchronization Is Already Running.' => $this->__('Another Synchronization Is Already Running.'),
-        'Getting information. Please wait ...' => $this->__('Getting information. Please wait ...'),
-        'Preparing to start. Please wait ...' => $this->__('Preparing to start. Please wait ...'),
-
-        'Synchronization has successfully ended.' => $this->__('Synchronization has successfully ended.'),
-        'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.'),
-        'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
-    )); ?>);
+    M2ePro.translator.add(<?php echo $translations; ?>);
 
     Event.observe(window, 'load', function() {
         setTimeout(function() {

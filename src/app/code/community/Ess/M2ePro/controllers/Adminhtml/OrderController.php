@@ -57,7 +57,7 @@ class Ess_M2ePro_Adminhtml_OrderController
             }
         }
 
-        exit(json_encode($regions));
+        return $this->getResponse()->setBody(json_encode($regions));
     }
 
     //#############################################
@@ -421,7 +421,11 @@ class Ess_M2ePro_Adminhtml_OrderController
         $associatedProducts = $optionsFinder->prepareAssociatedProducts($associatedProducts);
 
         foreach ($associatedProducts as $productId) {
-            if (!Mage::getModel('M2ePro/Magento_Product')->getStockAvailabilityByProductId($productId)) {
+
+            $magentoProductTemp = Mage::getModel('M2ePro/Magento_Product');
+            $magentoProductTemp->setProductId($productId);
+
+            if (!$magentoProductTemp->getStockAvailability()) {
                 $this->getResponse()->setBody(json_encode(array('is_in_stock' => false)));
                 return;
             }
@@ -451,6 +455,52 @@ class Ess_M2ePro_Adminhtml_OrderController
         }
 
         return $optionsData;
+    }
+
+    //#############################################
+
+    public function resubmitShippingInfoAction()
+    {
+        $ids = $this->getRequestIds();
+
+        $succeeded = $failed = 0;
+
+        foreach ($ids as $id) {
+            $order    = Mage::helper('M2ePro/Component')->getUnknownObject('Order', $id);
+            $shipment = Mage::getResourceModel('sales/order_shipment_collection')
+                ->setOrderFilter($order->getMagentoOrderId())
+                ->getLastItem();
+
+            if (!$shipment->getId()) {
+                continue;
+            }
+
+            $handler = Mage::getModel('M2ePro/Order_Shipment_Handler')->factory($order->getComponentMode());
+            $result  = $handler->handle($order, $shipment);
+
+            switch ($result) {
+                case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_SUCCEEDED:
+                    $succeeded++;
+                    break;
+                case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_FAILED:
+                    $failed++;
+                    break;
+            }
+        }
+
+        if ($succeeded > 0) {
+            $this->_getSession()->addSuccess(
+                Mage::helper('M2ePro')->__('Shipping Information has been resend for %d order(s).', $succeeded)
+            );
+        }
+
+        if ($failed > 0) {
+            $this->_getSession()->addError(
+                Mage::helper('M2ePro')->__('Shipping Information was not resend for %d order(s).', $failed)
+            );
+        }
+
+        $this->_redirectUrl($this->_getRefererUrl());
     }
 
     //#############################################

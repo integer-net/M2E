@@ -15,10 +15,8 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
     const IS_VARIATION_MATCHED_NO  = 0;
     const IS_VARIATION_MATCHED_YES = 1;
 
-    const GENERAL_ID_SEARCH_STATUS_NONE  = 0;
     const GENERAL_ID_SEARCH_STATUS_SET_MANUAL  = 1;
     const GENERAL_ID_SEARCH_STATUS_SET_AUTOMATIC  = 2;
-    const GENERAL_ID_SEARCH_STATUS_PROCESSING = 3;
 
     const SKU_MAX_LENGTH = 26;
 
@@ -288,11 +286,6 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
         return (int)$this->getData('general_id_search_status');
     }
 
-    public function isGeneralIdSearchStatusNone()
-    {
-        return $this->getGeneralIdSearchStatus() == self::GENERAL_ID_SEARCH_STATUS_NONE;
-    }
-
     public function isGeneralIdSearchStatusSetManual()
     {
         return $this->getGeneralIdSearchStatus() == self::GENERAL_ID_SEARCH_STATUS_SET_MANUAL;
@@ -386,6 +379,7 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
             $result = NULL;
         } else {
             $result = (string)$this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
+            $result = str_replace('-','',$result);
         }
 
         $this->setData('cache_adding_general_id',$result);
@@ -522,7 +516,7 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
             $result = $this->getActualMagentoProduct()->getAttributeValue($src['attribute']);
         }
 
-        is_string($result) && $result = trim($result);
+        is_string($result) && $result = trim(str_replace(array("\r","\n","\t"), '', $result));
         $this->setData('cache_adding_condition_note',$result);
 
         return $result;
@@ -762,7 +756,7 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
         switch ($src['mode']) {
             case Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_SINGLE:
                 if ($productMode) {
-                    $qty = $this->_getProductGeneralQty();
+                    $qty = $this->getParentObject()->getQty();
                 } else {
                     $qty = 1;
                 }
@@ -770,7 +764,7 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
 
             case Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_NUMBER:
                 if ($productMode) {
-                    $qty = $this->_getProductGeneralQty();
+                    $qty = $this->getParentObject()->getQty();
                 } else {
                     $qty = $src['value'];
                 }
@@ -782,7 +776,7 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
 
             default:
             case Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT:
-                $qty = $this->_getProductGeneralQty();
+                $qty = $this->getParentObject()->getQty();
                 break;
         }
 
@@ -794,16 +788,6 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
         $qty < 0 && $qty = 0;
 
         return (int)floor($qty);
-    }
-
-    //-----------------------------------------
-
-    protected function _getProductGeneralQty()
-    {
-        if ($this->getMagentoProduct()->isStrictVariationProduct()) {
-            return $this->getParentObject()->_getOnlyVariationProductQty();
-        }
-        return (int)floor($this->getMagentoProduct()->getQty());
     }
 
     //-----------------------------------------
@@ -841,29 +825,29 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
 
     public function listAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_LIST, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_LIST, $params);
     }
 
     public function relistAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_RELIST, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_RELIST, $params);
     }
 
     public function reviseAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_REVISE, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_REVISE, $params);
     }
 
     public function stopAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_STOP, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_STOP, $params);
     }
 
     //-----------------------------------------
 
     protected function processDispatcher($action, array $params = array())
     {
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Product_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Product_Dispatcher');
         return $dispatcherObject->process($action, $this->getId(), $params);
     }
 

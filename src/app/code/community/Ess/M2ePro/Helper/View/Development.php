@@ -11,6 +11,7 @@ class Ess_M2ePro_Helper_View_Development extends Mage_Core_Helper_Abstract
     const NICK            = 'development';
     const TITLE           = 'Control Panel (M2E Pro)';
 
+    const TAB_SUMMARY     = 'summary';
     const TAB_ABOUT       = 'about';
     const TAB_INSPECTION  = 'inspection';
     const TAB_DATABASE    = 'database';

@@ -96,6 +96,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
 
         $mapAutoToProductUrl = $this->getUrl('*/adminhtml_listing_other_mapping/autoMap');
 
+        $removingProductsUrl = $this->getUrl('*/adminhtml_ebay_listing_other/removing');
+        $unmappingProductsUrl = $this->getUrl('*/adminhtml_listing_other_mapping/unmapping');
+
         $someProductsWereNotMappedMessage = 'No matches were found. Please change the mapping attributes in <strong>';
         $someProductsWereNotMappedMessage .= 'Configuration > Account > 3rd Party Listings</strong> ';
         $someProductsWereNotMappedMessage .= 'or try to map manually.';
@@ -121,6 +124,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully mapped.'));
         $mappingProductMessage = $helper->escapeJs($helper->__('Mapping Product'));
         $productDoesNotExistMessage = $helper->escapeJs($helper->__('Product does not exist.'));
+
+        $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data.'));
+        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
+        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
 
         // ->__('Current eBay version only supports simple products in mapping. Please, choose simple product.')
         $temp = 'Current eBay version only supports simple products in mapping. Please, choose simple product.';
@@ -220,6 +227,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
     M2eProEbay.url.tryToMoveToListing = '{$tryToMoveToListing}';
     M2eProEbay.url.moveToListing = '{$moveToListing}';
 
+    M2eProEbay.url.removingProducts = '{$removingProductsUrl}';
+    M2eProEbay.url.unmappingProducts = '{$unmappingProductsUrl}';
+
     M2eProEbay.text.successfully_mapped = '{$successfullyMappedMessage}';
     M2eProEbay.text.mapping_product_title = '{$mappingProductMessage}';
     M2eProEbay.text.product_does_not_exist = '{$productDoesNotExistMessage}';
@@ -234,6 +244,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
     M2eProEbay.text.successfully_moved = '{$successfullyMovedMessage}';
     M2eProEbay.text.products_were_not_moved = '{$productsWereNotMovedMessage}';
     M2eProEbay.text.some_products_were_not_moved = '{$someProductsWereNotMovedMessage}';
+    M2eProEbay.text.not_enough_data = '{$notEnoughDataMessage}';
+    M2eProEbay.text.successfully_unmapped = '{$successfullyUnmappedMessage}';
+    M2eProEbay.text.successfully_removed = '{$successfullyRemovedMessage}';
 
     M2eProEbay.text.task_completed_message = '{$taskCompletedMessage}';
     M2eProEbay.text.task_completed_success_message = '{$taskCompletedSuccessMessage}';
@@ -275,6 +288,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         EbayListingOtherGridHandlerObj.movingHandler.setOptions(M2eProEbay);
         EbayListingOtherGridHandlerObj.actionHandler.setOptions(M2eProEbay);
         EbayListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProEbay);
+        EbayListingOtherGridHandlerObj.removingHandler.setOptions(M2eProEbay);
+        EbayListingOtherGridHandlerObj.unmappingHandler.setOptions(M2eProEbay);
 
     });
 

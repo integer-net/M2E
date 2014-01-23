@@ -1,9 +1,70 @@
+<?php
+
+$translations = array();
+
+// ->__('Synchronization settings have been saved.')
+$text = 'Synchronization settings have been saved.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Running All Enabled Tasks')
+$text = 'Running All Enabled Tasks';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Inventory Synchronization')
+$text = 'Inventory Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Orders Synchronization')
+$text = 'Orders Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('3rd Party Listings Synchronization')
+$text = '3rd Party Listings Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Feedback Synchronization')
+$text = 'Feedback Synchronization';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Another Synchronization Is Already Running.')
+$text = 'Another Synchronization Is Already Running.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Getting information. Please wait ...')
+$text = 'Getting information. Please wait ...';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Preparing to start. Please wait ...')
+$text = 'Preparing to start. Please wait ...';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Synchronization has successfully ended.')
+$text = 'Synchronization has successfully ended.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.')
+$text = 'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
+$text = 'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+// ->__('Revise All')
+$text = 'Revise All';
+$translations[$text] = Mage::helper('M2ePro')->__($text);
+
+$translations = json_encode($translations);
+
+?>
+
 <script type="text/javascript">
 
     M2ePro.url.add(<?php echo json_encode(array(
         'formSubmit' => $this->getUrl('M2ePro/adminhtml_ebay_synchronization/save'),
         'logViewUrl' => $this->getUrl('M2ePro/adminhtml_ebay_log/synchronization',array('back'=>Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_ebay_synchronization/index'))),
 
+        'runReviseAll'        => $this->getUrl('M2ePro/adminhtml_ebay_synchronization/runReviseAll'),
         'runAllEnabledNow'    => $this->getUrl('M2ePro/adminhtml_ebay_synchronization/runAllEnabledNow'),
         'runNowTemplates'     => $this->getUrl('M2ePro/adminhtml_ebay_synchronization/runNowTemplates'),
         'runNowOrders'        => $this->getUrl('M2ePro/adminhtml_ebay_synchronization/runNowOrders'),
@@ -13,22 +74,7 @@
         'synchCheckProcessingNow' => $this->getUrl('M2ePro/adminhtml_ebay_synchronization/synchCheckProcessingNow')
     )); ?>);
 
-    M2ePro.translator.add(<?php echo json_encode(array(
-        'Synchronization settings have been saved.' => $this->__('Synchronization settings have been saved.'),
-        'Running All Enabled Tasks' => $this->__('Running All Enabled Tasks'),
-        'Stock Level Synchronization' => $this->__('Stock Level Synchronization'),
-        'Orders Synchronization' => $this->__('Orders Synchronization'),
-        '3rd Party Listings Synchronization' => $this->__('3rd Party Listings Synchronization'),
-        'Feedback Synchronization' => $this->__('Feedback Synchronization'),
-
-        'Another Synchronization Is Already Running.' => $this->__('Another Synchronization Is Already Running.'),
-        'Getting information. Please wait ...' => $this->__('Getting information. Please wait ...'),
-        'Preparing to start. Please wait ...' => $this->__('Preparing to start. Please wait ...'),
-
-        'Synchronization has successfully ended.' => $this->__('Synchronization has successfully ended.'),
-        'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.'),
-        'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' => $this->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
-    )); ?>);
+    M2ePro.translator.add(<?php echo $translations; ?>);
 
     Event.observe(window, 'load', function() {
         setTimeout(function() {
@@ -46,6 +92,15 @@
             SynchronizationHandlerObj.moveChildBlockContent('<?php echo $childBlockId; ?>', '<?php echo $destinationBlockId; ?>');
             <?php } ?>
 
+            <?php if ($this->isShowReviseAll()) { ?>
+                SynchronizationHandlerObj.initReviseAllInfo(
+                    <?php echo json_encode($this->reviseAllInProcessingState) ?>,
+                    '<?php echo $this->reviseAllStartDate ?>',
+                    '<?php echo $this->reviseAllEndDate ?>',
+                    '<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK ?>'
+                );
+            <?php } ?>
+
         }, 350);
     });
 
@@ -60,15 +115,16 @@
     <div class="entry-edit" id="magento_block_ebay_synchronization_templates">
 
         <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Stock Level Synchronization'); ?></h4>
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Inventory Synchronization'); ?></h4>
         </div>
 
         <div class="fieldset">
             <div class="hor-scroll">
 
                 <div id="block_notice_ebay_synchronization_stock_level" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+                    <?php $inspectorMode = ($this->inspectorMode == 1) ? '<span style="color: green"> ('. Mage::helper('M2ePro')->__('enabled') .') </span>' : ''; ?>
                     <?php echo Mage::helper('M2ePro')->__('If catalog updates in your magento performed using import/export tools, custom scripts or direct changes in database,
-                    then, you can use <a target="_blank" href="%s#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> functionality to detect changes in products\' price and quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl()) ?>
+                    then, you can use <a target="_blank" href="%s#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> %s functionality to detect changes in products\' price and quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl(), $inspectorMode) ?>
                 </div>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -84,7 +140,7 @@
                                 <option value="1"<?php if ($templates_mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__("Updates and synchronizes eBay Listings according to<br/>Synchronization Templates' rules."); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__("Updates and synchronizes eBay Listings according to Synchronization Policies' rules."); ?></span>
                             </p>
                         </td>
 
@@ -108,6 +164,46 @@
                     </tr>
 
                 </table>
+
+                <div style="padding: 12px"></div>
+
+                <?php if ($this->isShowReviseAll()) { ?>
+                    <div id="block_notice_ebay_synchronization_revise_all" style="<?php if (!$templates_mode) echo 'display: none'; ?>" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+
+                        <?php echo Mage::helper('M2ePro')->__(
+    'If your eBay listings for some reason were asynchronized with the products in Magento, <a href="javascript:" onclick="%s">turn on</a> the Revise All action to catch data up.
+    <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
+<br><br>
+    ',
+    'SynchronizationHandlerObj.showReviseAllConfirmPopup(\''.Ess_M2ePro_Helper_Component_Ebay::NICK.'\');'
+                        )?>
+
+                        <span id="ebay_revise_all_start" style="display: none">
+
+                            <span style="color: blue">
+                                <?php echo Mage::helper('M2ePro')->__('In Progress, start date - ') ?>
+                            </span>
+
+                            <span id="ebay_revise_all_start_date" style="color: blue">
+                                <?php echo $this->reviseAllStartDate; ?>
+                            </span>
+
+                        </span>
+
+                        <span id="ebay_revise_all_end" style="display: none">
+
+                            <span style="color: green">
+                                <?php echo Mage::helper('M2ePro')->__('Finished, end date - ') ?>
+                            </span>
+
+                            <span id="ebay_revise_all_end_date" style="color: green">
+                                <?php echo $this->reviseAllEndDate; ?>
+                            </span>
+
+                        </span>
+
+                    </div>
+                <?php } ?>
 
             </div>
         </div>
@@ -136,7 +232,7 @@
                                 <option value="1"<?php if ($orders_mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes eBay Orders for accounts,<br/>which have enabled Import eBay Orders in their<br/>Accounts settings.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes eBay Orders for accounts, which have enabled Import eBay Orders in their Accounts settings.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -186,7 +282,7 @@
                                 <option value="1"<?php if ($feedbacks_mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__("Imports buyers' feedback and automatically sends<br/>Auto Responses according to eBay Accounts settings."); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__("Imports buyers' feedback and automatically sends Auto Responses according to eBay Accounts settings."); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -236,7 +332,7 @@
                                 <option value="1"<?php if ($otherListingsMode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for eBay accounts, which have enabled Import 3rd Party Listings in their Accounts settings.<br /><br /><strong>Note: </strong>click "Synchronization Settings" for configure settings.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for eBay accounts, which have enabled Import 3rd Party Listings in their Accounts settings.<br/><strong>Note: </strong>Click "Synchronization Settings" to configure settings.'); ?></span>
                             </p>
                         </td>
                         <td class="value" id="ebay_other_listings_synchronization_settings_button_container" <?php if ($otherListingsMode != 1) echo ' style="display: none;"'; ?>>
@@ -270,3 +366,24 @@
 </div>
 
 </form>
+
+<div id="ebay_revise_all_confirm_popup" style="display: none;">
+    <div style="margin: 17px 0">
+
+        <?php echo Mage::helper('M2ePro')->__(
+            'Click \'Confirm\' and Revise will be performed by the Inventory Synchronization, 100 items per a cycle.'
+        ); ?>
+
+    </div>
+
+    <div class="clear"></div>
+
+    <div class="right">
+        <a href="javascript:void(0);" onclick="Windows.getFocusedWindow().close()"><?php echo Mage::helper('M2ePro')->__('Cancel') ?></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <?php echo $this->getChildHtml('revise_all_confirm_popup_ok_button'); ?>
+    </div>
+
+    <div class="clear"></div>
+
+</div>

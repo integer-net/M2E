@@ -204,6 +204,9 @@ class Ess_M2ePro_Model_Magento_Quote
     private function initializeQuoteItems()
     {
         foreach ($this->proxyOrder->getItems() as $item) {
+
+            $this->clearQuoteItemsCache();
+
             /** @var $quoteItemBuilder Ess_M2ePro_Model_Magento_Quote_Item */
             $quoteItemBuilder = Mage::getModel('M2ePro/Magento_Quote_Item');
             $quoteItemBuilder->init($this->quote, $item);
@@ -211,6 +214,7 @@ class Ess_M2ePro_Model_Magento_Quote
             $product = $quoteItemBuilder->getProduct();
             $request = $quoteItemBuilder->getRequest();
 
+            // see Mage_Sales_Model_Observer::substractQtyFromQuotes
             $this->quote->setItemsCount($this->quote->getItemsCount() + 1);
             $this->quote->setItemsQty((float)$this->quote->getItemsQty() + $request->getQty());
 
@@ -228,6 +232,22 @@ class Ess_M2ePro_Model_Magento_Quote
                 $quoteItem->setGiftMessageId($quoteItemBuilder->getGiftMessageId());
                 $quoteItem->setAdditionalData($quoteItemBuilder->getAdditionalData($quoteItem));
             }
+        }
+    }
+
+    /**
+     * Mage_Sales_Model_Quote_Address caches items after each collectTotals call. Some extensions calls collectTotals
+     * after adding new item to quote in observers. So we need clear this cache before adding new item to quote.
+     */
+    private function clearQuoteItemsCache()
+    {
+        foreach ($this->quote->getAllAddresses() as $address) {
+
+            /** @var $address Mage_Sales_Model_Quote_Address */
+
+            $address->unsetData('cached_items_all');
+            $address->unsetData('cached_items_nominal');
+            $address->unsetData('cached_items_nonominal');
         }
     }
 

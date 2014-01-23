@@ -1,3 +1,155 @@
+* 6.1.0 (r5993) (08/01/2014)
+
+* Added: [eBay] using of custom magento templates in custom description of the item
+* Fix: significant bug during 6.0.8 - 6.0.9 upgrade for PHP version < 5.3.x
+* Fix: [eBay] synchronization schedule didn't work correctly in some cases (error converting time)
+* Fix: [eBay] magento variation option price coefficients, which have minus values, were ignored
+
+* 6.0.9 (r5985) (06/01/2014)
+
+* Added: [eBay] ability to set Out Of Stock Control for GTC listing
+* Added: [eBay] "Global Shipping Program" for eBay Motor site
+* Added: [eBay] ability to include the VAT to the price in selling format policy
+* Added: [eBay] ability to use Strike-Through Pricing on US, UK and DE marketplaces
+* Added: [Amazon] information about gift wrapping in magento order
+* Improvement: recommended value for cron job interval was changed to 5 minutes
+* Improvement: other content will be blocked until the configuration wizard will not be finished
+* Improvement: ability to unmap and remove products in bulk from 3rd party listings
+* Improvement: [eBay] taxation block was moved from shipping to selling format policy
+* Improvement: [eBay] use warehouse address as shipping address in Global Shipping Program orders
+* Improvement: [eBay] auto saving when receiving new token / add button - update account title
+* Improvement: [eBay] validator of conflicts between stop and relist rules (3rd party sync. settings)
+* Improvement: [Amazon] Sale price start & end date validation
+* Improvement: [Amazon] ASIN lookup improvements, ability to select options.
+* Improvement: [Amazon] New ASIN template, do not strip allowed tags ('<p>', '<br>', '<ul>', '<li>')
+* Improvement: [Amazon / Rakuten / Play.com] - titles of products found using Lookup are not clipped now
+* Improvement: [Amazon / Rakuten / Play.com] - ability to move several 3rd party items mapped to the same Magento product to the same listing
+* Fix: mode of some indexes set to "Manual Update" after synchronization. Reindex process improvements.
+* Fix: "Auto Actions" synchronization fails
+* Fix: unable to get magento configurable attributes
+* Fix: advanced filter does not work in some cases
+* Fix: some amount was subtracted from order price, when "Tax Source" is [Channel]&Magento
+* Fix: reservation qty not released in some cases
+* Fix: items in magento order has zero price in some cases
+* Fix: [eBay] not saving category in use in Magento version prior 1.6.0.0
+* Fix: [eBay] bug in shipping policy related with cash on delivery option
+* Fix: [eBay] Call to a member function getResource() on a non-object
+* Fix: [eBay] blank page on settings view in some cases (memory leak)
+* Fix: [eBay] broken link to documentation
+* Fix: [eBay] stuck receiving status for SKU in 3rd party listings
+* Fix: [eBay] wrong adding of 3rd party items which have been already listed/relisted from M2E Pro listings
+* Fix: [eBay] marketplace filter in orders grid not working
+* Fix: [eBay] Error - "Currency 'CAD,USD' not found" on eBay Search Grid
+* Fix: [eBay] Add product Specifics page, locked screen when "Skip optional specifics" is checked.
+* Fix: [eBay] error during estimating eBay fee
+
+* 6.0.8 (r5777) (09/11/2013)
+
+* Added: [eBay] "Global Shipping Program" option into shipping policy
+* Added: [eBay] ability to use "eBay Values" in advanced filter
+* Improvement: [Buy] automatic and manual lookup are searching an 'Out Of Stock' items
+* Fix: Invalid block type: Ess_M2ePro_Block_Adminhtml_Development_Tabs_Build
+* Fix: minimal supported version of Magento Community was increased to 1.4.1.0
+* Fix: web server returns 500 error for ajax requests in some configurations
+* Fix: "Not created orders only" filter in orders grid
+* Fix: [eBay] error "Cannot retrieve entity config: M2ePro/Array"
+* Fix: [eBay] wrong attributes list in 'Best Offer' option
+* Fix: [eBay] Fatal Error: Unsupported operand types
+* Fix: [eBay] not working "Save And Continue Edit" button during editing category in use
+
+* 6.0.7 (r5736) (01/11/2013)
+
+* Added: ability to revise all items if they were resynchronized
+* Added: "Track Direct Database changes" option supports adding products to the listing
+* Added: [eBay] ability to set eBay categories/specifics settings only one time for "The Same" mode.
+* Added: [eBay] ability to use eBay Domestic Shipping Rate Tables in Australia site
+* Added: [eBay] ability to add M2ePro values (price, qty, title, subtitle, etc.) to Custom Description
+* Added: [eBay] ability to add default (placeholder) image in description policy
+* Improvement: Amazon / Rakuten / Play.com integrations are enabled after installation
+* Improvement: validator of conflicts between stop and relist rules (synchronization template/policy)
+* Improvement: [eBay] edit primary & store primary category settings action was added to actions dropdown in settings view grid
+* Improvement: [eBay] ability to refresh eBay Store categories, eBay Catalog categories
+* Improvement: [eBay] vehicle compatibility tool for eBay motors / settings view grid
+* Improvement: [eBay] wrong amount of products beside each category when new products are added to the listing
+* Improvement: [Buy] ability to use UPC Exemption in NewSku template
+* Fix: Products Presented In Other Listings additional filter by account and marketplace
+* Fix: wrong attributes list in advanced filter
+* Fix: Error : "Front controller reached 100 router match iterations" in some cases
+* Fix: [eBay] wrong warning message "Compatibility: attribute(s) were not found ..." if compatibility attribute is not defined
+* Fix: [eBay] conflict of "Full Revise" options and "Track direct database changes" logic
+* Fix: [eBay] empty recent eBay categories list
+* Fix: [eBay] Call to a member function getDataSnapshot() on a non-object
+* Fix: [eBay] wrong attributes in "Change Images for Attribute" option in description policy
+* Fix: [eBay] wrong generated link from search grid to the 3rd party items
+* Fix: [eBay] some protections of duplicates eBay Items (eBay connection / eBay internal error)
+* Fix: [eBay] watermark does not change after save of description policy
+* Fix: [eBay] do not overwrite compatibility vehicles after revise if compatibility attribute is not selected
+* Fix: [eBay] quantity of eBay item was not changed if magento orders creation process is disabled in account settings
+* Fix: [eBay] images are not uploaded again if "Can't upload image ..." error occurred
+* Fix: [eBay] some fixes in the interface excluded shipping locations
+* Fix: [eBay] memory leak when synchronization schedule is configured and enabled
+
+* 6.0.6 (r5602) (14/10/2013)
+
+* Added: [eBay] ability to update item condition in relist action
+* Added: [eBay] ability to set Store Primary Category separately of other categories
+* Added: [eBay] warning messages if magento multi-variation product will be used as a single eBay item
+* Added: [eBay] ignore variations option (ability to list magento variation product to eBay as a simple item)
+* Improvement: [eBay] international excluded location is hidden if international shipping is not supported
+* Improvement: [eBay] major improvements of working with categories (specifics) in Auto Actions
+* Improvement: [eBay] eBay marketplaces (eBay Sites) were sorted by popularity
+* Improvement: [eBay] show only Text Field and Dropdown attributes for eBay Categories
+* Fix: javascript error when moving item(s) from 3rd Party to M2ePro Listing
+* Fix: some attributes not displaying in advanced filter
+* Fix: [eBay] ePIDs were stored to the attribute only for admin store view (eBay Motors)
+* Fix: [eBay] synchronization policy -> full revise options (in some cases)
+* Fix: [eBay] undefined variable websiteId in Ess_M2ePro_Model_Observer_Category::synchProductWithAddedCategoryId()
+* Fix: [eBay] sql error "Unknown column 'main_table.SELECT GROUP_CONCAT(`category_id`) FROM `m2epro_ebay_listing_auto_category`"
+* Fix: [eBay] 404 page when "Resubmit Shipping Info" action is used from eBay orders grid
+
+* 6.0.5 (r5534) (03/10/2013)
+
+* Added: [eBay] excluded shipping locations option into shipping policy
+* Fix: weren't caught some changes for product categories if website state was changed
+* Fix: crash during migration process from 4.x.x - 6.x.x version
+
+* 6.0.4 (r5518) (02/10/2013)
+
+* Added: ability to resend order's shipping information (tracking numbers, carriers etc)
+* Added: [eBay] automatic revise item option into synchronization policy when product gallery was changed
+* Added: [eBay] ability to select used currency (USD or CAD) for Canada and Canada (French) marketplace
+* Added: [eBay] "Stock Availability" and "Qty" filters into magento product advanced filter
+* Added: [eBay] ability to change listing title on the listings grid page
+* Added: [eBay] "Stock Availability" column and filter with it into search grid
+* Added: [eBay] notification if categories of active marketplace(s) were changed
+* Added: [eBay] additional filter "eBay Primary Category Assigned" was added to Products Grid Settings View
+* Improvement: ability to show long descriptions in logs
+* Improvement: ability to filter using all attributes in advanced filter
+* Improvement: [eBay] "Available QTY" column is now sortable / filterable on listing view of grid(s)
+* Improvement: [eBay] don't send images on eBay during revise action if they weren't changed
+* Improvement: [eBay] tax category option was moved to the Shipping Policy
+* Improvement: [eBay] ability to set Combined Shipping Profile separately for all accounts
+* Improvement: [eBay] motor specific attribute is global for all listings
+* Improvement: [eBay] major improvements of working with eBay categories and item specifics
+* Fix: magento product performance improvements of getting stock availability and status
+* Fix: unable to edit order shipping address if state/region is invalid
+* Fix: wrong message for license validation (base directory / IP)
+* Fix: weren't caught some changes for global attributes
+* Fix: Column 'items_active_count' cannot be null on Listings grid pages on certain MySQL versions
+* Fix: [eBay] 'is_metric_measurement_system' column is not exist in 'm2epro_ebay_marketplace' table
+* Fix: [eBay] generate random sku if it length is more than 80 characters
+* Fix: [eBay] wrong USD currency of India marketplace was changed to INR
+* Fix: [eBay] table '*.catalog_category_entity_varchar' doesn't exist'
+* Fix: [eBay] weren't shown some configurable attributes for variation images option
+* Fix: [eBay] wrong watermarks are applied after migration to version 6.x.x
+* Fix: [eBay] motors compatibility tool for certain magento versions
+* Fix: [eBay] auto actions bug when category used from magento attribute
+* Fix: [eBay] search by category path and category id on the settings view mode of grid
+* Fix: [eBay] an empty shipping service in international shipping
+* Fix: [eBay] unable to save specifics for some eBay categories
+* Fix: [eBay] international shipping locations in shipping policy
+* Fix: [Buy] unable to save specifics in newSku template (stringTypeValidator is not exist)
+
 * 6.0.3 (r5285) (04/09/2013)
 
 * Added: separated documentation and video tutorials links for eBay and Other integrations

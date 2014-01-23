@@ -79,7 +79,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Stop When Item QTY Is'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Stop When QTY Is'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="stop_qty" name="stop_qty" class="required-entry">
@@ -97,8 +97,8 @@
                 <tr id="stop_qty_value_container" <?php if ($formData['stop_qty'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_NONE) echo ' style="display: none;"'; ?>>
                     <td class="label">
                         <label for="stop_qty_value">
-                            <span id="stop_qty_item" <?php if ($formData['stop_qty'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Item Quantity'); ?>: <span class="required">*</span></span>
-                            <span id="stop_qty_item_min" <?php if ($formData['stop_qty'] != Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Item Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="stop_qty_item" <?php if ($formData['stop_qty'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="stop_qty_item_min" <?php if ($formData['stop_qty'] != Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Quantity'); ?>: <span class="required">*</span></span>
                         </label>
                     </td>
                     <td class="value" style="width: auto;">
@@ -108,10 +108,10 @@
 
                 <tr id="stop_qty_value_max_container" <?php if ($formData['stop_qty'] != Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="stop_qty_value_max"><?php echo Mage::helper('M2ePro')->__('Max Item Quantity'); ?>: <span class="required">*</span></label>
+                        <label for="stop_qty_value_max"><?php echo Mage::helper('M2ePro')->__('Max Quantity'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <input id="stop_qty_value_max" name="stop_qty_value_max" value="<?php echo $this->escapeHtml($formData['stop_qty_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits" />
+                        <input id="stop_qty_value_max" name="stop_qty_value_max" value="<?php echo $this->escapeHtml($formData['stop_qty_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits M2ePro-validate-conditions-between" />
                     </td>
                 </tr>
 

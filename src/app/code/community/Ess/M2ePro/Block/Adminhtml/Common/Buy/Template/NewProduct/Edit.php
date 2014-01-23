@@ -20,12 +20,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit extends Mag
 
         // Set header text
         //------------------------------
+        $templateId = $this->getRequest()->getParam('id');
 
-        if ($this->getRequest()->getParam('id')) {
-            $this->_headerText = Mage::helper('M2ePro')->__('Edit New SKU Template For Rakuten.com (Beta)');
-        } else {
-            $this->_headerText = Mage::helper('M2ePro')->__('Add New SKU Template For Rakuten.com (Beta)');
-        }
+        $this->_headerText = $templateId
+            ? Mage::helper('M2ePro')->__('Edit New SKU Template For Rakuten.com (Beta)')
+            : Mage::helper('M2ePro')->__('Add New SKU Template For Rakuten.com (Beta)');
         //------------------------------
 
         // Set buttons actions
@@ -62,9 +61,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit extends Mag
 
         //------------------------------
         $params = array();
-        if ($listingProductId) {
-            $params['listing_product_id'] = $listingProductId;
-        }
+        $listingProductId && $params['listing_product_id'] = $listingProductId;
+        $templateId && $params['id'] = $listingProductId;
+
         $url = $this->getUrl('*/adminhtml_common_buy_template_newProduct/add', $params);
         $this->_addButton('save', array(
             'label'     => Mage::helper('M2ePro')->__('Save'),

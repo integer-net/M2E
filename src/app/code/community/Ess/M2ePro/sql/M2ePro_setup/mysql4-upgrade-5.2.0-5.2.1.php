@@ -76,7 +76,7 @@ $tempQuery = <<<SQL
     WHERE `group` = '/play/synchronization/settings/orders/receive/'
     AND   `key` = 'mode'
 SQL;
-$tempRow = $installer->getConnection()->query($tempQuery)->fetch();
+$tempRow = $connection->query($tempQuery)->fetch();
 
 if ($tempRow === false) {
 
@@ -319,7 +319,6 @@ if (!empty($insertSql)) {
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

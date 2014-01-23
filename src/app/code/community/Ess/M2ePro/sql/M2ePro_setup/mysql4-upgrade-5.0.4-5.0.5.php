@@ -240,7 +240,7 @@ if (!isset($tempTableIndexList[strtoupper('state')])) {
 //#############################################
 
 $tempTable = $installer->getTable('m2epro_config');
-$tempRow = $installer->getConnection()->query("
+$tempRow = $connection->query("
     SELECT * FROM `{$tempTable}`
     WHERE `group` = '/ebay/synchronization/settings/orders/reserve_cancellation/'
     AND   `key` = 'interval'
@@ -282,7 +282,6 @@ SQL
 
 //#############################################
 
-$installer->removeConfigDuplicates();
 $installer->endSetup();
 
 //#############################################

@@ -225,8 +225,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Cancellation
         }
 
         $request = array('orders_ids' => $ordersIds);
-        $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-            ->processVirtualAbstract('sales', 'get', 'orders', $request, NULL, NULL, $account, NULL);
+        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+            ->processVirtual('sales', 'get', 'orders', $request, NULL, NULL, $account, NULL);
 
         return isset($response['orders']) ? $response['orders'] : array();
     }
@@ -402,14 +402,14 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Cancellation
             return;
         }
 
-        $action = Ess_M2ePro_Model_Connector_Server_Ebay_OrderItem_Dispatcher::ACTION_ADD_DISPUTE;
+        $action = Ess_M2ePro_Model_Connector_Ebay_OrderItem_Dispatcher::ACTION_ADD_DISPUTE;
         $params = array(
             'explanation' => Ess_M2ePro_Model_Ebay_Order_Item::DISPUTE_EXPLANATION_BUYER_HAS_NOT_PAID,
             'reason'      => Ess_M2ePro_Model_Ebay_Order_Item::DISPUTE_REASON_BUYER_HAS_NOT_PAID
         );
 
-        /** @var $dispatcher Ess_M2ePro_Model_Connector_Server_Ebay_OrderItem_Dispatcher */
-        $dispatcher = Mage::getModel('M2ePro/Connector_Server_Ebay_OrderItem_Dispatcher');
+        /** @var $dispatcher Ess_M2ePro_Model_Connector_Ebay_OrderItem_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Connector_Ebay_OrderItem_Dispatcher');
         $dispatcher->process($action, $items, $params);
 
         $this->totalOpenedUnpaidItemProcesses += count($items);

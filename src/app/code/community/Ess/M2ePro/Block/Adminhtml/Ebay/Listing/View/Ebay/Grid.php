@@ -64,6 +64,19 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
 
     // ####################################
 
+    protected function _setCollectionOrder($column)
+    {
+        $collection = $this->getCollection();
+        if ($collection) {
+            $columnIndex = $column->getFilterIndex() ?
+                $column->getFilterIndex() : $column->getIndex();
+            $collection->getSelect()->order($columnIndex.' '.strtoupper($column->getDir()));
+        }
+        return $this;
+    }
+
+    // ####################################
+
     protected function _prepareCollection()
     {
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getData();
@@ -95,9 +108,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             array(
                 'listing_product_id'    => 'listing_product_id',
                 'end_date'              => 'end_date',
+                'start_date'            => 'start_date',
                 'online_title'          => 'online_title',
                 'online_sku'            => 'online_sku',
-                'online_qty'            => 'online_qty',
+                'available_qty'         => new Zend_Db_Expr('(online_qty - online_qty_sold)'),
                 'ebay_item_id'          => 'ebay_item_id',
                 'online_category'       => 'online_category',
                 'online_qty_sold'       => 'online_qty_sold',
@@ -110,15 +124,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             'id=ebay_item_id',
             array(
                 'item_id' => 'item_id',
-            ),
-            NULL,
-            'left'
-        );
-        $collection->joinTable(
-            array('etc' => 'M2ePro/Ebay_Template_Category'),
-            'id=template_category_id',
-            array(
-                'motors_specifics_attribute' => 'motors_specifics_attribute',
             ),
             NULL,
             'left'
@@ -148,7 +153,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
-            'index'     => 'name',
+            'index'     => 'online_title',
             'frame_callback' => array($this, 'callbackColumnTitle'),
             'filter_condition_callback' => array($this, 'callbackFilterTitle')
         ));
@@ -162,14 +167,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             'frame_callback' => array($this, 'callbackColumnEbayItemId')
         ));
 
-        $this->addColumn('online_qty', array(
+        $this->addColumn('available_qty', array(
             'header'    => Mage::helper('M2ePro')->__('Available QTY'),
             'align'     => 'right',
             'width'     => '50px',
             'type'      => 'number',
-            'index'     => 'online_qty',
+            'index'     => 'available_qty',
             'filter'    => false,
-            'sortable'  => false,
             'frame_callback' => array($this, 'callbackColumnOnlineAvailableQty')
         ));
 
@@ -211,10 +215,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
                 'sortable'  => false,
                 'options' => array(
                     Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED => Mage::helper('M2ePro')->__('Not Listed'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_LISTED => Mage::helper('M2ePro')->__('Listed'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_SOLD => Mage::helper('M2ePro')->__('Sold'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED => Mage::helper('M2ePro')->__('Stopped'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED => Mage::helper('M2ePro')->__('Finished')
+                    Ess_M2ePro_Model_Listing_Product::STATUS_LISTED     => Mage::helper('M2ePro')->__('Listed'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN    => Mage::helper('M2ePro')->__('Listed (Hidden)'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_SOLD       => Mage::helper('M2ePro')->__('Sold'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED    => Mage::helper('M2ePro')->__('Stopped'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED   => Mage::helper('M2ePro')->__('Finished'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED    => Mage::helper('M2ePro')->__('Pending')
                 ),
                 'frame_callback' => array($this, 'callbackColumnStatus')
             ));
@@ -241,6 +247,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
                 'index'     => 'value',
                 'filter'    => false,
                 'sortable'  => false,
+                'js_handler' => 'EbayListingEbayGridHandlerObj'
             ));
         }
 
@@ -313,6 +320,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
+        $value = $row->getName();
+
         $onlineTitle = $row->getData('online_title');
         !empty($onlineTitle) && $value = $onlineTitle;
 
@@ -352,7 +361,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
         /* @var $listing Ess_M2ePro_Model_Listing */
         $listing = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
-        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED ||
+            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
             $additionalData = (array)json_decode($row->getData('additional_data'), true);
 
             if (empty($additionalData['ebay_item_fees']['listing_fee']['fee'])) {
@@ -373,7 +383,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
         $label = Mage::helper('M2ePro')->__('estimate');
 
         return <<<HTML
-[<a href="javascript:void(0);" onclick="ListingGridHandlerObj.getEstimatedFees({$listingProductId});">{$label}</a>]
+[<a href="javascript:void(0);"
+    onclick="EbayListingEbayGridHandlerObj.getEstimatedFees({$listingProductId});">{$label}</a>]
 HTML;
 
     }
@@ -384,10 +395,18 @@ HTML;
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        $url   = $this->getUrl('*/adminhtml_ebay_listing/goToEbay/', array('item_id' => $value));
-        $value = '<a href="' . $url . '" target="_blank">'.$value.'</a>';
+        $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getData();
 
-        return $value;
+        $url = $this->getUrl(
+            '*/adminhtml_ebay_listing/gotoEbay/',
+            array(
+                'item_id' => $value,
+                'account_id' => $listingData['account_id'],
+                'marketplace_id' => $listingData['marketplace_id']
+            )
+        );
+
+        return '<a href="' . $url . '" target="_blank">'.$value.'</a>';
     }
 
     public function callbackColumnOnlineAvailableQty($value, $row, $column, $isExport)
@@ -395,8 +414,6 @@ HTML;
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
-
-        $value = $row->getData('online_qty') - $row->getData('online_qty_sold');
 
         if ($value <= 0) {
             return '<span style="color: red;">0</span>';
@@ -484,6 +501,10 @@ HTML;
                 $value = '<span style="color: green;">'.$value.'</span>';
                 break;
 
+            case Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN:
+                $value = '<span style="color: red;">'.$value.'</span>';
+                break;
+
             case Ess_M2ePro_Model_Listing_Product::STATUS_SOLD:
                 $value = '<span style="color: brown;">'.$value.'</span>';
                 break;
@@ -494,6 +515,10 @@ HTML;
 
             case Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED:
                 $value = '<span style="color: blue;">'.$value.'</span>';
+                break;
+
+            case Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED:
+                $value = '<span style="color: orange;">'.$value.'</span>';
                 break;
 
             default:
@@ -615,8 +640,8 @@ HTML;
             'rows' => $actionsRows,
             'tips' => $tips,
             'icons' => $icons,
-            'view_help_handler' => 'ListingGridHandlerObj.viewItemHelp',
-            'hide_help_handler' => 'ListingGridHandlerObj.hideItemHelp',
+            'view_help_handler' => 'EbayListingEbayGridHandlerObj.viewItemHelp',
+            'hide_help_handler' => 'EbayListingEbayGridHandlerObj.hideItemHelp',
         ));
 
         return $summary->toHtml();
@@ -712,8 +737,8 @@ HTML;
             $javascriptsMain = <<<HTML
 
 <script type="text/javascript">
-    ListingGridHandlerObj.afterInitPage();
-    ListingGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
+    EbayListingEbayGridHandlerObj.afterInitPage();
+    EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
 </script>
 
 HTML;
@@ -854,6 +879,14 @@ HTML;
         $isSimpleViewMode = json_encode(Mage::helper('M2ePro/View_Ebay')->isSimpleMode());
         $showAutoAction   = json_encode((bool)$this->getRequest()->getParam('auto_actions'));
 
+        $showMotorNotification= json_encode((bool)$this->isShowMotorNotification());
+        $motorNotification = $helper->escapeJs($helper->__(
+            'Please check eBay Motors compatibility attribute.
+            You can find it in %s > Configuration > <a target="_blank" href="%s">General</a>.',
+            Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+            $this->getUrl('*/adminhtml_ebay_configuration')
+        ));
+
         $javascriptsMain = <<<HTML
 
 <script type="text/javascript">
@@ -921,27 +954,31 @@ HTML;
 
     Event.observe(window, 'load', function() {
 
-        ListingGridHandlerObj = new EbayListingGridHandler(
+        EbayListingEbayGridHandlerObj = new EbayListingEbayGridHandler(
             '{$this->getId()}',
             {$listingData['id']}
         );
-        ListingGridHandlerObj.afterInitPage();
-        ListingGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
+        EbayListingEbayGridHandlerObj.afterInitPage();
+        EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
 
         // todo next (temp solution)
-        ListingGridHandlerObj.actionHandler.setOptions(M2ePro);
-        ListingGridHandlerObj.movingHandler.setOptions(M2ePro);
+        EbayListingEbayGridHandlerObj.actionHandler.setOptions(M2ePro);
+        EbayListingEbayGridHandlerObj.movingHandler.setOptions(M2ePro);
 
         ListingProgressBarObj = new ProgressBar('listing_view_progress_bar');
         GridWrapperObj = new AreaWrapper('listing_view_content_container');
 
         if (M2ePro.productsIdsForList) {
-            ListingGridHandlerObj.getGridMassActionObj().checkedString = M2ePro.productsIdsForList;
-            ListingGridHandlerObj.actionHandler.listAction();
+            EbayListingEbayGridHandlerObj.getGridMassActionObj().checkedString = M2ePro.productsIdsForList;
+            EbayListingEbayGridHandlerObj.actionHandler.listAction();
         }
 
         if (!{$isSimpleViewMode} && {$showAutoAction}) {
             EbayListingAutoActionHandlerObj.loadAutoActionHtml();
+        }
+
+        if ({$showMotorNotification}) {
+            EbayListingEbayGridHandlerObj.showMotorsNotificationPopUp('{$motorNotification}');
         }
 
     });
@@ -969,6 +1006,31 @@ HTML;
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         return implode(',',$connRead->fetchCol($select));
+    }
+
+    // ####################################
+
+    protected function isShowMotorNotification()
+    {
+        $listing = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
+
+        if ($listing->getMarketplaceId() != Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_MOTORS) {
+            return false;
+        }
+
+        $configValue = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/view/ebay/motors_specifics_attribute/', 'listing_notification_shown'
+        );
+
+        if ($configValue) {
+            return false;
+        }
+
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/view/ebay/motors_specifics_attribute/', 'listing_notification_shown', 1
+        );
+
+        return true;
     }
 
     // ####################################

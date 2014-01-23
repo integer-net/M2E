@@ -17,7 +17,7 @@ class Ess_M2ePro_Adminhtml_Common_GeneralController
         $maxResults  = (int) $this->getRequest()->getParam('maxResults');
 
         if (!$model || !$component || !$queryString || !$maxResults) {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
         $where = array();
@@ -31,7 +31,7 @@ class Ess_M2ePro_Adminhtml_Common_GeneralController
         }
 
         if (empty($where)) {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
         $quotedQueryString = addslashes(trim($queryString));
@@ -67,7 +67,7 @@ class Ess_M2ePro_Adminhtml_Common_GeneralController
             'data'        => $ids,
             'quantity'    => $quantity
         );
-        exit(json_encode($array));
+        return $this->getResponse()->setBody(json_encode($array));
     }
 
     public function searchAutocompleteByAttributeSetIdAction()
@@ -80,7 +80,7 @@ class Ess_M2ePro_Adminhtml_Common_GeneralController
         $attributeSets = $this->getRequest()->getParam('attribute_sets');
 
         if (!$model || !$component || !$queryString || !$maxResults || !$attributeSets) {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
         $where = array();
@@ -94,7 +94,7 @@ class Ess_M2ePro_Adminhtml_Common_GeneralController
         }
 
         if (empty($where)) {
-            exit(json_encode(array()));
+            return $this->getResponse()->setBody(json_encode(array()));
         }
 
         $quotedQueryString = addslashes(trim($queryString));
@@ -149,7 +149,7 @@ class Ess_M2ePro_Adminhtml_Common_GeneralController
             'data'        => $ids,
             'quantity'    => $quantity
         );
-        exit(json_encode($array));
+        return $this->getResponse()->setBody(json_encode($array));
     }
 
     //#############################################

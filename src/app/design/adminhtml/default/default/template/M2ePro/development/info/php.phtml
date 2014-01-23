@@ -32,7 +32,7 @@
             <label><?php echo Mage::helper('M2ePro')->__('Max Execution Time'); ?>: </label>
         </td>
         <td class="value">
-            <?php echo $this->phpSettings['max_execution_time'] == 0 ? Mage::helper('M2ePro')->__('Unlimited') : $this->phpSettings['max_execution_time']; ?>
+            <?php echo $this->phpSettings['max_execution_time'] == 0 ? Mage::helper('M2ePro')->__('Unlimited') : $this->phpSettings['max_execution_time'] . ' sec'; ?>
         </td>
     </tr>
 

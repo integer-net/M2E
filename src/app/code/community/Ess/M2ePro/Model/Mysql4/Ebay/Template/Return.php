@@ -19,8 +19,8 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Template_Return
     public function isDifferent($newData, $oldData)
     {
         $ignoreFields = array(
-            'id', 'title',
-            'is_custom_template',
+            $this->getIdFieldName(),
+            'title', 'is_custom_template',
             'create_date', 'update_date',
         );
 

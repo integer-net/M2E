@@ -116,17 +116,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
             $percentsForAccount = $percentsForAccount/$accountsTotalCount;
         }
 
-        $marketplaceObj = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_VIRTUAL_ID
-        );
-
         $accountIteration = 1;
         foreach ($accountsCollection->getItems() as $accountObj) {
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
 
-            if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplaceObj->getId())) {
-                $this->processAccountMarketplaceInventoryData($accountObj,$marketplaceObj);
+            if (!$this->isLockedAccount($accountObj->getId())) {
+                $this->processAccountInventoryData($accountObj);
             }
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
@@ -154,15 +150,11 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
             $percentsForAccount = $percentsForAccount/$accountsTotalCount;
         }
 
-        $marketplaceObj = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_VIRTUAL_ID
-        );
-
         $accountIteration = 1;
         foreach ($accountsCollection->getItems() as $accountObj) {
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
-            $this->processAccountMarketplaceInventoryTitle($accountObj,$marketplaceObj);
+            $this->processAccountInventoryTitle($accountObj);
 
             $this->_lockItem->setPercents(self::PERCENTS_START + self::PERCENTS_INTERVAL/2
                                           + $percentsForAccount*$accountIteration);
@@ -175,25 +167,23 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
 
     //####################################
 
-    private function processAccountMarketplaceInventoryData(Ess_M2ePro_Model_Account $accountObj,
-                                                            Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function processAccountInventoryData(Ess_M2ePro_Model_Account $accountObj)
     {
         $this->_profiler->addTitle(
-            'Starting account "'.$accountObj->getTitle().'" and marketplace "'.$marketplaceObj->getTitle().'"'
+            'Starting account "'.$accountObj->getTitle().'"'
         );
         $this->_profiler->addTimePoint(__METHOD__.'send'.$accountObj->getId(),'Get inventory from Buy');
 
         $tempString = Mage::helper('M2ePro')->__('Task "3rd Party Listings Synchronization" for Rakuten.com account: ');
-        $tempString .= Mage::helper('M2ePro')->__('"%s" and marketplace "%s" is started. Please wait...',
-                                                  $accountObj->getTitle(),
-                                                  Mage::helper('M2ePro')->__($marketplaceObj->getTitle()));
+        $tempString .= Mage::helper('M2ePro')->__('"%s" is started. Please wait...',
+                                                  $accountObj->getTitle());
         $this->_lockItem->setStatus($tempString);
 
         // Get all changes on Buy for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
         $dispatcherObject->processConnector('tasks', 'otherListings' ,'requester',
-                                            array(), $marketplaceObj, $accountObj,
+                                            array(), $accountObj,
                                             'Ess_M2ePro_Model_Buy_Synchronization');
         //---------------------------
 
@@ -201,8 +191,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
         $this->_profiler->addEol();
     }
 
-    private function processAccountMarketplaceInventoryTitle(Ess_M2ePro_Model_Account $accountObj,
-                                                             Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function processAccountInventoryTitle(Ess_M2ePro_Model_Account $accountObj)
     {
         $firstSynchronizationTime = $accountObj->getChildObject()->getOtherListingsFirstSynchronization();
         if (is_null($firstSynchronizationTime) ||
@@ -211,16 +200,12 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
         }
 
         $this->_profiler->addTitle(
-            'Starting account "'.$accountObj->getTitle().'" and marketplace "'.$marketplaceObj->getTitle().'"'
+            'Starting account "'.$accountObj->getTitle().'"'
         );
         $this->_profiler->addTimePoint(__METHOD__.'send'.$accountObj->getId(),'Get inventory from Buy');
 
         $tempString = Mage::helper('M2ePro')->__('Task "3rd Party Listings Synchronization" for Rakuten.com account: ');
-        $tempString .= Mage::helper('M2ePro')->__(
-            '"%s" and marketplace "%s" is started. Please wait...',
-            $accountObj->getTitle(),
-            Mage::helper('M2ePro')->__($marketplaceObj->getTitle())
-        );
+        $tempString .= Mage::helper('M2ePro')->__('"%s" is started. Please wait...', $accountObj->getTitle());
         $this->_lockItem->setStatus($tempString);
 
         $updateByPagesSettings = $accountObj->getChildObject()->getDecodedOtherListingsUpdateTitlesSettings();
@@ -230,9 +215,9 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
                 (int)$updateByPagesSettings['next_page'] < 10000
             )) {
 
-            $this->updateInventoryTitlesByPages($accountObj,$marketplaceObj);
+            $this->updateInventoryTitlesByPages($accountObj);
         } else {
-            $this->updateInventoryTitlesBySkus($accountObj,$marketplaceObj);
+            $this->updateInventoryTitlesBySkus($accountObj);
         }
 
         $this->_profiler->saveTimePoint(__METHOD__.'send'.$accountObj->getId());
@@ -241,8 +226,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
 
     //####################################
 
-    private function updateInventoryTitlesByPages(Ess_M2ePro_Model_Account $accountObj,
-                                                  Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function updateInventoryTitlesByPages(Ess_M2ePro_Model_Account $accountObj)
     {
         // get server data
 
@@ -258,17 +242,17 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
             $inputData['necessary_page'] = (int)$updateByPagesSettings['next_page'];
         }
 
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher')
-                            ->processVirtualAbstract('inventory','get','pagesTitles',
+        $responseData = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
+                            ->processVirtual('inventory','get','pagesTitles',
                                                      $inputData,NULL,
-                                                     NULL,$accountObj->getId(),NULL);
+                                                     $accountObj->getId());
 
         if (!isset($responseData['items']) || !is_array($responseData['items'])) {
             return;
         }
 
         // process and update received data
-        $this->updateReceivedTitles($responseData['items'],$accountObj,$marketplaceObj);
+        $this->updateReceivedTitles($responseData['items'],$accountObj);
 
         // calculate and save next data
 
@@ -296,8 +280,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
             ->save();
     }
 
-    private function updateInventoryTitlesBySkus(Ess_M2ePro_Model_Account $accountObj,
-                                                 Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function updateInventoryTitlesBySkus(Ess_M2ePro_Model_Account $accountObj)
     {
         // get server data
 
@@ -316,24 +299,23 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
             $neededItems[] = $tempItem->getData('general_id');
         }
 
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher')
-                            ->processVirtualAbstract('inventory','get','skusTitles',
+        $responseData = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
+                            ->processVirtual('inventory','get','skusTitles',
                                                      array('items'=>$neededItems),NULL,
-                                                     NULL,$accountObj->getId(),NULL);
+                                                     $accountObj->getId());
 
         if (!isset($responseData['items']) || !is_array($responseData['items'])) {
             return;
         }
 
         // process and update received data
-        $this->updateReceivedTitles($responseData['items'],$accountObj,$marketplaceObj);
+        $this->updateReceivedTitles($responseData['items'],$accountObj);
     }
 
     //------------------------------------
 
     private function updateReceivedTitles(array $items,
-                                          Ess_M2ePro_Model_Account $accountObj,
-                                          Ess_M2ePro_Model_Marketplace $marketplaceObj)
+                                          Ess_M2ePro_Model_Account $accountObj)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
@@ -386,7 +368,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
                     $listingOtherModel->setData('title',(string)$title);
                     $listingOtherModel->getChildObject()->setData('title',(string)$title);
 
-                    $mappingModel->initialize($marketplaceObj,$accountObj);
+                    $mappingModel->initialize($accountObj);
                     $mappingResult = $mappingModel->autoMapOtherListingProduct($listingOtherModel);
 
                     if ($mappingResult) {
@@ -395,7 +377,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
                             continue;
                         }
 
-                        $movingModel->initialize($marketplaceObj,$accountObj);
+                        $movingModel->initialize($accountObj);
                         $movingModel->autoMoveOtherListingProduct($listingOtherModel);
                     }
                 }
@@ -456,11 +438,11 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_OtherListings extends Ess_M2ePr
 
     //------------------------------------
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $tempGroup = '/buy/other_listings/';
         $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()

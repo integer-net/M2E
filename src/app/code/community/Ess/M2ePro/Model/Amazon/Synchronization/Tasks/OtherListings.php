@@ -110,10 +110,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
 
-            $marketplace = $accountObj->getChildObject()->getMarketplace();
-
-            if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplace->getId())) {
-                $this->updateAccountMarketplace($accountObj,$marketplace);
+            if (!$this->isLockedAccount($accountObj->getId())) {
+                $this->updateAccount($accountObj);
             }
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
@@ -125,24 +123,23 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
         $this->_profiler->saveTimePoint(__METHOD__);
     }
 
-    private function updateAccountMarketplace(Ess_M2ePro_Model_Account $accountObj,
-                                              Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function updateAccount(Ess_M2ePro_Model_Account $accountObj)
     {
         $this->_profiler->addTitle(
-            'Starting account "'.$accountObj->getTitle().'" and marketplace "'.$marketplaceObj->getTitle().'"'
+            'Starting account "'.$accountObj->getTitle().'"'
         );
         $this->_profiler->addTimePoint(__METHOD__.'send'.$accountObj->getId(),'Get inventory from Amazon');
 
         $tempString = 'Task "3rd Party Listings Synchronization" for Amazon account: ';
-        $tempString .= '"%s" and marketplace "%s" is started. Please wait...';
+        $tempString .= '"%s" is started. Please wait...';
         $this->_lockItem->setStatus(Mage::helper('M2ePro')->__(
-            $tempString, $accountObj->getTitle(), $marketplaceObj->getTitle()
+            $tempString, $accountObj->getTitle()
         ));
         // Get all changes on Amazon for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
         $dispatcherObject->processConnector('tasks', 'otherListings' ,'requester',
-                                            array(), $marketplaceObj, $accountObj,
+                                            array(), $accountObj,
                                             'Ess_M2ePro_Model_Amazon_Synchronization');
         //---------------------------
 
@@ -203,11 +200,11 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_OtherListings extends Ess_M2
 
     //------------------------------------
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $tempGroup = '/amazon/other_listings/';
         $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()

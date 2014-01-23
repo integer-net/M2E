@@ -19,6 +19,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults extends Ess_M2ePro_Mo
         $config = Mage::helper('M2ePro/Module')->getSynchronizationConfig();
         $configGroup = '/ebay/defaults/';
 
+        $rdpMode = (bool)$config->getGroupValue($configGroup . 'remove_duplicates/','mode');
         $ulpMode = (bool)$config->getGroupValue($configGroup . 'update_listings_products/','mode');
         $rutMode = (bool)$config->getGroupValue($configGroup . 'remove_unused_templates/','mode');
 
@@ -34,6 +35,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults extends Ess_M2ePro_Mo
 
         // RUN CHILD SYNCH
         //---------------------------
+        if ($rdpMode) {
+            $tempSynch = new Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_RemoveDuplicates();
+            $tempSynch->process();
+        }
         if ($ulpMode) {
             $tempSynch = new Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProducts();
             $tempSynch->process();

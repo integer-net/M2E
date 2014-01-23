@@ -7,35 +7,13 @@
 class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
     extends Ess_M2ePro_Model_Listing_Product_Variation_Updater
 {
-    private $logsActionId = NULL;
-    private $logsInitiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN;
-    private $logsAction = Ess_M2ePro_Model_Listing_Log::ACTION_ADD_PRODUCT_TO_LISTING;
-
-    // ########################################
-
-    public function setLoggingData($logsActionId = NULL,
-                                   $logsInitiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
-                                   $logsAction = Ess_M2ePro_Model_Listing_Log::ACTION_ADD_PRODUCT_TO_LISTING)
-    {
-        $this->logsActionId = $logsActionId;
-        $this->logsInitiator = $logsInitiator;
-        $this->logsAction = $logsAction;
-    }
+    const VALIDATE_MESSAGE_DATA_KEY = '_validate_limits_conditions_message_';
 
     // ########################################
 
     public function updateVariations(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        if (is_null($listingProduct->getChildObject()->getTemplateCategoryId())) {
-            return;
-        }
-
-        if (!$listingProduct->getChildObject()->isListingTypeFixed() ||
-            !$listingProduct->getChildObject()->getCategoryTemplate()->isVariationMode()) {
-            return;
-        }
-
-        if ($listingProduct->getMagentoProduct()->isProductWithoutVariations()) {
+        if (!$listingProduct->getChildObject()->isVariationMode()) {
             return;
         }
 
@@ -56,16 +34,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
     public function isAddedNewVariationsAttributes(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        if (is_null($listingProduct->getChildObject()->getTemplateCategoryId())) {
-            return false;
-        }
-
-        if (!$listingProduct->getChildObject()->isListingTypeFixed() ||
-            !$listingProduct->getChildObject()->getCategoryTemplate()->isVariationMode()) {
-            return false;
-        }
-
-        if ($listingProduct->getMagentoProduct()->isProductWithoutVariations()) {
+        if (!$listingProduct->getChildObject()->isVariationMode()) {
             return false;
         }
 
@@ -95,9 +64,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
     protected function validateLimitsConditions($sourceVariations,
                                                 Ess_M2ePro_Model_Listing_Product $listingProduct = NULL)
     {
-        $tempLog = Mage::getModel('M2ePro/Listing_Log');
-        $tempLog->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
-
         $failResult = array(
             'set' => array(),
             'variations' => array()
@@ -113,18 +79,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
                 // Maximum 30 options by one attribute:
                 // Color: Red, Blue, Green, ...
 
-                !is_null($listingProduct) && $tempLog->addProductMessage(
-                    $listingProduct->getListingId(),
-                    $listingProduct->getProductId(),
-                    $listingProduct->getId(),
-                    $this->logsInitiator,
-                    $this->logsActionId,
-                    $this->logsAction,
-            'The product will be listed as a simple product as it has limitation for multi-variation items. Reason: '.
-            'number of values for each option more than 30.',
-                    Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
-                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
-                );
+                if (!is_null($listingProduct)) {
+                    $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
+                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
+                    'Reason: number of values for each option more than 30.'
+                    );
+                }
 
                 return $failResult;
             }
@@ -137,18 +97,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
                 // Max 5 pair attribute-option:
                 // Color: Blue, Size: XL, ...
 
-                !is_null($listingProduct) && $tempLog->addProductMessage(
-                    $listingProduct->getListingId(),
-                    $listingProduct->getProductId(),
-                    $listingProduct->getId(),
-                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
-                    NULL,
-                    Ess_M2ePro_Model_Listing_Log::ACTION_ADD_PRODUCT_TO_LISTING,
-            'The product will be listed as a simple product as it has limitation for multi-variation items. Reason: '.
-            'number of options more than 5.',
-                    Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
-                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
-                );
+                if (!is_null($listingProduct)) {
+                    $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
+                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
+                    'Reason: number of options more than 5.'
+                    );
+                }
 
                 return $failResult;
             }
@@ -158,18 +112,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
             // Not more that 250 possible variations
 
-            !is_null($listingProduct) && $tempLog->addProductMessage(
-                $listingProduct->getListingId(),
-                $listingProduct->getProductId(),
-                $listingProduct->getId(),
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
-                NULL,
-                Ess_M2ePro_Model_Listing_Log::ACTION_ADD_PRODUCT_TO_LISTING,
-            'The product will be listed as a simple product as it has limitation for multi-variation items. Reason: '.
-            'sum of quantities of all possible products options more than 250.',
-                Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
-                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
-            );
+            if (!is_null($listingProduct)) {
+                $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
+                'The product was listed as a simple product as it has limitation for multi-variation items. '.
+                'Reason: sum of quantities of all possible products options more than 250.'
+                );
+            }
 
             return $failResult;
         }

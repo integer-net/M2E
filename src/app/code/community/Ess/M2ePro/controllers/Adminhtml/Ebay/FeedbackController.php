@@ -21,8 +21,9 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_ebay/accounts');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_ebay/configuration');
     }
+
     //#############################################
 
     public function indexAction()
@@ -64,7 +65,7 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
         $account = Mage::getModel('M2ePro/Ebay_Feedback')->loadInstance($feedbackId)->getAccount();
         $feedbacksTemplates = $account->getChildObject()->getFeedbackTemplates(false);
 
-        exit(json_encode(array(
+        return $this->getResponse()->setBody(json_encode(array(
             'feedbacks_templates' => $feedbacksTemplates
         )));
     }
@@ -107,8 +108,9 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
         $feedback = Mage::getModel('M2ePro/Ebay_Feedback')->loadInstance((int)$feedbackId);
         $itemId = $feedback->getData('ebay_item_id');
 
-        $listingProduct = Mage::getModel('M2ePro/Ebay_Listing_Product')
-            ->getParentInstanceByEbayItem($feedback->getData('ebay_item_id'));
+        $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getListingProductByEbayItem(
+            $feedback->getData('ebay_item_id'), $feedback->getData('account_id')
+        );
 
         if (!is_null($listingProduct)) {
             $itemUrl = Mage::helper('M2ePro/Component_Ebay')->getItemUrl(

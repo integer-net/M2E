@@ -76,6 +76,14 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
+    updateHiddenValue : function(elementMode, elementHidden)
+    {
+        var value = elementMode.options[elementMode.selectedIndex].getAttribute('value_hack');
+        elementHidden.value = value;
+    },
+
+    //----------------------------------
+
     saveAndClose: function()
     {
         var url = typeof M2ePro.url.urls.formSubmit == 'undefined' ?
@@ -103,6 +111,34 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return;
         }
         setLocation(M2ePro.url.get('deleteAction'));
+    },
+
+    //----------------------------------
+
+    update_account_title: function()
+    {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/update_account_title'),
+            {
+                method: 'post',
+                parameters : {
+                    id : M2ePro.formData.id,
+                    mode : $('mode').value
+                },
+                onSuccess: function (transport)
+                {
+                    var response = transport.responseText.evalJSON();
+
+                    if (response['status'] == 'success') {
+                        var title;
+                        if (response['url'] != '') {
+                            title = '<a target="_blank" href="' + response['url'] + '">' + response['title'] + '</a>';
+                        } else {
+                            title = response['title'];
+                        }
+                        $('account_title').update(title);
+                    }
+                }
+            });
     },
 
     //----------------------------------
@@ -500,33 +536,33 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     mapping_sku_mode_change : function()
     {
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_NONE')) {
-            $('mapping_sku_priority_td').hide();
-            $('mapping_sku_attribute_tr').hide();
-        } else {
-            $('mapping_sku_priority_td').show();
+        var self        = EbayAccountHandlerObj,
+            attributeEl = $('mapping_sku_attribute');
 
-            if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_CUSTOM_ATTRIBUTE')) {
-                $('mapping_sku_attribute_tr').show();
-            } else {
-                $('mapping_sku_attribute_tr').hide();
-            }
+        $('mapping_sku_priority_td').hide();
+        if (this.value != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_NONE')) {
+            $('mapping_sku_priority_td').show();
+        }
+
+        attributeEl.value = '';
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_CUSTOM_ATTRIBUTE')) {
+            self.updateHiddenValue(this, attributeEl);
         }
     },
 
     mapping_title_mode_change : function()
     {
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE')) {
-            $('mapping_title_priority_td').hide();
-            $('mapping_title_attribute_tr').hide();
-        } else {
-            $('mapping_title_priority_td').show();
+        var self        = EbayAccountHandlerObj,
+            attributeEl = $('mapping_title_attribute');
 
-            if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_CUSTOM_ATTRIBUTE')) {
-                $('mapping_title_attribute_tr').show();
-            } else {
-                $('mapping_title_attribute_tr').hide();
-            }
+        $('mapping_title_priority_td').hide();
+        if (this.value != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE')) {
+            $('mapping_title_priority_td').show();
+        }
+
+        attributeEl.value = '';
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_CUSTOM_ATTRIBUTE')) {
+            self.updateHiddenValue(this, attributeEl);
         }
     }
 

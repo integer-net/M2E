@@ -216,7 +216,7 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    changeStatus : function(element)
+    changeStatus : function(element, marketplaceId)
     {
         var marketplaceId = element.readAttribute('marketplace_id');
         var runSingleButton = $('run_single_button_' + marketplaceId);
@@ -228,6 +228,7 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
         } else {
             element.removeClassName('hightlight_selected');
             element.addClassName('lacklustre_selected');
+            $('synch_info_complete_'+marketplaceId).hide();
             runSingleButton && runSingleButton.hide();
         }
     }

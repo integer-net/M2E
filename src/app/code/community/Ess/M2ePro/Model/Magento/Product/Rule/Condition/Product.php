@@ -15,6 +15,8 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
 
     protected $_arrayInputTypes = array();
 
+    protected $_customFiltersCache = array();
+
     // ####################################
 
     public function getValue()
@@ -43,9 +45,16 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
         /** @var  $product Mage_Catalog_Model_Product */
         $attrCode = $this->getAttribute();
 
+        if ($this->isFilterCustom($attrCode)) {
+            $value = $this->getCustomFilterInstance($attrCode)->getValueByProductInstance($product);
+            return $this->validateAttribute($value);
+        }
+
         if ('category_ids' == $attrCode) {
             return $this->validateAttribute($product->getAvailableInCategories());
-        } elseif (! isset($this->_entityAttributeValues[$product->getId()])) {
+        }
+
+        if (! isset($this->_entityAttributeValues[$product->getId()])) {
             if (!$product->getResource()) {
                 return false;
             }
@@ -93,59 +102,8 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
 
     // ####################################
 
-    public function loadAttributeOptionsByCriteria($criteria, $attributeSets = array())
-    {
-        if (is_null($criteria)) {
-            $criteria = Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_ALL;
-        }
-
-        if ($criteria == Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ATTRIBUTE_SETS
-            && empty($attributeSets)) {
-
-            $criteria = Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ALL_ATTRIBUTE_SETS;
-        }
-
-        $productAttributes = array();
-        switch ($criteria) {
-            case Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_ALL:
-                $productAttributes = Mage::helper('M2ePro/Magento_Attribute')->getAll();
-                break;
-
-            case Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ATTRIBUTE_SETS:
-                $productAttributes = Mage::helper('M2ePro/Magento_Attribute')->getGeneralFromAttributeSets(
-                    $attributeSets
-                );
-                break;
-
-            case Ess_M2ePro_Model_Magento_Product_Rule::LOAD_ATTRIBUTES_CRITERIA_BY_ALL_ATTRIBUTE_SETS:
-                $productAttributes = Mage::helper('M2ePro/Magento_Attribute')
-                    ->getGeneralFromAllAttributeSets();
-                break;
-        }
-
-        if (empty($productAttributes)) {
-            return $this;
-        }
-
-        $attributes = array();
-        foreach ($productAttributes as $attribute) {
-            $attributes[$attribute['code']] = $attribute['label'];
-        }
-
-        $this->_addSpecialAttributes($attributes);
-
-        asort($attributes);
-        $this->setAttributeOption($attributes);
-
-        return $this;
-    }
-
     public function getAttributeElement()
     {
-        $this->loadAttributeOptionsByCriteria(
-            $this->getRule()->getAttributeCriteria(), $this->getRule()->getAttributeSets()
-        );
-
         $element = parent::getAttributeElement();
         $element->setShowAsText(true);
 
@@ -232,6 +190,10 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
     {
         $attributes['attribute_set_id'] = Mage::helper('catalogrule')->__('Attribute Set');
         $attributes['category_ids'] = Mage::helper('catalogrule')->__('Category');
+
+        foreach ($this->getCustomFilters() as $filterId => $instanceName) {
+            $attributes[$filterId] = $this->getCustomFilterInstance($filterId)->getLabel();
+        }
     }
 
     /**
@@ -241,24 +203,16 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
      */
     public function loadAttributeOptions()
     {
-        $productAttributes = Mage::getResourceSingleton('catalog/product')
-            ->loadAllAttributes()
-            ->getAttributesByCode();
+        $productAttributes = Mage::helper('M2ePro/Magento_Attribute')->getAllAsObjects();
 
         $attributes = array();
         foreach ($productAttributes as $attribute) {
             /* @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
-            if (!$attribute->isAllowedForRuleCondition()
-                || !$attribute->getDataUsingMethod($this->_isUsedForRuleProperty)
-            ) {
-                continue;
-            }
             $attributes[$attribute->getAttributeCode()] = $attribute->getFrontendLabel();
         }
 
         $this->_addSpecialAttributes($attributes);
-
-        asort($attributes);
+        natcasesort($attributes);
         $this->setAttributeOption($attributes);
 
         return $this;
@@ -290,6 +244,8 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
                 ->setEntityTypeFilter($entityTypeId)
                 ->load()
                 ->toOptionArray();
+        } else if ($this->isFilterCustom($this->getAttribute())) {
+            $selectOptions = $this->getCustomFilterInstance($this->getAttribute())->getOptions();
         } else if (is_object($this->getAttributeObject())) {
             $attributeObject = $this->getAttributeObject();
             if ($attributeObject->usesSource()) {
@@ -378,15 +334,17 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
     public function collectValidatedAttributes($productCollection)
     {
         $attribute = $this->getAttribute();
-        if ('category_ids' != $attribute) {
-            if ($this->getAttributeObject()->isScopeGlobal()) {
-                $attributes = $this->getRule()->getCollectedAttributes();
-                $attributes[$attribute] = true;
-                $this->getRule()->setCollectedAttributes($attributes);
-                $productCollection->addAttributeToSelect($attribute, 'left');
-            } else {
-                $this->_entityAttributeValues = $productCollection->getAllAttributeValues($attribute);
-            }
+        if ($attribute == 'category_ids' || $this->isFilterCustom($attribute)) {
+            return $this;
+        }
+
+        if ($this->getAttributeObject()->isScopeGlobal()) {
+            $attributes = $this->getRule()->getCollectedAttributes();
+            $attributes[$attribute] = true;
+            $this->getRule()->setCollectedAttributes($attributes);
+            $productCollection->addAttributeToSelect($attribute, 'left');
+        } else {
+            $this->_entityAttributeValues = $productCollection->getAllAttributeValues($attribute);
         }
 
         return $this;
@@ -399,7 +357,10 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
      */
     public function getInputType()
     {
-        if ($this->getAttribute()==='attribute_set_id') {
+        if ($this->isFilterCustom($this->getAttribute())) {
+            return $this->getCustomFilterInstance($this->getAttribute())->getInputType();
+        }
+        if ($this->getAttribute() == 'attribute_set_id') {
             return 'select';
         }
         if (!is_object($this->getAttributeObject())) {
@@ -433,7 +394,10 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
      */
     public function getValueElementType()
     {
-        if ($this->getAttribute()==='attribute_set_id') {
+        if ($this->isFilterCustom($this->getAttribute())) {
+            return $this->getCustomFilterInstance($this->getAttribute())->getValueElementType();
+        }
+        if ($this->getAttribute() == 'attribute_set_id') {
             return 'select';
         }
         if (!is_object($this->getAttributeObject())) {
@@ -463,6 +427,13 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
     public function getValueElement()
     {
         $element = parent::getValueElement();
+
+        if ($this->isFilterCustom($this->getAttribute())
+            && $this->getCustomFilterInstance($this->getAttribute())->getInputType() == 'date'
+        ) {
+            $element->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'));
+        }
+
         if (is_object($this->getAttributeObject())) {
             switch ($this->getAttributeObject()->getFrontendInput()) {
                 case 'date':
@@ -481,10 +452,17 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
      */
     public function getExplicitApply()
     {
+        if ($this->isFilterCustom($this->getAttribute())
+            && $this->getCustomFilterInstance($this->getAttribute())->getInputType() == 'date'
+        ) {
+            return true;
+        }
+
         switch ($this->getAttribute()) {
             case 'sku': case 'category_ids':
             return true;
         }
+
         if (is_object($this->getAttributeObject())) {
             switch ($this->getAttributeObject()->getFrontendInput()) {
                 case 'date':
@@ -548,6 +526,42 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
         }
 
         return $op;
+    }
+
+    // ####################################
+
+    protected function getCustomFilters()
+    {
+        return array(
+            'is_in_stock' => 'Stock',
+            'qty' => 'Qty',
+        );
+    }
+
+    protected function isFilterCustom($filterId)
+    {
+        $customFilters = $this->getCustomFilters();
+        return isset($customFilters[$filterId]);
+    }
+
+    /**
+     * @param $filterId
+     * @return Ess_M2ePro_Model_Magento_Product_Rule_Custom_Abstract
+     */
+    protected function getCustomFilterInstance($filterId)
+    {
+        $customFilters = $this->getCustomFilters();
+        if (!isset($customFilters[$filterId])) {
+            return null;
+        }
+
+        if (!isset($this->_customFiltersCache[$filterId])) {
+            $this->_customFiltersCache[$filterId] = Mage::getModel(
+                'M2ePro/Magento_Product_Rule_Custom_'.$customFilters[$filterId]
+            );
+        }
+
+        return $this->_customFiltersCache[$filterId];
     }
 
     // ####################################

@@ -17,6 +17,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
         $tempTables = array_merge($this->getMySqlTablesV3(),$tempTables);
         $tempTables = array_merge($this->getMySqlTablesV4(),$tempTables);
         $tempTables = array_merge($this->getMySqlTablesV5(),$tempTables);
+        $tempTables = array_merge($this->getRemovedMySqlTables(),$tempTables);
         $tempTables = array_values(array_unique($tempTables));
 
         // Sort by length tables
@@ -51,6 +52,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
     public function endSetup()
     {
+        $this->removeConfigDuplicates();
         Mage::helper('M2ePro/Module')->clearCache();
         return parent::endSetup();
     }
@@ -417,6 +419,12 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
         );
     }
 
+    private function getRemovedMySqlTables()
+    {
+        return array(
+            'm2epro_ebay_listing_auto_filter'
+        );
+    }
     //------------------------------------
 
     private function getConfigTablesV5()

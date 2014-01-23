@@ -132,10 +132,23 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Edit_Form_Data exte
         return $messagesBlock->getMessagesHtml($messages);
     }
 
+    /**
+     * @return  Ess_M2ePro_Model_Marketplace|null
+    **/
+    public function getMarketplace()
+    {
+        $marketplace = Mage::helper('M2ePro/Data_Global')->getValue('ebay_marketplace');
+
+        if (is_null($marketplace)) {
+            return NULL;
+        }
+
+        return $marketplace;
+    }
+
     public function getMarketplaceId()
     {
-        /** @var Ess_M2ePro_Model_Ebay_Marketplace $marketplace */
-        $marketplace = Mage::helper('M2ePro/Data_Global')->getValue('ebay_marketplace');
+        $marketplace = $this->getMarketplace();
 
         if (is_null($marketplace)) {
             return NULL;
@@ -184,13 +197,44 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Edit_Form_Data exte
 
     public function isCharity()
     {
-        $marketplaceId = $this->getMarketplaceId();
+        $marketplace = $this->getMarketplace();
 
-        if (!is_null($marketplaceId) && Mage::helper('M2ePro/Component_Ebay')->isCharityMarketplace($marketplaceId)) {
+        if (!is_null($marketplace) && $marketplace->getChildObject()->isCharityEnabled()) {
            return true;
         }
 
         return false;
+    }
+
+    // ####################################
+
+    public  function isShowMultiCurrencyNotification()
+    {
+        $marketplace = $this->getMarketplace();
+
+        if (is_null($marketplace)) {
+           return false;
+        }
+
+        if (!$marketplace->getChildObject()->isMultiCurrencyEnabled()) {
+            return false;
+        }
+
+        $marketplaceId = $marketplace->getId();
+
+        $configValue = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            "/view/ebay/multi_currency_marketplace_{$marketplaceId}/", 'notification_shown'
+        );
+
+        if ($configValue) {
+            return false;
+        }
+
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            "/view/ebay/multi_currency_marketplace_{$marketplaceId}/", 'notification_shown', 1
+        );
+
+        return true;
     }
 
     // ####################################

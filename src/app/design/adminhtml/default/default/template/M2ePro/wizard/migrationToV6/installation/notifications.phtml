@@ -23,7 +23,7 @@
 ?>
 
 <div style="display: none;" id="migration_notification_notice" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Migration Notifications'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
-    <?php echo Mage::helper('M2ePro')->__('Below you can find all changes that were made after migration. Click on the links to check or edit changed options.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('Below you can find all changes that have been made after migration. Click on the links to check or edit changed options.'); ?>
 </div>
 
 <div style="display: none;" id="migration_notification_notice_empty" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
@@ -32,7 +32,7 @@
 
 <div id="migration_notification_content">
 <?php if (!empty($renameAccountsData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('eBay accounts were renamed'); ?></strong>
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('eBay accounts have been renamed'); ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($renameAccountsData as $id => $row): ?>
@@ -52,7 +52,7 @@
 ?>
 
 <?php if (!empty($ebayConditionsData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('eBay Condition was changed for the next Description Templates') ?></strong>
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('eBay Condition has been changed in the next Description Templates') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayConditionsData as $row): ?>
@@ -72,9 +72,8 @@
 ?>
 
 <?php if (!empty($ebayVariationIgnoreData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Ignore variation option was removed from the settings.
-    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Now listing of products with variaions is always allowed if eBay site supports them.
-    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Below you can find the listings which used this option
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Ignore variation option has been moved from eBay General template to the Selling Format policy and set to default \'No\'.
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Below you can find the listings that used \'Yes\' in this option. Please, check their the Selling Format settings to make sure the option has the value you need.
     ') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
@@ -96,8 +95,8 @@
 ?>
 
 <?php if (!empty($hideProductsData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('\'Products Presented in Other listings\' option was removed from the listing settings.
-    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Now you can use Advanced Filter on the Add products page to filter products this way.
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('\'Products Presented in Other listings\' option has been removed from the listing settings.
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Instead of it you can use Advanced Filter on the Add products page.
     <br/>&nbsp;&nbsp;&nbsp;&nbsp;Listings which used \'Do Not Show\' in this option are displayed below
     ') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
@@ -126,8 +125,8 @@
 ?>
 
 <?php if (!empty($listingSynchTypeData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Activation and Deactivation of Synchronization Template options were removed from the listings settings.
-    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Now the settings of Synchronization template (policy) are activated immediately and will be never deactivated.
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Activation and Deactivation Synchronization Template options have been removed from the listings settings.
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Synchronization template (policy) settings take effect immediately and will be active during whole its life.
     <br/>&nbsp;&nbsp;&nbsp;&nbsp;The listings below used these options') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
@@ -155,7 +154,7 @@
 ?>
 
 <?php if (!empty($ebayScheduleListData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Schedule was updated for eBay Synchronization policy and now it also covers the List rules, not only Relist.') ?></strong>
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Schedule has been updated for eBay Synchronization policy. It now covers both list and relist rules.') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayScheduleListData as $row): ?>
@@ -175,7 +174,7 @@
 ?>
 
 <?php if (!empty($ebayScheduleDelayAfterEndData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('\'Delay After End\' option was removed from eBay Synchronization template (policy). \'Immediate\' is used instead of it in the listings below.') ?></strong>
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('\'Delay After End\' option has been removed from eBay Synchronization template (policy). \'Immediate\' is used instead of it in the listings below.') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayScheduleDelayAfterEndData as $row): ?>
@@ -195,8 +194,8 @@
 ?>
 
 <?php if (!empty($commonRelistScheduleData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Schedule was removed from Amazon, Rakuten.com and Play.com Relist Rules of Synchronization templates. Relist action will be performed immediately from now.
-    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Below the listings that used Schedule settings different from \'Immediately\'.
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Schedule has been removed from Amazon, Rakuten.com and Play.com.
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;The Schedule was listed in the listings below.
     ') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
@@ -217,8 +216,8 @@
 ?>
 
 <?php if (!empty($ebayProductDetailsData)): ?>
-    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Custom value option was removed from eBay Product Items Details settings (General template > Item Specifics).
-    <br/>&nbsp;&nbsp;&nbsp;&nbsp;\'None\' is chosen instead in Description policies below') ?></strong>
+    <strong><?php echo $notificationIndex; ?>) <?php echo Mage::helper('M2ePro')->__('Custom value option has been removed from eBay Product Items Details settings (General template > Item Specifics).
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;Please, check the Description policies below') ?></strong>
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayProductDetailsData as $row): ?>

@@ -161,8 +161,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Moving_Grid extends Mage_Adminhtml_Bloc
     {
         $confirmMessage = Mage::helper('M2ePro')->__('Are you sure?');
         $actions = '&nbsp;<a href="javascript:void(0);" onclick="confirm(\''.$confirmMessage.'\') && ';
-        $actions .= ucfirst($this->getMode());
-        $actions .= 'GridHandlerObj.movingHandler.tryToSubmit('.$row->getData('listing_id').');">';
+        $actions .= $this->getMovingHandlerJs() . '.tryToSubmit('.$row->getData('listing_id').');">';
         $actions .= 'Move To This Listing</a>';
         return $actions;
     }

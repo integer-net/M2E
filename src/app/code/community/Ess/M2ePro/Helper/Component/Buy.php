@@ -13,7 +13,7 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
 
     const DEFAULT_CURRENCY = 'USD';
 
-    const MARKETPLACE_VIRTUAL_ID = 33;
+    const MARKETPLACE_ID = 33;
 
     // ########################################
 
@@ -64,19 +64,22 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function getVirtualMarketplaceId()
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
     {
-        return self::MARKETPLACE_VIRTUAL_ID;
+        return $this->getCachedObject('Marketplace', $this->getMarketplaceId());
     }
 
-    public function getItemUrl($productId, $marketplaceId = NULL)
+    public function getMarketplaceId()
     {
-        $marketplaceId = (int)$marketplaceId;
-        $marketplaceId <= 0 && $marketplaceId = self::MARKETPLACE_VIRTUAL_ID;
+        return self::MARKETPLACE_ID;
+    }
 
-        $domain = $this->getCachedObject('Marketplace',$marketplaceId)->getUrl();
-
-        return 'http://'.$domain.'/pr/SellerListings.aspx?sku='.$productId;
+    public function getItemUrl($productId)
+    {
+        return 'http://'.$this->getMarketplace()->getUrl().'/prod/'.$productId.'.html';
     }
 
     // ########################################

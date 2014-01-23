@@ -1,7 +1,7 @@
 <div class="entry-edit group_container" id="magento_block_development_module_module">
 
     <div class="development_head_container">
-        <h4><?php echo Mage::helper('M2ePro')->__('Module Group'); ?></h4>
+        <h4><?php echo Mage::helper('M2ePro')->__('Module'); ?></h4>
     </div>
 
     <div class="fieldset">
@@ -13,11 +13,23 @@
 <div class="entry-edit group_container" id="magento_block_development_module_synchronization">
 
     <div class="development_head_container">
-        <h4><?php echo Mage::helper('M2ePro')->__('Synchronization Group'); ?></h4>
+        <h4><?php echo Mage::helper('M2ePro')->__('Synchronization'); ?></h4>
     </div>
 
     <div class="fieldset">
         <?php echo $this->getChildHtml('development_module_synchronization'); ?>
+    </div>
+
+</div>
+
+<div class="entry-edit group_container" id="magento_block_development_module_ebay">
+
+    <div class="development_head_container">
+        <h4><?php echo Mage::helper('M2ePro')->__('eBay'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <?php echo $this->getChildHtml('development_module_ebay'); ?>
     </div>
 
 </div>

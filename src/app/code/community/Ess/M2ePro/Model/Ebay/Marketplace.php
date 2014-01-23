@@ -21,6 +21,26 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     // ########################################
 
+    public static function getTaxCategoriesInfo()
+    {
+        $marketplacesCollection = Mage::helper('M2ePro/Component_Ebay')->getModel('Marketplace')
+            ->getCollection()
+            ->addFieldToFilter('status',Ess_M2ePro_Model_Marketplace::STATUS_ENABLE)
+            ->setOrder('sorder','ASC');
+
+        $marketplacesCollection->getSelect()->limit(1);
+
+        $marketplaces = $marketplacesCollection->getItems();
+
+        if (count($marketplaces) == 0) {
+            return array();
+        }
+
+        return array_shift($marketplaces)->getChildObject()->getTaxCategoryInfo();
+    }
+
+    // ########################################
+
     public function deleteInstance()
     {
         if ($this->isLocked()) {
@@ -50,14 +70,33 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     // ########################################
 
-    public function getCurrency()
+    public function getCurrencies()
     {
         return $this->getData('currency');
     }
 
-    public function getCategoriesVersion()
+    public function getCurrency()
     {
-        return (int)$this->getData('categories_version');
+        $currency = (string)$this->getData('currency');
+
+        if (strpos($currency,',') === false) {
+            return $currency;
+        }
+
+        $currency = explode(',', $currency);
+
+        if (!is_null($setting = Mage::helper('M2ePro/Module')->getConfig()
+                                ->getGroupValue('/ebay/selling/currency/',$this->getParentObject()->getCode()))
+            && in_array($setting, $currency)) {
+            return $setting;
+        }
+
+        return array_shift($currency);
+    }
+
+    public function isMultiCurrencyEnabled()
+    {
+        return (bool)(int)$this->getData('is_multi_currency');
     }
 
     public function isMultivariationEnabled()
@@ -65,14 +104,24 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
         return (int)$this->getData('is_multivariation') == self::IS_MULTIVARIATION_YES;
     }
 
-    public function isTaxEnabled()
+    public function isTaxTableEnabled()
     {
-        return (bool)(int)$this->getData('is_tax');
+        return (bool)(int)$this->getData('is_tax_table');
     }
 
     public function isVatEnabled()
     {
         return (bool)(int)$this->getData('is_vat');
+    }
+
+    public function isStpEnabled()
+    {
+        return (bool)(int)$this->getData('is_stp');
+    }
+
+    public function isStpAdvancedEnabled()
+    {
+        return (bool)(int)$this->getData('is_stp_advanced');
     }
 
     public function isLocalShippingRateTableEnabled()
@@ -113,6 +162,16 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
     public function isCalculatedShippingEnabled()
     {
         return (bool)(int)$this->getData('is_calculated_shipping');
+    }
+
+    public function isGlobalShippingProgramEnabled()
+    {
+        return (bool)(int)$this->getData('is_global_shipping_program');
+    }
+
+    public function isCharityEnabled()
+    {
+        return (bool)(int)$this->getData('is_charity');
     }
 
     // ########################################

@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Tabs_General extends Mage_Adminhtml_Block_Widget
 {
+    // ########################################
+
     public function __construct()
     {
         parent::__construct();
@@ -17,6 +19,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Tabs_Genera
 
         $this->setTemplate('M2ePro/common/buy/template/newProduct/tabs/general.phtml');
     }
+
+    // ########################################
 
     protected function _beforeToHtml()
     {
@@ -159,4 +163,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Tabs_Genera
 
         return parent::_beforeToHtml();
     }
+
+    // ########################################
+
+    public function isAllowedUpcExemption($formData)
+    {
+        $isAllowedUpcExemption = Ess_M2ePro_Model_Buy_Template_NewProduct_Source::isAllowedUpcExemption();
+        $gtinMode = $formData['category']['gtin_mode'];
+        return $isAllowedUpcExemption || $gtinMode == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::GTIN_MODE_NONE;
+    }
+
+    // ########################################
 }

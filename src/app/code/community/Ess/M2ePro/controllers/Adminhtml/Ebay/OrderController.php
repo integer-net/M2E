@@ -156,14 +156,14 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
             return false;
         }
 
-        return Mage::getModel('M2ePro/Connector_Server_Ebay_Order_Dispatcher')->process($action, $ids, $params);
+        return Mage::getModel('M2ePro/Connector_Ebay_Order_Dispatcher')->process($action, $ids, $params);
     }
 
     //--------------------
 
     public function updatePaymentStatusAction()
     {
-        if ($this->processConnector(Ess_M2ePro_Model_Connector_Server_Ebay_Order_Dispatcher::ACTION_PAY)) {
+        if ($this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_PAY)) {
             $this->_getSession()->addSuccess(
                 Mage::helper('M2ePro')->__('Payment status for selected eBay Order(s) was updated to Paid.')
             );
@@ -178,7 +178,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
     public function updateShippingStatusAction()
     {
-        if ($this->processConnector(Ess_M2ePro_Model_Connector_Server_Ebay_Order_Dispatcher::ACTION_SHIP)) {
+        if ($this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_SHIP)) {
             $this->_getSession()->addSuccess(
                 Mage::helper('M2ePro')->__('Shipping status for selected eBay Order(s) was updated to Shipped.')
             );

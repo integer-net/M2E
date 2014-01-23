@@ -24,6 +24,7 @@ class Ess_M2ePro_Model_Mysql4_Buy_Template_SellingFormat
     public function isDifferent($newData, $oldData)
     {
         $ignoreFields = array(
+            $this->getIdFieldName(),
             'id', 'title',
             'component_mode',
             'create_date', 'update_date'

@@ -58,6 +58,8 @@ ListingOtherAutoMappingHandler = Class.create(ActionHandler, {
         var self = this;
 
         if (parts.length == 0) {
+            MagentoMessageObj.clearAll();
+
             if (isFailed == 1) {
                 MagentoMessageObj.addError(self.options.text.failed_mapped);
             } else {

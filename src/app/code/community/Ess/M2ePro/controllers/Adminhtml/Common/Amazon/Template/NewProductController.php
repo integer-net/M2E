@@ -407,7 +407,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
         $table = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_category');
 
-        exit(json_encode($connRead->select()
+        return $this->getResponse()->setBody(json_encode($connRead->select()
                                   ->from($table,'*')
                                   ->where('marketplace_id = ?', $marketplaceId)
                                   ->where('node_hash = ?', $nodeHash)
@@ -426,7 +426,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
             $specifics[$tempSpecific['id']] = $tempSpecific;
         }
 
-        exit(json_encode($specifics));
+        return $this->getResponse()->setBody(json_encode($specifics));
     }
 
     //#############################################
@@ -454,7 +454,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
             }
         }
 
-        exit(json_encode($xsds));
+        return $this->getResponse()->setBody(json_encode($xsds));
     }
 
     //#############################################
@@ -563,7 +563,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
         $keywords = $this->getRequest()->getParam('keywords','');
 
         if (!$keywords) {
-            exit(json_encode(array(
+            return $this->getResponse()->setBody(json_encode(array(
                 'result' => 'error',
                 'message' => Mage::helper('M2ePro')->__('Please enter keywords.')
             )));

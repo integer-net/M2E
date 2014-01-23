@@ -66,7 +66,7 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
             }
         }
 
-        exit(json_encode(array('ok' => $result)));
+        return $this->getResponse()->setBody(json_encode(array('ok' => $result)));
     }
 
     //#############################################

@@ -4,7 +4,7 @@
     <b>List Action</b> - at first this action to be executed for each item in M2E Listings, which has <i>Not Listed</i> status and its settings meet the List Condition. If an item was not listed for some reason, autosynchronization will attempt
     to list it again only if Product Status, Stock Availability or Quantity is changed.
     <br/><br/>
-    <b>Note:</b> Stock Level Synchronization setting must be enabled in Synchronization (Configuration > Synchronization).
+    <b>Note:</b> Inventory Synchronization setting must be enabled in Synchronization (Configuration > Synchronization).
     Otherwise, Synchronization Template Rules will not take effect.'); ?>
 </div>
 
@@ -45,7 +45,10 @@
 
     M2ePro.translator.add(<?php echo json_encode(array(
         'Add Synchronization Template.' => $this->__('Add Synchronization Template.'),
-        'Wrong time format string.' => $this->__('Wrong time format string.')
+        'Wrong time format string.' => $this->__('Wrong time format string.'),
+
+        'Must be greater than "Min".' => $this->__('Must be greater than "Min".'),
+        'Inconsistent settings in Revise and Stop rules.' => $this->__('Inconsistent settings in Revise and Stop rules.'),
     )); ?>);
 
     M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
@@ -182,7 +185,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Item QTY'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('QTY'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="list_qty" name="list_qty" class="required-entry">
@@ -200,8 +203,8 @@
                 <tr id="list_qty_value_container" <?php if ($formData['list_qty'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_NONE) echo ' style="display: none;"'; ?>>
                     <td class="label">
                         <label for="list_qty_value">
-                            <span id="list_qty_item" <?php if ($formData['list_qty'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Item Quantity'); ?>: <span class="required">*</span></span>
-                            <span id="list_qty_item_min" <?php if ($formData['list_qty'] != Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Item Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="list_qty_item" <?php if ($formData['list_qty'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="list_qty_item_min" <?php if ($formData['list_qty'] != Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Quantity'); ?>: <span class="required">*</span></span>
                         </label>
                     </td>
                     <td class="value" style="width: auto;">
@@ -211,10 +214,10 @@
 
                 <tr id="list_qty_value_max_container" <?php if ($formData['list_qty'] != Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="list_qty_value_max"><?php echo Mage::helper('M2ePro')->__('Max Item Quantity'); ?>: <span class="required">*</span></label>
+                        <label for="list_qty_value_max"><?php echo Mage::helper('M2ePro')->__('Max Quantity'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <input id="list_qty_value_max" name="list_qty_value_max" value="<?php echo $this->escapeHtml($formData['list_qty_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits" />
+                        <input id="list_qty_value_max" name="list_qty_value_max" value="<?php echo $this->escapeHtml($formData['list_qty_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits M2ePro-validate-conditions-between" />
                     </td>
                 </tr>
 

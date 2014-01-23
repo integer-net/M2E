@@ -124,6 +124,10 @@ select.lacklustre_selected option[value="1"] {
     background: none !important;
 }
 
+.invalid-row {
+    background-color: #ffcdbd !important;
+}
+
 /* ================================================ */
 
 /* Errors Summary */

@@ -203,14 +203,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Grid extends Mage_Ad
 
         if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
             $this->addColumn('developer_action', array(
-                'header'    => Mage::helper('M2ePro')->__('Actions'),
-                'align'     => 'left',
-                'width'     => '100px',
-                'type'      => 'text',
-                'renderer'  => 'M2ePro/adminhtml_listing_view_grid_column_renderer_developerAction',
-                'index'     => 'value',
-                'filter'    => false,
-                'sortable'  => false,
+                'header'     => Mage::helper('M2ePro')->__('Actions'),
+                'align'      => 'left',
+                'width'      => '100px',
+                'type'       => 'text',
+                'renderer'   => 'M2ePro/adminhtml_listing_view_grid_column_renderer_developerAction',
+                'index'      => 'value',
+                'filter'     => false,
+                'sortable'   => false,
+                'js_handler' => 'ListingGridHandlerObj'
             ));
         }
 

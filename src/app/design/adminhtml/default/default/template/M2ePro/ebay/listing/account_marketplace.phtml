@@ -26,7 +26,8 @@
 
 <div id="progress_bar"></div>
 
-<form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
+<form id="<?php echo $this->getForm()->getId(); ?>" method="post" enctype="multipart/form-data"
+      onsubmit="$$('.next_step_button').first().simulate('click'); return false;">
 
     <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
 
@@ -47,7 +48,7 @@
 
                             <tr>
                                 <td class="label">
-                                    <label for="title"><?php echo Mage::helper('M2ePro')->__('Listing Title') ?>: <span class="required">*</span></label>
+                                    <label for="title"><?php echo Mage::helper('M2ePro')->__('Title') ?>: <span class="required">*</span></label>
                                 </td>
 
                                 <td class="value">
@@ -84,7 +85,7 @@
                                 </p>
                             </td>
                             <td class="value">
-                                <?php echo $this->getChildHtml('add_another_button'); ?>
+                                <?php echo $this->getChildHtml('add_account_button'); ?>
                             </td>
                         </tr>
 
@@ -161,6 +162,7 @@
 
         var renderAccounts = function (callback) {
 
+            var account_add_btn = $('add_account_button');
             var account_label_el = $('account_label');
             var account_select_el = $('account_id');
 
@@ -170,6 +172,7 @@
                     var accounts = transport.responseText.evalJSON();
 
                     if (accounts.length == 0) {
+                        account_add_btn.down('span').update('<?php echo Mage::helper('M2ePro')->__('Add'); ?>');
                         account_label_el.update('<?php echo Mage::helper('M2ePro')->__('Account not found, please create it.'); ?>');
                         account_label_el.show();
                         account_select_el.hide();
@@ -181,6 +184,8 @@
                     accounts.each(function(account) {
                         account_select_el.appendChild(new Element('option', {value: account.id})).insert(account.title);
                     });
+
+                    account_add_btn.down('span').update('<?php echo Mage::helper('M2ePro')->__('Add Another'); ?>');
 
                     if (accounts.length == 1) {
                         var account = accounts.shift();
@@ -215,7 +220,7 @@
             <?php } ?>
         });
 
-        $('add_another_button').observe('click', function() {
+        $('add_account_button').observe('click', function() {
             var win = window.open('<?php echo $this->getUrl('*/adminhtml_ebay_account/new',array(
                 'close_on_save' => true,
                 'wizard' => (bool)$this->getRequest()->getParam('wizard',false)

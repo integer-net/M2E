@@ -45,20 +45,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AccountMarketplace_Form extends Ma
         //------------------------------
 
         //------------------------------
-        $buttonBlock = $this->getLayout()
-            ->createBlock('adminhtml/widget_button')
-            ->setData( array(
-                'label'   => Mage::helper('M2ePro')->__('Add Another'),
-                'onclick' => '',
-                'id' => 'add_another_button',
-            ) );
-        Mage::helper('M2ePro/View_Ebay')->isSimpleMode()   && $buttonBlock->setData('style','display: none');
-        (bool)$this->getRequest()->getParam('wizard',false) && $buttonBlock->setData('style','display: none');
-
-        $this->setChild('add_another_button',$buttonBlock);
-        //------------------------------
-
-        //------------------------------
         $tempMarketplaces = Mage::helper('M2ePro/Component_Ebay')->getCollection('Marketplace')
             ->setOrder('sorder','ASC')
             ->setOrder('title','ASC')
@@ -79,6 +65,22 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AccountMarketplace_Form extends Ma
                 Mage::getModel('M2ePro/Marketplace')->getIdByCode($info['Site'])
             );
         }
+
+        //------------------------------
+        $buttonBlock = $this->getLayout()
+            ->createBlock('adminhtml/widget_button')
+            ->setData( array(
+                'label'   => 'Add',
+                'onclick' => '',
+                'id' => 'add_account_button',
+            ) );
+        if ($account->getId()) {
+            Mage::helper('M2ePro/View_Ebay')->isSimpleMode()    && $buttonBlock->setData('style','display: none');
+            (bool)$this->getRequest()->getParam('wizard',false) && $buttonBlock->setData('style','display: none');
+        }
+
+        $this->setChild('add_account_button',$buttonBlock);
+        //------------------------------
 
         //------------------------------
         $sessionKey = 'ebay_listing_create';

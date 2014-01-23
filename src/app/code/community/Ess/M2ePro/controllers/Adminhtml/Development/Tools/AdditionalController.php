@@ -17,8 +17,18 @@ class Ess_M2ePro_Adminhtml_Development_Tools_AdditionalController
     public function testMemoryLimitAction()
     {
         ini_set('display_errors', 1);
+
+        $dir = Mage::getBaseDir('var') . DS . 'log' . DS;
+        $file = 'm2epro_memory_limit.log';
+
+        is_file($dir . $file) && unlink($dir . $file);
+
+        $i = 0;
         $array = array();
-        while (1) $array[] = $array;
+
+        while (1)  {
+            ($array[] = $array) && ((++$i % 100) == 0) && Mage::log(memory_get_usage(true) / 1000000 ,null,$file,1);
+        }
     }
 
     /**
@@ -33,10 +43,17 @@ class Ess_M2ePro_Adminhtml_Development_Tools_AdditionalController
 
         $seconds = (int)$this->getRequest()->getParam('seconds', 0);
         if ($seconds) {
+
+            $dir = Mage::getBaseDir('var') . DS . 'log' . DS;
+            $file = 'm2epro_execution_time.log';
+
+            is_file($dir . $file) && unlink($dir . $file);
+
             $i = 0;
 
-            while ($i++ < $seconds) {
+            while ($i < $seconds) {
                 sleep(1);
+                ((++$i % 10) == 0) && Mage::log("{$i} seconds passed",null,$file,1);
             }
 
             echo <<<HTML
@@ -52,6 +69,25 @@ HTML;
     <button type="submit">Test</button>
 </form>
 HTML;
+    }
+
+    /**
+     * @title "Clear APC Opcode"
+     * @description "Clear APC Opcode"
+     * @confirm "Are you sure?"
+     */
+    public function clearApcOpcodeAction()
+    {
+        if (!Mage::helper('M2ePro/Client_Cache')->isApcAvailable()) {
+            $this->_getSession()->addError('APC not installed');
+            $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
+            return;
+        }
+
+        apc_clear_cache('system');
+
+        $this->_getSession()->addSuccess('APC opcode cache has been cleared');
+        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
     }
 
     /**

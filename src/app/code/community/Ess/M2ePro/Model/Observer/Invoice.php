@@ -24,15 +24,17 @@ class Ess_M2ePro_Model_Observer_Invoice
 
             try {
                 /** @var $order Ess_M2ePro_Model_Order */
-                $order = Mage::helper('M2ePro/Component')
-                    ->getUnknownObject('Order', $magentoOrderId, 'magento_order_id');
+                $order = Mage::helper('M2ePro/Component_Ebay')
+                    ->getObject('Order', $magentoOrderId, 'magento_order_id');
             } catch (Exception $e) {
                 return;
             }
 
-            if (!$order->isComponentModeEbay()) {
+            if (!$order->getChildObject()->canUpdatePaymentStatus()) {
                 return;
             }
+
+            $this->createChange($order);
 
             Mage::getSingleton('M2ePro/Order_Log_Manager')
                 ->setInitiator(Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION);
@@ -51,6 +53,21 @@ class Ess_M2ePro_Model_Observer_Invoice
 
     //####################################
 
+    private function createChange(Ess_M2ePro_Model_Order $order)
+    {
+        // save change
+        //------------------------------
+        $orderId   = $order->getId();
+        $action    = Ess_M2ePro_Model_Order_Change::ACTION_UPDATE_PAYMENT;
+        $creator   = Ess_M2ePro_Model_Order_Change::CREATOR_TYPE_OBSERVER;
+        $component = $order->getComponentMode();
+
+        Mage::getModel('M2ePro/Order_Change')->create($orderId, $action, $creator, $component, array());
+        //------------------------------
+    }
+
+    //####################################
+
     private function addSessionSuccessMessage()
     {
         $message = Mage::helper('M2ePro')->__('Payment Status for eBay Order was updated to Paid.');
@@ -59,8 +76,8 @@ class Ess_M2ePro_Model_Observer_Invoice
 
     private function addSessionErrorMessage(Ess_M2ePro_Model_Order $order)
     {
-        // todo adminhtml_log
-        $url = Mage::helper('adminhtml')->getUrl('M2ePro/adminhtml_log/order', array('order_id' => $order->getId()));
+        $url = Mage::helper('adminhtml')
+            ->getUrl('M2ePro/adminhtml_ebay_log/order', array('order_id' => $order->getId()));
 
         $startLink = '<a href="' . $url . '" target="_blank">';
         $endLink = '</a>';

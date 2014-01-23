@@ -117,11 +117,15 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
             return $isPriceIncludesTax;
         }
 
+        if ($this->proxyOrder->isTaxModeChannel()) {
+            return !$this->proxyOrder->hasTax();
+        }
+
         if ($this->proxyOrder->hasTax()) {
             return false;
         }
 
-        return true;
+        return $isPriceIncludesTax;
     }
 
     // ########################################
@@ -162,10 +166,12 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
             ->hasRatesForCountry($this->quote->getShippingAddress()->getCountryId());
         $storeShippingTaxRate = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
             ->getStoreShippingTaxRate($this->getStore());
+        $calculationBasedOnOrigin = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
+            ->isCalculationBasedOnOrigin($this->getStore());
 
         if ($proxyOrder->isTaxModeNone()
             || ($proxyOrder->isTaxModeChannel() && $proxyOrder->getTaxRate() == 0)
-            || ($proxyOrder->isTaxModeMagento() && !$hasRatesForCountry)
+            || ($proxyOrder->isTaxModeMagento() && !$hasRatesForCountry && !$calculationBasedOnOrigin)
         ) {
             return Ess_M2ePro_Model_Magento_Product::TAX_CLASS_ID_NONE;
         }
@@ -209,6 +215,10 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
             return $originCountryId;
         }
 
+        if ($this->proxyOrder->isTaxModeMixed() && $this->proxyOrder->getTaxRate() == 0) {
+            return $originCountryId;
+        }
+
         if ($this->proxyOrder->isTaxModeNone()
             || ($this->proxyOrder->isTaxModeChannel() && $this->proxyOrder->getTaxRate() == 0)
         ) {
@@ -231,6 +241,10 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
             return $originRegionId;
         }
 
+        if ($this->proxyOrder->isTaxModeMixed() && $this->proxyOrder->getTaxRate() == 0) {
+            return $originRegionId;
+        }
+
         if ($this->proxyOrder->isTaxModeNone()
             || ($this->proxyOrder->isTaxModeChannel() && $this->proxyOrder->getTaxRate() == 0)
         ) {
@@ -250,6 +264,10 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
         $originPostcode = $this->getStoreConfig($this->getOriginPostcodeXmlPath());
 
         if ($this->proxyOrder->isTaxModeMagento()) {
+            return $originPostcode;
+        }
+
+        if ($this->proxyOrder->isTaxModeMixed() && $this->proxyOrder->getTaxRate() == 0) {
             return $originPostcode;
         }
 
@@ -296,8 +314,14 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
 
     private function getTaxCalculationBasedOn()
     {
+        $basedOn = $this->getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_BASED_ON);
+
         if ($this->proxyOrder->isTaxModeMagento()) {
-            return $this->getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_BASED_ON);
+            return $basedOn;
+        }
+
+        if ($this->proxyOrder->isTaxModeMixed() && $this->proxyOrder->getTaxRate() == 0) {
+            return $basedOn;
         }
 
         return 'shipping';

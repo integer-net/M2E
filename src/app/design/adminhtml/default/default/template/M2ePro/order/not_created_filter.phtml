@@ -1,0 +1,19 @@
+<p class="switcher">
+    <label>
+        <input type="checkbox" name="" <?php if ($this->isChecked()): ?>checked="checked"<?php endif; ?> onclick="setLocation('<?php echo $this->getFilterUrl(); ?>');">
+        &nbsp;<?php echo Mage::helper('M2ePro')->__('Not created orders only'); ?>
+    </label>
+    <span>
+        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+        <span class="tool-tip-message" style="font-size: 12px; display: none;">
+        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+            <span>
+                <?php echo Mage::helper('M2ePro')->__(
+                    'Using this, you can  see the records for which order(s) were not created in magento.
+                    <br/>It might happened, because particular product(s) or product option(s) were not found and some action is required for such orders.
+                    <br/>
+                    <br/>When you open order detail, you can use appropriate options <b>Map to Magento Product</b> or <b>Set Options</b> to correct missing information and create order in magento.'
+                ); ?>
+        </span>
+    </span>
+</p>

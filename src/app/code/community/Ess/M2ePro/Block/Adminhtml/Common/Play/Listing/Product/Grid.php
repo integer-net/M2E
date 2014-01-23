@@ -36,6 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Product_Grid extends Mage_A
 
         // Get collection
         //----------------------------
+        /* @var $collection Mage_Catalog_Model_Resource_Product_Collection */
         $collection = Mage::getModel('catalog/product')->getCollection()
             ->addAttributeToSelect('sku')
             ->addAttributeToSelect('name')
@@ -117,30 +118,36 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Product_Grid extends Mage_A
         // Hide products others listings
         //----------------------------
         $prefix = Mage::helper('M2ePro/Data_Global')->getValue('hide_products_others_listings_prefix');
+        is_null($hideParam = Mage::helper('M2ePro/Data_Session')->getValue($prefix)) && $hideParam = true;
 
-        if (Mage::helper('M2ePro/Data_Session')->getValue($prefix)) {
+        if ($hideParam || isset($listingData['id'])) {
 
-            $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+            $dbExcludeSelect = Mage::getResourceModel('core/config')->getReadConnection()
                 ->select()
                 ->from(Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable(),
-                new Zend_Db_Expr('DISTINCT `product_id`'))
-                ->where('`component_mode` = ?',Ess_M2ePro_Helper_Component_Play::NICK);
+                    new Zend_Db_Expr('DISTINCT `product_id`'));
 
-            $collection->getSelect()->where('`e`.`entity_id` NOT IN ('.$dbSelect->__toString().')');
+            if ($hideParam) {
 
-        } else {
+                $dbExcludeSelect->join(
+                    array('l' => Mage::getResourceModel('M2ePro/Listing')->getMainTable()),
+                    '`l`.`id` = `listing_id`', NULL
+                );
 
-            if (isset($listingData['id'])) {
+                $dbExcludeSelect->where('`l`.`account_id` = ?', $listingData['account_id']);
+                $dbExcludeSelect->where('`l`.`marketplace_id` = ?', $listingData['marketplace_id']);
+                $dbExcludeSelect->where('`l`.`component_mode` = ?',Ess_M2ePro_Helper_Component_Play::NICK);
 
-                $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                    ->select()
-                    ->from(Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable(),
-                    new Zend_Db_Expr('DISTINCT `product_id`'))
-                    ->where('`listing_id` = ?',(int)$listingData['id']);
-
-                $collection->getSelect()->where('`e`.`entity_id` NOT IN ('.$dbSelect->__toString().')');
+            } else {
+                $dbExcludeSelect->where('`listing_id` = ?',(int)$listingData['id']);
             }
+
+            $collection->getSelect()
+                ->joinLeft(array('sq' => $dbExcludeSelect), 'sq.product_id = e.entity_id', array())
+                ->where('sq.product_id IS NULL');
         }
+
+//        $collection->getSelect()->where('`e`.`entity_id` NOT IN ('.$dbSelect->__toString().')');
         //----------------------------
 
         // Add categories filter
@@ -328,6 +335,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Product_Grid extends Mage_A
     {
         $advancedFilterBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_listing_product_rule');
         $advancedFilterBlock->setShowHideProductsOption();
+        $advancedFilterBlock->setGridJsObjectName($this->getJsObjectName());
 
         return $advancedFilterBlock->toHtml() . parent::getMassactionBlockHtml();
     }
@@ -584,7 +592,7 @@ JAVASCRIPT;
             Mage::helper('M2ePro/Data_Global')->getValue('hide_products_others_listings_prefix')
         );
 
-        return !empty($ruleData) || $showHideProductsOption;
+        return !empty($ruleData) || is_null($showHideProductsOption) || $showHideProductsOption;
     }
 
     // ####################################

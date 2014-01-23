@@ -7,13 +7,15 @@
 class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
     extends Mage_Adminhtml_Block_Widget_Grid
 {
+    private $modelName = null;
+
     public function __construct()
     {
         parent::__construct();
 
         // Initialization block
         //------------------------------
-        $this->setId('developmentTable'.Mage::helper('M2ePro/Data_Global')->getValue('data_model').'Grid');
+        $this->setId('developmentTable'.$this->getRequest()->getParam('table').'Grid');
         //------------------------------
 
         // Set default values
@@ -27,12 +29,31 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
 
     // ####################################
 
+    protected function getModelName()
+    {
+        if (!is_null($this->modelName)) {
+            return $this->modelName;
+        }
+
+        $modelName = Mage::helper('M2ePro/Module_Database')->getTableModel(
+            $this->getRequest()->getParam('table')
+        );
+
+        if (is_null($modelName)) {
+            throw new Exception(sprintf(
+                'Specified table "%s" cannot be managed.', $this->getRequest()->getParam('table')
+            ));
+        }
+
+        return $this->modelName = $modelName;
+    }
+
+    // ####################################
+
     protected function _prepareCollection()
     {
         // Get collection of prices templates
-        $collection = Mage::getModel('M2ePro/'.Mage::helper('M2ePro/Data_Global')->getValue('data_model'))
-                                                                                 ->getCollection();
-        // Set collection to grid
+        $collection = Mage::getModel('M2ePro/'.$this->getModelName())->getCollection();
         $this->setCollection($collection);
 
         return parent::_prepareCollection();
@@ -40,30 +61,38 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
 
     protected function _prepareColumns()
     {
-        $resourceModel = Mage::getResourceModel('M2ePro/'.Mage::helper('M2ePro/Data_Global')->getValue('data_model'));
+        $resourceModel = Mage::getResourceModel('M2ePro/'.$this->getModelName());
+        $tableAction = Mage::getSingleton('core/resource')->getTableName($this->getRequest()->getParam('table'));
 
-        $tableAction = Mage::getSingleton('core/resource')
-                                 ->getTableName(Mage::helper('M2ePro/Data_Global')->getValue('data_table'));
         $columns = $resourceModel->getReadConnection()->fetchAll('SHOW COLUMNS FROM '.$tableAction);
 
-        $type = 'number';
         foreach ($columns as $column) {
 
             $header = '<big>'.$column['Field'].'</big> &nbsp;
                        <small style="font-weight:normal;">('.$column['Type'].')</small>';
 
-            $this->addColumn($column['Field'], array(
+            $columnType = $this->getColumnType($column);
+
+            $params = array(
                 'header'    => $header,
                 'align'     => 'left',
-                //'width'     => '200px',
-                'type'      => $type,
+                'type'      => $columnType,
                 'string_limit' => 10000,
                 'index'     => strtolower($column['Field']),
                 'filter_index' => 'main_table.'.strtolower($column['Field']),
-                'frame_callback' => array($this, 'callbackColumnData')
-            ));
+                'frame_callback' => array($this, 'callbackColumnData'),
+            );
 
-            $type = 'text';
+            if ($columnType == 'datetime') {
+                $params = array_merge($params, array(
+                    'filter_time' => true,
+                    'align'       => 'right',
+                    'renderer' => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_renderer_datetime',
+                    'filter'   => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_filter_datetime'
+                ));
+            }
+
+            $this->addColumn($column['Field'], $params);
         }
 
         $this->addColumn('actions_row', array(
@@ -80,6 +109,42 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
         return parent::_prepareColumns();
     }
 
+    protected function _toHtml()
+    {
+        $gridId = $this->getId();
+
+        $urlParams = array(
+            'model' => $this->getModelName(),
+            'table' => $this->getRequest()->getParam('table')
+        );
+
+        $root = 'adminhtml_development_database';
+        $urls = json_encode(array(
+            $root.'/deleteTableRows' => $this->getUrl('*/*/deleteTableRows', $urlParams),
+            $root.'/updateTableCells' => $this->getUrl('*/*/updateTableCells', $urlParams),
+            $root.'/getUpdateCellsPopupHtml' => $this->getUrl('*/*/getUpdateCellsPopupHtml', $urlParams)
+        ));
+
+        $commonJs = <<<HTML
+<script type="text/javascript">
+    DevelopmentDatabaseGridHandlerObj.afterInitPage();
+</script>
+HTML;
+        $additionalJs = '';
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            $additionalJs = <<<HTML
+<script type="text/javascript">
+
+   M2ePro.url.add({$urls});
+   DevelopmentDatabaseGridHandlerObj = new DatabaseGridHandler('{$gridId}');
+
+</script>
+HTML;
+        }
+
+        return parent::_toHtml() . $additionalJs . $commonJs;
+    }
+
     // ####################################
 
     protected function _prepareMassaction()
@@ -91,17 +156,16 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
         //--------------------------------
 
         //--------------------------------
-        $url = $this->getUrl(
-            '*/*/deleteTableSelectedRows',
-            array(
-                'model'=>Mage::helper('M2ePro/Data_Global')->getValue('data_model'),
-                'table'=>Mage::helper('M2ePro/Data_Global')->getValue('data_table')
-            )
-        );
-        $this->getMassactionBlock()->addItem('delete', array(
+        $this->getMassactionBlock()->addItem('deleteTableRows', array(
              'label'    => Mage::helper('M2ePro')->__('Delete'),
-             'url'      => $url,
-             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
+             'url'      => '',
+        ));
+        //--------------------------------
+
+        //--------------------------------
+        $this->getMassactionBlock()->addItem('updateTableCells', array(
+            'label'    => Mage::helper('M2ePro')->__('Update'),
+            'url'      => ''
         ));
         //--------------------------------
 
@@ -114,76 +178,50 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
     {
         $cellId = 'table_row_cell_'.$column->getId().'_'.$row->getId();
 
-        $htmlValue = '<div id="'.$cellId.'" onmouseover="mouseOverCell(\''.$cellId.'\');"
-                                            onmouseout="mouseOutCell(\''.$cellId.'\');">';
-
-        $htmlValue .= '<span id="'.$cellId.'_view_container">';
-        if (is_null($value)) {
-            $htmlValue .= '<span style="color:silver;"><small>NULL</small></span>';
-        } else {
-            $tempValue = $value;
-            strlen($tempValue) > 255 && $tempValue = substr($tempValue,0,255).' ...';
-            $htmlValue .= Mage::helper('M2ePro')->escapeHtml($tempValue);
-        }
-        $htmlValue .= '</span>';
-
-        $inputValue = $value;
-
-        if (is_null($inputValue)) {
-            $inputValue = 'NULL';
-        } else {
-            $inputValue = Mage::helper('M2ePro')->escapeHtml($inputValue);
+        $tempValue = '<span style="color:silver;"><small>NULL</small></span>';
+        if (!is_null($value)) {
+            $tempValue = strlen($value) > 255 ? substr($value,0,255).' ...' : $value;
+            $tempValue = Mage::helper('M2ePro')->escapeHtml($tempValue);
         }
 
-        $htmlValue .= '<span id="'.$cellId.'_edit_container" style="display:none;">';
-        $htmlValue .= '<textarea style="width:100%;height:100%;" id="'.$cellId.'_edit_input">';
-        $htmlValue .= $inputValue;
-        $htmlValue .= '</textarea>';
-        $htmlValue .= '</span>';
+        $inputValue = 'NULL';
+        if (!is_null($value)) {
+            $inputValue = Mage::helper('M2ePro')->escapeHtml($value);
+        }
 
-        $tempUrl = $this->getUrl(
-            '*/*/updateTableCell',
-            array(
-                'id'=>$row->getId(),
-                'column'=>$column->getId(),
-                'model'=>Mage::helper('M2ePro/Data_Global')->getValue('data_model'),
-                'table'=>Mage::helper('M2ePro/Data_Global')->getValue('data_table'),
-            )
-        );
+        return <<<HTML
+<div id="{$cellId}" onmouseover="DevelopmentDatabaseGridHandlerObj.mouseOverCell('{$cellId}');"
+                    onmouseout="DevelopmentDatabaseGridHandlerObj.mouseOutCell('{$cellId}');">
 
-        $htmlValue .= '&nbsp;<a id="'.$cellId.'_edit_link"
-                                href="javascript:void(0);"
-                                onclick="switchCellToEdit(\''.$cellId.'\');"
-                                style="display:none;">edit</a>';
+    <span id="{$cellId}_view_container">{$tempValue}</span>
 
-        $htmlValue .= '&nbsp;<a id="'.$cellId.'_view_link"
-                                href="javascript:void(0);"
-                                onclick="switchCellToView(\''.$cellId.'\');"
-                                style="display:none;">cancel</a>';
-        $htmlValue .= '&nbsp;<a id="'.$cellId.'_save_link"
-                                href="javascript:void(0);"
-                                onclick="saveCell(\''.$cellId.'\',\''.$tempUrl.'\');"
-                                style="display:none;">save</a>';
+    <span id="{$cellId}_edit_container" style="display: none;">
+        <textarea style="width:100%; height:100%;" id="{$cellId}_edit_input">{$inputValue}</textarea>
+    </span>
 
-        return $htmlValue.'</div>';
+    <span id="{$cellId}_edit_link" style="display: none;">&nbsp;
+        <a href="javascript:void(0);"
+           onclick="DevelopmentDatabaseGridHandlerObj.switchCellToEdit('{$cellId}');">edit</a>
+    </span>
+    <span id="{$cellId}_view_link" style="display: none;">&nbsp;
+        <a href="javascript:void(0);"
+           onclick="DevelopmentDatabaseGridHandlerObj.switchCellToView('{$cellId}');">cancel</a>
+    </span>
+    <span id="{$cellId}_save_link" style="display: none;">&nbsp;
+        <a href="javascript:void(0);"
+           onclick="DevelopmentDatabaseGridHandlerObj.saveTableCell('{$row->getId()}','{$column->getId()}');">save</a>
+    </span>
+</div>
+HTML;
     }
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
-        $resultHtml = '';
-        $tempId = $row->getId();
-
-        $tempUrl = $this->getUrl(
-            '*/*/deleteTableRow',
-            array(
-                'id'=>$tempId,
-                'model'=>Mage::helper('M2ePro/Data_Global')->getValue('data_model'),
-                'table'=>Mage::helper('M2ePro/Data_Global')->getValue('data_table'),
-            )
-        );
-        $resultHtml .= '<a href="javascript:void(0);" onclick="deleteTableRow(\''.$tempUrl.'\')">Delete</a>';
-
-        return $resultHtml;
+        return <<<HTML
+<a href="javascript:void(0);" onclick="DevelopmentDatabaseGridHandlerObj.deleteTableRows('{$row->getId()}')">
+    Delete
+</a>
+HTML;
     }
 
     // ####################################
@@ -196,6 +234,21 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
     public function getRowUrl($row)
     {
         //return $this->getUrl('*/*/editTableRow', array('id' => $row->getId()));
+    }
+
+    // ####################################
+
+    private function getColumnType($columnData)
+    {
+        if ($columnData['Type'] == 'datetime') {
+            return 'datetime';
+        }
+
+        if (preg_match('/int|float|decimal/', $columnData['Type'])) {
+            return 'number';
+        }
+
+        return 'text';
     }
 
     // ####################################

@@ -20,6 +20,11 @@
         <tr>
             <td class="label">
                 <label><?php echo $module; ?>: </label>
+                <?php if (!empty($data['description'])) { ?>
+                    <p class="note" style="color: grey">
+                        <span><?php echo Mage::helper('M2ePro')->__($data['description']); ?></span>
+                    </p>
+                <?php } ?>
             </td>
             <td class="value">
                 <?php if ($data['active']) { ?>

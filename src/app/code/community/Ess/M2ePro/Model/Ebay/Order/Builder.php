@@ -138,6 +138,8 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
         $shippingStatus = $this->helper->getShippingStatus($data['shipping_date'], $data['shipping_method_selected']);
         $this->setData('shipping_status', $shippingStatus);
+
+        $this->setData('global_shipping_details', $data['global_shipping_details']);
         // ------------------
 
         $this->items = $data['items'];
@@ -359,6 +361,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
         $this->setData('shipping_address', json_encode($this->getData('shipping_address')));
         $this->setData('shipping_tracking_details', json_encode($this->getData('shipping_tracking_details')));
+        $this->setData('global_shipping_details', json_encode($this->getData('global_shipping_details')));
 
         $this->order->addData($this->getData());
         $this->order->save();

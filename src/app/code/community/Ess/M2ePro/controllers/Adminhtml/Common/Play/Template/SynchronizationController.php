@@ -147,9 +147,15 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SynchronizationController
         // Add or update model
         //--------------------
         $model = Mage::helper('M2ePro/Component_Play')->getModel('Template_Synchronization');
-        is_null($id) && $model->setData($data);
-        !is_null($id) && $model->load($id)->addData($data);
-        $id = $model->save()->getId();
+        $model->load($id);
+
+        $oldData = $model->getDataSnapshot();
+        $model->addData($data)->save();
+        $newData = $model->getDataSnapshot();
+
+        $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
+
+        $id = $model->getId();
         //--------------------
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Template was successfully saved'));

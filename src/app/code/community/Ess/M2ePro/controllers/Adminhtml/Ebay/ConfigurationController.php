@@ -13,6 +13,9 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
         $this->loadLayout()
             ->_title(Mage::helper('M2ePro')->__('Configuration'));
 
+        $this->getLayout()->getBlock('head')
+            ->addJs('M2ePro/Ebay/ConfigurationHandler.js');
+
         return $this;
     }
 
@@ -33,6 +36,16 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
             )->renderLayout();
     }
 
+    public function globalAction()
+    {
+        $this->_initAction()
+            ->_addContent($this->getLayout()->createBlock(
+                    'M2ePro/adminhtml_ebay_configuration', '',
+                    array('active_tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_GLOBAL)
+                )
+            )->renderLayout();
+    }
+
     public function saveAction()
     {
         Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
@@ -46,6 +59,29 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
         Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
             '/view/ebay/cron/notification/', 'mode',
             (int)$this->getRequest()->getParam('cron_notification_mode')
+        );
+
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/view/ebay/template/category/', 'use_last_specifics',
+            (int)$this->getRequest()->getParam('use_last_specifics_mode')
+        );
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/ebay/connector/listing/', 'check_the_same_product_already_listed',
+            (int)$this->getRequest()->getParam('check_the_same_product_already_listed_mode')
+        );
+
+        $sellingCurrency = $this->getRequest()->getParam('selling_currency');
+        if (!empty($sellingCurrency)) {
+            foreach ($sellingCurrency as $code => $value) {
+                Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+                    '/ebay/selling/currency/', $code, (string)$value
+                );
+            }
+        }
+
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/ebay/motor/', 'motors_specifics_attribute',
+            $this->getRequest()->getParam('motors_specifics_attribute')
         );
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Settings was successfully saved.'));

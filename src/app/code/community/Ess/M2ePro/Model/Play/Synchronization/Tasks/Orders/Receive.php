@@ -108,14 +108,10 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
             $percentsForAccount = $percentsForAccount/$accountsTotalCount;
         }
 
-        $marketplace = Mage::helper('M2ePro/Component_Play')->getCachedObject(
-            'Marketplace', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID
-        );
-
         $accountIteration = 1;
         foreach ($accountsCollection->getItems() as $account) {
-            if (!$this->isLockedAccountMarketplace($account->getId(), $marketplace->getId())) {
-                $this->processAccountMarketplace($account, $marketplace);
+            if (!$this->isLockedAccount($account->getId())) {
+                $this->processAccount($account);
             }
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
@@ -129,18 +125,16 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
 
     //####################################
 
-    private function processAccountMarketplace(
-        Ess_M2ePro_Model_Account $account,
-        Ess_M2ePro_Model_Marketplace $marketplace
-    ) {
-        $title = 'Starting account "%s" and marketplace "%s%';
-        $title = sprintf($title, $account->getTitle(), $marketplace->getTitle());
+    private function processAccount(Ess_M2ePro_Model_Account $account)
+    {
+        $title = 'Starting account "%s"';
+        $title = sprintf($title, $account->getTitle());
 
         $this->_profiler->addTitle($title);
         $this->_profiler->addTimePoint(__METHOD__.'send'.$account->getId(),'Get orders from Play');
 
-        $status = 'Task "%s" for Play.com "%s" Account and "%s" marketplace is started. Please wait...';
-        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle(), $marketplace->getTitle());
+        $status = 'Task "%s" for Play.com "%s" Account is started. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle());
         $this->_lockItem->setStatus($status);
 
         //------------------------------
@@ -156,11 +150,11 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
 
         // Get open orders from Play.com for account
         //---------------------------
-        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Server_Play_Dispatcher */
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
+        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Play_Dispatcher */
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Dispatcher');
         $prefix = 'Ess_M2ePro_Model_Play_Synchronization';
         $dispatcherObject->processConnector(
-            'tasks', 'orders_receive', 'requester', $params, $marketplace, $account, $prefix
+            'tasks', 'orders_receive', 'requester', $params, $account, $prefix
         );
         //---------------------------
 
@@ -214,11 +208,11 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Orders_Receive extends Ess_M2e
 
     //####################################
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $maxDeactivateTime = (int)$this->config->getGroupValue('/play/orders/receive/', 'max_deactivate_time');
         $lockItem->setMaxDeactivateTime($maxDeactivateTime);

@@ -90,12 +90,17 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_RemoveUnusedTemplates
         $this->removeUnusedTemplates(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING);
         $this->removeUnusedTemplates(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN);
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 1*self::PERCENTS_INTERVAL/3);
+        $this->_lockItem->setPercents(self::PERCENTS_START + 1*self::PERCENTS_INTERVAL/4);
         $this->_lockItem->activate();
 
         $this->removeCategoriesTemplates();
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 2*self::PERCENTS_INTERVAL/3);
+        $this->_lockItem->setPercents(self::PERCENTS_START + 2*self::PERCENTS_INTERVAL/4);
+        $this->_lockItem->activate();
+
+        $this->removeOtherCategoriesTemplates();
+
+        $this->_lockItem->setPercents(self::PERCENTS_START + 3*self::PERCENTS_INTERVAL/4);
         $this->_lockItem->activate();
 
         $this->setCheckLastTime(Mage::helper('M2ePro')->getCurrentGmtDate(true));
@@ -112,6 +117,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_RemoveUnusedTemplates
 
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
         $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
 
@@ -151,16 +157,18 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_RemoveUnusedTemplates
         $this->_profiler->saveTimePoint(__METHOD__.$templateNick);
     }
 
+    // -----------------------------------
+
     private function removeCategoriesTemplates()
     {
         $this->_profiler->addTimePoint(__METHOD__,'Remove Unused "Category" Templates');
 
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
         $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
         $listingAutoCategoryTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category')->getMainTable();
-        $listingAutoFilterTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Filter')->getMainTable();
 
         $minCreateDate = Mage::helper('M2ePro')->getCurrentGmtDate(true) - self::SAFE_CREATE_DATE_INTERVAL;
         $minCreateDate = Mage::helper('M2ePro')->getDate($minCreateDate);
@@ -174,9 +182,6 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_RemoveUnusedTemplates
         $unionListingAutoCategorySelect = $connWrite->select()
                     ->from($listingAutoCategoryTable,array('result_field'=>'adding_template_category_id'))
                     ->where('adding_template_category_id IS NOT NULL');
-        $unionListingAutoFilterSelect = $connWrite->select()
-                    ->from($listingAutoFilterTable,array('result_field'=>'adding_template_category_id'))
-                    ->where('adding_template_category_id IS NOT NULL');
         $unionSelectListingProductTemplate = $connWrite->select()
                     ->from($listingProductTable,array('result_field'=>'template_category_id'))
                     ->where('template_category_id IS NOT NULL');
@@ -185,11 +190,56 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_RemoveUnusedTemplates
             $unionListingAutoGlobalSelect,
             $unionListingAutoWebsiteSelect,
             $unionListingAutoCategorySelect,
-            $unionListingAutoFilterSelect,
             $unionSelectListingProductTemplate
         ));
 
         $collection = Mage::getModel('M2ePro/Ebay_Template_Category')->getCollection();
+        $collection->getSelect()->where('`id` NOT IN ('.$unionSelect->__toString().')');
+        $collection->getSelect()->where('`create_date` < ?',$minCreateDate);
+
+        $unusedTemplates = $collection->getItems();
+        foreach ($unusedTemplates as $unusedTemplate) {
+            $unusedTemplate->deleteInstance();
+        }
+
+        $this->_profiler->saveTimePoint(__METHOD__);
+    }
+
+    private function removeOtherCategoriesTemplates()
+    {
+        $this->_profiler->addTimePoint(__METHOD__,'Remove Unused "Other Category" Templates');
+
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
+        $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
+        $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
+        $listingAutoCategoryTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category')->getMainTable();
+
+        $minCreateDate = Mage::helper('M2ePro')->getCurrentGmtDate(true) - self::SAFE_CREATE_DATE_INTERVAL;
+        $minCreateDate = Mage::helper('M2ePro')->getDate($minCreateDate);
+
+        $unionListingAutoGlobalSelect = $connWrite->select()
+                    ->from($listingTable,array('result_field'=>'auto_global_adding_template_other_category_id'))
+                    ->where('auto_global_adding_template_other_category_id IS NOT NULL');
+        $unionListingAutoWebsiteSelect = $connWrite->select()
+                    ->from($listingTable,array('result_field'=>'auto_website_adding_template_other_category_id'))
+                    ->where('auto_website_adding_template_other_category_id IS NOT NULL');
+        $unionListingAutoCategorySelect = $connWrite->select()
+                    ->from($listingAutoCategoryTable,array('result_field'=>'adding_template_other_category_id'))
+                    ->where('adding_template_other_category_id IS NOT NULL');
+        $unionSelectListingProductTemplate = $connWrite->select()
+                    ->from($listingProductTable,array('result_field'=>'template_other_category_id'))
+                    ->where('template_other_category_id IS NOT NULL');
+
+        $unionSelect = $connWrite->select()->union(array(
+            $unionListingAutoGlobalSelect,
+            $unionListingAutoWebsiteSelect,
+            $unionListingAutoCategorySelect,
+            $unionSelectListingProductTemplate
+        ));
+
+        $collection = Mage::getModel('M2ePro/Ebay_Template_OtherCategory')->getCollection();
         $collection->getSelect()->where('`id` NOT IN ('.$unionSelect->__toString().')');
         $collection->getSelect()->where('`create_date` < ?',$minCreateDate);
 

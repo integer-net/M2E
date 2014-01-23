@@ -99,14 +99,14 @@ abstract class Ess_M2ePro_Controller_Adminhtml_BaseController
     {
         $this->appendGeneralBlock($this->getLayout()->getBlock('left'));
         $this->beforeAddLeftEvent();
-        return parent::_addLeft($block);
+        return $this->addLeft($block);
     }
 
     protected function _addContent(Mage_Core_Block_Abstract $block)
     {
         $this->appendGeneralBlock($this->getLayout()->getBlock('content'));
         $this->beforeAddContentEvent();
-        return parent::_addContent($block);
+        return $this->addContent($block);
     }
 
     //---------------------------------------------
@@ -183,6 +183,8 @@ abstract class Ess_M2ePro_Controller_Adminhtml_BaseController
         return $this;
     }
 
+    //#############################################
+
     protected function appendGeneralBlock(Mage_Core_Block_Abstract $block)
     {
         if ($this->generalBlockWasAppended) {
@@ -194,6 +196,16 @@ abstract class Ess_M2ePro_Controller_Adminhtml_BaseController
 
         $block->append($blockGeneral);
         $this->generalBlockWasAppended = true;
+    }
+
+    protected function addLeft(Mage_Core_Block_Abstract $block)
+    {
+        return parent::_addLeft($block);
+    }
+
+    protected function addContent(Mage_Core_Block_Abstract $block)
+    {
+        return parent::_addContent($block);
     }
 
     //#############################################

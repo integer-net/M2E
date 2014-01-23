@@ -12,7 +12,7 @@ If you want the price on Play.com to be multiplied by coefficient 1.2, you shoul
 <br/>
 <i>Play.com Price = Magento Price * 1.2.</i>
 <br/><br/>
-<b>Note:</b> If the Special Price is chosen in the <span style="text-decoration: underline;">Item Price</span> option, but it is not set in Magento Product settings or it is set but it has already expired, the Product Price is used instead.
+<b>Note:</b> If the Special Price is chosen in the <span style="text-decoration: underline;">Price</span> option, but it is not set in Magento Product settings or it is set but it has already expired, the Product Price is used instead.
 <br/><br/>
 <b>Note:</b> Attributes must contain only numeric values.'); ?>
 </div>
@@ -216,7 +216,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr class="requirie-attribute-set">
                     <td class="label">
-                        <label for="qty_mode"><?php echo Mage::helper('M2ePro')->__('Item Quantity'); ?>: </label>
+                        <label for="qty_mode"><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="qty_mode" name="qty_mode">
@@ -286,7 +286,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 <div class="entry-edit" id="magento_block_play_template_selling_format_price">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Item Price'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Price'); ?></h4>
     </div>
 
     <div class="fieldset">

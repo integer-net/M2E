@@ -49,7 +49,7 @@
     <div id="magento_block_configuration_ebay_channel">
 
         <div id="block_notice_configuration_ebay_channel" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Channels'); ?>">
-            <p><?php echo Mage::helper('M2ePro')->__('Enable channels you are going to work with and Save configuration, the new settings to take effect.'); ?></p>
+            <p><?php echo Mage::helper('M2ePro')->__('Enable channels you are going to work with and Save configuration.'); ?></p>
         </div>
 
         <div class="entry-edit" id="magento_block_configuration_channel_status">
@@ -115,7 +115,7 @@
                     <?php if ($this->component_amazon_allowed) { ?>
                         <tr>
                             <td class="label">
-                                <label><?php echo Ess_M2ePro_Helper_Component_Amazon::TITLE; ?>: </label>
+                                <label><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE); ?>: </label>
                             </td>
                             <td class="value">
                                 <select id="component_amazon_mode" name="component_amazon_mode" class="M2ePro-component-other">
@@ -163,7 +163,7 @@
                                 <?php if ($this->component_buy_allowed) { ?>
                                     <tr>
                                         <td class="label">
-                                            <label><?php echo Ess_M2ePro_Helper_Component_Buy::TITLE; ?>: </label>
+                                            <label><?php echo  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE); ?>: </label>
                                         </td>
                                         <td class="value">
                                             <select id="component_buy_mode" name="component_buy_mode" class="M2ePro-component-other">
@@ -180,7 +180,7 @@
                                 <?php if ($this->component_play_allowed) { ?>
                                     <tr>
                                         <td class="label">
-                                            <label><?php echo Ess_M2ePro_Helper_Component_Play::TITLE; ?>: </label>
+                                            <label><?php echo  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE); ?>: </label>
                                         </td>
                                         <td class="value">
                                             <select id="component_play_mode" name="component_play_mode" class="M2ePro-component-other">
@@ -231,12 +231,12 @@
                         </td>
                         <td class="value">
                             <select id="view_common_component_default" name="view_common_component_default">
-                                <option value="<?php echo Ess_M2ePro_Helper_Component_Amazon::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Amazon::NICK) echo 'selected="selected"'; ?>><?php echo Ess_M2ePro_Helper_Component_Amazon::TITLE; ?></option>
-                                <option value="<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Buy::NICK) echo 'selected="selected"'; ?>><?php echo Ess_M2ePro_Helper_Component_Buy::TITLE; ?></option>
-                                <option value="<?php echo Ess_M2ePro_Helper_Component_Play::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Play::NICK) echo 'selected="selected"'; ?>><?php echo Ess_M2ePro_Helper_Component_Play::TITLE; ?></option>
+                                <option value="<?php echo Ess_M2ePro_Helper_Component_Amazon::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Amazon::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Buy::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Helper_Component_Play::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Play::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('The tab of which channel must be opened by default.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Open tab by default.'); ?></span>
                             </p>
                         </td>
                     </tr>

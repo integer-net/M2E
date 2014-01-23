@@ -5,33 +5,18 @@
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_OtherListings_Update_Requester
+    extends Ess_M2ePro_Model_Connector_Ebay_Inventory_Get_Items
 {
-    protected $params = array();
-
-    /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
-     * @var Ess_M2ePro_Model_Account|null
-     */
-    protected $account = NULL;
-
     // ########################################
 
-    public function initialize(array $params = array(),
-                               Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
+    protected function makeResponserModel()
     {
-        $this->params = $params;
-        $this->marketplace = $marketplace;
-        $this->account = $account;
+        return 'M2ePro/Ebay_Synchronization_Tasks_OtherListings_Update_Responser';
     }
 
     // ########################################
 
-    public function setLocks($hash)
+    protected function setLocks($hash)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');

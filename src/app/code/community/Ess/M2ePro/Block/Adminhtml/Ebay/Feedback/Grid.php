@@ -38,12 +38,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback_Grid extends Mage_Adminhtml_Block
                    ->joinLeft(
                        array('mea' => Mage::getResourceModel('M2ePro/Ebay_Account')->getMainTable()),
                        '(`mea`.`account_id` = `main_table`.`account_id`)',
-                       array('account_mode'=>'mode')
-                   )
-                   ->joinLeft(
-                       array('mei' => Mage::getResourceModel('M2ePro/Ebay_Item')->getMainTable()),
-                       '(`mei`.item_id = `main_table`.ebay_item_id)',
-                       array('have_seller_feedback' => $dbExpr)
+                       array('account_mode'=>'mode','have_seller_feedback' => $dbExpr)
                    );
 
         $collection->addFieldToFilter('`main_table`.`account_id`', $accountId);

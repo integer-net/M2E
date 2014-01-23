@@ -11,7 +11,7 @@ class Ess_M2ePro_Model_Observer_Ebay_Category
 
     //####################################
 
-    public function synchProductWithAddedCategoryId($product, $categoryId)
+    public function synchProductWithAddedCategoryId($product, $categoryId, $websiteId)
     {
         /** @var Ess_M2ePro_Model_Observer_Ebay_Product $ebayObserver */
         $ebayObserver = Mage::getModel('M2ePro/Observer_Ebay_Product');
@@ -29,6 +29,10 @@ class Ess_M2ePro_Model_Observer_Ebay_Category
             /** @var $listing Ess_M2ePro_Model_Listing */
             $listing = $this->getLoadedListing($autoCategory->getListingId());
 
+            if ((int)$listing->getData('store_website_id') != $websiteId) {
+                continue;
+            }
+
             if (!$listing->getChildObject()->isAutoModeCategory()) {
                 continue;
             }
@@ -36,18 +40,13 @@ class Ess_M2ePro_Model_Observer_Ebay_Category
             /** @var Mage_Catalog_Model_Product $product */
             $product = Mage::helper('M2ePro/Magento_Product')->getCachedAndLoadedProduct($product);
 
-            if ((int)$listing->getData('store_website_id') > 0 &&
-                !in_array($listing->getData('store_website_id'),$product->getWebsiteIds())) {
-                continue;
-            }
-
             $ebayObserver->addProductToListing($listing,$product,
-                                               $autoCategory->isAddingDuplicate(),
-                                               $autoCategory->getAddingTemplateCategoryId());
+                                               $autoCategory->getAddingTemplateCategoryId(),
+                                               $autoCategory->getAddingTemplateOtherCategoryId());
         }
     }
 
-    public function synchProductWithDeletedCategoryId($product, $categoryId)
+    public function synchProductWithDeletedCategoryId($product, $categoryId, $websiteId)
     {
         /** @var Ess_M2ePro_Model_Observer_Ebay_Product $ebayObserver */
         $ebayObserver = Mage::getModel('M2ePro/Observer_Ebay_Product');
@@ -65,17 +64,16 @@ class Ess_M2ePro_Model_Observer_Ebay_Category
             /** @var $listing Ess_M2ePro_Model_Listing */
             $listing = $this->getLoadedListing($autoCategory->getListingId());
 
+            if ((int)$listing->getData('store_website_id') != $websiteId) {
+                continue;
+            }
+
             if (!$listing->getChildObject()->isAutoModeCategory()) {
                 continue;
             }
 
             /** @var Mage_Catalog_Model_Product $product */
             $product = Mage::helper('M2ePro/Magento_Product')->getCachedAndLoadedProduct($product);
-
-            if ((int)$listing->getData('store_website_id') > 0 &&
-                !in_array($listing->getData('store_website_id'),$product->getWebsiteIds())) {
-                continue;
-            }
 
             $ebayObserver->deleteProductFromListing($listing,$product,
                                                     $autoCategory->getDeletingMode());

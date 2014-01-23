@@ -38,10 +38,10 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
         $lockItem = Mage::getModel('M2ePro/Listing_Other_LockItem',array('component' => $component));
 
         if ($lockItem->isExist()) {
-            exit('locked');
+            return $this->getResponse()->setBody('locked');
         }
 
-        exit('unlocked');
+        return $this->getResponse()->setBody('unlocked');
     }
 
     public function lockNowAction()
@@ -53,8 +53,6 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
         if (!$lockItem->isExist()) {
             $lockItem->create();
         }
-
-        exit();
     }
 
     public function unlockNowAction()
@@ -66,8 +64,6 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
         if ($lockItem->isExist()) {
             $lockItem->remove();
         }
-
-        exit();
     }
 
     //---------------------------------------------
@@ -80,7 +76,7 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
             'type_log' => 'listing_other'
         );
         $block = $this->getLayout()->createBlock('M2ePro/adminhtml_log_errorsSummary','',$blockParams);
-        exit($block->toHtml());
+        return $this->getResponse()->setBody($block->toHtml());
     }
 
     //#############################################

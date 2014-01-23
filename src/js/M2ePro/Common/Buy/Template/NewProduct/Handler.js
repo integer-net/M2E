@@ -137,7 +137,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
     node_title_change: function(element)
     {
-        this.parentId = element.down('option[value=' + element.value + ']').getAttribute('id_node_key');
+        this.parentId = element.down('option[value="' + element.value + '"]').getAttribute('id_node_key');
 
         this.categoriesTr.show();
         this.categoriesContainer.show();
@@ -146,7 +146,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         this.changeButton.hide();
         this.confirmButton.hide();
 
-        this.getCategories(element.down('option[value=' + element.value + ']').getAttribute('node_id'),function(transport) {
+        this.getCategories(element.down('option[value="' + element.value + '"]').getAttribute('node_id'),function(transport) {
             this.categories = transport.responseText.evalJSON();
             this.showCategories(this.categoriesContainer);
         });
@@ -243,7 +243,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
         this.changeButton.show();
         this.categoriesTr.hide();
-        $$('input[name=category[node_title]]').shift().value = this.nodeTitleEl.value;
+        $$('input[name="category[node_title]"]').shift().value = this.nodeTitleEl.value;
 
         this.nodeTitleEl.value = '';
 
@@ -297,6 +297,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
     initPopUp: function(contentId,width,height,title)
     {
         this[contentId] = new Window({
+            id: 'window_'+contentId,
             draggable: true,
             resizable: true,
             closable: true,
@@ -369,7 +370,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
         this.categoriesTr.hide();
 
-        $$('input[name=category[node_title]]').shift().value = this.nodeTitleEl.select('option[node_id='+ categoryInfo.node_id +']').shift().getAttribute('value');
+        $$('input[name="category[node_title]"]').shift().value = this.nodeTitleEl.select('option[node_id="'+ categoryInfo.node_id +'"]').shift().getAttribute('value');
 
         this.search_category.close();
 
@@ -384,36 +385,25 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
     //----------------------------------
 
+    gtin_mode_change: function()
+    {
+        this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::GTIN_MODE_NONE')
+            ? $('gtin_custom_attribute_tr').hide()
+            : $('gtin_custom_attribute_tr').show();
+    },
+
     isbn_mode_change: function()
     {
-        var self = BuyTemplateNewProductHandlerObj;
-        var handlers = {};
-
-        handlers[M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_NONE')] = function() {
-            $('isbn_custom_attribute_tr').hide();
-        };
-
-        handlers[M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_CUSTOM_ATTRIBUTE')] = function() {
-            $('isbn_custom_attribute_tr').show();
-        };
-
-        handlers[this.value].call(self);
+        this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_NONE')
+            ? $('isbn_custom_attribute_tr').hide()
+            : $('isbn_custom_attribute_tr').show();
     },
 
     asin_mode_change: function()
     {
-        var self = BuyTemplateNewProductHandlerObj;
-        var handlers = {};
-
-        handlers[M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_NONE')] = function() {
-            $('asin_custom_attribute_tr').hide();
-        };
-
-        handlers[M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_CUSTOM_ATTRIBUTE')] = function() {
-            $('asin_custom_attribute_tr').show();
-        };
-
-        handlers[this.value].call(self);
+        this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_NONE')
+            ? $('asin_custom_attribute_tr').hide()
+            : $('asin_custom_attribute_tr').show();
     },
 
     mfg_part_number_mode_change: function()

@@ -41,12 +41,19 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log extends Mage_Adminhtml_Block_Widget_Co
 
     protected function _toHtml()
     {
+        $translations = json_encode(array(
+            'Description' => Mage::helper('M2ePro')->__('Description')
+        ));
+
         $javascript = <<<JAVASCIRPT
 
 <script type="text/javascript">
 
+    M2ePro.translator.add({$translations});
+
     Event.observe(window, 'load', function() {
         CommonHandlerObj = new CommonHandler();
+        LogHandlerObj = new LogHandler();
     });
 
 </script>

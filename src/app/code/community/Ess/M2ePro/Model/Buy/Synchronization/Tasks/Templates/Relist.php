@@ -85,6 +85,22 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Relist
 
     private function execute()
     {
+        $tasks = array(
+            'immediatelyChangedProducts',
+        );
+
+        foreach ($tasks as $i => $task) {
+            $this->$task();
+
+            $this->_lockItem->setPercents(self::PERCENTS_START + ($i+1)*self::PERCENTS_INTERVAL/count($tasks));
+            $this->_lockItem->activate();
+        }
+    }
+
+    //####################################
+
+    private function immediatelyChangedProducts()
+    {
         $this->_profiler->addTimePoint(__METHOD__,'Immediately when product was changed');
 
         // Get changed listings products
@@ -105,7 +121,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Tasks_Templates_Relist
 
             $this->_runnerActions->setProduct(
                 $listingProduct,
-                Ess_M2ePro_Model_Connector_Server_Buy_Product_Dispatcher::ACTION_RELIST,
+                Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_RELIST,
                 array()
             );
         }

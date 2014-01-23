@@ -31,14 +31,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Same_Specific extends Mag
             'step' => 3,
             '_current' => true
         ));
-        $redirectUrl = $this->getUrl('*/adminhtml_ebay_listing/review', array(
-            '_current' => true
-        ));
 
         $this->_addButton('save', array(
             'label'     => Mage::helper('M2ePro')->__('Continue'),
             'class'     => 'scalable next',
-            'onclick'   => "EbayListingCategorySpecificHandlerObj.submitData('".$saveUrl."', '".$redirectUrl."');"
+            'onclick'   => "EbayListingCategorySpecificHandlerObj.submitData('{$saveUrl}');"
         ));
     }
 
@@ -96,7 +93,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Same_Specific extends Mag
 
         // --------------------------------------
         if ($categoryMode == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
-            $this->_selectedCategoryPath = Mage::helper('M2ePro/Component_Ebay_Category')->getPathById(
+            $this->_selectedCategoryPath = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
                 $categoryValue, $listingData['marketplace_id']
             );
         } else {

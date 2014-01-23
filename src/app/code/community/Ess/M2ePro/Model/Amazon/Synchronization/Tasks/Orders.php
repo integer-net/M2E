@@ -112,10 +112,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders extends Ess_M2ePro_Mo
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
 
-            $marketplace = $accountObj->getChildObject()->getMarketplace();
-
-            if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplace->getId())) {
-                $this->updateAccountMarketplace($accountObj,$marketplace);
+            if (!$this->isLockedAccount($accountObj->getId())) {
+                $this->updateAccount($accountObj);
             }
 
             $this->_lockItem->setPercents(self::PERCENTS_START + $percentsForAccount*$accountIteration);
@@ -128,11 +126,11 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders extends Ess_M2ePro_Mo
 
     //####################################
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $maxDeactivateTime = (int)$this->config->getGroupValue('/amazon/orders/', 'max_deactivate_time');
 
@@ -143,18 +141,16 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders extends Ess_M2ePro_Mo
 
     //####################################
 
-    private function updateAccountMarketplace(
-        Ess_M2ePro_Model_Account $account,
-        Ess_M2ePro_Model_Marketplace $marketplace
-    ) {
+    private function updateAccount(Ess_M2ePro_Model_Account $account)
+    {
         $this->_profiler->addTitle(
-            'Starting account "'.$account->getTitle().'" and marketplace "'.$marketplace->getTitle().'"'
+            'Starting account "'.$account->getTitle().'"'
         );
         $this->_profiler->addTimePoint(__METHOD__.'send'.$account->getId(),'Get orders from Amazon');
 
-        //->__('Task "%s" for Amazon account: "%s" and marketplace "%s" is started. Please wait...')
-        $status = 'Task "%s" for Amazon account: "%s" and marketplace "%s" is started. Please wait...';
-        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle(), $marketplace->getTitle());
+        //->__('Task "%s" for Amazon account: "%s" is started. Please wait...')
+        $status = 'Task "%s" for Amazon account: "%s" is started. Please wait...';
+        $status = Mage::helper('M2ePro')->__($status, $this->name, $account->getTitle());
         $this->_lockItem->setStatus($status);
 
         // Get orders from Amazon for account
@@ -173,9 +169,9 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Orders extends Ess_M2ePro_Mo
         $name   = 'requester';
         $prefix = 'Ess_M2ePro_Model_Amazon_Synchronization';
 
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
         $dispatcherObject->processConnector(
-            $entity, $type, $name, $params, $marketplace, $account, $prefix
+            $entity, $type, $name, $params, $account, $prefix
         );
         //---------------------------
 

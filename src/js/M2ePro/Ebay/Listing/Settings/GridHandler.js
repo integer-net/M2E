@@ -1,21 +1,19 @@
-EbayListingSettingsGridHandler = Class.create(GridHandler, {
-
-    productIdCellIndex: 1,
-    productTitleCellIndex: 2,
-
-    selectedProductsIds: [],
-    selectedCategoriesData: {},
+EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
 
     //----------------------------------
 
-    prepareActions: function()
+    prepareActions: function($super)
     {
-        this.actions = {
+        $super();
 
-            editCategorySettingsAction: function(id) {
+        this.actions = Object.extend(this.actions,{
+
+            editPrimaryCategorySettingsAction: function(id) {
                 this.editCategorySettings(id);
             }.bind(this),
-
+            editStorePrimaryCategorySettingsAction: function(id) {
+                this.editCategorySettings(id);
+            }.bind(this),
             editAllSettingsAction: function (id) {
                 this.editSettings(id);
             }.bind(this),
@@ -29,92 +27,22 @@ EbayListingSettingsGridHandler = Class.create(GridHandler, {
                 this.editSettings(id, 'synchronization');
             }.bind(this),
 
-            editMotorsSpecificsAction: function() {
-                EbayMotorSpecificHandlerObj.openPopUp();
-            }
-        };
+            editMotorsSpecificsAction: function(id) {
+                this.openMotorsSpecificsPopup(id);
+            }.bind(this)
+
+        });
     },
 
     //----------------------------------
 
-    editCategorySettings: function(id)
+    showEpidsDetails: function(content)
     {
-        this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
-
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/getCategoryChooserHtml') ,
-        {
-            method: 'get',
-            asynchronous : true,
-            parameters : {
-                ids: this.selectedProductsIds.join(',')
-            },
-            onSuccess: function (transport)
-            {
-                var title = M2ePro.translator.translate('eBay Categories');
-
-                this.openPopUp(title, transport.responseText);
-
-                $('cancel_button').observe('click', function() { Windows.getFocusedWindow().close(); });
-
-                $('done_button').observe('click', function() {
-                    if (!EbayListingCategoryChooserHandlerObj.validate()) {
-                        return;
-                    }
-
-                    this.selectedCategoriesData = EbayListingCategoryChooserHandlerObj.getInternalData();
-                    this.editSpecificSettings();
-                }.bind(this));
-            }.bind(this)
-        });
-    },
-
-    editSpecificSettings: function()
-    {
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/getCategorySpecificHtml') ,
-        {
-            method: 'get',
-            asynchronous : true,
-            parameters : {
-                ids: this.selectedProductsIds.join(','),
-                category_mode: EbayListingCategoryChooserHandlerObj.getSelectedCategory(0)['mode'],
-                category_value: EbayListingCategoryChooserHandlerObj.getSelectedCategory(0)['value']
-            },
-            onSuccess: function (transport)
-            {
-                var title = M2ePro.translator.translate('Specifics');
-
-                this.openPopUp(title, transport.responseText);
-
-                $('cancel_button').observe('click', function() { Windows.getFocusedWindow().close(); });
-                $('done_button').observe('click', this.saveCategoryTemplate.bind(this));
-            }.bind(this)
-        });
-    },
-
-    saveCategoryTemplate: function()
-    {
-        if (!EbayListingCategorySpecificHandlerObj.validate()) {
-            return;
-        }
-
-        var categoryTemplateData = {};
-        categoryTemplateData = Object.extend(categoryTemplateData, this.selectedCategoriesData);
-        categoryTemplateData = Object.extend(categoryTemplateData, EbayListingCategorySpecificHandlerObj.getInternalData());
-
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/saveCategoryTemplate') ,
-        {
-            method: 'post',
-            asynchronous : true,
-            parameters : {
-                ids: this.selectedProductsIds.join(','),
-                template_category_data: Object.toJSON(categoryTemplateData)
-            },
-            onSuccess: function (transport)
-            {
-                Windows.getFocusedWindow().close();
-                this.getGridObj().doFilter();
-            }.bind(this)
-        });
+        this.openPopUp(
+            M2ePro.translator.translate('Compatibility Attribute ePIDs'),
+            content,
+            {width: 500, height: 405}
+        );
     },
 
     //----------------------------------
@@ -125,7 +53,7 @@ EbayListingSettingsGridHandler = Class.create(GridHandler, {
 
         new Ajax.Request( M2ePro.url.get('adminhtml_ebay_template/editListingProduct') ,
         {
-            method: 'get',
+            method: 'post',
             asynchronous : true,
             parameters : {
                 ids: this.selectedProductsIds.join(','),
@@ -140,6 +68,12 @@ EbayListingSettingsGridHandler = Class.create(GridHandler, {
                 ebayListingTemplateEditTabsJsTabs.moveTabContentInDest();
             }.bind(this)
         });
+    },
+
+    openMotorsSpecificsPopup: function(id)
+    {
+        this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
+        EbayMotorSpecificHandlerObj.openPopUp();
     },
 
     //----------------------------------
@@ -229,52 +163,9 @@ EbayListingSettingsGridHandler = Class.create(GridHandler, {
 
     //----------------------------------
 
-    openPopUp: function(title, content)
-    {
-        var self = this;
-
-        var config = {
-            draggable: true,
-            resizable: true,
-            closable: true,
-            className: "magento",
-            windowClassName: "popup-window",
-            top: 50,
-            maxHeight: 500,
-            height: 500,
-            width: 1000,
-            zIndex: 100,
-            recenterAuto: true,
-            hideEffect: Element.hide,
-            showEffect: Element.show,
-            closeCallback: function() {
-                self.selectedProductsIds = [];
-                self.selectedCategoriesData = {};
-
-                return true;
-            }
-        };
-
-        try {
-            Windows.getFocusedWindow() || Dialog.info(null, config);
-            Windows.getFocusedWindow().setTitle(title);
-            $('modal_dialog_message').innerHTML = content;
-            $('modal_dialog_message').innerHTML.evalScripts();
-        } catch (ignored) {}
-    },
-
-    //----------------------------------
-
     confirm: function()
     {
         return true;
-    },
-
-    //----------------------------------
-
-    getComponent: function()
-    {
-        return 'ebay';
     }
 
     //----------------------------------

@@ -3635,7 +3635,7 @@ SQL
 
 //#############################################
 
-Mage::register('M2ePro_IS_INSTALLATION',true);
+Mage::register('M2EPRO_IS_INSTALLATION',true);
 $installer->endSetup();
 
 //#############################################

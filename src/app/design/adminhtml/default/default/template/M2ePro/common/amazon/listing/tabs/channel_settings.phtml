@@ -252,6 +252,7 @@
                     <li>if no result by ASIN/ISBN parameter, then UPC/EAN search is performed. (if specified)</li>
                     <li>if no result by UPC/EAN parameter, then additional search by Magento product name is performed. (if enabled)</li>
                 </ul>
+                <b>Note:</b> These settings are also used in auto list action.
                 '); ?>
             </div>
 
@@ -271,10 +272,10 @@
 
                 <tr id="general_id_custom_attribute_container" <?php if ($formData['general_id_mode'] != Ess_M2ePro_Model_Amazon_Listing::GENERAL_ID_MODE_CUSTOM_ATTRIBUTE) echo ' style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="general_id_custom_attribute"><?php echo Mage::helper('M2ePro')->__('ASIN / ISBN Attribute'); ?>:</label>
+                        <label for="general_id_custom_attribute"><?php echo Mage::helper('M2ePro')->__('ASIN / ISBN Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="general_id_custom_attribute" name="general_id_custom_attribute">
+                        <select id="general_id_custom_attribute" name="general_id_custom_attribute" class="M2ePro-required-when-visible">
                             <?php if ($formData['general_id_custom_attribute'] == ''): ?>
                                 <option class="empty"></option>
                             <?php endif ?>
@@ -302,10 +303,10 @@
 
                 <tr id="worldwide_id_custom_attribute_container" <?php if ($formData['worldwide_id_mode'] != Ess_M2ePro_Model_Amazon_Listing::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE) echo ' style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="worldwide_id_custom_attribute"><?php echo Mage::helper('M2ePro')->__('UPC / EAN Attribute'); ?>:</label>
+                        <label for="worldwide_id_custom_attribute"><?php echo Mage::helper('M2ePro')->__('UPC / EAN Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="worldwide_id_custom_attribute" name="worldwide_id_custom_attribute">
+                        <select id="worldwide_id_custom_attribute" name="worldwide_id_custom_attribute" class="M2ePro-required-when-visible">
                             <?php if ($formData['worldwide_id_custom_attribute'] == ''): ?>
                             <option class="empty"></option>
                             <?php endif ?>

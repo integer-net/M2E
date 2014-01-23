@@ -4,33 +4,37 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
     listingId: null,
     specificsGridId: null,
     productsGridId: null,
+    isEmptySpecificsAttribute: false,
 
     //----------------------------------
 
-    initialize: function(listingId, specificsGridId, productsGridId)
+    initialize: function(listingId, specificsGridId, productsGridId, isEmptySpecificsAttribute)
     {
         this.listingId = listingId;
         this.specificsGridId = specificsGridId;
         this.productsGridId = productsGridId;
+        this.isEmptySpecificsAttribute = isEmptySpecificsAttribute;
     },
 
     //----------------------------------
 
     initProductGrid: function()
     {
-        var grid = window[this.productsGridId + 'JsObject'];
+        var self = this;
+        var grid = eval(self.productsGridId + 'JsObject');
+
         if (!grid.massaction) {
-            grid.massaction = window[this.productsGridId + '_massactionJsObject'];
+            grid.massaction = eval(self.productsGridId + '_massactionJsObject');
         }
     },
 
     initSpecificGrid: function()
     {
         var self = this;
-        var grid = window[this.specificsGridId + 'JsObject'];
+        var grid = eval(self.specificsGridId + 'JsObject');
 
         if (!grid.massaction) {
-            grid.massaction = window[this.specificsGridId + '_massactionJsObject'];
+            grid.massaction = eval(self.specificsGridId + '_massactionJsObject');
         }
 
         grid.massaction.updateCount = grid.massaction.updateCount.wrap(
@@ -38,7 +42,10 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
                 callOriginal();
 
                 $('attribute_content').value = grid.massaction.getCheckedValues()
-                    .replace(/,/g, M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::MOTORS_SPECIFICS_VALUE_SEPARATOR'));
+                    .replace(/,/g, ',');
+
+                $('attribute_content').value == ''
+                    ? $('generate_attribute_content_container').hide() : $('generate_attribute_content_container').show();
             }
         );
 
@@ -64,10 +71,6 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
                 case 'add_to_attribute':
                     self.addSpecificsToProducts(false);
-                    break;
-
-                case 'copy_attribute_value':
-                    $('generate_attribute_content_container').show();
                     break;
             }
         };
@@ -109,12 +112,15 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
         MagentoMessageObj.clearAll();
 
-        if (self.hasEmptyAttributes()) {
-            MagentoMessageObj.addError(M2ePro.translator.translate('Please edit categories settings for selected products and select the compatibility attribute.'));
+        if (self.isEmptySpecificsAttribute) {
+            MagentoMessageObj.addError(M2ePro.translator.translate('Please specify eBay motors compatibility attribute in %s > Configuration > <a target="_blank" href="%s">General</a>'));
             return;
         }
 
-        var isSpecificsGridExists = $(self.specificsGridId) != null;
+        var isSpecificsGridExists = false;
+        if ($(self.specificsGridId) != null && $('specifics_grid_container').innerHTML != '') {
+            isSpecificsGridExists = true;
+        }
 
         if (!isSpecificsGridExists) {
             self.loadSpecificsGrid();
@@ -152,42 +158,18 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
     closeCallback: function()
     {
+        var self = this;
+
         $(document.body).appendChild($(this.popUpBlockId).hide());
 
-        var specificsGrid = window[this.specificsGridId + 'JsObject'];
+        var specificsGrid = eval(self.specificsGridId + 'JsObject');
         specificsGrid.massaction.unselectAll();
         specificsGrid.massaction.select.value = '';
 
-        var productsGrid = window[this.productsGridId + 'JsObject'];
+        var productsGrid = eval(self.productsGridId + 'JsObject');
         productsGrid.massaction.unselectAll();
 
-        $('generate_attribute_content_container').hide();
-
         $('attribute_content').value = '';
-    },
-
-    //----------------------------------
-
-    hasEmptyAttributes: function()
-    {
-        var hasEmpty = true;
-        var productsGrid = window[this.productsGridId + 'JsObject'];
-
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/hasEmptyMotorsSpecificsAttributes') ,
-        {
-            method: 'get',
-            asynchronous : false,
-            parameters : {
-                listing_id: this.listingId,
-                listing_product_ids: productsGrid.massaction.getCheckedValues()
-            },
-            onSuccess: function (transport)
-            {
-                hasEmpty = transport.responseText.evalJSON()['has_empty'];
-            }
-        });
-
-        return hasEmpty;
     },
 
     //----------------------------------
@@ -195,8 +177,8 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
     addSpecificsToProducts: function(overwrite)
     {
         var self = this;
-        var specificsGrid = window[this.specificsGridId + 'JsObject'];
-        var productsGrid = window[this.productsGridId + 'JsObject'];
+        var specificsGrid = eval(self.specificsGridId + 'JsObject');
+        var productsGrid = eval(self.productsGridId + 'JsObject');
 
         new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/updateMotorsSpecificsAttributes') ,
         {
@@ -204,7 +186,7 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
             asynchronous : true,
             parameters : {
                 listing_id: this.listingId,
-                listing_product_ids: productsGrid.massaction.getCheckedValues(),
+                listing_product_ids: EbayListingSettingsGridHandlerObj.selectedProductsIds.toString(),
                 epids: specificsGrid.massaction.getCheckedValues(),
                 overwrite: overwrite ? 'yes' : 'no'
             },

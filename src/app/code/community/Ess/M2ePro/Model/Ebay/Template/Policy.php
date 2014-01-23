@@ -140,7 +140,7 @@ class Ess_M2ePro_Model_Ebay_Template_Policy extends Ess_M2ePro_Model_Component_A
 //
 //    // #######################################
 //
-//    public function setIsNeedSynchronize($newData, $oldData)
+//    public function setSynchStatusNeed($newData, $oldData)
 //    {
 //        if (!$this->getResource()->isDifferent($newData,$oldData)) {
 //            return;
@@ -148,7 +148,7 @@ class Ess_M2ePro_Model_Ebay_Template_Policy extends Ess_M2ePro_Model_Component_A
 //
 //        /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 //        foreach ($this->getAffectedListingProducts() as $listingProduct) {
-//            $listingProduct->setData('is_need_synchronize', 1)->save();
+//            $listingProduct->setData('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED)->save();
 //        }
 //    }
 

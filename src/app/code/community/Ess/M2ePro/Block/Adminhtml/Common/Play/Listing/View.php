@@ -297,7 +297,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_View extends Mage_Adminhtml
         $unmapFromPlayID = $this->getUrl('*/adminhtml_common_play_listing/unmapFromPlayID');
 
         $enterProductSearchQueryMessage = $helper->escapeJs(
-            $helper->__('Please enter product name or ISBN.')
+            $helper->__('Enter product name or ISBN/EAN/UPC.')
         );
         $autoMapPlayIDProgressTitle = $helper->escapeJs($helper->__('Assign Play ID to Item(s)'));
         $autoMapPlayIDErrorMessage = $helper->escapeJs(

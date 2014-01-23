@@ -103,8 +103,8 @@ class Ess_M2ePro_Model_Ebay_Feedback extends Ess_M2ePro_Model_Component_Abstract
         $this->setData('last_response_attempt_date', Mage::helper('M2ePro')->getCurrentGmtDate())->save();
 
         try {
-            $response = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                                ->processVirtualAbstract('feedback', 'add', 'entity',
+            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                                ->processVirtual('feedback', 'add', 'entity',
                                                          $paramsConnector, NULL, NULL,
                                                          $this->getAccount()
             );
@@ -164,8 +164,8 @@ class Ess_M2ePro_Model_Ebay_Feedback extends Ess_M2ePro_Model_Component_Abstract
     {
         // Create connector
         //-----------------------
-        $feedbacks = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                                ->processVirtualAbstract('feedback','get','entity',
+        $feedbacks = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                                ->processVirtual('feedback','get','entity',
                                                          $paramsConnector,'feedbacks',
                                                          NULL,$account->getId(),NULL);
         is_null($feedbacks) && $feedbacks = array();

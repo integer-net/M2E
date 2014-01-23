@@ -13,6 +13,33 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
     const HANDLE_RESULT_SKIPPED   = 0;
     const HANDLE_RESULT_SUCCEEDED = 1;
 
+    public static function factory($component)
+    {
+        $handler = null;
+
+        switch ($component) {
+            case Ess_M2ePro_Helper_Component_Buy::NICK:
+                $handler = Mage::getModel('M2ePro/Order_Shipment_Handler');
+                break;
+            case Ess_M2ePro_Helper_Component_Amazon::NICK:
+                $handler = Mage::getModel('M2ePro/Amazon_Order_Shipment_Handler');
+                break;
+            case Ess_M2ePro_Helper_Component_Ebay::NICK:
+                $handler = Mage::getModel('M2ePro/Ebay_Order_Shipment_Handler');
+                break;
+
+            case Ess_M2ePro_Helper_Component_Play::NICK:
+                $handler = Mage::getModel('M2ePro/Play_Order_Shipment_Handler');
+                break;
+        }
+
+        if (!$handler) {
+            throw new LogicException('Shipment handler not found.');
+        }
+
+        return $handler;
+    }
+
     public function handle(Ess_M2ePro_Model_Order $order, Mage_Sales_Model_Order_Shipment $shipment)
     {
         $trackingDetails = $this->getTrackingDetails($shipment);

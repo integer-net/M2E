@@ -144,6 +144,7 @@ HTML;
     /**
      * @title "Show Installed Modules"
      * @description "Show Installed Modules"
+     * @new_line
      */
     public function showInstalledModulesAction()
     {
@@ -184,7 +185,7 @@ HTML;
                 : 'Disabled';
 
             $codePool = $data['codePool'];
-            $version = $data['version'];
+            $version = $data['version']!=''?$data['version']:'&nbsp;';
 
             $html .= <<<HTML
 <tr>
@@ -208,6 +209,41 @@ HTML;
         $html .= '</table>';
 
         print str_replace('%count%',count($installedModules),$html);
+    }
+
+    /**
+     * @title "Refresh Compilation"
+     * @description "Refresh Compilation"
+     * @confirm "Are you sure?"
+     */
+    public function refreshCompilationAction()
+    {
+        if (!defined('COMPILER_INCLUDE_PATH')) {
+            $this->_getSession()->addError('Compilation is not enabled');
+            $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
+        } else {
+            $this->_redirect('*/*/runCompilation');
+            Mage::getModel('compiler/process')->clear();
+            $this->getResponse()->sendHeaders();
+        }
+    }
+
+    /**
+     * @title "Run Compilation"
+     * @description "Run Compilation"
+     * @hidden
+     */
+    public function runCompilationAction()
+    {
+        try {
+            Mage::getModel('compiler/process')->run();
+
+            $this->_getSession()->addSuccess('The compilation has completed.');
+        } catch (Exception $e) {
+            $this->_getSession()->addError('Compilation error');
+        }
+
+        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
     }
 
     /**

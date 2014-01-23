@@ -483,18 +483,26 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         );
     }
 
-    public function addProductFromOther(Ess_M2ePro_Model_Listing_Other $listingOtherProduct)
+    public function addProductFromOther(Ess_M2ePro_Model_Listing_Other $listingOtherProduct,
+                                        $checkingMode = false,
+                                        $checkHasProduct = true)
     {
         if (!$listingOtherProduct->getProductId()) {
             return false;
         }
 
         $productId = $listingOtherProduct->getProductId();
-        $listingProduct = $this->getParentObject()->addProduct($productId);
+        $result = $this->getParentObject()->addProduct($productId, $checkingMode, $checkHasProduct);
 
-        if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
+        if ($checkingMode) {
+            return $result;
+        }
+
+        if (!($result instanceof Ess_M2ePro_Model_Listing_Product)) {
             return false;
         }
+
+        $listingProduct = $result;
 
         $listingProduct->getChildObject()
                        ->getAmazonItem()
@@ -528,37 +536,54 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
 
     // ########################################
 
-    public function save()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
-        return parent::save();
-    }
-
-    public function delete()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
-        return parent::delete();
-    }
-
-    // ########################################
-
-    public function getAffectedListingProducts($asObjects = false)
+    public function getAffectedListingProducts($asObjects = false, $key = NULL)
     {
         if (is_null($this->getId())) {
             throw new LogicException('Method require loaded instance first');
         }
 
-        return $this->getProducts($asObjects);
+        $listingProducts = $this->getProducts($asObjects);
+
+        if (is_null($key)) {
+            return $listingProducts;
+        }
+
+        $return = array();
+        foreach ($listingProducts as $listingProduct) {
+            isset($listingProduct[$key]) && $return[] = $listingProduct[$key];
+        }
+
+        return $return;
     }
 
-    public function setIsNeedSynchronize($newData, $oldData)
+    public function setSynchStatusNeed($newData, $oldData)
     {
+        $affectedListingProducts = $this->getAffectedListingProducts();
+
+        if (!$affectedListingProducts) {
+            return;
+        }
+
+        $this->setSynchStatusNeedByListing($newData,$oldData, $affectedListingProducts);
+        $this->setSynchStatusNeedBySellingFormatTemplate($newData,$oldData, $affectedListingProducts);
+        $this->setSynchStatusNeedBySynchronizationTemplate($newData,$oldData, $affectedListingProducts);
+    }
+
+    // ---------------------------------------
+
+    private function setSynchStatusNeedByListing($newData, $oldData, $listingProducts)
+    {
+        unset(
+            $newData['template_selling_format_id'], $oldData['template_selling_format_id'],
+            $newData['template_synchronization_id'], $oldData['template_synchronization_id']
+        );
+
         if (!$this->getResource()->isDifferent($newData,$oldData)) {
             return;
         }
 
         $ids = array();
-        foreach ($this->getAffectedListingProducts() as $listingProduct) {
+        foreach ($listingProducts as $listingProduct) {
             $ids[] = (int)$listingProduct['id'];
         }
 
@@ -571,7 +596,7 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         Mage::getSingleton('core/resource')->getConnection('core_read')->update(
             Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
             array(
-                'is_need_synchronize' => 1,
+                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
                 'synch_reasons' => new Zend_Db_Expr(
                     "IF(synch_reasons IS NULL,
                         '".implode(',',$templates)."',
@@ -581,7 +606,120 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
             ),
             array('id IN ('.implode(',', $ids).')')
         );
+    }
 
+    private function setSynchStatusNeedBySellingFormatTemplate($newData, $oldData, $listingProducts)
+    {
+        $newSellingFormatTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            $this->getComponentMode(),
+            'Template_SellingFormat',
+            $newData['template_selling_format_id'],
+            NULL, array('template')
+        );
+
+        $oldSellingFormatTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            $this->getComponentMode(),
+            'Template_SellingFormat',
+            $oldData['template_selling_format_id'],
+            NULL, array('template')
+        );
+
+        $isDifferent = Mage::getResourceModel('M2ePro/Amazon_Template_SellingFormat')->isDifferent(
+            $newSellingFormatTemplate->getDataSnapshot(), $oldSellingFormatTemplate->getDataSnapshot()
+        );
+
+        if (!$isDifferent) {
+            return;
+        }
+
+        $templates = array('sellingFormatTemplate');
+
+        $ids = array();
+        foreach ($listingProducts as $listingProduct) {
+            $ids[] = $listingProduct['id'];
+        }
+
+        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
+            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
+            array(
+                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
+                'synch_reasons' => new Zend_Db_Expr(
+                    "IF(synch_reasons IS NULL,
+                        '".implode(',',$templates)."',
+                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
+                    )"
+                )
+            ),
+            array('id IN ('.implode(',', $ids).')')
+        );
+    }
+
+    private function setSynchStatusNeedBySynchronizationTemplate($newData, $oldData, $listingProducts)
+    {
+        $newSynchTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            $this->getComponentMode(),
+            'Template_Synchronization',
+            $newData['template_synchronization_id'],
+            NULL, array('template')
+        );
+
+        $oldSynchTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            $this->getComponentMode(),
+            'Template_Synchronization',
+            $oldData['template_synchronization_id'],
+            NULL, array('template')
+        );
+
+        $settings = $newSynchTemplate->getChildObject()->getFullReviseSettingWhichWereEnabled(
+            $newSynchTemplate->getDataSnapshot(), $oldSynchTemplate->getDataSnapshot()
+        );
+
+        if (!$settings) {
+            return;
+        }
+
+        $idsByReasonDictionary = array();
+        foreach ($listingProducts as $listingProduct) {
+
+            if ($listingProduct['synch_status'] != Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP) {
+                continue;
+            }
+
+            $listingProductSynchReasons = array_unique(array_filter(explode(',',$listingProduct['synch_reasons'])));
+            foreach ($listingProductSynchReasons as $reason) {
+                $idsByReasonDictionary[$reason][] = $listingProduct['id'];
+            }
+        }
+
+        $idsForUpdate = array();
+        foreach ($settings as $reason => $setting) {
+
+            if (!isset($idsByReasonDictionary[$reason])) {
+                continue;
+            }
+
+            $idsForUpdate = array_merge($idsForUpdate, $idsByReasonDictionary[$reason]);
+        }
+
+        Mage::getSingleton('core/resource')->getConnection('core_write')->update(
+            Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable(),
+            array('synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED),
+            array('id IN (?)' => array_unique($idsForUpdate))
+        );
+    }
+
+    // ########################################
+
+    public function save()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        return parent::save();
+    }
+
+    public function delete()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        return parent::delete();
     }
 
     // ########################################

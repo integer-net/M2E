@@ -74,33 +74,18 @@ class Ess_M2ePro_Adminhtml_Common_AccountController
 
                     if ($account->isComponentModeAmazon()) {
 
-                        $marketplace = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
-                            'Marketplace', $account->getChildObject()->getMarketplaceId()
-                        );
-
-                        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
-                        $dispatcherObject->processConnector('account', 'delete' ,'entity', array(),
-                                                            $marketplace, $account);
+                        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+                        $dispatcherObject->processConnector('account', 'delete' ,'entity', array(), $account);
 
                     } else if ($account->isComponentModeBuy()) {
 
-                        $marketplace = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
-                            'Marketplace', Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_VIRTUAL_ID
-                        );
-
-                        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Buy_Dispatcher');
-                        $dispatcherObject->processConnector('account', 'delete' ,'entity',
-                                                            array(), $marketplace, $account);
+                        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
+                        $dispatcherObject->processConnector('account', 'delete' ,'entity', array(), $account);
 
                     } else if ($account->isComponentModePlay()) {
 
-                        $marketplace = Mage::helper('M2ePro/Component_Play')->getCachedObject(
-                            'Marketplace', Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID
-                        );
-
-                        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Play_Dispatcher');
-                        $dispatcherObject->processConnector('account', 'delete' ,'entity',
-                                                            array(), $marketplace, $account);
+                        $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Dispatcher');
+                        $dispatcherObject->processConnector('account', 'delete' ,'entity', array(), $account);
                     }
 
                 } catch (Exception $e) {

@@ -105,7 +105,7 @@ $isEdit = (bool)$this->getRequest()->getParam('id');
 
         <?php if ($this->getRequest()->getParam('id')): ?>
             PlayListingSettingsHandlerObj.storeId = <?php echo (int)$formData['store_id']; ?>;
-            PlayListingSettingsHandlerObj.marketplaceId = <?php echo Ess_M2ePro_Helper_Component_Play::MARKETPLACE_VIRTUAL_ID; ?>;
+            PlayListingSettingsHandlerObj.marketplaceId = <?php echo Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID; ?>;
         <?php endif; ?>
 
         AutoCompleteHandler = new AutoComplete();

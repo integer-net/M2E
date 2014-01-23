@@ -29,8 +29,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule
                     array(
                         'prefix' => $prefix,
                         'store' => $storeId,
-                        'attribute_criteria' => $model->getAttributeCriteria(),
-                        'attribute_sets' => $attributeSets
                     )
                 )
             );

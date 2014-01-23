@@ -143,6 +143,15 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function isASIN($string)
+    {
+        return !empty($string) &&
+               $string{0} == 'B' &&
+               strlen($string) == 10;
+    }
+
+    // ########################################
+
     public function clearCache()
     {
         Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);

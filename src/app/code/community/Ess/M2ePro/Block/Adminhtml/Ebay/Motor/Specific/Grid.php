@@ -129,11 +129,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Specific_Grid extends Mage_Adminhtml
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
         ));
-
-        $this->getMassactionBlock()->addItem('copy_attribute_value', array(
-            'label'   => Mage::helper('M2ePro')->__('Show ePIDs'),
-            'url'     => ''
-        ));
         //--------------------------------
 
         return parent::_prepareMassaction();

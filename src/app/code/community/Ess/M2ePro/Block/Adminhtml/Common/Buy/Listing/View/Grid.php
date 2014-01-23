@@ -194,6 +194,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View_Grid extends Mage_Admin
                 'index'     => 'value',
                 'filter'    => false,
                 'sortable'  => false,
+                'js_handler' => 'ListingGridHandlerObj'
             ));
         }
 
@@ -631,21 +632,6 @@ HTML;
         }
         // ---------------------------------
 
-        $generalIdSearchStatus = $row->getData('general_id_search_status');
-
-        // ---------------------------------
-        if ($generalIdSearchStatus == Ess_M2ePro_Model_Buy_Listing_Product::GENERAL_ID_SEARCH_STATUS_PROCESSING) {
-
-            $tip = Mage::helper('M2ePro')->__('Automatic Rakuten SKU search in progress.');
-            $iconSrc = $iconPath.'processing.gif';
-
-            return <<<HTML
-&nbsp;
-<a href="javascript:;" title="{$tip}">
-    <img src="{$iconSrc}" alt="">
-</a>
-HTML;
-        }
         // ---------------------------------
         $generalIdSearchSuggestData = $row->getData('general_id_search_suggest_data');
 

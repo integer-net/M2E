@@ -2737,7 +2737,7 @@ Order item was successfully mapped.,L'oggetto dell'ordine è stato associato.
 Order item options were successfully mapped.,Le opzioni dell'oggetto dell'ordine sono state associate.
 Item was successfully unmapped.,Annullamento dell'associazione dell'oggetto eseguito correttamente.
 Data has been sent on Rakuten.com. It is being processed now. You can continue working with M2E Pro.,I dati sono stati inviati a Rakuten.com. Attualmente sono in fase di elaborazione. Puoi continuare a utilizzare M2E Pro.
-We recommend to set up your cron job to be run every 5 minutes (e.g. */5 * * * *).,È consigliabile impostare l'esecuzione del processo cron ogni 5 minuti (ad esempio */5 * * * *).
+We recommend to set up your cron job to be run every 5 minutes (e.g. * * * * *).,È consigliabile impostare l'esecuzione del processo cron ogni 5 minuti (ad esempio * * * * *).
 "<br/><b>Note:</b> M2E Pro v.5.x.x consists of %s.<br/>
     %s
     %s
@@ -2875,8 +2875,8 @@ Essi servono a formattare il testo affinché venga visualizzato correttamente ne
             Clicca su
             <a href=""%s"">Avvia la configurazione</a> o
             <a href=""%s"">Salta</a> la procedura guidata.<br/>"
-"Set up a cron job to run every 5 minutes (e.g. */5 * * * *) to enable automatic work of the extension.<br/>
-            Otherwise, some processes will not work (i.e. synchronization tasks, logs cleaning).","Imposta l'esecuzione di un processo cron ogni 5 minuti (ad esempio */5 * * * *) per abilitare l'utilizzo automatico dell'estensione.<br/>
+"Set up a cron job to run every 5 minutes (e.g. * * * * *) to enable automatic work of the extension.<br/>
+            Otherwise, some processes will not work (i.e. synchronization tasks, logs cleaning).","Imposta l'esecuzione di un processo cron ogni 5 minuti (ad esempio * * * * *) per abilitare l'utilizzo automatico dell'estensione.<br/>
             In caso contrario, alcuni processi non funzioneranno (ad esempio le attività di sincronizzazione e la pulitura dei registri)."
 "You have successfully installed <strong>M2E Pro v. %s</strong>.<br/>
              Click

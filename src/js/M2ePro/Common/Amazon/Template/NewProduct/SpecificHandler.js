@@ -247,7 +247,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
                 if (orig) {
                     orig.parentNode
-                        .down('button[add_button_id=' + dictionarySpecific.id + ']').simulate('click');
+                        .down('button[add_button_id="' + dictionarySpecific.id + '"]').simulate('click');
 
                     var origIndex = parseInt(orig.up('tr[index_number]').getAttribute('index_number'));
                     var realXpath = specific.xpath.replace(/\d*$/,origIndex + 1);
@@ -274,7 +274,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 select = self.getChosenSelect(specific);
                 if (select) {
                     select.value = dictionarySpecific.id;
-                    select.next('button[add_button_id=' + specific.parentId + ']').simulate('click');
+                    select.next('button[add_button_id="' + specific.parentId + '"]').simulate('click');
 
                     dictionarySpecific.type == self.TYPE_TEXT && self.setValues(specific);
                     dictionarySpecific.type == self.TYPE_SELECT && self.setValues(specific);
@@ -285,7 +285,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 // otherwise it was added
                 select = self.getAddedSelect(specific);
                 select.value = dictionarySpecific.id;
-                select.next('button[add_button_id=' + specific.parentId + ']').simulate('click');
+                select.next('button[add_button_id="' + specific.parentId + '"]').simulate('click');
 
                 dictionarySpecific.type == self.TYPE_TEXT && self.setValues(specific);
                 dictionarySpecific.type == self.TYPE_SELECT && self.setValues(specific);
@@ -366,7 +366,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         try {
             return this.specificsContainer
                 .down("*[name='specifics[" + specific.parentXpath + "][mode]']")
-                .parentNode.down('select[id=' + specific.parentId + ']');
+                .parentNode.down('select[id="' + specific.parentId + '"]');
         } catch (e) {
            return null;
         }
@@ -377,7 +377,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         try {
             return this.specificsContainer
                 .down("*[name='specifics[" + specific.parentXpath + "][mode]']")
-                .up('table').down('select[id=' + specific.parentId + ']');
+                .up('table').down('select[id="' + specific.parentId + '"]');
         } catch (e) {
             specific.parentXpath = specific.parentXpath.split('/');
             specific.parentXpath.pop();
@@ -386,7 +386,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
             return this.specificsContainer
                 .down("*[name='specifics[" + specific.parentXpath + "][mode]']")
-                .up('table').down('select[id=' + specific.parentId + ']');
+                .up('table').down('select[id="' + specific.parentId + '"]');
         }
     },
 
@@ -545,10 +545,10 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
         if (specific.title == 'Parentage') {
 
-            var chooseModeSelect = container.down('tr[mode=none] select');
-            var customValueSelect = container.down('tr[mode=custom_value] select');
+            var chooseModeSelect = container.down('tr[mode="none"] select');
+            var customValueSelect = container.down('tr[mode="custom_value"] select');
 
-            if (customValueSelect.down('option[value=base-product]')) {
+            if (customValueSelect.down('option[value="base-product"]')) {
                 chooseModeSelect.value = 'custom_value';
                 chooseModeSelect.simulate('change');
                 customValueSelect.value = 'base-product';
@@ -814,7 +814,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             })()});
 
             return function() {
-                var select = refTr.down('select[id=' + this.getAttribute('add_button_id') + ']');
+                var select = refTr.down('select[id="' + this.getAttribute('add_button_id') + '"]');
                 self.chooseButtonClick(select,newContainer,this);
             }
         })());
@@ -846,7 +846,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             });
 
             return function() {
-                var select = container.down('select[id=' + this.getAttribute('add_button_id') + ']');
+                var select = container.down('select[id="' + this.getAttribute('add_button_id') + '"]');
                 self.addButtonClick(select,newContainer,this);
             }
         })());
@@ -869,7 +869,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 : self.containerCloneButtonClick(specific,div,container);
         });
 
-        var occurs = container.up('table').select('tr[id=' + specific.id + ']').length;
+        var occurs = container.up('table').select('tr[id="' + specific.id + '"]').length;
 
         occurs >= parseInt(specific.max_occurs) && cloneButton.hide();
     },
@@ -897,7 +897,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             self.removeButtonClick(specific,div,container);
         });
 
-        var occurs = container.up('table').select('tr[id=' + specific.id + ']').length;
+        var occurs = container.up('table').select('tr[id="' + specific.id + '"]').length;
 
         if (specific.min_occurs == 1) {
             occurs == 1 && removeButton.hide();
@@ -914,7 +914,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         var specific = this.specifics[select.value];
         select.disabled = true;
         this.renderSpecifics([specific],container);
-        container.down('button[remove_button_id=' + specific.id + ']').show();
+        container.down('button[remove_button_id="' + specific.id + '"]').show();
     },
 
     addButtonClick: function(select,container,button)
@@ -926,7 +926,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         }
 
         var specific = this.specifics[select.value];
-        var option = select.down('option[value=' + select.value + ']');
+        var option = select.down('option[value="' + select.value + '"]');
 
         option.hide();
 
@@ -943,13 +943,13 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         container = container.up('table');
         div.down('button').hide();
 
-//        container.select('button[remove_button_id=' + specific.id + ']').each(function(button) {
+//        container.select('button[remove_button_id="' + specific.id + '"]').each(function(button) {
 //            button.show();
 //        });
 
         this.renderSpecifics([specific],container,function(contentCallback,specific,container) {
 
-            var refTr = div.up('tr[id=' + specific.id + ']');
+            var refTr = div.up('tr[id="' + specific.id + '"]');
             var newContainer = new Element('table',{
                 'class': 'form-list',
                 'style': style,
@@ -988,11 +988,11 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         container = container.up('table');
         div.down('button').hide();
 
-        container.select('button[remove_button_id=' + specific.id + ']').each(function(button) {
+        container.select('button[remove_button_id="' + specific.id + '"]').each(function(button) {
             button.show();
         });
 
-        var refTr = div.up('tr[id=' + specific.id + ']');
+        var refTr = div.up('tr[id="' + specific.id + '"]');
 
         var newContainer = new Element('table',{'class': 'form-list','style': style,'cellspacing': 0,'cellpadding': 0});
         var newTr = new Element('tr',{'id': specific.id,'index_number': parseInt(refTr.getAttribute('index_number')) + 1});
@@ -1026,30 +1026,30 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
     {
         container = container.up('table');
 
-        var parentTr = div.up('tr[id=' + specific.id +']');
+        var parentTr = div.up('tr[id="' + specific.id +'"]');
 
         var select = container
             .up('table')
-            .down('select[id=' + specific.parent_id + ']');
+            .down('select[id="' + specific.parent_id + '"]');
 
-        select = select || container.up('table').down('select[id=' + this.specifics[specific.parent_id].parent_id + ']');
+        select = select || container.up('table').down('select[id="' + this.specifics[specific.parent_id].parent_id + '"]');
 
         select.removeAttribute('disabled');
         select.firstChild.selected = true;
 
         parentTr.parentNode.removeChild(parentTr);
 
-        var option = select.down('option[value=' + specific.id + ']');
-        var founds = container.select('tr[id=' + specific.id + ']');
+        var option = select.down('option[value="' + specific.id + '"]');
+        var founds = container.select('tr[id="' + specific.id + '"]');
 
         if (founds.length == 0) {
             option.show();
         } else if (founds.length == 1 && specific.min_occurs == 1) {
             var found = founds.shift();
-            found.down('button[remove_button_id=' + specific.id + ']').hide();
-            found.down('button[add_button_id=' + specific.id + ']').show();
+            found.down('button[remove_button_id="' + specific.id + '"]').hide();
+            found.down('button[add_button_id="' + specific.id + '"]').show();
         } else {
-            founds.pop().down('button[add_button_id=' + specific.id + ']').show();
+            founds.pop().down('button[add_button_id="' + specific.id + '"]').show();
         }
 
         this.isAllOptionsHidden(select) || select.removeAttribute('disabled');
@@ -1078,7 +1078,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 return;
             }
 
-            var parentContainer = parent.container && parent.container.up('tr[id=' + parent.id + ']');
+            var parentContainer = parent.container && parent.container.up('tr[id="' + parent.id + '"]');
             var indexNumber = parentContainer
                 ? parseInt(parentContainer.getAttribute('index_number'))
                 : 1;

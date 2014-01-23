@@ -145,14 +145,14 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
 
             // Create connector
             //-----------------------
-            $details = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                                ->processVirtualAbstract('marketplace','get','info',
+            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                                ->processVirtual('marketplace','get','info',
                                                           array('include_details'=>1),'info',
                                                           $marketplace->getId(),NULL,NULL);
-            if (is_null($details)) {
+            if (is_null($response)) {
                 $details = array();
             } else {
-                $details = $details['details'];
+                $details = $response['details'];
             }
             //-----------------------
 
@@ -175,17 +175,19 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Details
                 ->delete($tableMarketplaces,array('marketplace_id = ?'=>$marketplace->getId()));
 
             $data = array(
-                'marketplace_id'      => $marketplace->getId(),
-                'dispatch'            => json_encode($details['dispatch']),
-                'packages'            => json_encode($details['packages']),
-                'return_policy'       => json_encode($details['return_policy']),
-                'listing_features'    => json_encode($details['listing_features']),
-                'payments'            => json_encode($details['payments']),
-                'shipping_locations'  => json_encode($details['shipping_locations']),
-                'shipping_locations_exclude' => json_encode($details['shipping_locations_exclude']),
+                'marketplace_id'               => $marketplace->getId(),
+                'client_categories_version'    => $response['categories_version'],
+                'server_categories_version'    => $response['categories_version'],
+                'dispatch'                     => json_encode($details['dispatch']),
+                'packages'                     => json_encode($details['packages']),
+                'return_policy'                => json_encode($details['return_policy']),
+                'listing_features'             => json_encode($details['listing_features']),
+                'payments'                     => json_encode($details['payments']),
+                'shipping_locations'           => json_encode($details['shipping_locations']),
+                'shipping_locations_exclude'   => json_encode($details['shipping_locations_exclude']),
                 'categories_features_defaults' => json_encode($details['categories_features_defaults']),
-                'tax_categories' => json_encode($details['tax_categories']),
-                'charities'      => json_encode($details['charities']),
+                'tax_categories'               => json_encode($details['tax_categories']),
+                'charities'                    => json_encode($details['charities']),
             );
 
             $connWrite->insertOnDuplicate($tableMarketplaces, $data);

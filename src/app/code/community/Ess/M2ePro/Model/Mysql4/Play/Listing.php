@@ -36,7 +36,7 @@ class Ess_M2ePro_Model_Mysql4_Play_Listing
             ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
 
         $query = "UPDATE `{$listingTable}`
-                  SET `items_active_count` =  (".$dbSelect->__toString().")
+                  SET `items_active_count` =  IFNULL((".$dbSelect->__toString()."),0)
                   WHERE `component_mode` = 'play'";
 
         $this->_getWriteAdapter()->query($query);
@@ -47,8 +47,8 @@ class Ess_M2ePro_Model_Mysql4_Play_Listing
     public function isDifferent($newData, $oldData)
     {
         $ignoreFields = array(
-            'id', 'title',
-            'component_mode',
+            $this->getIdFieldName(),
+            'id', 'title', 'component_mode',
             'create_date', 'update_date'
         );
 

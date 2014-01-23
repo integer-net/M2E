@@ -92,6 +92,10 @@ EbayListingCategorySpecificWrapperHandler = Class.create(CommonHandler, {
 
     renderNextCategory: function()
     {
+        if (!EbayListingCategorySpecificHandlerObj.validate()) {
+            return;
+        }
+
         if (!!$('skip_optional_specifics').checked) {
             this.lock();
         }

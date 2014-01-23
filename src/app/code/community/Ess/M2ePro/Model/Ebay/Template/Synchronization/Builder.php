@@ -106,9 +106,9 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_Builder
             $prepared['revise_update_qty'] = (int)$data['revise_update_qty'];
         }
 
-        if (isset($data['revise_update_qty_max_applied_value_mode'])) {
-            $prepared['revise_update_qty_max_applied_value_mode'] =
-                (int)$data['revise_update_qty_max_applied_value_mode'];
+        $key = 'revise_update_qty_max_applied_value_mode';
+        if (isset($data[$key])) {
+            $prepared[$key] = (int)$data[$key];
         }
 
         if (isset($data['revise_update_qty_max_applied_value'])) {
@@ -129,6 +129,10 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_Builder
 
         if (isset($data['revise_update_description'])) {
             $prepared['revise_update_description'] = (int)$data['revise_update_description'];
+        }
+
+        if (isset($data['revise_update_images'])) {
+            $prepared['revise_update_images'] = (int)$data['revise_update_images'];
         }
 
         //------------------------------
@@ -235,50 +239,46 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_Builder
         }
 
         //--
-        $intervalSettings = array();
-        if ($prepared['schedule_mode'] == 1 && isset($data['schedule_interval_settings']['mode'])) {
+        $intervalSettings = array(
+            'mode'      => 0,
+            'date_from' => null,
+            'date_to'   => null
+        );
+
+        if ($prepared['schedule_mode'] && isset($data['schedule_interval_settings']['mode'])) {
             $intervalSettings['mode'] = (int)$data['schedule_interval_settings']['mode'];
         }
 
-        $dateFrom = null;
-        if ($prepared['schedule_mode'] == 1 && $intervalSettings['mode'] == 1 &&
-            isset($data['schedule_interval_settings']['date_from'])) {
-
-            $dateFrom = Mage::helper('M2ePro')->timezoneDateToGmt(
-                $data['schedule_interval_settings']['date_from'].' 00:00:00'
-            );
-        }
-        $intervalSettings['date_from'] = $dateFrom;
-
-        $dateTo = null;
-        if ($prepared['schedule_mode'] == 1 && $intervalSettings['mode'] == 1 &&
+        if ($intervalSettings['mode'] &&
+            isset($data['schedule_interval_settings']['date_from']) &&
             isset($data['schedule_interval_settings']['date_to'])) {
 
-            $dateTo = Mage::helper('M2ePro')->timezoneDateToGmt(
+            $intervalSettings['date_from'] = Mage::helper('M2ePro')->timezoneDateToGmt(
+                $data['schedule_interval_settings']['date_from'].' 00:00:00'
+            );
+
+            $intervalSettings['date_to'] = Mage::helper('M2ePro')->timezoneDateToGmt(
                 $data['schedule_interval_settings']['date_to'].' 23:59:59'
             );
         }
-        $intervalSettings['date_to'] = $dateTo;
 
         $prepared['schedule_interval_settings'] = json_encode($intervalSettings);
         //--
 
         //--
         $weekSettings = array();
-        if (isset($data['schedule_week_days']) && $prepared['schedule_mode'] == 1) {
+        if (isset($data['schedule_week_days']) && $prepared['schedule_mode']) {
 
             foreach ($data['schedule_week_days'] as $weekDay) {
 
                 if (!empty($data['schedule_week_settings'][$weekDay]['time_from']) &&
                     !empty($data['schedule_week_settings'][$weekDay]['time_to'])) {
 
+                    $timeInfo = $data['schedule_week_settings'][$weekDay];
+
                     $weekSettings[$weekDay] = array(
-                        'time_from' => Mage::helper('M2ePro')->timezoneDateToGmt(
-                            $data['schedule_week_settings'][$weekDay]['time_from'],false,'H:i:s'
-                        ),
-                        'time_to' => Mage::helper('M2ePro')->timezoneDateToGmt(
-                            $data['schedule_week_settings'][$weekDay]['time_to'],false,'H:i:s'
-                        )
+                        'time_from' => date('H:i:s', strtotime($timeInfo['time_from'])),
+                        'time_to'   => date('H:i:s', strtotime($timeInfo['time_to']))
                     );
                 }
             }

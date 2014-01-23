@@ -39,4 +39,27 @@
         </td>
     </tr>
 
+    <?php if (Mage::helper('M2ePro/Client_Cache')->isWrongSlowBackendType()) { ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Slow Cache Backend'); ?>: </label>
+            </td>
+            <td class="value">
+                <span class="red"><b><?php echo ucfirst(Mage::helper('M2ePro/Client_Cache')->getSlowBackend()); ?></b></span>
+            </td>
+        </tr>
+    <?php } ?>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Compilation'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php if (defined('COMPILER_INCLUDE_PATH')) { ?>
+                <span style="color: red">Enabled</span>
+            <?php } else { ?>
+                <span>Disabled</span>
+            <?php } ?>
+        </td>
+    </tr>
 </table>

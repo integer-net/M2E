@@ -18,6 +18,9 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
     isShowEditLinks: true,
     categoriesRequiringValidation: {},
 
+    isSingleCategoryMode: false,
+    singleCategoryType: null,
+
     tempUnselectedCategory: {},
     tempSelectedCategory: {},
 
@@ -77,6 +80,20 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
         self.interfaceMode = mode;
     },
 
+    setSingleCategoryMode: function(mode)
+    {
+        var self = EbayListingCategoryChooserHandlerObj;
+
+        self.isSingleCategoryMode = mode;
+    },
+
+    setSingleCategoryType: function(type)
+    {
+        var self = EbayListingCategoryChooserHandlerObj;
+
+        self.singleCategoryType = type;
+    },
+
     setShowEditLinks: function(mode)
     {
         var self = EbayListingCategoryChooserHandlerObj;
@@ -121,42 +138,29 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
     {
         var self = EbayListingCategoryChooserHandlerObj;
 
-        var internalData = {};
-
-        internalData['tax_category_mode'] = 0;
-        internalData['tax_category_value'] = null;
-        internalData['tax_category_attribute'] = null;
-
-        var taxCategoryType = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_TAX');
-        if (typeof self.selectedCategories[taxCategoryType] != 'undefined' &&
-            typeof self.selectedCategories[taxCategoryType]['mode'] != 'undefined') {
-
-            internalData['tax_category_mode'] = self.selectedCategories[taxCategoryType].mode;
-
-            if (internalData['tax_category_mode'] == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_VALUE')) {
-                internalData['tax_category_value'] = self.selectedCategories[taxCategoryType].value;
-            } else if(internalData['tax_category_mode'] == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_ATTRIBUTE')) {
-                internalData['tax_category_attribute'] = self.selectedCategories[taxCategoryType].value;
-            }
+        if (self.isSingleCategoryMode) {
+            return self.selectedCategories[self.singleCategoryType];
         }
 
+        var internalData = {};
+
         self.setCategoryToInternalData(
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_MAIN'),
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN'),
             'category_main_',
             internalData
         );
         self.setCategoryToInternalData(
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_SECONDARY'),
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY'),
             'category_secondary_',
             internalData
         );
         self.setCategoryToInternalData(
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_MAIN'),
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN'),
             'store_category_main_',
             internalData
         );
         self.setCategoryToInternalData(
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_SECONDARY'),
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY'),
             'store_category_secondary_',
             internalData
         );
@@ -164,13 +168,20 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
         return internalData;
     },
 
-    getInternalEbayMainData: function()
+    getInternalDataByType: function(type)
     {
+        var prefixByType = {};
+
+        prefixByType[M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN')] = 'category_main_';
+        prefixByType[M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY')] = 'category_secondary_';
+        prefixByType[M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN')] = 'store_category_main_';
+        prefixByType[M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY')] = 'store_category_secondary_';
+
         var data = {};
 
         this.setCategoryToInternalData(
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_MAIN'),
-            'category_main_',
+            type,
+            prefixByType[type],
             data
         );
 
@@ -291,27 +302,6 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
     },
 
     //----------------------------------
-
-    taxCategoryChange: function(select)
-    {
-        var self = EbayListingCategoryChooserHandlerObj;
-
-        var taxCategoryMode = select.options[select.selectedIndex].up().getAttribute('tax_category_mode');
-
-        if (taxCategoryMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_VALUE')) {
-            self.selectedCategories[M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_TAX')] = {
-                mode: M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_VALUE'),
-                value: select.value
-            };
-        } else if (taxCategoryMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_ATTRIBUTE')) {
-            self.selectedCategories[M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_TAX')] = {
-                mode: M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::TAX_CATEGORY_MODE_ATTRIBUTE'),
-                value: select.value
-            };
-        } else {
-            delete self.selectedCategories[M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_TAX')];
-        }
-    },
 
     cancelPopUp: function()
     {
@@ -439,30 +429,32 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
 
         var selectedCategories = {};
         var types = [
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_MAIN'),
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_SECONDARY'),
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_MAIN'),
-            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_SECONDARY')
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN'),
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY'),
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN'),
+            M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY')
         ];
 
         types.each(function(type) {
             if (typeof self.selectedCategories[type] == 'undefined') {
                 selectedCategories[type] = null;
             } else {
-                selectedCategories[type] = self.selectedCategories[type]
+                selectedCategories[type] = self.selectedCategories[type];
             }
         });
 
         new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/getChooserHtml'),
         {
             method: 'post',
+            asynchronous: false,
             parameters: {
                 marketplace_id: self.marketplaceId,
                 account_id: self.accountId,
                 div_id: self.divId,
                 selected_categories: Object.toJSON(selectedCategories),
-                attributes: implode(',', self.attributes),
                 interface_mode: self.interfaceMode,
+                is_single_category_mode: self.isSingleCategoryMode,
+                single_category_type: self.singleCategoryType,
                 is_show_edit_links: self.isShowEditLinks,
                 select_callback: self.selectCallback,
                 unselect_callback: self.unselectCallback
@@ -492,56 +484,31 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
             return;
         }
 
-        var type = $('category_type').value;
-        var attributesParam = [];
-        if (typeof self.selectedCategories[type] != 'undefined'
-            && self.selectedCategories[type].mode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE')) {
+        var isTrFinished = false;
+        var trHtml = '';
+        self.attributes.each(function(attribute) {
+            if (!isTrFinished) {
+                trHtml = '<tr>';
+            }
 
-            self.attributes.each(function(attribute) {
-                if (attribute != self.selectedCategories[type].value) {
-                    attributesParam[attributesParam.length] = attribute;
-                }
-            });
-        } else {
-            attributesParam = self.attributes;
-        }
+            trHtml += '<td>'+attribute.label+'</td>' +
+                '<td style="padding-left: 55px"><a href="javascript:void(0)" ' +
+                'onclick="EbayListingCategoryChooserHandlerObj.selectCategory('+M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE')+', \''+attribute.code+'\')">' +
+                M2ePro.translator.translate('Select') + '</a></td>';
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/getAttributeLabels'),
-        {
-            method: 'post',
-            parameters: {
-                attributes: implode(',', attributesParam)
-            },
-            onSuccess: function(transport)
-            {
-                var attributes = transport.responseText.evalJSON();
-                var trHtml = '';
-                var isTrFinished = false;
-                attributes.reverse().each(function(attribute) {
-                    if (!isTrFinished) {
-                        trHtml = '<tr>';
-                    }
-
-                    trHtml += '<td>'+attribute.label+'</td>' +
-                            '<td style="padding-left: 55px"><a href="javascript:void(0)" ' +
-                            'onclick="EbayListingCategoryChooserHandlerObj.selectCategory('+M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE')+', \''+attribute.code+'\')">' +
-                            M2ePro.translator.translate('Select') + '</a></td>';
-
-                    if (isTrFinished) {
-                        trHtml += '</tr>';
-                        $('chooser_attributes_table').insert(trHtml);
-                        isTrFinished = false;
-                    } else {
-                        isTrFinished = true;
-                    }
-                });
-
-                if (isTrFinished) {
-                    trHtml += '</tr>';
-                    $('chooser_attributes_table').insert(trHtml);
-                }
+            if (isTrFinished) {
+                trHtml += '</tr>';
+                $('chooser_attributes_table').insert(trHtml);
+                isTrFinished = false;
+            } else {
+                isTrFinished = true;
             }
         });
+
+        if (isTrFinished) {
+            trHtml += '</tr>';
+            $('chooser_attributes_table').insert(trHtml);
+        }
     },
 
     renderRecent: function()
@@ -577,10 +544,10 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
 
                 if (transport.responseText.length > 2) {
                     html += '<tr><td width="730px"></td><td width="70px"></td></tr>';
-                    $H(categories).each(function(category) {
-                        html += '<tr><td>'+category.value+'</td>' +
+                    categories.each(function(category) {
+                        html += '<tr><td>'+category.path+'</td>' +
                             '<td><a href="javascript:void(0)" ' +
-                            'onclick="EbayListingCategoryChooserHandlerObj.selectCategory('+M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY')+', \''+category.key+'\')">' +
+                            'onclick="EbayListingCategoryChooserHandlerObj.selectCategory('+M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY')+', \''+category.id+'\')">' +
                             M2ePro.translator.translate('Select') + '</a></td></tr>';
                     });
                 } else {
@@ -629,7 +596,18 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
                             html += '</td>';
                         });
                     } else {
-                        html += '<tr><td colspan="2" style="padding-left: 270px"><strong>' + M2ePro.translator.translate('No results') + '</strong></td></tr>';
+                        html += '<tr><td colspan="2" style="text-align: center;"><strong>' + M2ePro.translator.translate('No results') + '</strong></td></tr>';
+
+                        var refreshMessage = '';
+                        if ($('category_type').value == M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN') ||
+                            $('category_type').value == M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY')
+                        ) {
+                            refreshMessage = M2ePro.translator.translate('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshEbayCategories()">update eBay sites data</a> and repeate the search.');
+                        } else {
+                            refreshMessage = M2ePro.translator.translate('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshStoreCategories()">refresh eBay store data</a> and repeate the search.');
+                        }
+
+                        html += '<tr><td colspan="2" style="text-align: center;">' + refreshMessage + '</td></tr>';
                     }
 
                     html += '</table>';
@@ -646,19 +624,89 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
         $('query').focus();
     },
 
+    refreshStoreCategories: function()
+    {
+        var self = EbayListingCategoryChooserHandlerObj;
+
+        if (self.accountId == null) {
+            return;
+        }
+
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/refreshStoreCategories'),
+        {
+            method: 'post',
+            parameters: {
+                account_id: self.accountId
+            },
+            onSuccess: function(transport)
+            {
+                EbayListingCategoryChooserBrowseHandlerObj.renderTopLevelCategories('chooser_browser');
+
+                if ($('query').value.length != 0) {
+                    self.search();
+                }
+            }
+        });
+    },
+
+    refreshEbayCategories: function()
+    {
+        var self = EbayListingCategoryChooserHandlerObj;
+        var win = window.open(M2ePro.url.get('adminhtml_ebay_marketplace/index'));
+
+        var intervalId = setInterval(function(){
+            if (!win.closed) {
+                return;
+            }
+
+            clearInterval(intervalId);
+
+            EbayListingCategoryChooserBrowseHandlerObj.renderTopLevelCategories('chooser_browser');
+
+            if ($('query').value.length != 0) {
+                self.search();
+            }
+        }, 1000);
+    },
+
     //----------------------------------
 
     validate: function()
     {
         var self  = EbayListingCategoryChooserHandlerObj;
+        var mainStore = false;
+
+        if ($$('#' + self.divId + ' .main-empty-advice').length <= 0) {
+            return true;
+        }
+
+        if($$('.main-store-empty-advice').length > 0) {
+            mainStore = true;
+        }
 
         $$('#' + self.divId + ' .main-empty-advice')[0].hide();
-        var typeEbayMain = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_MAIN');
+        if(mainStore) {
+            $$('.main-store-empty-advice')[0].hide();
+        }
+
+        var typeEbayMain = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN');
         if (typeof self.selectedCategories[typeEbayMain] == 'undefined' ||
             typeof self.selectedCategories[typeEbayMain]['mode'] == 'undefined' ||
             self.selectedCategories[typeEbayMain]['mode'] == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE')) {
 
             $$('#' + self.divId + ' .main-empty-advice')[0].show();
+            return false;
+        }
+
+        if (!mainStore) {
+            return true;
+        }
+
+        var primary = $('magento_block_ebay_listing_category_chooser_store_primary_not_selected') == null;
+        var secondary = $('magento_block_ebay_listing_category_chooser_store_secondary_not_selected') == null;
+
+        if (primary == false && secondary == true) {
+            $$('.main-store-empty-advice')[0].show();
             return false;
         }
 
@@ -678,7 +726,7 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
 
     //----------------------------------
 
-    submitData: function(url, redirectUrl)
+    submitData: function(url)
     {
         var self  = EbayListingCategoryChooserHandlerObj;
 
@@ -687,19 +735,8 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
         }
 
         var categoryData = self.getInternalData();
-        categoryData['attributes'] = self.attributes.join(',');
 
-        new Ajax.Request(url,
-        {
-            method: 'post',
-            parameters: {
-                category_data: Object.toJSON(categoryData)
-            },
-            onSuccess: function(transport)
-            {
-                setLocation(redirectUrl);
-            }
-        });
+        self.postForm(url,{category_data: Object.toJSON(categoryData)});
     }
 
     //----------------------------------

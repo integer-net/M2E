@@ -20,6 +20,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
 
     protected $_internalData = array();
 
+    protected $_uniqueId = '';
+
+    protected $_isCompactMode = false;
+
     // ########################################
 
     public function __construct()
@@ -38,12 +42,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
 
     protected function _beforeToHtml()
     {
+        $uniqueId = $this->getUniqueId();
+
         //------------------------------
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label'   => '',
-                'onclick' => 'EbayListingCategorySpecificHandlerObj.removeSpecific(this);',
+                'onclick' => 'EbayListingCategorySpecificHandler'.$uniqueId.'Obj.removeSpecific(this);',
                 'class' => 'scalable delete remove_custom_specific_button'
             ) );
         $this->setChild('remove_custom_specific_button',$buttonBlock);
@@ -54,7 +60,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label'   => Mage::helper('M2ePro')->__('Add Custom Specific'),
-                'onclick' => 'EbayListingCategorySpecificHandlerObj.addRow();',
+                'onclick' => 'EbayListingCategorySpecificHandler'.$uniqueId.'Obj.addRow();',
                 'class' => 'add add_custom_specific_button'
             ) );
         $this->setChild('add_custom_specific_button',$buttonBlock);
@@ -122,7 +128,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
             return array();
         }
 
-        return Mage::helper('M2ePro/Component_Ebay_Category')->getFullCategoryData(
+        return Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getData(
             $this->getCategoryValue(), $this->getMarketplaceId()
         );
     }
@@ -211,6 +217,28 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
     public function getInternalData()
     {
         return $this->_internalData;
+    }
+
+    public function setUniqueId($id)
+    {
+        $this->_uniqueId = $id;
+        return $this;
+    }
+
+    public function getUniqueId()
+    {
+        return $this->_uniqueId;
+    }
+
+    public function setCompactMode($isMode = true)
+    {
+        $this->_isCompactMode = $isMode;
+        return $this;
+    }
+
+    public function isCompactMode()
+    {
+        return $this->_isCompactMode;
     }
 
     // ########################################

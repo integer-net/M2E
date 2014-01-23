@@ -10,8 +10,6 @@ class Ess_M2ePro_Helper_Magento_Store extends Mage_Core_Helper_Abstract
     private $defaultStoreGroup = NULL;
     private $defaultStore = NULL;
 
-    private $storeIdsByAttributeAndStore = array();
-
     // ########################################
 
     public function isSingleStoreMode()
@@ -91,54 +89,6 @@ class Ess_M2ePro_Helper_Magento_Store extends Mage_Core_Helper_Abstract
     public function getDefaultStoreId()
     {
         return (int)$this->getDefaultStore()->getId();
-    }
-
-    // ########################################
-
-    public function getStoreIdsByAttributeAndStore($attributeCode, $storeId)
-    {
-        $cacheKey = $attributeCode.'_'.$storeId;
-
-        if (isset($this->storeIdsByAttributeAndStore[$cacheKey])) {
-            return $this->storeIdsByAttributeAndStore[$cacheKey];
-        }
-
-        $attributeInstance = Mage::getModel('eav/config')->getAttribute('catalog_product',$attributeCode);
-
-        if (!($attributeInstance instanceof Mage_Catalog_Model_Resource_Eav_Attribute)) {
-            return $this->storeIdsByAttributeAndStore[$cacheKey] = array();
-        }
-
-        $storeIds = array();
-
-        switch ((int)$attributeInstance->getData('is_global')) {
-
-            case Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_GLOBAL:
-                foreach (Mage::app()->getWebsites() as $website) {
-                    /** @var $website Mage_Core_Model_Website */
-                    $storeIds = array_merge($storeIds,$website->getStoreIds());
-                }
-                break;
-
-            case Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_WEBSITE:
-                if ($storeId != Mage_Core_Model_App::ADMIN_STORE_ID) {
-                    $storeIds = Mage::getModel('core/store')->load($storeId)->getWebsite()->getStoreIds();
-                }
-                break;
-
-            case Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_STORE:
-                if ($storeId != Mage_Core_Model_App::ADMIN_STORE_ID) {
-                    $storeIds = array($storeId);
-                }
-                break;
-        }
-
-        $storeIds = array_values(array_unique($storeIds));
-        foreach ($storeIds as &$storeIdTemp) {
-            $storeIdTemp = (int)$storeIdTemp;
-        }
-
-        return $this->storeIdsByAttributeAndStore[$cacheKey] = $storeIds;
     }
 
     // ########################################

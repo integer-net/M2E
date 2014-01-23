@@ -44,10 +44,7 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
 
     public function getNewChildSelectOptions()
     {
-        $productCondition = Mage::getModel('M2ePro/Magento_Product_Rule_Condition_Product');
-        $productAttributes = $productCondition->loadAttributeOptionsByCriteria(
-            $this->getRule()->getAttributeCriteria(), $this->getRule()->getAttributeSets()
-        )->getAttributeOption();
+        $productAttributes = Mage::getModel('M2ePro/Magento_Product_Rule_Condition_Product')->getAttributeOption();
 
         $attributes = array();
         foreach ($productAttributes as $code => $label) {

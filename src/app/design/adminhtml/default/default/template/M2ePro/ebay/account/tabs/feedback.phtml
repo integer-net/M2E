@@ -2,8 +2,8 @@
     <?php
         $menuLabel = Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
         echo Mage::helper('M2ePro')->__('
-This tab contains settings of receiving, saving buyers\' feedback and sending seller\'s Auto Responses to received feedback.<br/><br/>
-<b>Note:</b> To allow receiving feedback from eBay, Feedback Synchronization should be enabled in %s > Configuration > Synchronization.', $menuLabel);
+        M2E allows you to receive feedback from your buyers and respond them according to the settings below.
+<br/><br/><b>Note:</b> The Feedback Synchronization must be enabled in %s > Configuration > Synchronization.', $menuLabel);
     ?>
 </div>
 
@@ -112,7 +112,7 @@ This tab contains settings of receiving, saving buyers\' feedback and sending se
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES; ?>" <?php if ($formData['feedbacks_auto_response_only_positive'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Positive'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Which feedback auto responses should be sent to: all or positive only.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Responses to All feedbacks or Positive only.'); ?></span>
                         </p>
                     </td>
                 </tr>

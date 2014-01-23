@@ -132,6 +132,24 @@ class Ess_M2ePro_Model_General_VariablesDir
         }
     }
 
+    public function removeBaseForce()
+    {
+        if (!$this->isBaseExist()) {
+            return;
+        }
+
+        $directoryIterator = new RecursiveDirectoryIterator($this->getBasePath(), FilesystemIterator::SKIP_DOTS);
+        $iterator = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::CHILD_FIRST);
+
+        foreach($iterator as $path) {
+            $path->isFile() ? unlink($path->getPathname()) : rmdir($path->getPathname());
+        }
+
+        if (!@rmdir($this->getBasePath())) {
+            throw new Exception('M2ePro base var dir removing is failed.');
+        }
+    }
+
     public function remove()
     {
         if (!$this->isExist()) {

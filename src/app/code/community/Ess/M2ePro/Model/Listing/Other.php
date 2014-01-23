@@ -141,6 +141,13 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
         return is_null($temp) ? NULL : (int)$temp;
     }
 
+    public function getAdditionalData()
+    {
+        $additionalData = $this->getData('additional_data');
+        is_string($additionalData) && $additionalData = json_decode($additionalData,true);
+        return is_array($additionalData) ? $additionalData : array();
+    }
+
     //---------------------------------------
 
     public function getStatus()

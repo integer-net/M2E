@@ -8,7 +8,7 @@
 
     <tr>
         <td class="label">
-            <label><?php echo Mage::helper('M2ePro')->__('Last Run'); ?>: </label>
+            <label><?php echo Mage::helper('M2ePro')->__('Last Run'); if ($this->cronLastGMT) { echo ' ('.Mage::helper('M2ePro')->__('GMT').')'; } ?>: </label>
         </td>
         <?php
             $style = '';
@@ -43,6 +43,15 @@
         </td>
         <td class="value">
             <?php echo $this->cronGet ?>
+        </td>
+    </tr>
+
+    <tr <?php if (!$this->getIsInspection()) echo 'style="display: none"' ?>>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Cron Schedule Table'); ?>: </label>
+        </td>
+        <td class="value">
+            <a href="<?php echo $this->getUrl('*/adminhtml_development_inspection/cronScheduleTable'); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Show') ?></a>
         </td>
     </tr>
 

@@ -298,7 +298,7 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
 
     // ########################################
 
-    public function addProduct($product,$checkingMode = false, $checkHasProduct = true)
+    public function addProduct($product, $checkingMode = false, $checkHasProduct = true)
     {
         $productId = $product instanceof Mage_Catalog_Model_Product ?
                         (int)$product->getId() : (int)$product;

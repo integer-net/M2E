@@ -27,7 +27,6 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Module extends Mage_Adminhtml_
         $this->moduleName = Mage::helper('M2ePro/Module')->getName();
         $this->moduleVersion = Mage::helper('M2ePro/Module')->getVersion();
         $this->moduleRevision = Mage::helper('M2ePro/Module')->getRevision();
-        $this->moduleApplicationKey = Mage::helper('M2ePro/Server')->getApplicationKey();
 
         return parent::_beforeToHtml();
     }

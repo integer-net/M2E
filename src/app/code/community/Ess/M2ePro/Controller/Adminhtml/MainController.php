@@ -17,6 +17,11 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             !$this->getRequest()->isPost() &&
             !$this->getRequest()->isXmlHttpRequest()) {
 
+            // check rewrite menu
+            if (count($this->getCustomViewComponentHelper()->getActiveComponents()) < 1) {
+                throw new Exception('At least 1 channel of current view should be enabled.');
+            }
+
             // update client data
             try {
                 Mage::helper('M2ePro/Client')->updateBackupConnectionData(false);
@@ -50,9 +55,10 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             !$this->getRequest()->isXmlHttpRequest()) {
 
             $lockNotification = $this->addLockNotifications();
+            $browserNotification = $this->addBrowserNotifications();
             $maintenanceNotification = $this->addMaintenanceNotifications();
 
-            $muteMessages = $lockNotification || $maintenanceNotification;
+            $muteMessages = $lockNotification || $browserNotification || $maintenanceNotification;
 
             if (!$muteMessages &&
                 Mage::helper('M2ePro/Module_Wizard')->isFinished(
@@ -73,7 +79,6 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             }
 
             $this->addServerNotifications();
-            $this->addBrowserNotifications();
 
             if (!$muteMessages) {
                 $this->getCustomViewControllerHelper()->addMessages($this);
@@ -83,23 +88,34 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
         return parent::loadLayout($ids, $generateBlocks, $generateXml);
     }
 
-    protected function _addContent(Mage_Core_Block_Abstract $block)
+    //---------------------------------------------
+
+    protected function addLeft(Mage_Core_Block_Abstract $block)
     {
         if ($this->getRequest()->isGet() &&
             !$this->getRequest()->isPost() &&
             !$this->getRequest()->isXmlHttpRequest()) {
 
-            if (Mage::helper('M2ePro/Module')->isLockedByServer()) {
-                return $this;
-            }
-
-            if (Mage::helper('M2ePro/Module_Maintenance')->isEnabled() &&
-                !Mage::helper('M2ePro/Module_Maintenance')->isOwner()) {
+            if ($this->isContentLocked()) {
                 return $this;
             }
         }
 
-        return parent::_addContent($block);
+        return parent::addLeft($block);
+    }
+
+    protected function addContent(Mage_Core_Block_Abstract $block)
+    {
+        if ($this->getRequest()->isGet() &&
+            !$this->getRequest()->isPost() &&
+            !$this->getRequest()->isXmlHttpRequest()) {
+
+            if ($this->isContentLocked()) {
+                return $this;
+            }
+        }
+
+        return parent::addContent($block);
     }
 
     //---------------------------------------------
@@ -199,11 +215,11 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
     private function addBrowserNotifications()
     {
-        // Check MS Internet Explorer 6
-        if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE 6.') !== false) {
-            $warning = 'Magento and M2E Pro has Internet Explorer 7 as minimal browser requirement. ';
-            $warning .= 'Please upgrade your browser.';
-            $this->_getSession()->addWarning(Mage::helper('M2ePro')->__($warning));
+        if (Mage::helper('M2ePro/Client')->isBrowserIE()) {
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__(
+                'We are sorry, Internet Explorer browser is not supported. Please, use
+                 another browser (Mozilla Firefox, Google Chrome, etc.).'
+            ));
             return true;
         }
         return false;
@@ -245,8 +261,10 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             '/license/validation/domain/notification/', 'mode'
         );
 
+        $licenseDomain = Mage::helper('M2ePro/Module_License')->getDomain();
+
         if ($domainNotify &&
-            Mage::helper('M2ePro/Module_License')->getDomain() != Mage::helper('M2ePro/Client')->getDomain()) {
+            strtolower($licenseDomain) != strtolower(Mage::helper('M2ePro/Client')->getDomain())) {
 
             $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
             $endLink = '</a>';
@@ -263,7 +281,10 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             '/license/validation/ip/notification/', 'mode'
         );
 
-        if ($ipNotify && Mage::helper('M2ePro/Module_License')->getIp() != Mage::helper('M2ePro/Client')->getIp()) {
+        $licenseIp = Mage::helper('M2ePro/Module_License')->getIp();
+
+        if ($ipNotify &&
+            strtolower($licenseIp) != strtolower(Mage::helper('M2ePro/Client')->getIp())) {
 
             $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
             $endLink = '</a>';
@@ -283,7 +304,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
         $licenseDirectory = Mage::helper('M2ePro/Module_License')->getDirectory();
 
         if ($directoryNotify &&
-            $licenseDirectory != Mage::helper('M2ePro/Client')->getBaseDirectory()) {
+            strtolower($licenseDirectory) != strtolower(Mage::helper('M2ePro/Client')->getBaseDirectory())) {
 
             $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
             $endLink = '</a>';
@@ -437,7 +458,8 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
         foreach ($this->getCustomViewComponentHelper()->getActiveComponents() as $component) {
 
-            if (Mage::helper('M2ePro/Module_License')->getIntervalBeforeExpirationDate($component) <= 60*60*24*3) {
+            if (Mage::helper('M2ePro/Module_License')->getIntervalBeforeExpirationDate($component) > 0 &&
+                Mage::helper('M2ePro/Module_License')->getIntervalBeforeExpirationDate($component) <= 60*60*24*3) {
 
                 $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
                 $endLink = '</a>';
@@ -526,6 +548,37 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
         $this->getLayout()->getBlock('content')->append(
             $this->getLayout()->createBlock('M2ePro/adminhtml_requirementsPopup')
         );
+    }
+
+    //#############################################
+
+    private function isContentLocked()
+    {
+        return $this->isContentLockedByWizard() ||
+               Mage::helper('M2ePro/Client')->isBrowserIE() ||
+               Mage::helper('M2ePro/Module')->isLockedByServer() ||
+               (
+                   Mage::helper('M2ePro/Module_Maintenance')->isEnabled() &&
+                   !Mage::helper('M2ePro/Module_Maintenance')->isOwner()
+               );
+    }
+
+    private function isContentLockedByWizard()
+    {
+        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
+
+        if (!($activeWizard = $wizardHelper->getActiveBlockerWizard($this->getCustomViewNick()))) {
+            return false;
+        }
+
+        $activeWizardNick = $wizardHelper->getNick($activeWizard);
+
+        if ((bool)$this->getRequest()->getParam('wizard',false) ||
+            $this->getRequest()->getControllerName() == 'adminhtml_wizard_'.$activeWizardNick) {
+            return false;
+        }
+
+        return true;
     }
 
     //#############################################

@@ -61,7 +61,7 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
                              ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
 
         $query = "UPDATE `{$listingTable}`
-                  SET `items_active_count` =  (".$dbSelect->__toString().")
+                  SET `items_active_count` =  IFNULL((".$dbSelect->__toString()."),0)
                   WHERE `component_mode` = 'ebay'";
 
         $this->_getWriteAdapter()->query($query);
@@ -121,10 +121,10 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
             return;
         }
 
-        $storeId = Mage_Core_Model_App::ADMIN_STORE_ID;
+        $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $listingId);
+        $storeId = (int)$listing->getStoreId();
 
-        $attributeSeparator = Ess_M2ePro_Model_Ebay_Template_Category::MOTORS_SPECIFICS_VALUE_SEPARATOR;
-        $attributeValue = implode($attributeSeparator, $epids);
+        $attributeValue = implode(',', $epids);
 
         $listingProductsCollection = Mage::getModel('M2ePro/Listing_Product')->getCollection();
         $listingProductsCollection->addFieldToFilter('id', array('in' => $listingProductIds));
@@ -132,154 +132,39 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
         $listingProductsCollection->getSelect()->columns(array('product_id'));
 
         $productIds = $listingProductsCollection->getColumnValues('product_id');
-
-        $attributesData = Mage::getResourceModel('M2ePro/Ebay_Listing')
-            ->getMotorsSpecificsAttributesData(
-                $listingId,
-                $listingProductIds
-            );
-        $attributeCodes = array_keys($attributesData);
+        $motorsSpecificsAttribute = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/ebay/motor/','motors_specifics_attribute'
+        );
 
         if ($overwrite) {
-            foreach ($attributesData as $attributeCode => $attributeData) {
-                Mage::getSingleton('catalog/product_action')
-                    ->updateAttributes(
-                        $attributeData['product_ids'],
-                        array($attributeCode => $attributeValue),
-                        $storeId
-                    );
-            }
+            Mage::getSingleton('catalog/product_action')->updateAttributes(
+                $productIds,
+                array($motorsSpecificsAttribute => $attributeValue),
+                $storeId
+            );
             return;
         }
 
         $productCollection = Mage::getModel('catalog/product')->getCollection();
+        $productCollection->setStoreId($storeId);
         $productCollection->addFieldToFilter('entity_id', array('in' => $productIds));
+        $productCollection->addAttributeToSelect($motorsSpecificsAttribute);
 
-        foreach ($attributeCodes as $attributeCode) {
-            $productCollection->addAttributeToSelect($attributeCode);
-        }
+        foreach ($productCollection->getItems() as $itemId => $item) {
 
-        foreach ($attributesData as $attributeCode => $attributeData) {
-            foreach ($attributeData['product_ids'] as $productId) {
-                $product = $productCollection->getItemByColumnValue('entity_id', $productId);
+            $currentAttributeValue = $item->getData($motorsSpecificsAttribute);
+            $newAttributeValue = $attributeValue;
 
-                if (is_null($product)) {
-                    continue;
-                }
-
-                $product->setStoreId($storeId);
-                /** @var $magentoProduct Ess_M2ePro_Model_Magento_Product */
-                $magentoProduct = Mage::getModel('M2ePro/Magento_Product');
-                $magentoProduct->setProduct($product);
-                $magentoProduct->saveAttribute($attributeCode, $attributeValue, $overwrite, $attributeSeparator);
-            }
-        }
-    }
-
-    // ########################################
-
-    public function getMotorsSpecificsAttributesData($listingId, array $listingProductIds = array())
-    {
-        $resource = Mage::getSingleton('core/resource');
-
-        $dbSelect = $resource
-            ->getConnection('core_read')
-                ->select()
-                ->from(
-                    array('lp' => $resource->getTableName('M2ePro/Listing_Product')),
-                    array('product_id')
-                )
-                ->where('listing_id = ?', $listingId);
-
-        if (count($listingProductIds) > 0) {
-            $dbSelect->where('lp.id IN (?)', $listingProductIds);
-        }
-
-        $dbSelect->joinLeft(
-            array('elp' => $resource->getTableName('M2ePro/Ebay_Listing_Product')),
-            'lp.id = elp.listing_product_id',
-            array('')
-        );
-
-        $dbSelect->joinLeft(
-            array('etc' => $resource->getTableName('M2ePro/Ebay_Template_Category')),
-            'etc.id = elp.template_category_id',
-            'motors_specifics_attribute'
-        );
-
-        $query = $dbSelect->query();
-
-        $data = array();
-
-        while (($row = $query->fetch()) !== false) {
-            if ($row['motors_specifics_attribute'] == '') {
-                continue;
+            if (!empty($currentAttributeValue)) {
+                $newAttributeValue = $currentAttributeValue . ',' . $attributeValue;
             }
 
-            $attribute = $row['motors_specifics_attribute'];
-
-            if (!array_key_exists($attribute, $data)) {
-                $attributeObject = Mage::getResourceModel('catalog/product')->getAttribute($attribute);
-
-                if (!$attributeObject || $attributeObject->getBackendType() != 'text') {
-                    $data[$attribute] = NULL;
-                } else {
-                    $data[$attribute] = array(
-                        'attribute_id' => (int)$attributeObject->getId(),
-                        'product_ids' => array()
-                    );
-                }
-            }
-
-            if (is_null($data[$attribute])) {
-                continue;
-            }
-
-            $data[$attribute]['product_ids'][] = (int)$row['product_id'];
+            Mage::getSingleton('catalog/product_action')->updateAttributes(
+                array($itemId),
+                array($motorsSpecificsAttribute => $newAttributeValue),
+                $storeId
+            );
         }
-
-        return array_filter($data);
-    }
-
-    // ########################################
-
-    public function hasEmptyMotorsSpecificsAttributes($listingId, array $listingProductIds = array())
-    {
-        $resource = Mage::getSingleton('core/resource');
-
-        $dbSelect = $resource
-            ->getConnection('core_read')
-                ->select()
-                ->from(
-                    array('lp' => $resource->getTableName('M2ePro/Listing_Product')),
-                    array('')
-                )
-                ->where('listing_id = ?', $listingId);
-
-        if (count($listingProductIds) > 0) {
-            $dbSelect->where('lp.id IN (?)', $listingProductIds);
-        }
-
-        $dbSelect->joinLeft(
-            array('elp' => $resource->getTableName('M2ePro/Ebay_Listing_Product')),
-            'lp.id = elp.listing_product_id',
-            array('')
-        );
-
-        $dbSelect->joinLeft(
-            array('etc' => $resource->getTableName('M2ePro/Ebay_Template_Category')),
-            'etc.id = elp.template_category_id',
-            array('')
-        );
-
-        $dbSelect->where(
-            'elp.template_category_id IS NULL'
-            . ' OR etc.motors_specifics_attribute IS NULL'
-            . ' OR etc.motors_specifics_attribute = \'\''
-        );
-        $dbSelect->columns(new Zend_Db_Expr('COUNT(*)'));
-
-        return $dbSelect->query()->fetchColumn() != 0;
     }
 
     // ########################################

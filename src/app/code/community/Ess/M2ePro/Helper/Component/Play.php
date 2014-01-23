@@ -14,7 +14,7 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
     const CURRENCY_GBP = 'GBP';
     const CURRENCY_EUR = 'EUR';
 
-    const MARKETPLACE_VIRTUAL_ID = 34;
+    const MARKETPLACE_ID = 34;
 
     // ########################################
 
@@ -65,19 +65,22 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function getVirtualMarketplaceId()
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
     {
-        return self::MARKETPLACE_VIRTUAL_ID;
+        return $this->getCachedObject('Marketplace',$this->getMarketplaceId());
     }
 
-    public function getItemUrl($playId, $categoryCode, $marketplaceId = NULL)
+    public function getMarketplaceId()
     {
-        $marketplaceId = (int)$marketplaceId;
-        $marketplaceId <= 0 && $marketplaceId = self::MARKETPLACE_VIRTUAL_ID;
+        return self::MARKETPLACE_ID;
+    }
 
-        $domain = $this->getCachedObject('Marketplace',$marketplaceId)->getUrl();
-
-        return 'http://'.$domain.'/Product.aspx?title='.$playId.'&r='.$categoryCode;
+    public function getItemUrl($playId, $categoryCode)
+    {
+        return 'http://'.$this->getMarketplace()->getUrl().'/Product.aspx?title='.$playId.'&r='.$categoryCode;
     }
 
     // ########################################

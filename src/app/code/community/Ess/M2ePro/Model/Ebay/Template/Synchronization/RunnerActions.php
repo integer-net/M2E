@@ -50,30 +50,30 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_RunnerActions
 
             do {
 
-                if ($action == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP) {
+                if ($action == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP) {
                     return false;
                 }
 
-                if ($action == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_LIST) {
+                if ($action == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_LIST) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_LIST) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_LIST) {
                     return false;
                 }
 
-                if ($action == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST) {
+                if ($action == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST) {
                     $this->deleteProduct($tempExistItem['instance']);
                     break;
                 }
 
-                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST) {
+                if ($tempExistItem['action'] == Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST) {
                     return false;
                 }
 
@@ -184,7 +184,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_RunnerActions
         $results = array();
 
         if ($totalCount == 0) {
-            $results[] = Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::STATUS_SUCCESS;
+            $results[] = Ess_M2ePro_Helper_Data::STATUS_SUCCESS;
         } else {
 
             // Execute eBay actions
@@ -212,7 +212,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_RunnerActions
 
                         // Set status for progress bar
                         //-----------------------------
-                        $actionTitle = Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::getActionTitle($action);
+                        $actionTitle = Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::getActionTitle($action);
                         $statusProductsIds = array();
                         foreach ($itemsForStep as $item) {
                             $statusProductsIds[] = $item->getData('product_id');
@@ -227,7 +227,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_RunnerActions
                         $lockItem->setStatus($actionTitle.' '.$statusIdsString.' '.$waitMessage);
                         //-----------------------------
 
-                        $tempResult = Mage::getModel('M2ePro/Connector_Server_Ebay_Item_Dispatcher')
+                        $tempResult = Mage::getModel('M2ePro/Connector_Ebay_Item_Dispatcher')
                             ->process($action, $itemsForStep, $combination['params']);
                         $results  = array_merge($results,array($tempResult));
 
@@ -249,7 +249,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_RunnerActions
         $lockItem->setPercents($percentsTo);
         $lockItem->activate();
 
-        return Ess_M2ePro_Model_Connector_Server_Ebay_Item_Abstract::getMainStatus($results);
+        return Mage::helper('M2ePro')->getMainStatus($results);
     }
 
     //-----------------------------------------
@@ -257,10 +257,10 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_RunnerActions
     private function makeActionsForExecute()
     {
         $actions = array(
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP => array(),
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_RELIST => array(),
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_REVISE => array(),
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_LIST => array()
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP => array(),
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST => array(),
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE => array(),
+            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_LIST => array()
         );
 
         foreach ($this->_actionsProducts as $item) {

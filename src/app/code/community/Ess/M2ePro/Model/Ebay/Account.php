@@ -682,6 +682,25 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
         return $this->getData('ebay_store_description');
     }
 
+    public function getEbayStoreCategory($id)
+    {
+        $tableAccountStoreCategories = Mage::getSingleton('core/resource')
+            ->getTableName('m2epro_ebay_account_store_category');
+
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        $dbSelect = $connRead->select()
+            ->from($tableAccountStoreCategories,'*')
+            ->where('`account_id` = ?',(int)$this->getId())
+            ->where('`category_id` = ?',(int)$id)
+            ->order(array('sorder ASC'));
+
+        $categories = $connRead->fetchAll($dbSelect);
+
+        return count($categories) > 0 ? $categories[0] : array();
+    }
+
     public function getEbayStoreCategories()
     {
         $tableAccountStoreCategories = Mage::getSingleton('core/resource')
@@ -732,8 +751,8 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
     {
         // Get eBay store data
         //----------------------------
-        $data = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                        ->processVirtualAbstract('account','get','store',
+        $data = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                        ->processVirtual('account','get','store',
                                                  array(),NULL,
                                                  NULL,$this->getId(),NULL);
         //----------------------------
@@ -775,7 +794,7 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
     {
         // Get shipping discount profiles
         //----------------------------
-        $data = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')->processVirtualAbstract(
+        $data = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')->processVirtual(
             'account', 'get', 'shippingDiscountProfiles', array(), NULL, $marketplaceId, $this->getId(), NULL
         );
 

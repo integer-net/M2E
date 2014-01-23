@@ -20,6 +20,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
         if ($wizardHelper->isFinished(Ess_M2ePro_Helper_View_Ebay::WIZARD_INSTALLATION_NICK)) {
             $this->addFeedbackNotificationMessage($controller);
             $this->addTokenExpirationDateNotificationMessage($controller);
+            $this->addMarketplacesCategoriesVersionNotificationMessage($controller);
         }
     }
 
@@ -71,11 +72,14 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
         return false;
     }
 
-    private function addTokenExpirationDateNotificationMessage(Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
+    private function addTokenExpirationDateNotificationMessage(
+                            Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        $tokenExpirationMessages = Mage::helper('M2ePro/Data_Cache')->getValue('ebay_accounts_token_expiration_messages');
+        $tokenExpirationMessages = Mage::helper('M2ePro/Data_Cache')->getValue(
+            'ebay_accounts_token_expiration_messages'
+        );
 
-        if (!$tokenExpirationMessages) {
+        if ($tokenExpirationMessages === false) {
 
             $tokenExpirationMessages = array();
 
@@ -148,6 +152,62 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
         }
 
         return true;
+    }
+
+    //#############################################
+
+    private function addMarketplacesCategoriesVersionNotificationMessage(
+                            Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
+    {
+        $outdatedMarketplaces = Mage::helper('M2ePro/Data_Cache')->getValue('outdated_marketplaces');
+
+        if ($outdatedMarketplaces === false) {
+            $readConn = Mage::getSingleton('core/resource')->getConnection('core_read');
+            $dictionaryTable = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_marketplace');
+
+            $rows = $readConn->select()->from($dictionaryTable,'marketplace_id')
+                ->where('client_categories_version IS NOT NULL')
+                ->where('server_categories_version IS NOT NULL')
+                ->where('client_categories_version < server_categories_version')
+                ->query();
+
+            $ids = array();
+            foreach ($rows as $row) {
+                $ids[] = $row['marketplace_id'];
+            }
+
+            $marketplacesCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Marketplace')
+                ->addFieldToFilter('id',array('in' => $ids));
+
+            $outdatedMarketplaces = array();
+            /* @var $marketplace Ess_M2ePro_Model_Marketplace */
+            foreach ($marketplacesCollection as $marketplace) {
+                $outdatedMarketplaces[] = $marketplace->getTitle();
+            }
+
+            Mage::helper('M2ePro/Data_Cache')->setValue('outdated_marketplaces',
+                                                         $outdatedMarketplaces,
+                                                         array('ebay','marketplace'),
+                                                         60*60*24);
+        }
+
+        if (count($outdatedMarketplaces) <= 0) {
+            return;
+        }
+
+        $message = '%s data was changed on eBay. You need to synchronize it the extension works properly.
+                    Please, go to %s > Configuration >
+                    <a href="%s" target="_blank">eBay Sites</a> and click the Save And Update button.';
+
+        $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
+            $message,
+            implode(', ',$outdatedMarketplaces),
+            Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+            $controller->getUrl(
+                '*/adminhtml_ebay_marketplace',
+                array('tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_MARKETPLACE)
+            )
+        ));
     }
 
     //#############################################

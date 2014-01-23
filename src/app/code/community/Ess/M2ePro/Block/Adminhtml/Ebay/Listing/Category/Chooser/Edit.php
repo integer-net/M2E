@@ -104,16 +104,16 @@ HTML;
     {
         $titles = array();
 
-        $type = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_MAIN;
+        $type = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN;
         $titles[$type] = Mage::helper('M2ePro')->__('eBay Primary Category');
 
-        $type = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_EBAY_SECONDARY;
+        $type = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY;
         $titles[$type] = Mage::helper('M2ePro')->__('eBay Secondary Category');
 
-        $type = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_MAIN;
+        $type = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN;
         $titles[$type] = Mage::helper('M2ePro')->__('Store Primary Category');
 
-        $type = Ess_M2ePro_Helper_Component_Ebay_Category::CATEGORY_TYPE_STORE_SECONDARY;
+        $type = Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY;
         $titles[$type] = Mage::helper('M2ePro')->__('Store Secondary Category');
 
         return $titles;

@@ -66,7 +66,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '5285';
+        $revision = '5993';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -110,6 +110,8 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         return self::SERVER_LOCK_NO;
     }
 
+    // -------------------------------------------
+
     public function getServerMessages()
     {
         $messages = Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue(
@@ -120,20 +122,22 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
                     (array)json_decode((string)$messages,true) :
                     array();
 
-        function getServerMessagesFilterModuleMessages($message) {
-
-            if (!isset($message['title']) || !isset($message['text']) || !isset($message['type'])) {
-                return false;
-            }
-
-            return true;
-        }
-
-        $messages = array_filter($messages,'getServerMessagesFilterModuleMessages');
+        $messages = array_filter($messages,array($this,'getServerMessagesFilterModuleMessages'));
         !is_array($messages) && $messages = array();
 
         return $messages;
     }
+
+    public function getServerMessagesFilterModuleMessages($message)
+    {
+        if (!isset($message['text']) || !isset($message['type'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // -------------------------------------------
 
     public function isPossibleToRunCron()
     {
@@ -208,7 +212,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
                     'sign' => '>=',
                     'value' => (Mage::helper('M2ePro/Magento')->isGoEdition()           ? '1.9.0.0' :
                                (Mage::helper('M2ePro/Magento')->isEnterpriseEdition()   ? '1.7.0.0' :
-                               (Mage::helper('M2ePro/Magento')->isProfessionalEdition() ? '1.7.0.0' : '1.4.0.0')))
+                               (Mage::helper('M2ePro/Magento')->isProfessionalEdition() ? '1.7.0.0' : '1.4.1.0')))
                 ),
                 'current' => array(
                     'value' => Mage::helper('M2ePro/Magento')->getVersion(false),

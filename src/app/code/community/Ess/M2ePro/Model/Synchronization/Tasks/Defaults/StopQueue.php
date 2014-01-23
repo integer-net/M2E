@@ -171,8 +171,8 @@ class Ess_M2ePro_Model_Synchronization_Tasks_Defaults_StopQueue extends Ess_M2eP
                 $name = 'entities';
             }
 
-            $dispatcher = Mage::getModel('M2ePro/Connector_Server_'.ucwords($component).'_Dispatcher');
-            $dispatcher->processVirtualAbstract($entity, $type, $name, $requestData);
+            $dispatcher = Mage::getModel('M2ePro/Connector_'.ucwords($component).'_Dispatcher');
+            $dispatcher->processVirtual($entity, $type, $name, $requestData);
 
         } catch (Exception $exception) {}
     }

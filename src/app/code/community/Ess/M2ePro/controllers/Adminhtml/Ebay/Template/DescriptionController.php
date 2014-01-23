@@ -11,111 +11,66 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
 
     public function previewAction()
     {
-        $body = '';
-        $errorTxt = false;
-        $productId = NULL;
+        $title = NULL;
+        $description = NULL;
+        $errorMessage = NULL;
 
-        if ((int)$this->getRequest()->getPost('show',0) == 1) {
-
-            // form sended
-            //--------------------------------
-            $templateData = $this->_getSession()->getPreviewFormData();
-            if (!$productId = $this->getRequest()->getPost('id',NULL)) {
-                $productId = $this->_getRandomProduct();
-            }
-            //--------------------------------
-
-            if (!$productId) {
-                $errorTxt = Mage::helper('M2ePro')->__('There are no any products in your magento store.');
-            } else {
-                $productId = (int)$productId;
-                $product = Mage::getModel('catalog/product')->load($productId);
-
-                if (!$product->getId()) {
-                    $errorTxt = Mage::helper('M2ePro')->__('Product #%s does not exist', $productId);
-                } else {
-
-                    if (Ess_M2ePro_Model_Ebay_Template_Description::TITLE_MODE_CUSTOM == $templateData['title_mode']) {
-
-                        /** @var $magentoProduct Ess_M2ePro_Model_Magento_Product */
-                        $magentoProduct = Mage::getModel('M2ePro/Magento_Product')->setProduct($product);
-
-                        $title = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
-                            $templateData['title_template'], $magentoProduct
-                        );
-
-                    } else {
-                        $title = $product->getData('name');
-                    }
-
-                    $temp = Ess_M2ePro_Model_Ebay_Template_Description::SUBTITLE_MODE_CUSTOM;
-                    if ($temp == $templateData['subtitle_mode']) {
-
-                        /** @var $magentoProduct Ess_M2ePro_Model_Magento_Product */
-                        $magentoProduct = Mage::getModel('M2ePro/Magento_Product')->setProduct($product);
-
-                        $subTitle =  Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
-                            $templateData['subtitle_template'], $magentoProduct
-                        );
-
-                    } else {
-                        $subTitle = '';
-                    }
-
-                    $cutLongTitles = !empty($templateData['cut_long_titles']);
-                    if ($cutLongTitles) {
-                        $title = Mage::getModel('M2ePro/Ebay_Template_Description')->cutLongTitles($title);
-                        $subTitle = Mage::getModel('M2ePro/Ebay_Template_Description')->cutLongTitles($subTitle, 55);
-                    }
-
-                    $description = $product->getDescription();
-                    $temp1 = Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_SHORT;
-                    $temp2 = Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_CUSTOM;
-                    if ($temp1 == $templateData['description_mode']) {
-                        $description = $product->getShortDescription();
-                    } elseif ($temp2 == $templateData['description_mode']) {
-
-                        /** @var $magentoProduct Ess_M2ePro_Model_Magento_Product */
-                        $magentoProduct = Mage::getModel('M2ePro/Magento_Product')->setProduct($product);
-
-                        $description = Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
-                            $templateData['description_template'], $magentoProduct
-                        );
-                    }
-
-                    $body = $this->getLayout()->createBlock(
-                        'M2ePro/adminhtml_ebay_template_description_preview_body', '',
-                        array(
-                            'title' => $title,
-                            'subtitle' => $subTitle,
-                            'description' => $description
-                        )
-                    )->toHtml();
-                }
-            }
+        if (!(int)$this->getRequest()->getPost('show',0)) {
+            $templateData = $this->getRequest()->getPost('description');
+            $this->_getSession()->setTemplateData($templateData);
         } else {
-            // first load
-            $this->_getSession()->setPreviewFormData($this->getRequest()->getPost('description'));
+
+            $productEntities = $this->getProductsEntities();
+
+            if (is_null($productEntities['magento_product'])) {
+                $errorMessage = Mage::helper('M2ePro')->__('This product ID does not exist');
+            } else {
+
+                $templateData = $this->_getSession()->getTemplateData();
+
+                $title = $productEntities['magento_product']->getProduct()->getData('name');
+                $description = $this->getDescription($templateData['description_mode'],
+                                                     $templateData['description_template'],
+                                                     $productEntities['magento_product'],
+                                                     $productEntities['listing_product']);
+            }
         }
 
+        $this->printOutput($title, $description, $errorMessage);
+    }
+
+    private function printOutput($title = NULL, $description = NULL, $errorMessage = NULL)
+    {
         $this->loadLayout();
 
         $headBlock = $this->getLayout()->getBlock('head');
         $generalBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_general');
+
+        $productId = $this->getRequest()->getPost('id',NULL);
+
         $previewFormBlock = $this->getLayout()->createBlock(
             'M2ePro/adminhtml_ebay_template_description_preview_form', '',
-            array('error_txt' => $errorTxt, 'product_id' => $productId)
+            array('error_message' => $errorMessage, 'product_id' => $productId)
         );
 
-        $html = $headBlock->toHtml() . $generalBlock->toHtml() . $previewFormBlock->toHtml() . $body;
+        $previewBodyBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_ebay_template_description_preview_body', '',
+            array('title' => $title, 'description' => $description)
+        );
+
+        $html = $headBlock->toHtml() . $generalBlock->toHtml() .
+                $previewFormBlock->toHtml() . $previewBodyBlock->toHtml();
+
         $this->getResponse()->setBody($html);
     }
 
+    // --------------------------------------------
+
     public function saveWatermarkImageAction()
     {
-        $descriptionData = $this->getRequest()->getPost('description');
+        $templateData = $this->getRequest()->getPost('description');
 
-        if (is_null($descriptionData['id']) || empty($_FILES['watermark_image']['tmp_name'])) {
+        if (is_null($templateData['id']) || empty($_FILES['watermark_image']['tmp_name'])) {
             return NULL;
         }
 
@@ -123,12 +78,12 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
             array('child_folder' => 'ebay/template/description/watermarks')
         );
 
-        $watermarkPath = $varDir->getPath().(int)$descriptionData['id'].'.png';
+        $watermarkPath = $varDir->getPath().(int)$templateData['id'].'.png';
         if (is_file($watermarkPath)) {
             @unlink($watermarkPath);
         }
 
-        $template = Mage::getModel('M2ePro/Ebay_Template_Description')->load((int)$descriptionData['id']);
+        $template = Mage::getModel('M2ePro/Ebay_Template_Description')->load((int)$templateData['id']);
         $template->updateWatermarkHashes();
 
         $data = array(
@@ -139,11 +94,46 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
         $template->save();
     }
 
-    private function _getRandomProduct()
+    //#############################################
+
+    private function getProductsEntities()
+    {
+        if ($productId = $this->getRequest()->getPost('id',NULL)) {
+            return array(
+                'magento_product' => $this->getMagentoProduct($productId),
+                'listing_product' => $this->getListingProduct($productId)
+            );
+        }
+
+        $result = array(
+            'magento_product' => NULL,
+            'listing_product' => NULL
+        );
+
+        $listingProduct = $this->getRandomListingProduct();
+
+        if (!is_null($listingProduct)) {
+            $result['magento_product'] = $listingProduct->getMagentoProduct();
+            $result['listing_product'] = $listingProduct;
+            return $result;
+        }
+
+        $magentoProduct = $this->getRandomMagentoProduct();
+
+        if (!is_null($magentoProduct)) {
+            $result['magento_product'] = $magentoProduct;
+        }
+
+        return $result;
+    }
+
+    // --------------------------------------------
+
+    private function getRandomMagentoProduct()
     {
         $products = Mage::getModel('catalog/product')
             ->getCollection()
-            ->setPage(1,4)
+            ->setPageSize(100)
             ->getItems();
 
         if (count($products) <= 0) {
@@ -151,9 +141,94 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
         }
 
         shuffle($products);
-        $product = array_shift($products);
 
-        return (int)$product->getId();
+        $magentoProduct = Mage::getModel('M2ePro/Magento_Product');
+        $magentoProduct->setProduct(array_shift($products));
+
+        return $magentoProduct;
+    }
+
+    private function getRandomListingProduct()
+    {
+        $listingProducts = Mage::helper('M2ePro/Component_Ebay')
+            ->getCollection('Listing_Product')
+            ->setPageSize(100)
+            ->getItems();
+
+        if (count($listingProducts) <= 0) {
+            return NULL;
+        }
+
+        shuffle($listingProducts);
+
+        return array_shift($listingProducts);
+    }
+
+    // --------------------------------------------
+
+    private function getMagentoProduct($productId)
+    {
+        $product = Mage::getModel('catalog/product')->load($productId);
+
+        if (is_null($product->getId())) {
+            return NULL;
+        }
+
+        $magentoProduct = Mage::getModel('M2ePro/Magento_Product');
+        $magentoProduct->setProduct($product);
+
+        return $magentoProduct;
+    }
+
+    private function getListingProduct($productId)
+    {
+        $listingProduct = Mage::helper('M2ePro/Component_Ebay')
+            ->getCollection('Listing_Product')
+            ->addFieldToFilter('product_id', $productId)
+            ->getFirstItem();
+
+        if (is_null($listingProduct->getId())) {
+            return NULL;
+        }
+
+        return $listingProduct;
+    }
+
+    // --------------------------------------------
+
+    private function getDescription($descriptionMode, $customDescription,
+                                    Ess_M2ePro_Model_Magento_Product $magentoProduct,
+                                    Ess_M2ePro_Model_Listing_Product $listingProduct = NULL)
+    {
+        $description = '';
+
+        $descriptionModeProduct = Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_PRODUCT;
+        $descriptionModeShort = Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_SHORT;
+        $descriptionModeCustom = Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_CUSTOM;
+
+        if ($descriptionModeProduct == $descriptionMode) {
+            $description = $magentoProduct->getProduct()->getDescription();
+        } elseif ($descriptionModeShort == $descriptionMode){
+            $description = $magentoProduct->getProduct()->getShortDescription();
+        } elseif ($descriptionModeCustom == $descriptionMode){
+            $description = $customDescription;
+        }
+
+        if (empty($description)) {
+            return $description;
+        }
+
+        $renderer = Mage::helper('M2ePro/Module_Renderer_Description');
+        $description = $renderer->parseTemplate($description, $magentoProduct);
+
+        if (!is_null($listingProduct)){
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer $renderer */
+            $renderer = Mage::getSingleton('M2ePro/Ebay_Listing_Product_Description_Renderer');
+            $renderer->setListingProduct($listingProduct->getChildObject());
+            $description = $renderer->parseTemplate($description);
+        }
+
+        return $description;
     }
 
     //#############################################

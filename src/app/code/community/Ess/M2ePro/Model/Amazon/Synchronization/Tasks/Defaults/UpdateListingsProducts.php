@@ -102,18 +102,15 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
 
             /** @var $accountObj Ess_M2ePro_Model_Account */
 
-            $marketplace = $accountObj->getChildObject()->getMarketplace();
-
-            if (!$this->isLockedAccountMarketplace($accountObj->getId(),$marketplace->getId())) {
+            if (!$this->isLockedAccount($accountObj->getId())) {
 
                 /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
                 $collection = Mage::getModel('M2ePro/Listing')->getCollection();
                 $collection->addFieldToFilter('component_mode',Ess_M2ePro_Helper_Component_Amazon::NICK);
-                $collection->addFieldToFilter('marketplace_id',(int)$marketplace->getId());
                 $collection->addFieldToFilter('account_id',(int)$accountObj->getId());
 
                 if ($collection->getSize()) {
-                    $this->updateAccountMarketplace($accountObj,$marketplace);
+                    $this->updateAccount($accountObj);
                 }
             }
 
@@ -125,28 +122,22 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
         $this->setCheckLastTime(Mage::helper('M2ePro')->getCurrentGmtDate(true));
     }
 
-    private function updateAccountMarketplace(Ess_M2ePro_Model_Account $accountObj,
-                                              Ess_M2ePro_Model_Marketplace $marketplaceObj)
+    private function updateAccount(Ess_M2ePro_Model_Account $accountObj)
     {
         $this->_profiler->addTitle(
-            'Starting account "'.$accountObj->getTitle().'" and marketplace "'.$marketplaceObj->getTitle().'"'
+            'Starting account "'.$accountObj->getTitle().'"'
         );
         $this->_profiler->addTimePoint(__METHOD__.'send'.$accountObj->getId(),'Get inventory from Amazon');
 
-        $status = 'Task "Update Listings Products" for Amazon account: "%s" and marketplace "%s" ';
-        $status .= 'is started. Please wait...';
+        $status = 'Task "Update Listings Products" for Amazon account: "%s" is started. Please wait...';
 
-        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__(
-            $status,
-            $accountObj->getTitle(),
-            Mage::helper('M2ePro')->__($marketplaceObj->getTitle()))
-        );
+        $this->_lockItem->setStatus(Mage::helper('M2ePro')->__($status, $accountObj->getTitle()));
 
         // Get all changes on Amazon for account
         //---------------------------
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_Server_Amazon_Dispatcher');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
         $dispatcherObject->processConnector('defaults', 'updateListingsProducts' ,'requester',
-                                            array(), $marketplaceObj, $accountObj,
+                                            array(), $accountObj,
                                             'Ess_M2ePro_Model_Amazon_Synchronization_Tasks');
         //---------------------------
 
@@ -207,11 +198,11 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Tasks_Defaults_UpdateListingsProdu
 
     //------------------------------------
 
-    private function isLockedAccountMarketplace($accountId, $marketplaceId)
+    private function isLockedAccount($accountId)
     {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
-        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId.'_'.$marketplaceId);
+        $lockItem->setNick(self::LOCK_ITEM_PREFIX.'_'.$accountId);
 
         $tempGroup = '/amazon/defaults/update_listings_products/';
         $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()

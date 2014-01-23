@@ -12,9 +12,10 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
     const TITLE = 'eBay';
 
     const MARKETPLACE_US     = 1;
-    const MARKETPLACE_UK     = 3;
-    const MARKETPLACE_DE     = 8;
     const MARKETPLACE_MOTORS = 9;
+    const MARKETPLACE_AUSTRALIA = 4;
+
+    const LISTING_DURATION_GTC = 100;
 
     // ########################################
 
@@ -61,6 +62,32 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
     public function getCollection($modelName)
     {
         return $this->getModel($modelName)->getCollection();
+    }
+
+    public function getListingProductByEbayItem($ebayItem, $accountId)
+    {
+        // Get listing product
+        //-----------------------------
+        $readConnection = Mage::getResourceModel('core/config')->getReadConnection();
+
+        $ebayItem  = $readConnection->quoteInto('?', $ebayItem);
+        $accountId = $readConnection->quoteInto('?', $accountId);
+
+        /** @var $collection Ess_M2ePro_Model_Mysql4_Listing_Product_Collection */
+        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+        $collection->getSelect()->join(
+            array('mei' => Mage::getResourceModel('M2ePro/Ebay_Item')->getMainTable()),
+            "(second_table.ebay_item_id = mei.id AND mei.item_id = {$ebayItem}
+                                                 AND mei.account_id = {$accountId})",
+            array()
+        );
+        //-----------------------------
+
+        if ($collection->getSize() == 0) {
+            return NULL;
+        }
+
+        return $collection->getFirstItem();
     }
 
     // ########################################
@@ -140,13 +167,28 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
         );
     }
 
-    public function isCharityMarketplace($marketplaceId)
+    // ########################################
+
+    public function isShowTaxCategory()
     {
-        return in_array($marketplaceId, array(
-            self::MARKETPLACE_US,
-            self::MARKETPLACE_UK,
-            self::MARKETPLACE_MOTORS
-        ));
+        return (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/view/ebay/template/selling_format/', 'show_tax_category'
+        );
+    }
+
+    public function getAvailableDurations()
+    {
+        $helper = Mage::helper('M2ePro');
+
+        return array(
+            '1' => $helper->__('1 day'),
+            '3' => $helper->__('3 days'),
+            '5' => $helper->__('5 days'),
+            '7' => $helper->__('7 days'),
+            '10' => $helper->__('10 days'),
+            '30' => $helper->__('30 days'),
+            self::LISTING_DURATION_GTC => $helper->__('Good Till Cancelled'),
+        );
     }
 
     // ########################################

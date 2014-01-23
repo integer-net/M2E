@@ -119,6 +119,9 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Categories
         }
         //-----------------------
 
+        Mage::helper('M2ePro/Data_Cache')
+            ->removeTagValues(Ess_M2ePro_Helper_Component_Ebay_Category_Ebay::CACHE_TAG);
+
         // Get and update categories
         //-----------------------
         $iteration = 1;
@@ -143,8 +146,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Marketplaces_Categories
 
             // Create connector
             //-----------------------
-            $categories = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                            ->processVirtualAbstract('marketplace','get','info',
+            $categories = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                            ->processVirtual('marketplace','get','info',
                                                      array('include_categories'=>1),'info',
                                                      $marketplace->getId(),NULL,NULL);
             if (is_null($categories)) {

@@ -31,12 +31,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher extends Mage_Adm
                     'label' => Mage::helper('M2ePro')->__('eBay')
                 ),
                 array(
-                    'value' => 'magento',
-                    'label' => Mage::helper('M2ePro')->__('Magento')
-                ),
-                array(
                     'value' => 'settings',
                     'label' => Mage::helper('M2ePro')->__('Settings')
+                ),
+                array(
+                    'value' => 'magento',
+                    'label' => Mage::helper('M2ePro')->__('Magento')
                 )
             )
         );

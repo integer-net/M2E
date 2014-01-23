@@ -25,8 +25,8 @@
 <div id="block_notice_ebay_template_synchronization_form_data_stop" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Stop Rules'); ?>">
     <?php echo Mage::helper('M2ePro')->__('Define the conditions when you want eBay items stopped.
                                            <br/>
-                                           <br/><b>Note:</b> If all Stop Conditions are set to <i>No</i> or <i>No Action</i>, then the stop option for eBay items is disabled.<br/>
-                                           If all Stop Conditions are enabled, then an item will be stopped if at least one of the Stop Conditions is met.'); ?>
+                                           <br/><b>Note:</b> If all options are set to No or No Action, then the stop action for eBay items, which use this Synchronization Policy, is disabled.<br>
+If all options are enabled, then an item will be stopped if at least one of the Stop Conditions is met.'); ?>
 </div>
 
 <div class="entry-edit" id="magento_block_ebay_template_synchronization_form_data_stop_rules">
@@ -50,7 +50,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_OUT_OFF_STOCK_YES; ?>" <?php if ($formData['stop_status_disabled'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_STATUS_DISABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an item that is on eBay if status changed to \'Disabled\' in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an item that is on eBay if status is changed to \'Disabled\' in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -72,7 +72,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Stop When Item Quantity Is'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Stop When Quantity Is'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="stop_qty" name="synchronization[stop_qty]" class="required-entry">
@@ -90,8 +90,8 @@
                 <tr id="stop_qty_value_container" <?php if ($formData['stop_qty'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_NONE) echo ' style="display: none;"'; ?>>
                     <td class="label">
                         <label for="stop_qty_value">
-                            <span id="stop_qty_item" <?php if ($formData['stop_qty'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Item Quantity'); ?>: <span class="required">*</span></span>
-                            <span id="stop_qty_item_min" <?php if ($formData['stop_qty'] != Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Item Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="stop_qty_item" <?php if ($formData['stop_qty'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="stop_qty_item_min" <?php if ($formData['stop_qty'] != Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Quantity'); ?>: <span class="required">*</span></span>
                         </label>
                     </td>
                     <td class="value" style="width: auto;">
@@ -101,10 +101,10 @@
 
                 <tr id="stop_qty_value_max_container" <?php if ($formData['stop_qty'] != Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN) echo ' style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="stop_qty_value_max"><?php echo Mage::helper('M2ePro')->__('Max Item Quantity'); ?>: <span class="required">*</span></label>
+                        <label for="stop_qty_value_max"><?php echo Mage::helper('M2ePro')->__('Max Quantity'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <input id="stop_qty_value_max" name="synchronization[stop_qty_value_max]" value="<?php echo $this->escapeHtml($formData['stop_qty_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits" />
+                        <input id="stop_qty_value_max" name="synchronization[stop_qty_value_max]" value="<?php echo $this->escapeHtml($formData['stop_qty_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits M2ePro-validate-conditions-between" />
                     </td>
                 </tr>
 

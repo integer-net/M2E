@@ -1,5 +1,5 @@
 <div id="block_notice_ebay_listing_other_synchronization_revise" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Revise Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This section contains list of product details, which changes you want to be automatically reflected on eBay.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('Specify the product details you want to keep up to date on eBay.'); ?>
 </div>
 
 <?php
@@ -37,7 +37,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_QTY_YES; ?>" <?php if ($formData['revise_update_qty'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_QTY_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically updates quantity on eBay listing(s) when the source of quantity is changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Updates eBay listing quantity when it changes in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -52,7 +52,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_PRICE_YES; ?>" <?php if ($formData['revise_update_price'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_PRICE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically updates price on eBay listing(s) when the source of price is changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Updates eBay listing price when it changes in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -67,7 +67,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_TITLE_YES; ?>" <?php if ($formData['revise_update_title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_TITLE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically updates title on eBay listing(s) when the source of title is changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Updates eBay listing title when it changes in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -82,7 +82,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_SUB_TITLE_YES; ?>" <?php if ($formData['revise_update_sub_title'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_SUB_TITLE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically updates subtitle on eBay listing(s) when the source of subtitle is changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Updates eBay listing subtitle when it changes in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -97,7 +97,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_DESCRIPTION_YES; ?>" <?php if ($formData['revise_update_description'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::REVISE_UPDATE_DESCRIPTION_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically updates description on eBay listing(s) when the source of description is changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Updates eBay listing description when it changes in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>

@@ -308,7 +308,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View extends Mage_Adminhtml_
         );
 
         $enterProductSearchQueryMessage = $helper->escapeJs(
-            $helper->__('Please enter product name or Rakuten.com SKU/Seller SKU/ISBN/UPC.')
+            $helper->__('Please enter product name or Rakuten.com SKU/ISBN/UPC.')
         );
         $autoMapBuyComSkuProgressTitle = $helper->escapeJs($helper->__('Assign Rakuten.com SKU to Item(s)'));
         $autoMapBuyComSkuErrorMessage = $helper->escapeJs(

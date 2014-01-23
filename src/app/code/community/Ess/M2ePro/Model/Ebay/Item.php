@@ -7,6 +7,16 @@
 class Ess_M2ePro_Model_Ebay_Item extends Ess_M2ePro_Model_Component_Abstract
 {
     /**
+     * @var Ess_M2ePro_Model_Account
+     */
+    private $accountModel = NULL;
+
+    /**
+     * @var Ess_M2ePro_Model_Marketplace
+     */
+    private $marketplaceModel = NULL;
+
+    /**
      * @var Ess_M2ePro_Model_Magento_Product
      */
     protected $magentoProductModel = NULL;
@@ -24,11 +34,61 @@ class Ess_M2ePro_Model_Ebay_Item extends Ess_M2ePro_Model_Component_Abstract
     public function deleteInstance()
     {
         $temp = parent::deleteInstance();
+        $temp && $this->accountModel = NULL;
+        $temp && $this->marketplaceModel = NULL;
         $temp && $this->magentoProductModel = NULL;
         return $temp;
     }
 
     // ########################################
+
+    /**
+     * @return Ess_M2ePro_Model_Account
+     */
+    public function getAccount()
+    {
+        if (is_null($this->accountModel)) {
+            $this->accountModel = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
+                'Account', $this->getAccountId()
+            );
+        }
+
+        return $this->accountModel;
+    }
+
+    /**
+     * @param Ess_M2ePro_Model_Account $instance
+     */
+    public function setAccount(Ess_M2ePro_Model_Account $instance)
+    {
+        $this->accountModel = $instance;
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        if (is_null($this->marketplaceModel)) {
+            $this->marketplaceModel = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
+                'Marketplace', $this->getMarketplaceId()
+            );
+        }
+
+        return $this->marketplaceModel;
+    }
+
+    /**
+     * @param Ess_M2ePro_Model_Marketplace $instance
+     */
+    public function setMarketplace(Ess_M2ePro_Model_Marketplace $instance)
+    {
+        $this->marketplaceModel = $instance;
+    }
+
+    //-----------------------------------------
 
     /**
      * @return Ess_M2ePro_Model_Magento_Product
@@ -57,6 +117,16 @@ class Ess_M2ePro_Model_Ebay_Item extends Ess_M2ePro_Model_Component_Abstract
     public function getItemId()
     {
         return (double)$this->getData('item_id');
+    }
+
+    public function getAccountId()
+    {
+        return (double)$this->getData('account_id');
+    }
+
+    public function getMarketplaceId()
+    {
+        return (double)$this->getData('marketplace_id');
     }
 
     public function getProductId()

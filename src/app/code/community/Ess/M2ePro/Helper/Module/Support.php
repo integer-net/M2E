@@ -54,6 +54,8 @@ class Ess_M2ePro_Helper_Module_Support extends Mage_Core_Helper_Abstract
         }
     }
 
+    //#############################################
+
     public function getKnowledgeBaseUrl()
     {
         return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/support/', 'knowledge_base_url');

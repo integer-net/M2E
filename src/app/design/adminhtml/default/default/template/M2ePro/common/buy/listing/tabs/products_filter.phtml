@@ -49,7 +49,7 @@
 
         <?php if (!$this->getRequest()->getParam('id')): ?>
             BuyListingProductsFilterHandlerObj.templateSellingFormatId = <?php echo (int)$sessionData['template_selling_format_id']; ?>;
-            BuyListingProductsFilterHandlerObj.marketplaceId = <?php echo Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_VIRTUAL_ID; ?>;
+            BuyListingProductsFilterHandlerObj.marketplaceId = <?php echo Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_ID; ?>;
 
             $('store_id').observe('change', BuyListingProductsFilterHandlerObj.store_id_change);
             $('store_id').simulate('change');

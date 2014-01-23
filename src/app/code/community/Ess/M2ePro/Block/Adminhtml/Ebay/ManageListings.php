@@ -100,7 +100,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Mage_Adminhtml_Bloc
 
         if ($this->getActiveTab() != self::TAB_ID_LISTING_OTHER) {
             $tab['class'] = 'ajax';
-            $tab['url'] = $this->getUrl('*/adminhtml_ebay_listing/getListingOtherTab');;
+            $tab['url'] = $this->getUrl('*/adminhtml_ebay_listing/getListingOtherTab');
         } else {
             $tab['content'] = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_other')->toHtml();
         }
@@ -117,7 +117,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Mage_Adminhtml_Bloc
 
         if ($this->getActiveTab() != self::TAB_ID_SEARCH) {
             $tab['class'] = 'ajax';
-            $tab['url'] = $this->getUrl('*/adminhtml_ebay_listing/getSearchTab');;
+            $tab['url'] = $this->getUrl('*/adminhtml_ebay_listing/getSearchTab');
         } else {
             $tab['content'] = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_search')->toHtml();
         }

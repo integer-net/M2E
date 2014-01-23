@@ -24,8 +24,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         $params['item_id'] = $this->item->getItemId();
         count($this->item->getVariation()) > 0 && $params['variation_sku'] = $this->item->getSku();
 
-        $itemData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-            ->processVirtualAbstract('item', 'get', 'info',
+        $itemData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+            ->processVirtual('item', 'get', 'info',
                 $params, 'result',
                 NULL, $this->item->getParentObject()->getOrder()->getAccount(), NULL);
 
@@ -156,7 +156,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         curl_setopt($curlHandler, CURLOPT_FILE, $fileHandler);
         curl_setopt($curlHandler, CURLOPT_REFERER, $url);
         curl_setopt($curlHandler, CURLOPT_AUTOREFERER, 1);
-        curl_setopt($curlHandler, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($curlHandler, CURLOPT_CONNECTTIMEOUT, 15);
+        curl_setopt($curlHandler, CURLOPT_TIMEOUT, 30);
 
         curl_exec($curlHandler);
         curl_close($curlHandler);

@@ -135,11 +135,7 @@ abstract class Ess_M2ePro_Model_Order_Item_Proxy
      */
     public function getBasePrice()
     {
-        $price    = $this->getPrice();
-        $currency = $this->getProxyOrder()->getCurrency();
-        $store    = $this->getProxyOrder()->getStore();
-
-        return Mage::getSingleton('M2ePro/Currency')->convertPriceToBaseCurrency($price, $currency, $store);
+        return $this->getProxyOrder()->convertPriceToBase($this->getPrice());
     }
 
     /**

@@ -71,7 +71,16 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
 
     private function execute()
     {
-        $this->immediatelyChangedProducts();
+        $tasks = array(
+            'immediatelyChangedProducts',
+        );
+
+        foreach ($tasks as $i => $task) {
+            $this->$task();
+
+            $this->_lockItem->setPercents(self::PERCENTS_START + ($i+1)*self::PERCENTS_INTERVAL/count($tasks));
+            $this->_lockItem->activate();
+        }
     }
 
     //####################################
@@ -96,10 +105,12 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
                 continue;
             }
 
+            $tempActionAndParams = $this->getActionAndParamsFromListingProduct($listingProduct);
+
             $this->_runnerActions->setProduct(
                 $listingProduct,
-                Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP,
-                array()
+                $tempActionAndParams['action'],
+                $tempActionAndParams['params']
             );
         }
         //------------------------------------
@@ -126,14 +137,17 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
             return false;
         }
 
-        if (!$listingProduct->isStoppable()) {
+        if (!$listingProduct->isStoppable() || $listingProduct->isHidden()) {
             return false;
         }
 
-        if ($this->_runnerActions->isExistProductAction(
-            $listingProduct,
-            Ess_M2ePro_Model_Connector_Server_Ebay_Item_Dispatcher::ACTION_STOP,
-            array())
+        $tempActionAndParams = $this->getActionAndParamsFromListingProduct($listingProduct);
+
+        if ($this->_runnerActions
+                 ->isExistProductAction(
+                        $listingProduct,
+                        $tempActionAndParams['action'],
+                        $tempActionAndParams['params'])
         ) {
             return false;
         }
@@ -190,7 +204,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
 
         if ($listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isStopWhenQtyHasValue()) {
 
-            $productQty = (int)$listingProduct->getChildObject()->getQty(true);
+            $productQty = (int)$listingProduct->getChildObject()->getQtyTotal(true);
             $ebaySynchronizationTemplate = $listingProduct->getChildObject()->getEbaySynchronizationTemplate();
 
             $typeQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyHasValueType();
@@ -215,6 +229,27 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Templates_Stop
         //--------------------
 
         return false;
+    }
+
+    //####################################
+
+    private function getActionAndParamsFromListingProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $actionAndParams = array();
+
+        if ($listingProduct->getChildObject()->getSellingFormatTemplate()->getOutOfStockControl()) {
+            $actionAndParams['action'] = Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE;
+            $actionAndParams['params'] = array(
+                'replaced_action' => Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,
+                'only_data' => array('qty'=>true,'variations'=>true));
+        } else {
+            $actionAndParams = array(
+                'action' => Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,
+                'params' => array()
+            );
+        }
+
+        return $actionAndParams;
     }
 
     //####################################

@@ -214,8 +214,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProduct
 
         // Get all changes on eBay for account
         //---------------------------
-        $responseData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                                ->processVirtualAbstract('item','get','changes',
+        $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                                ->processVirtual('item','get','changes',
                                                          array('since_time'=>$sinceTime),NULL,
                                                          NULL,$account['id'],NULL);
 
@@ -230,8 +230,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProduct
             $sinceTime->modify("-1 day");
             $sinceTime = $sinceTime->format('Y-m-d H:i:s');
 
-            $responseData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                                ->processVirtualAbstract('item','get','changes',
+            $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                                ->processVirtual('item','get','changes',
                                                          array('since_time'=>$sinceTime),NULL,
                                                          NULL,$account['id'],NULL);
 
@@ -243,8 +243,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Defaults_UpdateListingsProduct
                 $sinceTime = new DateTime('now', new DateTimeZone('UTC'));
                 $sinceTime = $sinceTime->format('Y-m-d H:i:s');
 
-                $responseData = Mage::getModel('M2ePro/Connector_Server_Ebay_Dispatcher')
-                                    ->processVirtualAbstract('item','get','changes',
+                $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+                                    ->processVirtual('item','get','changes',
                                                              array('since_time'=>$sinceTime),NULL,
                                                              NULL,$account['id'],NULL);
 
@@ -278,8 +278,9 @@ STATUS;
             // Check exist listing product
             //--------------------------
             /* @var $tempListingProductModel Ess_M2ePro_Model_Listing_Product */
-            $tempListingProductModel = Mage::getModel('M2ePro/Ebay_Listing_Product')
-                                                 ->getParentInstanceByEbayItem($changeItem['id']);
+            $tempListingProductModel = Mage::helper('M2ePro/Component_Ebay')->getListingProductByEbayItem(
+                $changeItem['id'], $account['id']
+            );
 
             if (is_null($tempListingProductModel)) {
                 continue;
@@ -290,10 +291,6 @@ STATUS;
                 continue;
             }
             //--------------------------
-
-            if ($tempListingProductModel->getListing()->getAccountId() != $account['id']) {
-                continue;
-            }
 
             // Get prepared listings products
             //--------------------------
@@ -339,10 +336,10 @@ STATUS;
             $tempEbayChanges['online_bids'] = (int)$ebayChange['bidCount'] < 0 ? 0 : (int)$ebayChange['bidCount'];
         }
 
-        $tempEbayChanges['start_date'] = Ess_M2ePro_Model_Connector_Server_Ebay_Abstract::ebayTimeToString(
+        $tempEbayChanges['start_date'] = Ess_M2ePro_Model_Connector_Ebay_Abstract::ebayTimeToString(
             $ebayChange['startTime']
         );
-        $tempEbayChanges['end_date'] = Ess_M2ePro_Model_Connector_Server_Ebay_Abstract::ebayTimeToString(
+        $tempEbayChanges['end_date'] = Ess_M2ePro_Model_Connector_Ebay_Abstract::ebayTimeToString(
             $ebayChange['endTime']
         );
 
@@ -366,14 +363,17 @@ STATUS;
 
         }
 
+        if ($tempListingProductModel->getStatus() != $tempEbayChanges['status'] ||
+            $tempListingProductModel->getChildObject()->getOnlineQty() != $tempEbayChanges['online_qty'] ||
+            $tempListingProductModel->getChildObject()->getOnlineQtySold() != $tempEbayChanges['online_qty_sold']) {
+            Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
+                $tempListingProductModel->getProductId(), Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
+            );
+        }
+
         if ($tempEbayChanges['status'] != $tempListingProductModel->getStatus()) {
 
             $tempEbayChanges['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
-
-            Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
-                $tempListingProductModel->getProductId(),
-                Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
-            );
 
             $tempLogMessage = '';
             switch ($tempEbayChanges['status']) {

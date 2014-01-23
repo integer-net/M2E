@@ -8,12 +8,6 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
 {
     // ####################################
 
-    const LOAD_ATTRIBUTES_CRITERIA_ALL = 0;
-    const LOAD_ATTRIBUTES_CRITERIA_BY_ATTRIBUTE_SETS = 2;
-    const LOAD_ATTRIBUTES_CRITERIA_BY_ALL_ATTRIBUTE_SETS = 3;
-
-    // ####################################
-
     protected $_conditions = null;
 
     protected $_form;
@@ -119,11 +113,6 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
     public function getConditionsSerialized()
     {
         return $this->getData('conditions_serialized');
-    }
-
-    public function getAttributeCriteria()
-    {
-        return $this->getData('attribute_criteria');
     }
 
     public function getAttributeSets()

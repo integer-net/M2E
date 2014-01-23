@@ -35,6 +35,7 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders extends Ess_M2ePro_Mode
         //-----------------------------
         $generalMode             = $this->config->getGroupValue('/ebay/orders/', 'mode');
         $receiveMode             = $this->config->getGroupValue('/ebay/orders/receive/', 'mode');
+        $updateMode              = $this->config->getGroupValue('/ebay/orders/update/', 'mode');
         $cancellationMode        = $this->config->getGroupValue('/ebay/orders/cancellation/', 'mode');
         $reserveCancellationMode = $this->config->getGroupValue('/ebay/orders/reserve_cancellation/', 'mode');
 
@@ -100,6 +101,14 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders extends Ess_M2ePro_Mode
             $tempSynch->process();
         }
         //---------------------------
+
+        // RUN UPDATE SYNCH
+        //------------------------------
+        if ($updateMode) {
+            $tempSynch = new Ess_M2ePro_Model_Ebay_Synchronization_Tasks_Orders_Update();
+            $tempSynch->process();
+        }
+        //------------------------------
 
         // CANCEL SYNCH
         //---------------------------

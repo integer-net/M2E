@@ -164,11 +164,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
         }
 
         if ($src['mode'] == Ess_M2ePro_Model_Amazon_Listing::SKU_MODE_CUSTOM_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
+            return trim($this->getMagentoProduct()->getAttributeValue($src['attribute']));
         }
 
         if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-            return $this->getMagentoProduct()->getSku();
+            return trim($this->getMagentoProduct()->getSku());
         }
 
         $tempSku = '';
@@ -213,7 +213,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
             }
         }
 
-        return $tempSku;
+        return trim($tempSku);
     }
 
     public function getQty()
@@ -283,8 +283,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
         } else if ($this->getListingProduct()->getMagentoProduct()->isGroupedType()) {
             $price = $this->getBaseProductPrice($returnSalePrice);
         }
-
-        $price < 0 && $price = 0;
 
         return $price;
     }
@@ -367,8 +365,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
             }
         }
 
-        $price < 0 && $price = 0;
-
         return $price;
     }
 
@@ -427,8 +423,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
                 break 2;
             }
         }
-
-        $price < 0 && $price = 0;
 
         return $price;
     }
@@ -500,8 +494,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Option extends Ess_M2ePr
                 break 2;
             }
         }
-
-        $price < 0 && $price = 0;
 
         return $price;
     }

@@ -136,7 +136,7 @@ HTML;
         $helper = Mage::helper('M2ePro');
 
         $onclick = <<<JS
-ListingProductAddHandlerObj.autoactionPopup.hide();
+ListingProductAddHandlerObj.autoactionPopup.close();
 EbayListingAutoActionHandlerObj.loadAutoActionHtml();
 JS;
         $data = array(

@@ -7,11 +7,6 @@
 class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
 {
     /**
-     * @var Ess_M2ePro_Model_Marketplace|null
-     */
-    protected $marketplace = NULL;
-
-    /**
      * @var Ess_M2ePro_Model_Account|null
      */
     protected $account = NULL;
@@ -20,10 +15,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
 
     // ########################################
 
-    public function initialize(Ess_M2ePro_Model_Marketplace $marketplace = NULL,
-                               Ess_M2ePro_Model_Account $account = NULL)
+    public function initialize(Ess_M2ePro_Model_Account $account = NULL)
     {
-        $this->marketplace = $marketplace;
         $this->account = $account;
         $this->tempObjectsCache = array();
     }
@@ -49,24 +42,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
             return false;
         }
 
-        $accountsMarketplaces = array();
+        $sortedItems = array();
 
+        /** @var $otherListing Ess_M2ePro_Model_Listing_Other */
         foreach ($otherListingsFiltered as $otherListing) {
-
-            /** @var $otherListing Ess_M2ePro_Model_Listing_Other */
-
-            $identifier = $otherListing->getAccountId().'_'.$otherListing->getMarketplaceId();
-
-            if (!isset($accountsMarketplaces[$identifier])) {
-                $accountsMarketplaces[$identifier] = array();
-            }
-
-            $accountsMarketplaces[$identifier][] = $otherListing;
+            $sortedItems[$otherListing->getAccountId()][] = $otherListing;
         }
 
         $result = true;
 
-        foreach ($accountsMarketplaces as $otherListings) {
+        foreach ($sortedItems as $otherListings) {
             foreach ($otherListings as $otherListing) {
                 /** @var $otherListing Ess_M2ePro_Model_Listing_Other */
                 $temp = $this->autoMoveOtherListingProduct($otherListing);
@@ -80,7 +65,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
     public function autoMoveOtherListingProduct(Ess_M2ePro_Model_Listing_Other $otherListing)
     {
         $this->setAccountByOtherListingProduct($otherListing);
-        $this->setMarketplaceByOtherListingProduct($otherListing);
 
         if (!$this->getAccount()->getChildObject()->isOtherListingsMoveToListingsEnabled()) {
             return false;
@@ -118,10 +102,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
         $itemsCollection = Mage::getModel('M2ePro/Amazon_Item')->getCollection();
 
         $itemsCollection->addFieldToFilter(
-            'account_id', $otherListing->getChildObject()->getAccountId()
+            'account_id', $otherListing->getAccountId()
         );
         $itemsCollection->addFieldToFilter(
-            'marketplace_id', $otherListing->getChildObject()->getMarketplaceId()
+            'marketplace_id', $otherListing->getMarketplaceId()
         );
         $itemsCollection->addFieldToFilter(
             'sku', $otherListing->getChildObject()->getSku()
@@ -134,8 +118,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
             $itemsCollection->getFirstItem()->setData('store_id', $listing->getStoreId())->save();
         } else {
             $dataForAdd = array(
-                'account_id' => $otherListing->getChildObject()->getAccountId(),
-                'marketplace_id' => $otherListing->getChildObject()->getMarketplaceId(),
+                'account_id' => $otherListing->getAccountId(),
+                'marketplace_id' => $otherListing->getMarketplaceId(),
                 'sku' => $otherListing->getChildObject()->getSku(),
                 'product_id' => $otherListing->getProductId(),
                 'store_id' => $listing->getStoreId()
@@ -188,10 +172,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
     public function getDefaultListing(Ess_M2ePro_Model_Listing_Other $otherListing)
     {
         $accountId = $this->getAccount()->getId();
-        $marketplaceId = $this->getMarketplace()->getId();
 
-        if (isset($this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId])) {
-            return $this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId];
+        if (isset($this->tempObjectsCache['listing_'.$accountId])) {
+            return $this->tempObjectsCache['listing_'.$accountId];
         }
 
         $tempCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing');
@@ -202,7 +185,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
         $tempItem = $tempCollection->getFirstItem();
 
         if (!is_null($tempItem->getId())) {
-            $this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId] = $tempItem;
+            $this->tempObjectsCache['listing_'.$accountId] = $tempItem;
             return $tempItem;
         }
 
@@ -211,7 +194,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
         $dataForAdd = array(
             'title' => 'Default ('.$this->getAccount()->getTitle().' - '.$this->getMarketplace()->getTitle().')',
             'store_id' => $otherListing->getChildObject()->getRelatedStoreId(),
-            'marketplace_id' => $marketplaceId,
+            'marketplace_id' => $this->getMarketplace()->getId(),
             'account_id' => $accountId,
 
             'template_selling_format_id'  => $this->getDefaultSellingFormatTemplate($otherListing)->getId(),
@@ -234,7 +217,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
         );
 
         $tempModel->addData($dataForAdd)->save();
-        $this->tempObjectsCache['listing_'.$accountId.'_'.$marketplaceId] = $tempModel;
+        $this->tempObjectsCache['listing_'.$accountId] = $tempModel;
 
         $attributesSets = Mage::helper('M2ePro/Magento_AttributeSet')->getAll();
         foreach ($attributesSets as $attributeSet) {
@@ -362,9 +345,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
 
             'sale_price_mode' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_NOT_SET,
             'sale_price_start_date_mode' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::DATE_VALUE,
-            'sale_price_start_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate(),
+            'sale_price_start_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate(false, 'Y-m-d'),
             'sale_price_end_date_mode' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::DATE_VALUE,
-            'sale_price_end_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate()
+            'sale_price_end_date_value' => Mage::helper('M2ePro')->getCurrentGmtDate(false, 'Y-m-d')
         );
 
         $tempModel->addData($dataForAdd)->save();
@@ -398,7 +381,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
      */
     protected function getMarketplace()
     {
-        return $this->marketplace;
+        return $this->getAccount()->getChildObject()->getMarketplace();
     }
 
     //-----------------------------------------
@@ -411,17 +394,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
 
         $this->account = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
             'Account',$otherListing->getAccountId()
-        );
-    }
-
-    protected function setMarketplaceByOtherListingProduct(Ess_M2ePro_Model_Listing_Other $otherListing)
-    {
-        if (!is_null($this->marketplace) && $this->marketplace->getId() == $otherListing->getMarketplaceId()) {
-            return;
-        }
-
-        $this->marketplace = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
-            'Marketplace',$otherListing->getMarketplaceId()
         );
     }
 

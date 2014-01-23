@@ -221,14 +221,8 @@ ACTION;
 
     private function send($info, $type)
     {
-        // todo change when new server will be in production
-
-//        Mage::getModel('M2ePro/Connector_Server_M2ePro_Dispatcher')
-//                ->processVirtual('exception','add','entity',
-//                                array('info' => $info, 'type' => $type));
-
-        Mage::getModel('M2ePro/Connector_Server_Api_Dispatcher')
-                ->processVirtual('domain','add','exception',
+        Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
+                ->processVirtual('exception','add','entity',
                                  array('info' => $info, 'type' => $type));
     }
 

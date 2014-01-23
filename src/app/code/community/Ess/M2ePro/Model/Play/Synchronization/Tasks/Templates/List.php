@@ -85,12 +85,17 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Templates_List
 
     private function execute()
     {
-        $this->immediatelyChangedProducts();
+        $tasks = array(
+            'immediatelyChangedProducts',
+            'immediatelyNotCheckedProducts',
+        );
 
-        $this->_lockItem->setPercents(self::PERCENTS_START + 1*self::PERCENTS_INTERVAL/2);
-        $this->_lockItem->activate();
+        foreach ($tasks as $i => $task) {
+            $this->$task();
 
-        $this->immediatelyNotCheckedProducts();
+            $this->_lockItem->setPercents(self::PERCENTS_START + ($i+1)*self::PERCENTS_INTERVAL/count($tasks));
+            $this->_lockItem->activate();
+        }
     }
 
     //####################################
@@ -117,7 +122,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Templates_List
 
             $this->_runnerActions->setProduct(
                 $listingProduct,
-                Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_LIST,
+                Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_LIST,
                 array()
             );
         }
@@ -158,7 +163,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Tasks_Templates_List
 
             $this->_runnerActions->setProduct(
                 $listingProduct,
-                Ess_M2ePro_Model_Connector_Server_Play_Product_Dispatcher::ACTION_LIST,
+                Ess_M2ePro_Model_Connector_Play_Product_Dispatcher::ACTION_LIST,
                 array()
             );
         }

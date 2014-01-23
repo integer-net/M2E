@@ -150,7 +150,8 @@ CommonHandler.prototype = {
 
         $(document.body).insert(form);
 
-        form.submit();
+        // chrome ugly hack
+        setTimeout(form.submit.bind(form), 250);
     },
 
     //----------------------------------

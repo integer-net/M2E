@@ -96,6 +96,11 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         $this->_init('M2ePro/Ebay_Template_Description');
     }
 
+    public function getNick()
+    {
+        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION;
+    }
+
     // ########################################
 
     public function isLocked()
@@ -542,11 +547,20 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         $attributes = array();
         $src = $this->getGalleryImagesSource();
 
-        if ($src['mode'] == self::GALLERY_IMAGES_MODE_ATTRIBUTE) {
+        if ($src['mode'] == self::GALLERY_IMAGES_MODE_PRODUCT) {
+            $attributes[] = 'media_gallery';
+        } else if ($src['mode'] == self::GALLERY_IMAGES_MODE_ATTRIBUTE) {
             $attributes[] = $src['attribute'];
         }
 
         return $attributes;
+    }
+
+    //-------------------------
+
+    public function getDefaultImageUrl()
+    {
+        return $this->getData('default_image_url');
     }
 
     //-------------------------
@@ -782,17 +796,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             return $str;
         }
 
-        if (!preg_match('/^.{0,'.$length.'}\s/us', $str, $matches)) {
-            return '';
-        }
-
-        if (!isset($matches[0])) {
-            return '';
-        }
-
-        $str = trim($matches[0]);
-
-        return $str;
+        return Mage::helper('core/string')->truncate($str, $length, '');
     }
 
     //---------------------------------------
@@ -980,6 +984,11 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         $mainImage = $this->getMainImageLink();
 
         if ($mainImage == '') {
+            $defaultImage = $this->getDefaultImageUrl();
+            if (!empty($defaultImage)) {
+                return array($defaultImage);
+            }
+
             return array();
         }
 
@@ -1033,21 +1042,13 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     public function getTrackingAttributes()
     {
-        $tempArray = array_unique(array_merge(
+        return array_unique(array_merge(
             $this->getTitleAttributes(),
             $this->getSubTitleAttributes(),
-            $this->getDescriptionAttributes()
+            $this->getDescriptionAttributes(),
+            $this->getImageMainAttributes(),
+            $this->getGalleryImagesAttributes()
         ));
-
-        $resultArray = array();
-        foreach ($tempArray as $attribute) {
-            if (strpos($attribute,'media_gallery') !== false) {
-                continue;
-            }
-            $resultArray[] = $attribute;
-        }
-
-        return $resultArray;
     }
 
     public function getUsedAttributes()
@@ -1062,27 +1063,6 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             $this->getImageMainAttributes(),
             $this->getGalleryImagesAttributes()
         ));
-    }
-
-    // #######################################
-
-    public function getNick()
-    {
-        return Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION;
-    }
-
-    // #######################################
-
-    public function save()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_description');
-        return parent::save();
-    }
-
-    public function delete()
-    {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_description');
-        return parent::delete();
     }
 
     // #######################################
@@ -1126,6 +1106,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             'gallery_images_mode' => self::GALLERY_IMAGES_MODE_PRODUCT,
             'gallery_images_limit' => 3,
             'gallery_images_attribute' => '',
+            'default_image_url' => '',
 
             'variation_configurable_images' => '',
             'use_supersize_images' => self::USE_SUPERSIZE_IMAGES_NO,
@@ -1156,7 +1137,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     // #######################################
 
-    public function getAffectedListingProducts($asObjects = false)
+    public function getAffectedListingProducts($asObjects = false, $key = NULL)
     {
         if (is_null($this->getId())) {
             throw new LogicException('Method require loaded instance first');
@@ -1169,14 +1150,15 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
         $listingProducts = $templateManager->getAffectedItems(
             Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
-            $this->getId(),
-            array(), $asObjects
+            $this->getId(), array(), $asObjects, $key
         );
 
-        foreach ($listingProducts as $key => $listingProduct) {
-            unset($listingProducts[$key]);
-            $listingProducts[$listingProduct['id']] = $listingProduct;
+        $ids = array();
+        foreach ($listingProducts as $listingProduct) {
+            $ids[] = is_null($key) ? $listingProduct['id'] : $listingProduct;
         }
+
+        $listingProducts && $listingProducts = array_combine($ids, $listingProducts);
 
         $listings = $templateManager->getAffectedItems(
             Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
@@ -1184,28 +1166,26 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         );
 
         foreach ($listings as $listing) {
-            $tempListingProducts = $listing->getChildObject()->getAffectedListingProducts($template,$asObjects);
+
+            $tempListingProducts = $listing->getChildObject()
+                                           ->getAffectedListingProducts($template,$asObjects,$key);
 
             foreach ($tempListingProducts as $listingProduct) {
-                $listingProducts[$listingProduct['id']] = $listingProduct;
+                $id = is_null($key) ? $listingProduct['id'] : $listingProduct;
+                !isset($listingProducts[$id]) && $listingProducts[$id] = $listingProduct;
             }
         }
 
-        return $listingProducts;
+        return array_values($listingProducts);
     }
 
-    // #######################################
-
-    public function setIsNeedSynchronize($newData, $oldData)
+    public function setSynchStatusNeed($newData, $oldData)
     {
         if (!$this->getResource()->isDifferent($newData,$oldData)) {
             return;
         }
 
-        $ids = array();
-        foreach ($this->getAffectedListingProducts() as $listingProduct) {
-            $ids[] = (int)$listingProduct['id'];
-        }
+        $ids = $this->getAffectedListingProducts(false,'id');
 
         if (empty($ids)) {
             return;
@@ -1216,7 +1196,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         Mage::getSingleton('core/resource')->getConnection('core_read')->update(
             Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
             array(
-                'is_need_synchronize' => 1,
+                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
                 'synch_reasons' => new Zend_Db_Expr(
                     "IF(synch_reasons IS NULL,
                         '".implode(',',$templates)."',
@@ -1226,6 +1206,20 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             ),
             array('id IN ('.implode(',', $ids).')')
         );
+    }
+
+    // #######################################
+
+    public function save()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_description');
+        return parent::save();
+    }
+
+    public function delete()
+    {
+        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_description');
+        return parent::delete();
     }
 
     // #######################################

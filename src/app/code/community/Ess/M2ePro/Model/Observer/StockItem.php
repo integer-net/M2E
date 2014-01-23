@@ -160,47 +160,50 @@ class Ess_M2ePro_Model_Observer_StockItem
 
     public function disableAutomaticReindex(Varien_Event_Observer $observer)
     {
-        $indexMode = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/product/index/', 'mode');
-
-        if (!$indexMode) {
-            return;
-        }
-
         /** @var $index Ess_M2ePro_Model_Magento_Product_Index */
         $index = Mage::getSingleton('M2ePro/Magento_Product_Index');
 
-        foreach ($index->getSwitchableIndexes() as $code) {
-            $index->disableAutomaticReindex($code);
+        if (!$index->isIndexManagementEnabled()) {
+            return;
+        }
+
+        foreach ($index->getIndexes() as $code) {
+            if ($index->disableReindex($code)) {
+                $index->rememberDisabledIndex($code);
+            }
         }
     }
 
     public function enableAutomaticReindex(Varien_Event_Observer $observer)
     {
-        $indexMode = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/product/index/', 'mode');
-
-        if (!$indexMode) {
-            return;
-        }
-
         /** @var $index Ess_M2ePro_Model_Magento_Product_Index */
         $index = Mage::getSingleton('M2ePro/Magento_Product_Index');
-        $reindexExecuted = false;
 
-        if (!$index->hasDisabledSwitchableIndexes()) {
+        if (!$index->isIndexManagementEnabled()) {
             return;
         }
 
-        foreach ($index->getRequiredIndexes() as $code) {
-            if ($index->reindex($code)) {
-                $reindexExecuted = true;
+        $enabledIndexes = array();
+
+        foreach ($index->getIndexes() as $code) {
+            if ($index->isDisabledIndex($code) && $index->enableReindex($code)) {
+                $index->forgetDisabledIndex($code);
+                $enabledIndexes[] = $code;
             }
-            $index->enableAutomaticReindex($code);
+        }
+
+        $executedIndexes = array();
+
+        foreach ($enabledIndexes as $code) {
+            if ($index->requireReindex($code) && $index->executeReindex($code)) {
+                $executedIndexes[] = $code;
+            }
         }
 
         /** @var $synchronizationLog Ess_M2ePro_Model_Synchronization_Log */
         $synchronizationLog = Mage::helper('M2ePro/Data_Global')->getValue('synchLogs');
 
-        if (!$reindexExecuted || !$synchronizationLog) {
+        if (count($executedIndexes) <= 0 || !$synchronizationLog) {
             return;
         }
 

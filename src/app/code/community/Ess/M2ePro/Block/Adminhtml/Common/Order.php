@@ -99,7 +99,7 @@ JAVASCRIPT;
         $accountFilterBlock->setUseConfirm(false);
 
         $orderStateSwitcherBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_order_actionRequiredFilter',
+            'M2ePro/adminhtml_order_notCreatedFilter',
             '',
             array(
                 'component_mode' => Ess_M2ePro_Helper_Component_Amazon::NICK,
@@ -141,7 +141,7 @@ JAVASCRIPT;
         $accountFilterBlock->setUseConfirm(false);
 
         $orderStateSwitcherBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_order_actionRequiredFilter',
+            'M2ePro/adminhtml_order_notCreatedFilter',
             '',
             array(
                 'component_mode' => Ess_M2ePro_Helper_Component_Buy::NICK,
@@ -182,7 +182,7 @@ JAVASCRIPT;
         $accountFilterBlock->setUseConfirm(false);
 
         $orderStateSwitcherBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_order_actionRequiredFilter',
+            'M2ePro/adminhtml_order_notCreatedFilter',
             '',
             array(
                 'component_mode' => Ess_M2ePro_Helper_Component_Play::NICK,

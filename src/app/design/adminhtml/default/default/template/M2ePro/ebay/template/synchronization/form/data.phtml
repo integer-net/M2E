@@ -2,7 +2,6 @@
     /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Template_Synchronization_Edit_Form_Data $this */
 
     $formData = $this->getFormData();
-
 ?>
 
 <script type="text/javascript">
@@ -12,6 +11,10 @@
 
     M2ePro.translator.add(<?php echo json_encode(array(
         'Wrong value. Only integer numbers.' => $this->__('Wrong value. Only integer numbers.'),
+
+        'Must be greater than "Min".' => $this->__('Must be greater than "Min".'),
+        'Inconsistent settings in Revise and Stop rules.' => $this->__('Inconsistent settings in Revise and Stop rules.'),
+
         'Require to select at least one day of week.' => $this->__('Require to select at least one day of week.'),
         'You should specify time.' => $this->__('You should specify time.'),
 
@@ -61,7 +64,7 @@
                     <span>
                         <span class="changed" title="The information in this tab has been changed."></span>
                         <span class="error" title="This tab contains invalid data. Please solve the problem before saving."></span>
-                        List Rules
+                        <?php echo Mage::helper('M2ePro')->__('List Rules'); ?>
                     </span>
                 </a>
             </li>
@@ -70,7 +73,7 @@
                     <span>
                         <span class="changed" title="The information in this tab has been changed."></span>
                         <span class="error" title="This tab contains invalid data. Please solve the problem before saving."></span>
-                        Revise Rules
+                        <?php echo Mage::helper('M2ePro')->__('Revise Rules'); ?>
                     </span>
                 </a>
             </li>
@@ -79,7 +82,7 @@
                     <span>
                         <span class="changed" title="The information in this tab has been changed."></span>
                         <span class="error" title="This tab contains invalid data. Please solve the problem before saving."></span>
-                        Relist Rules
+                        <?php echo Mage::helper('M2ePro')->__('Relist Rules'); ?>
                     </span>
                 </a>
             </li>
@@ -88,7 +91,7 @@
                     <span>
                         <span class="changed" title="The information in this tab has been changed."></span>
                         <span class="error" title="This tab contains invalid data. Please solve the problem before saving."></span>
-                        Stop Rules
+                        <?php echo Mage::helper('M2ePro')->__('Stop Rules'); ?>
                     </span>
                 </a>
             </li>
@@ -97,7 +100,7 @@
                     <span>
                         <span class="changed" title="The information in this tab has been changed."></span>
                         <span class="error" title="This tab contains invalid data. Please solve the problem before saving."></span>
-                        Schedule
+                        <?php echo Mage::helper('M2ePro')->__('Schedule'); ?>
                     </span>
                 </a>
             </li>

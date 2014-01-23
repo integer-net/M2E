@@ -1,269 +1,180 @@
-EbayListingGridHandler = Class.create(ListingGridHandler, {
+EbayListingGridHandler = Class.create(GridHandler, {
 
-    selectedProductsIds: [],
-    selectedCategoriesData: {},
+    backParam: base64_encode('*/adminhtml_ebay_listing/index'),
 
     //----------------------------------
 
-    afterInitPage: function($super)
+    prepareActions: function()
     {
-        $super();
-
-        $(this.gridId+'_massaction-select').observe('change', function() {
-            if (!$('get-estimated-fee')) {
-                return;
-            }
-
-            if (this.value == 'list') {
-                $('get-estimated-fee').show();
-            } else {
-                $('get-estimated-fee').hide();
-            }
-        });
+        return false;
     },
 
     //----------------------------------
 
-    getComponent: function()
+    manageProductsAction: function(id)
     {
-        return 'ebay';
+        setLocation(M2ePro.url.get('adminhtml_ebay_listing/view', {id: id, back: this.backParam}));
     },
 
     //----------------------------------
 
-    getMaxProductsInPart: function()
+    addProductsSourceProductsAction: function(id)
     {
-        var maxProductsInPart = 10;
-        var selectedProductsArray = this.getSelectedProductsArray();
-
-        if (selectedProductsArray.length <= 25) {
-            maxProductsInPart = 5;
-        }
-        if (selectedProductsArray.length <= 15) {
-            maxProductsInPart = 3;
-        }
-        if (selectedProductsArray.length <= 8) {
-            maxProductsInPart = 2;
-        }
-        if (selectedProductsArray.length <= 4) {
-            maxProductsInPart = 1;
-        }
-
-        return maxProductsInPart;
+        setLocation(M2ePro.url.get('adminhtml_ebay_listing_productAdd/index', {
+            listing_id: id,
+            source: 'products',
+            clear: true,
+            back: this.backParam
+        }));
     },
 
     //----------------------------------
 
-    prepareActions: function($super)
+    addProductsSourceCategoriesAction: function(id)
     {
-        $super();
-        this.movingHandler = new ListingMovingHandler(this);
-
-        this.actions = Object.extend(this.actions,{
-
-            editCategorySettingsAction: this.editCategorySettings.bind(this),
-            movingAction: this.movingHandler.run.bind(this.movingHandler)
-
-        });
-
+        setLocation(M2ePro.url.get('adminhtml_ebay_listing_productAdd/index', {
+            listing_id: id,
+            source: 'categories',
+            clear: true,
+            back: this.backParam
+        }));
     },
 
     //----------------------------------
 
-    getLogViewUrl: function(rowId)
+    autoActionsAction: function(id)
     {
-        var temp = this.getProductIdByRowId(rowId);
-
-        var regExpImg= new RegExp('<img[^><]*>','gi');
-        var regExpHr= new RegExp('<hr>','gi');
-
-        temp = temp.replace(regExpImg,'');
-        temp = temp.replace(regExpHr,'');
-
-        var productId = strip_tags(temp).trim();
-
-        return M2ePro.url.get('adminhtml_ebay_log/listing',{
-            filter: base64_encode('product_id[from]='+productId+'&product_id[to]='+productId)
-        });
+        setLocation(M2ePro.url.get('adminhtml_ebay_listing/view', {id: id, auto_actions: 1}));
     },
 
     //----------------------------------
 
-    editCategorySettings: function()
+    viewLogsAction: function(id)
     {
-        this.selectedProductsIds = this.getSelectedProductsArray();
-
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/getCategoryChooserHtml') ,
-        {
-            method: 'get',
-            asynchronous : true,
-            parameters : {
-                ids: this.selectedProductsIds.join(',')
-            },
-            onSuccess: function (transport)
-            {
-                var title = M2ePro.translator.translate('eBay Categories');
-
-                this.openCategoryTemplatePopUp(title, transport.responseText);
-
-                $('cancel_button').observe('click', function() { Windows.getFocusedWindow().close(); });
-
-                $('done_button').observe('click', function() {
-                    if (!EbayListingCategoryChooserHandlerObj.validate()) {
-                        return;
-                    }
-
-                    this.selectedCategoriesData = EbayListingCategoryChooserHandlerObj.getInternalData();
-                    this.editSpecificSettings();
-                }.bind(this));
-            }.bind(this)
-        });
+        setLocation(M2ePro.url.get('adminhtml_ebay_log/listing', {id: id}));
     },
 
-    editSpecificSettings: function()
+    //----------------------------------
+
+    deleteAction: function(id)
     {
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/getCategorySpecificHtml') ,
-        {
-            method: 'get',
-            asynchronous : true,
-            parameters : {
-                ids: this.selectedProductsIds.join(','),
-                category_mode: EbayListingCategoryChooserHandlerObj.getSelectedCategory(0)['mode'],
-                category_value: EbayListingCategoryChooserHandlerObj.getSelectedCategory(0)['value']
-            },
-            onSuccess: function (transport)
-            {
-                var title = M2ePro.translator.translate('Specifics');
-
-                this.openCategoryTemplatePopUp(title, transport.responseText);
-
-                $('cancel_button').observe('click', function() { Windows.getFocusedWindow().close(); });
-                $('done_button').observe('click', this.saveCategoryTemplate.bind(this));
-            }.bind(this)
-        });
-    },
-
-    saveCategoryTemplate: function()
-    {
-        if (!EbayListingCategorySpecificHandlerObj.validate()) {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
         }
 
-        var categoryTemplateData = {};
-        categoryTemplateData = Object.extend(categoryTemplateData, this.selectedCategoriesData);
-        categoryTemplateData = Object.extend(categoryTemplateData, EbayListingCategorySpecificHandlerObj.getInternalData());
-
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/saveCategoryTemplate') ,
-        {
-            method: 'post',
-            asynchronous : true,
-            parameters : {
-                ids: this.selectedProductsIds.join(','),
-                template_category_data: Object.toJSON(categoryTemplateData)
-            },
-            onSuccess: function (transport)
-            {
-                Windows.getFocusedWindow().close();
-                this.getGridObj().doFilter();
-            }.bind(this)
-        });
+        setLocation(M2ePro.url.get('adminhtml_ebay_listing/delete', {id: id}));
     },
 
-    openCategoryTemplatePopUp: function(title, content)
-    {
-        var self = this;
+    //----------------------------------
 
+    editSettingsAction: function(id)
+    {
+        setLocation(M2ePro.url.get('adminhtml_ebay_template/editListing', {id: id, back: this.backParam}));
+    },
+
+    //----------------------------------
+
+    editPaymentAndShippingAction: function(id)
+    {
+        setLocation(M2ePro.url.get('adminhtml_ebay_template/editListing', {
+            id: id,
+            tab: 'general',
+            back: this.backParam
+        }));
+    },
+
+    //----------------------------------
+
+    editSellingAction: function(id)
+    {
+        setLocation(M2ePro.url.get('adminhtml_ebay_template/editListing', {
+            id: id,
+            tab: 'selling',
+            back: this.backParam
+        }));
+    },
+
+    //----------------------------------
+
+    editSynchronizationAction: function(id)
+    {
+        setLocation(M2ePro.url.get('adminhtml_ebay_template/editListing', {
+            id: id,
+            tab: 'synchronization',
+            back: this.backParam
+        }));
+    },
+
+    //----------------------------------
+
+    editTitleAction: function(id)
+    {
         var config = {
             draggable: true,
             resizable: true,
             closable: true,
             className: "magento",
             windowClassName: "popup-window",
-            title: title,
-            top: 50,
+            title: M2ePro.translator.translate('Edit Listing Title'),
+            top: 250,
             maxHeight: 500,
-            height: 500,
-            width: 1000,
+            height: 90,
+            width: 460,
             zIndex: 100,
             recenterAuto: true,
             hideEffect: Element.hide,
-            showEffect: Element.show,
-            closeCallback: function() {
-                self.selectedProductsIds = [];
-                self.selectedCategoriesData = {};
-
-                return true;
-            }
+            showEffect: Element.show
         };
 
-        try {
-            Windows.getFocusedWindow() || Dialog.info(null, config);
-            Windows.getFocusedWindow().setTitle(title);
-            $('modal_dialog_message').innerHTML = content;
-            $('modal_dialog_message').innerHTML.evalScripts();
-        } catch (ignored) {}
+        var currentTitle = $('listing_title_' + id).innerHTML;
+        var popUpHtml = '<div style="margin: 10px">' +
+                        '<input id="listing_title_input" ' +
+                                'style="width: 410px;" ' +
+                                'type="text" ' +
+                                'value="'+currentTitle+'" />' +
+                        '<div style="display: none;" id="listing_title_validation_message" class="validation-advice">' +
+                            M2ePro.translator.translate('This is a required field.') +
+                        '</div> ' +
+                        '</div>' +
+                        '<div style="float: right; margin-top: 10px;">' +
+                        '<a onclick="Windows.getFocusedWindow().close();" ' +
+                            'href="javascript:void(0)">'+M2ePro.translator.translate('Cancel')+
+                        '</a>&nbsp;&nbsp;&nbsp;' +
+                        '<button onclick="EbayListingGridHandlerObj.saveListingTitle('+id+');">'+M2ePro.translator.translate('Save')+'</button>' +
+                        '</div>'
+            ;
+
+        Dialog.info(popUpHtml, config);
     },
 
     //----------------------------------
 
-    openFeePopUp: function(content)
+    saveListingTitle: function(listingId)
     {
-        Dialog.info(content, {
-            draggable: true,
-            resizable: true,
-            closable: true,
-            className: "magento",
-            windowClassName: "popup-window",
-            title: M2ePro.translator.translate('Estimated Fee Details'),
-            width: 400,
-            zIndex: 100,
-            recenterAuto: true
-        });
+        $('listing_title_validation_message').hide();
 
-        Windows.getFocusedWindow().content.style.height = '';
-        Windows.getFocusedWindow().content.style.maxHeight = '550px';
-    },
-
-    getEstimatedFees: function(listingProductId)
-    {
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/getEstimatedFees'),
-        {
-            method: 'get',
-            asynchronous : true,
-            parameters : {
-                listing_product_id: listingProductId
-            },
-            onSuccess: function (transport)
-            {
-                var response = transport.responseText.evalJSON();
-
-                if (response.error) {
-                    alert('Unable to receive estimated fee.');
-                    return;
-                }
-
-                ListingGridHandlerObj.openFeePopUp(response.html);
-            }
-        });
-    },
-
-    //----------------------------------
-
-    confirm: function($super)
-    {
-        var action = '';
-
-        $$('select#'+this.gridId+'_massaction-select option').each(function(o) {
-            if (o.selected && o.value != '') {
-                action = o.value;
-            }
-        });
-
-        if (action == 'editCategorySettings') {
-            return true;
+        var newTitle = $('listing_title_input').value;
+        if (newTitle.length <= 0) {
+            $('listing_title_validation_message').show();
+            return;
         }
 
-        return $super();
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
+            return;
+        }
+
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/saveTitle'),
+        {
+            parameters : {
+                listing_id: listingId,
+                title: newTitle
+            },
+            onSuccess: (function (transport)
+            {
+                Windows.getFocusedWindow().close();
+                this.getGridObj().reload();
+            }).bind(this)
+        });
     }
 
     //----------------------------------

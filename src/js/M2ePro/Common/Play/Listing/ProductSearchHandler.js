@@ -159,6 +159,7 @@ PlayListingProductSearchHandler = Class.create(ActionHandler,{
         $('productSearch_buttons').show();
         $('productSearch_error_block').hide();
         $('productSearch_grid').hide();
+        $('query').value = '';
     },
 
     showSearchGeneralIdAutoPrompt: function ()
