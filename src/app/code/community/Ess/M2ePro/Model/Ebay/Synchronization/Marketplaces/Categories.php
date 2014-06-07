@@ -95,12 +95,20 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
         $iterationsForOneStep = 1000;
         $percentsForOneStep = ($this->getPercentsInterval()/2) / (count($categories)/$iterationsForOneStep);
 
-        foreach ($categories as &$data) {
+        foreach ($categories as $data) {
 
-            $data['marketplace_id'] = $marketplace->getId();
-            $data['features'] = json_encode($data['features']);
+            $insertData = array(
+                'marketplace_id' => $marketplace->getId(),
+                'category_id' => $data['category_id'],
+                'title' => $data['title'],
+                'parent_category_id' => $data['parent_id'],
+                'level' => $data['level'],
+                'is_leaf' => $data['is_leaf'],
+                'features' => json_encode($data['features']),
+                'attribute_set_id' => $data['attribute_set_id']
+            );
 
-            $connWrite->insertOnDuplicate($tableCategories, $data);
+            $connWrite->insert($tableCategories, $insertData);
 
             if (++$iteration % $iterationsForOneStep == 0) {
                 $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;

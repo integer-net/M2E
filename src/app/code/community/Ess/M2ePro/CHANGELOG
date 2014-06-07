@@ -1,3 +1,18 @@
+* 6.1.5 (r6329) (29/04/2014)
+
+* Added: [eBay] global shipping program for "eBay Motors" category "Parts & Accessories"
+* Fix: cron is not working correctly if magento is placed not under root of domain name
+* Fix: cron is not working correctly if option "Add Store Code to Urls" is enabled
+* Fix: major fixes for marketplaces synchronization (SQL Error: Duplicate entry key)
+* Fix: Wrong input data. Comment max length is 250 characters (Mage + Zend_Db_Expr + empty string)
+* Fix: Conflict during order creation with 3rd party extensions
+* Fix: [eBay] supporting of multiple select attribute type for item specifics
+* Fix: [eBay] empty content for item specifics during "Add New Products" process
+* Fix: [eBay] fatal error "Call to undefined method Varien_Db_Adapter_Pdo_Mysql::isTableExists()" in sales grid
+* Fix: [eBay] "Variation cannot be deleted during restricted revise." error in some cases.
+* Fix: [eBay] double adding VAT in magento orders
+* Fix: [Amazon / Rakuten.com / Play.com] "Can't generate SKU" in some causes
+
 * 6.1.4 (r6256) (17/04/2014)
 
 * Fix: [eBay] variations generation for bundle or grouped product

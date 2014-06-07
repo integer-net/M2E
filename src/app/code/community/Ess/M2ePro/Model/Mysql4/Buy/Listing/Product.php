@@ -20,14 +20,4 @@ class Ess_M2ePro_Model_Mysql4_Buy_Listing_Product
     }
 
     // ########################################
-
-    protected function _beforeSave(Mage_Core_Model_Abstract $object)
-    {
-        if ($object->getData('condition_note') === '') {
-            $object->setData('condition_note',new Zend_Db_Expr("''"));
-        }
-        return $this;
-    }
-
-    // ########################################
 }

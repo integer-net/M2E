@@ -125,7 +125,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $tableMotorsSpecifics = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_motor_specific');
+        $tableMotorsSpecifics = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_motor_specific');
 
         $connWrite->delete($tableMotorsSpecifics,array('marketplace_id = ?'=>$marketplace->getId()));
     }
@@ -134,7 +134,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $tableMotorsSpecifics = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_motor_specific');
+        $tableMotorsSpecifics = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_motor_specific');
 
         $iteration = 0;
         $iterationsForOneStep = 1000;
@@ -149,10 +149,18 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
         foreach ($parts as $part) {
             foreach ($part['items'] as $item) {
 
-                $item['marketplace_id'] = $marketplace->getId();
-                $item['product_type'] = (int)$part['product_type'];
+                $insertData = array(
+                    'epid'           => $item['ePID'],
+                    'marketplace_id' => $marketplace->getId(),
+                    'product_type'   => (int)$part['product_type'],
+                    'make'           => $item['Make'],
+                    'model'          => $item['Model'],
+                    'year'           => $item['Year'],
+                    'engine'         => (isset($item['Engine']) ? $item['Engine'] : NULL),
+                    'submodel'       => (isset($item['Submodel']) ? $item['Submodel'] : NULL)
+                );
 
-                $connWrite->insertOnDuplicate($tableMotorsSpecifics, $item);
+                $connWrite->insert($tableMotorsSpecifics, $insertData);
 
                 if (++$iteration % $iterationsForOneStep == 0) {
                     $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;

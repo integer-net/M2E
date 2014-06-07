@@ -67,12 +67,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
             );
 
             if (isset($receivedItem['sku'])) {
-
-                if ($receivedItem['sku'] == '') {
-                    $newData['sku'] = new Zend_Db_Expr("''");
-                } else {
-                    $newData['sku'] = (string)$receivedItem['sku'];
-                }
+                $newData['sku'] = (string)$receivedItem['sku'];
             }
 
             if ($existsId) {

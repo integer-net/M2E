@@ -84,7 +84,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
             'nodes'          => json_encode($details)
         );
 
-        $connWrite->insertOnDuplicate($tableMarketplaces, $data);
+        $connWrite->insert($tableMarketplaces, $data);
     }
 
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)

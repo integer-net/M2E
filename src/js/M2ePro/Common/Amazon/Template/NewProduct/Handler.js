@@ -150,14 +150,14 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
             selectEl.appendChild(new Element('option',{'value': 'empty','style': 'display: none'}));
 
         self.categories.each(function(category) {
-            category.parent_id === self.parentId && categories.push(category)
+            category.parent_category_id === self.parentId && categories.push(category)
         });
 
         categories.sort(function(a,b) {
             return a.sorder - b.sorder;
         });
 
-        if (categories.length == 0 || self.getCategoryInfo('id',self.parentId).is_listable == 1) {
+        if (categories.length == 0 || self.getCategoryInfo('category_id',self.parentId).is_listable == 1) {
             self.confirmButton.show();
             if (categories.length == 0) {
                 selectEl.hide();
@@ -166,7 +166,7 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
         }
 
         categories.each(function(category) {
-            selectEl.appendChild(new Element('option',{'value': category.id}))
+            selectEl.appendChild(new Element('option',{'value': category.category_id}))
                     .update(category.title);
         });
 
@@ -205,7 +205,7 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
         this.specificHandler.specificsContainer.update();
         this.specificHandler.specificsMainContainer.hide();
 
-        var categoryInfo = this.getCategoryInfo('id',this.parentId);
+        var categoryInfo = this.getCategoryInfo('category_id',this.parentId);
         var categoryPath = categoryInfo.path.replace(/->/g,' > ') + ' > ' + categoryInfo.title;
 
         if (!categoryInfo.xsd_hash) {

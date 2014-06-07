@@ -33,7 +33,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_NewProduct_Search_Grid e
         $results = new Varien_Data_Collection();
         foreach ($data as $index => $item) {
             $temp = array(
-                'id'        => $index,
+                'id'        => $item['category_id'],
                 'title'     => $item['title'],
                 'path'      => $item['path'],
                 'xsd_hash'  => $item['xsd_hash'],

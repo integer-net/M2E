@@ -51,7 +51,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion611_OrdersData
         $orderBackupTable = $this->getTableName(
             'm2epro'. Ess_M2ePro_Model_Upgrade_Migration_ToVersion611::BACKUP_TABLE_PREFIX .'_ebay_order'
         );
-        if (!$this->getConnection()->isTableExists($orderBackupTable)) {
+        if (!$this->isTableExists($orderBackupTable)) {
             return 0;
         }
 
@@ -505,6 +505,13 @@ SQL
     protected function getTableName($table)
     {
         return Mage::getSingleton('core/resource')->getTableName($table);
+    }
+
+    protected function isTableExists($table)
+    {
+        $select = $this->getConnection()->quoteInto('SHOW TABLES LIKE ?', $table);
+        $result = $this->getConnection()->fetchOne($select);
+        return !empty($result);
     }
 
     // ##########################################################

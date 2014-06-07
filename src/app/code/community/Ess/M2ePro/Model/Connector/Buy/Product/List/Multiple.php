@@ -413,7 +413,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_Multiple
         // check in queue of SKUs by account and marketplace
 
         $queue = $this->getQueueOfSkus();
-        if (in_array($sku,$queue) || isset($this->skusToCheck[$sku])) {
+        if (in_array($sku,$queue,true) || isset($this->skusToCheck[$sku])) {
 
             if ($listingProduct->getChildObject()->getBuyListing()->isGenerateSkuModeNo()) {
                 $this->addListingsProductsLogsMessage(

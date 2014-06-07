@@ -26,7 +26,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Specific_Grid extends Mage_Adminhtml
 
     protected function _prepareCollection()
     {
-        $collection = Mage::getModel('M2ePro/Ebay_Motor_Specific')->getCollection();
+        $collection = new Ess_M2ePro_Model_Mysql4_Ebay_MotorSpecifics_Collection('epid');
 
         $this->setCollection($collection);
 
@@ -49,8 +49,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Specific_Grid extends Mage_Adminhtml
             'type'   => 'options',
             'index'  => 'product_type',
             'options'  => array(
-                Ess_M2ePro_Model_Ebay_Motor_Specific::TYPE_VEHICLE => Mage::helper('M2ePro')->__('Car / Truck'),
-                Ess_M2ePro_Model_Ebay_Motor_Specific::TYPE_MOTORCYCLE => Mage::helper('M2ePro')->__('Motorcycle'),
+                Ess_M2ePro_Helper_Component_Ebay_MotorSpecific::TYPE_VEHICLE => Mage::helper('M2ePro')->__('Car / Truck'),
+                Ess_M2ePro_Helper_Component_Ebay_MotorSpecific::TYPE_MOTORCYCLE => Mage::helper('M2ePro')->__('Motorcycle'),
             )
         ));
 

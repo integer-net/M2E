@@ -86,11 +86,21 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
         $iterationsForOneStep = 1000;
         $percentsForOneStep = ($this->getPercentsInterval()/2) / (count($categories)/$iterationsForOneStep);
 
-        foreach ($categories as &$data) {
+        foreach ($categories as $data) {
 
-            $data['attributes'] = json_encode($data['attributes']);
+            $insertData = array(
+                'native_id' => $data['category_id'],
+                'node_id' => $data['node_id'],
+                'category_id' => $data['id'],
+                'parent_category_id' => $data['parent_id'],
+                'title' => $data['title'],
+                'path' => $data['path'],
+                'is_listable' => $data['is_listable'],
+                'attributes' => json_encode($data['attributes']),
+                'sorder' => $data['sorder']
+            );
 
-            $connWrite->insertOnDuplicate($tableCategories, $data);
+            $connWrite->insert($tableCategories, $insertData);
 
             if (++$iteration % $iterationsForOneStep == 0) {
                 $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;

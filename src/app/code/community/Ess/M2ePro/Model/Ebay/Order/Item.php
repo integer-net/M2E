@@ -105,12 +105,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     public function getPrice()
     {
-        $price = (float)$this->getData('price');
-        if ($this->getEbayOrder()->hasVat()) {
-            $price += $this->getTaxAmount();
-        }
-
-        return $price;
+        return (float)$this->getData('price');
     }
 
     public function getFinalFee()

@@ -257,7 +257,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Responser
             }
 
             $newData['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
-            $newData['start_date'] == '' && $newData['start_date'] = new Zend_Db_Expr("''");
 
             $listingOtherModel = Mage::helper('M2ePro/Component_Amazon')->getModel('Listing_Other');
             $listingOtherModel->setData($newData)->save();

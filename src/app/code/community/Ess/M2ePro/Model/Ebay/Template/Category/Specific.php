@@ -207,7 +207,7 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
                 foreach($specifics['specifics'] as $specific) {
 
                     if($specific['id'] === $this->getAttributeId() &&
-                        $specific['type'] === 'select_multiple') {
+                       in_array($specific['type'],array('select_multiple_or_text','select_multiple'))) {
 
                         $valuesTemp = explode(',', $valueTemp);
 

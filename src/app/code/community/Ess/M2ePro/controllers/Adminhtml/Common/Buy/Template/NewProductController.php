@@ -131,7 +131,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         //----------------------------
         /** @var $buyTemplateNewProductInstance Ess_M2ePro_Model_Buy_Template_NewProduct */
         $buyTemplateNewProductInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct');
-        $post['category']['id'] && $buyTemplateNewProductInstance->loadInstance((int)$post['category']['id']);
+        $post['category']['category_id'] && $buyTemplateNewProductInstance->loadInstance((int)$post['category']['category_id']);
 
         // Saving general data
         //-----------------------------
@@ -140,7 +140,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
             'title'          => $post['category']['title'],
             'node_title'     => $post['category']['node_title'],
             'category_path'  => $post['category']['path'],
-            'category_id'    => (int)$post['category']['category_id'],
+            'category_id'    => (int)$post['category']['native_id'],
         ));
         $buyTemplateNewProductInstance->save();
 
@@ -233,7 +233,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         //--------------------
         /* @var $templateCoreInstance Ess_M2ePro_Model_Buy_Template_NewProduct_Core */
         $templateCoreInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct_Core');
-        if ($post['category']['id']) {
+        if ($post['category']['category_id']) {
             $templateCoreInstance->loadInstance($buyTemplateNewProductInstance->getId());
         }
 
@@ -423,7 +423,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
     public function getAttributesAction()
     {
-        $category_id = $this->getRequest()->getParam('category_id');
+        $native_id = $this->getRequest()->getParam('native_id');
 
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
@@ -432,7 +432,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         return $this->getResponse()->setBody(json_encode(
             $connRead->select()
                 ->from($table,'attributes')
-                ->where('category_id = ?', (int)$category_id)
+                ->where('native_id = ?', (int)$native_id)
                 ->query()
                 ->fetchAll()
         ));

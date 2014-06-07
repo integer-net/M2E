@@ -17,7 +17,9 @@ class Ess_M2ePro_Model_Servicing_Task_Cron implements Ess_M2ePro_Model_Servicing
 
     public function getRequestData()
     {
-        return array();
+        return array(
+            'base_url' => Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK)
+        );
     }
 
     public function processResponseData(array $data)

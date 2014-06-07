@@ -169,11 +169,11 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
 
             $pathData[] = $category[$dataField];
 
-            if (!$category['parent_id']) {
+            if (!$category['parent_category_id']) {
                 break;
             }
 
-            $categoryId = (int)$category['parent_id'];
+            $categoryId = (int)$category['parent_category_id'];
         }
 
         return array_reverse($pathData);
@@ -223,15 +223,13 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
 
             if (!is_null($specifics)) {
 
-                $tempData = array(
-                    'marketplace_id' => (int)$categoryRow['marketplace_id'],
-                    'category_id' => (int)$categoryRow['category_id'],
-                    'item_specifics' => json_encode($specifics['specifics'])
-                );
-
                 /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
                 $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-                $connWrite->insertOnDuplicate($tableDictCategories, $tempData);
+                $connWrite->update($tableDictCategories,
+                                   array('item_specifics' => json_encode($specifics['specifics'])),
+                                   array('marketplace_id = ?' => (int)$categoryRow['marketplace_id'],
+                                         'category_id = ?' => (int)$categoryRow['category_id'])
+                                  );
 
             } else {
                 $specifics['specifics'] = array();
@@ -273,15 +271,13 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
 
                 if (!is_null($specifics['specifics'])) {
 
-                    $tempData = array(
-                        'marketplace_id' => (int)$categoryRow['marketplace_id'],
-                        'category_id' => (int)$categoryRow['category_id'],
-                        'attribute_set' => json_encode($specifics['specifics'])
-                    );
-
                     /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
                     $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-                    $connWrite->insertOnDuplicate($tableDictCategories, $tempData);
+                    $connWrite->update($tableDictCategories,
+                                       array('attribute_set' => json_encode($specifics['specifics'])),
+                                       array('marketplace_id = ?' => (int)$categoryRow['marketplace_id'],
+                                             'category_id = ?' => (int)$categoryRow['category_id'])
+                                       );
 
                 } else {
                     $specifics['specifics'] = array();

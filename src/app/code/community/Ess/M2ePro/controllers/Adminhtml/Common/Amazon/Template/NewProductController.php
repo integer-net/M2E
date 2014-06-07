@@ -423,7 +423,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
 
         $specifics = array();
         foreach ($tempSpecifics as $tempSpecific) {
-            $specifics[$tempSpecific['id']] = $tempSpecific;
+            $specifics[$tempSpecific['specific_id']] = $tempSpecific;
         }
 
         return $this->getResponse()->setBody(json_encode($specifics));
@@ -515,7 +515,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
         $table =  Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_specific');
 
         $dictionarySpecifics = $connRead->select()
-                                        ->from($table,array('id','xpath'))
+                                        ->from($table,array('specific_id','xpath'))
                                         ->where('xsd_hash = ?',$xsdHash)
                                         ->query()
                                         ->fetchAll();
@@ -523,7 +523,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
         foreach ($dictionarySpecifics as $key => $specific) {
             $xpath = $specific['xpath'];
             unset($dictionarySpecifics[$key]);
-            $dictionarySpecifics[$xpath] = $specific['id'];
+            $dictionarySpecifics[$xpath] = $specific['specific_id'];
         }
 
         Mage::helper('M2ePro/Data_Global')->setValue('dictionary_specifics',$dictionarySpecifics);

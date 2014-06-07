@@ -37,7 +37,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 return true;
             }
 
-            var params = self.specifics[element.getAttribute('id')].params.evalJSON();
+            var params = self.specifics[element.getAttribute('specific_id')].params.evalJSON();
             return self[params.type + 'TypeValidator'](value,params,element);
         });
 
@@ -46,7 +46,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 return true;
             }
 
-            var params = self.specifics[element.getAttribute('id')].params.evalJSON().attributes[element.getAttribute('index')];
+            var params = self.specifics[element.getAttribute('specific_id')].params.evalJSON().attributes[element.getAttribute('index')];
             return self[params.type + 'TypeValidator'](value,params,element);
         });
     },
@@ -179,7 +179,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
     run: function(xsd_hash)
     {
         this.xsd_hash = xsd_hash;
-        this.parent = {'id': null};
+        this.parent = {'specific_id': null};
         this.specificsContainer.update();
         this.getSpecifics();
     },
@@ -225,7 +225,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 var dictionarySpecific = self.getDictionarySpecific(specific.xpath);
 
                 // checking if this specific is parent
-                if (dictionarySpecific.parent_id == null) {
+                if (dictionarySpecific.parent_specific_id == null) {
                     self.renderSpecifics([dictionarySpecific],self.specificsContainer,null,true);
 
                     return '';
@@ -247,7 +247,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
                 if (orig) {
                     orig.parentNode
-                        .down('button[add_button_id="' + dictionarySpecific.id + '"]').simulate('click');
+                        .down('button[add_button_id="' + dictionarySpecific.specific_id + '"]').simulate('click');
 
                     var origIndex = parseInt(orig.up('tr[index_number]').getAttribute('index_number'));
                     var realXpath = specific.xpath.replace(/\d*$/,origIndex + 1);
@@ -273,7 +273,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 // checking if this specific was chosen
                 select = self.getChosenSelect(specific);
                 if (select) {
-                    select.value = dictionarySpecific.id;
+                    select.value = dictionarySpecific.specific_id;
                     select.next('button[add_button_id="' + specific.parentId + '"]').simulate('click');
 
                     dictionarySpecific.type == self.TYPE_TEXT && self.setValues(specific);
@@ -284,7 +284,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
                 // otherwise it was added
                 select = self.getAddedSelect(specific);
-                select.value = dictionarySpecific.id;
+                select.value = dictionarySpecific.specific_id;
                 select.next('button[add_button_id="' + specific.parentId + '"]').simulate('click');
 
                 dictionarySpecific.type == self.TYPE_TEXT && self.setValues(specific);
@@ -358,7 +358,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
     makeParentId: function(specific)
     {
-        specific.parentId = this.getDictionarySpecific(specific.parentXpath).id;
+        specific.parentId = this.getDictionarySpecific(specific.parentXpath).specific_id;
     },
 
     getChosenSelect: function(specific)
@@ -366,7 +366,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         try {
             return this.specificsContainer
                 .down("*[name='specifics[" + specific.parentXpath + "][mode]']")
-                .parentNode.down('select[id="' + specific.parentId + '"]');
+                .parentNode.down('select[specific_id="' + specific.parentId + '"]');
         } catch (e) {
            return null;
         }
@@ -377,7 +377,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         try {
             return this.specificsContainer
                 .down("*[name='specifics[" + specific.parentXpath + "][mode]']")
-                .up('table').down('select[id="' + specific.parentId + '"]');
+                .up('table').down('select[specific_id="' + specific.parentId + '"]');
         } catch (e) {
             specific.parentXpath = specific.parentXpath.split('/');
             specific.parentXpath.pop();
@@ -386,7 +386,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
             return this.specificsContainer
                 .down("*[name='specifics[" + specific.parentXpath + "][mode]']")
-                .up('table').down('select[id="' + specific.parentId + '"]');
+                .up('table').down('select[specific_id="' + specific.parentId + '"]');
         }
     },
 
@@ -489,14 +489,14 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
     renderUnrequiredSpecifics: function(specifics,container,renderCallback)
     {
         var self = this;
-        var parent_id = specifics[0].parent_id;
+        var parent_specific_id = specifics[0].parent_specific_id;
 
         var labelDiv = new Element('div',{'style': 'padding: 15px 0'});
         var label = labelDiv.appendChild(new Element('label',{'style': 'font-weight: bold; font-style: italic'})
                             .insert(M2ePro.translator.translate('Optional Specifics') + ': '));
 
         var contentDiv = new Element('div',{'style': 'padding: 15px 0'});
-        var select = contentDiv.appendChild(new Element('select',{'id': parent_id}));
+        var select = contentDiv.appendChild(new Element('select',{'specific_id': parent_specific_id}));
 
         select.appendChild(new Element('option',{'style': 'display: none; '}));
         specifics.each(function(specific) {
@@ -504,7 +504,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             if (parseInt(specific.data_definition.evalJSON().is_desired)) {
                 specificTitle += ' (' + M2ePro.translator.translate('Desired') + ')';
             }
-            select.appendChild(new Element('option',{'value': specific.id})).insert(specificTitle);
+            select.appendChild(new Element('option',{'value': specific.specific_id})).insert(specificTitle);
         });
 
 //        select.observe('change',function() {
@@ -516,7 +516,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         tr.appendChild(new Element('td',{'class': 'label'})).insert(labelDiv);
         tr.appendChild(new Element('td',{'class': 'value'})).insert(contentDiv);
 
-        self.appendAddButton({'id': parent_id},contentDiv,container);
+        self.appendAddButton({'specific_id': parent_specific_id},contentDiv,container);
     },
 
     //----------------------------------
@@ -524,7 +524,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
     renderSpecific: function(contentCallback,specific,container)
     {
         container = this.newContainer(container,{
-            'tr': {'id': specific.id,'index_number': 1},
+            'tr': {'specific_id': specific.specific_id,'index_number': 1},
             'table': {
                 'class': 'form-list',
                 'style': 'width: 100%',
@@ -580,14 +580,14 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
         if (params.max_length &&  params.max_length >= 100) {
             var textarea = div.appendChild(new Element('textarea',{
-                'id': specific.id,
+                'specific_id': specific.specific_id,
                 'name': 'specifics[' + specific.path + "][custom_value]",
                 'class': 'M2ePro-required-when-visible M2ePro-specifics-validation',
                 'style': 'width: 350px'
             }));
         } else {
             var input = div.appendChild(new Element('input',{
-                'id': specific.id,
+                'specific_id': specific.specific_id,
                 'name': 'specifics[' + specific.path + "][custom_value]",
                 'type': 'text',
                 'class': 'input-text M2ePro-required-when-visible M2ePro-specifics-validation'
@@ -604,7 +604,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         }
 
         div.appendChild(new Element('input',{
-            'id': specific.id,
+            'specific_id': specific.specific_id,
             'name': 'specifics[' + specific.path + "][type]",
             'type': 'hidden',
             'value': params.type
@@ -628,7 +628,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         var div = new Element('div');
 
         var select = div.appendChild(new Element('select',{
-            'id': specific.id,
+            'specific_id': specific.specific_id,
             'name': 'specifics[' + specific.path + "][custom_value]",
             'class': 'M2ePro-required-when-visible'
         }));
@@ -651,12 +651,12 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
         container = self.newContainer(container,{
             'tr': {
-                'id': specific.id,
+                'specific_id': specific.specific_id,
                 'index_number': 1
             },
             'table': {
                 'class': 'form-list',
-                'style': specific.parent_id == null ? 'width: 100%' : 'width: 100%; padding: 0; margin-top: 15px; border-right: 1px solid #D6D6D6 !important; border-bottom: 1px solid #D6D6D6 !important; border-left: 1px solid #D6D6D6 !important; margin: 10px 0;',
+                'style': specific.parent_specific_id == null ? 'width: 100%' : 'width: 100%; padding: 0; margin-top: 15px; border-right: 1px solid #D6D6D6 !important; border-bottom: 1px solid #D6D6D6 !important; border-left: 1px solid #D6D6D6 !important; margin: 10px 0;',
                 'cellspacing': 0,
                 'cellpadding': 0
             }
@@ -665,12 +665,12 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         specific.container = container;
 
         var div = new Element('div',{
-            'style': specific.parent_id == null ? '' : 'padding: 2px 0 2px 10px; color: white; background: #6F8992; border-bottom: 1px solid #D6D6D6 !important'
+            'style': specific.parent_specific_id == null ? '' : 'padding: 2px 0 2px 10px; color: white; background: #6F8992; border-bottom: 1px solid #D6D6D6 !important'
         });
 
-        specific.parent_id == null && console.log(specific.title);
+        specific.parent_specific_id == null && console.log(specific.title);
 
-        if (specific.parent_id != null) {
+        if (specific.parent_specific_id != null) {
             div.appendChild(new Element('span',{'style': 'font-weight: bold'}))
                 .insert(specific.title);
             self.appendCloneButton(specific,div,container);
@@ -704,14 +704,14 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         var isRequired = (specific.min_occurs > 0 || specific.title == 'Product Type');
 
         var select = div.appendChild(new Element('select',{
-            'id': specific.id,
+            'specific_id': specific.specific_id,
             'class': (isRequired ? 'M2ePro-required-when-visible' : '') + ' M2ePro-container-select-choose'
         }));
 
         select.appendChild(new Element('option',{'style': 'display: none; '}));
 
         childSpecifics.each(function(childSpecific) {
-            select.appendChild(new Element('option',{'value': childSpecific.id}))
+            select.appendChild(new Element('option',{'value': childSpecific.specific_id}))
                   .insert(childSpecific.title);
         });
 
@@ -721,7 +721,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
         container = self.newContainer(container,{
             'tr': {
-                'id': specific.id,
+                'specific_id': specific.specific_id,
                 'index_number': 1
             },
             'table': {
@@ -751,7 +751,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
     {
         var specifics = [];
         $H(this.specifics).each(function(data) {
-            data[1].parent_id == parent.id && specifics.push(data[1]);
+            data[1].parent_specific_id == parent.specific_id && specifics.push(data[1]);
         });
 
         specifics.sort(function(a,b) {
@@ -795,7 +795,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
         var chooseButton = div.appendChild(new Element('button',{
             'type': 'button',
-            'add_button_id': specific.id,
+            'add_button_id': specific.specific_id,
             'class': 'scalable add',
             'style': 'margin-left: 5px; display: none'
         }));
@@ -803,7 +803,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
         chooseButton.observe('click',(function() {
 
-            var newContainer = new Element('table',{'id':specific.id,'class': 'form-list','style': 'margin: 0 0 0 0px; width: 100%','cellspacing': 0,'cellpadding': 0});
+            var newContainer = new Element('table',{'specific_id':specific.specific_id,'class': 'form-list','style': 'margin: 0 0 0 0px; width: 100%','cellspacing': 0,'cellpadding': 0});
             var refTr = div.up('tr');
 
             refTr.insert({'after': (function() {
@@ -814,7 +814,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             })()});
 
             return function() {
-                var select = refTr.down('select[id="' + this.getAttribute('add_button_id') + '"]');
+                var select = refTr.down('select[specific_id="' + this.getAttribute('add_button_id') + '"]');
                 self.chooseButtonClick(select,newContainer,this);
             }
         })());
@@ -826,7 +826,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
 
         var addButton = div.appendChild(new Element('button',{
             'type': 'button',
-            'add_button_id': specific.id,
+            'add_button_id': specific.specific_id,
             'class': 'scalable add',
             'style': 'margin-left: 5px'
         }));
@@ -837,7 +837,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             var newContainer = self.newContainer(container,{
                 'tr': {},
                 'table': {
-                    'id': specific.id,
+                    'specific_id': specific.specific_id,
                     'class': 'form-list',
                     'style': 'margin: 0 0 0 0px; width: 100%',
                     'cellspacing': 0,
@@ -846,7 +846,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             });
 
             return function() {
-                var select = container.down('select[id="' + this.getAttribute('add_button_id') + '"]');
+                var select = container.down('select[specific_id="' + this.getAttribute('add_button_id') + '"]');
                 self.addButtonClick(select,newContainer,this);
             }
         })());
@@ -857,7 +857,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         var self = this;
         var cloneButton = div.appendChild(new Element('button',{
             'type': 'button',
-            'add_button_id': specific.id,
+            'add_button_id': specific.specific_id,
             'class': 'scalable add',
             'style': 'margin-left: 5px'
         }));
@@ -869,7 +869,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 : self.containerCloneButtonClick(specific,div,container);
         });
 
-        var occurs = container.up('table').select('tr[id="' + specific.id + '"]').length;
+        var occurs = container.up('table').select('tr[specific_id="' + specific.specific_id + '"]').length;
 
         occurs >= parseInt(specific.max_occurs) && cloneButton.hide();
     },
@@ -879,7 +879,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         var self = this;
         var removeButton = div.appendChild(new Element('button',{
             'type': 'button',
-            'remove_button_id': specific.id,
+            'remove_button_id': specific.specific_id,
             'class': 'scalable delete',
             'style': 'margin-left: 5px;'
         }));
@@ -897,7 +897,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             self.removeButtonClick(specific,div,container);
         });
 
-        var occurs = container.up('table').select('tr[id="' + specific.id + '"]').length;
+        var occurs = container.up('table').select('tr[specific_id="' + specific.specific_id + '"]').length;
 
         if (specific.min_occurs == 1) {
             occurs == 1 && removeButton.hide();
@@ -914,7 +914,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         var specific = this.specifics[select.value];
         select.disabled = true;
         this.renderSpecifics([specific],container);
-        container.down('button[remove_button_id="' + specific.id + '"]').show();
+        container.down('button[remove_button_id="' + specific.specific_id + '"]').show();
     },
 
     addButtonClick: function(select,container,button)
@@ -943,13 +943,13 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         container = container.up('table');
         div.down('button').hide();
 
-//        container.select('button[remove_button_id="' + specific.id + '"]').each(function(button) {
+//        container.select('button[remove_button_id="' + specific.specific_id + '"]').each(function(button) {
 //            button.show();
 //        });
 
         this.renderSpecifics([specific],container,function(contentCallback,specific,container) {
 
-            var refTr = div.up('tr[id="' + specific.id + '"]');
+            var refTr = div.up('tr[specific_id="' + specific.specific_id + '"]');
             var newContainer = new Element('table',{
                 'class': 'form-list',
                 'style': style,
@@ -957,7 +957,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 'cellpadding': 0
             });
             var newTr = new Element('tr',{
-                'id': specific.id,
+                'specific_id': specific.specific_id,
                 'index_number': parseInt(refTr.getAttribute('index_number')) + 1
             });
 
@@ -988,14 +988,14 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
         container = container.up('table');
         div.down('button').hide();
 
-        container.select('button[remove_button_id="' + specific.id + '"]').each(function(button) {
+        container.select('button[remove_button_id="' + specific.specific_id + '"]').each(function(button) {
             button.show();
         });
 
-        var refTr = div.up('tr[id="' + specific.id + '"]');
+        var refTr = div.up('tr[specific_id="' + specific.specific_id + '"]');
 
         var newContainer = new Element('table',{'class': 'form-list','style': style,'cellspacing': 0,'cellpadding': 0});
-        var newTr = new Element('tr',{'id': specific.id,'index_number': parseInt(refTr.getAttribute('index_number')) + 1});
+        var newTr = new Element('tr',{'specific_id': specific.specific_id,'index_number': parseInt(refTr.getAttribute('index_number')) + 1});
 
         newTr.appendChild(new Element('td',{'colspan': 2}))
              .appendChild(newContainer);
@@ -1026,30 +1026,30 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
     {
         container = container.up('table');
 
-        var parentTr = div.up('tr[id="' + specific.id +'"]');
+        var parentTr = div.up('tr[specific_id="' + specific.specific_id +'"]');
 
         var select = container
             .up('table')
-            .down('select[id="' + specific.parent_id + '"]');
+            .down('select[specific_id="' + specific.parent_specific_id + '"]');
 
-        select = select || container.up('table').down('select[id="' + this.specifics[specific.parent_id].parent_id + '"]');
+        select = select || container.up('table').down('select[specific_id="' + this.specifics[specific.parent_specific_id].parent_specific_id + '"]');
 
         select.removeAttribute('disabled');
         select.firstChild.selected = true;
 
         parentTr.parentNode.removeChild(parentTr);
 
-        var option = select.down('option[value="' + specific.id + '"]');
-        var founds = container.select('tr[id="' + specific.id + '"]');
+        var option = select.down('option[value="' + specific.specific_id + '"]');
+        var founds = container.select('tr[specific_id="' + specific.specific_id + '"]');
 
         if (founds.length == 0) {
             option.show();
         } else if (founds.length == 1 && specific.min_occurs == 1) {
             var found = founds.shift();
-            found.down('button[remove_button_id="' + specific.id + '"]').hide();
-            found.down('button[add_button_id="' + specific.id + '"]').show();
+            found.down('button[remove_button_id="' + specific.specific_id + '"]').hide();
+            found.down('button[add_button_id="' + specific.specific_id + '"]').show();
         } else {
-            founds.pop().down('button[add_button_id="' + specific.id + '"]').show();
+            founds.pop().down('button[add_button_id="' + specific.specific_id + '"]').show();
         }
 
         this.isAllOptionsHidden(select) || select.removeAttribute('disabled');
@@ -1078,14 +1078,14 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
                 return;
             }
 
-            var parentContainer = parent.container && parent.container.up('tr[id="' + parent.id + '"]');
+            var parentContainer = parent.container && parent.container.up('tr[specific_id="' + parent.specific_id + '"]');
             var indexNumber = parentContainer
                 ? parseInt(parentContainer.getAttribute('index_number'))
                 : 1;
 
             specific.path = '/' + parent.xml_tag  + '-' + indexNumber + specific.path;
 
-            parent && makePath.call(this,parent.parent_id && this.specifics[parent.parent_id],specific);
+            parent && makePath.call(this,parent.parent_specific_id && this.specifics[parent.parent_specific_id],specific);
         }
 
         specific.path = '';
@@ -1296,7 +1296,7 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
             });
         } else {
             div.appendChild(new Element('input',{
-                'id': specific.id,
+                'specific_id': specific.specific_id,
                 'index': index,
                 'type': 'text',
                 'class': 'input-text M2ePro-specificAttributes-validation' + (attribute.required ? ' M2ePro-required-when-visible' : ''),
@@ -1321,12 +1321,12 @@ CommonAmazonTemplateNewProductSpecificHandler.prototype = Object.extend(new Comm
     {
         var prev = container.up('tr').previous();
 
-        if (!prev || !prev.getAttribute('id')) {
+        if (!prev || !prev.getAttribute('specific_id')) {
             return;
         }
 
-        if (this.specifics[prev.getAttribute('id')].type == this.TYPE_CONTAINER ||
-            this.specifics[prev.getAttribute('id')].type == this.TYPE_CONTAINER_SELECT) {
+        if (this.specifics[prev.getAttribute('specific_id')].type == this.TYPE_CONTAINER ||
+            this.specifics[prev.getAttribute('specific_id')].type == this.TYPE_CONTAINER_SELECT) {
             return;
         }
 

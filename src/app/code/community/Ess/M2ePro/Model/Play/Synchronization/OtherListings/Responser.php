@@ -193,8 +193,6 @@ class Ess_M2ePro_Model_Play_Synchronization_OtherListings_Responser
             $listingOtherObj = Mage::helper('M2ePro/Component_Play')
                                 ->getObject('Listing_Other',(int)$existingItem['listing_other_id']);
 
-            $newData['condition_note'] == '' && $newData['condition_note'] = new Zend_Db_Expr("''");
-
             $listingOtherObj->addData($newData)->save();
         }
     }
@@ -264,8 +262,6 @@ class Ess_M2ePro_Model_Play_Synchronization_OtherListings_Responser
             }
 
             $newData['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
-            $newData['condition_note'] == '' && $newData['condition_note'] = new Zend_Db_Expr("''");
-            $newData['start_date'] == '' && $newData['start_date'] = new Zend_Db_Expr("''");
 
             $listingOtherModel = Mage::helper('M2ePro/Component_Play')->getModel('Listing_Other');
             $listingOtherModel->setData($newData)->save();

@@ -103,8 +103,6 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
             'status_changer' => $otherListing->getStatusChanger()
         );
 
-        $dataForUpdate['condition_note'] == '' && $dataForUpdate['condition_note'] = new Zend_Db_Expr("''");
-
         $listingProduct->addData($dataForUpdate)->save();
 
         // Set listing store id to Play Item

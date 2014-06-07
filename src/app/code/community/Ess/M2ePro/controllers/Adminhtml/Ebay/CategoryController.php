@@ -355,7 +355,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
     {
         $marketplaceId  = $this->getRequest()->getParam('marketplace_id');
         $accountId = $this->getRequest()->getParam('account_id');
-        $parentCategoryId  = $this->getRequest()->getParam('parent_id');
+        $parentCategoryId  = $this->getRequest()->getParam('parent_category_id');
         $categoryType = $this->getRequest()->getParam('category_type');
 
         $ebayCategoryTypes = Mage::helper('M2ePro/Component_Ebay_Category')->getEbayCategoryTypes();

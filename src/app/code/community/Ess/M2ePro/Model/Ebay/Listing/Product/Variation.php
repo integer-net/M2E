@@ -454,8 +454,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
         }
 
         ksort($currentSpecifics);
-        $variationKeys = array_keys($currentSpecifics);
-        $variationValues = array_values($currentSpecifics);
+        $variationKeys = array_map('trim', array_keys($currentSpecifics));
+        $variationValues = array_map('trim', array_values($currentSpecifics));
 
         $realEbayItemId = $this->getEbayListingProduct()->getEbayItem()->getItemId();
 
@@ -474,8 +474,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
             }
 
             ksort($variationOrder);
-            $orderItemVariationKeys = array_keys($variationOrder);
-            $orderItemVariationValues = array_values($variationOrder);
+            $orderItemVariationKeys = array_map('trim', array_keys($variationOrder));
+            $orderItemVariationValues = array_map('trim', array_values($variationOrder));
 
             if (count($currentSpecifics) == count($variationOrder) &&
                 count(array_diff($variationKeys,$orderItemVariationKeys)) <= 0 &&

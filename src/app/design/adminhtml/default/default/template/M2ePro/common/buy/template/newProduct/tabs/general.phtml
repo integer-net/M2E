@@ -101,7 +101,7 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
             .observe('click',BuyTemplateNewProductHandlerObj.attribute_sets_confirm.bind(BuyTemplateNewProductHandlerObj))
             .observe('click',BuyTemplateNewProductHandlerObj.confirmAttributeSets);
 
-        $('rakuten_category_id')
+        $('rakuten_native_id')
             .observe('change', BuyTemplateNewProductHandlerObj.rakuten_category_change)
             .simulate('change');
 
@@ -158,11 +158,11 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
 </style>
 
 <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
-<input name="category[id]" value="<?php echo $formData['category']['id']; ?>" type="hidden" />
+<input name="category[category_id]" value="<?php echo $formData['category']['id']; ?>" type="hidden" />
 
 <div class="entry-edit" id="magento_block_category_edit_general">
 
-    <input name="category[category_id]" class = "rakuten_category_id" id="rakuten_category_id" value="<?php echo $formData['category']['category_id']; ?>" type="hidden" />
+    <input name="category[native_id]" class = "rakuten_native_id" id="rakuten_native_id" value="<?php echo $formData['category']['category_id']; ?>" type="hidden" />
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
@@ -247,7 +247,7 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                     <?php foreach ($this->nodes as $node) {
                         if ($node['title'] == $formData['category']['node_title']) {
                             echo '<input id="node_id" name="node_id" value="'.$node['node_id'].'" type="hidden" />';
-                            echo '<input id="id_node_key" name="id_node_key" value="'.$node['id'].'" type="hidden" />';
+                            echo '<input id="id_node_key" name="id_node_key" value="'.$node['category_id'].'" type="hidden" />';
                             break;
                         }
                     } ?>
@@ -452,7 +452,7 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                                 <select id="node_title" name="category[node_title]" class="required-entry">
                                     <option style="display: none"></option>
                                     <?php foreach ($this->nodes as $node) { ?>
-                                    <option value="<?php echo $node['title'] ;?>" id_node_key = "<?php echo $node['id']; ?>" node_id="<?php echo $node['node_id']; ?>"> <?php echo $node['title'] ;?></option>
+                                    <option value="<?php echo $node['title'] ;?>" id_node_key = "<?php echo $node['category_id']; ?>" node_id="<?php echo $node['node_id']; ?>"> <?php echo $node['title'] ;?></option>
                                     <?php } ?>
                                 </select>
 

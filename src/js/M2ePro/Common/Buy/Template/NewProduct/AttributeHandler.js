@@ -100,13 +100,13 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
         }
     },
 
-    showAttributes: function(categoryId)
+    showAttributes: function(nativeId)
     {
         var self = BuyTemplateNewProductHandlerObj.attributesHandler;
 
         self.clearAttributes();
 
-        if (categoryId <= 0) {
+        if (nativeId <= 0) {
             var tr = $('buy_attr_container').appendChild(new Element('tr'));
             var td = tr.appendChild(new Element ('td'));
             var label = td.appendChild(new Element ('label')).insert(M2ePro.translator.translate('Select Category first.'));
@@ -118,7 +118,7 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
                 method : 'get',
                 asynchronous : true,
                 parameters : {
-                    category_id : categoryId
+                    native_id : nativeId
                 },
                 onSuccess: function(transport) {
                     var attributes = transport.responseText.evalJSON();

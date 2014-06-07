@@ -39,7 +39,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Tabs_Genera
 
         $this->nodes = $connRead->select()
             ->from(Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category'))
-            ->where('parent_id = ?', 0)
+            ->where('parent_category_id = ?', 0)
             ->query()
             ->fetchAll();
         !is_array($this->nodes) && $this->nodes = array();

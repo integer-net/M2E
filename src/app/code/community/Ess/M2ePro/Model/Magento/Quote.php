@@ -90,7 +90,7 @@ class Ess_M2ePro_Model_Magento_Quote
      */
     private function initializeQuote()
     {
-        $this->quote = Mage::getModel('sales/quote');
+        $this->quote = Mage::getSingleton('adminhtml/session_quote')->getQuote();
 
         $this->quote->setCheckoutMethod($this->proxyOrder->getCheckoutMethod());
         $this->quote->setStore($this->proxyOrder->getStore());
@@ -246,7 +246,6 @@ class Ess_M2ePro_Model_Magento_Quote
                 $quoteItem->setOriginalCustomPrice($item->getPrice());
                 $quoteItem->setOriginalPrice($productOriginalPrice);
                 $quoteItem->setWeight($weight);
-                $quoteItem->setNoDiscount(1);
                 $quoteItem->setGiftMessageId($quoteItemBuilder->getGiftMessageId());
                 $quoteItem->setAdditionalData($quoteItemBuilder->getAdditionalData($quoteItem));
             }

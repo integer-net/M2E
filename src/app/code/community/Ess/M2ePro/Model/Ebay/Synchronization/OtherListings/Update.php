@@ -188,7 +188,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
 
         if (count($items) <= 0) {
             foreach ($listingOtherCollection->getItems() as $listingOther) {
-                $listingOther->getChildObject()->setData('sku',new Zend_Db_Expr("''"))->save();
+                $listingOther->getChildObject()->setData('sku','')->save();
             }
             return;
         }
@@ -258,11 +258,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
                     continue;
                 }
 
-                if ($item['sku'] == '') {
-                    $listingOther->getChildObject()->setData('sku',new Zend_Db_Expr("''"))->save();
-                } else {
-                    $listingOther->getChildObject()->setData('sku',(string)$item['sku'])->save();
-                }
+                $listingOther->getChildObject()->setData('sku',(string)$item['sku'])->save();
 
                 if ($account->getChildObject()->isOtherListingsMappingEnabled()) {
                     $mappingModel->initialize($account);

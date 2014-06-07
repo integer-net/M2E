@@ -84,7 +84,7 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
             method: 'post',
             asynchronous: true,
             parameters: {
-                "parent_id": parentCategoryId,
+                "parent_category_id": parentCategoryId,
                 "marketplace_id": self.getMarketplaceId(),
                 "account_id": EbayListingCategoryChooserHandlerObj.getAccountId(),
                 "category_type": $('category_type').value

@@ -53,7 +53,6 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
 
         $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),'Save specifics to DB');
 
-        $this->clearXsdsHashes($marketplace);
         $this->saveSpecificsToDb($marketplace,$specifics);
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
@@ -78,44 +77,13 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
         return $specifics;
     }
 
-    protected function clearXsdsHashes(Ess_M2ePro_Model_Marketplace $marketplace)
-    {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-
-        $tableMarketplaces = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_marketplace');
-        $tableSpecifics = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_specific');
-
-        $nodesData = $connWrite->select()
-                               ->from($tableMarketplaces, 'nodes')
-                               ->where('marketplace_id = ?', $marketplace->getId())
-                               ->query()->fetchColumn();
-
-        $nodesData = json_decode($nodesData,true);
-
-        $marketplaceXsds = array();
-        foreach ($nodesData as $nodeData) {
-            foreach ($nodeData['xsds'] as $xsd) {
-                $marketplaceXsds[] = $connWrite->quote($xsd['hash']);
-            }
-        }
-
-        array_unique($marketplaceXsds);
-
-        if (count($marketplaceXsds) <= 0) {
-            return;
-        }
-
-        $connWrite->delete(
-            $tableSpecifics, array('xsd_hash IN ('.implode(',', $marketplaceXsds).')')
-        );
-    }
-
     protected function saveSpecificsToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $specifics)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tableSpecifics = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_specific');
+
+        $connWrite->delete($tableSpecifics,array('marketplace_id = ?' => $marketplace->getId()));
 
         if (!count($specifics)) {
             return;
@@ -125,9 +93,24 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
         $iterationsForOneStep = 1000;
         $percentsForOneStep = ($this->getPercentsInterval()/2) / (count($specifics)/$iterationsForOneStep);
 
-        foreach ($specifics as &$data) {
-
-            $connWrite->insert($tableSpecifics, $data);
+        foreach ($specifics as $data) {
+            $insertData = array(
+                'marketplace_id'     => $marketplace->getId(),
+                'specific_id'        => $data['id'],
+                'parent_specific_id' => $data['parent_id'],
+                'xsd_hash'           => $data['xsd_hash'],
+                'title'              => $data['title'],
+                'xml_tag'            => $data['xml_tag'],
+                'xpath'              => $data['xpath'],
+                'type'               => (int)$data['type'],
+                'values'             => $data['values'],
+                'recommended_values' => $data['recommended_values'],
+                'params'             => $data['params'],
+                'data_definition'    => $data['data_definition'],
+                'min_occurs'         => (int)$data['min_occurs'],
+                'max_occurs'         => (int)$data['max_occurs']
+            );
+            $connWrite->insert($tableSpecifics, $insertData);
 
             if (++$iteration % $iterationsForOneStep == 0) {
                 $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;

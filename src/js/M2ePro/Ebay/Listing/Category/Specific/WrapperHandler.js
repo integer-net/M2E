@@ -219,22 +219,18 @@ EbayListingCategorySpecificWrapperHandler = Class.create(CommonHandler, {
     lock: function()
     {
         $(this.wrapperObj.wrapperId).visible() || this.wrapperObj.lock();
-        $(this.wrapperObj.wrapperId).setStyle({height: '320px'});
 
         this.loadingMask.setStyle({visibility: 'hidden'});
         $(this.wrapperObj.wrapperId).update(
             '<div style="height: 46%"></div>' +
             '<div>'+M2ePro.translator.translate('Loading. Please wait')+' ...</div>'
         );
-
-        $('specifics_main_container').hide();
     },
 
     unlock: function()
     {
         this.wrapperObj.unlock();
         this.loadingMask.setStyle({visibility: 'visible'});
-        $('specifics_main_container').show();
     }
 
     //----------------------------------

@@ -29,7 +29,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Product extends Mage_Adminht
         $this->_headerText = Mage::helper('M2ePro')->__('Add Products To%s Listing "%s" ',
                                                         $componentName,
                                                         $this->escapeHtml($listingData['title']));
-
         //------------------------------
 
         // Set buttons actions

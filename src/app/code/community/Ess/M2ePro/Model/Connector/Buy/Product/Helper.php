@@ -424,7 +424,6 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Helper
 
         if (isset($nativeRequestData['condition_note'])) {
             $dataForUpdate['condition_note'] = (string)$nativeRequestData['condition_note'];
-            $dataForUpdate['condition_note'] == '' && $dataForUpdate['condition_note'] = new Zend_Db_Expr("''");
         }
 
         if (isset($nativeRequestData['shipping_standard_rate'])) {

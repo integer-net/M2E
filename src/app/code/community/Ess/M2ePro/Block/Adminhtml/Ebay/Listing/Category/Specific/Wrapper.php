@@ -170,7 +170,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific_Wrapper extends 
 
         EbayListingCategorySpecificWrapperHandlerObj = new EbayListingCategorySpecificWrapperHandler(
             '{$this->getData('current_category')}',
-            new AreaWrapper('specifics_main_container')
+            new AreaWrapper('specifics_main_container_wrapper')
         );
 
     });

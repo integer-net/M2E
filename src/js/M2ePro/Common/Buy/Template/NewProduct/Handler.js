@@ -26,8 +26,8 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
         self.setValidationCheckRepetitionValue('M2ePro-new-sku-template-title',
                                                 M2ePro.translator.translate('The specified title is already used for another New SKU Template.'),
-                                                'Buy_Template_NewProduct', 'title', 'id',
-                                                M2ePro.formData.category.id);
+                                                'Buy_Template_NewProduct', 'title', 'category_id',
+                                                M2ePro.formData.category.category_id);
 
         self.initPopUp('search_category',850,550, M2ePro.translator.translate('Search For Category'));
         self.initPopUp('browse_category',600,500, M2ePro.translator.translate('Search For Category'));
@@ -120,7 +120,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
     checkAttributesReady: function()
     {
-        if ($('rakuten_category_id').value == 0) {
+        if ($('rakuten_native_id').value == 0) {
             alert(M2ePro.translator.translate('Select Category first.'));
             buyTemplateNewProductEditTabsJsTabs.showTabContent($('buyTemplateNewProductEditTabs_general'));
         }
@@ -185,10 +185,10 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         selectEl.appendChild(new Element('option',{'value': 'empty','style': 'display: none'}));
 
         self.categories.each(function(category) {
-            category.parent_id === self.parentId && categories.push(category)
+            category.parent_category_id === self.parentId && categories.push(category)
         });
 
-        if (categories.length == 0 || self.getCategoryInfo('id',self.parentId).is_listable == 1) {
+        if (categories.length == 0 || self.getCategoryInfo('category_id',self.parentId).is_listable == 1) {
             self.confirmButton.show();
             if (categories.length == 0) {
                 selectEl.hide();
@@ -197,7 +197,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         }
 
         categories.each(function(category) {
-            selectEl.appendChild(new Element('option',{'value': category.id}))
+            selectEl.appendChild(new Element('option',{'value': category.category_id}))
                 .update(category.title);
         });
 
@@ -236,7 +236,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         this.categoriesContainer.hide();
         this.confirmButton.hide();
 
-        var categoryInfo = this.getCategoryInfo('id',this.parentId);
+        var categoryInfo = this.getCategoryInfo('category_id',this.parentId);
         var categoryPath = categoryInfo.path.replace(/->/g,' > ');
 
         this.categoryPathHiddenInput.value = categoryPath;
@@ -253,8 +253,8 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         this.showSpanWithCategoryPath(categoryPath);
 
         // -- render Attributes
-        $('rakuten_category_id').value = categoryInfo.category_id;
-        self.attributesHandler.showAttributes(categoryInfo.category_id);
+        $('rakuten_native_id').value = categoryInfo.native_id;
+        self.attributesHandler.showAttributes(categoryInfo.native_id);
     },
 
     // ---------------------------------
@@ -268,7 +268,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         this.categoriesContainer.show();
         this.searchCategoryButton.parentNode.parentNode.show();
         this.categoryPathHiddenInput.value = '';
-        $('rakuten_category_id').value = '';
+        $('rakuten_native_id').value = '';
     },
 
     //----------------------------------
@@ -289,7 +289,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         self.attribute_sets_confirm();
 
         // -- render Attributes
-        BuyTemplateNewProductHandlerObj.attributesHandler.showAttributes($('rakuten_category_id').value);
+        BuyTemplateNewProductHandlerObj.attributesHandler.showAttributes($('rakuten_native_id').value);
     },
 
     //----------------------------------
@@ -378,8 +378,8 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         this.showSpanWithCategoryPath(categoryPath);
 
         // -- render Attributes
-        $('rakuten_category_id').value = categoryInfo.category_id;
-        BuyTemplateNewProductHandlerObj.attributesHandler.showAttributes(categoryInfo.category_id);
+        $('rakuten_native_id').value = categoryInfo.native_id;
+        BuyTemplateNewProductHandlerObj.attributesHandler.showAttributes(categoryInfo.native_id);
         this.resetSearchClick();
     },
 

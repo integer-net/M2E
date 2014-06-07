@@ -195,13 +195,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
 
         foreach ($savedAttributes as $epid => $savedAttribute) {
 
-            /** @var Ess_M2ePro_Model_Ebay_Motor_Specific $savedAttribute */
-
             $compatibilityList = array();
 
             if($savedAttribute != null) {
 
-                $compatibilityData = $savedAttribute->getCompatibilityData();
+                $compatibilityData = $this->buildSpecificsCompatibilityData($savedAttribute);
 
                 foreach ($compatibilityData as $key => $value) {
 
@@ -234,9 +232,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
         if(count($emptySavedAttributes) > 0) {
             $isSingleEpid = count($emptySavedAttributes) > 1;
             $msg = 'The '.implode(', ', $emptySavedAttributes).' ePID'.($isSingleEpid ? 's' : '');
-            $msg .= 'specified in the Compatibility Attribute';
-            $msg .= '<br/>were dropped out of the listing because'.($isSingleEpid ? 'it was' : 'they were');
-            $msg .= 'deleted from eBay Catalog of Compatible Vehicles.';
+            $msg .= ' specified in the Compatibility Attribute';
+            $msg .= ' were dropped out of the listing because '.($isSingleEpid ? 'it was' : 'they were');
+            $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';
             $this->addWarningMessage($msg);
         }
 
@@ -268,6 +266,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
         return $attributes;
     }
 
+    // ----------------------------------------
+
     private function getSavedMotorsSpecificsAttributes()
     {
         $attributeCode  = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
@@ -280,20 +280,43 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
             return array();
         }
 
+        $attributes = array();
+
         $epids = explode(',', $attributeValue);
 
-        $specifics = Mage::getModel('M2ePro/Ebay_Motor_Specific')
-                        ->getCollection()
-                        ->addFieldToFilter('epid', array('in' => $epids))
-                        ->getItems();
-
-        foreach($epids as $epid){
-            if(empty($specifics[$epid])){
-                $specifics[$epid] = null;
-            }
+        foreach ($epids as $epid) {
+            $attributes[$epid] = NULL;
         }
 
-        return $specifics;
+        $attributesSelect = Mage::getResourceModel('core/config')->getReadConnection()
+                               ->select()
+                               ->from(Mage::getSingleton('core/resource')
+                                          ->getTableName('m2epro_ebay_dictionary_motor_specific'))
+                               ->where('`epid` IN (?)', $epids);
+
+        foreach ($attributesSelect->query()->fetchAll() as $attributeRow) {
+            $attributes[$attributeRow['epid']] = $attributeRow;
+        }
+
+        return $attributes;
+    }
+
+    private function buildSpecificsCompatibilityData($resource)
+    {
+        $compatibilityData = array(
+            'Make'  => $resource['make'],
+            'Model' => $resource['model'],
+            'Year'  => $resource['year']
+        );
+
+        if ((int)$resource['product_type'] == Ess_M2ePro_Helper_Component_Ebay_MotorSpecific::TYPE_VEHICLE) {
+            $compatibilityData['Trim'] = $resource['trim'];
+            $compatibilityData['Engine'] = $resource['engine'];
+        } else {
+            $compatibilityData['Submodel'] = $resource['submodel'];
+        }
+
+        return $compatibilityData;
     }
 
     // ########################################

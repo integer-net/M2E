@@ -206,7 +206,7 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
                              ->select()
                              ->from($tableCategories,array('category_id','title','is_leaf'))
                              ->where('`marketplace_id` = ?',(int)$this->getId())
-                             ->where('`parent_id` = ?',(int)$parentId)
+                             ->where('`parent_category_id` = ?',(int)$parentId)
                              ->order(array('title ASC'));
 
         $categories = Mage::getResourceModel('core/config')

@@ -188,8 +188,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
             $listingProductObj = Mage::helper('M2ePro/Component_Buy')
                                     ->getObject('Listing_Product',(int)$existingItem['listing_product_id']);
 
-            $newData['condition_note'] == '' && $newData['condition_note'] = new Zend_Db_Expr("''");
-
             $listingProductObj->addData($newData)->save();
         }
     }

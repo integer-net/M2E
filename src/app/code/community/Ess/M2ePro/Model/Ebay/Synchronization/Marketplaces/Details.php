@@ -89,7 +89,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
         //-----------------------
         $connWrite->delete($tableMarketplaces, array('marketplace_id = ?' => $marketplace->getId()));
 
-        $data = array(
+        $insertData = array(
             'marketplace_id'               => $marketplace->getId(),
             'client_categories_version'    => $details['categories_version'],
             'server_categories_version'    => $details['categories_version'],
@@ -106,7 +106,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
         );
 
         unset($details['categories_version']);
-        $connWrite->insertOnDuplicate($tableMarketplaces, $data);
+        $connWrite->insert($tableMarketplaces, $insertData);
         //-----------------------
 
         // Save shipping
@@ -114,8 +114,17 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
         $connWrite->delete($tableShipping, array('marketplace_id = ?' => $marketplace->getId()));
 
         foreach ($details['shipping'] as $data) {
-            $data['marketplace_id'] = $marketplace->getId();
-            $connWrite->insertOnDuplicate($tableShipping, $data);
+            $insertData = array(
+                'marketplace_id'   => $marketplace->getId(),
+                'ebay_id'          => $data['ebay_id'],
+                'title'            => $data['title'],
+                'category'         => $data['category'],
+                'is_flat'          => $data['is_flat'],
+                'is_calculated'    => $data['is_calculated'],
+                'is_international' => $data['is_international'],
+                'data'             => $data['data']
+            );
+            $connWrite->insert($tableShipping, $insertData);
         }
         //-----------------------
 
@@ -124,8 +133,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
         $connWrite->delete($tableShippingCategories, array('marketplace_id = ?' => $marketplace->getId()));
 
         foreach ($details['shipping_categories'] as $data) {
-            $data['marketplace_id'] = $marketplace->getId();
-            $connWrite->insertOnDuplicate($tableShippingCategories, $data);
+            $insertData = array(
+                'marketplace_id' => $marketplace->getId(),
+                'ebay_id'        => $data['ebay_id'],
+                'title'          => $data['title']
+            );
+            $connWrite->insert($tableShippingCategories, $insertData);
         }
         //-----------------------
     }
