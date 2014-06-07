@@ -71,16 +71,16 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
 
     public function clearLogAction()
     {
-        $synchTask = $this->getRequest()->getParam('synch_task');
+        $task = $this->getRequest()->getParam('task');
 
-        if (is_null($synchTask)) {
+        if (is_null($task)) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select item(s) to clear'));
             return $this->_redirect('*/*/index');
         }
 
         Mage::getModel('M2ePro/Synchronization_Log')
             ->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK)
-            ->clearMessages($synchTask);
+            ->clearMessages($task);
 
         $this->_getSession()->addSuccess(
             Mage::helper('M2ePro')->__('The synchronization task log has been successfully cleaned.')
@@ -94,23 +94,26 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
 
         $tasks = array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::TEMPLATES,
-            Ess_M2ePro_Model_Synchronization_Tasks::ORDERS,
-            Ess_M2ePro_Model_Synchronization_Tasks::FEEDBACKS
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::TEMPLATES,
+            Ess_M2ePro_Model_Synchronization_Task::ORDERS,
+            Ess_M2ePro_Model_Synchronization_Task::FEEDBACKS
         );
         if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
-            $tasks[] = Ess_M2ePro_Model_Synchronization_Tasks::OTHER_LISTINGS;
+            $tasks[] = Ess_M2ePro_Model_Synchronization_Task::OTHER_LISTINGS;
         }
-        $synchDispatcher->setTasks($tasks);
+        $dispatcher->setAllowedTasksTypes($tasks);
 
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     //------------------------
@@ -119,60 +122,76 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::TEMPLATES
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::TEMPLATES
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     public function runNowOrdersAction()
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::ORDERS
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::ORDERS
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     public function runNowOtherListingsAction()
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::OTHER_LISTINGS
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::OTHER_LISTINGS
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     public function runNowFeedbacksAction()
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::FEEDBACKS
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::FEEDBACKS
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     //#############################################

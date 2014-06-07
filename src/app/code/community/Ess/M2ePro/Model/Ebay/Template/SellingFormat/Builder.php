@@ -189,6 +189,20 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
 
         //------------------------------
 
+        if (isset($data['price_discount_map_mode'])) {
+            $prepared['price_discount_map_mode'] = (int)$data['price_discount_map_mode'];
+        }
+
+        if (isset($data['price_discount_map_attribute'])) {
+            $prepared['price_discount_map_attribute'] = $data['price_discount_map_attribute'];
+        }
+
+        if (isset($data['price_discount_map_exposure_type'])) {
+            $prepared['price_discount_map_exposure_type'] = (int)$data['price_discount_map_exposure_type'];
+        }
+
+        //------------------------------
+
         if (isset($data['best_offer_mode'])) {
             $prepared['best_offer_mode'] = (int)$data['best_offer_mode'];
         }
@@ -217,7 +231,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
             $prepared['best_offer_reject_attribute'] = $data['best_offer_reject_attribute'];
         }
 
-        if (isset($data['charity_id'], $data['charity_name'], $data['charity_percentage'])) {
+        if (isset($data['charity_id'], $data['charity_name'], $data['charity_percentage'])
+            && $prepared['is_custom_template'] == 1) {
             $src = array(
                 'id'            => $data['charity_id'],
                 'name'          => $data['charity_name'],

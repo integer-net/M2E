@@ -63,4 +63,37 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationCommonController
     }
 
     //#############################################
+
+    public function createLicenseAction()
+    {
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
+
+        if ($licenseHelper->getKey()) {
+            return $this->getResponse()->setBody(json_encode(array('result' => true)));
+        }
+
+        $keys = array(
+            'email',
+            'firstname',
+            'lastname',
+            'country',
+            'city',
+            'postal_code',
+        );
+
+        $post = $this->getRequest()->getPost();
+        foreach ($keys as $key) {
+            (!isset($post[$key]) || !$post[$key]) && $post[$key] = 'undefined';
+        }
+
+        $licenseResult = $licenseHelper->obtainRecord($post['email'],
+                                                      $post['firstname'],$post['lastname'],
+                                                      $post['country'],$post['city'],$post['postal_code']
+        );
+
+        return $this->getResponse()->setBody(json_encode(array('result' => $licenseResult)));
+    }
+
+    //#############################################
 }

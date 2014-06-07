@@ -85,9 +85,9 @@ class Ess_M2ePro_Adminhtml_GeneralController
 
     public function synchCheckStateAction()
     {
-        $lockItemModel = Mage::getModel('M2ePro/Synchronization_LockItem');
+        $lockItem = Mage::getModel('M2ePro/Synchronization_LockItem');
 
-        if ($lockItemModel->isExist()) {
+        if ($lockItem->isExist()) {
             return $this->getResponse()->setBody('executing');
         }
 
@@ -96,22 +96,26 @@ class Ess_M2ePro_Adminhtml_GeneralController
 
     public function synchGetLastResultAction()
     {
-        $logsModel = Mage::getModel('M2ePro/Synchronization_Log');
-        $runsModel = Mage::getModel('M2ePro/Synchronization_Run');
+        $operationHistoryCollection = Mage::getModel('M2ePro/Synchronization_OperationHistory')->getCollection();
+        $operationHistoryCollection->addFieldToFilter('nick', 'synchronization');
+        $operationHistoryCollection->setOrder('id', 'DESC');
+        $operationHistoryCollection->getSelect()->limit(1);
 
-        $tempCollection = $logsModel->getCollection();
-        $tempCollection->addFieldToFilter('synchronization_run_id', (int)$runsModel->getLastId());
-        $tempCollection->addFieldToFilter('type', array('in' => array(Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR)));
+        $operationHistory = $operationHistoryCollection->getFirstItem();
 
-        if ($tempCollection->getSize() > 0) {
+        $logCollection = Mage::getModel('M2ePro/Synchronization_Log')->getCollection();
+        $logCollection->addFieldToFilter('operation_history_id', (int)$operationHistory->getId());
+        $logCollection->addFieldToFilter('type', array('in' => array(Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR)));
+
+        if ($logCollection->getSize() > 0) {
             return $this->getResponse()->setBody('error');
         }
 
-        $tempCollection = $logsModel->getCollection();
-        $tempCollection->addFieldToFilter('synchronization_run_id', (int)$runsModel->getLastId());
-        $tempCollection->addFieldToFilter('type', array('in' => array(Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING)));
+        $logCollection = Mage::getModel('M2ePro/Synchronization_Log')->getCollection();
+        $logCollection->addFieldToFilter('operation_history_id', (int)$operationHistory->getId());
+        $logCollection->addFieldToFilter('type', array('in' => array(Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING)));
 
-        if ($tempCollection->getSize() > 0) {
+        if ($logCollection->getSize() > 0) {
             return $this->getResponse()->setBody('warning');
         }
 
@@ -120,23 +124,17 @@ class Ess_M2ePro_Adminhtml_GeneralController
 
     public function synchGetExecutingInfoAction()
     {
-        $response = array(
-            'mode' => 'executing'
-        );
+        $response = array();
+        $lockItem = Mage::getModel('M2ePro/Synchronization_LockItem');
 
-        $lockItemModel = Mage::getModel('M2ePro/Synchronization_LockItem');
-
-        if (!$lockItemModel->isExist()) {
+        if (!$lockItem->isExist()) {
             $response['mode'] = 'inactive';
-            return $this->getResponse()->setBody(json_encode($response));
+        } else {
+            $response['mode'] = 'executing';
+            $response['title'] = $lockItem->getTitle();
+            $response['percents'] = $lockItem->getPercents();
+            $response['status'] = $lockItem->getStatus();
         }
-
-        $response['title'] = $lockItemModel->getContentData('info_title');
-
-        $response['percents'] = (int)$lockItemModel->getContentData('info_percents');
-        $response['percents'] < 0 && $response['percents'] = 0;
-
-        $response['status'] = $lockItemModel->getContentData('info_status');
 
         return $this->getResponse()->setBody(json_encode($response));
     }

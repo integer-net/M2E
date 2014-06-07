@@ -40,7 +40,7 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Settings_Form extends Ess_M2ePro_
     protected function _prepareLayout()
     {
         parent::_prepareLayout();
-        $this->getLayout()->getBlock('head')->addJs('M2ePro/Configuration/LicenseHandler.js');
+        $this->getLayout()->getBlock('head')->addJs('M2ePro/Configuration/SettingsHandler.js');
     }
 
     protected function _beforeToHtml()
@@ -65,6 +65,15 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Settings_Form extends Ess_M2ePro_
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('restore_block_notices',$buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $this->forceQtyMode = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/product/force_qty/','mode'
+        );
+        $this->forceQtyValue = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/product/force_qty/','value'
+        );
         //-------------------------------
 
         //-------------------------------

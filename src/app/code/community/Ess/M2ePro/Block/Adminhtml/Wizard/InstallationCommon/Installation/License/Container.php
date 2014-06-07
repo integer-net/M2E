@@ -16,7 +16,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation_License_
         $this->setId('license');
         $this->_blockGroup = 'M2ePro';
         $this->_controller = 'adminhtml';
-        $this->_mode = 'configuration_license';
+        $this->_mode = 'wizard_installationCommon_installation_license';
         //------------------------------
 
         // Set header text
@@ -40,8 +40,9 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation_License_
         ));
 
         $this->_addButton('close', array(
+            'id' => 'installation_common_license_complete_this_step',
             'label'     => Mage::helper('M2ePro')->__('Complete This Step'),
-            'onclick'   => 'LicenseHandlerObj.completeStep();',
+            'onclick'   => '',
             'class'     => 'close'
         ));
 

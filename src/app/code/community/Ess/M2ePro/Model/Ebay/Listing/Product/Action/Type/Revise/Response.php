@@ -145,7 +145,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
         $params = $this->getParams();
 
         if (!isset($params['replaced_action']) ||
-            $params['replaced_action'] != Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP) {
+            $params['replaced_action'] != Ess_M2ePro_Model_Listing_Product::ACTION_STOP) {
             return $data;
         }
 

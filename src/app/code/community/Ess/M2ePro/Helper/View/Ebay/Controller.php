@@ -10,15 +10,20 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
 
     public function addMessages(Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        /** @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        !$wizardHelper->isFinished(Ess_M2ePro_Helper_View_Ebay::WIZARD_INSTALLATION_NICK) ||
+        !Mage::helper('M2ePro/Module_Cron')->isReadyToRun() ||
+        !Mage::helper('M2ePro/Module_Cron')->isLastRunMoreThan(1,true) ||
         Mage::helper('M2ePro/Magento')->isDeveloper() ||
         $this->addCronNotificationMessage($controller);
 
-        if ($wizardHelper->isFinished(Ess_M2ePro_Helper_View_Ebay::WIZARD_INSTALLATION_NICK)) {
+        if (Mage::helper('M2ePro/View_Ebay')->isInstallationWizardFinished()) {
+
+            $feedbacksNotificationMode = Mage::helper('M2ePro/Module')->getConfig()
+                                        ->getGroupValue('/view/ebay/feedbacks/notification/', 'mode');
+
+            !$feedbacksNotificationMode ||
+            !$this->haveNewNegativeFeedbacks() ||
             $this->addFeedbackNotificationMessage($controller);
+
             $this->addTokenExpirationDateNotificationMessage($controller);
             $this->addMarketplacesCategoriesVersionNotificationMessage($controller);
         }
@@ -28,49 +33,34 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
 
     private function addCronNotificationMessage(Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        if (Mage::getModel('M2ePro/Cron')->isShowNotification()) {
+        $url = 'http://support.m2epro.com/knowledgebase/articles/';
+        $url .= '334421-why-automatic-synchronization-is-needed-for-ebay-i';
 
-            $allowedInactiveHours = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-                '/view/ebay/cron/notification/', 'max_inactive_hours'
-            );
+        $startLinkArticle = '<a href="'.$url.'" target="_blank">';
+        $endLink = '</a>';
 
-            $url = 'http://support.m2epro.com/knowledgebase/articles/42054-how-to-set-up-cron-job-for-m2e-pro-';
-            $startLinkArticle = '<a href="'.$url.'" target="_blank">';
-            $endLink = '</a>';
+        $message = 'Attention! AUTOMATIC synchronization is not running at the moment.';
+        $message .= '<br/>Please check this %sarticle%s to learn why it is required.';
+        $message = $this->__(
+            $message, $startLinkArticle, $endLink
+        );
 
-            $message = 'Attention! Last eBay AUTOMATIC synchronization was performed by cron ';
-            $message .= 'more than %s hours ago. You should set up cron job, otherwise no automatic synchronization ';
-            $message .= 'will be performed. <br/>You can check this %sarticle%s to get how to set cron job.';
-            $message = Mage::helper('M2ePro')->__(
-                $message, $allowedInactiveHours, $startLinkArticle, $endLink
-            );
-
-            $controller->getSession()->addNotice($message);
-            return true;
-        }
-
-        return false;
+        $controller->getSession()->addNotice($message);
     }
-
-    //-----------------------------------------
 
     private function addFeedbackNotificationMessage(Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        if (Mage::getModel('M2ePro/Ebay_Feedback')->haveNew(true)) {
+        $startLink = '<a href="'.$controller->getUrl('*/adminhtml_ebay_feedback/index').'" target="_blank">';
+        $endLink = '</a>';
 
-            $startLink = '<a href="'.$controller->getUrl('*/adminhtml_ebay_feedback/index').'" target="_blank">';
-            $endLink = '</a>';
+        // ->__('New buyer negative feedback was received. Go to the %sfeedback page%s.')
+        $message = 'New buyer negative feedback was received. Go to the %sfeedback page%s.';
+        $message = $this->__($message, $startLink, $endLink);
 
-            // ->__('New buyer negative feedback was received. Go to the %sfeedback page%s.')
-            $message = 'New buyer negative feedback was received. Go to the %sfeedback page%s.';
-            $message = Mage::helper('M2ePro')->__($message, $startLink, $endLink);
-
-            $controller->getSession()->addNotice($message);
-            return true;
-        }
-
-        return false;
+        $controller->getSession()->addNotice($message);
     }
+
+    //#############################################
 
     private function addTokenExpirationDateNotificationMessage(
                             Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
@@ -83,7 +73,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
 
             $tokenExpirationMessages = array();
 
-            /* @var $tempCollection Mage_Core_Model_Resource_Db_Collection_Abstract */
+            /* @var $tempCollection Mage_Core_Model_Mysql4_Collection_Abstract */
             $tempCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account');
 
             $tempCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
@@ -98,7 +88,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
                 $tokenExpirationTimeStamp = strtotime($accountData['token_expired_date']);
 
                 if ($tokenExpirationTimeStamp < $currentTimeStamp) {
-                    $tempMessage = Mage::helper('M2ePro')->__(
+                    $tempMessage = $this->__(
                         'The token for "%s" eBay Account has been expired.
                         <br>
                         Please, go to %s > Configuration > eBay Account > <a href="%s" target="_blank">General TAB</a>,
@@ -118,7 +108,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
                 }
 
                 if (($currentTimeStamp + 60*60*24*10) >= $tokenExpirationTimeStamp) {
-                    $tempMessage = Mage::helper('M2ePro')->__(
+                    $tempMessage = $this->__(
                     'Attention! The token for "%s" eBay Account will be expired soon ( %s ).
                     <br>
                     Please, go to %s > Configuration > eBay Account > <a href="%s" target="_blank">General TAB</a>,
@@ -150,11 +140,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
             $method = 'add' . ucfirst($messageData['type']);
             $controller->getSession()->$method($messageData['message']);
         }
-
-        return true;
     }
-
-    //#############################################
 
     private function addMarketplacesCategoriesVersionNotificationMessage(
                             Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
@@ -199,7 +185,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
                     Please, go to %s > Configuration >
                     <a href="%s" target="_blank">eBay Sites</a> and click the Save And Update button.';
 
-        $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
+        $controller->getSession()->addNotice($this->__(
             $message,
             implode(', ',$outdatedMarketplaces),
             Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
@@ -208,6 +194,32 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
                 array('tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_MARKETPLACE)
             )
         ));
+    }
+
+    //#############################################
+
+    private function haveNewNegativeFeedbacks()
+    {
+        $config = Mage::helper('M2ePro/Module')->getConfig();
+        $configGroup = '/view/ebay/feedbacks/notification/';
+
+        $lastCheckDate = $config->getGroupValue($configGroup, 'last_check');
+
+        if (is_null($lastCheckDate)) {
+            $config->setGroupValue($configGroup, 'last_check', Mage::helper('M2ePro')->getCurrentGmtDate());
+            return false;
+        }
+
+        $collection = Mage::getModel('M2ePro/Ebay_Feedback')->getCollection()
+                            ->addFieldToFilter('buyer_feedback_date', array('gt' => $lastCheckDate))
+                            ->addFieldToFilter('buyer_feedback_type', Ess_M2ePro_Model_Ebay_Feedback::TYPE_NEGATIVE);
+
+        if ($collection->getSize() > 0) {
+            $config->setGroupValue($configGroup, 'last_check', Mage::helper('M2ePro')->getCurrentGmtDate());
+            return true;
+        }
+
+        return false;
     }
 
     //#############################################

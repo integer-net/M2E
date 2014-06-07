@@ -20,6 +20,16 @@ class Ess_M2ePro_Adminhtml_Configuration_SettingsController
             (int)$this->getRequest()->getParam('block_notices_show')
         );
 
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/product/force_qty/', 'mode',
+            (int)$this->getRequest()->getParam('force_qty_mode')
+        );
+
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/product/force_qty/', 'value',
+            (int)$this->getRequest()->getParam('force_qty_value')
+        );
+
         Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
             '/defaults/inspector/', 'mode',
             (int)$this->getRequest()->getParam('inspector_mode')
@@ -37,7 +47,7 @@ class Ess_M2ePro_Adminhtml_Configuration_SettingsController
     public function restoreBlockNoticesAction()
     {
         foreach ($_COOKIE as $name => $value) {
-            strpos($name,'block_notice_') !== false && setcookie($name, '', 0, '/');
+            strpos($name,'m2e_bn_') !== false && setcookie($name, '', 0, '/');
         }
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('All help blocks were restored.'));

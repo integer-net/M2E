@@ -32,7 +32,7 @@ class Ess_M2ePro_Helper_Module_Database_RepairTables extends Mage_Core_Helper_Ab
             }
         }
 
-        return $brokenTables = array(
+        return array(
             'parent'      => $brokenParentTables,
             'children'    => $brokenChildrenTables,
             'total_count' => $totalBrokenTables
@@ -94,7 +94,7 @@ class Ess_M2ePro_Helper_Module_Database_RepairTables extends Mage_Core_Helper_Ab
         return NULL;
     }
 
-    private function getBrokenRecordsInfo($table, $returnOnlyCount = false)
+    public function getBrokenRecordsInfo($table, $returnOnlyCount = false)
     {
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');

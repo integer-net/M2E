@@ -36,8 +36,6 @@ class Ess_M2ePro_Model_Buy_Search_Manual
         return $result;
     }
 
-    // ########################################
-
     public function processResponse(Ess_M2ePro_Model_Listing_Product $listingProduct, $result, $params = array())
     {
         Mage::helper('M2ePro/Data_Global')->setValue('temp_buy_manual_search_result', $result);

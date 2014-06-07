@@ -24,11 +24,21 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_License_Information extends Ma
 
     protected function _beforeToHtml()
     {
-        $this->licenseKey = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro/Module_License')->getKey());
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
 
-        $this->licenseDomain = Mage::helper('M2ePro/Module_License')->getDomain();
-        $this->licenseIp = Mage::helper('M2ePro/Module_License')->getIp();
-        $this->licenseDirectory = Mage::helper('M2ePro/Module_License')->getDirectory();
+        $this->licenseKey = Mage::helper('M2ePro')->escapeHtml($licenseHelper->getKey());
+
+        $this->licenseData = array(
+            'domain' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getDomain()),
+            'ip' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getIp()),
+            'directory' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getDirectory()),
+            'valid' => array(
+                'domain' => $licenseHelper->isValidDomain(),
+                'ip' => $licenseHelper->isValidIp(),
+                'directory' => $licenseHelper->isValidDirectory()
+            )
+        );
 
         return parent::_beforeToHtml();
     }

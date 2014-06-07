@@ -6,10 +6,12 @@
 
 class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 {
+    // ##########################################################
+
     /** @var $order Ess_M2ePro_Model_Ebay_Order */
     protected $order = NULL;
 
-    // ########################################
+    // ##########################################################
 
     public function getCheckoutMethod()
     {
@@ -21,14 +23,15 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         return self::CHECKOUT_GUEST;
     }
 
-    // ########################################
+    // ##########################################################
 
     public function getBuyerEmail()
     {
-        return $this->order->getBuyerEmail();
+        $addressData = $this->order->getShippingAddress()->getRawData();
+        return $addressData['email'];
     }
 
-    // ########################################
+    // ##########################################################
 
     public function getCustomer()
     {
@@ -155,18 +158,20 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 
     public function getPaymentTransactions()
     {
-        $transactions = array();
+        /** @var Ess_M2ePro_Model_Ebay_Order_ExternalTransaction[] $externalTransactions */
+        $externalTransactions = $this->order->getExternalTransactionsCollection()->getItems();
 
-        foreach ($this->order->getExternalTransactionsCollection() as $externalTransaction) {
-            $transactions[] = array(
-                'transaction_id'   => $externalTransaction->getData('transaction_id'),
-                'fee'              => $this->convertPrice((float)$externalTransaction->getData('fee')),
-                'sum'              => $this->convertPrice((float)$externalTransaction->getData('sum')),
-                'transaction_date' => $externalTransaction->getData('transaction_date')
+        $paymentTransactions = array();
+        foreach ($externalTransactions as $externalTransaction) {
+            $paymentTransactions[] = array(
+                'transaction_id'   => $externalTransaction->getTransactionId(),
+                'sum'              => $this->convertPrice($externalTransaction->getSum()),
+                'fee'              => $this->convertPrice($externalTransaction->getFee()),
+                'transaction_date' => $externalTransaction->getTransactionDate(),
             );
         }
 
-        return $transactions;
+        return $paymentTransactions;
     }
 
     // ########################################
@@ -174,7 +179,7 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
     public function getShippingData()
     {
         return array(
-            'shipping_method' => $this->order->getShippingMethod(),
+            'shipping_method' => $this->order->getShippingService(),
             'shipping_price'  => $this->getBaseShippingPrice(),
             'carrier_title'   => Mage::helper('M2ePro')->__('eBay Shipping')
         );
@@ -182,7 +187,12 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 
     protected function getShippingPrice()
     {
-        $price = $this->order->getShippingPrice();
+        if ($this->order->isUseGlobalShippingProgram()) {
+            $globalShippingDetails = $this->order->getGlobalShippingDetails();
+            $price = $globalShippingDetails['service_details']['price'];
+        } else {
+            $price = $this->order->getShippingPrice();
+        }
 
         if ($this->isTaxModeNone() && !$this->isShippingPriceIncludesTax()) {
             $taxAmount = Mage::getSingleton('tax/calculation')
@@ -204,9 +214,9 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             $comments[] = '<b>'.Mage::helper('M2ePro')->__('Global Shipping Program is used for this Order').'</b><br />';
         }
 
-        if ($this->order->getCheckoutBuyerMessage() != '') {
+        if ($this->order->getBuyerMessage() != '') {
             $comment = '<b>' . Mage::helper('M2ePro')->__('Checkout Message From Buyer') . ': </b>';
-            $comment .= $this->order->getCheckoutBuyerMessage() . '<br />';
+            $comment .= $this->order->getBuyerMessage() . '<br />';
 
             $comments[] = $comment;
         }

@@ -147,11 +147,11 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct extends Ess_M2ePro_Model_Componen
     public function getSource(Ess_M2ePro_Model_Buy_Listing_Product $listingProduct)
     {
         return Mage::getModel(
-                              'M2ePro/Buy_Template_NewProduct_Source',
-                              array(
-                                    $listingProduct,
-                                    $this
-                              )
+            'M2ePro/Buy_Template_NewProduct_Source',
+            array(
+                $listingProduct,
+                $this
+            )
         );
     }
 

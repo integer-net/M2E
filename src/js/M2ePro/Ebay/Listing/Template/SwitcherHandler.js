@@ -364,52 +364,59 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
             '/>' +
             '</div>';
 
-        Dialog._openDialog(template.innerHTML, {
-            draggable: true,
-            resizable: true,
-            closable: true,
-            className: "magento",
-            title: M2ePro.translator.translate('Save as New Policy'),
-            width: 400,
-            height: 80,
-            zIndex: 2100,
-            recenterAuto: false,
-            hideEffect: Element.hide,
-            showEffect: Element.show,
-            id: "save-template",
-            ok: function() {
-                if (!Validation.validate($('template_title'))) {
-                    return false;
+        var me = this;
+        if(!me.isCreatedDialog) {
+            me.isCreatedDialog = true;
+            Dialog._openDialog(template.innerHTML, {
+                draggable: true,
+                resizable: true,
+                closable: true,
+                className: "magento",
+                title: M2ePro.translator.translate('Save as New Policy'),
+                width: 400,
+                height: 80,
+                zIndex: 2100,
+                recenterAuto: false,
+                destroyOnClose: true,
+                hideEffect: Element.hide,
+                showEffect: Element.show,
+                id: "save-template",
+                ok: function() {
+                    if (!Validation.validate($('template_title'))) {
+                        return false;
+                    }
+
+                    $$('input[name="'+templateNick+'[id]"]')[0].value = '';
+                    $$('input[name="'+templateNick+'[is_custom_template]"]')[0].value = 0;
+                    $$('input[name="'+templateNick+'[title]"]')[0].value = $('template_title').value;
+
+                    $('edit_form').request({
+                        method: 'post',
+                        asynchronous: true,
+                        parameters: {
+                            nick : templateNick
+                        },
+                        onSuccess: function(transport) {
+                            var response = transport.responseText.evalJSON();
+
+                            response.each(function(template) {
+                                EbayListingTemplateSwitcherHandlerObj.addToSwitcher(template.nick, template.id, template.title);
+                                EbayListingTemplateSwitcherHandlerObj.clearContent(template.nick);
+                                EbayListingTemplateSwitcherHandlerObj.updateButtonsVisibility(template.nick);
+                                EbayListingTemplateSwitcherHandlerObj.updateEditVisibility(template.nick);
+                                EbayListingTemplateSwitcherHandlerObj.updateTemplateLabelVisibility(template.nick);
+                            });
+                        }.bind(this)
+                    });
+
+                    return true;
+                }.bind(this),
+                cancel: function() {},
+                onClose: function() {
+                    me.isCreatedDialog = false;
                 }
-
-                $$('input[name="'+templateNick+'[id]"]')[0].value = '';
-                $$('input[name="'+templateNick+'[is_custom_template]"]')[0].value = 0;
-                $$('input[name="'+templateNick+'[title]"]')[0].value = $('template_title').value;
-
-                $('edit_form').request({
-                    method: 'post',
-                    asynchronous: true,
-                    parameters: {
-                        nick : templateNick
-                    },
-                    onSuccess: function(transport) {
-                        var response = transport.responseText.evalJSON();
-
-                        response.each(function(template) {
-                            EbayListingTemplateSwitcherHandlerObj.addToSwitcher(template.nick, template.id, template.title);
-                            EbayListingTemplateSwitcherHandlerObj.clearContent(template.nick);
-                            EbayListingTemplateSwitcherHandlerObj.updateButtonsVisibility(template.nick);
-                            EbayListingTemplateSwitcherHandlerObj.updateEditVisibility(template.nick);
-                            EbayListingTemplateSwitcherHandlerObj.updateTemplateLabelVisibility(template.nick);
-                        });
-                    }.bind(this)
-                });
-
-                return true;
-            }.bind(this),
-            cancel: function() {},
-            onClose: function() {}
-        });
+            });
+        }
     },
 
     afterCustomSaveAsTemplate: function(templateNick, templateId, templateTitle)

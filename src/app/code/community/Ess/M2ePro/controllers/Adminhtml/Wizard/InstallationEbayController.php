@@ -227,7 +227,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
 
         if (!Mage::helper('M2ePro/Module_License')->getKey()) {
 
-            $licenseResult = Mage::helper('M2ePro/Module_License')->obtainFreeRecord(
+            $licenseResult = Mage::helper('M2ePro/Module_License')->obtainRecord(
                 $post['email'],$post['firstname'],$post['lastname'],
                 $post['country'],$post['city'],$post['postal_code']
             );
@@ -276,6 +276,8 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Token is not defined'));
             return $this->_redirect('*/*/installation');
         }
+
+        Mage::helper('M2ePro/Module_License')->setTrial(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
         $accountMode = $this->getRequest()->getParam('mode');
 

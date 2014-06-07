@@ -760,13 +760,13 @@ HTML;
         $string = '';
 
         switch ((int)$actionRows['initiator']) {
-            case Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN:
+            case Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN:
                 $string = '';
                 break;
-            case Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER:
+            case Ess_M2ePro_Helper_Data::INITIATOR_USER:
                 $string = Mage::helper('M2ePro')->__('Manual');
                 break;
-            case Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION:
+            case Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION:
                 $string = Mage::helper('M2ePro')->__('Automatic');
                 break;
         }

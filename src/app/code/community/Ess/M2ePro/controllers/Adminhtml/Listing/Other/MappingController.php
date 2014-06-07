@@ -44,7 +44,7 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MappingController
             $componentMode,'Listing_Other',$productOtherId
         );
 
-        $productOtherInstance->mapProduct($productId, Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER);
+        $productOtherInstance->mapProduct($productId, Ess_M2ePro_Helper_Data::INITIATOR_USER);
 
         return $this->getResponse()->setBody('0');
     }
@@ -110,7 +110,7 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MappingController
                 continue;
             }
 
-            $listingOtherProductInstance->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER);
+            $listingOtherProductInstance->unmapProduct(Ess_M2ePro_Helper_Data::INITIATOR_USER);
         }
 
         return $this->getResponse()->setBody('1');

@@ -37,7 +37,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table extends Mage_Ad
         $url = Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl();
         $this->_addButton('back', array(
             'label'     => Mage::helper('M2ePro')->__('Back'),
-            'onclick'   => 'setLocation(\''.$url.'\')',
+            'onclick'   => "window.open('{$url}','_blank')",
             'class'     => 'back'
         ));
         //------------------------------

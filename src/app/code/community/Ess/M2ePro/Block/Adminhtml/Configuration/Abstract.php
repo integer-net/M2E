@@ -13,7 +13,7 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Abstract extends Mage_Adminhtml_B
         //-------------------------------
         $url = Mage::helper('M2ePro/View_Development')->getPageUrl();
         $data = array(
-            'label'   => Mage::helper('M2ePro')->__('Development'),
+            'label'   => Mage::helper('M2ePro')->__('Control Panel'),
             'onclick' => 'window.open(\'' . $url . '\')',
             'class'   => 'development button_link',
             'style'   => 'display: none;'
@@ -46,7 +46,6 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Abstract extends Mage_Adminhtml_B
         $this->getLayout()->getBlock('head')->addJs('M2ePro/Plugin/BlockNotice.js');
 
         $this->getLayout()->getBlock('head')->addJs('M2ePro/Initialization.js');
-        $this->getLayout()->getBlock('head')->addJs('M2ePro/Configuration/General.js');
 
         $this->getLayout()->getBlock('head')->addCss('M2ePro/css/main.css');
         $this->getLayout()->getBlock('head')->addCss('M2ePro/css/Plugin/BlockNotice.css');

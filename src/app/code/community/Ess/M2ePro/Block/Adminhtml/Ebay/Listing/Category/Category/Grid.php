@@ -36,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Category_Grid extends Ess
 
     protected function _prepareCollection()
     {
-        /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
+        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::getModel('catalog/category')->getCollection();
         $collection->addAttributeToSelect('name');
 

@@ -62,7 +62,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Synchronization_Log extends Mage_Adminht
         ));
         //------------------------------
 
-        if (!is_null($this->getRequest()->getParam('synch_task'))) {
+        if (!is_null($this->getRequest()->getParam('task'))) {
             //------------------------------
             $url = $this->getUrl('*/*/*');
             $this->_addButton('show_general_log', array(

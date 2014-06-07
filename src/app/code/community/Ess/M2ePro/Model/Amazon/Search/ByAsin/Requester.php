@@ -44,6 +44,9 @@ class Ess_M2ePro_Model_Amazon_Search_ByAsin_Requester extends Ess_M2ePro_Model_C
 
         $this->account->getChildObject()->getMarketplace()->addObjectLock('products_in_action',$hash);
         $this->account->getChildObject()->getMarketplace()->addObjectLock('products_search_action',$hash);
+
+        $processingStatus = Ess_M2ePro_Model_Amazon_Listing_Product::GENERAL_ID_SEARCH_STATUS_PROCESSING;
+        $this->getListingProduct()->getChildObject()->setData('general_id_search_status',$processingStatus)->save();
     }
 
     // ########################################
@@ -71,24 +74,6 @@ class Ess_M2ePro_Model_Amazon_Search_ByAsin_Requester extends Ess_M2ePro_Model_C
         }
 
         return $this->listingProduct;
-    }
-
-    // ########################################
-
-    public function process()
-    {
-        $processingStatus = Ess_M2ePro_Model_Amazon_Listing_Product::GENERAL_ID_SEARCH_STATUS_PROCESSING;
-        $this->getListingProduct()->getChildObject()->setData('general_id_search_status',$processingStatus)->save();
-
-        try {
-            parent::process();
-        } catch (Exception $exception) {
-
-            $processingStatus = Ess_M2ePro_Model_Amazon_Listing_Product::GENERAL_ID_SEARCH_STATUS_NONE;
-            $this->getListingProduct()->getChildObject()->setData('general_id_search_status',$processingStatus)->save();
-
-            throw $exception;
-        }
     }
 
     // ########################################

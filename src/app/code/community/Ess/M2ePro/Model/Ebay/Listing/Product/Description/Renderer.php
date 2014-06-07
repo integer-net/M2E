@@ -55,25 +55,47 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
 
     // ########################################
 
-    protected function getBuyItNowPrice()
-    {
-        return $this->listingProduct->getPriceTotal();
-    }
-
-    protected function getStartPrice()
-    {
-        return ($temp = $this->listingProduct->getStartPrice()) ? $temp : 'N/A';
-    }
-
-    protected function getReservePrice()
-    {
-        return ($temp = $this->listingProduct->getReservePrice()) ? $temp : 'N/A';
-    }
-
     protected function getQty()
     {
         return (int)$this->listingProduct->getQtyTotal();
     }
+
+    // ----------------------------------------
+
+    protected function getBuyItNowPrice()
+    {
+        $price = $this->listingProduct->getPriceTotal();
+
+        if (empty($price)) {
+            return 'N/A';
+        }
+
+        return sprintf('%01.2f', $price);
+    }
+
+    protected function getStartPrice()
+    {
+        $price = $this->listingProduct->getStartPrice();
+
+        if (empty($price)) {
+            return 'N/A';
+        }
+
+        return sprintf('%01.2f', $price);
+    }
+
+    protected function getReservePrice()
+    {
+        $price = $this->listingProduct->getReservePrice();
+
+        if (empty($price)) {
+            return 'N/A';
+        }
+
+        return sprintf('%01.2f', $price);
+    }
+
+    // ########################################
 
     protected function getTitle()
     {
@@ -84,6 +106,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
     {
         return $this->listingProduct->getDescriptionTemplate()->getSubTitleResultValue();
     }
+
+    // ----------------------------------------
 
     protected function getListingType()
     {
@@ -135,6 +159,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         return $result;
     }
 
+    // ----------------------------------------
+
     protected function getCondition()
     {
         $conditions = array_combine(
@@ -178,6 +204,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         return $this->listingProduct->getDescriptionTemplate()->getConditionNote();
     }
 
+    // ########################################
+
     protected function getPrimaryCategoryId()
     {
         $category = $this->listingProduct->getCategoryTemplate()->getMainCategory();
@@ -201,6 +229,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         $category = $this->listingProduct->getOtherCategoryTemplate()->getStoreCategorySecondary();
         return $category ? $category : 'N/A';
     }
+
+    // ----------------------------------------
 
     protected function getPrimaryCategoryName()
     {
@@ -246,6 +276,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         return 'N/A';
     }
 
+    // ########################################
+
     protected function getDomesticShippingMethod($i)
     {
         $services = array_values($this->listingProduct->getShippingTemplate()->getLocalShippingServices());
@@ -287,8 +319,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         }
 
         $cost = $services[$i]->getCost();
+        if (empty($cost)) {
+            return Mage::helper('M2ePro')->__('Free');
+        }
 
-        return $cost ? $cost : Mage::helper('M2ePro')->__('Free');
+        return sprintf('%01.2f', $cost);
     }
 
     protected function getDomesticShippingAdditionalCost($i)
@@ -301,9 +336,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         }
 
         $cost = $services[$i]->getCostAdditional();
+        if (empty($cost)) {
+            return Mage::helper('M2ePro')->__('Free');
+        }
 
-        return $cost ? $cost : Mage::helper('M2ePro')->__('Free');
+        return sprintf('%01.2f', $cost);
     }
+
+    // ----------------------------------------
 
     protected function getInternationalShippingMethod($i)
     {
@@ -346,8 +386,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         }
 
         $cost = $services[$i]->getCost();
+        if (empty($cost)) {
+            return Mage::helper('M2ePro')->__('Free');
+        }
 
-        return $cost ? $cost : Mage::helper('M2ePro')->__('Free');
+        return sprintf('%01.2f', $cost);
     }
 
     protected function getInternationalShippingAdditionalCost($i)
@@ -360,8 +403,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
         }
 
         $cost = $services[$i]->getCostAdditional();
+        if (empty($cost)) {
+            return Mage::helper('M2ePro')->__('Free');
+        }
 
-        return $cost ? $cost : Mage::helper('M2ePro')->__('Free');
+        return sprintf('%01.2f', $cost);
     }
 
     // ########################################

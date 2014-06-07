@@ -29,8 +29,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Inspection extends Mage_Adminh
             'M2ePro/adminhtml_development_inspection_requirements'
         ));
         $this->setChild('cron', $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_development_inspection_cron','',
-            array('is_inspection' => true)
+            'M2ePro/adminhtml_development_inspection_cron'
         ));
         //----------------------------
 
@@ -46,6 +45,9 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Inspection extends Mage_Adminh
         ));
         $this->setChild('database_broken', $this->getLayout()->createBlock(
             'M2ePro/adminhtml_development_inspection_databaseBrokenTables'
+        ));
+        $this->setChild('installation', $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_development_inspection_installation'
         ));
         //----------------------------
 

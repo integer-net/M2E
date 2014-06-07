@@ -76,13 +76,33 @@ CommonAmazonTemplateSellingFormatHandler.prototype = Object.extend(new CommonHan
 
     attribute_sets_confirm: function()
     {
+        var self = AmazonTemplateSellingFormatHandlerObj;
+
         AttributeSetHandlerObj.confirmAttributeSets();
 
-        AttributeSetHandlerObj.renderAttributesWithEmptyOption('qty_custom_attribute', 'qty_custom_attribute_td');
-        AttributeSetHandlerObj.renderAttributesWithEmptyOption('price_custom_attribute', 'price_custom_attribute_td');
-        AttributeSetHandlerObj.renderAttributesWithEmptyOption('sale_price_custom_attribute', 'sale_price_custom_attribute_td');
-        AttributeSetHandlerObj.renderAttributesWithEmptyOption('sale_price_start_date_custom_attribute', 'sale_price_start_date_custom_attribute_td');
-        AttributeSetHandlerObj.renderAttributesWithEmptyOption('sale_price_end_date_custom_attribute', 'sale_price_end_date_custom_attribute_td');
+        self.renderAttributesWithEmptyOption('qty_custom_attribute', 'qty_custom_attribute_td');
+        self.renderAttributesWithEmptyOption('price_custom_attribute', 'price_custom_attribute_td');
+        self.renderAttributesWithEmptyOption('sale_price_custom_attribute', 'sale_price_custom_attribute_td');
+        self.renderAttributesWithEmptyOption('sale_price_start_date_custom_attribute', 'sale_price_start_date_custom_attribute_td');
+        self.renderAttributesWithEmptyOption('sale_price_end_date_custom_attribute', 'sale_price_end_date_custom_attribute_td');
+    },
+
+    renderAttributesWithEmptyOption: function(name, insertTo)
+    {
+        AttributeSetHandlerObj.renderAttributesWithEmptyOption(name, insertTo);
+
+        if (name != 'qty_custom_attribute') {
+            return;
+        }
+
+        var option = '<option value="' + M2ePro.php.constant('Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_SellingFormat_Edit_Form::QTY_MODE_PRODUCT_FIXED_VIRTUAL_ATTRIBUTE_VALUE') + '">' +
+                            M2ePro.translator.translate('QTY') +
+                     '</option>';
+
+        $$('#' + name + ' option').first().insert({after: option});
+        $$('#' + name + ' option').first().selected = 1;
+
+        AttributeSetHandlerObj.checkAttributesSelect(name, '');
     },
 
     //----------------------------------

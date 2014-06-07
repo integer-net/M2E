@@ -14,6 +14,8 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
              ->_title(Mage::helper('M2ePro')->__('Policies'));
 
         $this->getLayout()->getBlock('head')
+            ->addJs('M2ePro/Plugin/AreaWrapper.js')
+            ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addCss('M2ePro/css/Plugin/DropDown.css')
             ->addJs('M2ePro/AttributeSetHandler.js')

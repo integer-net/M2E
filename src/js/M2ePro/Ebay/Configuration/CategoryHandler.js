@@ -180,30 +180,37 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
                 M2ePro.translator.translate('Do not show any more') +
             '</div>';
 
-        Dialog._openDialog(template.innerHTML, {
-            draggable: true,
-            resizable: true,
-            closable: true,
-            className: "magento",
-            title: 'Save Category',
-            height: 80,
-            width: 650,
-            zIndex: 2100,
-            recenterAuto: false,
-            hideEffect: Element.hide,
-            showEffect: Element.show,
-            id: "save-template",
-            buttonClass: "form-button button",
-            ok: function() {
-                if ($('do_not_show_again').checked) {
-                    setCookie('ebay_configuration_category_skip_save_confirmation', 1, 3*365, '/');
-                }
+        var me = this;
+        if(!me.isCreatedDialog) {
+            me.isCreatedDialog = true;
+            Dialog._openDialog(template.innerHTML, {
+                draggable: true,
+                resizable: true,
+                closable: true,
+                className: "magento",
+                title: 'Save Category',
+                height: 80,
+                width: 650,
+                zIndex: 2100,
+                recenterAuto: false,
+                destroyOnClose: true,
+                hideEffect: Element.hide,
+                showEffect: Element.show,
+                id: "save-template",
+                buttonClass: "form-button button",
+                ok: function() {
+                    if ($('do_not_show_again').checked) {
+                        setCookie('ebay_configuration_category_skip_save_confirmation', 1, 3*365, '/');
+                    }
 
-                okCallback(type, isEdit);
-            },
-            cancel: function() {},
-            onClose: function() {}
-        });
+                    okCallback(type, isEdit);
+                },
+                cancel: function() {},
+                onClose: function() {
+                    me.isCreatedDialog = false;
+                }
+            });
+        }
     }
 
     //----------------------------------

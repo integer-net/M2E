@@ -357,13 +357,13 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
                                     ->getItems();
 
         foreach ($listingsOther as $listingOther) {
-            $listingOther->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+            $listingOther->unmapProduct(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
         }
     }
 
     //-----------------------------------------
 
-    public function mapProduct($productId, $logsInitiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN)
+    public function mapProduct($productId, $logsInitiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN)
     {
         $this->addData(array('product_id'=>$productId))->save();
         $this->getChildObject()->afterMapProduct();
@@ -380,7 +380,7 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
     }
 
-    public function unmapProduct($logsInitiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN)
+    public function unmapProduct($logsInitiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN)
     {
         $this->getChildObject()->beforeUnmapProduct();
         $this->setData('product_id', NULL)->save();

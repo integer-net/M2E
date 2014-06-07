@@ -23,9 +23,9 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
             );
             //--------------------
 
-            Mage::getModel('M2ePro/Servicing_Dispatcher')->processTasks(array(
+            Mage::getModel('M2ePro/Servicing_Dispatcher')->processTask(
                 Mage::getModel('M2ePro/Servicing_Task_License')->getPublicNick()
-            ));
+            );
 
             $this->_getSession()->addSuccess(
                 Mage::helper('M2ePro')->__('The license key has been successfully updated.')
@@ -37,9 +37,9 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
 
     public function refreshStatusAction()
     {
-        Mage::getModel('M2ePro/Servicing_Dispatcher')->processTasks(array(
+        Mage::getModel('M2ePro/Servicing_Dispatcher')->processTask(
             Mage::getModel('M2ePro/Servicing_Task_License')->getPublicNick()
-        ));
+        );
 
         $this->_getSession()->addSuccess(
             Mage::helper('M2ePro')->__('The license status has been successfully refreshed.')
@@ -67,6 +67,25 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
         }
 
         return $this->getResponse()->setBody(json_encode(array('ok' => $result)));
+    }
+
+    // -------------------------------------------
+
+    public function componentSetTrialAction()
+    {
+        if (!is_null($component = $this->getRequest()->getParam('component'))) {
+            if (Mage::helper('M2ePro/Module_License')->setTrial($component)) {
+                $expirationDate = Mage::helper('M2ePro/Module_License')->getTextExpirationDate($component);
+                $this->_getSession()->addSuccess(
+                     Mage::helper('M2ePro')->__(
+                         'Trial license key was successfully obtained. It will be valid until %s.',
+                         $expirationDate
+                     )
+                );
+            }
+        }
+
+        $this->_redirectUrl($this->_getRefererUrl());
     }
 
     //#############################################

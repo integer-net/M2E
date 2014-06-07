@@ -36,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Product_Grid extends Mage
 
         // Get collection
         //----------------------------
-        /* @var $collection Mage_Catalog_Model_Resource_Product_Collection */
+        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::getModel('catalog/product')->getCollection()
             ->addAttributeToSelect('sku')
             ->addAttributeToSelect('name')

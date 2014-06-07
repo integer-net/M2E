@@ -363,7 +363,7 @@ LEFT JOIN `{$listingTable}`
     ON `{$listingProductTable}`.`listing_id` = `{$listingTable}`.`id`
 LEFT JOIN `{$ebayItemTable}`
     ON `{$ebayListingProductTable}`.`ebay_item_id` = `{$ebayItemTable}`.`id`
-WHERE `{$ebayListingProductTable}`.`ebay_item_id` IS NOT NULL
+HAVING `account_id` IS NOT NULL AND `marketplace_id` IS NOT NULL AND `ebay_item_id` IS NOT NULL
     UNION
 SELECT `{$listingOtherTable}`.`account_id`,
        `{$listingOtherTable}`.`marketplace_id`,
@@ -373,13 +373,18 @@ LEFT JOIN `{$listingOtherTable}`
     ON `{$ebayListingOtherTable}`.`listing_other_id` = `{$listingOtherTable}`.`id`
 LEFT JOIN `{$ebayItemTable}`
     ON `{$ebayListingOtherTable}`.`item_id` = `{$ebayItemTable}`.`item_id`
-WHERE `{$ebayItemTable}`.`id` IS NOT NULL
+HAVING `account_id` IS NOT NULL AND `marketplace_id` IS NOT NULL AND `ebay_item_id` IS NOT NULL
 
 SQL
 );
 
 $preparedData = array();
 while ($row = $queryStmt->fetch()) {
+
+    if (empty($row['ebay_item_id'])) {
+        continue;
+    }
+
     $preparedData[$row['account_id'].'#'.$row['marketplace_id']][] = $row['ebay_item_id'];
 }
 
@@ -964,7 +969,7 @@ INSERT INTO `{$generalSellingTable}`
     (`title`, `component_mode`, `update_date`, `create_date`)
 SELECT CONCAT(`{$generalSellingTable}`.`title`,
               IF (`{$shippingTable}`.`title` <> '' AND `{$generalSellingTable}`.`title` <> '',
-                  CONCAT (' (',`{$shippingTable}`.`title`,')'),
+                  CONCAT(' (',`{$shippingTable}`.`title`,')'),
                   '')),
        `{$generalSellingTable}`.`component_mode`,
        `{$generalSellingTable}`.`update_date`,

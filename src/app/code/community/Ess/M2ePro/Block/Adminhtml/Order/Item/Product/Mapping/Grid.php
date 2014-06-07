@@ -79,6 +79,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Mapping_Grid extends Mage_Ad
             'header'=> Mage::helper('catalog')->__('Type'),
             'width' => '60px',
             'index' => 'type_id',
+            'sortable'  => false,
             'type'  => 'options',
             'options' => Mage::getSingleton('catalog/product_type')->getOptionArray()
         ));

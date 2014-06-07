@@ -9,18 +9,6 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
     const LAYOUT_NICK = 'm2epro';
     const GENERAL_BLOCK_PATH = 'M2ePro/adminhtml_general';
 
-    const ANALYTIC_VIEW_BOTH = 'both';
-    const ANALYTIC_VIEW_EBAY = 'ebay';
-    const ANALYTIC_VIEW_COMMON = 'common';
-
-    const ANALYTIC_NAVIGATION_MODE_DISABLED = 'disabled';
-    const ANALYTIC_NAVIGATION_MODE_STANDARD = 'standard';
-    const ANALYTIC_NAVIGATION_MODE_ADVANCED = 'advanced';
-
-    const ANALYTIC_ACTION_MODE_DISABLED = 'disabled';
-    const ANALYTIC_ACTION_MODE_ALL = 'all';
-    const ANALYTIC_ACTION_MODE_SPECIAL = 'special';
-
     // ########################################
 
     public function isBaseControllerLoaded()
@@ -121,6 +109,10 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
             return Ess_M2ePro_Helper_View_Common::NICK;
         }
 
+        if (stripos($controller, 'adminhtml_development') !== false) {
+            return Ess_M2ePro_Helper_View_Development::NICK;
+        }
+
         if (stripos($controller, 'system_config') !== false) {
             return Ess_M2ePro_Helper_View_Configuration::NICK;
         }
@@ -140,81 +132,14 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
         return $this->getCurrentView() == Ess_M2ePro_Helper_View_Common::NICK;
     }
 
+    public function isCurrentViewDevelopment()
+    {
+        return $this->getCurrentView() == Ess_M2ePro_Helper_View_Development::NICK;
+    }
+
     public function isCurrentViewConfiguration()
     {
         return $this->getCurrentView() == Ess_M2ePro_Helper_View_Configuration::NICK;
-    }
-
-    // ########################################
-
-    public function getAnalyticView()
-    {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/analytic/', 'view');
-    }
-
-    //-----------------------------------------
-
-    public function isAnalyticViewBoth()
-    {
-        return $this->getAnalyticView() == self::ANALYTIC_VIEW_BOTH;
-    }
-
-    public function isAnalyticViewEbay()
-    {
-        return $this->getAnalyticView() == self::ANALYTIC_VIEW_EBAY;
-    }
-
-    public function isAnalyticViewCommon()
-    {
-        return $this->getAnalyticView() == self::ANALYTIC_VIEW_COMMON;
-    }
-
-    // ########################################
-
-    public function getAnalyticNavigationMode()
-    {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/analytic/', 'navigation_mode');
-    }
-
-    //-----------------------------------------
-
-    public function isAnalyticNavigationModeDisabled()
-    {
-        return $this->getAnalyticNavigationMode() == self::ANALYTIC_NAVIGATION_MODE_DISABLED;
-    }
-
-    public function isAnalyticNavigationModeStandard()
-    {
-        return $this->getAnalyticNavigationMode() == self::ANALYTIC_NAVIGATION_MODE_STANDARD;
-    }
-
-    public function isAnalyticNavigationModeAdvanced()
-    {
-        return $this->getAnalyticNavigationMode() == self::ANALYTIC_NAVIGATION_MODE_ADVANCED;
-    }
-
-    // ########################################
-
-    public function getAnalyticActionMode()
-    {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/analytic/', 'action_mode');
-    }
-
-    //-----------------------------------------
-
-    public function isAnalyticActionModeDisabled()
-    {
-        return $this->getAnalyticActionMode() == self::ANALYTIC_ACTION_MODE_DISABLED;
-    }
-
-    public function isAnalyticActionModeAll()
-    {
-        return $this->getAnalyticActionMode() == self::ANALYTIC_ACTION_MODE_ALL;
-    }
-
-    public function isAnalyticActionModeSpecial()
-    {
-        return $this->getAnalyticActionMode() == self::ANALYTIC_ACTION_MODE_SPECIAL;
     }
 
     // ########################################

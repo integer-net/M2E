@@ -140,7 +140,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         $logModel = Mage::getModel('M2ePro/Listing_Other_Log');
         $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Play::NICK);
         $logModel->addProductMessage($otherListing->getId(),
-                                     Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                     Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_MOVE_LISTING,
                                      // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully moved');
@@ -153,7 +153,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         $tempLog->addProductMessage( $listingProduct->getListingId(),
                                      $otherListing->getProductId(),
                                      $listingProduct->getId(),
-                                     Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                     Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_FROM_OTHER_LISTING,
                                      // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully moved');

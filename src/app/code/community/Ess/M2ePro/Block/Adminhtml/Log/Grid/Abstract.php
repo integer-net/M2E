@@ -44,8 +44,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
     protected function _getLogInitiatorList()
     {
         return array(
-            Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER => Mage::helper('M2ePro')->__('Manual'),
-            Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION => Mage::helper('M2ePro')->__('Automatic')
+            Ess_M2ePro_Helper_Data::INITIATOR_USER => Mage::helper('M2ePro')->__('Manual'),
+            Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION => Mage::helper('M2ePro')->__('Automatic')
         );
     }
 
@@ -103,7 +103,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
     {
         switch ($row->getData('initiator')) {
 
-            case Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION:
+            case Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION:
                 $value = '<span style="text-decoration: underline;">'.$value.'</span>';
                 break;
 
@@ -117,6 +117,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
     public function callbackDescription($value, $row, $column, $isExport)
     {
         $fullDescription = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row->getData('description'));
+        $fullDescription = htmlentities($fullDescription);
         $row->setData('description', $fullDescription);
         $value = $column->getRenderer()->render($row);
 

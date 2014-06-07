@@ -103,7 +103,7 @@ class Ess_M2ePro_Adminhtml_Common_Listing_OtherController
             );
 
             if (!is_null($listingOther->getProductId())) {
-                $listingOther->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+                $listingOther->unmapProduct(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
             }
 
             $listingOther->deleteInstance();

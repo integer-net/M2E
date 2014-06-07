@@ -9,34 +9,53 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_InstallController
 {
     //#############################################
 
-    private function getStyleHtml()
+    /**
+     * @title "Show Installation History"
+     * @description "Show History of Install/Upgrade Module"
+     * @new_line
+     */
+    public function showInstallationVersionHistoryAction()
     {
-        return <<<HTML
-<style type="text/css">
+        /** @var $cacheConfigCollection Mage_Core_Model_Mysql4_Collection_Abstract */
+        $cacheConfigCollection = Mage::helper('M2ePro/Module')->getCacheConfig()->getCollection();
+        $cacheConfigCollection->addFieldToFilter('`group`', '/installation/version/history/')
+                              ->setOrder('create_date','DESC');
 
-    table.grid {
-        border-color: black;
-        border-style: solid;
-        border-width: 1px 0 0 1px;
-    }
-    table.grid th {
-        padding: 5px 20px;
-        border-color: black;
-        border-style: solid;
-        border-width: 0 1px 1px 0;
-        background-color: silver;
-        color: white;
-        font-weight: bold;
-    }
-    table.grid td {
-        padding: 3px 10px;
-        border-color: black;
-        border-style: solid;
-        border-width: 0 1px 1px 0;
-    }
+        $history = $cacheConfigCollection->toArray();
+        $history = $history['items'];
 
-</style>
+        if (count($history) <= 0) {
+            echo $this->getEmptyResultsHtml('Installation History is not available.');
+            return;
+        }
+
+        $html = $this->getStyleHtml();
+
+        $html .= <<<HTML
+<h2 style="margin: 20px 0 0 10px">Installation History
+    <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
+</h2>
+<br>
+
+<table class="grid" cellpadding="0" cellspacing="0">
+    <tr>
+        <th style="width: 200px">Version</th>
+        <th>Date</th>
+    </tr>
 HTML;
+        foreach ($history as $item) {
+
+            $html .= <<<HTML
+<tr>
+    <td>{$item['key']}</td>
+    <td>{$item['value']}</td>
+</tr>
+HTML;
+        }
+
+        $html .= '</table>';
+
+        print str_replace('%count%', count($history), $html);
     }
 
     //#############################################
@@ -98,7 +117,7 @@ HTML;
             return;
         }
 
-        $urlPhpInfo = $this->getUrl('*/*/*', array('upgrade' => 'yes'));
+        $urlPhpInfo = Mage::helper('adminhtml')->getUrl('*/*/*', array('upgrade' => 'yes'));
 
         echo '<form method="GET" action="'.$urlPhpInfo.'">
                 From version: <input type="text" name="version" value="3.2.0" />
@@ -118,7 +137,7 @@ HTML;
                                     ->processVirtual('files','get','info');
 
         if (count($responseData) <= 0) {
-            echo '<h2 style="margin: 20px 0 0 10px">No files info for this M2E version on server.</span></h2>';
+            echo $this->getEmptyResultsHtml('No files info for this M2E version on server.');
             return;
         }
 
@@ -163,19 +182,14 @@ HTML;
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
-        <th style="width: 600px">
-            Path
-        </th>
-        <th>
-            Reason
-        </th>
-        <th>
-            Action
-        </th>
+        <th style="width: 600px">Path</th>
+        <th>Reason</th>
+        <th>Action</th>
     </tr>
 HTML;
         foreach ($problems as $item) {
-            $url = $this->getUrl('*/*/filesDiff', array('filePath' => base64_encode($item['path'])));
+            $url = Mage::helper('adminhtml')->getUrl('*/*/filesDiff',
+                                                     array('filePath' => base64_encode($item['path'])));
 
             $html .= <<<HTML
 <tr>
@@ -196,6 +210,70 @@ HTML;
         $html .= '</table>';
 
         print str_replace('%count%',count($problems),$html);
+    }
+
+    /**
+     * @title "Check Tables Structure Validity"
+     * @description "Check Tables Structure Validity"
+     */
+    public function checkTablesStructureValidityAction()
+    {
+        $tablesInfo = Mage::helper('M2ePro/Module_Database_Structure')->getTablesInfo();
+
+        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
+                            ->processVirtual('tables','get','diff',
+                                             array('tables_info' => json_encode($tablesInfo)));
+
+        if (!isset($responseData['diff'])) {
+            echo $this->getEmptyResultsHtml('No tables info for this M2E version on server.');
+            return;
+        }
+
+        if (count($responseData['diff']) <= 0) {
+            echo $this->getEmptyResultsHtml('All tables are valid.');
+            return;
+        }
+
+        $html = $this->getStyleHtml();
+
+        $html .= <<<HTML
+<h2 style="margin: 20px 0 0 10px">Tables Structure Validity
+    <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
+</h2>
+<br>
+
+<table class="grid" cellpadding="0" cellspacing="0">
+    <tr>
+        <th style="width: 400px">Table</th>
+        <th>Problem</th>
+        <th style="width: 300px">Info</th>
+    </tr>
+HTML;
+
+        foreach ($responseData['diff'] as $tableName => $checkResult) {
+            foreach ($checkResult as $resultRow) {
+
+                $additionalInfo = '';
+                if (isset($resultRow['info']['diff_data'])) {
+                    foreach ($resultRow['info']['diff_data'] as $diffCode => $diffValue) {
+                        $additionalInfo .= "<b>{$diffCode}</b>: '{$diffValue}'. ";
+                        $additionalInfo .= "<b>original:</b> '{$resultRow['info']['original_data'][$diffCode]}'.";
+                        $additionalInfo .= "</br>";
+                    }
+                }
+
+                $html .= <<<HTML
+<tr>
+    <td>{$tableName}</td>
+    <td>{$resultRow['message']}</td>
+    <td>{$additionalInfo}</td>
+</tr>
+HTML;
+            }
+        }
+
+        $html .= '</table>';
+        print str_replace('%count%',count($responseData['diff']),$html);
     }
 
     /**
@@ -243,7 +321,7 @@ HTML;
         $unWritableDirectories = Mage::helper('M2ePro/Module')->getUnWritableDirectories();
 
         if (count ($unWritableDirectories) <= 0) {
-            echo '<h2 style="margin: 20px 0 0 10px">No UnWritable Directories</span></h2>';
+            echo $this->getEmptyResultsHtml('No UnWritable Directories');
             return;
         }
 
@@ -257,181 +335,21 @@ HTML;
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
-        <th style="width: 800px">
-            Path
-        </th>
+        <th style="width: 800px">Path</th>
     </tr>
 HTML;
         foreach ($unWritableDirectories as $item) {
 
             $html .= <<<HTML
 <tr>
-    <td>
-        $item
-    </td>
+    <td>{$item}</td>
 </tr>
-
 HTML;
         }
 
         $html .= '</table>';
 
         print str_replace('%count%',count($unWritableDirectories),$html);
-    }
-
-    //#############################################
-
-    /**
-     * @title "Repair Broken Tables"
-     * @description "Command for show and repair broken horizontal tables"
-     */
-    public function checkTablesAction()
-    {
-        $tableNames = $this->getRequest()->getParam('table');
-
-        if ($tableNames != NULL) {
-            Mage::helper('M2ePro/Module_Database_RepairTables')->repairBrokenTables($tableNames);
-            $this->_redirectUrl($this->getUrl('*/*/checkTables/'));
-        }
-
-        $brokenTables = Mage::helper('M2ePro/Module_Database_RepairTables')->getBrokenTablesInfo();
-
-        if ($brokenTables['total_count'] <= 0) {
-            echo '<h2 style="margin: 20px 0 0 10px">No Broken Tables</span></h2>';
-            return;
-        }
-
-        $baseUrl = Mage::helper('adminhtml')->getUrl('*/*/*');
-
-        $html = <<<HTML
-<html>
-    <body>
-        <h2 style="margin: 20px 0 0 10px">Broken Tables
-            <span style="color: #808080; font-size: 15px;">({$brokenTables['total_count']} entries)</span>
-        </h2>
-        <br>
-        <form method="GET" action="{$baseUrl}">
-            <table class="grid" cellpadding="0" cellspacing="0">
-HTML;
-        if (count($brokenTables['parent'])) {
-
-            $html .= <<<HTML
-<tr bgcolor="#E7E7E7">
-    <td colspan="4">
-        <h4 style="margin: 0 0 0 10px">Parent Tables</h4>
-    </td>
-</tr>
-<tr>
-    <th style="width: 400">
-        Table
-    </th>
-    <th style="width: 50">
-        Count
-    </th>
-    <th style="width: 50">
-    </th>
-    <th style="width: 50">
-    </th>
-</tr>
-HTML;
-            foreach ($brokenTables['parent'] as $parentTable => $brokenItemsCount) {
-
-                $html .= <<<HTML
-<tr>
-    <td>
-        {$parentTable}
-    </td>
-    <td>
-        {$brokenItemsCount}
-    </td>
-    <td>
-        <input type='button' value="Repair" onclick ="location.href = '{$baseUrl}?table[]={$parentTable}'" />
-    </td>
-    <td>
-        <input type="checkbox" name="table[]" value="{$parentTable}" />
-    </td>
-HTML;
-            }
-        }
-
-        if (count($brokenTables['children'])) {
-
-            $html .= <<<HTML
-<tr height="100%">
-    <td><div style="height: 10px;"></div></td>
-</tr>
-<tr bgcolor="#E7E7E7">
-    <td colspan="4">
-        <h4 style="margin: 0 0 0 10px">Children Tables</h4>
-    </td>
-</tr>
-<tr>
-    <th style="width: 400">
-        Table
-    </th>
-    <th style="width: 50">
-        Count
-    </th>
-    <th style="width: 50">
-    </th>
-    <th style="width: 50">
-    </th>
-</tr>
-HTML;
-            foreach ($brokenTables['children'] as $childrenTable => $brokenItemsCount) {
-
-                $html .= <<<HTML
-<tr>
-    <td>
-        {$childrenTable}
-    </td>
-    <td>
-        {$brokenItemsCount}
-    </td>
-    <td>
-        <input type='button' value="Repair" onclick ="location.href = '{$baseUrl}?table[]={$childrenTable}'" />
-    </td>
-    <td>
-        <input type="checkbox" name="table[]" value="{$childrenTable}" />
-    </td>
-HTML;
-            }
-        }
-
-        $html .= <<<HTML
-                <tr>
-                    <td colspan="4"><hr/></td>
-                </tr>
-                <tr>
-                    <td colspan="4" align="right">
-                        <input type="submit" value="Repair Checked">
-                    <td>
-                </tr>
-            </table>
-        </form>
-    </body>
-</html>
-HTML;
-
-        echo $html;
-    }
-
-    /**
-     * @title "Remove Config Duplicates"
-     * @description "Remove Configuration Duplicates"
-     * @confirm "Are you sure?"
-     * @new_line
-     */
-    public function removeConfigDuplicatesAction()
-    {
-        /** @var $installerInstance Ess_M2ePro_Model_Upgrade_MySqlSetup */
-        $installerInstance = new Ess_M2ePro_Model_Upgrade_MySqlSetup('M2ePro_setup');
-        $installerInstance->removeConfigDuplicates();
-
-        Mage::helper('M2ePro/Module')->clearCache();
-
-        $this->_getSession()->addSuccess('Remove duplicates was successfully completed.');
-        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
     }
 
     //#############################################
@@ -525,6 +443,20 @@ HTML;
         foreach ($tablesForTruncate as $table) {
             $connWrite->delete(Mage::getSingleton('core/resource')->getTableName($table));
         }
+    }
+
+    //#############################################
+
+    private function getEmptyResultsHtml($messageText)
+    {
+        $backUrl = Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl();
+
+        return <<<HTML
+<h2 style="margin: 20px 0 0 10px">
+    {$messageText} <span style="color: grey; font-size: 10px;">
+    <a href="{$backUrl}">[back]</a>
+</h2>
+HTML;
     }
 
     //#############################################

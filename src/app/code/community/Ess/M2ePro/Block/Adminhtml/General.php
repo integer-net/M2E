@@ -66,21 +66,21 @@ class Ess_M2ePro_Block_Adminhtml_General extends Mage_Adminhtml_Block_Widget
             'mode' => false
         );
 
-        if (Mage::helper('M2ePro/View')->isAnalyticNavigationModeDisabled() &&
-            Mage::helper('M2ePro/View')->isAnalyticActionModeDisabled()) {
+        if (Mage::helper('M2ePro/Module_Analytic')->isNavigationModeDisabled() &&
+            Mage::helper('M2ePro/Module_Analytic')->isActionModeDisabled()) {
             return;
         }
 
-        if (!Mage::helper('M2ePro/View')->isAnalyticViewBoth() &&
-            Mage::helper('M2ePro/View')->getAnalyticView() != Mage::helper('M2ePro/View')->getCurrentView()) {
+        if (!Mage::helper('M2ePro/Module_Analytic')->isViewBoth() &&
+            Mage::helper('M2ePro/Module_Analytic')->getView() != Mage::helper('M2ePro/View')->getCurrentView()) {
             return;
         }
 
         $analytic = array(
             'mode' => true,
             'url' => Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/analytic/', 'url'),
-            'navigation_mode' => Mage::helper('M2ePro/View')->getAnalyticNavigationMode(),
-            'action_mode' => Mage::helper('M2ePro/View')->getAnalyticActionMode()
+            'navigation_mode' => Mage::helper('M2ePro/Module_Analytic')->getNavigationMode(),
+            'action_mode' => Mage::helper('M2ePro/Module_Analytic')->getActionMode()
         );
 
         $mageParamsString = '';
@@ -96,7 +96,7 @@ class Ess_M2ePro_Block_Adminhtml_General extends Mage_Adminhtml_Block_Widget
             'mage_params' => !empty($mageParamsString) ? $mageParamsString.'/' : '',
         );
 
-        if (Mage::helper('M2ePro/View')->isAnalyticNavigationModeAdvanced()) {
+        if (Mage::helper('M2ePro/Module_Analytic')->isNavigationModeAdvanced()) {
             $analytic['additional_data'] = array(
                 'get_params' => (isset($_GET) && is_array($_GET)) ? http_build_query($_GET,'','&') : '',
                 'post_params' => (isset($_POST) && is_array($_POST)) ? http_build_query($_POST,'','&') : '',

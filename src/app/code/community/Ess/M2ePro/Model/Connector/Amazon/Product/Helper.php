@@ -263,7 +263,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Helper
         $dataForUpdate = array(
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED,
             'end_date' => Mage::helper('M2ePro')->getCurrentGmtDate(),
-            'online_qty' => 0
+            'online_qty' => 0,
+            'ignore_next_inventory_synch' => 1
         );
 
         isset($params['status_changer']) && $dataForUpdate['status_changer'] = (int)$params['status_changer'];
@@ -397,8 +398,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Helper
             'store_id' => (int)$listingProduct->getListing()->getStoreId()
         );
 
-        if ($listingProduct->getChildObject()->isVariationMatched() &&
-            $listingProduct->getChildObject()->isVariationProduct()) {
+        if ($listingProduct->getChildObject()->isVariationsReady()) {
 
             $variations = $listingProduct->getVariations(true);
             /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
@@ -422,7 +422,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Helper
     {
         $dataForUpdate = array(
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_LISTED,
-            'is_afn_channel' => Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_NO
+            'is_afn_channel' => Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_NO,
+            'ignore_next_inventory_synch' => 1
         );
 
         if ($this->isAllPermissionsEnabled($this->getPreparedPermissions($params['params']))) {

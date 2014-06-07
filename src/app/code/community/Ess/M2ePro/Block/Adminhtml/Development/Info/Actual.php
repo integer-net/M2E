@@ -47,29 +47,15 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Actual extends Mage_Adminhtml_
         //-------------------------------------
 
         //-------------------------------------
-        $this->cronLastRun = 'N/A';
-        $this->cronLastGMT = false;
+        $this->cronLastRunTime = 'N/A';
+        $this->cronIsNotWorking = false;
+        $this->cronCurrentType = ucfirst(Mage::helper('M2ePro/Module_Cron')->getType());
 
-        $cronLastAccessTime = Mage::helper('M2ePro/Module')->getConfig()
-                                        ->getGroupValue('/cron/', 'last_access');
+        $cronLastRunTime = Mage::helper('M2ePro/Module_Cron')->getLastRun();
 
-        if (!is_null($cronLastAccessTime)) {
-
-            if ($this->getIsSupportMode()) {
-                $this->cronLastRun = Mage::helper('M2ePro')->gmtDateToTimezone($cronLastAccessTime);
-            } else {
-                $this->cronLastRun = $cronLastAccessTime;
-                $this->cronLastGMT = true;
-            }
-        }
-
-        $modelCron = Mage::getModel('M2ePro/Cron');
-
-        $this->cronLastRunHighlight = 'none';
-        if ($modelCron->isShowError()) {
-            $this->cronLastRunHighlight = 'error';
-        } else if ($modelCron->isShowNotification()) {
-            $this->cronLastRunHighlight = 'warning';
+        if (!is_null($cronLastRunTime)) {
+            $this->cronLastRunTime = $cronLastRunTime;
+            $this->cronIsNotWorking = Mage::helper('M2ePro/Module_Cron')->isLastRunMoreThan(12,true);
         }
         //-------------------------------------
 

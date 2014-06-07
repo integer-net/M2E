@@ -207,7 +207,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         if (is_null($this->magentoProduct)) {
             $this->magentoProduct = Mage::getModel('M2ePro/Magento_Product');
             $this->magentoProduct
-                ->setStoreId($this->getStoreId())
+                ->setStoreId($this->getOrder()->getStoreId())
                 ->setProductId($this->getProductId());
         }
 
@@ -283,7 +283,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         $this->associateVariationWithOptions();
 
-        if ($this->getMagentoProduct()->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
+        if (!$this->getMagentoProduct()->isStatusEnabled()) {
             $this->setActionRequired(true)->save();
             throw new Exception('Product is disabled.');
         }

@@ -132,6 +132,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
             Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_MARKETPLACES   => 'Marketplaces',
             Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_LISTINGS       => 'Listings',
             Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_LISTINGS_OTHER => 'Listings Other',
+            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_LOGS           => 'Logs',
             Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_ITEMS          => 'Items',
             Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_DICTIONARY     => 'Dictionary',
             Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_ORDERS         => 'Orders',

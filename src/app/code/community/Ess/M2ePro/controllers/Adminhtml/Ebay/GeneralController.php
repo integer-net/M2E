@@ -28,12 +28,4 @@ class Ess_M2ePro_Adminhtml_Ebay_GeneralController
     }
 
     //#############################################
-
-    public function cronPopupConfirmAction()
-    {
-        Mage::helper('M2ePro/Module')->getConfig()
-                        ->setGroupValue('/view/ebay/cron/popup/','confirm','1');
-    }
-
-    //#############################################
 }

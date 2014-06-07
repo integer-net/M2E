@@ -7,10 +7,17 @@
 class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation
     extends Ess_M2ePro_Block_Adminhtml_Wizard_Installation
 {
+    private $isEbayWizardFinished = false;
+
     // ########################################
 
     protected function _beforeToHtml()
     {
+        /** @var Ess_M2ePro_Helper_Module_Wizard $wizardHelper */
+        $wizardHelper = $this->helper('M2ePro/Module_Wizard');
+
+        $this->isEbayWizardFinished = Mage::helper('M2ePro/View_Ebay')->isInstallationWizardFinished();
+
         //-------------------------------
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
@@ -26,22 +33,23 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation
 
         // Steps
         //-------------------------------
-        $this->setChild(
-            'step_cron',
-            $this->helper('M2ePro/Module_Wizard')->createBlock('installation_cron',$this->getNick())
-        );
-        $this->setChild(
-            'step_license',
-            $this->helper('M2ePro/Module_Wizard')->createBlock('installation_license',$this->getNick())
-        );
+        if (!$this->isEbayWizardFinished) {
+            $this->setChild(
+                 'step_license',
+                 $wizardHelper->createBlock('installation_license',$this->getNick())
+            );
+        }
+
         $this->setChild(
             'step_settings',
-            $this->helper('M2ePro/Module_Wizard')->createBlock('installation_settings',$this->getNick())
+            $wizardHelper->createBlock('installation_settings',$this->getNick())
         );
         //-------------------------------
 
-        if (Mage::helper('M2ePro/Module_Wizard')->isFinished(Ess_M2ePro_Helper_View_Ebay::WIZARD_INSTALLATION_NICK)) {
-            $this->unsetChild('step_license');
+        if ($this->isEbayWizardFinished &&
+            $wizardHelper->getStep($this->getNick()) == 'license') {
+            $steps = $wizardHelper->getWizard($this->getNick())->getSteps();
+            $wizardHelper->setStep($this->getNick(), $steps[array_search('license', $steps) + 1]);
         }
 
         $temp = parent::_beforeToHtml();
@@ -59,8 +67,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation
     protected function _toHtml()
     {
         return parent::_toHtml()
-            . $this->getChildHtml('step_cron')
-            . $this->getChildHtml('step_license')
+            . ($this->isEbayWizardFinished ? '' : $this->getChildHtml('step_license'))
             . $this->getChildHtml('step_settings')
             . $this->getChildHtml('end_button');
     }

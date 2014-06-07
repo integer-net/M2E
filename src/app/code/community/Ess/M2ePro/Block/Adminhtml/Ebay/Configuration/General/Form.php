@@ -45,9 +45,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
         $this->view_ebay_feedbacks_notification_mode = (bool)(int)$configModel->getGroupValue(
             '/view/ebay/feedbacks/notification/','mode'
         );
-        $this->cron_notification_mode = (bool)(int)$configModel->getGroupValue(
-            '/view/ebay/cron/notification/','mode'
-        );
 
         $this->use_last_specifics_mode = (bool)(int)$configModel->getGroupValue(
             '/view/ebay/template/category/','use_last_specifics'

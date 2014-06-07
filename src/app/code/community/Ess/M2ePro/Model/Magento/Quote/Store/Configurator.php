@@ -145,11 +145,15 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
             return $isShippingPriceIncludesTax;
         }
 
-        if ($this->proxyOrder->getTaxRate() > 0 && !$this->proxyOrder->isShippingPriceIncludesTax()) {
+        if ($this->proxyOrder->isTaxModeChannel()) {
             return false;
         }
 
-        return true;
+        if ($this->proxyOrder->getTaxRate() > 0) {
+            return false;
+        }
+
+        return $isShippingPriceIncludesTax;
     }
 
     // ########################################
@@ -170,7 +174,7 @@ class Ess_M2ePro_Model_Magento_Quote_Store_Configurator
             ->isCalculationBasedOnOrigin($this->getStore());
 
         if ($proxyOrder->isTaxModeNone()
-            || ($proxyOrder->isTaxModeChannel() && $proxyOrder->getTaxRate() == 0)
+            || $proxyOrder->isTaxModeChannel()
             || ($proxyOrder->isTaxModeMagento() && !$hasRatesForCountry && !$calculationBasedOnOrigin)
         ) {
             return Ess_M2ePro_Model_Magento_Product::TAX_CLASS_ID_NONE;

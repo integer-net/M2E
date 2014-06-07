@@ -44,6 +44,20 @@ ConfigurationLicenseHandler.prototype = Object.extend(new CommonHandler(), {
                 }
             }
         });
+    },
+
+    //----------------------------------
+
+    componentSetTrial : function(button)
+    {
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
+            return;
+        }
+
+        var componentName = $(button).up().readAttribute('id');
+        componentName = componentName.substr(componentName.indexOf('_') + 1);
+        this.postForm(M2ePro.url.get('component_set_trial'),
+                      {component:componentName});
     }
 
     //----------------------------------

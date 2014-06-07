@@ -80,9 +80,11 @@ class Ess_M2ePro_Helper_Module_Exception extends Mage_Core_Helper_Abstract
     public function setFatalErrorHandler()
     {
         $temp = Mage::helper('M2ePro/Data_Global')->getValue('set_fatal_error_handler');
+
         if (!empty($temp)) {
             return;
         }
+
         Mage::helper('M2ePro/Data_Global')->setValue('set_fatal_error_handler', true);
 
         $functionCode = '$error = error_get_last();
@@ -105,7 +107,7 @@ class Ess_M2ePro_Helper_Module_Exception extends Mage_Core_Helper_Abstract
 
     public function getUserMessage(Exception $exception)
     {
-        return Mage::helper('M2ePro')->__('Fatal error occurred').': "'.$exception->getMessage().'".';
+        return $this->__('Fatal error occurred').': "'.$exception->getMessage().'".';
     }
 
     // ########################################

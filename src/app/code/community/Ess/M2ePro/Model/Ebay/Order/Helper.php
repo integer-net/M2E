@@ -6,17 +6,18 @@
 
 class Ess_M2ePro_Model_Ebay_Order_Helper
 {
-    const EBAY_CHECKOUT_STATUS_SINGLE_COMPLETE   = 'CheckoutComplete';
-    const EBAY_CHECKOUT_STATUS_COMBINED_COMPLETE = 'Complete';
+    // ##########################################################
+
+    const EBAY_CHECKOUT_STATUS_COMPLETE = 'Complete';
 
     const EBAY_PAYMENT_METHOD_NONE      = 'None';
     const EBAY_PAYMENT_STATUS_SUCCEEDED = 'NoPaymentFailure';
 
+    // ##########################################################
+
     public function getCheckoutStatus($checkoutStatusEbay)
     {
-        if ($checkoutStatusEbay == self::EBAY_CHECKOUT_STATUS_SINGLE_COMPLETE ||
-            $checkoutStatusEbay == self::EBAY_CHECKOUT_STATUS_COMBINED_COMPLETE
-        ) {
+        if ($checkoutStatusEbay == self::EBAY_CHECKOUT_STATUS_COMPLETE) {
             return Ess_M2ePro_Model_Ebay_Order::CHECKOUT_STATUS_COMPLETED;
         }
 
@@ -48,16 +49,18 @@ class Ess_M2ePro_Model_Ebay_Order_Helper
         return Ess_M2ePro_Model_Ebay_Order::PAYMENT_STATUS_ERROR;
     }
 
-    public function getShippingStatus($shippingDate, $isShippingMethodSelected)
+    public function getShippingStatus($shippingDate, $isShippingServiceSelected)
     {
         if ($shippingDate == '') {
-            return $isShippingMethodSelected
+            return $isShippingServiceSelected
                 ? Ess_M2ePro_Model_Ebay_Order::SHIPPING_STATUS_PROCESSING
                 : Ess_M2ePro_Model_Ebay_Order::SHIPPING_STATUS_NOT_SELECTED;
         }
 
         return Ess_M2ePro_Model_Ebay_Order::SHIPPING_STATUS_COMPLETED;
     }
+
+    // ##########################################################
 
     public function getPaymentMethodNameByCode($code, $marketplaceId)
     {
@@ -89,7 +92,7 @@ class Ess_M2ePro_Model_Ebay_Order_Helper
         return $code;
     }
 
-    public function getShippingMethodNameByCode($code, $marketplaceId)
+    public function getShippingServiceNameByCode($code, $marketplaceId)
     {
         if ((int)$marketplaceId <= 0) {
             return $code;
@@ -107,4 +110,6 @@ class Ess_M2ePro_Model_Ebay_Order_Helper
 
         return !empty($shipping['title']) ? $shipping['title'] : $code;
     }
+
+    // ##########################################################
 }

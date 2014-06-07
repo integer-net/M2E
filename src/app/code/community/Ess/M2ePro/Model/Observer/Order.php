@@ -70,7 +70,7 @@ class Ess_M2ePro_Model_Observer_Order
                                 $listingProductArray['object']->getListingId(),
                                 $product->getId(),
                                 $listingProductArray['id'],
-                                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_QTY,
                                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -88,7 +88,7 @@ class Ess_M2ePro_Model_Observer_Order
                              $tempLog->setComponentMode($otherListingTemp['component_mode']);
                              $tempLog->addProductMessage(
                                 $otherListingTemp['id'],
-                                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_QTY,
                                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -127,7 +127,7 @@ class Ess_M2ePro_Model_Observer_Order
                                 $listingProductArray['object']->getListingId(),
                                 $product->getId(),
                                 $listingProductArray['id'],
-                                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
                                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -148,7 +148,7 @@ class Ess_M2ePro_Model_Observer_Order
                              $tempLog->setComponentMode($otherListingTemp['component_mode']);
                              $tempLog->addProductMessage(
                                 $otherListingTemp['id'],
-                                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
                                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');

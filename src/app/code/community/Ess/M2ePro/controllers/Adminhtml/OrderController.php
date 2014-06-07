@@ -14,7 +14,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         parent::preDispatch();
 
         Mage::getSingleton('M2ePro/Order_Log_Manager')
-            ->setInitiator(Ess_M2ePro_Model_Order_Log::INITIATOR_USER);
+            ->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
     }
 
     //#############################################
@@ -425,7 +425,7 @@ class Ess_M2ePro_Adminhtml_OrderController
             $magentoProductTemp = Mage::getModel('M2ePro/Magento_Product');
             $magentoProductTemp->setProductId($productId);
 
-            if (!$magentoProductTemp->getStockAvailability()) {
+            if (!$magentoProductTemp->isStockAvailability()) {
                 $this->getResponse()->setBody(json_encode(array('is_in_stock' => false)));
                 return;
             }
@@ -463,40 +463,40 @@ class Ess_M2ePro_Adminhtml_OrderController
     {
         $ids = $this->getRequestIds();
 
-        $succeeded = $failed = 0;
+        $isFail = false;
 
         foreach ($ids as $id) {
-            $order    = Mage::helper('M2ePro/Component')->getUnknownObject('Order', $id);
-            $shipment = Mage::getResourceModel('sales/order_shipment_collection')
-                ->setOrderFilter($order->getMagentoOrderId())
-                ->getLastItem();
+            $order = Mage::helper('M2ePro/Component')->getUnknownObject('Order', $id);
 
-            if (!$shipment->getId()) {
-                continue;
-            }
+            $shipmentsCollection = Mage::getResourceModel('sales/order_shipment_collection')
+                ->setOrderFilter($order->getMagentoOrderId());
 
-            $handler = Mage::getModel('M2ePro/Order_Shipment_Handler')->factory($order->getComponentMode());
-            $result  = $handler->handle($order, $shipment);
+            foreach ($shipmentsCollection->getItems() as $shipment) {
+                /** @var Mage_Sales_Model_Order_Shipment $shipment */
+                if (!$shipment->getId()) {
+                    continue;
+                }
 
-            switch ($result) {
-                case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_SUCCEEDED:
-                    $succeeded++;
-                    break;
-                case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_FAILED:
-                    $failed++;
-                    break;
+                /** @var Ess_M2ePro_Model_Order_Shipment_Handler $handler */
+                $handler = Mage::getModel('M2ePro/Order_Shipment_Handler')->factory($order->getComponentMode());
+                $result  = $handler->handle($order, $shipment);
+
+                if ($result == Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_FAILED) {
+                    $isFail = true;
+                }
             }
         }
 
-        if ($succeeded > 0) {
+        if ($isFail) {
+            $errorMessage = Mage::helper('M2ePro')->__('Shipping Information was not resend.');
+            if (count($ids) > 1) {
+                $errorMessage = Mage::helper('M2ePro')->__('Shipping Information was not resend for some orders.');
+            }
+
+            $this->_getSession()->addError($errorMessage);
+        } else {
             $this->_getSession()->addSuccess(
-                Mage::helper('M2ePro')->__('Shipping Information has been resend for %d order(s).', $succeeded)
-            );
-        }
-
-        if ($failed > 0) {
-            $this->_getSession()->addError(
-                Mage::helper('M2ePro')->__('Shipping Information was not resend for %d order(s).', $failed)
+                Mage::helper('M2ePro')->__('Shipping Information has been successfully resend.')
             );
         }
 

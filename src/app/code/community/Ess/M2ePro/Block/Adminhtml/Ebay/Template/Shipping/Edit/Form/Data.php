@@ -242,17 +242,49 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
 
     private function getSortedLocationExcludeInfo()
     {
-        $sortedInfo = array();
-        foreach($this->getMarketplace()->getChildObject()->getShippingLocationExcludeInfo() as $locationExcludeRecord) {
+        $sortedInfo = array(
+            'international' => array(),
+            'domestic' => array(),
+            'additional' => array()
+        );
 
-            $region = $locationExcludeRecord['region'];
+        foreach($this->getMarketplace()->getChildObject()->getShippingLocationExcludeInfo() as $item) {
 
-            strpos(strtolower($region), 'worldwide') !== false && $region = 'international';
-            strpos(strtolower($region), 'domestic') !== false && $region = 'domestic';
-            strpos(strtolower($region), 'additional') !== false && $region = 'additional';
+            $region = $item['region'];
 
-            $sortedInfo[$region][$locationExcludeRecord['ebay_id']] = $locationExcludeRecord['title'];
+            strpos(strtolower($item['region']), 'worldwide') !== false && $region = 'international';
+            strpos(strtolower($item['region']), 'domestic') !== false && $region = 'domestic';
+            strpos(strtolower($item['region']), 'additional') !== false && $region = 'additional';
+
+            $sortedInfo[$region][$item['ebay_id']] = $item['title'];
         }
+
+        foreach ($sortedInfo as $code => $info) {
+
+            if ($code == 'domestic' || $code == 'international' || $code == 'additional') {
+                continue;
+            }
+
+            $isInternational = array_key_exists($code, $sortedInfo['international']);
+            $isDomestic = array_key_exists($code, $sortedInfo['domestic']);
+            $isAdditional = array_key_exists($code, $sortedInfo['additional']);
+
+            if (!$isInternational && !$isDomestic && !$isAdditional) {
+
+                $foundedItem = array();
+                foreach ($this->getMarketplace()->getChildObject()->getShippingLocationExcludeInfo() as $item) {
+                    $item['ebay_id'] == $code && $foundedItem = $item;
+                }
+
+                if (empty($foundedItem)) {
+                    continue;
+                }
+
+                unset($sortedInfo[$foundedItem['region']][$code]);
+                $sortedInfo['international'][$code] = $foundedItem['title'];
+            }
+        }
+
         return $sortedInfo;
     }
 
@@ -391,10 +423,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
 
     public function canDisplayLocalShippingRateTable()
     {
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            return false;
-        }
-
         return $this->getMarketplace()->getChildObject()->isLocalShippingRateTableEnabled();
     }
 
@@ -411,10 +439,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
     public function canDisplayLocalCalculatedShippingType()
     {
         if (!$this->canDisplayCalculatedShippingType()) {
-            return false;
-        }
-
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
             return false;
         }
 
@@ -436,28 +460,16 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
 
     public function canDisplayInternationalShippingRateTable()
     {
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            return false;
-        }
-
         return $this->getMarketplace()->getChildObject()->isInternationalShippingRateTableEnabled();
     }
 
     public function canDisplayGetItFast()
     {
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            return false;
-        }
-
         return $this->getMarketplace()->getChildObject()->isGetItFastEnabled();
     }
 
     public function canDisplayCashOnDelivery()
     {
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            return false;
-        }
-
         return $this->getMarketplace()->getChildObject()->isCashOnDeliveryEnabled();
     }
 
@@ -489,10 +501,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
 
     public function canDisplayGlobalShippingProgram()
     {
-        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            return false;
-        }
-
         return $this->getMarketplace()->getChildObject()->isGlobalShippingProgramEnabled();
     }
 

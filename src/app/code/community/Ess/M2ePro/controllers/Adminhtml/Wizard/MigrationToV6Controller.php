@@ -11,7 +11,7 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationToV6Controller
 
     protected function getNick()
     {
-        return Ess_M2ePro_Helper_Module::MIGRATION_WIZARD_NICK;
+        return Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK;
     }
 
     //#############################################

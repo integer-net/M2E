@@ -55,6 +55,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_View_Log_Grid extends Mage_Adminhtml_Bloc
             'align'     => 'left',
             'width'     => '65px',
             'index'     => 'type',
+            'sortable'  => false,
             'frame_callback' => array($this, 'callbackColumnType')
         ));
 
@@ -63,12 +64,14 @@ class Ess_M2ePro_Block_Adminhtml_Order_View_Log_Grid extends Mage_Adminhtml_Bloc
             'align'     => 'left',
             'width'     => '65px',
             'index'     => 'initiator',
+            'sortable'  => false,
             'type'      => 'options',
             'options'   => array(
-                Ess_M2ePro_Model_Order_Log::INITIATOR_UNKNOWN   => Mage::helper('M2ePro')->__('Unknown'),
-                Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION => Mage::helper('M2ePro')->__('Automatic'),
-                Ess_M2ePro_Model_Order_Log::INITIATOR_USER      => Mage::helper('M2ePro')->__('Manual'),
+                Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN   => Mage::helper('M2ePro')->__('Unknown'),
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION => Mage::helper('M2ePro')->__('Automatic'),
+                Ess_M2ePro_Helper_Data::INITIATOR_USER      => Mage::helper('M2ePro')->__('Manual'),
             ),
+            'sortable'  => false,
             'frame_callback' => array($this, 'callbackColumnInitiator')
         ));
 
@@ -94,16 +97,16 @@ class Ess_M2ePro_Block_Adminhtml_Order_View_Log_Grid extends Mage_Adminhtml_Bloc
     public function callbackColumnType($value, $row, $column, $isExport)
     {
         switch ($value) {
-            case Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS:
+            case Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS:
                 $message = '<span style="color: green;">'.Mage::helper('M2ePro')->__('Success').'</span>';
                 break;
-            case Ess_M2ePro_Model_Order_Log::TYPE_NOTICE:
+            case Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE:
                 $message = '<span style="color: blue;">'.Mage::helper('M2ePro')->__('Notice').'</span>';
                 break;
-            case Ess_M2ePro_Model_Order_Log::TYPE_WARNING:
+            case Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING:
                 $message = '<span style="color: orange;">'.Mage::helper('M2ePro')->__('Warning').'</span>';
                 break;
-            case Ess_M2ePro_Model_Order_Log::TYPE_ERROR:
+            case Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR:
             default:
                 $message = '<span style="color: red;">'.Mage::helper('M2ePro')->__('Error').'</span>';
                 break;
@@ -117,13 +120,13 @@ class Ess_M2ePro_Block_Adminhtml_Order_View_Log_Grid extends Mage_Adminhtml_Bloc
         $initiator = $row->getData('initiator');
 
         switch ($initiator) {
-            case Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION:
+            case Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION:
                 $message = "<span style=\"text-decoration: underline;\">{$value}</span>";
                 break;
-            case Ess_M2ePro_Model_Order_Log::INITIATOR_UNKNOWN:
+            case Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN:
                 $message = "<span style=\"font-style: italic; color: gray;\">{$value}</span>";
                 break;
-            case Ess_M2ePro_Model_Order_Log::INITIATOR_USER:
+            case Ess_M2ePro_Helper_Data::INITIATOR_USER:
             default:
                 $message = "<span>{$value}</span>";
                 break;

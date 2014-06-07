@@ -4,7 +4,8 @@
         'formSubmit' => $this->getUrl('M2ePro/adminhtml_common_marketplace/save'),
         'logViewUrl' => $this->getUrl('M2ePro/adminhtml_common_log/synchronization',array('back'=>Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_common_synchronization/index'))),
 
-        'runSynchNow' => $this->getUrl('M2ePro/adminhtml_common_marketplace/runSynchNow')
+        'runSynchNow' => $this->getUrl('M2ePro/adminhtml_common_marketplace/runSynchNow'),
+        'synchCheckProcessingNow' => $this->getUrl('M2ePro/adminhtml_common_synchronization/synchCheckProcessingNow')
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(

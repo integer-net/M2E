@@ -79,8 +79,8 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Mysql_Module extends Mage_Admi
     {
         return array(
             'Additional' => array(
-            'm2epro_processing_request',
-            'm2epro_synchronization_run'
+                'm2epro_processing_request',
+                'm2epro_operation_history'
             )
         );
     }

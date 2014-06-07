@@ -4,9 +4,10 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Servicing_Dispatcher
+final class Ess_M2ePro_Model_Servicing_Dispatcher
 {
     const DEFAULT_INTERVAL = 3600;
+    const MAX_MEMORY_LIMIT = 256;
 
     // ########################################
 
@@ -16,16 +17,21 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
 
         if (!is_null($minInterval) &&
             $timeLastUpdate + (int)$minInterval > Mage::helper('M2ePro')->getCurrentGmtDate(true)) {
-            return;
+            return false;
         }
 
         $this->setLastUpdateDateTime();
-        $this->processTasks($this->getRegisteredTasks());
+        return $this->processTasks($this->getRegisteredTasks());
+    }
+
+    public function processTask($allowedTask)
+    {
+        return $this->processTasks(array($allowedTask));
     }
 
     public function processTasks(array $allowedTasks = array())
     {
-        Mage::helper('M2ePro/Client')->setMemoryLimit(256);
+        Mage::helper('M2ePro/Client')->setMemoryLimit(self::MAX_MEMORY_LIMIT);
         Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
 
         $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
@@ -33,10 +39,12 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
                                                      $this->getRequestData($allowedTasks));
 
         if (!is_array($responseData)) {
-            return;
+            return false;
         }
 
         $this->dispatchResponseData($responseData,$allowedTasks);
+
+        return true;
     }
 
     // ########################################
@@ -91,7 +99,8 @@ class Ess_M2ePro_Model_Servicing_Dispatcher
             'backups',
             'exceptions',
             'analytic',
-            'marketplaces'
+            'marketplaces',
+            'cron'
         );
     }
 

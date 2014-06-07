@@ -4,330 +4,331 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Synchronization_Dispatcher extends Ess_M2ePro_Model_Synchronization_Dispatcher_Abstract
+final class Ess_M2ePro_Model_Synchronization_Dispatcher
 {
-    /**
-     * @var array
-     */
-    private $_components = array();
+    const MAX_MEMORY_LIMIT = 512;
+
+    private $allowedComponents = array();
+    private $allowedTasksTypes = array();
+
+    private $lockItem = NULL;
+    private $operationHistory = NULL;
+
+    private $parentLockItem = NULL;
+    private $parentOperationHistory = NULL;
+
+    private $log = NULL;
+    private $params = array();
+    private $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
 
     //####################################
 
     public function process()
     {
-        Mage::helper('M2ePro/Client')->setMemoryLimit(512);
-        Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
+        $this->initialize();
+        $this->updateLastAccess();
 
-        // Check global mode
-        //----------------------------------
-        if (!(bool)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGlobalValue('mode')) {
+        if (!$this->isPossibleToRun()) {
             return false;
         }
-        //----------------------------------
 
-        // Before dispatch actions
-        //---------------------------
-        if (!$this->beforeDispatch()) {
-            return false;
-        }
-        //---------------------------
+        $this->updateLastRun();
+        $this->beforeStart();
 
-        if (in_array(Ess_M2ePro_Model_Synchronization_Tasks::ORDERS, $this->_tasks)) {
-            Mage::dispatchEvent('m2epro_synchronization_before_start', array());
-        }
+        $result = true;
 
         try {
 
-            // DEFAULTS SYNCH
-            //---------------------------
-            $tempTask = $this->checkTask(Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS);
-            $tempGlobalMode = (bool)(int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-                '/defaults/','mode'
+            // global tasks
+            $result = !$this->processTask('Synchronization_Task_Defaults') ? false : $result;
+
+            // components tasks
+            $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Ebay::NICK) ? false : $result;
+            $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Amazon::NICK) ? false : $result;
+            $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Buy::NICK) ? false : $result;
+            $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Play::NICK) ? false : $result;
+
+        } catch (Exception $exception) {
+
+            $result = false;
+
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
+
+            $this->getOperationHistory()->setContentData('exception', array(
+                'message' => $exception->getMessage(),
+                'file'    => $exception->getFile(),
+                'line'    => $exception->getLine(),
+                'trace'   => $exception->getTraceAsString(),
+            ));
+
+            $this->getLog()->addMessage(
+                Mage::helper('M2ePro')->__($exception->getMessage()),
+                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
             );
-            if ($tempTask && $tempGlobalMode) {
-                $tempSynch = new Ess_M2ePro_Model_Synchronization_Tasks_Defaults();
-                $tempSynch->process();
-            }
-            //---------------------------
-
-        } catch (Exception $exception) {
-            $this->catchException($exception);
         }
 
-        try {
+        $this->afterEnd();
 
-            // EBAY SYNCH
-            //---------------------------
-            if (Mage::helper('M2ePro/Component_Ebay')->isActive() &&
-                $this->checkComponent(Ess_M2ePro_Helper_Component_Ebay::NICK)) {
+        return $result;
+    }
 
-                $synchDispatcher = Mage::getModel('M2ePro/Ebay_Synchronization_Dispatcher');
-                $synchDispatcher->setInitiator($this->_initiator);
-                $synchDispatcher->setTasks($this->_tasks);
-                $synchDispatcher->setParams($this->_params);
-                $synchDispatcher->process();
-            }
-            //---------------------------
+    // ----------------------------------
 
-        } catch (Exception $exception) {
-            $this->catchException($exception);
-        }
-
-        try {
-
-            // AMAZON SYNCH
-            //---------------------------
-            if (Mage::helper('M2ePro/Component_Amazon')->isActive() &&
-                $this->checkComponent(Ess_M2ePro_Helper_Component_Amazon::NICK)) {
-
-                $synchDispatcher = Mage::getModel('M2ePro/Amazon_Synchronization_Dispatcher');
-                $synchDispatcher->setInitiator($this->_initiator);
-                $synchDispatcher->setTasks($this->_tasks);
-                $synchDispatcher->setParams($this->_params);
-                $synchDispatcher->process();
-            }
-            //---------------------------
-
-        } catch (Exception $exception) {
-            $this->catchException($exception);
-        }
-
-        try {
-
-            // BUY SYNCH
-            //---------------------------
-            if (Mage::helper('M2ePro/Component_Buy')->isActive() &&
-                $this->checkComponent(Ess_M2ePro_Helper_Component_Buy::NICK)) {
-
-                $synchDispatcher = Mage::getModel('M2ePro/Buy_Synchronization_Dispatcher');
-                $synchDispatcher->setInitiator($this->_initiator);
-                $synchDispatcher->setTasks($this->_tasks);
-                $synchDispatcher->setParams($this->_params);
-                $synchDispatcher->process();
-            }
-            //---------------------------
-
-        } catch (Exception $exception) {
-            $this->catchException($exception);
-        }
-
-        try {
-
-            // PLAY SYNCH
-            //---------------------------
-            if (Mage::helper('M2ePro/Component_Play')->isActive() &&
-                $this->checkComponent(Ess_M2ePro_Helper_Component_Play::NICK)) {
-
-                $synchDispatcher = Mage::getModel('M2ePro/Play_Synchronization_Dispatcher');
-                $synchDispatcher->setInitiator($this->_initiator);
-                $synchDispatcher->setTasks($this->_tasks);
-                $synchDispatcher->setParams($this->_params);
-                $synchDispatcher->process();
-            }
-            //---------------------------
-
-        } catch (Exception $exception) {
-            $this->catchException($exception);
-        }
-
-        if (in_array(Ess_M2ePro_Model_Synchronization_Tasks::ORDERS, $this->_tasks)) {
-            Mage::dispatchEvent('m2epro_synchronization_after_end', array());
-        }
-
-        // After dispatch actions
-        //---------------------------
-        if (!$this->afterDispatch()) {
+    protected function processComponent($component)
+    {
+        if (!in_array($component,$this->getAllowedComponents())) {
             return false;
         }
-        //---------------------------
 
-        return true;
+        return $this->processTask(ucfirst($component).'_Synchronization_Launcher');
+    }
+
+    protected function processTask($taskPath)
+    {
+        $result = $this->makeTask($taskPath)->process();
+        return is_null($result) || $result;
+    }
+
+    protected function makeTask($taskPath)
+    {
+        /** @var $task Ess_M2ePro_Model_Synchronization_Task **/
+        $task = Mage::getModel('M2ePro/'.$taskPath);
+
+        $task->setParentLockItem($this->getLockItem());
+        $task->setParentOperationHistory($this->getOperationHistory());
+
+        $task->setAllowedTasksTypes($this->getAllowedTasksTypes());
+
+        $task->setLog($this->getLog());
+        $task->setInitiator($this->getInitiator());
+        $task->setParams($this->getParams());
+
+        return $task;
     }
 
     //####################################
 
-    public function setComponents(array $components = array())
+    public function setAllowedComponents(array $components)
     {
-        $this->_components = array();
+        $this->allowedComponents = $components;
+    }
 
-        foreach ($components as $component) {
-            if ($component !== Ess_M2ePro_Helper_Component_Ebay::NICK &&
-                $component !== Ess_M2ePro_Helper_Component_Amazon::NICK &&
-                $component !== Ess_M2ePro_Helper_Component_Buy::NICK &&
-                $component !== Ess_M2ePro_Helper_Component_Play::NICK) {
-                    continue;
-            }
-            $this->_components[] = $component;
+    public function getAllowedComponents()
+    {
+        return $this->allowedComponents;
+    }
+
+    // -----------------------------------
+
+    public function setAllowedTasksTypes(array $types)
+    {
+        $this->allowedTasksTypes = $types;
+    }
+
+    public function getAllowedTasksTypes()
+    {
+        return $this->allowedTasksTypes;
+    }
+
+    // -----------------------------------
+
+    public function setParams(array $params)
+    {
+        $this->params = $params;
+    }
+
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    // -----------------------------------
+
+    public function setInitiator($value)
+    {
+        $this->initiator = (int)$value;
+    }
+
+    public function getInitiator()
+    {
+        return $this->initiator;
+    }
+
+    // -----------------------------------
+
+    public function setParentLockItem(Ess_M2ePro_Model_LockItem $object)
+    {
+        $this->parentLockItem = $object;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_LockItem
+     */
+    public function getParentLockItem()
+    {
+        return $this->parentLockItem;
+    }
+
+    // -----------------------------------
+
+    public function setParentOperationHistory(Ess_M2ePro_Model_OperationHistory $object)
+    {
+        $this->parentOperationHistory = $object;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_OperationHistory
+     */
+    public function getParentOperationHistory()
+    {
+        return $this->parentOperationHistory;
+    }
+
+    //####################################
+
+    protected function initialize()
+    {
+        Mage::helper('M2ePro/Client')->setMemoryLimit(self::MAX_MEMORY_LIMIT);
+        Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
+    }
+
+    protected function updateLastAccess()
+    {
+        $currentDateTime = Mage::helper('M2ePro')->getCurrentGmtDate();
+        $this->setConfigValue(NULL,'last_access',$currentDateTime);
+    }
+
+    protected function isPossibleToRun()
+    {
+        return (bool)(int)$this->getConfigValue(NULL,'mode') &&
+               !$this->getLockItem()->isExist();
+    }
+
+    protected function updateLastRun()
+    {
+        $currentDateTime = Mage::helper('M2ePro')->getCurrentGmtDate();
+        $this->setConfigValue(NULL,'last_run',$currentDateTime);
+    }
+
+    // -----------------------------------
+
+    protected function beforeStart()
+    {
+        $lockItemParentId = $this->getParentLockItem() ? $this->getParentLockItem()->getRealId() : NULL;
+        $this->getLockItem()->create($lockItemParentId);
+        $this->getLockItem()->makeShutdownFunction();
+
+        $this->getOperationHistory()->cleanOldData();
+
+        $operationHistoryParentId = $this->getParentOperationHistory() ?
+                $this->getParentOperationHistory()->getObject()->getId() : NULL;
+        $this->getOperationHistory()->start('synchronization',
+                                            $operationHistoryParentId,
+                                            $this->getInitiator());
+        $this->getOperationHistory()->makeShutdownFunction();
+
+        $this->getLog()->setOperationHistoryId($this->getOperationHistory()->getObject()->getId());
+
+        $this->checkAndPrepareProductChange();
+
+        // todo investigate
+        if (in_array(Ess_M2ePro_Model_Synchronization_Task::ORDERS, $this->getAllowedTasksTypes())) {
+            Mage::dispatchEvent('m2epro_synchronization_before_start', array());
         }
     }
 
-    private function checkComponent($component)
+    protected function afterEnd()
     {
-        return in_array($component, $this->_components);
-    }
-
-    //------------------------------------
-
-    private function beforeDispatch()
-    {
-        $helper = Mage::helper('M2ePro');
-
-        //----------------------------------
-        Mage::helper('M2ePro/Data_Global')->setValue('synchStartTime',$helper->getCurrentGmtDate());
-        //----------------------------------
-
-        // Create and save tasks
-        //----------------------------------
-        Mage::helper('M2ePro/Data_Global')->setValue('synchTasks',$this->_tasks);
-        //----------------------------------
-
-        // Create and save initiator
-        //----------------------------------
-        Mage::helper('M2ePro/Data_Global')->setValue('synchInitiator',$this->_initiator);
-        //----------------------------------
-
-        // Create and save initiator
-        //----------------------------------
-        Mage::helper('M2ePro/Data_Global')->setValue('synchParams',$this->_params);
-        //----------------------------------
-
-        // Create and save profiler
-        //----------------------------------
-        $profilerParams = array();
-
-        if ($this->_initiator == Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER) {
-            $profilerParams['muteOutput'] = true;
-        } else {
-            $profilerParams['muteOutput'] = false;
+        // todo investigate
+        if (in_array(Ess_M2ePro_Model_Synchronization_Task::ORDERS, $this->getAllowedTasksTypes())) {
+            Mage::dispatchEvent('m2epro_synchronization_after_end', array());
         }
-
-        $profiler = Mage::getModel('M2ePro/Synchronization_Profiler',$profilerParams);
-        Mage::helper('M2ePro/Data_Global')->setValue('synchProfiler',$profiler);
-
-        Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->enable();
-        Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->start();
-        Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->makeShutdownFunction();
-
-        Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->setClearResources();
-        //----------------------------------
-
-        // Create and save synch session
-        //----------------------------------
-        $runs = Mage::getModel('M2ePro/Synchronization_Run');
-        Mage::helper('M2ePro/Data_Global')->setValue('synchRun',$runs);
-
-        Mage::helper('M2ePro/Data_Global')->getValue('synchRun')->start($this->_initiator);
-        Mage::helper('M2ePro/Data_Global')->getValue('synchRun')->makeShutdownFunction();
-        Mage::helper('M2ePro/Data_Global')->getValue('synchRun')->cleanOldData();
-
-        Mage::helper('M2ePro/Data_Global')->setValue(
-            'synchId',Mage::helper('M2ePro/Data_Global')->getValue('synchRun')->getLastId()
-        );
-        //----------------------------------
-
-        // Create and save logs
-        //----------------------------------
-        $logs = Mage::getModel('M2ePro/Synchronization_Log');
-        Mage::helper('M2ePro/Data_Global')->setValue('synchLogs',$logs);
-
-        Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')
-                                          ->setSynchronizationRun(Mage::helper('M2ePro/Data_Global')
-                                          ->getValue('synchId'));
-
-        Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')->setSynchronizationTask(
-            Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_UNKNOWN
-        );
-
-        switch ($this->_initiator) {
-            case Ess_M2ePro_Model_Synchronization_Run::INITIATOR_CRON:
-            case Ess_M2ePro_Model_Synchronization_Run::INITIATOR_DEVELOPER:
-                Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')
-                    ->setInitiator(Ess_M2ePro_Model_Synchronization_Log::INITIATOR_EXTENSION);
-                break;
-            case Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER:
-                Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')
-                    ->setInitiator(Ess_M2ePro_Model_Synchronization_Log::INITIATOR_USER);
-                break;
-            default:
-                Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')
-                    ->setInitiator(Ess_M2ePro_Model_Synchronization_Log::INITIATOR_UNKNOWN);
-                break;
-        }
-        //----------------------------------
-
-        // Create and save lock item
-        //----------------------------------
-        $lockItem = Mage::getModel('M2ePro/Synchronization_LockItem');
-        Mage::helper('M2ePro/Data_Global')->setValue('synchLockItem',$lockItem);
-
-        if (Mage::helper('M2ePro/Data_Global')->getValue('synchLockItem')->isExist()) {
-
-            Mage::helper('M2ePro/Data_Global')->getValue('synchLogs')->addMessage(
-                $helper->__('Another synchronization is already running'),
-                Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
-                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
-            );
-            Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->addTitle(
-                'Another synchronization is already running.',Ess_M2ePro_Model_General_Profiler::TYPE_ERROR
-            );
-            return false;
-        }
-
-        Mage::helper('M2ePro/Data_Global')->getValue('synchLockItem')->setSynchRunObj($runs);
-        Mage::helper('M2ePro/Data_Global')->getValue('synchLockItem')->create();
-        Mage::helper('M2ePro/Data_Global')->getValue('synchLockItem')->makeShutdownFunction();
-        //----------------------------------
-
-        Mage::getModel('M2ePro/ProductChange')->clearOutdated(
-            Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-                '/settings/product_change/', 'max_lifetime'
-            )
-        );
-        Mage::getModel('M2ePro/ProductChange')->clearExcessive(
-            (int)Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-                '/settings/product_change/', 'max_count'
-            )
-        );
-
-        // Make shutdown function for clearing product changes
-        $this->makeShutdownFunctionForProductChanges();
-
-        return true;
-    }
-
-    private function afterDispatch()
-    {
-        Mage::helper('M2ePro/Data_Global')->getValue('synchRun')->stop();
-        Mage::helper('M2ePro/Data_Global')->getValue('synchProfiler')->stop();
-        Mage::helper('M2ePro/Data_Global')->getValue('synchLockItem')->remove();
 
         Mage::getModel('M2ePro/ProductChange')->clearLastProcessed(
-            Mage::helper('M2ePro/Data_Global')->getValue('synchStartTime'),
-            Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-                '/settings/product_change/', 'max_count_per_one_time'
-            )
+            $this->getOperationHistory()->getObject()->getData('start_date'),
+            (int)$this->getConfigValue('/settings/product_change/', 'max_count_per_one_time')
         );
 
-        return true;
+        $this->getOperationHistory()->stop();
+        $this->getLockItem()->remove();
     }
 
-    //------------------------------------
+    //####################################
 
-    private function makeShutdownFunctionForProductChanges()
+    /**
+     * @return Ess_M2ePro_Model_Synchronization_LockItem
+     */
+    protected function getLockItem()
     {
-        $synchStartTime = Mage::helper('M2ePro/Data_Global')->getValue('synchStartTime');
-        $maxPerOneTime = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-            '/settings/product_change/', 'max_count_per_one_time'
+        if (is_null($this->lockItem)) {
+            $this->lockItem = Mage::getModel('M2ePro/Synchronization_LockItem');
+        }
+        return $this->lockItem;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Synchronization_OperationHistory
+     */
+    public function getOperationHistory()
+    {
+        if (is_null($this->operationHistory)) {
+            $this->operationHistory = Mage::getModel('M2ePro/Synchronization_OperationHistory');
+        }
+        return $this->operationHistory;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Synchronization_Log
+     */
+    protected function getLog()
+    {
+        if (is_null($this->log)) {
+            $this->log = Mage::getModel('M2ePro/Synchronization_Log');
+            $this->log->setInitiator($this->getInitiator());
+            $this->log->setSynchronizationTask(Ess_M2ePro_Model_Synchronization_Log::TASK_UNKNOWN);
+        }
+        return $this->log;
+    }
+
+    // -----------------------------------
+
+    protected function checkAndPrepareProductChange()
+    {
+        Mage::getModel('M2ePro/ProductChange')->clearOutdated(
+            $this->getConfigValue('/settings/product_change/', 'max_lifetime')
+        );
+        Mage::getModel('M2ePro/ProductChange')->clearExcessive(
+            (int)$this->getConfigValue('/settings/product_change/', 'max_count')
         );
 
-        $functionCode = <<<PHP
-Mage::getModel('M2ePro/ProductChange')->clearLastProcessed('{$synchStartTime}',{$maxPerOneTime});
-PHP;
+        $startDate = $this->getOperationHistory()->getObject()->getData('start_date');
+        $maxCountPerOneTime = (int)$this->getConfigValue('/settings/product_change/', 'max_count_per_one_time');
 
-        $shutdownDeleteFunction = create_function('', $functionCode);
-        register_shutdown_function($shutdownDeleteFunction);
+        $functionCode = "Mage::getModel('M2ePro/ProductChange')
+                                ->clearLastProcessed('{$startDate}',{$maxCountPerOneTime});";
 
-        return true;
+        $shutdownFunction = create_function('', $functionCode);
+        register_shutdown_function($shutdownFunction);
+    }
+
+    //####################################
+
+    private function getConfig()
+    {
+        return Mage::helper('M2ePro/Module')->getSynchronizationConfig();
+    }
+
+    // ----------------------------------------
+
+    private function getConfigValue($group, $key)
+    {
+        return $this->getConfig()->getGroupValue($group, $key);
+    }
+
+    private function setConfigValue($group, $key, $value)
+    {
+        return $this->getConfig()->setGroupValue($group, $key, $value);
     }
 
     //####################################

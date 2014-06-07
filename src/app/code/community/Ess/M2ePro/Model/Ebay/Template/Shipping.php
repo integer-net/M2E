@@ -568,7 +568,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
             'global_shipping_program' => 0,
             'local_shipping_mode' =>  self::SHIPPING_TYPE_FLAT,
             'local_shipping_discount_mode' => 0,
-            'local_shipping_combined_discount_profile_id' => '',
+            'local_shipping_combined_discount_profile_id' => json_encode(array()),
 
             'local_shipping_cash_on_delivery_cost_mode' => self::CASH_ON_DELIVERY_COST_MODE_NONE,
             'local_shipping_cash_on_delivery_cost_value' => '',
@@ -576,7 +576,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
             'international_shipping_mode' => self::SHIPPING_TYPE_NO_INTERNATIONAL,
             'international_shipping_discount_mode' => 0,
-            'international_shipping_combined_discount_profile_id' => '',
+            'international_shipping_combined_discount_profile_id' => json_encode(array()),
 
             // CALCULATED SHIPPING
             //----------------------------------

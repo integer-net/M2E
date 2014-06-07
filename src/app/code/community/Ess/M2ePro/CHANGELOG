@@ -1,3 +1,64 @@
+* 6.1.4 (r6256) (17/04/2014)
+
+* Fix: [eBay] variations generation for bundle or grouped product
+
+* 6.1.3 (r6248) (08/04/2014)
+
+* Fix: [eBay] interface problem during adding to listing products from categories
+* Fix: [eBay] Donation problem when Selling Format Template used as Policy
+* Fix: [Play.com] update shipping status for orders did not work
+
+* 6.1.2 (r6218) (01/04/2014) [Beta Testing]
+
+* Fix: major fixes of migration to the extension of 6.1.1 version
+* Fix: wrong calculation of qty for list/relist/stop conditions in synchronization policy/template
+* Fix: manage qty settings when manage stock is disabled or backorders is enabled
+* Fix: ability to setup settings for "Manage Stock" and "Backorders" features
+
+* 6.1.1 (r6192) (26/03/2014) [Beta Testing]
+
+* Added: [eBay] support of Minimum Advertised Price (MAP) for US marketplace
+* Added: [eBay] ability to use Strike-Through Pricing for Australia marketplace
+* Added: [eBay] donation feature is available now for all marketplaces
+* Added: [eBay] ability to add watermark for images in custom description (description policy)
+* Improvement: significant improvements of cron subsystem
+* Improvement: significant improvements of synchronization subsystem
+* Improvement: significant improvements of extension licensing subsystem
+* Improvement: supporting of option "Manage stock" during getting product quantity
+* Improvement: supporting of option "Backorders" during getting product quantity
+* Improvement: [eBay] significant improvements of orders downloading subsystem
+* Improvement: [eBay] amount of variations attribute options was increased from 30 to 60
+* Improvement: [eBay] showing watermark info in preview of "Custom Description"
+* Improvement: [eBay] added support of Middle East / Southeast Asia regions in excluded shipping locations (shipping policy)
+* Fix: creating magento order duplicates in some cases
+* Fix: applying magento shipment changes to channel, even if channel is disabled
+* Fix: wrong original price in magento order for variation products
+* Fix: weight did not save in orders and shipments created by M2ePro
+* Fix: incorrect view of description that contains html code in all logs grids
+* Fix: "Edit" button on magento order page does not work, if associated products was created by M2ePro
+* Fix: QTY for the same simple products in one Bundle product
+* Fix: fatal error "column not found" in listing search items page in some MySql versions.
+* Fix: issue with autocomplete results in "Multi-Channels" listings grid
+* Fix: [eBay] watermark image was not updated during list/relist/revise actions if it was changed from policy settings
+* Fix: [eBay] wrong attribute labels for configurable products and images in some cases
+* Fix: [eBay] Fatal error: Call to a member function getChildObject() on a non-object in Settings View Grid
+* Fix: [eBay] Fatal error occurred: "SQLSTATE[42S22]: Column not found: 1054 Unknown column 'state' in 'order clause'".
+* Fix: [eBay] broken sort action for state and price columns on Magento View Mode
+* Fix: [eBay] do not sending tracking numbers for order items separately
+* Fix: [eBay] synchronization fails in some cases, if php version < 5.3
+* Fix: [eBay] skipping confirmation window for saving policy created from duplication
+* Fix: [eBay] disabled option "Listing Duration" from "Listing Type - Attribute" for "Simple Mode" in "Selling Policy"
+* Fix: [eBay] some issues in policies forms, for "Simple" and Advanced "Mode".
+* Fix: [eBay] "Variation Price" availability in "Listing Type": "Magento Attribute" if "Buy It Now" price: "None"
+* Fix: [eBay] Currency 'CAD,USD' not found
+* Fix: [eBay] adding of Magento blocks did not work in custom description when was run from a cron
+* Fix: [eBay] Motors problem with old compatibility ePIDs that were deleted from eBay
+* Fix: [Amazon] amazon search ASIN(s) tool is stuck in some cases
+* Fix: [Amazon] invalid billing address in magento order in some cases
+* Fix: [Amazon] major inventory synchronization issue, wrong statuses changing (ignore next inventory synchronization)
+* Fix: [Amazon] doesn't active "Assign To This Template" button because wrong Attribute Sets calculation
+* Fix: [Rakuten.com] sort by buyer name in orders grid did not work
+
 * 6.1.0 (r5993) (08/01/2014)
 
 * Added: [eBay] using of custom magento templates in custom description of the item

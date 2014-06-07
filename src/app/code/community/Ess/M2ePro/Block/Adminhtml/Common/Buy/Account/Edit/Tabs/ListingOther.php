@@ -20,23 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit_Tabs_ListingOther exten
 
     protected function _beforeToHtml()
     {
-        $attributesTemp = Mage::getModel('eav/entity_attribute')
-            ->getCollection()
-            ->setEntityTypeFilter(Mage::getModel('eav/entity')->setType('catalog_product')->getTypeId());
-
-        $attributes = array();
-        foreach ($attributesTemp as $attributeTemp) {
-            if ((int)$attributeTemp->getData('is_visible') != 1) {
-                continue;
-            }
-            $attributes[] = array(
-                'label' => $attributeTemp->getData('frontend_label'),
-                'code'  => $attributeTemp->getData('attribute_code')
-            );
-        }
-
-        $this->attributes = $attributes;
-        //var_dump($this->attributes); exit();
+        $this->attributes = Mage::helper('M2ePro/Magento_Attribute')->getGeneralFromAllAttributeSets();
 
         return parent::_beforeToHtml();
     }

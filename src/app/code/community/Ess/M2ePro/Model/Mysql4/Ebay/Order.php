@@ -21,20 +21,6 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Order
 
     // ########################################
 
-    public function getItemsTotal($orderId)
-    {
-        /** @var $collection Ess_M2ePro_Model_Mysql4_Ebay_Order_Collection */
-        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Order_Item');
-        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
-        $collection->addFieldToFilter('order_id', (int)$orderId);
-        $collection->getSelect()->columns(array('items_total' => new Zend_Db_Expr('SUM(`price`*`qty_purchased`)')));
-        $collection->getSelect()->group('order_id');
-
-        return round($collection->getFirstItem()->getData('items_total'), 2);
-    }
-
-    // ########################################
-
     public function getOrdersContainingItemsFromOrder(Ess_M2ePro_Model_Order $order)
     {
         // Prepare item_id-transaction_id pairs for sql

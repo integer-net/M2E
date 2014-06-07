@@ -24,9 +24,18 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
         return $this->__(self::TITLE);
     }
 
+    // ########################################
+
     public function getWizardInstallationNick()
     {
         return self::WIZARD_INSTALLATION_NICK;
+    }
+
+    public function isInstallationWizardFinished()
+    {
+        return Mage::helper('M2ePro/Module_Wizard')->isFinished(
+            $this->getWizardInstallationNick()
+        );
     }
 
     // ########################################
@@ -61,12 +70,14 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
 
     public function getDocumentationUrl()
     {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/ebay/support/', 'documentation_url');
+        return Mage::helper('M2ePro/Module')->getConfig()
+                    ->getGroupValue('/view/ebay/support/', 'documentation_url');
     }
 
     public function getVideoTutorialsUrl()
     {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/ebay/support/', 'video_tutorials_url');
+        return Mage::helper('M2ePro/Module')->getConfig()
+                    ->getGroupValue('/view/ebay/support/', 'video_tutorials_url');
     }
 
     // ########################################

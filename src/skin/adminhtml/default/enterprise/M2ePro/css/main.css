@@ -356,3 +356,21 @@ a.wizard-close:hover {
     float: left;
 }
 /* ================================================ */
+
+/* Description preview */
+.description-preview-watermark-info {
+    position: relative;
+    display: inline;
+}
+
+.description-preview-watermark-info p {
+    background-color: #fff;
+    color: #000;
+    position: absolute;
+    bottom: 5px;
+    left: 0px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* ================================================ */

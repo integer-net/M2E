@@ -14,6 +14,11 @@ class Ess_M2ePro_Adminhtml_Development_InspectionController
         phpinfo();
     }
 
+    public function cacheSettingsAction()
+    {
+        echo '<pre>'.print_r(Mage::app()->getCache()->getBackend(), true);
+    }
+
     //#############################################
 
     public function cronScheduleTableAction()

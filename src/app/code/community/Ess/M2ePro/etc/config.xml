@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>6.1.0</version>
+            <version>6.1.4</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -598,6 +598,16 @@
                     <ProductChange>
                         <table>m2epro_product_change</table>
                     </ProductChange>
+                    <OperationHistory>
+                        <table>m2epro_operation_history</table>
+                    </OperationHistory>
+                    <Processing_Request>
+                        <table>m2epro_processing_request</table>
+                    </Processing_Request>
+                    <Synchronization_Log>
+                        <table>m2epro_synchronization_log</table>
+                    </Synchronization_Log>
+
                     <AttributeSet>
                         <table>m2epro_attribute_set</table>
                     </AttributeSet>
@@ -607,17 +617,6 @@
                     <Wizard>
                         <table>m2epro_wizard</table>
                     </Wizard>
-
-                    <Synchronization_Log>
-                        <table>m2epro_synchronization_log</table>
-                    </Synchronization_Log>
-                    <Synchronization_Run>
-                        <table>m2epro_synchronization_run</table>
-                    </Synchronization_Run>
-
-                    <Processing_Request>
-                        <table>m2epro_processing_request</table>
-                    </Processing_Request>
 
                     <!-- ACCOUNTS AND MARKETPLACES -->
 
@@ -974,7 +973,7 @@
                     <cron_expr>*/1 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>M2ePro/Cron::process</model>
+                    <model>M2ePro/Cron_Type_Magento::process</model>
                 </run>
             </M2ePro_cron>
         </jobs>

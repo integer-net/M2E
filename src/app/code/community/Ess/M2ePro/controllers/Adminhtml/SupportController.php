@@ -16,7 +16,6 @@ class Ess_M2ePro_Adminhtml_SupportController
              ->_title(Mage::helper('M2ePro')->__('Support'));
 
         $this->getLayout()->getBlock('head')
-            ->addJs('M2ePro/Configuration/General.js')
             ->addJs('M2ePro/SupportHandler.js')
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addCss('M2ePro/css/Plugin/DropDown.css');

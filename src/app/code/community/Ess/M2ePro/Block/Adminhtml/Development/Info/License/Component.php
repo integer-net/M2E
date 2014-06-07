@@ -19,18 +19,23 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_License_Component extends Mage
 
     protected function _beforeToHtml()
     {
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
+
         $component = $this->getComponent();
 
-        if (Mage::helper('M2ePro/Module_License')->isLiveMode($component)) {
+        if ($licenseHelper->isFreeMode($component)) {
+            $licenseModeText = 'Free';
+        } elseif ($licenseHelper->isLiveMode($component)) {
             $licenseModeText = 'Live';
-        } elseif (Mage::helper('M2ePro/Module_License')->isTrialMode($component)) {
+        } elseif ($licenseHelper->isTrialMode($component)) {
             $licenseModeText = 'Trial';
         } else {
-            $licenseModeText = 'None';
+            $licenseModeText = 'Not Activated';
         }
 
         $this->licenseMode = $licenseModeText . Mage::helper('M2ePro')->__(' License');
-        $this->licenseExpirationDate = Mage::helper('M2ePro/Module_License')->getTextExpirationDate($component);
+        $this->licenseExpirationDate = $licenseHelper->getTextExpirationDate($component);
 
         return parent::_beforeToHtml();
     }

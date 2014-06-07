@@ -306,22 +306,22 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     public function addSuccessLog($message, array $params = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS, $params);
     }
 
     public function addNoticeLog($message, array $params = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Order_Log::TYPE_NOTICE, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE, $params);
     }
 
     public function addWarningLog($message, array $params = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Order_Log::TYPE_WARNING, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING, $params);
     }
 
     public function addErrorLog($message, array $params = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Order_Log::TYPE_ERROR, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR, $params);
     }
 
     // ########################################
@@ -523,15 +523,9 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
             $this->magentoOrder = $magentoOrderBuilder->getOrder();
 
-            $this->setData('magento_order_id', $this->magentoOrder->getId());
-            $this->setActionRequired(false);
-            $this->save();
-
             unset($magentoQuoteBuilder);
             unset($magentoOrderBuilder);
             // ---------------
-
-            $this->afterCreateMagentoOrder();
 
         } catch (Exception $e) {
 
@@ -548,6 +542,12 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
             throw $e;
         }
+
+        $this->setData('magento_order_id', $this->magentoOrder->getId());
+        $this->setActionRequired(false);
+        $this->save();
+
+        $this->afterCreateMagentoOrder();
 
         return $this->magentoOrder;
     }

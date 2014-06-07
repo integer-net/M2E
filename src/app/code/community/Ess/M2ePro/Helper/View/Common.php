@@ -21,35 +21,44 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         $componentsLabels = array();
 
         if (Mage::helper('M2ePro/Component_Amazon')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
+            $componentsLabels[] = $this->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
         }
 
         if (Mage::helper('M2ePro/Component_Buy')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentsLabels[] = $this->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
         }
 
         if (Mage::helper('M2ePro/Component_Play')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentsLabels[] = $this->__(Ess_M2ePro_Helper_Component_Play::TITLE);
         }
 
         if (count($componentsLabels) <= 0 || count($componentsLabels) > 2) {
-            return Mage::helper('M2ePro')->__('Sell On Multi-Channels');
+            return $this->__(self::TITLE);
         }
 
         return implode(' / ', $componentsLabels);
     }
+
+    // ########################################
 
     public function getWizardInstallationNick()
     {
         return self::WIZARD_INSTALLATION_NICK;
     }
 
+    public function isInstallationWizardFinished()
+    {
+        return Mage::helper('M2ePro/Module_Wizard')->isFinished(
+            $this->getWizardInstallationNick()
+        );
+    }
+
     // ########################################
 
-    public function getAutocompleteMaxInactiveHours()
+    public function getAutocompleteMaxItems()
     {
         $temp = (int)Mage::helper('M2ePro/Module')->getConfig()
-                        ->getGroupValue('/autocomplete/','max_records_quantity');
+                        ->getGroupValue('/view/common/autocomplete/','max_records_quantity');
         return $temp <= 0 ? 100 : $temp;
     }
 
@@ -57,12 +66,14 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
 
     public function getDocumentationUrl()
     {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/common/support/', 'documentation_url');
+        return Mage::helper('M2ePro/Module')->getConfig()
+                    ->getGroupValue('/view/common/support/', 'documentation_url');
     }
 
     public function getVideoTutorialsUrl()
     {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/common/support/', 'video_tutorials_url');
+        return Mage::helper('M2ePro/Module')->getConfig()
+                    ->getGroupValue('/view/common/support/', 'video_tutorials_url');
     }
 
     // ########################################

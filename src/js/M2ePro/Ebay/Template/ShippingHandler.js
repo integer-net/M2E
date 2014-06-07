@@ -65,6 +65,13 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
+    simple_mode_disallowed_hide : function()
+    {
+        $$('#template_shipping_data_container .simple_mode_disallowed').invoke('hide');
+    },
+
+    //----------------------------------
+
     postalCodeChange: function()
     {
         if ($('postal_code').value == '' || $('originating_postal_code').value != '') {
@@ -1239,8 +1246,6 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         Windows.focusedWindow = focusBefore;
     },
 
-    //----------------------------------
-
     showExcludeListPopup: function()
     {
         var self = EbayTemplateShippingHandlerObj;
@@ -1362,53 +1367,214 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
     updateExcludedLocationsHiddenInput: function(element)
     {
-        var self              = EbayTemplateShippingHandlerObj,
-            code   = element.value,
-            title  = element.next().innerHTML,
-            region = element.getAttribute('region'),
-            type   = element.getAttribute('location_type');
+        var self = EbayTemplateShippingHandlerObj,
+            asia = $('shipping_excluded_location_international_Asia');
 
         if (element.hasClassName('shipping_excluded_region')) {
 
-            if (element.checked) {
-                self.selectExcludedLocationAllRegion(code, 1);
-                self.deleteExcludedLocation(code, 'region');
-                self.addExcludedLocation(code, title, region, type);
-            } else {
-                self.selectExcludedLocationAllRegion(code, 0);
-                self.deleteExcludedLocation(code);
-            }
+            element.checked
+                ? self.processRegionWasSelected(element) : self.processRegionWasDeselected(element);
+
+            self.processRelatedRegions(element);
 
         } else {
 
-            if (element.checked) {
+            element.checked
+                ? self.processOneLocationWasSelected(element) : self.processOneLocationWasDeselected(element);
 
-                self.addExcludedLocation(code, title, region, type);
-
-                if (self.isAllLocationsOfRegionAreSelected(region)) {
-                    var regionTitle = $('shipping_excluded_location_international_' + region).next('label').innerHTML;
-
-                    $('shipping_excluded_location_international_' + region).checked = 1;
-                    self.deleteExcludedLocation(region, 'region');
-                    self.addExcludedLocation(region, regionTitle, null, type);
-                }
-            } else {
-
-                self.deleteExcludedLocation(code);
-
-                if (region != null) {
-                    self.deleteExcludedLocation(region);
-                    self.deleteExcludedLocation(region, 'region');
-
-                    $('shipping_excluded_location_international_' + region).checked = 0;
-
-                    var result = self.getLocationsByRegion(region);
-                    result['locations'].each(function(el){
-                        self.addExcludedLocation(el.value, el.next().innerHTML, region, type);
-                    });
-                }
+            if (self.isChildAsiaRegion(element.getAttribute('region'))) {
+                self.processAsiaChildRegion(element);
             }
         }
+
+        if (self.isAllLocationsOfAsiaAreSelected() && !asia.checked) {
+            asia.checked = 1;
+            self.processRegionWasSelected($(asia));
+        }
+    },
+
+    //----------------------------------
+
+    processRegionWasSelected: function(regionCheckBox)
+    {
+        var self = EbayTemplateShippingHandlerObj,
+
+            code   = regionCheckBox.value,
+            title  = regionCheckBox.next().innerHTML,
+            region = regionCheckBox.getAttribute('region'),
+            type   = regionCheckBox.getAttribute('location_type');
+
+        self.selectExcludedLocationAllRegion(code, 1);
+        self.deleteExcludedLocation(code, 'region');
+        self.addExcludedLocation(code, title, region, type);
+    },
+
+    processRegionWasDeselected: function(regionCheckBox)
+    {
+        var self = EbayTemplateShippingHandlerObj,
+            code = regionCheckBox.value;
+
+        self.selectExcludedLocationAllRegion(code, 0);
+        self.deleteExcludedLocation(code);
+    },
+
+    processRelatedRegions: function(regionCheckBox)
+    {
+        var self = EbayTemplateShippingHandlerObj;
+
+        if (self.isAsiaRegion(regionCheckBox.value)) {
+            self.processAsiaRegion(regionCheckBox);
+        }
+
+        if (self.isChildAsiaRegion(regionCheckBox.value)) {
+            self.processAsiaChildRegion(regionCheckBox);
+        }
+    },
+
+    processAsiaRegion: function(regionCheckBox)
+    {
+        var self = EbayTemplateShippingHandlerObj;
+
+        var middleEast = $('shipping_excluded_location_international_Middle East'),
+            southeastAsia = $('shipping_excluded_location_international_Southeast Asia');
+
+        if (regionCheckBox.checked) {
+
+            if (!middleEast.checked) {
+                middleEast.checked = 1;
+                self.processRegionWasSelected(middleEast);
+            }
+
+            if (!southeastAsia.checked) {
+                southeastAsia.checked = 1;
+                self.processRegionWasSelected(southeastAsia);
+            }
+
+            return;
+        }
+
+        middleEast.checked = 0;
+        southeastAsia.checked = 0;
+
+        self.processRegionWasDeselected(middleEast);
+        self.processRegionWasDeselected(southeastAsia);
+    },
+
+    processAsiaChildRegion: function(regionCheckBox)
+    {
+        var self = EbayTemplateShippingHandlerObj,
+            asia = $('shipping_excluded_location_international_Asia');
+
+        if (!regionCheckBox.checked && asia.checked) {
+
+            var code = asia.value;
+
+            asia.checked = 0;
+            self.deleteExcludedLocation(code, 'code');
+
+            $$('div[id="shipping_excluded_location_international_region_' + code + '"] .shipping_excluded_location').each(function(el){
+                el.checked = 1;
+                self.addExcludedLocation(el.value, el.next().innerHTML, el.getAttribute('region'), el.getAttribute('type'));
+            });
+        }
+    },
+
+    processOneLocationWasSelected: function(locationCheckBox)
+    {
+        var self = EbayTemplateShippingHandlerObj,
+
+            code   = locationCheckBox.value,
+            title  = locationCheckBox.next().innerHTML,
+            region = locationCheckBox.getAttribute('region'),
+            type   = locationCheckBox.getAttribute('location_type');
+
+        self.addExcludedLocation(code, title, region, type);
+
+        if (!self.isAllLocationsOfRegionAreSelected(region)) {
+            return;
+        }
+
+        if (self.isAsiaRegion(region) && !self.isAllLocationsOfAsiaAreSelected()) {
+            return;
+        }
+
+        var regionTitle = $('shipping_excluded_location_international_' + region).next('label').innerHTML;
+
+        $('shipping_excluded_location_international_' + region).checked = 1;
+        self.deleteExcludedLocation(region, 'region');
+        self.addExcludedLocation(region, regionTitle, null, type);
+    },
+
+    processOneLocationWasDeselected: function(locationCheckBox)
+    {
+        var self = EbayTemplateShippingHandlerObj,
+
+            code   = locationCheckBox.value,
+            region = locationCheckBox.getAttribute('region'),
+            type   = locationCheckBox.getAttribute('location_type');
+
+        self.deleteExcludedLocation(code);
+
+        if (region == null) {
+            return;
+        }
+
+        self.deleteExcludedLocation(region);
+        self.deleteExcludedLocation(region, 'region');
+
+        $('shipping_excluded_location_international_' + region).checked = 0;
+
+        var result = self.getLocationsByRegion(region);
+        result['locations'].each(function(el){
+            self.addExcludedLocation(el.value, el.next().innerHTML, region, type);
+        });
+    },
+
+    //----------------------------------
+
+    updateExcludedLocationsTitles: function(sourse)
+    {
+        sourse = sourse || 'excluded_locations_popup_titles';
+
+        var excludedLocations = $(sourse.replace('titles','hidden')).value.evalJSON(),
+            title = sourse == 'excluded_locations_popup_titles'
+                ? M2ePro.translator.translate('None')
+                : M2ePro.translator.translate('No locations are currently excluded.');
+
+        if (excludedLocations.length) {
+
+            title = [];
+
+            excludedLocations.each(function(location){
+                var currentTitle = EbayTemplateShippingHandlerObj.isRootLocation(location)
+                    ? '<b>' + location['title'] + '</b>' : location['title'];
+                title.push(currentTitle);
+            });
+
+            title = title.join(', ');
+        }
+
+        $('excluded_locations_reset_link').show();
+        if (sourse == 'excluded_locations_popup_titles' && title == M2ePro.translator.translate('None')) {
+            $('excluded_locations_reset_link').hide()
+        }
+
+        $(sourse).innerHTML = title;
+    },
+
+    updateExcludedLocationsSelectedRegions: function()
+    {
+        $$('.shipping_excluded_location_region_link').each(function(el){
+
+            var locations = EbayTemplateShippingHandlerObj.getLocationsByRegion(el.getAttribute('region'));
+
+            el.removeClassName('have_selected_locations');
+//            if (locations['total'] != locations['selected'] && locations['selected'] > 0) {
+            if (locations['selected'] > 0 && !el.children[0].checked) {
+                el.addClassName('have_selected_locations');
+                el.down('span').innerHTML = '(' + locations['selected'] + ' ' + M2ePro.translator.translate('selected') + ')';
+            }
+        });
     },
 
     //----------------------------------
@@ -1441,54 +1607,34 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         return locations['total'] == locations['selected'];
     },
 
+    isAllLocationsOfAsiaAreSelected: function()
+    {
+        var asiaLocations = EbayTemplateShippingHandlerObj.getLocationsByRegion('Asia'),
+            eastLocations = EbayTemplateShippingHandlerObj.getLocationsByRegion('Middle East'),
+            southLocations = EbayTemplateShippingHandlerObj.getLocationsByRegion('Southeast Asia');
+
+        if (!asiaLocations || !eastLocations || !southLocations) {
+            return false;
+        }
+
+        return asiaLocations['total'] == asiaLocations['selected'] &&
+               eastLocations['total'] == eastLocations['selected'] &&
+               southLocations['total'] == southLocations['selected'];
+    },
+
     isRootLocation: function(location)
     {
         return !!(location['region'] == null);
     },
 
-    //----------------------------------
-
-    updateExcludedLocationsTitles: function(sourse)
+    isAsiaRegion: function(location)
     {
-        sourse = sourse || 'excluded_locations_popup_titles';
-
-        var excludedLocations = $(sourse.replace('titles','hidden')).value.evalJSON(),
-            title = sourse == 'excluded_locations_popup_titles'
-                ? M2ePro.translator.translate('None')
-                : M2ePro.translator.translate('No locations are currently excluded.');
-
-        if (excludedLocations.length) {
-            title = [];
-            excludedLocations.each(function(location){
-                var currentTitle = EbayTemplateShippingHandlerObj.isRootLocation(location)
-                    ? '<b>' + location['title'] + '</b>'
-                    : location['title'];
-
-                title.push(currentTitle);
-            });
-            title = title.join(', ');
-        }
-
-        $('excluded_locations_reset_link').show();
-        if (sourse == 'excluded_locations_popup_titles' && title == M2ePro.translator.translate('None')) {
-            $('excluded_locations_reset_link').hide()
-        }
-
-        $(sourse).innerHTML = title;
+        return location == 'Asia';
     },
 
-    updateExcludedLocationsSelectedRegions: function()
+    isChildAsiaRegion: function(location)
     {
-        $$('.shipping_excluded_location_region_link').each(function(el){
-
-            var locations = EbayTemplateShippingHandlerObj.getLocationsByRegion(el.getAttribute('region'));
-
-            el.removeClassName('have_selected_locations');
-            if (locations['total'] != locations['selected'] && locations['selected'] > 0) {
-                el.addClassName('have_selected_locations');
-                el.down('span').innerHTML = '(' + locations['selected'] + ' ' + M2ePro.translator.translate('selected') + ')';
-            }
-        });
+        return location == 'Middle East' || location == 'Southeast Asia';
     },
 
     //----------------------------------

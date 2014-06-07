@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Revise_Single
 
     protected function getActionType()
     {
-        return Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE;
+        return Ess_M2ePro_Model_Listing_Product::ACTION_REVISE;
     }
 
     // ########################################
@@ -56,20 +56,20 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Revise_Single
             return false;
         }
 
-        if (Mage::getModel('M2ePro/Ebay_Listing_Product_Variation_Updater')
-                    ->isAddedNewVariationsAttributes($this->listingProduct)) {
-
-            $message = array(
-                // ->__('Variation attributes were changed. Please stop and list product.');
-                parent::MESSAGE_TEXT_KEY => 'Variation attributes were changed. Please stop and list product.',
-                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
-            );
-
-            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
-
-            return false;
-        }
+//        if (Mage::getModel('M2ePro/Ebay_Listing_Product_Variation_Updater')
+//                    ->isAddedNewVariationsAttributes($this->listingProduct)) {
+//
+//            $message = array(
+//                // ->__('Variation attributes were changed. Please stop and list product.');
+//                parent::MESSAGE_TEXT_KEY => 'Variation attributes were changed. Please stop and list product.',
+//                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
+//            );
+//
+//            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
+//                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
+//
+//            return false;
+//        }
 
         return true;
     }

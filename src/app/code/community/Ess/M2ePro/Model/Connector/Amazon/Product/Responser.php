@@ -83,8 +83,8 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Responser
 
     protected function inspectProducts()
     {
-        /** @var $inspector Ess_M2ePro_Model_Amazon_Template_Synchronization_ProductInspector */
-        $inspector = Mage::getModel('M2ePro/Amazon_Template_Synchronization_ProductInspector');
+        /** @var $inspector Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector */
+        $inspector = Mage::getModel('M2ePro/Amazon_Synchronization_Templates_Inspector');
         $inspector->processProducts($this->succeededListingsProducts);
     }
 
@@ -112,13 +112,13 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Responser
         $action = $this->getListingsLogsCurrentAction();
         is_null($action) && $action = Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN;
 
-        $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN;
+        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
         if ($this->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
-            $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN;
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
         } else if ($this->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
-            $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER;
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
         } else {
-            $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION;
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
         }
 
         $logModel = Mage::getModel('M2ePro/Listing_Log');

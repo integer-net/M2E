@@ -60,17 +60,13 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
             $muteMessages = $lockNotification || $browserNotification || $maintenanceNotification;
 
-            if (!$muteMessages &&
-                Mage::helper('M2ePro/Module_Wizard')->isFinished(
-                    $this->getCustomViewHelper()->getWizardInstallationNick()
-                )) {
+            if (!$muteMessages && $this->getCustomViewHelper()->isInstallationWizardFinished()) {
 
                 $licenseMainErrorStatus =
                     $this->addLicenseActivationNotifications() ||
                     $this->addLicenseValidationFailNotifications();
 
                 if (!$licenseMainErrorStatus) {
-                    $this->addLicenseModesNotifications();
                     $this->addLicenseStatusesNotifications();
                     $this->addLicenseExpirationDatesNotifications();
                     $this->addLicenseTrialNotifications();
@@ -250,21 +246,10 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
     private function addLicenseValidationFailNotifications()
     {
-        // MAGENTO GO UGLY HACK
-        //#################################
-        if (Mage::helper('M2ePro/Magento')->isGoEdition()) {
-            return false;
-        }
-        //#################################
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
 
-        $domainNotify = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/license/validation/domain/notification/', 'mode'
-        );
-
-        $licenseDomain = Mage::helper('M2ePro/Module_License')->getDomain();
-
-        if ($domainNotify &&
-            strtolower($licenseDomain) != strtolower(Mage::helper('M2ePro/Client')->getDomain())) {
+        if (!$licenseHelper->isValidDomain()) {
 
             $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
             $endLink = '</a>';
@@ -277,14 +262,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             return true;
         }
 
-        $ipNotify = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/license/validation/ip/notification/', 'mode'
-        );
-
-        $licenseIp = Mage::helper('M2ePro/Module_License')->getIp();
-
-        if ($ipNotify &&
-            strtolower($licenseIp) != strtolower(Mage::helper('M2ePro/Client')->getIp())) {
+        if (!$licenseHelper->isValidIp()) {
 
             $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
             $endLink = '</a>';
@@ -297,14 +275,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             return true;
         }
 
-        $directoryNotify = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/license/validation/directory/notification/', 'mode'
-        );
-
-        $licenseDirectory = Mage::helper('M2ePro/Module_License')->getDirectory();
-
-        if ($directoryNotify &&
-            strtolower($licenseDirectory) != strtolower(Mage::helper('M2ePro/Client')->getBaseDirectory())) {
+        if (!$licenseHelper->isValidDirectory()) {
 
             $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
             $endLink = '</a>';
@@ -322,41 +293,20 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
     // --------------------------------------------
 
-    private function addLicenseModesNotifications()
-    {
-        $hasMessage = false;
-
-        foreach ($this->getCustomViewComponentHelper()->getActiveComponents() as $component) {
-
-            if (Mage::helper('M2ePro/Module_License')->isNoneMode($component)) {
-
-                $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
-                $endLink = '</a>';
-
-                $message = 'M2E Pro module requires activation for "%s" component. ';
-                $message .= 'Go to the %slicense page%s.';
-                $message = Mage::helper('M2ePro')->__(
-                    $message,
-                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
-                    $startLink,
-                    $endLink
-                );
-
-                $this->_getSession()->addError($message);
-                $hasMessage = true;
-            }
-        }
-
-        return $hasMessage;
-    }
-
     private function addLicenseStatusesNotifications()
     {
         $hasMessage = false;
 
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
+
         foreach ($this->getCustomViewComponentHelper()->getActiveComponents() as $component) {
 
-            if (Mage::helper('M2ePro/Module_License')->isSuspendedStatus($component)) {
+            if ($licenseHelper->isNoneMode($component)) {
+                continue;
+            }
+
+            if ($licenseHelper->isSuspendedStatus($component)) {
 
                 $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
                 $endLink = '</a>';
@@ -374,9 +324,28 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
                 $hasMessage = true;
             }
 
-            if (Mage::helper('M2ePro/Module_License')->isClosedStatus($component)) {
+            if ($licenseHelper->isClosedStatus($component)) {
 
                 $message = 'M2E Pro module license closed for "%s" component. ';
+                $message .= 'Go to the %slicense page%s.';
+
+                $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
+                $endLink = '</a>';
+
+                $message = Mage::helper('M2ePro')->__(
+                    $message,
+                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
+                    $startLink,
+                    $endLink
+                );
+
+                $this->_getSession()->addError($message);
+                $hasMessage = true;
+            }
+
+            if ($licenseHelper->isCanceledStatus($component)) {
+
+                $message = 'M2E Pro module license canceled for "%s" component. ';
                 $message .= 'Go to the %slicense page%s.';
 
                 $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
@@ -401,9 +370,16 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
     {
         $hasMessage = false;
 
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
+
         foreach ($this->getCustomViewComponentHelper()->getActiveComponents() as $component) {
 
-            if (Mage::helper('M2ePro/Module_License')->isExpirationDate($component)) {
+            if ($licenseHelper->isNoneMode($component)) {
+                continue;
+            }
+
+            if ($licenseHelper->isExpirationDate($component)) {
 
                 $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
                 $endLink = '</a>';
@@ -429,11 +405,15 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
     {
         $hasMessage = false;
 
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
+
         foreach ($this->getCustomViewComponentHelper()->getActiveComponents() as $component) {
 
-            if (Mage::helper('M2ePro/Module_License')->isTrialMode($component)) {
+            if ($licenseHelper->isTrialMode($component) &&
+                !$licenseHelper->isExpirationDate($component)) {
 
-                $expirationDate = Mage::helper('M2ePro/Module_License')->getTextExpirationDate($component);
+                $expirationDate = $licenseHelper->getTextExpirationDate($component);
 
                 $message = 'M2E Pro module is running under Trial License for "%s" component, ';
                 $message .= 'that will expire on %s.';
@@ -456,14 +436,21 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
     {
         $hasMessage = false;
 
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
+
         foreach ($this->getCustomViewComponentHelper()->getActiveComponents() as $component) {
 
-            if (Mage::helper('M2ePro/Module_License')->getIntervalBeforeExpirationDate($component) > 0 &&
-                Mage::helper('M2ePro/Module_License')->getIntervalBeforeExpirationDate($component) <= 60*60*24*3) {
+            if ($licenseHelper->isNoneMode($component)) {
+                continue;
+            }
+
+            if ($licenseHelper->getIntervalBeforeExpirationDate($component) > 0 &&
+                $licenseHelper->getIntervalBeforeExpirationDate($component) <= 60*60*24*3) {
 
                 $startLink = '<a href="'.Mage::helper('M2ePro/View_Configuration')->getLicenseUrl().'" target="_blank">';
                 $endLink = '</a>';
-                $expirationDate = Mage::helper('M2ePro/Module_License')->getTextExpirationDate($component);
+                $expirationDate = $licenseHelper->getTextExpirationDate($component);
 
                 $message = 'M2E Pro module license will expire on %s for "%s" component. ';
                 $message .= 'Go to the %slicense page%s.';

@@ -28,9 +28,9 @@ class Ess_M2ePro_Model_Servicing_Task_Analytic implements Ess_M2ePro_Model_Servi
         }
 
         $validValues = array(
-            Ess_M2ePro_Helper_View::ANALYTIC_VIEW_BOTH,
-            Ess_M2ePro_Helper_View::ANALYTIC_VIEW_EBAY,
-            Ess_M2ePro_Helper_View::ANALYTIC_VIEW_COMMON
+            Ess_M2ePro_Helper_Module_Analytic::VIEW_BOTH,
+            Ess_M2ePro_Helper_Module_Analytic::VIEW_EBAY,
+            Ess_M2ePro_Helper_Module_Analytic::VIEW_COMMON
         );
 
         if (isset($data['view']) && in_array($data['view'],$validValues)) {
@@ -39,9 +39,9 @@ class Ess_M2ePro_Model_Servicing_Task_Analytic implements Ess_M2ePro_Model_Servi
         }
 
         $validValues = array(
-            Ess_M2ePro_Helper_View::ANALYTIC_NAVIGATION_MODE_DISABLED,
-            Ess_M2ePro_Helper_View::ANALYTIC_NAVIGATION_MODE_STANDARD,
-            Ess_M2ePro_Helper_View::ANALYTIC_NAVIGATION_MODE_ADVANCED
+            Ess_M2ePro_Helper_Module_Analytic::NAVIGATION_MODE_DISABLED,
+            Ess_M2ePro_Helper_Module_Analytic::NAVIGATION_MODE_STANDARD,
+            Ess_M2ePro_Helper_Module_Analytic::NAVIGATION_MODE_ADVANCED
         );
 
         if (isset($data['navigation_mode']) && in_array($data['navigation_mode'],$validValues)) {
@@ -51,9 +51,9 @@ class Ess_M2ePro_Model_Servicing_Task_Analytic implements Ess_M2ePro_Model_Servi
         }
 
         $validValues = array(
-            Ess_M2ePro_Helper_View::ANALYTIC_ACTION_MODE_DISABLED,
-            Ess_M2ePro_Helper_View::ANALYTIC_ACTION_MODE_ALL,
-            Ess_M2ePro_Helper_View::ANALYTIC_ACTION_MODE_SPECIAL
+            Ess_M2ePro_Helper_Module_Analytic::ACTION_MODE_DISABLED,
+            Ess_M2ePro_Helper_Module_Analytic::ACTION_MODE_ALL,
+            Ess_M2ePro_Helper_Module_Analytic::ACTION_MODE_SPECIAL
         );
 
         if (isset($data['action_mode']) && in_array($data['action_mode'],$validValues)) {

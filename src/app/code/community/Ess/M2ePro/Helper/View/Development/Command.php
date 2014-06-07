@@ -10,7 +10,7 @@ class Ess_M2ePro_Helper_View_Development_Command extends Mage_Core_Helper_Abstra
 
     const CONTROLLER_MODULE_MODULE          = 'adminhtml_development_module_module';
     const CONTROLLER_MODULE_SYNCHRONIZATION = 'adminhtml_development_module_synchronization';
-    const CONTROLLER_MODULE_EBAY            = 'adminhtml_development_module_ebay';
+    const CONTROLLER_MODULE_INTEGRATION     = 'adminhtml_development_module_integration';
 
     const CONTROLLER_TOOLS_M2EPRO_GENERAL   = 'adminhtml_development_tools_m2ePro_general';
     const CONTROLLER_TOOLS_M2EPRO_INSTALL   = 'adminhtml_development_tools_m2ePro_install';

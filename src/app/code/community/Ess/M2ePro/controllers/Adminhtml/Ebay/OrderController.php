@@ -15,10 +15,13 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
              ->_title(Mage::helper('M2ePro')->__('Orders'));
 
         $this->getLayout()->getBlock('head')
+             ->addJs('M2ePro/Plugin/ProgressBar.js')
+             ->addCss('M2ePro/css/Plugin/ProgressBar.css')
              ->addJs('M2ePro/Order/Debug.js')
              ->addJs('M2ePro/Order/Handler.js')
              ->addJs('M2ePro/Order/Edit/ItemHandler.js')
-             ->addJs('M2ePro/Order/Edit/ShippingAddressHandler.js');
+             ->addJs('M2ePro/Order/Edit/ShippingAddressHandler.js')
+             ->addJs('M2ePro/Ebay/Order/MigrationToV611Handler.js');
 
         return $this;
     }
@@ -35,7 +38,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         parent::preDispatch();
 
         Mage::getSingleton('M2ePro/Order_Log_Manager')
-            ->setInitiator(Ess_M2ePro_Model_Order_Log::INITIATOR_USER);
+            ->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
     }
 
     //#############################################
@@ -104,6 +107,8 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         }
 
         $id = $this->getRequest()->getParam('order_id');
+
+        /** @var Ess_M2ePro_Model_Order $order */
         $order = Mage::helper('M2ePro/Component_Ebay')->getObject('Order', (int)$id);
 
         $data = array();
@@ -137,7 +142,10 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
             }
         }
 
-        $order->setData('shipping_address', json_encode($data));
+        $shippingDetails = $order->getChildObject()->getShippingDetails();
+        $shippingDetails['address'] = $data;
+
+        $order->setData('shipping_details', json_encode($shippingDetails));
         $order->save();
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Order address has been updated.'));
@@ -276,6 +284,21 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         }
 
         return $this->_redirectUrl($transaction->getPaypalUrl());
+    }
+
+    //#############################################
+
+    public function migrateOrdersPackToV611Action()
+    {
+        $ordersCount = (int)$this->getRequest()->getParam('orders_count');
+        if ($ordersCount <= 0) {
+            return;
+        }
+
+        /** @var Ess_M2ePro_Model_Upgrade_Migration_ToVersion611_OrdersData $migrationModel */
+        $migrationModel = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion611_OrdersData');
+        $migrationModel->setMaxOrdersCount($ordersCount);
+        $migrationModel->migrate();
     }
 
     //#############################################

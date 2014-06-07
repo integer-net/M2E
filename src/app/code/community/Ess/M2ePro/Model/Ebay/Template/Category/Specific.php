@@ -189,15 +189,45 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
             $this->isAttributeSetMode() && $valueData[count($valueData)-1]['id'] = -6;
         }
 
-        if ($this->isCustomAttributeValueMode()) {
-            $valueTemp = $this->getAttributeValue($this->getData('value_custom_attribute'));
-            $valueData[] = array('id'=>'unknown','value'=>$valueTemp);
-            $this->isAttributeSetMode() && $valueData[count($valueData)-1]['id'] = -6;
-        }
+        if ($this->isCustomAttributeValueMode() || $this->isCustomLabelAttributeValueMode()) {
 
-        if ($this->isCustomLabelAttributeValueMode()) {
-            $valueTemp = $this->getAttributeValue($this->getData('value_custom_attribute'));
-            $valueData[] = array('id'=>'unknown','value'=>$valueTemp);
+            $attributeCode = $this->getData('value_custom_attribute');
+            $valueTemp = $this->getAttributeValue($attributeCode);
+
+            $categoryId = $this->getCategoryTemplate()->getCategoryMainId();
+            $marketplaceId = $this->getCategoryTemplate()->getMarketplaceId();
+
+            if(!empty($categoryId) && !empty($marketplaceId) && strpos($valueTemp, ',') &&
+                $this->getMagentoProduct()->getAttributeFrontendInput($attributeCode) === 'multiselect') {
+
+                $specifics = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
+                                    ->getSpecifics($categoryId, $marketplaceId);
+
+                $usedAsMultiple = false;
+                foreach($specifics['specifics'] as $specific) {
+
+                    if($specific['id'] === $this->getAttributeId() &&
+                        $specific['type'] === 'select_multiple') {
+
+                        $valuesTemp = explode(',', $valueTemp);
+
+                        foreach($valuesTemp as $val) {
+                            $valueData[] =  array('id'=>'unknown','value'=>trim($val));
+                        }
+
+                        $usedAsMultiple = true;
+                        break;
+                    }
+                }
+
+                if (!$usedAsMultiple) {
+                    $valueData[] = array('id'=>'unknown','value'=>$valueTemp);
+                }
+
+            } else {
+                $valueData[] = array('id'=>'unknown','value'=>$valueTemp);
+            }
+
             $this->isAttributeSetMode() && $valueData[count($valueData)-1]['id'] = -6;
         }
 

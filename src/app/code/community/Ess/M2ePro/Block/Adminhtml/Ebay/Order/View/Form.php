@@ -6,13 +6,20 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Block_Widget_Container
 {
+    // ##########################################################
+
     public $shippingAddress = array();
 
     public $ebayWarehouseAddress = array();
 
     public $globalShippingServiceDetails = array();
 
-    public $realMagentoOrderId = NULL;
+    public $realMagentoOrderId = null;
+
+    /** @var $order Ess_M2ePro_Model_Order */
+    public $order = null;
+
+    // ##########################################################
 
     public function __construct()
     {
@@ -24,7 +31,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
         $this->setTemplate('M2ePro/ebay/order.phtml');
         //------------------------------
 
-        /** @var $order Ess_M2ePro_Model_Order */
         $this->order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
     }
 
@@ -79,29 +85,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
         ));
 
         return parent::_beforeToHtml();
-    }
-
-    public function getTaxSuffix()
-    {
-        if ($this->order->getChildObject()->hasVat()) {
-            return ' (' . Mage::helper('M2ePro')->__('Incl. Tax') .') ';
-        } else if ($this->order->getChildObject()->hasTax()) {
-            return ' (' . Mage::helper('M2ePro')->__('Excl. Tax') .') ';
-        }
-        return '';
-    }
-
-    public function getShippingTaxSuffix()
-    {
-        $ebayOrder = $this->order->getChildObject();
-
-        if ($ebayOrder->isShippingPriceIncludesTax()) {
-            return ' (' . Mage::helper('M2ePro')->__('Incl. Tax') . ') ';
-        } else if ($ebayOrder->getTaxRate() > 0) {
-            return ' (' . Mage::helper('M2ePro')->__('Excl. Tax') . ') ';
-        }
-
-        return '';
     }
 
     private function getStore()

@@ -57,7 +57,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_NewSku_MultipleResponser
         $this->unsetLocks();
 
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Product_Dispatcher');
-        $dispatcherObject->process(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_LIST,
+        $dispatcherObject->process(Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
                                    $needListListingsProducts, $this->params['params']);
     }
 

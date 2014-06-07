@@ -37,7 +37,7 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
     public function getPrevStep()
     {
         $currentStep = Mage::helper('M2ePro/Module_Wizard')->getStep(
-            Ess_M2ePro_Helper_Module::MIGRATION_WIZARD_NICK
+            Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK
         );
 
         $prevStepIndex = array_search($currentStep,$this->steps) - 1;
@@ -48,7 +48,7 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
     public function getNextStep()
     {
         $currentStep = Mage::helper('M2ePro/Module_Wizard')->getStep(
-            Ess_M2ePro_Helper_Module::MIGRATION_WIZARD_NICK
+            Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK
         );
 
         $nextStepIndex = array_search($currentStep,$this->steps) + 1;

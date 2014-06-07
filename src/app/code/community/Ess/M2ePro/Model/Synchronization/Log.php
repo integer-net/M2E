@@ -6,38 +6,38 @@
 
 class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
 {
-    const SYNCH_TASK_UNKNOWN = 0;
-    const _SYNCH_TASK_UNKNOWN = 'System';
+    const TASK_UNKNOWN = 0;
+    const _TASK_UNKNOWN = 'System';
 
-    const SYNCH_TASK_DEFAULTS = 1;
-    const _SYNCH_TASK_DEFAULTS = 'Default Synchronization';
-    const SYNCH_TASK_TEMPLATES = 2;
-    const _SYNCH_TASK_TEMPLATES = 'Inventory Synchronization';
-    const SYNCH_TASK_ORDERS = 3;
-    const _SYNCH_TASK_ORDERS = 'Orders Synchronization';
-    const SYNCH_TASK_FEEDBACKS = 4;
-    const _SYNCH_TASK_FEEDBACKS = 'Feedback Synchronization';
-    const SYNCH_TASK_MARKETPLACES = 5;
-    const _SYNCH_TASK_MARKETPLACES = 'Marketplaces Synchronization';
-    const SYNCH_TASK_OTHER_LISTINGS = 6;
-    const _SYNCH_TASK_OTHER_LISTINGS = '3rd Party Listings Synchronization';
-    const SYNCH_TASK_POLICIES = 7;
-    const _SYNCH_TASK_OTHER_POLICIES = 'Business Policies Synchronization';
+    const TASK_DEFAULTS = 1;
+    const _TASK_DEFAULTS = 'Default Synchronization';
+    const TASK_TEMPLATES = 2;
+    const _TASK_TEMPLATES = 'Inventory Synchronization';
+    const TASK_ORDERS = 3;
+    const _TASK_ORDERS = 'Orders Synchronization';
+    const TASK_FEEDBACKS = 4;
+    const _TASK_FEEDBACKS = 'Feedback Synchronization';
+    const TASK_MARKETPLACES = 5;
+    const _TASK_MARKETPLACES = 'Marketplaces Synchronization';
+    const TASK_OTHER_LISTINGS = 6;
+    const _TASK_OTHER_LISTINGS = '3rd Party Listings Synchronization';
+    const TASK_POLICIES = 7;
+    const _TASK_OTHER_POLICIES = 'Business Policies Synchronization';
 
     /**
      * @var null|int
      */
-    private $_synchRun = NULL;
+    private $operationHistoryId = NULL;
 
     /**
      * @var int
      */
-    private $_synchTask = self::SYNCH_TASK_UNKNOWN;
+    private $task = self::TASK_UNKNOWN;
 
     /**
      * @var int
      */
-    protected $_initiator = Ess_M2ePro_Model_Synchronization_Run::INITIATOR_UNKNOWN;
+    protected $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
 
     //####################################
 
@@ -49,19 +49,19 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
 
     //####################################
 
-    public function setSynchronizationRun($id)
+    public function setOperationHistoryId($id)
     {
-        $this->_synchRun = (int)$id;
+        $this->operationHistoryId = (int)$id;
     }
 
-    public function setInitiator($initiator = parent::INITIATOR_UNKNOWN)
+    public function setInitiator($initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN)
     {
-        $this->_initiator = (int)$initiator;
+        $this->initiator = (int)$initiator;
     }
 
-    public function setSynchronizationTask($task = self::SYNCH_TASK_UNKNOWN)
+    public function setSynchronizationTask($task = self::TASK_UNKNOWN)
     {
-        $this->_synchTask = (int)$task;
+        $this->task = (int)$task;
     }
 
     //####################################
@@ -85,22 +85,22 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
 
     public function getActionsTitles()
     {
-        return $this->getActionsTitlesByClass(__CLASS__,'SYNCH_TASK_');
+        return $this->getActionsTitlesByClass(__CLASS__,'TASK_');
     }
 
-    public function clearMessages($synchTask = NULL)
+    public function clearMessages($task = NULL)
     {
-        $columnName = !is_null($synchTask) ? 'synch_task' : NULL;
-        $this->clearMessagesByTable('M2ePro/Synchronization_Log',$columnName,$synchTask);
+        $columnName = !is_null($task) ? 'task' : NULL;
+        $this->clearMessagesByTable('M2ePro/Synchronization_Log',$columnName,$task);
     }
 
     //####################################
 
     private function createMessage($dataForAdd)
     {
-        $dataForAdd['synchronization_run_id'] = $this->_synchRun;
-        $dataForAdd['synch_task'] = $this->_synchTask;
-        $dataForAdd['initiator'] = $this->_initiator;
+        $dataForAdd['operation_history_id'] = $this->operationHistoryId;
+        $dataForAdd['task'] = $this->task;
+        $dataForAdd['initiator'] = $this->initiator;
         $dataForAdd['component_mode'] = $this->componentMode;
 
         Mage::getModel('M2ePro/Synchronization_Log')

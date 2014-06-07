@@ -300,7 +300,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
         return $sku;
     }
 
-    public function getQty($productMode = false)
+    public function getQty()
     {
         $qty = 0;
 
@@ -318,7 +318,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
 
             foreach ($options as $option) {
                 /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $qty = $option->getChildObject()->getQty($productMode);
+                $qty = $option->getChildObject()->getQty();
                 break;
             }
 
@@ -326,16 +326,23 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
         } else {
 
             $optionsQtyList = array();
+            $optionsQtyArray = array();
+
+            // grouping qty by product id
             foreach ($options as $option) {
-               /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-               $optionsQtyList[] = $option->getChildObject()->getQty($productMode);
+                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
+                $optionsQtyArray[$option->getProductId()][] = $option->getChildObject()->getQty();
+            }
+
+            foreach ($optionsQtyArray as $optionQty) {
+                $optionsQtyList[] = floor($optionQty[0]/count($optionQty));
             }
 
             $qty = min($optionsQtyList);
         }
 
-        //-- Check max posted QTY on channel
         $src = $this->getEbaySellingFormatTemplate()->getQtySource();
+
         if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
             $qty = $src['qty_max_posted_value'];
         }
@@ -359,6 +366,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     public function getPriceDiscountStp()
     {
         $src = $this->getEbaySellingFormatTemplate()->getPriceDiscountStpSource();
+        $price = $this->getBaseProductPrice($src);
+
+        return $this->getEbayListingProduct()->increasePriceByVatPercent($price);
+    }
+
+    public function getPriceDiscountMap()
+    {
+        $src = $this->getEbaySellingFormatTemplate()->getPriceDiscountMapSource();
         $price = $this->getBaseProductPrice($src);
 
         return $this->getEbayListingProduct()->increasePriceByVatPercent($price);

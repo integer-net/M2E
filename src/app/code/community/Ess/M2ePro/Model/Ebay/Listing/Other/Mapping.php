@@ -104,7 +104,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Mapping
                 continue;
             }
 
-            $otherListing->mapProduct($magentoProductId, Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+            $otherListing->mapProduct($magentoProductId, Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
 
             return true;
         }

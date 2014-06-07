@@ -47,55 +47,6 @@ class Ess_M2ePro_Model_Play_Search_Automatic
         );
     }
 
-    // ########################################
-
-    private function getQueryParam(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
-    {
-        /* @var $playListingProduct Ess_M2ePro_Model_Play_Listing_Product */
-        $playListingProduct = $listingProduct->getChildObject();
-
-        switch ($step) {
-            case self::STEP_GENERAL_ID:
-
-                $query = $playListingProduct->getGeneralId();
-                empty($query) && $query = $playListingProduct->getAddingGeneralId();
-
-                break;
-
-            case self::STEP_MAGENTO_TITLE:
-
-                $query = false;
-
-                if ($playListingProduct->getPlayListing()->isSearchByMagentoTitleModeEnabled()) {
-                    $query = $playListingProduct->getActualMagentoProduct()->getName();
-                }
-
-                break;
-
-            default: throw new Exception('Step is out of knowledge base.');
-        }
-
-        return $query;
-    }
-
-    // ########################################
-
-    private function getSearchMethod(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
-    {
-        /** @var $listing Ess_M2ePro_Model_Play_Listing */
-        $listing = $listingProduct->getListing()->getChildObject();
-
-        if ($step == self::STEP_GENERAL_ID) {
-            if ($listing->isGeneralIdWorldwideMode() || $listing->isGeneralIdIsbnMode()) {
-                return 'byEanIsbn';
-            }
-        }
-
-        return 'byQuery';
-    }
-
-    // ########################################
-
     public function processResponse(Ess_M2ePro_Model_Listing_Product $listingProduct, $result, $params = array())
     {
         if (empty($result)) {
@@ -141,7 +92,7 @@ class Ess_M2ePro_Model_Play_Search_Automatic
         $childListingProduct->save();
     }
 
-    // ########################################
+    // ----------------------------------------
 
     private function processNotFound(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
@@ -155,6 +106,51 @@ class Ess_M2ePro_Model_Play_Search_Automatic
     }
 
     // ########################################
+
+    private function getQueryParam(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
+    {
+        /* @var $playListingProduct Ess_M2ePro_Model_Play_Listing_Product */
+        $playListingProduct = $listingProduct->getChildObject();
+
+        switch ($step) {
+            case self::STEP_GENERAL_ID:
+
+                $query = $playListingProduct->getGeneralId();
+                empty($query) && $query = $playListingProduct->getAddingGeneralId();
+
+                break;
+
+            case self::STEP_MAGENTO_TITLE:
+
+                $query = false;
+
+                if ($playListingProduct->getPlayListing()->isSearchByMagentoTitleModeEnabled()) {
+                    $query = $playListingProduct->getActualMagentoProduct()->getName();
+                }
+
+                break;
+
+            default: throw new Exception('Step is out of knowledge base.');
+        }
+
+        return $query;
+    }
+
+    private function getSearchMethod(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
+    {
+        /** @var $listing Ess_M2ePro_Model_Play_Listing */
+        $listing = $listingProduct->getListing()->getChildObject();
+
+        if ($step == self::STEP_GENERAL_ID) {
+            if ($listing->isGeneralIdWorldwideMode() || $listing->isGeneralIdIsbnMode()) {
+                return 'byEanIsbn';
+            }
+        }
+
+        return 'byQuery';
+    }
+
+    // ----------------------------------------
 
     private function filterReceivedItemsFullTitleMatch($results, Ess_M2ePro_Model_Listing_Product $listingProduct)
     {

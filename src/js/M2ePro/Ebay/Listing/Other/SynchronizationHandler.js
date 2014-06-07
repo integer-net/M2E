@@ -118,7 +118,10 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
         var id = this.id.replace('_source', '');
         var sourceMode = this.options[this.selectedIndex].up().getAttribute(id + '_source');
 
-        if (sourceMode === null) {
+        //hack for PRODUCT FIXED QTY virtual attribute
+        if (sourceMode === null ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Listing_Other_Source::QTY_SOURCE_PRODUCT_FIXED')) {
+
             sourceMode = this.value;
         }
 

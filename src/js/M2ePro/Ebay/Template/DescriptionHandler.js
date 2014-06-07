@@ -18,7 +18,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
     simple_mode_disallowed_hide : function()
     {
-        $$('.simple_mode_disallowed').invoke('hide');
+        $$('#template_description_data_container .simple_mode_disallowed').invoke('hide');
     },
 
     duplicate_click: function(headId, chapter_when_duplicate_text, templateNick)
@@ -318,6 +318,12 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
             template += ',""';
         }
 
+        if ($('image_insertion_watermark_mode').value == '1') {
+            template += ',1';
+        } else {
+            template += ',';
+        }
+
         template += ']#';
 
         EbayTemplateDescriptionHandlerObj.appendToTextarea(template);
@@ -372,6 +378,8 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
     openInsertImageWindow : function()
     {
+        var self = EbayTemplateDescriptionHandlerObj;
+
         dialog_image_window = Dialog.info(null, {
             draggable: true,
             resizable: true,
@@ -395,6 +403,14 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
         });
 
         $('modal_dialog_message').appendChild($('image_insertion'));
+
+        if($('watermark_mode').value == 1) {
+            self.setTextVisibilityMode($('watermark_mode'), 'products_images_watermark_mode');
+            $('image_insertion_watermark_mode').selectedIndex = 1;
+        } else {
+            self.setTextVisibilityMode($('watermark_mode'), 'products_images_watermark_mode');
+            $('image_insertion_watermark_mode').selectedIndex = 0;
+        }
 
         $('new-image_close').writeAttribute('onclick', 'EbayTemplateDescriptionHandlerObj.stopObservingImageAttributes()');
 

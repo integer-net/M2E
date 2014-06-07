@@ -48,18 +48,14 @@ class Ess_M2ePro_Helper_View_Development_Controller extends Mage_Core_Helper_Abs
 
     public function validateControllerFileName($fileName)
     {
-        if ($fileName && is_readable($fileName) && false===strpos($fileName, '//')) {
-            return true;
-        }
-        return false;
+        return $fileName && is_readable($fileName) && false===strpos($fileName, '//');
     }
 
     //----------------------------------------
 
     public function getControllerClassName($controller)
     {
-        $class = self::REAL_MODULE.'_'.uc_words($controller).'Controller';
-        return $class;
+        return self::REAL_MODULE.'_'.uc_words($controller).'Controller';
     }
 
     //----------------------------------------
@@ -67,15 +63,18 @@ class Ess_M2ePro_Helper_View_Development_Controller extends Mage_Core_Helper_Abs
     protected function _includeControllerClass($controllerFileName, $controllerClassName)
     {
         if (!class_exists($controllerClassName, false)) {
+
             if (!file_exists($controllerFileName)) {
                 return false;
             }
+
             include $controllerFileName;
 
             if (!class_exists($controllerClassName, false)) {
                 throw Mage::exception('Mage_Core', Mage::helper('core')->__('Controller file was loaded but class does not exist'));
             }
         }
+
         return true;
     }
 

@@ -22,16 +22,4 @@ class Ess_M2ePro_Model_Wizard_Buy extends Ess_M2ePro_Model_Wizard
     }
 
     // ########################################
-
-    public function disableChildWizards()
-    {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        $wizardHelper->setStatus('buyNewSku', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED);
-
-        return true;
-    }
-
-    // ########################################
 }

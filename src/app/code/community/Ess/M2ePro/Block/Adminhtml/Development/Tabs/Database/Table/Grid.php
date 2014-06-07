@@ -29,7 +29,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
 
     // ####################################
 
-    protected function getModelName()
+    public function getModelName()
     {
         if (!is_null($this->modelName)) {
             return $this->modelName;
@@ -89,6 +89,12 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
                     'align'       => 'right',
                     'renderer' => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_renderer_datetime',
                     'filter'   => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_filter_datetime'
+                ));
+            }
+
+            if ($this->getRequest()->getParam('table') == 'm2epro_operation_history' && $column['Field'] == 'nick') {
+                $params = array_merge($params, array(
+                    'filter' => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_filter_select',
                 ));
             }
 

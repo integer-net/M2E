@@ -6,11 +6,6 @@
 
 class Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher
 {
-    const ACTION_LIST   = 1;
-    const ACTION_RELIST = 2;
-    const ACTION_REVISE = 3;
-    const ACTION_STOP   = 4;
-
     private $logsActionId = NULL;
 
     // ########################################
@@ -33,28 +28,28 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher
 
         switch ($action) {
 
-            case self::ACTION_LIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_LIST:
                 $result = $this->processListings(
                     $listings, 5, 'Ess_M2ePro_Model_Connector_Ebay_Item_List_Single',
                     'Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple', $params
                 );
                 break;
 
-            case self::ACTION_RELIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_RELIST:
                 $result = $this->processListings(
                     $listings, NULL, 'Ess_M2ePro_Model_Connector_Ebay_Item_Relist_Single',
                     NULL, $params
                 );
                 break;
 
-            case self::ACTION_REVISE:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_REVISE:
                 $result = $this->processListings(
                     $listings, NULL, 'Ess_M2ePro_Model_Connector_Ebay_Item_Revise_Single',
                     NULL, $params
                 );
                 break;
 
-            case self::ACTION_STOP:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_STOP:
                 $result = $this->processListings(
                     $listings, 10, 'Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Single',
                     'Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple', $params
@@ -205,7 +200,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher
 
             $logModel->addListingMessage(
                 $listingId,
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
+                Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                 $this->logsActionId,
                 Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN,
                 $exception->getMessage(),
@@ -264,22 +259,6 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher
         }
 
         return array_values($listings);
-    }
-
-    // ########################################
-
-    public static function getActionTitle($action)
-    {
-        $title = Mage::helper('M2ePro')->__('Unknown');
-
-        switch ($action) {
-            case self::ACTION_LIST:   $title = Mage::helper('M2ePro')->__('Listing'); break;
-            case self::ACTION_RELIST: $title = Mage::helper('M2ePro')->__('Relisting'); break;
-            case self::ACTION_REVISE: $title = Mage::helper('M2ePro')->__('Revising'); break;
-            case self::ACTION_STOP:   $title = Mage::helper('M2ePro')->__('Stopping'); break;
-        }
-
-        return $title;
     }
 
     // ########################################

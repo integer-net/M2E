@@ -179,8 +179,17 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
         return array_reverse($pathData);
     }
 
-    protected function getSpecifics($categoryId, $marketplaceId, $categoryFeatures = null)
+    public function getSpecifics($categoryId, $marketplaceId, $categoryFeatures = null)
     {
+        $categoryFeaturesArg = $categoryFeatures;
+
+        $cacheHelper = Mage::helper('M2ePro/Data_Cache');
+        $cacheKey = '_ebay_category_marketplace_specifics_'.$categoryId.'_'.$marketplaceId;
+
+        if ( $categoryFeaturesArg === null && ($cacheValue = $cacheHelper->getValue($cacheKey)) !== false) {
+            return $cacheValue;
+        }
+
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
         $tableDictCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_category');
@@ -234,14 +243,17 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
             if (!is_array($categoryFeatures)) {
                 $defaultFeatures = $this->getMarketplaceDefaultFeatures($marketplaceId);
                 $features = $this->getFeatures($categoryId, $marketplaceId);
-
                 $categoryFeatures = array_merge($defaultFeatures, $features);
             }
 
             if (!isset($categoryFeatures['attribute_conversion_enabled'])
                 || !(bool)$categoryFeatures['attribute_conversion_enabled']) {
 
-                return array();
+                $specifics = array();
+                if($categoryFeaturesArg === null) {
+                    $cacheHelper->setValue($cacheKey,$specifics,array(self::CACHE_TAG));
+                }
+                return $specifics;
             }
 
             $specifics = array(
@@ -276,7 +288,9 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
                 }
             }
         }
-
+        if($categoryFeaturesArg === null) {
+            $cacheHelper->setValue($cacheKey,$specifics,array(self::CACHE_TAG));
+        }
         return $specifics;
     }
 

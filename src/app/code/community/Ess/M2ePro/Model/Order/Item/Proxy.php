@@ -194,13 +194,13 @@ abstract class Ess_M2ePro_Model_Order_Item_Proxy
     }
 
     /**
-     * Check whether item has Tax (not VAT)
+     * Check whether item has Tax
      *
      * @return bool
      */
     public function hasTax()
     {
-        return $this->item->getParentObject()->getOrder()->getProxy()->hasTax();
+        return $this->getProxyOrder()->hasTax();
     }
 
     /**
@@ -210,7 +210,7 @@ abstract class Ess_M2ePro_Model_Order_Item_Proxy
      */
     public function hasVat()
     {
-        return $this->item->getParentObject()->getOrder()->getProxy()->hasVat();
+        return $this->getProxyOrder()->hasVat();
     }
 
     // ########################################

@@ -4,7 +4,8 @@
         'formSubmit' => $this->getUrl('M2ePro/adminhtml_ebay_marketplace/save'),
         'logViewUrl' => $this->getUrl('M2ePro/adminhtml_ebay_log/synchronization',array('back'=>Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_ebay_synchronization/index'))),
 
-        'runSynchNow' => $this->getUrl('M2ePro/adminhtml_ebay_marketplace/runSynchNow')
+        'runSynchNow' => $this->getUrl('M2ePro/adminhtml_ebay_marketplace/runSynchNow'),
+        'synchCheckProcessingNow' => $this->getUrl('M2ePro/adminhtml_ebay_synchronization/synchCheckProcessingNow')
     )); ?>);
 
     M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_marketplace')) ?>);

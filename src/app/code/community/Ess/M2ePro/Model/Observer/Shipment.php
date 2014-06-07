@@ -30,18 +30,22 @@ class Ess_M2ePro_Model_Observer_Shipment
                 return;
             }
 
+            if (is_null($order)) {
+                return;
+            }
+
+            if (!in_array($order->getComponentMode(), Mage::helper('M2ePro/Component')->getActiveComponents())) {
+                return;
+            }
+
             Mage::getSingleton('M2ePro/Order_Log_Manager')
-                ->setInitiator(Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION);
+                ->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
 
             // -------------
             /** @var $shipmentHandler Ess_M2ePro_Model_Order_Shipment_Handler */
             $shipmentHandler = Mage::getModel('M2ePro/Order_Shipment_Handler')->factory($order->getComponentMode());
             $result = $shipmentHandler->handle($order, $shipment);
             // -------------
-
-            if (!is_null(Mage::helper('M2ePro/Data_Global')->getValue('cron_running'))) {
-                return;
-            }
 
             switch ($result) {
                 case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_SUCCEEDED:

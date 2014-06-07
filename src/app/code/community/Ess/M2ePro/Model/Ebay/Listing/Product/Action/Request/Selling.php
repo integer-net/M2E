@@ -10,6 +10,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
     const LISTING_TYPE_AUCTION  = 'Chinese';
     const LISTING_TYPE_FIXED    = 'FixedPriceItem';
 
+    const PRICE_DISCOUNT_MAP_EXPOSURE_NONE             = 'None';
+    const PRICE_DISCOUNT_MAP_EXPOSURE_DURING_CHECKOUT  = 'DuringCheckout';
+    const PRICE_DISCOUNT_MAP_EXPOSURE_PRE_CHECKOUT     = 'PreCheckout';
+
     /**
      * @var Ess_M2ePro_Model_Template_SellingFormat
      */
@@ -34,7 +38,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
             $data,
             $this->getQtyData(),
             $this->getPriceData(),
-            $this->getPriceDiscountStpData()
+            $this->getPriceDiscountStpData(),
+            $this->getPriceDiscountMapData()
         );
     }
 
@@ -156,6 +161,47 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
         }
 
         return array('price_discount_stp' => $data);
+    }
+
+    public function getPriceDiscountMapData()
+    {
+        if (!$this->getConfigurator()->isPrice() ||
+            $this->getIsVariationItem()) {
+            return array();
+        }
+
+        if (!$this->getEbayListingProduct()->isListingTypeFixed() ||
+            !$this->getEbayListingProduct()->isPriceDiscountMap()) {
+            return array();
+        }
+
+        $data = array(
+            'minimum_advertised_price' => $this->getEbayListingProduct()->getPriceDiscountMap(),
+        );
+
+        $exposure = $this->getEbaySellingFormatTemplate()->getPriceDiscountMapExposureType();
+        $data['minimum_advertised_price_exposure'] =
+            Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling::
+                getPriceDiscountMapExposureType($exposure);
+
+        return array('price_discount_map' => $data);
+    }
+
+    public static function getPriceDiscountMapExposureType($type)
+    {
+        switch ($type) {
+            case Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_DISCOUNT_MAP_EXPOSURE_NONE:
+                return self::PRICE_DISCOUNT_MAP_EXPOSURE_NONE;
+
+            case Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_DISCOUNT_MAP_EXPOSURE_DURING_CHECKOUT:
+                return self::PRICE_DISCOUNT_MAP_EXPOSURE_DURING_CHECKOUT;
+
+            case Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_DISCOUNT_MAP_EXPOSURE_PRE_CHECKOUT:
+                return self::PRICE_DISCOUNT_MAP_EXPOSURE_PRE_CHECKOUT;
+
+            default:
+                return self::PRICE_DISCOUNT_MAP_EXPOSURE_NONE;
+        }
     }
 
     // ########################################

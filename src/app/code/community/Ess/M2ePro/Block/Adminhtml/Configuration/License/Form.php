@@ -49,23 +49,30 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_License_Form extends Ess_M2ePro_B
             Mage::helper('M2ePro/Client')->updateBackupConnectionData(true);
         } catch (Exception $exception) {}
 
+        /** @var Ess_M2ePro_Helper_Module_License $licenseHelper */
+        $licenseHelper = Mage::helper('M2ePro/Module_License');
+
         // Set data for form
         //----------------------------
-        $this->key = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro/Module_License')->getKey());
+        $this->key = Mage::helper('M2ePro')->escapeHtml($licenseHelper->getKey());
 
-        $valid = array();
-        $valid['domain'] = Mage::helper('M2ePro/Module_License')->getDomain();
-        $valid['ip'] = Mage::helper('M2ePro/Module_License')->getIp();
-        $valid['directory'] = Mage::helper('M2ePro/Module_License')->getDirectory();
-
-        $this->valid = $valid;
+        $this->licenseData = array(
+            'domain' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getDomain()),
+            'ip' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getIp()),
+            'directory' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getDirectory()),
+            'valid' => array(
+                'domain' => $licenseHelper->isValidDomain(),
+                'ip' => $licenseHelper->isValidIp(),
+                'directory' => $licenseHelper->isValidDirectory()
+            )
+        );
 
         $components = array();
         foreach (Mage::helper('M2ePro/Component')->getAllowedComponents() as $component) {
             $components[$component] = array(
-                'mode' => Mage::helper('M2ePro/Module_License')->getMode($component),
-                'status' => Mage::helper('M2ePro/Module_License')->getStatus($component),
-                'expiration_date' => Mage::helper('M2ePro/Module_License')->getTextExpirationDate($component)
+                'mode' => $licenseHelper->getMode($component),
+                'status' => $licenseHelper->getStatus($component),
+                'expiration_date' => $licenseHelper->getTextExpirationDate($component)
             );
         }
 
@@ -110,6 +117,16 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_License_Form extends Ess_M2ePro_B
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('confirm_key',$buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Get Trial'),
+            'onclick' => 'LicenseHandlerObj.componentSetTrial(this);',
+            'class'   => 'set_trial_key'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('set_trial_key', $buttonBlock);
         //-------------------------------
 
         return parent::_beforeToHtml();

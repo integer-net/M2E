@@ -50,24 +50,6 @@ class Ess_M2ePro_Block_Adminhtml_Support_Form extends Mage_Adminhtml_Block_Widge
         $this->setChild('tabs', $tabsBlock);
         //-------------------------------
 
-        //-------------------------------
-        $cronInfoBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_development_inspection_cron',
-            '',
-            array('is_support_mode' => true)
-        );
-        $this->setChild('cron_info', $cronInfoBlock);
-        //-------------------------------
-
-        //-------------------------------
-        $systemRequirementsBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_development_inspection_requirements',
-            '',
-            array('is_support_mode' => true)
-        );
-        $this->setChild('system_requirements', $systemRequirementsBlock);
-        //-------------------------------
-
         return parent::_beforeToHtml();
     }
 

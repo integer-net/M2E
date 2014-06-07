@@ -340,6 +340,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
                 $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
 
                 if (!$isEdit) {
+
+                    Mage::helper('M2ePro/Module_License')->setTrial(Ess_M2ePro_Helper_Component_Buy::NICK);
+
                     $params = array(
                         'title' => $post['title'],
                         'web_login' => $post['web_login'],

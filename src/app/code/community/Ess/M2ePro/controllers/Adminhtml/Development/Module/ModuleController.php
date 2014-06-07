@@ -15,7 +15,16 @@ class Ess_M2ePro_Adminhtml_Development_Module_ModuleController
      */
     public function runCronAction()
     {
-        Mage::getModel('M2ePro/Cron')->process();
+        $cron = Mage::getModel('M2ePro/Cron_Type_Developer');
+        $result = $cron->process();
+
+        if ($result) {
+            $this->_getSession()->addSuccess('Cron was successfully performed.');
+        } else {
+            $this->_getSession()->addError('Cron was performed with errors.');
+        }
+
+        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 
     /**
@@ -25,7 +34,17 @@ class Ess_M2ePro_Adminhtml_Development_Module_ModuleController
      */
     public function cronProcessingTemporaryAction()
     {
-        Mage::getModel('M2ePro/Processing_Cron')->process();
+        $dispatcher = Mage::getModel('M2ePro/Processing_Dispatcher');
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_DEVELOPER);
+        $result = $dispatcher->process();
+
+        if ($result) {
+            $this->_getSession()->addSuccess('Processing cron was successfully performed.');
+        } else {
+            $this->_getSession()->addError('Processing cron was performed with errors.');
+        }
+
+        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 
     //#############################################
@@ -36,11 +55,16 @@ class Ess_M2ePro_Adminhtml_Development_Module_ModuleController
      */
     public function licenseUpdateAction()
     {
-        Mage::getModel('M2ePro/Servicing_Dispatcher')->processTasks(array(
-            Mage::getModel('M2ePro/Servicing_Task_License')->getPublicNick()
-        ));
+        $dispatcher = Mage::getModel('M2ePro/Servicing_Dispatcher');
+        $licenseTaskNick = Mage::getModel('M2ePro/Servicing_Task_License')->getPublicNick();
+        $result = $dispatcher->processTask($licenseTaskNick);
 
-        $this->_getSession()->addSuccess('License status was successfully updated.');
+        if ($result) {
+            $this->_getSession()->addSuccess('License status was successfully updated.');
+        } else {
+            $this->_getSession()->addError('License status was updated with errors.');
+        }
+
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 

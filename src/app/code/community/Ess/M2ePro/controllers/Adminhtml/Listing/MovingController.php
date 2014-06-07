@@ -162,7 +162,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                     $listingProductInstance->getListingId(),
                     $listingProductInstance->getProductId(),
                     $listingProductInstance->getId(),
-                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER,
+                    Ess_M2ePro_Helper_Data::INITIATOR_USER,
                     NULL,
                     Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                     // Parser hack -> Mage::helper('M2ePro')->__('Item was not moved');
@@ -181,7 +181,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                     $listingProductInstance->getListingId(),
                     $listingProductInstance->getProductId(),
                     $listingProductInstance->getId(),
-                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER,
+                    Ess_M2ePro_Helper_Data::INITIATOR_USER,
                     NULL,
                     Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                     // Parser hack -> Mage::helper('M2ePro')->__('Item was not moved');
@@ -198,7 +198,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 $listingId,
                 $listingProductInstance->getProductId(),
                 $listingProductInstance->getId(),
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER,
+                Ess_M2ePro_Helper_Data::INITIATOR_USER,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                 // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully moved');
@@ -211,7 +211,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 $listingProductInstance->getListingId(),
                 $listingProductInstance->getProductId(),
                 $listingProductInstance->getId(),
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER,
+                Ess_M2ePro_Helper_Data::INITIATOR_USER,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                 // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully moved');

@@ -205,6 +205,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
             'type'          => 'options',
             'width'         => '100px',
             'index'         => 'type',
+            'sortable'      => false,
             'filter_index'  => 'main_table.type',
             'options'       => $options
         ));
@@ -239,6 +240,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
             'type'          => 'options',
             'width'         => '100px',
             'index'         => 'state',
+            'sortable'  => false,
             'filter_index'  => 'state',
             'filter_condition_callback' => array($this, 'callbackFilterState'),
             'frame_callback'=> array($this, 'callbackColumnState'),

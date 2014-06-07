@@ -38,7 +38,7 @@
     <?php $galleryClass = $data['layout'] == Ess_M2ePro_Helper_Module_Renderer_Description::LAYOUT_MODE_COLUMN ? 'gallery-column-view' : 'gallery-row-view'; ?>
     <center class="<?php echo $galleryClass; ?>">
         <div class="gallery-image">
-            <img name="view<?php echo $data['attribute_counter']; ?>" id="image<?php echo $data['attribute_counter']; ?>" src="<?php echo $data['src']; ?>"<?php if ($data['width'] != ''): echo " width={$data['width']}"; endif; ?><?php if ($data['height'] != ''): echo " height={$data['height']}"; endif; ?> style="<?php if ($data['margin'] != ''): echo "margin-bottom: {$data['margin']}px; margin-right: {$data['margin']}px;"; endif; ?>" />
+            <img name="view<?php echo $data['attribute_counter']; ?>" id="image<?php echo $data['attribute_counter']; ?>" src="<?php echo $data['src']; ?>"<?php if ($data['width'] != ''): echo " width={$data['width']}"; endif; ?><?php if ($data['height'] != ''): echo " height={$data['height']}"; endif; ?><?php if ($data['watermark'] != 0): echo ' m2e_watermark="1"'; endif; ?> style="<?php if ($data['margin'] != ''): echo "margin-bottom: {$data['margin']}px; margin-right: {$data['margin']}px;"; endif; ?>" />
             <br />
             <div style="<?php if ($data['width'] != ''): echo "width: {$data['width']}px"; endif; ?>">
                 <?php echo Mage::helper('M2ePro')->escapeHtml($data['gallery_hint']); ?>
@@ -50,7 +50,7 @@
     <?php endif; ?>
 
             <li>
-                <img width="68" height="68" style="cursor: pointer;" onclick="document.images['view<?php echo $data['attribute_counter']; ?>'].src='<?php echo $data['src']; ?>';" src="<?php echo $data['src']; ?>" />
+                <img width="68" height="68" style="cursor: pointer;" onclick="document.images['view<?php echo $data['attribute_counter']; ?>'].src='<?php echo $data['src']; ?>';" src="<?php echo $data['src']; ?>"<?php if ($data['watermark'] != 0): echo ' m2e_watermark="1"'; endif; ?> />
             </li>
 
     <?php if ($data['image_counter'] == $data['images_count']): ?>
@@ -63,10 +63,10 @@
 <?php else: ?>
 
     <?php if ($data['linked_mode'] == Ess_M2ePro_Helper_Module_Renderer_Description::IMAGES_MODE_NEW_WINDOW): ?>
-        <a href="<?php echo $data['src']; ?>" target="_blank">
+        <a href="<?php echo $data['src']; ?>" target="_blank"<?php if ($data['watermark'] != 0): echo ' m2e_watermark="1"'; endif; ?>>
     <?php endif; ?>
 
-        <img src="<?php echo $data['src']; ?>"<?php if ($data['width'] != ''): echo ' width="'.$data['width'].'"'; endif; ?><?php if ($data['height'] != ''): echo ' height="'.$data['height'].'"'; endif; ?> style="<?php if ($data['margin'] != ''): echo "margin-bottom: {$data['margin']}px; margin-right: {$data['margin']}px;"; endif; ?><?php if ($data['linked_mode'] == Ess_M2ePro_Helper_Module_Renderer_Description::IMAGES_MODE_NEW_WINDOW): echo ' cursor: pointer; border: none;'; endif; ?>" />
+        <img src="<?php echo $data['src']; ?>"<?php if ($data['width'] != ''): echo ' width="'.$data['width'].'"'; endif; ?><?php if ($data['height'] != ''): echo ' height="'.$data['height'].'"'; endif; ?><?php if ($data['watermark'] != 0): echo ' m2e_watermark="1"'; endif; ?> style="<?php if ($data['margin'] != ''): echo "margin-bottom: {$data['margin']}px; margin-right: {$data['margin']}px;"; endif; ?><?php if ($data['linked_mode'] == Ess_M2ePro_Helper_Module_Renderer_Description::IMAGES_MODE_NEW_WINDOW): echo ' cursor: pointer; border: none;'; endif; ?>" />
 
     <?php if ($data['linked_mode'] == Ess_M2ePro_Helper_Module_Renderer_Description::IMAGES_MODE_NEW_WINDOW): ?>
         </a>

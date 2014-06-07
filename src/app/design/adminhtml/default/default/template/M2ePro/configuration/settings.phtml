@@ -9,6 +9,14 @@
     )); ?>);
 
     Event.observe(window, 'load', function() {
+        SettingsHandlerObj = new ConfigurationSettingsHandler();
+
+        //------------------------------
+
+        $('force_qty_mode').simulate('change');
+
+        //------------------------------
+
         configEditForm = new varienForm('config_edit_form', '<?php echo $this->getValidationUrl(); ?>');
     });
     //-----------------------------
@@ -96,6 +104,61 @@
     </div>
     <!-- End General   -->
 
+    <!-- Qty Settings  -->
+    <div class="entry-edit" id="magento_block_configuration_settings_qty">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Quantity'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <div id="block_notice_configuration_qty" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Quantity'); ?>">
+                    <?php echo Mage::helper('M2ePro')->__('Allows to list products which have no stock in Magento or it is negative.'); ?>
+                </div>
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tbody>
+
+                    <tr>
+                        <td class="label">
+                            <label for="force_qty_mode"><?php echo Mage::helper('M2ePro')->__('Manage Stock "No", Backorders'); ?>: </label>
+                        </td>
+                        <td class="value" colspan="2">
+                            <select id="force_qty_mode" name="force_qty_mode" onchange="SettingsHandlerObj.changeForceQtyMode();">
+                                <option value="0"<?php if ($this->forceQtyMode == 0) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Disallow'); ?></option>
+                                <option value="1"<?php if ($this->forceQtyMode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Allow'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__("Enables ability to list the products which have Manage Stock \"No\" or Backorders enabled."); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="force_qty_value_tr">
+                        <td class="label">
+                            <label for="force_qty_value"><?php echo Mage::helper('M2ePro')->__('QTY To Be Listed'); ?>: </label>
+                        </td>
+                        <td class="value" colspan="2">
+                            <input id="force_qty_value" name="force_qty_value" value="<?php echo $this->forceQtyValue; ?>" type="text" class="M2ePro-required-when-visible input-text validate-greater-than-zero" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Set a number to list, e.g. if you have Manage Stock "No" in Magento Product and set this value to 10, 10 will be sent as available quantity to the channel.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- End Qty Settings   -->
+
     <!-- Advanced Settings  -->
     <div class="entry-edit" id="magento_block_configuration_settings_advanced">
 
@@ -106,7 +169,7 @@
         <div class="fieldset">
             <div class="hor-scroll">
 
-                <div id="block_notice_configuration_advanced_settings" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Global'); ?>">
+                <div id="block_notice_configuration_advanced_settings" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Global Synchronization'); ?>">
                     <?php echo Mage::helper('M2ePro')->__('Has to be enabled if product price and quantity changes are made directly to database.  Data update depends on the number of products and can be fully completed after several synchronization cycles finish.
                     <br><br>
                     <b>Note:</b> Enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance.'); ?>

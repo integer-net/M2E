@@ -191,37 +191,53 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
         }
 
         $data = array();
+        $emptySavedAttributes = array();
 
-        foreach ($savedAttributes as $savedAttribute) {
+        foreach ($savedAttributes as $epid => $savedAttribute) {
 
             /** @var Ess_M2ePro_Model_Ebay_Motor_Specific $savedAttribute */
 
             $compatibilityList = array();
-            $compatibilityData = $savedAttribute->getCompatibilityData();
 
-            foreach ($compatibilityData as $key => $value) {
+            if($savedAttribute != null) {
 
-                if ($value == '--') {
-                    unset($compatibilityData[$key]);
-                    continue;
-                }
+                $compatibilityData = $savedAttribute->getCompatibilityData();
 
-                $name = $key;
+                foreach ($compatibilityData as $key => $value) {
 
-                foreach ($ebayAttributes as $ebayAttribute) {
-                    if ($ebayAttribute['title'] == $key) {
-                        $name = $ebayAttribute['ebay_id'];
-                        break;
+                    if ($value == '--') {
+                        unset($compatibilityData[$key]);
+                        continue;
                     }
-                }
 
-                $compatibilityList[] = array(
-                    'name'  => $name,
-                    'value' => $value
-                );
+                    $name = $key;
+
+                    foreach ($ebayAttributes as $ebayAttribute) {
+                        if ($ebayAttribute['title'] == $key) {
+                            $name = $ebayAttribute['ebay_id'];
+                            break;
+                        }
+                    }
+
+                    $compatibilityList[] = array(
+                        'name'  => $name,
+                        'value' => $value
+                    );
+                }
+            } else {
+                $emptySavedAttributes[] = $epid;
             }
 
             $data[] = $compatibilityList;
+        }
+
+        if(count($emptySavedAttributes) > 0) {
+            $isSingleEpid = count($emptySavedAttributes) > 1;
+            $msg = 'The '.implode(', ', $emptySavedAttributes).' ePID'.($isSingleEpid ? 's' : '');
+            $msg .= 'specified in the Compatibility Attribute';
+            $msg .= '<br/>were dropped out of the listing because'.($isSingleEpid ? 'it was' : 'they were');
+            $msg .= 'deleted from eBay Catalog of Compatible Vehicles.';
+            $this->addWarningMessage($msg);
         }
 
         return $data;
@@ -266,10 +282,18 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
 
         $epids = explode(',', $attributeValue);
 
-        return Mage::getModel('M2ePro/Ebay_Motor_Specific')
+        $specifics = Mage::getModel('M2ePro/Ebay_Motor_Specific')
                         ->getCollection()
                         ->addFieldToFilter('epid', array('in' => $epids))
                         ->getItems();
+
+        foreach($epids as $epid){
+            if(empty($specifics[$epid])){
+                $specifics[$epid] = null;
+            }
+        }
+
+        return $specifics;
     }
 
     // ########################################

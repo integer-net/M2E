@@ -63,6 +63,11 @@ $isEdit = !!$this->getRequest()->getParam('id');
         'Ess_M2ePro_Helper_Component_Play'
     );
 
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Block_Adminhtml_Common_Play_Template_SellingFormat_Edit_Form'); ?>,
+        'Ess_M2ePro_Block_Adminhtml_Common_Play_Template_SellingFormat_Edit_Form'
+    );
+
     M2ePro.url.add(<?php echo json_encode(array(
         'formSubmit'    => $this->getUrl('M2ePro/adminhtml_common_play_template_sellingFormat/save', array('id' => $this->getRequest()->getParam('id'))),
         'formSubmitNew' => $this->getUrl('M2ePro/adminhtml_common_play_template_sellingFormat/save'),
@@ -70,6 +75,8 @@ $isEdit = !!$this->getRequest()->getParam('id');
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
+        'QTY' => $this->__('QTY'),
+
         'Price for selling in the UK.' => $this->__('Price for selling in the UK.'),
         'Price for selling in Europe.' => $this->__('Price for selling in Europe.'),
         'The price of products in Play.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.' => $this->__('The price of products in Play.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.'),
@@ -86,8 +93,19 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
     M2ePro.formData.qty_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_mode']); ?>';
     M2ePro.formData.qty_max_posted_value_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_max_posted_value_mode']); ?>';
-
     M2ePro.formData.qty_custom_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_custom_attribute']); ?>';
+
+    // virtual attribute for QTY_FIXED replacement
+    <?php if ($formData['qty_mode'] == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED) { ?>
+
+        <?php $formData['qty_mode'] = Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_ATTRIBUTE; ?>
+        M2ePro.formData.qty_mode = '<?php echo Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_ATTRIBUTE; ?>';
+
+        <?php $formData['qty_custom_attribute'] = Ess_M2ePro_Block_Adminhtml_Common_Play_Template_SellingFormat_Edit_Form::QTY_MODE_PRODUCT_FIXED_VIRTUAL_ATTRIBUTE_VALUE; ?>
+        M2ePro.formData.qty_custom_attribute = '<?php echo Ess_M2ePro_Block_Adminhtml_Common_Play_Template_SellingFormat_Edit_Form::QTY_MODE_PRODUCT_FIXED_VIRTUAL_ATTRIBUTE_VALUE; ?>';
+
+    <?php } ?>
+
     M2ePro.formData.price_gbr_custom_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['price_gbr_custom_attribute']); ?>';
     M2ePro.formData.price_euro_custom_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['price_euro_custom_attribute']); ?>';
 

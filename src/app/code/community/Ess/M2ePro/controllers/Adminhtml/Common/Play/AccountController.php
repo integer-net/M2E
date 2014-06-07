@@ -353,6 +353,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_AccountController
                 $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Dispatcher');
 
                 if (!$isEdit) {
+
+                    Mage::helper('M2ePro/Module_License')->setTrial(Ess_M2ePro_Helper_Component_Play::NICK);
+
                     $params = array(
                         'title' => $post['title'],
                         'login' => $post['login'],

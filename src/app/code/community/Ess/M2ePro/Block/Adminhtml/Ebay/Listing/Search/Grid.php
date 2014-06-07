@@ -477,9 +477,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         $currency = $row->getCurrency();
 
         if (strpos($currency, ',') !== false) {
-            $currency = Mage::helper('M2ePro')
-                ->getCachedObject('Ebay_Marketplace', $row->getMarketplaceId())
-                ->getCurrency();
+            $currency = Mage::helper('M2ePro/Component_Ebay')
+                        ->getCachedObject('Marketplace',$row->getMarketplaceId())
+                        ->getChildObject()->getCurrency();
         }
 
         return Mage::app()->getLocale()->currency($currency)->toCurrency($value);

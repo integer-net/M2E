@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Model_Ebay_Order_Shipment_Handler extends Ess_M2ePro_Model_Order_Shipment_Handler
 {
+    // ##########################################################
+
     public function handle(Ess_M2ePro_Model_Order $order, Mage_Sales_Model_Order_Shipment $shipment)
     {
         if (!$order->isComponentModeEbay()) {
@@ -18,26 +20,53 @@ class Ess_M2ePro_Model_Ebay_Order_Shipment_Handler extends Ess_M2ePro_Model_Orde
             return self::HANDLE_RESULT_SKIPPED;
         }
 
-        // collect change params
-        //------------------------------
-        $item   = $this->getItemToShip($order, $shipment);
-        $params = array('tracking_details' => $trackingDetails, 'item_id' => null);
-
-        if (!is_null($item)) {
-            $params['item_id'] = $item->getId();
+        if (empty($trackingDetails)) {
+            return $this->processOrder($order) ? self::HANDLE_RESULT_SUCCEEDED : self::HANDLE_RESULT_FAILED;
         }
-        //------------------------------
 
-        $this->createChange($order, $params);
+        $itemsToShip = $this->getItemsToShip($order, $shipment);
 
-        if (!is_null($item)) {
-            $succeeded = $item->getChildObject()->updateShippingStatus($trackingDetails);
-        } else {
-            $succeeded = $order->getChildObject()->updateShippingStatus($trackingDetails);
+        if (empty($itemsToShip) || count($itemsToShip) == $order->getItemsCollection()->getSize()) {
+            return $this->processOrder($order, $trackingDetails)
+                ? self::HANDLE_RESULT_SUCCEEDED : self::HANDLE_RESULT_FAILED;
+        }
+
+        $succeeded = true;
+        foreach ($itemsToShip as $item) {
+            if ($this->processOrderItem($item, $trackingDetails)) {
+                continue;
+            }
+
+            $succeeded = false;
         }
 
         return $succeeded ? self::HANDLE_RESULT_SUCCEEDED : self::HANDLE_RESULT_FAILED;
     }
+
+    // ##########################################################
+
+    private function processOrder(Ess_M2ePro_Model_Order $order, array $trackingDetails = array())
+    {
+        $changeParams = array(
+            'tracking_details' => $trackingDetails,
+        );
+        $this->createChange($order, $changeParams);
+
+        return $order->getChildObject()->updateShippingStatus($trackingDetails);
+    }
+
+    private function processOrderItem(Ess_M2ePro_Model_Order_Item $item, array $trackingDetails)
+    {
+        $changeParams = array(
+            'tracking_details' => $trackingDetails,
+            'item_id' => $item->getId(),
+        );
+        $this->createChange($item->getOrder(), $changeParams);
+
+        return $item->getChildObject()->updateShippingStatus($trackingDetails);
+    }
+
+    // ----------------------------------------------------------
 
     private function createChange(Ess_M2ePro_Model_Order $order, array $params)
     {
@@ -52,62 +81,84 @@ class Ess_M2ePro_Model_Ebay_Order_Shipment_Handler extends Ess_M2ePro_Model_Orde
         //------------------------------
     }
 
-    /**
-     * @param Ess_M2ePro_Model_Order          $order
-     * @param Mage_Sales_Model_Order_Shipment $shipment
-     *
-     * @return null|Ess_M2ePro_Model_Order_Item
-     */
-    private function getItemToShip(Ess_M2ePro_Model_Order $order, Mage_Sales_Model_Order_Shipment $shipment)
+    private function getItemsToShip(Ess_M2ePro_Model_Order $order, Mage_Sales_Model_Order_Shipment $shipment)
     {
-        if ($order->isSingle()) {
-            return null;
-        }
+        $productTypesNotAllowedByDefault = array(
+            Mage_Catalog_Model_Product_Type::TYPE_BUNDLE,
+            Mage_Catalog_Model_Product_Type::TYPE_GROUPED,
+        );
 
-        $shipmentItems = $shipment->getAllItems();
+        $items = array();
+        $allowedItems = array();
+        foreach ($shipment->getAllItems() as $shipmentItem) {
+            /** @var $shipmentItem Mage_Sales_Model_Order_Shipment_Item */
 
-        if (count($shipmentItems) != 1) {
-            return null;
-        }
+            $orderItem = $shipmentItem->getOrderItem();
+            $parentOrderItemId = $orderItem->getParentItemId();
 
-        /** @var $shipmentItem Mage_Sales_Model_Order_Shipment_Item */
-        $shipmentItem = reset($shipmentItems);
-        $additionalData = $shipmentItem->getOrderItem()->getAdditionalData();
-        $additionalData = is_string($additionalData) ? @unserialize($additionalData) : array();
-
-        $itemId = $transactionId = null;
-        $orderItemDataIdentifier = Ess_M2ePro_Helper_Data::CUSTOM_IDENTIFIER;
-
-        if (isset($additionalData['ebay_item_id']) && isset($additionalData['ebay_transaction_id'])) {
-            // backward compatibility with versions 5.0.4 or less
-            $itemId = $additionalData['ebay_item_id'];
-            $transactionId = $additionalData['ebay_transaction_id'];
-        } elseif (isset($additionalData[$orderItemDataIdentifier]['items'])) {
-            if (!is_array($additionalData[$orderItemDataIdentifier]['items'])
-                || count($additionalData[$orderItemDataIdentifier]['items']) != 1
-            ) {
-                return null;
+            if (!is_null($parentOrderItemId)) {
+                !in_array($parentOrderItemId, $allowedItems) && ($allowedItems[] = $parentOrderItemId);
+                continue;
             }
 
-            if (isset($additionalData[$orderItemDataIdentifier]['items'][0]['item_id'])) {
-                $itemId = $additionalData[$orderItemDataIdentifier]['items'][0]['item_id'];
+            if (!in_array($orderItem->getProductType(), $productTypesNotAllowedByDefault)) {
+                $allowedItems[] = $orderItem->getId();
             }
-            if (isset($additionalData[$orderItemDataIdentifier]['items'][0]['transaction_id'])) {
-                $transactionId = $additionalData[$orderItemDataIdentifier]['items'][0]['transaction_id'];
+
+            $additionalData = $orderItem->getAdditionalData();
+            $additionalData = is_string($additionalData) ? @unserialize($additionalData) : array();
+
+            $itemId = $transactionId = null;
+            $orderItemDataIdentifier = Ess_M2ePro_Helper_Data::CUSTOM_IDENTIFIER;
+
+            if (isset($additionalData['ebay_item_id']) && isset($additionalData['ebay_transaction_id'])) {
+                // backward compatibility with versions 5.0.4 or less
+                $itemId = $additionalData['ebay_item_id'];
+                $transactionId = $additionalData['ebay_transaction_id'];
+            } elseif (isset($additionalData[$orderItemDataIdentifier]['items'])) {
+                if (!is_array($additionalData[$orderItemDataIdentifier]['items'])
+                    || count($additionalData[$orderItemDataIdentifier]['items']) != 1
+                ) {
+                    return null;
+                }
+
+                if (isset($additionalData[$orderItemDataIdentifier]['items'][0]['item_id'])) {
+                    $itemId = $additionalData[$orderItemDataIdentifier]['items'][0]['item_id'];
+                }
+                if (isset($additionalData[$orderItemDataIdentifier]['items'][0]['transaction_id'])) {
+                    $transactionId = $additionalData[$orderItemDataIdentifier]['items'][0]['transaction_id'];
+                }
             }
-        }
 
-        if (is_null($itemId) || is_null($transactionId)) {
-            return null;
-        }
+            if (is_null($itemId) || is_null($transactionId)) {
+                continue;
+            }
 
-        $item = Mage::helper('M2ePro/Component_Ebay')
-            ->getCollection('Order_Item')
+            $item = Mage::helper('M2ePro/Component_Ebay')
+                ->getCollection('Order_Item')
                 ->addFieldToFilter('order_id', $order->getId())
                 ->addFieldToFilter('item_id', $itemId)
                 ->addFieldToFilter('transaction_id', $transactionId)
                 ->getFirstItem();
 
-        return $item->getId() ? $item : null;
+            if (!$item->getId()) {
+                continue;
+            }
+
+            $items[$orderItem->getId()] = $item;
+        }
+
+        $resultItems = array();
+        foreach ($items as $orderItemId => $item) {
+            if (!in_array($orderItemId, $allowedItems)) {
+                continue;
+            }
+
+            $resultItems[] = $item;
+        }
+
+        return $resultItems;
     }
+
+    // ##########################################################
 }

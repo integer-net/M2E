@@ -35,7 +35,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
         parent::preDispatch();
 
         Mage::getSingleton('M2ePro/Order_Log_Manager')
-            ->setInitiator(Ess_M2ePro_Model_Order_Log::INITIATOR_USER);
+            ->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
     }
 
     //#############################################

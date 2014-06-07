@@ -17,8 +17,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Log_Grid
         }
 
         $excludeTitles = array(
-            Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_OTHER_LISTINGS => '',
-            Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_FEEDBACKS => ''
+            Ess_M2ePro_Model_Synchronization_Log::TASK_OTHER_LISTINGS => '',
+            Ess_M2ePro_Model_Synchronization_Log::TASK_FEEDBACKS => ''
         );
 
         return array_diff_key($allTitles, $excludeTitles);

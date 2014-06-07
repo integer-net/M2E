@@ -52,7 +52,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Relist_Response
         $additionalData['last_failed_action_data'] = array(
             'native_request_data' => $this->getRequestData()->getData(),
             'previous_status' => $this->getListingOther()->getStatus(),
-            'action' => Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST,
+            'action' => Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,
             'request_time' => Mage::helper('M2ePro')->getCurrentGmtDate(),
         );
 

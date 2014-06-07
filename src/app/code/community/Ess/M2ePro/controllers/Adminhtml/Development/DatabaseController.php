@@ -48,9 +48,8 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
                 continue;
             }
 
-            $url = $this->getUrl(
-                '*/adminhtml_development_database/manageTable', array('table' => $table, 'model' => $model)
-            );
+            $url = Mage::helper('adminhtml')->getUrl('*/adminhtml_development_database/manageTable',
+                                                     array('table' => $table, 'model' => $model));
 
             $response .= "window.open('{$url}');";
         }
@@ -111,23 +110,16 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $tables = $this->getRequest()->getParam('tables',array());
         !is_array($tables) && $tables = array($tables);
 
-        $countTruncatedTables = 0;
         foreach ($tables as $table) {
 
-            if (is_null($model = Mage::helper('M2ePro/Module_Database')->getTableModel($table))) {
-                continue;
-            }
-
+            $model = Mage::helper('M2ePro/Module_Database')->getTableModel($table);
             $tableName  = Mage::getSingleton('core/resource')->getTableName($table);
-            Mage::getSingleton('core/resource')->getConnection('core_write')->delete($tableName);
 
+            Mage::getSingleton('core/resource')->getConnection('core_write')->delete($tableName);
             $this->afterTableAction($model);
-            $countTruncatedTables++;
         }
 
-        count($tables) == $countTruncatedTables ?
-            $this->_getSession()->addSuccess('Truncate tables was successfully completed.') :
-            $this->_getSession()->addError('Some tables was not truncated. (Resource model are missing.)');
+        $this->_getSession()->addSuccess('Truncate tables was successfully completed.');
 
         if (count($tables) == 1) {
             $tableName = array_shift($tables);
@@ -188,9 +180,15 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
 
     private function afterTableAction($model)
     {
-        if (strpos($model, 'Config_') === 0 || strpos($model, 'Wizard') === 0) {
-            Mage::helper('M2ePro/Module')->clearCache();
+        if (is_null($model)) {
+            return;
         }
+
+        if (strpos($model, 'Config_') !== 0 && strpos($model, 'Wizard') !== 0) {
+            return;
+        }
+
+        Mage::helper('M2ePro/Module')->clearCache();
     }
 
     //#############################################

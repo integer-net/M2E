@@ -113,6 +113,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Item extends Mage_Adminhtml_Blo
             'header'    => Mage::helper('M2ePro')->__('Row Total'),
             'align'     => 'left',
             'width'     => '80px',
+            'filter'    => false,
+            'sortable'  => false,
             'frame_callback' => array($this, 'callbackColumnRowTotal')
         ));
 
@@ -229,8 +231,23 @@ HTML;
     {
         $formattedPrice = '0';
 
-        if ($row->getProduct()) {
-            $formattedPrice = $row->getProduct()->getFormatedPrice();
+        $product = $row->getProduct();
+
+        if ($product) {
+            /** @var Ess_M2ePro_Model_Magento_Product $magentoProduct */
+            $magentoProduct = Mage::getModel('M2ePro/Magento_Product');
+            $magentoProduct->setProduct($product);
+
+            if ($magentoProduct->isGroupedType()) {
+                $associatedProducts = $row->getAssociatedProducts();
+                $price = Mage::getModel('catalog/product')
+                    ->load(array_shift($associatedProducts))
+                    ->getPrice();
+
+                $formattedPrice = $this->order->getStore()->formatPrice($price);
+            } else {
+                $formattedPrice = $this->order->getStore()->formatPrice($row->getProduct()->getPrice());
+            }
         }
 
        return $formattedPrice;
@@ -238,31 +255,42 @@ HTML;
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        return Mage::getSingleton('M2ePro/Currency')->formatPrice($row->getData('currency'), $row->getData('price'));
+        return Mage::getSingleton('M2ePro/Currency')->formatPrice(
+            $this->order->getChildObject()->getCurrency(), $row->getData('price')
+        );
     }
 
     public function callbackColumnTaxPercent($value, $row, $column, $isExport)
     {
-        $taxRate = (float)$this->order->getData('tax_rate');
-
-        if ($taxRate == 0) {
+        $taxDetails = $row->getData('tax_details');
+        if (empty($taxDetails)) {
             return '0%';
         }
 
-        return sprintf('%.2f%%', $taxRate);
+        $taxDetails = json_decode($taxDetails, true);
+        if (empty($taxDetails)) {
+            return '0%';
+        }
+
+        return sprintf('%s%%', $taxDetails['rate']);
     }
 
     public function callbackColumnRowTotal($value, $row, $column, $isExport)
     {
         $total = $row->getData('qty_purchased') * $row->getData('price');
 
-        if ($this->order->getChildObject()->hasTax()) {
-            $total += $this->taxCalculator->calcTaxAmount(
-                $total, (float)$this->order->getData('tax_rate'), false, true
-            );
+        $taxDetails = $row->getData('tax_details');
+        if (!empty($taxDetails)) {
+            $taxDetails = json_decode($row->getData('tax_details'), true);
+
+            if (!empty($taxDetails['amount'])) {
+                $total += $taxDetails['amount'];
+            }
         }
 
-        return Mage::getSingleton('M2ePro/Currency')->formatPrice($row->getData('currency'), $total);
+        return Mage::getSingleton('M2ePro/Currency')->formatPrice(
+            $this->order->getChildObject()->getCurrency(), $total
+        );
     }
 
     public function getRowUrl($row)

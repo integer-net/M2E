@@ -53,10 +53,6 @@ class Ess_M2ePro_Model_Magento_Quote_Item
         // tax class id should be set before price calculation
         $this->product->setTaxClassId($this->getProductTaxClassId());
 
-        $price = $this->proxyItem->getBasePrice();
-        $this->product->setPrice($price);
-        $this->product->setSpecialPrice($price);
-
         return $this->product;
     }
 
@@ -80,6 +76,7 @@ class Ess_M2ePro_Model_Magento_Quote_Item
     {
         $proxyOrder = $this->proxyItem->getProxyOrder();
         $taxRate = $this->proxyItem->getTaxRate();
+        $isOrderHasRate = $this->proxyItem->getProxyOrder()->getTaxRate() > 0;
         $hasRatesForCountry = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
             ->hasRatesForCountry($this->quote->getShippingAddress()->getCountryId());
         $calculationBasedOnOrigin = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
@@ -88,6 +85,7 @@ class Ess_M2ePro_Model_Magento_Quote_Item
         if ($proxyOrder->isTaxModeNone()
             || ($proxyOrder->isTaxModeChannel() && $taxRate == 0)
             || ($proxyOrder->isTaxModeMagento() && !$hasRatesForCountry && !$calculationBasedOnOrigin)
+            || ($proxyOrder->isTaxModeMixed() && $taxRate == 0 && $isOrderHasRate)
         ) {
             return Ess_M2ePro_Model_Magento_Product::TAX_CLASS_ID_NONE;
         }

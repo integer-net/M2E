@@ -14,7 +14,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
     const SERVER_MESSAGE_TYPE_WARNING = 2;
     const SERVER_MESSAGE_TYPE_SUCCESS = 3;
 
-    const MIGRATION_WIZARD_NICK = 'migrationToV6';
+    const WIZARD_MIGRATION_NICK = 'migrationToV6';
 
     // ########################################
 
@@ -66,7 +66,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '5993';
+        $revision = '6256';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -90,6 +90,13 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
     {
         return Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue(
             '/'.$this->getName().'/server/', 'installation_key'
+        );
+    }
+
+    public function isMigrationWizardFinished()
+    {
+        return Mage::helper('M2ePro/Module_Wizard')->isFinished(
+            self::WIZARD_MIGRATION_NICK
         );
     }
 
@@ -137,24 +144,6 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         return true;
     }
 
-    // -------------------------------------------
-
-    public function isPossibleToRunCron()
-    {
-        $migrationFinished = Mage::helper('M2ePro/Module_Wizard')->isFinished(
-            self::MIGRATION_WIZARD_NICK
-        );
-
-        $ebayFinished = Mage::helper('M2ePro/Module_Wizard')->isFinished(
-            Ess_M2ePro_Helper_View_Ebay::WIZARD_INSTALLATION_NICK
-        );
-        $commonFinished = Mage::helper('M2ePro/Module_Wizard')->isFinished(
-            Ess_M2ePro_Helper_View_Common::WIZARD_INSTALLATION_NICK
-        );
-
-        return $migrationFinished && ($ebayFinished || $commonFinished);
-    }
-
     // ########################################
 
     public function getFoldersAndFiles()
@@ -163,7 +152,8 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             'app/code/community/Ess/',
             'app/code/community/Ess/M2ePro/*',
 
-            'app/locale/*/Ess_M2ePro.csv',
+            // todo uncomment when translations will be available
+            //'app/locale/*/Ess_M2ePro.csv',
             'app/etc/modules/Ess_M2ePro.xml',
             'app/design/adminhtml/default/default/layout/M2ePro.xml',
 
@@ -183,7 +173,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         $requirements = array (
 
             'php_version' => array(
-                'title' => Mage::helper('M2ePro')->__('PHP Version'),
+                'title' => $this->__('PHP Version'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => '5.3.0'
@@ -195,7 +185,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             ),
 
             'memory_limit' => array(
-                'title' => Mage::helper('M2ePro')->__('Memory Limit'),
+                'title' => $this->__('Memory Limit'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => '256 MB'
@@ -207,7 +197,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             ),
 
             'magento_version' => array(
-                'title' => Mage::helper('M2ePro')->__('Magento Version'),
+                'title' => $this->__('Magento Version'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => (Mage::helper('M2ePro/Magento')->isGoEdition()           ? '1.9.0.0' :
@@ -221,7 +211,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             ),
 
             'max_execution_time' => array(
-                'title' => Mage::helper('M2ePro')->__('Max Execution Time'),
+                'title' => $this->__('Max Execution Time'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => '360 sec'
@@ -248,47 +238,37 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getUnWritableDirectories()
     {
-        $itemsToCheck = $this->getFoldersAndFiles();
+        $directoriesForCheck = array();
+        foreach ($this->getFoldersAndFiles() as $item) {
 
-        $unWritableDirs = array();
-        foreach ($itemsToCheck as $item) {
-
-            $item = Mage::getBaseDir() . '/' . $item;
-
-            $items = glob($item);
+            $fullDirPath = Mage::getBaseDir().DS.$item;
 
             if (preg_match('/\*$/',$item)) {
-                $item = preg_replace('/\*$/','',$item);
-                $items = array_merge($items,$this->getDirectories($item));
+                $fullDirPath = preg_replace('/\*$/', '', $fullDirPath);
+                $directoriesForCheck = array_merge($directoriesForCheck, $this->getDirectories($fullDirPath));
             }
 
-            foreach ($items as $path) {
-                if (is_file($path)) {
-                    $path = explode('/',$path);
-                    array_pop($path);
-                    $path = implode('/',$path);
-                }
-                $path = rtrim($path,'/');
+            $directoriesForCheck[] = dirname($fullDirPath);
+            is_dir($fullDirPath) && $directoriesForCheck[] = rtrim($fullDirPath, '/\\');
+        }
+        $directoriesForCheck = array_unique($directoriesForCheck);
 
-                !is_dir_writeable($path) && $unWritableDirs[] = $path;
-            }
+        $unWritableDirs = array();
+        foreach ($directoriesForCheck as $directory) {
+            !is_dir_writeable($directory) && $unWritableDirs[] = $directory;
         }
 
-        return array_values(array_unique($unWritableDirs));
+        return $unWritableDirs;
     }
 
-    private function getDirectories($baseDir)
+    private function getDirectories($dirPath)
     {
-        $baseDir = rtrim($baseDir,'/') . '/';
+        $directoryIterator = new RecursiveDirectoryIterator($dirPath, FilesystemIterator::SKIP_DOTS);
+        $iterator = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::SELF_FIRST);
+
         $directories = array();
-
-        foreach (scandir($baseDir) as $item) {
-            if (is_file($baseDir . $item) || in_array($item,array('.','..','.svn'))) {
-                continue;
-            }
-
-            $directories = array_merge($directories, $this->getDirectories($baseDir . $item));
-            $directories[] = $baseDir . $item;
+        foreach($iterator as $path) {
+            $path->isDir() && $directories[] = rtrim($path->getPathname(),'/\\');
         }
 
         return $directories;

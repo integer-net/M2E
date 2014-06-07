@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Edit_Tabs_Settings extends 
     protected function _beforeToHtml()
     {
         //-------------------------------
-        $maxRecordsQuantity = Mage::helper('M2ePro/View_Common')->getAutocompleteMaxInactiveHours();
+        $maxRecordsQuantity = Mage::helper('M2ePro/View_Common')->getAutocompleteMaxItems();
         //-------------------------------
 
         // Get attribute sets

@@ -52,8 +52,7 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Request
         $updater = Mage::getModel('M2ePro/Ebay_Listing_Product_Variation_Updater');
         $updater->updateVariations($this->getListingProduct());
 
-        $isVariationItem = $this->getEbayListingProduct()->isVariationMode() &&
-                           count($this->getListingProduct()->getVariations()) > 0;
+        $isVariationItem = $this->getEbayListingProduct()->isVariationsReady();
 
         $this->setIsVariationItem($isVariationItem);
 

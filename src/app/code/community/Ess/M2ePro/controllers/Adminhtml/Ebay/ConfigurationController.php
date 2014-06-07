@@ -56,10 +56,6 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
             '/view/ebay/feedbacks/notification/', 'mode',
             (int)$this->getRequest()->getParam('view_ebay_feedbacks_notification_mode')
         );
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
-            '/view/ebay/cron/notification/', 'mode',
-            (int)$this->getRequest()->getParam('cron_notification_mode')
-        );
 
         Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
             '/view/ebay/template/category/', 'use_last_specifics',

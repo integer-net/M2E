@@ -29,12 +29,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_NewProduct_Grid extends 
 
         //------------------------------
         $listingProductIds = Mage::helper('M2ePro/Data_Session')->getValue('listing_product_ids');
-        $listingProductId = reset($listingProductIds);
 
-        $this->listingAttributes = Mage::helper('M2ePro/Component_Amazon')
-            ->getObject('Listing_Product',$listingProductId)
-            ->getListing()
-            ->getAttributeSetsIds();
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $tableListingProduct = Mage::getSingleton('core/resource')->getTableName('m2epro_listing_product');
+
+        $productsIds = Mage::getResourceModel('core/config')
+            ->getReadConnection()
+            ->fetchCol($connWrite->select()
+                ->from($tableListingProduct, 'product_id')
+                ->where('id in (?)', $listingProductIds));
+
+        $this->attributesSetsIds = Mage::helper('M2ePro/Magento_AttributeSet')
+            ->getFromProducts($productsIds, Ess_M2ePro_Helper_Magento_Abstract::RETURN_TYPE_IDS);
     }
 
     protected function _prepareCollection()
@@ -231,8 +238,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_NewProduct_Grid extends 
         $newAsinTemplateAttributes = $row->getAttributeSetsIds();
 
         $listingAttributesAreIncludedInNewAsinTemplate = true;
-        foreach ($this->listingAttributes as $listingAttribute) {
-            if (array_search($listingAttribute,$newAsinTemplateAttributes) === false) {
+        foreach ($this->attributesSetsIds as $attributeSetId) {
+            if (array_search($attributeSetId, $newAsinTemplateAttributes) === false) {
                 $listingAttributesAreIncludedInNewAsinTemplate = false;
                 continue;
             }

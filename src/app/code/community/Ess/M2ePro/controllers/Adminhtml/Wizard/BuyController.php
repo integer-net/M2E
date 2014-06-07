@@ -41,14 +41,5 @@ class Ess_M2ePro_Adminhtml_Wizard_BuyController
         parent::installationAction();
     }
 
-    public function congratulationAction()
-    {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-        $wizardHelper->getWizard($this->getNick())->disableChildWizards();
-
-        parent::congratulationAction();
-    }
-
     //#############################################
 }

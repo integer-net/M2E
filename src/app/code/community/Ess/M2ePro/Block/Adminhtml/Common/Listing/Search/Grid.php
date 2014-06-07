@@ -68,7 +68,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
         );
         $collection->getSelect()->join(
             array('cpev'=>Mage::getSingleton('core/resource')->getTableName('catalog_product_entity_varchar')),
-            "( `cpev`.`entity_id` = `main_table`.product_id AND cpev.store_id = (".$dbSelect->__toString()."))",
+            "(`cpev`.`entity_id` = `main_table`.product_id)",
             array('value')
         );
         $collection->getSelect()->join(
@@ -76,6 +76,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
             '(`cpev`.`attribute_id` = `ea`.`attribute_id` AND `ea`.`attribute_code` = \'name\')',
             array()
         );
+        $collection->getSelect()->where('`cpev`.`store_id` = ('.$dbSelect->__toString().')');
         //--------------------------------
 
         //exit($collection->getSelect()->__toString());

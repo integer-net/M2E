@@ -10,25 +10,31 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Builder extends Mage_Core_Model_Abstract
 
     public function initialize(array $data)
     {
-        // Init general data
         // ------------------
         $this->setData('order_id', $data['order_id']);
-        $this->setData('listing_type', $data['listing_type']);
         $this->setData('transaction_id', $data['transaction_id']);
-        $this->setData('item_id', $data['item_id']);
-        $this->setData('title', $data['item_title']);
-        $this->setData('sku', $data['item_sku']);
-        $this->setData('condition_display_name', $data['item_condition_display_name']);
+        $this->setData('selling_manager_id', $data['selling_manager_id']);
         // ------------------
 
-        // Init sale data
         // ------------------
-        $this->setData('price', (float)$data['price']);
-        $this->setData('buy_it_now_price', (float)$data['buy_it_now_price']);
-        $this->setData('currency', $data['currency']);
-        $this->setData('qty_purchased', (int)$data['qty_purchased']);
-        $this->setData('auto_pay', (int)$data['auto_pay']);
-        $this->setData('variation', json_encode($data['variation']));
+        $this->setData('item_id', $data['item_id']);
+        $this->setData('title', $data['title']);
+        $this->setData('sku', $data['sku']);
+        // ------------------
+
+        // ------------------
+        $this->setData('price', (float)$data['selling']['price']);
+        $this->setData('qty_purchased', (int)$data['selling']['qty_purchased']);
+        $this->setData('tax_details', json_encode($data['selling']['tax_details']));
+        $this->setData('final_fee', (float)$data['selling']['final_fee']);
+        // ------------------
+
+        // ------------------
+        $this->setData('variation_details', json_encode($data['variation_details']));
+        // ------------------
+
+        // ------------------
+        $this->setData('tracking_details', json_encode($data['tracking_details']));
         // ------------------
     }
 

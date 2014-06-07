@@ -69,12 +69,16 @@ class Ess_M2ePro_Adminhtml_Ebay_MarketplaceController extends Ess_M2ePro_Control
         $marketplaceId = (int)$this->getRequest()->getParam('marketplace_id');
         $marketplaceObj = Mage::helper('M2ePro/Component')->getUnknownObject('Marketplace',$marketplaceId);
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(array($marketplaceObj->getComponentMode()));
-        $synchDispatcher->setTasks(array(Ess_M2ePro_Model_Synchronization_Tasks::MARKETPLACES));
-        $synchDispatcher->setParams(array('marketplace_id' => $marketplaceId));
-        $synchDispatcher->process();
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(array($marketplaceObj->getComponentMode()));
+        $dispatcher->setAllowedTasksTypes(array(Ess_M2ePro_Model_Synchronization_Task::MARKETPLACES));
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array('marketplace_id' => $marketplaceId));
+
+        $dispatcher->process();
     }
 
     public function isExistDeletedCategoriesAction()

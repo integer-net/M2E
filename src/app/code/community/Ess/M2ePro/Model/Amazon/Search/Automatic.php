@@ -54,86 +54,6 @@ class Ess_M2ePro_Model_Amazon_Search_Automatic
         );
     }
 
-    // ########################################
-
-    private function getQueryParam(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
-    {
-        $validation = Mage::helper('M2ePro');
-
-        switch ($step) {
-            case self::STEP_ASIN_ISBN:
-
-                $query = $listingProduct->getChildObject()->getGeneralId();
-                empty($query) && $query = $listingProduct->getChildObject()->getAddingGeneralId();
-
-                if (!Mage::helper('M2ePro/Component_Amazon')->isASIN($query) && !$validation->isISBN($query)) {
-                    $query = false;
-                }
-
-                break;
-
-            case self::STEP_UPC_EAN:
-
-                $query = $listingProduct->getChildObject()->getWorldwideId();
-                empty($query) && $query = $listingProduct->getChildObject()->getAddingWorldwideId();
-
-                if (!$validation->isEAN($query) && !$validation->isUPC($query)) {
-                    $query = false;
-                }
-
-                break;
-
-            case self::STEP_MAGENTO_TITLE:
-
-                $query = false;
-
-                if ($listingProduct->getListing()->getChildObject()->isSearchByMagentoTitleModeEnabled()) {
-                    $query = $listingProduct->getChildObject()->getActualMagentoProduct()->getName();
-                }
-
-                break;
-
-            default: throw new Exception('Step is out of knowledge base.');
-        }
-
-        return $query;
-    }
-
-    // ########################################
-
-    private function getSearchMethod($step, $query)
-    {
-        $searchMethods = array_combine(
-            $this->steps, array('byAsin', 'byIdentifier', 'byQuery')
-        );
-
-        if (!isset($searchMethods[$step])) {
-            throw new Exception('Step is out of knowledge base.');
-        }
-
-        $searchMethod = $searchMethods[$step];
-
-        if ($searchMethod == 'byAsin' && Mage::helper('M2ePro')->isISBN13($query)) {
-            $searchMethod = 'byIdentifier';
-        }
-
-        return $searchMethod;
-    }
-
-    // ########################################
-
-    private function getIdentifierType($identifier)
-    {
-        $validation = Mage::helper('M2ePro');
-
-        return (Mage::helper('M2ePro/Component_Amazon')->isASIN($identifier) ? 'ASIN' :
-               ($validation->isISBN($identifier)                             ? 'ISBN' :
-               ($validation->isUPC($identifier)                              ? 'UPC'  :
-               ($validation->isEAN($identifier)                              ? 'EAN'  : false))));
-    }
-
-    // ########################################
-
     public function processResponse(Ess_M2ePro_Model_Listing_Product $listingProduct, $result, $params = array())
     {
         if (empty($result)) {
@@ -188,7 +108,7 @@ class Ess_M2ePro_Model_Amazon_Search_Automatic
         $childListingProduct->addData($dataForUpdate)->save();
     }
 
-    // ########################################
+    // ----------------------------------------
 
     private function processNotFound(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
@@ -201,6 +121,80 @@ class Ess_M2ePro_Model_Amazon_Search_Automatic
         $childListingProduct->save();
 
         return true;
+    }
+
+    // ########################################
+
+    private function getQueryParam(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
+    {
+        $validation = Mage::helper('M2ePro');
+
+        switch ($step) {
+            case self::STEP_ASIN_ISBN:
+
+                $query = $listingProduct->getChildObject()->getGeneralId();
+                empty($query) && $query = $listingProduct->getChildObject()->getAddingGeneralId();
+
+                if (!Mage::helper('M2ePro/Component_Amazon')->isASIN($query) && !$validation->isISBN($query)) {
+                    $query = false;
+                }
+
+                break;
+
+            case self::STEP_UPC_EAN:
+
+                $query = $listingProduct->getChildObject()->getWorldwideId();
+                empty($query) && $query = $listingProduct->getChildObject()->getAddingWorldwideId();
+
+                if (!$validation->isEAN($query) && !$validation->isUPC($query)) {
+                    $query = false;
+                }
+
+                break;
+
+            case self::STEP_MAGENTO_TITLE:
+
+                $query = false;
+
+                if ($listingProduct->getListing()->getChildObject()->isSearchByMagentoTitleModeEnabled()) {
+                    $query = $listingProduct->getChildObject()->getActualMagentoProduct()->getName();
+                }
+
+                break;
+
+            default: throw new Exception('Step is out of knowledge base.');
+        }
+
+        return $query;
+    }
+
+    private function getSearchMethod($step, $query)
+    {
+        $searchMethods = array_combine(
+            $this->steps, array('byAsin', 'byIdentifier', 'byQuery')
+        );
+
+        if (!isset($searchMethods[$step])) {
+            throw new Exception('Step is out of knowledge base.');
+        }
+
+        $searchMethod = $searchMethods[$step];
+
+        if ($searchMethod == 'byAsin' && Mage::helper('M2ePro')->isISBN13($query)) {
+            $searchMethod = 'byIdentifier';
+        }
+
+        return $searchMethod;
+    }
+
+    private function getIdentifierType($identifier)
+    {
+        $validation = Mage::helper('M2ePro');
+
+        return (Mage::helper('M2ePro/Component_Amazon')->isASIN($identifier) ? 'ASIN' :
+               ($validation->isISBN($identifier)                             ? 'ISBN' :
+               ($validation->isUPC($identifier)                              ? 'UPC'  :
+               ($validation->isEAN($identifier)                              ? 'EAN'  : false))));
     }
 
     // ########################################

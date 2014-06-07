@@ -13,7 +13,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
     public function updateVariations(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        if (!$listingProduct->getChildObject()->isVariationMode()) {
+        if (!$listingProduct->getMagentoProduct()->isProductWithVariations()) {
             return;
         }
 
@@ -32,32 +32,32 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
         $this->saveVariationsSets($listingProduct,$rawMagentoVariations);
     }
 
-    public function isAddedNewVariationsAttributes(Ess_M2ePro_Model_Listing_Product $listingProduct)
-    {
-        if (!$listingProduct->getChildObject()->isVariationMode()) {
-            return false;
-        }
-
-        $rawMagentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
-        $rawMagentoVariations = $this->validateLimitsConditions($rawMagentoVariations,NULL);
-
-        $magentoVariations = $this->prepareMagentoVariations($rawMagentoVariations);
-        $currentVariations = $this->prepareCurrentVariations($listingProduct->getVariations(true));
-
-        if (!isset($magentoVariations[0]) && !isset($currentVariations[0])) {
-            return false;
-        }
-
-        if (!isset($magentoVariations[0]) || !isset($currentVariations[0])) {
-            return true;
-        }
-
-        if (count($magentoVariations[0]['options']) != count($currentVariations[0]['options'])) {
-            return true;
-        }
-
-        return false;
-    }
+//    public function isAddedNewVariationsAttributes(Ess_M2ePro_Model_Listing_Product $listingProduct)
+//    {
+//        if (!$listingProduct->getChildObject()->isVariationsMode()) {
+//            return false;
+//        }
+//
+//        $rawMagentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
+//        $rawMagentoVariations = $this->validateLimitsConditions($rawMagentoVariations,NULL);
+//
+//        $magentoVariations = $this->prepareMagentoVariations($rawMagentoVariations);
+//        $currentVariations = $this->prepareCurrentVariations($listingProduct->getVariations(true));
+//
+//        if (!isset($magentoVariations[0]) && !isset($currentVariations[0])) {
+//            return false;
+//        }
+//
+//        if (!isset($magentoVariations[0]) || !isset($currentVariations[0])) {
+//            return true;
+//        }
+//
+//        if (count($magentoVariations[0]['options']) != count($currentVariations[0]['options'])) {
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
     // ########################################
 
@@ -74,9 +74,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
         foreach ($set as $singleSet) {
 
-            if (count($singleSet) > 30) {
+            if (count($singleSet) > 60) {
 
-                // Maximum 30 options by one attribute:
+                // Maximum 60 options by one attribute:
                 // Color: Red, Blue, Green, ...
 
                 if (!is_null($listingProduct)) {

@@ -32,14 +32,12 @@ OrderHandler.prototype = Object.extend(new CommonHandler(), {
 
     disableGridCallback: function(gridId)
     {
-        var self = OrderHandlerObj;
         var tempGrid = window[gridId + 'JsObject'];
 
         if (!(tempGrid instanceof varienGrid)) {
             return;
         }
 
-        self[gridId] = tempGrid.rowClickCallback;
         tempGrid.rowClickCallback = '';
     },
 
@@ -52,7 +50,7 @@ OrderHandler.prototype = Object.extend(new CommonHandler(), {
             return;
         }
 
-        tempGrid.rowClickCallback = self[gridId];
+        tempGrid.rowClickCallback = self.gridRowClickCallback;
     },
 
     gridRowClickCallback: function(grid, event)
@@ -147,22 +145,22 @@ OrderHandler.prototype = Object.extend(new CommonHandler(), {
     createHelpActionHtml: function(action)
     {
         var classContainer = 'hl_container';
-        if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS')) {
+        if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS')) {
             classContainer += ' hl_container_success';
-        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Order_Log::TYPE_WARNING')) {
+        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING')) {
             classContainer += ' hl_container_warning';
-        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Order_Log::TYPE_NOTICE')) {
+        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE')) {
             classContainer += ' hl_container_notice';
-        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Order_Log::TYPE_ERROR')) {
+        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR')) {
             classContainer += ' hl_container_error';
         }
 
         var type = '<span style="color: green;">'+ M2ePro.translator.translate('Success')+'</span>';
-        if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Order_Log::TYPE_NOTICE')) {
+        if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE')) {
             type = '<span style="color: blue;">'+ M2ePro.translator.translate('Notice')+'</span>';
-        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Order_Log::TYPE_WARNING')) {
+        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING')) {
             type = '<span style="color: orange;">'+ M2ePro.translator.translate('Warning')+'</span>';
-        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Order_Log::TYPE_ERROR')) {
+        } else if (action.type == M2ePro.php.constant('Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR')) {
             type = '<span style="color: red;">'+ M2ePro.translator.translate('Error')+'</span>';
         }
 
@@ -191,19 +189,12 @@ OrderHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var url = '';
         if (gridId.match(/ebay/i)) {
-            url = M2ePro.url.get('adminhtml_ebay_order/view');
-        } else if (gridId.match(/amazon/i)) {
-            url = M2ePro.url.get('adminhtml_common_amazon_order/view');
-        } else if (gridId.match(/buy/i)) {
-            url = M2ePro.url.get('adminhtml_common_buy_order/view');
-        } else if (gridId.match(/play/i)) {
-            url = M2ePro.url.get('adminhtml_common_play_order/view');
+            url = M2ePro.url.get('adminhtml_ebay_log/order', {order_id: rowId});
         } else {
-            return '';
+            url = M2ePro.url.get('adminhtml_common_log/order', {order_id: rowId});
         }
 
-        url = url + 'id/' + rowId + '/';
-        return '<div class="hl_footer"><a href="'+url+'">'+ M2ePro.translator.translate('View All Order Logs.')+'</a></div>';
+        return '<div class="hl_footer"><a target="_blank" href="'+url+'">'+ M2ePro.translator.translate('View All Order Logs.')+'</a></div>';
     }
 
     //----------------------------------

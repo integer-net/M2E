@@ -38,7 +38,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Installation_SellingFormat
 
     public function getMigrationModel()
     {
-        return Mage::helper('M2ePro/Module_Wizard')->getWizard(Ess_M2ePro_Helper_Module::MIGRATION_WIZARD_NICK);
+        return Mage::helper('M2ePro/Module_Wizard')->getWizard(Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK);
     }
 
     // ########################################

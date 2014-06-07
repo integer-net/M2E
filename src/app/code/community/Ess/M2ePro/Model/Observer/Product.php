@@ -214,7 +214,7 @@ class Ess_M2ePro_Model_Observer_Product
                 $listingProductArray['object']->getListingId(),
                 $this->_productId,
                 $listingProductArray['id'],
-                Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STATUS,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%].');
@@ -223,8 +223,8 @@ class Ess_M2ePro_Model_Observer_Product
                     'From [%from%] to [%to%].',
                     array('from'=>$statusOld,'to'=>$statusNew)
                 ),
-                Ess_M2ePro_Model_Listing_Log::TYPE_NOTICE,
-                Ess_M2ePro_Model_Listing_Log::PRIORITY_LOW
+                Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
             );
         }
 
@@ -251,7 +251,7 @@ class Ess_M2ePro_Model_Observer_Product
             $tempLog->setComponentMode($otherListingTemp['component_mode']);
             $tempLog->addProductMessage(
                 $otherListingTemp['id'],
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STATUS,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%].');
@@ -286,15 +286,15 @@ class Ess_M2ePro_Model_Observer_Product
                 $listingProductArray['object']->getListingId(),
                 $this->_productId,
                 $listingProductArray['id'],
-                Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_PRICE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',array('!from'=>$priceOld,'!to'=>$priceNew)
                 ),
-                Ess_M2ePro_Model_Listing_Log::TYPE_NOTICE,
-                Ess_M2ePro_Model_Listing_Log::PRIORITY_LOW
+                Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
              );
         }
 
@@ -304,7 +304,7 @@ class Ess_M2ePro_Model_Observer_Product
              $tempLog->setComponentMode($otherListingTemp['component_mode']);
              $tempLog->addProductMessage(
                 $otherListingTemp['id'],
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_PRICE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -339,15 +339,15 @@ class Ess_M2ePro_Model_Observer_Product
                 $listingProductArray['object']->getListingId(),
                 $this->_productId,
                 $listingProductArray['id'],
-                Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',array('!from'=>$specialPriceOld,'!to'=>$specialPriceNew)
                 ),
-                Ess_M2ePro_Model_Listing_Log::TYPE_NOTICE,
-                Ess_M2ePro_Model_Listing_Log::PRIORITY_LOW
+                Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
             );
         }
 
@@ -357,7 +357,7 @@ class Ess_M2ePro_Model_Observer_Product
             $tempLog->setComponentMode($otherListingTemp['component_mode']);
             $tempLog->addProductMessage(
                 $otherListingTemp['id'],
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -404,7 +404,7 @@ class Ess_M2ePro_Model_Observer_Product
                 $listingProductArray['object']->getListingId(),
                 $this->_productId,
                 $listingProductArray['id'],
-                Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_FROM_DATE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -413,8 +413,8 @@ class Ess_M2ePro_Model_Observer_Product
                     'From [%from%] to [%to%]',
                     array('!from'=>$specialPriceFromDateOld,'!to'=>$specialPriceFromDateNew)
                 ),
-                Ess_M2ePro_Model_Listing_Log::TYPE_NOTICE,
-                Ess_M2ePro_Model_Listing_Log::PRIORITY_LOW
+                Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
             );
         }
 
@@ -424,7 +424,7 @@ class Ess_M2ePro_Model_Observer_Product
             $tempLog->setComponentMode($otherListingTemp['component_mode']);
             $tempLog->addProductMessage(
                 $otherListingTemp['id'],
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_FROM_DATE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -473,7 +473,7 @@ class Ess_M2ePro_Model_Observer_Product
                 $listingProductArray['object']->getListingId(),
                 $this->_productId,
                 $listingProductArray['id'],
-                Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -482,8 +482,8 @@ class Ess_M2ePro_Model_Observer_Product
                     'From [%from%] to [%to%]',
                     array('!from'=>$specialPriceToDateOld,'!to'=>$specialPriceToDateNew)
                 ),
-                Ess_M2ePro_Model_Listing_Log::TYPE_NOTICE,
-                Ess_M2ePro_Model_Listing_Log::PRIORITY_LOW
+                Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
             );
         }
 
@@ -493,7 +493,7 @@ class Ess_M2ePro_Model_Observer_Product
             $tempLog->setComponentMode($otherListingTemp['component_mode']);
             $tempLog->addProductMessage(
                 $otherListingTemp['id'],
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE,
                 // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -546,7 +546,7 @@ class Ess_M2ePro_Model_Observer_Product
                         $listingProductArray['object']->getListingId(),
                         $this->_productId,
                         $listingProductArray['id'],
-                        Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                        Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                         NULL,
                         Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_CUSTOM_ATTRIBUTE,
                         // ->__('Attribute "%attr%" from [%from%] to [%to%].');
@@ -558,8 +558,8 @@ class Ess_M2ePro_Model_Observer_Product
                                 '!to'=>$this->cutAttributeTitleLength($customAttributeNew)
                             )
                         ),
-                        Ess_M2ePro_Model_Listing_Log::TYPE_NOTICE,
-                        Ess_M2ePro_Model_Listing_Log::PRIORITY_LOW
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
                     );
                 }
             }
@@ -589,7 +589,7 @@ class Ess_M2ePro_Model_Observer_Product
                     $tempLog->setComponentMode($otherListingTemp['component_mode']);
                     $tempLog->addProductMessage(
                         $otherListingTemp['id'],
-                        Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                        Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                         NULL,
                         Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_CUSTOM_ATTRIBUTE,
                         // ->__('Attribute "%attr%" from [%from%] to [%to%].');

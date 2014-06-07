@@ -239,13 +239,13 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
                 break;
         }
 
-        $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN;
+        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
         if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
-            $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN;
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
         } else if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
-            $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER;
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
         } else {
-            $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION;
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
         }
 
         $logModel = Mage::getModel('M2ePro/Listing_Log');

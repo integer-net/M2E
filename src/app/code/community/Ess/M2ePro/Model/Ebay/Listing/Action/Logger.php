@@ -8,7 +8,7 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Logger
 {
     protected $action = NULL;
     protected $actionId = NULL;
-    protected $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN;
+    protected $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
 
     protected $storeMode = false;
     protected $storedMessages = array();

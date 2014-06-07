@@ -58,21 +58,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
         //->join(array('csi'=>Mage::getSingleton('core/resource')->getTableName('cataloginventory_stock_item')),
 //                             '(csi.product_id = `main_table`.product_id)',array('qty'))
             ->join(array('cpe'=>Mage::getSingleton('core/resource')->getTableName('catalog_product_entity')),
-            '(cpe.entity_id = `main_table`.product_id)',
-            array('magento_sku'=>'sku'))
-            ->join(array('cisi'=>Mage::getSingleton('core/resource')
-                ->getTableName('cataloginventory_stock_item')),
-            '(cisi.product_id = `main_table`.product_id AND cisi.stock_id = 1)',
-            array('is_in_stock'))
-            ->join(array('cpev'=>Mage::getSingleton('core/resource')
-                ->getTableName('catalog_product_entity_varchar')),
-            "( `cpev`.`entity_id` = `main_table`.product_id AND cpev.store_id = ("
-                .$dbSelect->__toString()
-                ."))",
-            array('value'))
+                '(cpe.entity_id = `main_table`.product_id)',
+                array('magento_sku'=>'sku'))
+            ->join(array('cisi'=>Mage::getSingleton('core/resource')->getTableName('cataloginventory_stock_item')),
+                '(cisi.product_id = `main_table`.product_id AND cisi.stock_id = 1)',
+                array('is_in_stock'))
+            ->join(array('cpev'=>Mage::getSingleton('core/resource')->getTableName('catalog_product_entity_varchar')),
+                "(`cpev`.`entity_id` = `main_table`.product_id)",
+                array('value'))
             ->join(array('ea'=>Mage::getSingleton('core/resource')->getTableName('eav_attribute')),
-            '(`cpev`.`attribute_id` = `ea`.`attribute_id` AND `ea`.`attribute_code` = \'name\')',
-            array());
+                '(`cpev`.`attribute_id` = `ea`.`attribute_id` AND `ea`.`attribute_code` = \'name\')',
+                array())
+            ->where('`cpev`.`store_id` = ('.$dbSelect->__toString().')');
         //--------------------------------
 
         //exit($collection->getSelect()->__toString());

@@ -6,10 +6,6 @@
 
 class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
 {
-    const INITIATOR_UNKNOWN = 0;
-    const INITIATOR_USER = 1;
-    const INITIATOR_EXTENSION = 2;
-
     const TYPE_NOTICE = 1;
     const TYPE_SUCCESS = 2;
     const TYPE_WARNING = 3;
@@ -34,8 +30,6 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
     {
         return $this->componentMode;
     }
-
-    //-----------------------------------
 
     public function unsetComponentMode()
     {

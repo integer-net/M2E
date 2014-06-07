@@ -87,7 +87,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_synchronization/clearLog',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_TEMPLATES,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_TEMPLATES,
                 'back'       => $backUrl
             )
         );
@@ -104,7 +104,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_log/synchronization',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_TEMPLATES,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_TEMPLATES,
             )
         );
         $data = array(
@@ -130,7 +130,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_synchronization/clearLog',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_ORDERS,
                 'back'       => $backUrl
             )
         );
@@ -147,7 +147,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_log/synchronization',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_ORDERS,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_ORDERS,
             )
         );
         $data = array(
@@ -173,7 +173,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_synchronization/clearLog',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_FEEDBACKS,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_FEEDBACKS,
                 'back'       => $backUrl
             )
         );
@@ -190,7 +190,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_log/synchronization',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_FEEDBACKS,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_FEEDBACKS,
             )
         );
         $data = array(
@@ -216,7 +216,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_synchronization/clearLog',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_OTHER_LISTINGS,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_OTHER_LISTINGS,
                 'back'       => $backUrl
             )
         );
@@ -233,7 +233,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Edit_Form extends Mage_Adm
         $url = $this->getUrl(
             '*/adminhtml_ebay_log/synchronization',
             array(
-                'synch_task' => Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_OTHER_LISTINGS,
+                'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_OTHER_LISTINGS,
             )
         );
         $data = array(

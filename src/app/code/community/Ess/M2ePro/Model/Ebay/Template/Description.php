@@ -127,7 +127,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
     {
         // Delete watermark if exists
         // ----------------------------------
-        $varDir = new Ess_M2ePro_Model_General_VariablesDir(
+        $varDir = new Ess_M2ePro_Model_VariablesDir(
             array('child_folder' => 'ebay/template/description/watermarks')
         );
 
@@ -719,7 +719,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             @unlink($prevMarkingImagePath);
         }
 
-        $varDir = new Ess_M2ePro_Model_General_VariablesDir(array(
+        $varDir = new Ess_M2ePro_Model_VariablesDir(array(
             'child_folder' => 'ebay/template/description/watermarks'
         ));
         $watermarkPath = $varDir->getPath().$this->getId().'.png';
@@ -899,6 +899,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             case self::DESCRIPTION_MODE_CUSTOM:
                 $description = Mage::helper('M2ePro/Module_Renderer_Description')
                     ->parseTemplate($src['template'], $this->getMagentoProduct());
+                $this->addWatermarkForCustomDescription($description);
                 break;
 
             default:
@@ -908,6 +909,34 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         }
 
         return str_replace(array('<![CDATA[', ']]>'), '', $description);
+    }
+
+    private function addWatermarkForCustomDescription(&$description)
+    {
+        if (strpos($description, 'm2e_watermark') !== false) {
+            preg_match_all('/<(img|a) [^>]*\bm2e_watermark[^>]*>/i', $description, $tagsArr);
+
+            $tags = $tagsArr[0];
+            $tagsNames = $tagsArr[1];
+
+            $count = count($tags);
+            for($i = 0; $i < $count; $i++){
+                $dom = new DOMDocument();
+                $dom->loadHTML($tags[$i]);
+                $tag = $dom->getElementsByTagName($tagsNames[$i])->item(0);
+
+                $newTag = str_replace(' m2e_watermark="1"', '', $tags[$i]);
+                if($tagsNames[$i] === 'a') {
+                    $newTag = str_replace($tag->getAttribute('href'),
+                        $this->addWatermarkIfNeed($tag->getAttribute('href')), $newTag);
+                }
+                if($tagsNames[$i] === 'img') {
+                    $newTag = str_replace($tag->getAttribute('src'),
+                        $this->addWatermarkIfNeed($tag->getAttribute('src')), $newTag);
+                }
+                $description = str_replace($tags[$i], $newTag, $description);
+            }
+        }
     }
 
     // #######################################

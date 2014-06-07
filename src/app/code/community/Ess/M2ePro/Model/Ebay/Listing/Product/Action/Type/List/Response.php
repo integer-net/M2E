@@ -49,7 +49,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Response
         $additionalData['last_failed_action_data'] = array(
             'native_request_data' => $this->getRequestData()->getData(),
             'previous_status' => $this->getListingProduct()->getStatus(),
-            'action' => Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_LIST,
+            'action' => Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
             'request_time' => Mage::helper('M2ePro')->getCurrentGmtDate(),
         );
 

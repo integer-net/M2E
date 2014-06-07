@@ -96,17 +96,17 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_OtherController extends Ess_M2ePro_Contr
 
     public function runReviseProductsAction()
     {
-        $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,array());
+        $this->processConnector(Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,array());
     }
 
     public function runRelistProductsAction()
     {
-        $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST,array());
+        $this->processConnector(Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,array());
     }
 
     public function runStopProductsAction()
     {
-        $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,array());
+        $this->processConnector(Ess_M2ePro_Model_Listing_Product::ACTION_STOP,array());
     }
 
     //#############################################
@@ -133,7 +133,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_OtherController extends Ess_M2ePro_Contr
             );
 
             if (!is_null($listingOther->getProductId())) {
-                $listingOther->unmapProduct(Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+                $listingOther->unmapProduct(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
             }
 
             $listingOther->deleteInstance();

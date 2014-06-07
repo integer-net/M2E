@@ -84,7 +84,7 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
     //####################################
 
     public function addListingMessage($listingId,
-                                      $initiator = parent::INITIATOR_UNKNOWN,
+                                      $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                                       $actionId = NULL,
                                       $action = NULL,
                                       $description = NULL,
@@ -108,7 +108,7 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
     public function addProductMessage($listingId,
                                       $productId,
                                       $listingProductId,
-                                      $initiator = parent::INITIATOR_UNKNOWN,
+                                      $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                                       $actionId = NULL,
                                       $action = NULL,
                                       $description = NULL,
@@ -205,7 +205,7 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
 
     private function makeDataForAdd($listingId,
                                     $creator,
-                                    $initiator = parent::INITIATOR_UNKNOWN,
+                                    $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                                     $productId = NULL,
                                     $listingProductId = NULL,
                                     $actionId = NULL,

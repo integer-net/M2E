@@ -208,15 +208,19 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
 
             $prepared['watermark_image'] = file_get_contents($_FILES['watermark_image']['tmp_name']);
 
-            $varDir = new Ess_M2ePro_Model_General_VariablesDir(
-                array('child_folder' => 'ebay/template/description/watermarks')
-            );
+            if (isset($prepared['id'])) {
 
-            $watermarkPath = $varDir->getPath().(int)$data['id'].'.png';
-            if (is_file($watermarkPath)) {
-                @unlink($watermarkPath);
+                $varDir = new Ess_M2ePro_Model_VariablesDir(
+                    array('child_folder' => 'ebay/template/description/watermarks')
+                );
+
+                $watermarkPath = $varDir->getPath().(int)$prepared['id'].'.png';
+                if (is_file($watermarkPath)) {
+                    @unlink($watermarkPath);
+                }
             }
-        } elseif (!empty($data['old_watermark_image']) && !isset($data['id'])) {
+
+        } elseif (!empty($data['old_watermark_image']) && !isset($prepared['id'])) {
             $prepared['watermark_image'] = base64_decode($data['old_watermark_image']);
         }
         //-----------------------------

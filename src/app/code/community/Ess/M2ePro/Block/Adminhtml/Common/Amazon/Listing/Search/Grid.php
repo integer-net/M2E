@@ -66,13 +66,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                                 array('is_in_stock'))
                    ->join(array('cpev'=>Mage::getSingleton('core/resource')
                                                 ->getTableName('catalog_product_entity_varchar')),
-                                "( `cpev`.`entity_id` = `main_table`.product_id AND cpev.store_id = ("
-                                    .$dbSelect->__toString()
-                                    ."))",
+                                "(`cpev`.`entity_id` = `main_table`.product_id)",
                                 array('value'))
                    ->join(array('ea'=>Mage::getSingleton('core/resource')->getTableName('eav_attribute')),
                                 '(`cpev`.`attribute_id` = `ea`.`attribute_id` AND `ea`.`attribute_code` = \'name\')',
-                                array());
+                                array())
+                   ->where('`cpev`.`store_id` = ('.$dbSelect->__toString().')');
         //--------------------------------
 
         //exit($collection->getSelect()->__toString());

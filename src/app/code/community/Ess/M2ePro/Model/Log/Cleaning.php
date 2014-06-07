@@ -6,26 +6,23 @@
 
 class Ess_M2ePro_Model_Log_Cleaning
 {
-    const LOG_LISTINGS = 'listings';
-    const LOG_OTHER_LISTINGS = 'other_listings';
-    const LOG_SYNCHRONIZATIONS = 'synchronizations';
-    const LOG_ORDERS = 'orders';
+    const LOG_LISTINGS          = 'listings';
+    const LOG_OTHER_LISTINGS    = 'other_listings';
+    const LOG_SYNCHRONIZATIONS  = 'synchronizations';
+    const LOG_ORDERS            = 'orders';
 
     // #######################################
 
     public function clearOldRecords($log)
     {
-        $log = (string)$log;
-
-        if ($log != self::LOG_LISTINGS &&
-            $log != self::LOG_OTHER_LISTINGS &&
-            $log != self::LOG_SYNCHRONIZATIONS &&
-            $log != self::LOG_ORDERS) {
+        if (!$this->isValidLogType($log)) {
             return false;
         }
 
-        $mode = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/logs/cleaning/'.$log.'/','mode');
-        $days = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/logs/cleaning/'.$log.'/','days');
+        $config = Mage::helper('M2ePro/Module')->getConfig();
+
+        $mode = $config->getGroupValue('/logs/cleaning/'.$log.'/','mode');
+        $days = $config->getGroupValue('/logs/cleaning/'.$log.'/','days');
 
         $mode = (int)$mode;
         $days = (int)$days;
@@ -34,7 +31,7 @@ class Ess_M2ePro_Model_Log_Cleaning
             return false;
         }
 
-        $minTime = $this->getMinTime($days);
+        $minTime = $this->getMinTimeByDays($days);
         $this->clearLogByMinTime($log,$minTime);
 
         return true;
@@ -42,11 +39,7 @@ class Ess_M2ePro_Model_Log_Cleaning
 
     public function clearAllLog($log)
     {
-        $log = (string)$log;
-
-        if ($log != self::LOG_LISTINGS &&
-            $log != self::LOG_OTHER_LISTINGS &&
-            $log != self::LOG_SYNCHRONIZATIONS) {
+        if (!$this->isValidLogType($log)) {
             return false;
         }
 
@@ -62,34 +55,40 @@ class Ess_M2ePro_Model_Log_Cleaning
 
     public function saveSettings($log, $mode, $days)
     {
-        $log = (string)$log;
-        $mode = (int)$mode;
-        $days = (int)$days;
-
-        if ($log != self::LOG_LISTINGS &&
-            $log != self::LOG_OTHER_LISTINGS &&
-            $log != self::LOG_SYNCHRONIZATIONS &&
-            $log != self::LOG_ORDERS) {
+        if (!$this->isValidLogType($log)) {
             return false;
         }
+
+        $mode = (int)$mode;
+        $days = (int)$days;
 
         if ($mode < 0 || $mode > 1) {
            $mode = 0;
         }
 
         if ($days <= 0) {
-           $days = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/logs/cleaning/'.$log.'/','default');
+           $days = 90;
         }
 
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/logs/cleaning/'.$log.'/','mode', $mode);
-        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/logs/cleaning/'.$log.'/','days', $days);
+        $config = Mage::helper('M2ePro/Module')->getConfig();
+
+        $config->setGroupValue('/logs/cleaning/'.$log.'/','mode', $mode);
+        $config->setGroupValue('/logs/cleaning/'.$log.'/','days', $days);
 
         return true;
     }
 
     // ########################################
 
-    private function getMinTime($days)
+    private function isValidLogType($log)
+    {
+        return $log == self::LOG_LISTINGS ||
+               $log == self::LOG_OTHER_LISTINGS ||
+               $log == self::LOG_SYNCHRONIZATIONS ||
+               $log == self::LOG_ORDERS;
+    }
+
+    private function getMinTimeByDays($days)
     {
         $timestamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
         $dateTimeArray = getdate($timestamp);
@@ -106,7 +105,7 @@ class Ess_M2ePro_Model_Log_Cleaning
         return Mage::helper('M2ePro')->getDate($timeStamp);
     }
 
-    private function clearLogByMinTime($log ,$minTime)
+    private function clearLogByMinTime($log, $minTime)
     {
         $table = NULL;
 

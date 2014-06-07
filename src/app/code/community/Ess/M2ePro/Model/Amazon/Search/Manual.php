@@ -44,6 +44,15 @@ class Ess_M2ePro_Model_Amazon_Search_Manual
         return $result;
     }
 
+    public function processResponse(Ess_M2ePro_Model_Listing_Product $listingProduct, $result, $params = array())
+    {
+        if ($params['search_method'] == 'byAsin' && $result !== false) {
+            $result = is_null($result) ? array() : array($result);
+        }
+
+        Mage::helper('M2ePro/Data_Global')->setValue('temp_amazon_manual_search_result', $result);
+    }
+
     // ########################################
 
     private function getIdentifierType($identifier)
@@ -54,17 +63,6 @@ class Ess_M2ePro_Model_Amazon_Search_Manual
                ($validation->isISBN($identifier)                             ? 'ISBN' :
                ($validation->isUPC($identifier)                              ? 'UPC'  :
                ($validation->isEAN($identifier)                              ? 'EAN'  : false))));
-    }
-
-    // ########################################
-
-    public function processResponse(Ess_M2ePro_Model_Listing_Product $listingProduct, $result, $params = array())
-    {
-        if ($params['search_method'] == 'byAsin' && $result !== false) {
-            $result = is_null($result) ? array() : array($result);
-        }
-
-        Mage::helper('M2ePro/Data_Global')->setValue('temp_amazon_manual_search_result', $result);
     }
 
     // ########################################

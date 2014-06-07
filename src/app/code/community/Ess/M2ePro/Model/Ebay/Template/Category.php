@@ -101,6 +101,10 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
 
         if ($asObjects) {
             foreach ($specifics as $specific) {
+
+                /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
+                $specific->setCategoryTemplate($this);
+
                 /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
                 if (!is_null($this->getMagentoProduct())) {
                     $specific->setMagentoProduct($this->getMagentoProduct());
@@ -112,6 +116,11 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     }
 
     // #######################################
+
+    public function getCategoryMainId()
+    {
+        return (int)$this->getData('category_main_id');
+    }
 
     public function getMarketplaceId()
     {

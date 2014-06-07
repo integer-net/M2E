@@ -73,7 +73,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
     {
         switch ($replacedAction) {
 
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_RELIST:
 
                 $this->addWarningMessage(
                     'Revise was executed instead of Relist because \'Out Of Stock Control\' Option is enabled '.
@@ -82,7 +82,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
 
             break;
 
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_STOP:
 
                 $this->addWarningMessage(
                     'Revise was executed instead of Stop because \'Out Of Stock Control\' Option is enabled '.
@@ -97,7 +97,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
 
     private function modifyQtyByReplacedAction($replacedAction, array $data)
     {
-        if ($replacedAction != Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP) {
+        if ($replacedAction != Ess_M2ePro_Model_Listing_Product::ACTION_STOP) {
             return $data;
         }
 

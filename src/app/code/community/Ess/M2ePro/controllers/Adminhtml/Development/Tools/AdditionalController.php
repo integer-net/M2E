@@ -34,38 +34,47 @@ class Ess_M2ePro_Adminhtml_Development_Tools_AdditionalController
     /**
      * @title "Execution Time Test"
      * @description "Execution Time Test"
-     * @confirm "Are you sure?"
      * @new_line
      */
     public function testExecutionTimeAction()
     {
         ini_set('display_errors', 1);
 
-        $seconds = (int)$this->getRequest()->getParam('seconds', 0);
+        $seconds = (int)$this->getRequest()->getParam('seconds', null);
+
+        $logDir = Mage::getBaseDir('var').DS.'log'.DS;
+        $fileName = 'm2epro_execution_time.log';
+
+        $isLogFileExists = is_file($logDir . $fileName);
+
         if ($seconds) {
 
-            $dir = Mage::getBaseDir('var') . DS . 'log' . DS;
-            $file = 'm2epro_execution_time.log';
-
-            is_file($dir . $file) && unlink($dir . $file);
+            $isLogFileExists && unlink($logDir . $fileName);
 
             $i = 0;
-
             while ($i < $seconds) {
                 sleep(1);
-                ((++$i % 10) == 0) && Mage::log("{$i} seconds passed",null,$file,1);
+                ((++$i % 10) == 0) && Mage::log("{$i} seconds passed",null,$fileName,1);
             }
 
-            echo <<<HTML
-<div>{$seconds} seconds passed successfully!</div><br>
-HTML;
+            echo "<div>{$seconds} seconds passed successfully!</div><br>";
         }
 
-        $url = $this->getUrl('*/*/*');
+        if ($isLogFileExists) {
+
+            $contentsRows = explode("\n",file_get_contents($logDir . $fileName));
+
+            if (count($contentsRows) >= 2) {
+                $lastRecord = trim($contentsRows[count($contentsRows)-2], "\r\n");
+                echo "<button onclick=\"alert('{$lastRecord}')\">show prev. log</button>";
+            }
+        }
+
+        $url = Mage::helper('adminhtml')->getUrl('*/*/*');
 
         return print <<<HTML
 <form action="{$url}" method="get">
-    <input type="text" name="seconds" class="input-text" value="180" style="text-align: right; width: 100px"/>
+    <input type="text" name="seconds" class="input-text" value="180" style="text-align: right; width: 100px" />
     <button type="submit">Test</button>
 </form>
 HTML;

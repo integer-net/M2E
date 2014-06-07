@@ -24,6 +24,7 @@ class Ess_M2ePro_Model_Servicing_Task_Settings implements Ess_M2ePro_Model_Servi
     {
         $this->updateLockData($data);
         $this->updateServersBaseUrls($data);
+        $this->updateLastVersion($data);
     }
 
     // ########################################
@@ -67,6 +68,17 @@ class Ess_M2ePro_Model_Servicing_Task_Settings implements Ess_M2ePro_Model_Servi
 
             $index++;
         }
+    }
+
+    private function updateLastVersion(array $data)
+    {
+        if (empty($data['last_version'])) {
+            return;
+        }
+
+        Mage::helper('M2ePro/Module')->getCacheConfig()->setGroupValue(
+            '/installation/version/', 'last_version', $data['last_version']
+        );
     }
 
     // ########################################

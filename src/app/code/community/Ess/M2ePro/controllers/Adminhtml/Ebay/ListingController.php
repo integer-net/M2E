@@ -660,35 +660,35 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
     public function runListProductsAction()
     {
         return $this->getResponse()->setBody(
-            $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_LIST)
+            $this->processConnector(Ess_M2ePro_Model_Listing_Product::ACTION_LIST)
         );
     }
 
     public function runReviseProductsAction()
     {
         return $this->getResponse()->setBody(
-            $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE)
+            $this->processConnector(Ess_M2ePro_Model_Listing_Product::ACTION_REVISE)
         );
     }
 
     public function runRelistProductsAction()
     {
         return $this->getResponse()->setBody(
-            $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST)
+            $this->processConnector(Ess_M2ePro_Model_Listing_Product::ACTION_RELIST)
         );
     }
 
     public function runStopProductsAction()
     {
         return $this->getResponse()->setBody(
-            $this->processConnector(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP)
+            $this->processConnector(Ess_M2ePro_Model_Listing_Product::ACTION_STOP)
         );
     }
 
     public function runStopAndRemoveProductsAction()
     {
         return $this->getResponse()->setBody($this->processConnector(
-            Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP, array('remove' => true)
+            Ess_M2ePro_Model_Listing_Product::ACTION_STOP, array('remove' => true)
         ));
     }
 

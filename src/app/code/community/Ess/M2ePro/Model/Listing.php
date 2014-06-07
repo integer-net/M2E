@@ -75,7 +75,7 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
         $tempLog = Mage::getModel('M2ePro/Listing_Log');
         $tempLog->setComponentMode($this->getComponentMode());
         $tempLog->addListingMessage( $this->getId(),
-                                     Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
+                                     Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_LISTING,
                                      // Parser hack -> Mage::helper('M2ePro')->__('Listing was successfully deleted');
@@ -363,7 +363,7 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
         $tempLog->addProductMessage( $this->getId(),
                                      $productId,
                                      $listingProductTemp->getId(),
-                                     Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
+                                     Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Log::ACTION_ADD_PRODUCT_TO_LISTING,
                                      // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully added');
@@ -482,12 +482,12 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
                 ->addProductMessage($listingId,
                                     $productId,
                                     $listingProduct->getId(),
-                                    Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                                    Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_MAGENTO,
                                     NULL,
-                                    Ess_M2ePro_Model_Listing_Log::TYPE_WARNING,
-                                    Ess_M2ePro_Model_Listing_Log::PRIORITY_HIGH );
+                                    Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
+                                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH );
         }
 
         $processedListings = array();
@@ -529,13 +529,13 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
                 ->addProductMessage($listingId,
                                     $productId,
                                     $listingProduct->getId(),
-                                    Ess_M2ePro_Model_Listing_Log::INITIATOR_EXTENSION,
+                                    Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_MAGENTO,
                                     // ->__('Variation option was deleted. Item was reset.');
                                     'Variation option was deleted. Item was reset.',
-                                    Ess_M2ePro_Model_Listing_Log::TYPE_WARNING,
-                                    Ess_M2ePro_Model_Listing_Log::PRIORITY_HIGH);
+                                    Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
+                                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
         }
 
         //------------------

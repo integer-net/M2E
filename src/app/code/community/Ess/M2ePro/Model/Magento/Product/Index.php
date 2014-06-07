@@ -74,7 +74,7 @@ class Ess_M2ePro_Model_Magento_Product_Index
             return false;
         }
 
-        /** @var $eventsCollection Mage_Index_Model_Resource_Event_Collection */
+        /** @var $eventsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $eventsCollection = Mage::getResourceModel('index/event_collection')
             ->addProcessFilter($process, Mage_Index_Model_Process::EVENT_STATUS_NEW);
 

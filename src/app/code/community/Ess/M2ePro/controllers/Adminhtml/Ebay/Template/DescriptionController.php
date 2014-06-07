@@ -33,10 +33,37 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
                                                      $templateData['description_template'],
                                                      $productEntities['magento_product'],
                                                      $productEntities['listing_product']);
+
+                if($templateData['watermark_mode']) {
+                    $this->addWatermarkInfoToDescription($description);
+                }
             }
         }
-
         $this->printOutput($title, $description, $errorMessage);
+    }
+
+    private function addWatermarkInfoToDescription(&$description)
+    {
+        if (strpos($description, 'm2e_watermark') !== false) {
+            preg_match_all('/<img [^>]*\bm2e_watermark[^>]*>/i', $description, $tagsArr);
+
+            $count = count($tagsArr[0]);
+            for($i = 0; $i < $count; $i++){
+                $dom = new DOMDocument();
+                $dom->loadHTML($tagsArr[0][$i]);
+                $tag = $dom->getElementsByTagName('img')->item(0);
+
+                $newTag = str_replace(' m2e_watermark="1"', '', $tagsArr[0][$i]);
+                $newTag = '<div class="description-preview-watermark-info">'.$newTag;
+
+                if($tag->getAttribute('width') == '' || $tag->getAttribute('width') > 100) {
+                    $newTag = $newTag.'<p>Watermark will be applied to this picture.</p></div>';
+                } else {
+                    $newTag = $newTag.'<p>Watermark.</p></div>';
+                }
+                $description = str_replace($tagsArr[0][$i], $newTag, $description);
+            }
+        }
     }
 
     private function printOutput($title = NULL, $description = NULL, $errorMessage = NULL)
@@ -74,7 +101,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
             return NULL;
         }
 
-        $varDir = new Ess_M2ePro_Model_General_VariablesDir(
+        $varDir = new Ess_M2ePro_Model_VariablesDir(
             array('child_folder' => 'ebay/template/description/watermarks')
         );
 

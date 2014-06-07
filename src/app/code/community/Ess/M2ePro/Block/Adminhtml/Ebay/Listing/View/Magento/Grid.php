@@ -68,7 +68,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
 
         // Get collection
         //----------------------------
-        /* @var $collection Mage_Catalog_Model_Resource_Product_Collection */
+        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection
             ->addAttributeToSelect('sku')
@@ -90,7 +90,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
             'product_id=entity_id',
             array(
                 'listing_product_id' => 'id',
-                'status' => 'status',
                 'additional_data' => 'additional_data'
             ),
             '{{table}}.listing_id='.(int)$listing->getId()
@@ -128,6 +127,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
         $store = $this->_getStore();
 
         if ($store->getId()) {
+            //$collection->addStoreFilter($store);
             $collection->joinAttribute(
                 'price', 'catalog_product/price', 'entity_id', NULL, 'left', $store->getId()
             );

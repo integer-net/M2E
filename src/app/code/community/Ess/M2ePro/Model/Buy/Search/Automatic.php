@@ -51,80 +51,6 @@ class Ess_M2ePro_Model_Buy_Search_Automatic
         );
     }
 
-    // ########################################
-
-    private function getQueryParam(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
-    {
-        /* @var $buyListingProduct Ess_M2ePro_Model_Buy_Listing_Product */
-        $buyListingProduct = $listingProduct->getChildObject();
-
-        switch ($step) {
-            case self::STEP_GENERAL_ID:
-
-                $query = $buyListingProduct->getGeneralId();
-                empty($query) && $query = $buyListingProduct->getAddingGeneralId();
-
-                break;
-
-            case self::STEP_MAGENTO_TITLE:
-
-                $query = false;
-
-                if ($buyListingProduct->getBuyListing()->isSearchByMagentoTitleModeEnabled()) {
-                    $query = $buyListingProduct->getActualMagentoProduct()->getName();
-                }
-
-                break;
-
-            default: throw new Exception('Step is out of knowledge base.');
-        }
-
-        return $query;
-    }
-
-    // ########################################
-
-    private function getSearchMethod(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
-    {
-        /** @var $listing Ess_M2ePro_Model_Buy_Listing */
-        $listing = $listingProduct->getListing()->getChildObject();
-
-        if ($step == self::STEP_GENERAL_ID) {
-
-            if ($listing->isGeneralIdSellerSkuMode()) {
-                return 'bySellerSku';
-            }
-
-            if ($listing->isGeneralIdWorldwideMode() || $listing->isGeneralIdGeneralIdMode()) {
-                return 'byIdentifier';
-            }
-        }
-
-        return 'byQuery';
-    }
-
-    // ########################################
-
-    private function getSearchType(Ess_M2ePro_Model_Listing_Product $listingProduct)
-    {
-        /* @var $listing Ess_M2ePro_Model_Buy_Listing */
-        $listing = $listingProduct->getListing()->getChildObject();
-
-        $searchType = false;
-
-        if ($listing->isGeneralIdGeneralIdMode()) {
-            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_Items::SEARCH_TYPE_GENERAL_ID;
-        }
-
-        if ($listing->isGeneralIdWorldwideMode()) {
-            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_Items::SEARCH_TYPE_UPC;
-        }
-
-        return $searchType;
-    }
-
-    // ########################################
-
     public function processResponse(Ess_M2ePro_Model_Listing_Product $listingProduct, $result, $params = array())
     {
         if (empty($result)) {
@@ -168,7 +94,7 @@ class Ess_M2ePro_Model_Buy_Search_Automatic
         $childListingProduct->save();
     }
 
-    // ########################################
+    // ----------------------------------------
 
     private function processNotFound(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
@@ -182,6 +108,74 @@ class Ess_M2ePro_Model_Buy_Search_Automatic
     }
 
     // ########################################
+
+    private function getQueryParam(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
+    {
+        /* @var $buyListingProduct Ess_M2ePro_Model_Buy_Listing_Product */
+        $buyListingProduct = $listingProduct->getChildObject();
+
+        switch ($step) {
+            case self::STEP_GENERAL_ID:
+
+                $query = $buyListingProduct->getGeneralId();
+                empty($query) && $query = $buyListingProduct->getAddingGeneralId();
+
+                break;
+
+            case self::STEP_MAGENTO_TITLE:
+
+                $query = false;
+
+                if ($buyListingProduct->getBuyListing()->isSearchByMagentoTitleModeEnabled()) {
+                    $query = $buyListingProduct->getActualMagentoProduct()->getName();
+                }
+
+                break;
+
+            default: throw new Exception('Step is out of knowledge base.');
+        }
+
+        return $query;
+    }
+
+    private function getSearchMethod(Ess_M2ePro_Model_Listing_Product $listingProduct, $step)
+    {
+        /** @var $listing Ess_M2ePro_Model_Buy_Listing */
+        $listing = $listingProduct->getListing()->getChildObject();
+
+        if ($step == self::STEP_GENERAL_ID) {
+
+            if ($listing->isGeneralIdSellerSkuMode()) {
+                return 'bySellerSku';
+            }
+
+            if ($listing->isGeneralIdWorldwideMode() || $listing->isGeneralIdGeneralIdMode()) {
+                return 'byIdentifier';
+            }
+        }
+
+        return 'byQuery';
+    }
+
+    private function getSearchType(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /* @var $listing Ess_M2ePro_Model_Buy_Listing */
+        $listing = $listingProduct->getListing()->getChildObject();
+
+        $searchType = false;
+
+        if ($listing->isGeneralIdGeneralIdMode()) {
+            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_Items::SEARCH_TYPE_GENERAL_ID;
+        }
+
+        if ($listing->isGeneralIdWorldwideMode()) {
+            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_Items::SEARCH_TYPE_UPC;
+        }
+
+        return $searchType;
+    }
+
+    // ----------------------------------------
 
     private function filterReceivedItemsFullTitleMatch($results, Ess_M2ePro_Model_Listing_Product $listingProduct)
     {

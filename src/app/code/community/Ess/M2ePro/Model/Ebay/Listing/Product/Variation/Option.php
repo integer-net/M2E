@@ -197,8 +197,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
 
         $tempSku = '';
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $simpleAttributes = $mainProduct->getOptions();
+        $simpleAttributes = $this->getListingProduct()->getMagentoProduct()->getProduct()->getOptions();
 
         foreach ($simpleAttributes as $tempAttribute) {
 
@@ -240,45 +239,41 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
         return trim($tempSku);
     }
 
-    public function getQty($productMode = false)
+    public function getQty()
     {
         $qty = 0;
-
         $src = $this->getEbaySellingFormatTemplate()->getQtySource();
+
+        if ($src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) {
+            if (!$this->getListingProduct()->getMagentoProduct()->isStatusEnabled() ||
+                !$this->getListingProduct()->getMagentoProduct()->isStockAvailability()) {
+                return 0;
+            }
+        }
 
         switch ($src['mode']) {
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_SINGLE:
-                if ($productMode) {
-                    $qty = (int)$this->getMagentoProduct()->getQty();
-                } else {
-                    $qty = 1;
-                }
+                $qty = 1;
                 break;
 
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_NUMBER:
-                if ($productMode) {
-                    $qty = (int)$this->getMagentoProduct()->getQty();
-                } else {
-                    $qty = (int)$src['value'];
-                }
+                $qty = (int)$src['value'];
                 break;
 
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE:
                 $qty = (int)$this->getMagentoProduct()->getAttributeValue($src['attribute']);
                 break;
 
-            default:
-            case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT:
-                $qty = (int)$this->getMagentoProduct()->getQty();
+            case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED:
+                $qty = (int)$this->getMagentoProduct()->getQty(false);
                 break;
-        }
 
-        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-            if (!$this->getMagentoProduct()->getStockAvailability() ||
-                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
-                // Out of stock or disabled Item? Set QTY = 0
-                $qty = 0;
-            }
+            case Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT:
+                $qty = (int)$this->getMagentoProduct()->getQty(true);
+                break;
+
+            default:
+                throw new Exception('Unknown mode in database.');
         }
 
         $qty < 0 && $qty = 0;
@@ -327,11 +322,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
     {
         $price = 0;
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $mainProductInstance = $mainProduct->getTypeInstance()->setStoreFilter($this->getListing()->getStoreId());
+        $productTypeInstance = $this->getListingProduct()->getMagentoProduct()->getTypeInstance();
 
-        $productAttributes = $mainProductInstance->getUsedProductAttributes();
-        $configurableAttributes = $mainProductInstance->getConfigurableAttributes();
+        $productAttributes = $productTypeInstance->getUsedProductAttributes();
+        $configurableAttributes = $productTypeInstance->getConfigurableAttributes();
 
         $attribute = strtolower($this->getParentObject()->getAttribute());
         $option = strtolower($this->getParentObject()->getOption());
@@ -395,9 +389,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
     {
         $price = 0;
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $mainProductInstance = $mainProduct->getTypeInstance()->setStoreFilter($this->getListing()->getStoreId());
-        $bundleAttributes = $mainProductInstance->getOptionsCollection($mainProduct);
+        $product = $this->getListingProduct()->getMagentoProduct()->getProduct();
+        $productTypeInstance = $this->getListingProduct()->getMagentoProduct()->getTypeInstance();
+        $bundleAttributes = $productTypeInstance->getOptionsCollection($product);
 
         $attribute = strtolower($this->getParentObject()->getAttribute());
 
@@ -414,8 +408,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
                 continue;
             }
 
-            $tempOptions = $mainProductInstance
-                ->getSelectionsCollection(array(0 => $tempAttribute->getId()), $mainProduct)
+            $tempOptions = $productTypeInstance
+                ->getSelectionsCollection(array(0 => $tempAttribute->getId()), $product)
                 ->getItems();
 
             foreach ($tempOptions as $tempOption) {
@@ -444,8 +438,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
     {
         $price = 0;
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $simpleAttributes = $mainProduct->getOptions();
+        $simpleAttributes = $this->getListingProduct()->getMagentoProduct()->getProduct()->getOptions();
 
         $attribute = strtolower($this->getParentObject()->getAttribute());
         $option = strtolower($this->getParentObject()->getOption());
@@ -526,11 +519,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
                 $price = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
                 break;
 
-            default:
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT:
                 $price = $this->getMagentoProduct()->getPrice();
                 $price = $this->getEbayListing()->convertPriceFromStoreToMarketplace($price);
                 break;
+
+            default:
+                throw new Exception('Unknown mode in database.');
         }
 
         $price < 0 && $price = 0;

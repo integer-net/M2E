@@ -10,6 +10,8 @@ AreaWrapper.prototype = {
         }
 
         this.containerId = containerId;
+        this.containerPosition = $(this.containerId).getStyle('position');
+
         this.wrapperId = this.containerId + '_wrapper';
 
         this.makeWrapperHtml();
@@ -20,7 +22,7 @@ AreaWrapper.prototype = {
     makeWrapperHtml : function()
     {
         var html = '<div id="' + this.wrapperId + '" class="area_wrapper" style="display: none;">&nbsp;</div>';
-        $(this.containerId).insert ({'before':html} );
+        $(this.containerId).insert ({'top':html} );
     },
 
     addDivClearBothToContainer : function()
@@ -32,21 +34,14 @@ AreaWrapper.prototype = {
 
     lock : function()
     {
+        $(this.containerId).setStyle({position: 'relative'});
         $(this.wrapperId).show();
-
-        var positionContainer = $(this.containerId).cumulativeOffset();
-        var widthContainer = $(this.containerId).getWidth();
-        var heightContainer = $(this.containerId).getHeight();
-
-        $(this.wrapperId).setStyle({left: positionContainer[0]+'px'});
-        $(this.wrapperId).setStyle({top: positionContainer[1]+'px'});
-        $(this.wrapperId).setStyle({width: widthContainer+'px'});
-        $(this.wrapperId).setStyle({height: heightContainer+'px'});
     },
 
     unlock : function()
     {
         $(this.wrapperId).hide();
+        $(this.containerId).setStyle({position: this.containerPosition});
     }
 
     //----------------------------------

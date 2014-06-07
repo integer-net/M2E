@@ -26,8 +26,8 @@ class Ess_M2ePro_Model_Servicing_Task_License implements Ess_M2ePro_Model_Servic
 
             $this->updateValidationMainData($data['validation']);
 
-            if (isset($data['validation']['checks']) && is_array($data['validation']['checks'])) {
-                $this->updateValidationChecksData($data['validation']['checks']);
+            if (isset($data['validation']['validation']) && is_array($data['validation']['validation'])) {
+                $this->updateValidationValidData($data['validation']['validation']);
             }
         }
 
@@ -59,19 +59,24 @@ class Ess_M2ePro_Model_Servicing_Task_License implements Ess_M2ePro_Model_Servic
         }
     }
 
-    private function updateValidationChecksData(array $validationChecksData)
+    private function updateValidationValidData(array $validationValidData)
     {
-        if (isset($validationChecksData['domain'])) {
-            Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/license/validation/domain/notification/',
-                                                                      'mode',(int)$validationChecksData['domain']);
+        if (isset($validationValidData['domain'])) {
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
+                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/','domain',(int)$validationValidData['domain']
+            );
         }
-        if (isset($validationChecksData['ip'])) {
-            Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/license/validation/ip/notification/',
-                                                                      'mode',(int)$validationChecksData['ip']);
+
+        if (isset($validationValidData['ip'])) {
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
+                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/','ip',(int)$validationValidData['ip']
+            );
         }
-        if (isset($validationChecksData['directory'])) {
-            Mage::helper('M2ePro/Module')->getConfig()->setGroupValue('/license/validation/directory/notification/',
-                                                                      'mode',(int)$validationChecksData['directory']);
+
+        if (isset($validationValidData['directory'])) {
+            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
+                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/','directory',(int)$validationValidData['directory']
+            );
         }
     }
 

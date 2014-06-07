@@ -13,7 +13,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Synchronization_Log_Grid
     {
         $allActions = Mage::getModel('M2ePro/Synchronization_Log')->getActionsTitles();
         $excludeActions = array(
-            Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_FEEDBACKS => '',
+            Ess_M2ePro_Model_Synchronization_Log::TASK_FEEDBACKS => '',
         );
 
         return array_diff_key($allActions, $excludeActions);

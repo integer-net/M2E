@@ -206,6 +206,45 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Edit_Form_Data exte
         return false;
     }
 
+    public function isStpAvailable()
+    {
+        if (is_null($marketplace = $this->getMarketplace())){
+            return true;
+        }
+
+        if ($marketplace->getChildObject()->isStpEnabled()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isStpAdvancedAvailable()
+    {
+        if (is_null($marketplace = $this->getMarketplace())){
+            return true;
+        }
+
+        if ($marketplace->getChildObject()->isStpAdvancedEnabled()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isMapAvailable()
+    {
+        if (is_null($marketplace = $this->getMarketplace())){
+            return true;
+        }
+
+        if ($marketplace->getChildObject()->isMapEnabled()) {
+            return true;
+        }
+
+        return false;
+    }
+
     // ####################################
 
     public  function isShowMultiCurrencyNotification()

@@ -6,14 +6,16 @@
 
 class Ess_M2ePro_Model_Ebay_Order_ExternalTransaction extends Mage_Core_Model_Abstract
 {
+    // ##########################################################
+
     const NOT_PAYPAL_TRANSACTION = 'SIS';
 
-    // ########################################
+    // ##########################################################
 
     /** @var $order Ess_M2ePro_Model_Order */
     private $order = NULL;
 
-    // ########################################
+    // ##########################################################
 
     public function _construct()
     {
@@ -21,7 +23,7 @@ class Ess_M2ePro_Model_Ebay_Order_ExternalTransaction extends Mage_Core_Model_Ab
         $this->_init('M2ePro/Ebay_Order_ExternalTransaction');
     }
 
-    // ########################################
+    // ##########################################################
 
     public function setOrder(Ess_M2ePro_Model_Order $order)
     {
@@ -37,11 +39,33 @@ class Ess_M2ePro_Model_Ebay_Order_ExternalTransaction extends Mage_Core_Model_Ab
         return $this->order;
     }
 
-    // ########################################
+    // ##########################################################
+
+    public function getTransactionId()
+    {
+        return $this->getData('transaction_id');
+    }
+
+    public function getSum()
+    {
+        return (float)$this->getData('sum');
+    }
+
+    public function getFee()
+    {
+        return (float)$this->getData('fee');
+    }
+
+    public function getTransactionDate()
+    {
+        return $this->getData('transaction_date');
+    }
+
+    // ##########################################################
 
     public function isPaypal()
     {
-        return $this->getData('transaction_id') != self::NOT_PAYPAL_TRANSACTION;
+        return $this->getTransactionId() != self::NOT_PAYPAL_TRANSACTION;
     }
 
     public function getPaypalUrl()
@@ -61,5 +85,5 @@ class Ess_M2ePro_Model_Ebay_Order_ExternalTransaction extends Mage_Core_Model_Ab
         return 'https://www.' . $modePrefix . $baseUrl . '?' . http_build_query($params, '', '&');
     }
 
-    // ########################################
+    // ##########################################################
 }

@@ -55,7 +55,7 @@ class Ess_M2ePro_Model_Observer_StockItem
                                     $listingProductArray['object']->getListingId(),
                                     $productId,
                                     $listingProductArray['id'],
-                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_QTY,
                                     // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -73,7 +73,7 @@ class Ess_M2ePro_Model_Observer_StockItem
                                  $tempLog->setComponentMode($otherListingTemp['component_mode']);
                                  $tempLog->addProductMessage(
                                     $otherListingTemp['id'],
-                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_QTY,
                                     // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -110,7 +110,7 @@ class Ess_M2ePro_Model_Observer_StockItem
                                     $listingProductArray['object']->getListingId(),
                                     $productId,
                                     $listingProductArray['id'],
-                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
                                     // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -131,7 +131,7 @@ class Ess_M2ePro_Model_Observer_StockItem
                                  $tempLog->setComponentMode($otherListingTemp['component_mode']);
                                  $tempLog->addProductMessage(
                                     $otherListingTemp['id'],
-                                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                                    Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
                                     // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
@@ -200,15 +200,11 @@ class Ess_M2ePro_Model_Observer_StockItem
             }
         }
 
-        /** @var $synchronizationLog Ess_M2ePro_Model_Synchronization_Log */
-        $synchronizationLog = Mage::helper('M2ePro/Data_Global')->getValue('synchLogs');
-
-        if (count($executedIndexes) <= 0 || !$synchronizationLog) {
+        if (count($executedIndexes) <= 0) {
             return;
         }
 
-        $synchronizationLog->unsetComponentMode();
-        $synchronizationLog->addMessage(
+        Mage::getModel('M2ePro/Synchronization_Log')->addMessage(
             Mage::helper('M2ePro')->__('Product reindex was executed.'),
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM

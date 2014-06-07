@@ -190,7 +190,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
         );
     }
 
-    public function getQty()
+    public function getQty($magentoMode = false)
     {
         $qty = 0;
 
@@ -204,7 +204,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
 
             foreach ($options as $option) {
                 /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $qty = $option->getChildObject()->getQty();
+                $qty = $option->getChildObject()->getQty($magentoMode);
                 break;
             }
 
@@ -213,17 +213,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
 
             $optionsQtyList = array();
             foreach ($options as $option) {
-               /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-               $optionsQtyList[] = $option->getChildObject()->getQty();
+                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
+                $optionsQtyList[] = $option->getChildObject()->getQty($magentoMode);
             }
 
             $qty = min($optionsQtyList);
-        }
-
-        //-- Check max posted QTY on channel
-        $src = $this->getAmazonSellingFormatTemplate()->getQtySource();
-        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
-            $qty = $src['qty_max_posted_value'];
         }
 
         $qty < 0 && $qty = 0;

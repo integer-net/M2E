@@ -370,8 +370,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Helper
             'store_id' => (int)$listingProduct->getListing()->getStoreId()
         );
 
-        if ($listingProduct->getChildObject()->isVariationMatched() &&
-            $listingProduct->getChildObject()->isVariationProduct()) {
+        if ($listingProduct->getChildObject()->isVariationsReady()) {
 
             $variations = $listingProduct->getVariations(true);
             /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */

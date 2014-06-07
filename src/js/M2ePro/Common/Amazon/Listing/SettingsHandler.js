@@ -122,6 +122,12 @@ AmazonListingSettingsHandler.prototype = Object.extend(new CommonHandler(), {
 
     initSellingFormatTemplateAutocomplete: function()
     {
+        var attributeSets = AttributeSetHandlerObj.getConfirmedAttributeSets();
+        if (attributeSets == '') {
+            alert(M2ePro.text.attribute_set_not_selected_error);
+            return;
+        }
+
         $('template_selling_format_autocomplete').remove();
 
         var newInput = new Element('input', {

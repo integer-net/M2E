@@ -40,11 +40,11 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Module extends Mage_Adminhtml_
             )
         );
 
-        $this->setChild('development_module_ebay',
+        $this->setChild('development_module_integration',
             $this->getLayout()->createBlock(
                 'M2ePro/adminhtml_development_tabs_command_group',
                 '',
-                array('controller_name' => Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_EBAY)
+                array('controller_name' => Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_INTEGRATION)
             )
         );
 

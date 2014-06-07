@@ -109,7 +109,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Grid extends Mage_Adminhtml_Bl
         $this->addColumn('buyer', array(
             'header' => Mage::helper('M2ePro')->__('Buyer'),
             'align'  => 'left',
-            'index'  => 'buyer_user_id',
+            'index'  => 'buyer_name',
             'frame_callback' => array($this, 'callbackColumnBuyer'),
             'filter_condition_callback' => array($this, 'callbackFilterBuyer'),
             'width'  => '170px'
@@ -238,15 +238,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Grid extends Mage_Adminhtml_Bl
         // --------------------------------
 
         $tips = array(
-            Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS => 'Last order action was completed successfully.',
-            Ess_M2ePro_Model_Order_Log::TYPE_ERROR => 'Last order action was completed with error(s).',
-            Ess_M2ePro_Model_Order_Log::TYPE_WARNING => 'Last order action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last order action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last order action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last order action was completed with warning(s).'
         );
 
         $icons = array(
-            Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS => 'normal',
-            Ess_M2ePro_Model_Order_Log::TYPE_ERROR => 'error',
-            Ess_M2ePro_Model_Order_Log::TYPE_WARNING => 'warning'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'normal',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'error',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'warning'
         );
 
         $summary = $this->getLayout()->createBlock('M2ePro/adminhtml_log_grid_summary', '', array(
@@ -266,13 +266,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Grid extends Mage_Adminhtml_Bl
         $string = '';
 
         switch ((int)$initiator) {
-            case Ess_M2ePro_Model_Order_Log::INITIATOR_UNKNOWN:
+            case Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN:
                 $string = '';
                 break;
-            case Ess_M2ePro_Model_Order_Log::INITIATOR_USER:
+            case Ess_M2ePro_Helper_Data::INITIATOR_USER:
                 $string = Mage::helper('M2ePro')->__('Manual');
                 break;
-            case Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION:
+            case Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION:
                 $string = Mage::helper('M2ePro')->__('Automatic');
                 break;
         }
@@ -295,8 +295,27 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Grid extends Mage_Adminhtml_Bl
                 $html .= '<br />';
             }
 
+            $isShowEditLink = false;
+
+            $product = $item->getProduct();
+            if (!is_null($product)) {
+                /** @var Ess_M2ePro_Model_Magento_Product $magentoProduct */
+                $magentoProduct = Mage::getModel('M2ePro/Magento_Product');
+                $magentoProduct->setProduct($product);
+
+                $associatedProducts = $item->getAssociatedProducts();
+                $associatedOptions = $item->getAssociatedOptions();
+
+                if ($magentoProduct->isProductWithVariations()
+                    && empty($associatedOptions)
+                    && empty($associatedProducts)
+                ) {
+                    $isShowEditLink = true;
+                }
+            }
+
             $editItemHtml = '';
-            if ($item->isActionRequired()) {
+            if ($isShowEditLink) {
                 $orderItemId = $item->getId();
                 $orderItemEditLabel = Mage::helper('M2ePro')->__('edit');
 

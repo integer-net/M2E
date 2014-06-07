@@ -26,12 +26,16 @@ class Ess_M2ePro_Model_Amazon_Order_ShippingAddress extends Ess_M2ePro_Model_Ord
     {
         $rawAddressData = $this->order->getShippingAddress()->getRawData();
 
-        // this might not work with UTF8 symbols
-        if (trim(strtolower($rawAddressData['buyer_name'])) == trim(strtolower($rawAddressData['recipient_name']))) {
-            return true;
-        }
+        $buyerNameParts =  array_map('strtolower', explode(' ', $rawAddressData['buyer_name']));
+        $recipientNameParts = array_map('strtolower', explode(' ', $rawAddressData['recipient_name']));
 
-        return false;
+        $buyerNameParts = array_map('trim', $buyerNameParts);
+        $recipientNameParts = array_map('trim', $recipientNameParts);
+
+        sort($buyerNameParts);
+        sort($recipientNameParts);
+
+        return count(array_diff($buyerNameParts, $recipientNameParts)) == 0;
     }
 
     private function getBuyerEmail()

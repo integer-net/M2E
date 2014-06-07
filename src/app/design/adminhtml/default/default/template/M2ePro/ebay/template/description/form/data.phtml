@@ -18,6 +18,27 @@
     $default = $this->getDefault();
     $formData = Mage::helper('M2ePro')->arrayReplaceRecursive($default, $formData);
 
+    $defaultStrictSettingsForSimpleMode = $default;
+
+    // removing ignored options for mode checking
+    $ignoredOptions = array('condition_value', 'condition_note_mode', 'condition_note_template',
+                            'condition_mode', 'product_details', 'gallery_images_mode',
+                            'watermark_settings');
+
+    $defaultProductDetails = $defaultStrictSettingsForSimpleMode['product_details'];
+    foreach($ignoredOptions as $val) {
+        unset($defaultStrictSettingsForSimpleMode[$val]);
+    }
+
+    $showBlockedAdvancedMode = false;
+    if(Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
+        $showBlockedAdvancedMode = $formData['gallery_images_mode'] != Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_PRODUCT ||
+            (!!count(array_diff_assoc($defaultStrictSettingsForSimpleMode, $formData)) ||
+             !!count(array_diff_assoc($defaultProductDetails, $formData['product_details'])));
+    }
+
+    $showAdvancedMode = (!Mage::helper('M2ePro/View_Ebay')->isSimpleMode() || (Mage::helper('M2ePro/View_Ebay')->isSimpleMode() && $showBlockedAdvancedMode));
+
     $tinymceEnabledForJavascript = $formData['editor_type'] == Ess_M2ePro_Model_Ebay_Template_Description::EDITOR_TYPE_TINYMCE ? 'true' : 'false';
 
     $isCustomDescription = ($formData['description_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_CUSTOM);
@@ -81,8 +102,13 @@
             .observe('change', EbayTemplateDescriptionHandlerObj.gallery_images_change)
             .simulate('change');
 
-        <?php if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) : ?>
+        <?php if (!$showAdvancedMode) : ?>
             EbayTemplateDescriptionHandlerObj.simple_mode_disallowed_hide();
+        <?php endif; ?>
+
+        <?php if($showBlockedAdvancedMode): ?>
+        var DescriptionFormWrapper = new AreaWrapper('template_description_data_container');
+        DescriptionFormWrapper.lock();
         <?php endif; ?>
     };
 
@@ -120,6 +146,10 @@
 <input type="hidden" name="description[title]" value="<?php echo Mage::helper('M2ePro')->escapeHtml($this->getTitle()); ?>" />
 <input type="hidden" name="description[is_custom_template]" value="<?php echo $this->isCustom() ? 1 : 0; ?>" />
 <input type="hidden" name="description[editor_type]" id="editor_type" value="<?php echo $formData['editor_type']; ?>"/>
+
+<?php if($showBlockedAdvancedMode): ?>
+    <p style="font-size: 15px; font-weight: bolder; color: red;">This set of options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (Sell On eBay -> Configuration -> General -> Mode -> Advanced).</p>
+<?php endif; ?>
 
 <div class="entry-edit" id="magento_block_ebay_template_description_form_data_condition">
 
@@ -280,7 +310,7 @@
 
     <tr id="use_supersize_images_tr">
         <td class="label">
-            <label for="use_supersize_images"><?php echo Mage::helper('M2ePro')->__('Picture Pack'); ?>:</label>
+            <label for="use_supersize_images"><?php echo Mage::helper('M2ePro')->__('Super Size'); ?>:</label>
         </td>
         <td class="value" style="width: auto;">
             <select id="use_supersize_images" name="description[use_supersize_images]">
@@ -896,6 +926,18 @@
                                     </td>
                                 </tr>
 
+                                <tr id="products_images_watermark_mode" class="products-images-watermark-mode">
+                                    <td class="label">
+                                        <label for="image_insertion_watermark_mode"><?php echo Mage::helper('M2ePro')->__('Use Watermark'); ?>:</label>
+                                    </td>
+                                    <td class="value" style="width: auto;">
+                                        <select id="image_insertion_watermark_mode" style="width: 200px;">
+                                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_NO ?>"><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_YES ?>"><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                                        </select>
+                                    </td>
+                                </tr>
+
                             </table>
 
                             <table cellspacing="0" class="form-list">
@@ -924,7 +966,7 @@
     </div>
 </div>
 
-<div class="entry-edit" id="magento_block_ebay_template_description_form_data_product_details">
+<div class="entry-edit simple_mode_disallowed" id="magento_block_ebay_template_description_form_data_product_details">
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('eBay Catalog Identifier'); ?></h4>

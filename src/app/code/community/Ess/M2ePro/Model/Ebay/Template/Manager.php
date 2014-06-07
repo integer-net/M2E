@@ -552,7 +552,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         $where .= "({$this->getModeColumnName()} = " . Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE;
         $where .= " AND {$this->getTemplateIdColumnName()} = " . (int)$templateId . ")";
 
-        /* @var $collection Mage_Core_Model_Resource_Db_Collection_Abstract */
+        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection->getSelect()->where($where);
 
         $items = $asObject ? $collection->getItems() : $collection->getData();

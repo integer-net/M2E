@@ -23,11 +23,18 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
         $text = $this->insertImages($text, $magentoProduct);
         $text = $this->insertMediaGalleries($text, $magentoProduct);
 
+        $design = Mage::getDesign();
+
+        $oldArea = $design->getArea();
+        $design->setArea('adminhtml');
+
         //  the CMS static block replacement i.e. {{media url=’image.jpg’}}
         $filter = new Mage_Core_Model_Email_Template_Filter();
         $filter->setVariables(array('product'=>$magentoProduct->getProduct()));
 
         $text = $filter->filter($text);
+
+        $design->setArea($oldArea);
 
         return $text;
     }
@@ -97,7 +104,7 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
 
             $tempImageAttributes = explode(',', $matches[1][$key]);
             $realImageAttributes = array();
-            for ($i=0;$i<4;$i++) {
+            for ($i=0;$i<5;$i++) {
                 if (!isset($tempImageAttributes[$i])) {
                     $realImageAttributes[$i] = 0;
                 } else {
@@ -110,6 +117,7 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
                 'height' => $realImageAttributes[1],
                 'margin' => $realImageAttributes[2],
                 'linked_mode' => $realImageAttributes[3],
+                'watermark' => $realImageAttributes[4],
                 'src' => $imageLink
             );
             $search[] = $match;
@@ -139,7 +147,7 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
         foreach ($matches[0] as $key => $match) {
             $tempMediaGalleryAttributes = explode(',', $matches[1][$key]);
             $realMediaGalleryAttributes = array();
-            for ($i=0;$i<7;$i++) {
+            for ($i=0;$i<8;$i++) {
                 if (!isset($tempMediaGalleryAttributes[$i])) {
                     $realMediaGalleryAttributes[$i] = '';
                 } else {
@@ -170,6 +178,7 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
                 'linked_mode'  => (int)$realMediaGalleryAttributes[3],
                 'layout'       => $realMediaGalleryAttributes[4],
                 'gallery_hint' => trim($realMediaGalleryAttributes[6], '"'),
+                'watermark' => (int)$realMediaGalleryAttributes[7],
                 'images_count' => count($galleryImagesLinks),
                 'image_counter' => 0
             );

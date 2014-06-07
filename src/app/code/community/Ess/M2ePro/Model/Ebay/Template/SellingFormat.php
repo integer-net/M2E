@@ -19,10 +19,11 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const DURATION_TYPE_EBAY       = 1;
     const DURATION_TYPE_ATTRIBUTE  = 2;
 
-    const QTY_MODE_PRODUCT      = 1;
-    const QTY_MODE_SINGLE       = 2;
-    const QTY_MODE_NUMBER       = 3;
-    const QTY_MODE_ATTRIBUTE    = 4;
+    const QTY_MODE_PRODUCT       = 1;
+    const QTY_MODE_SINGLE        = 2;
+    const QTY_MODE_NUMBER        = 3;
+    const QTY_MODE_ATTRIBUTE     = 4;
+    const QTY_MODE_PRODUCT_FIXED = 5;
 
     const QTY_MAX_POSTED_MODE_OFF = 0;
     const QTY_MAX_POSTED_MODE_ON = 1;
@@ -51,6 +52,10 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const PRICE_DISCOUNT_STP_TYPE_SOLD_ON_EBAY  = 1;
     const PRICE_DISCOUNT_STP_TYPE_SOLD_OFF_EBAY = 2;
     const PRICE_DISCOUNT_STP_TYPE_SOLD_ON_BOTH  = 3;
+
+    const PRICE_DISCOUNT_MAP_EXPOSURE_NONE             = 0;
+    const PRICE_DISCOUNT_MAP_EXPOSURE_DURING_CHECKOUT  = 1;
+    const PRICE_DISCOUNT_MAP_EXPOSURE_PRE_CHECKOUT     = 2;
 
     const BEST_OFFER_MODE_NO  = 0;
     const BEST_OFFER_MODE_YES = 1;
@@ -239,6 +244,11 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     public function isQtyModeAttribute()
     {
         return $this->getQtyMode() == self::QTY_MODE_ATTRIBUTE;
+    }
+
+    public function isQtyModeProductFixed()
+    {
+        return $this->getQtyMode() == self::QTY_MODE_PRODUCT_FIXED;
     }
 
     public function getQtyNumber()
@@ -613,6 +623,75 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     //-------------------------
 
+    public function getPriceDiscountMapMode()
+    {
+        return (int)$this->getData('price_discount_map_mode');
+    }
+
+    public function isPriceDiscountMapModeNone()
+    {
+        return $this->getPriceDiscountMapMode() == self::PRICE_NONE;
+    }
+
+    public function isPriceDiscountMapModeProduct()
+    {
+        return $this->getPriceDiscountMapMode() == self::PRICE_PRODUCT;
+    }
+
+    public function isPriceDiscountMapModeSpecial()
+    {
+        return $this->getPriceDiscountMapMode() == self::PRICE_SPECIAL;
+    }
+
+    public function isPriceDiscountMapModeAttribute()
+    {
+        return $this->getPriceDiscountMapMode() == self::PRICE_ATTRIBUTE;
+    }
+
+    public function getPriceDiscountMapSource()
+    {
+        return array(
+            'mode'      => $this->getPriceDiscountMapMode(),
+            'attribute' => $this->getData('price_discount_map_attribute')
+        );
+    }
+
+    public function getPriceDiscountMapAttributes()
+    {
+        $attributes = array();
+        $src = $this->getPriceDiscountMapSource();
+
+        if ($src['mode'] == self::PRICE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
+    //-------------------------
+
+    public function getPriceDiscountMapExposureType()
+    {
+        return (int)$this->getData('price_discount_map_exposure_type');
+    }
+
+    public function isPriceDiscountMapExposureTypeNone()
+    {
+        return $this->getPriceDiscountMapExposureType() == self::PRICE_DISCOUNT_MAP_EXPOSURE_NONE;
+    }
+
+    public function isPriceDiscountMapExposureTypeDuringCheckout()
+    {
+        return $this->getPriceDiscountMapExposureType() == self::PRICE_DISCOUNT_MAP_EXPOSURE_DURING_CHECKOUT;
+    }
+
+    public function isPriceDiscountMapExposureTypePreCheckout()
+    {
+        return $this->getPriceDiscountMapExposureType() == self::PRICE_DISCOUNT_MAP_EXPOSURE_PRE_CHECKOUT;
+    }
+
+    //-------------------------
+
     public function usesProductOrSpecialPrice()
     {
         if ($this->isListingTypeFixed()) {
@@ -786,6 +865,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             $this->getReservePriceAttributes(),
             $this->getBuyItNowPriceAttributes(),
             $this->getPriceDiscountStpAttributes(),
+            $this->getPriceDiscountMapAttributes(),
             $this->getBestOfferAcceptAttributes(),
             $this->getBestOfferRejectAttributes()
         ));
@@ -838,6 +918,10 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'price_discount_stp_mode' => self::PRICE_NONE,
             'price_discount_stp_attribute' => '',
             'price_discount_stp_type' => self::PRICE_DISCOUNT_STP_TYPE_RRP,
+
+            'price_discount_map_mode' => self::PRICE_NONE,
+            'price_discount_map_attribute' => '',
+            'price_discount_map_exposure_type' => self::PRICE_DISCOUNT_MAP_EXPOSURE_NONE,
 
             'best_offer_mode' => self::BEST_OFFER_MODE_NO,
 

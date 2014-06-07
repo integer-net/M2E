@@ -138,7 +138,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
 
                     $logModel->addProductMessage(
                         (int)$newData['id'],
-                        Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                        Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                         $this->getLogActionId(),
                         Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_STATUS_ON_CHANNEL,
                         $tempLogMessage,
@@ -156,7 +156,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
             if (!$existsId) {
 
                 $logModel->addProductMessage($listingOtherModel->getId(),
-                     Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION,
+                     Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                      NULL,
                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_ADD_LISTING,
                      // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully added');

@@ -6,12 +6,6 @@
 
 class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
 {
-    const ACTION_LIST    = 1;
-    const ACTION_RELIST  = 2;
-    const ACTION_REVISE  = 3;
-    const ACTION_STOP    = 4;
-    const ACTION_DELETE  = 5;
-
     private $logsActionId = NULL;
     private $isProcessingItems = false;
 
@@ -34,35 +28,35 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
         $sortedProductsData = $this->sortProductsByAccount($products);
 
         switch ($action) {
-            case self::ACTION_LIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_LIST:
                 $result = $this->processGroupedProducts($sortedProductsData,
                                                         1000,
                                                         'Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple',
                                                         $params);
                 break;
 
-            case self::ACTION_RELIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_RELIST:
                 $result = $this->processGroupedProducts($sortedProductsData,
                                                         1000,
                                                         'Ess_M2ePro_Model_Connector_Amazon_Product_Relist_Multiple',
                                                         $params);
                 break;
 
-            case self::ACTION_REVISE:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_REVISE:
                 $result = $this->processGroupedProducts($sortedProductsData,
                                                         1000,
                                                         'Ess_M2ePro_Model_Connector_Amazon_Product_Revise_Multiple',
                                                         $params);
                 break;
 
-            case self::ACTION_STOP:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_STOP:
                 $result = $this->processGroupedProducts($sortedProductsData,
                                                         1000,
                                                         'Ess_M2ePro_Model_Connector_Amazon_Product_Stop_Multiple',
                                                         $params);
                 break;
 
-            case self::ACTION_DELETE:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_DELETE:
                 $result = $this->processGroupedProducts($sortedProductsData,
                                                         1000,
                                                         'Ess_M2ePro_Model_Connector_Amazon_Product_Delete_Multiple',
@@ -188,7 +182,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
                 }
                 $logModel->addListingMessage(
                     $product->getListingId(),
-                    Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
+                    Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                     $this->logsActionId,
                     Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN,
                     $exception->getMessage(),
@@ -244,23 +238,6 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
         }
 
         return array_values($sortedProducts);
-    }
-
-    // ########################################
-
-    public static function getActionTitle($action)
-    {
-        $title = Mage::helper('M2ePro')->__('Unknown');
-
-        switch ($action) {
-            case self::ACTION_LIST:   $title = Mage::helper('M2ePro')->__('Listing'); break;
-            case self::ACTION_RELIST: $title = Mage::helper('M2ePro')->__('Relisting'); break;
-            case self::ACTION_REVISE: $title = Mage::helper('M2ePro')->__('Revising'); break;
-            case self::ACTION_STOP:   $title = Mage::helper('M2ePro')->__('Stopping'); break;
-            case self::ACTION_DELETE:   $title = Mage::helper('M2ePro')->__('Deleting'); break;
-        }
-
-        return $title;
     }
 
     // ########################################

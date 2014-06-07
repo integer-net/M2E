@@ -154,14 +154,10 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct extends Ess_M2ePro_Model_Compo
         }
 
         $categoryAttributes = $this->getAttributeSetsIds();
+        $listingAttributes = $this->getNewProductAttributes($listingProductIds);
 
-        $listingAttributes = Mage::helper('M2ePro/Component_Amazon')
-            ->getObject('Listing_Product',reset($listingProductIds))
-            ->getListing()
-            ->getAttributeSetsIds();
-
-        foreach ($listingAttributes as $listingAttribute) {
-            if (array_search($listingAttribute,$categoryAttributes) === false) {
+        foreach ($listingAttributes as $listingAttributeId) {
+            if (array_search($listingAttributeId, $categoryAttributes) === false) {
                 return false;
             }
         }
@@ -184,6 +180,22 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct extends Ess_M2ePro_Model_Compo
         }
 
         return !$hasFailed;
+    }
+
+    private function getNewProductAttributes($listingProductIds)
+    {
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+        $tableListingProduct = Mage::getSingleton('core/resource')->getTableName('m2epro_listing_product');
+
+        $productsIds = Mage::getResourceModel('core/config')
+            ->getReadConnection()
+            ->fetchCol($connRead->select()
+                ->from($tableListingProduct, 'product_id')
+                ->where('id in (?)', $listingProductIds));
+
+        return Mage::helper('M2ePro/Magento_AttributeSet')
+            ->getFromProducts($productsIds, Ess_M2ePro_Helper_Magento_Abstract::RETURN_TYPE_IDS);
     }
 
     // ########################################

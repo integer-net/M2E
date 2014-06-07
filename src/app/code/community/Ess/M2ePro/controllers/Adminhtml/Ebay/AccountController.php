@@ -594,6 +594,8 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
         } else {
 
+            Mage::helper('M2ePro/Module_License')->setTrial(Ess_M2ePro_Helper_Component_Ebay::NICK);
+
             $requestTempParams = array(
                 'mode' => $requestMode,
                 'token_session' => $data['token_session']

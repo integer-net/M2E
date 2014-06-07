@@ -204,7 +204,7 @@ HTML;
                                     'category_id')
                              ->where('`product_id` IN(?)',$this->getSelectedIds());
 
-        $affectedCategoriesCount = $this->getCategoryCollection()
+        $affectedCategoriesCount = Mage::getModel('catalog/category')->getCollection()
             ->getSelectCountSql()
             ->where('entity_id IN ('.$dbSelect->__toString().')')
             ->query()

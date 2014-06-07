@@ -173,8 +173,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
 
         $tempSku = '';
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $simpleAttributes = $mainProduct->getOptions();
+        $simpleAttributes = $this->getListingProduct()->getMagentoProduct()->getProduct()->getOptions();
 
         foreach ($simpleAttributes as $tempAttribute) {
 
@@ -216,11 +215,21 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
         return trim($tempSku);
     }
 
-    public function getQty()
+    public function getQty($magentoMode = false)
     {
         $qty = 0;
-
         $src = $this->getPlaySellingFormatTemplate()->getQtySource();
+
+        if ($magentoMode || $src['mode'] == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT) {
+            if (!$this->getListingProduct()->getMagentoProduct()->isStatusEnabled() ||
+                !$this->getListingProduct()->getMagentoProduct()->isStockAvailability()) {
+                return 0;
+            }
+        }
+
+        if ($magentoMode) {
+            return (int)$this->getMagentoProduct()->getQty(true);
+        }
 
         switch ($src['mode']) {
             case Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_SINGLE:
@@ -235,19 +244,17 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                 $qty = (int)$this->getMagentoProduct()->getAttributeValue($src['attribute']);
                 break;
 
-            default:
-            case Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT:
-                $qty = (int)$this->getMagentoProduct()->getQty();
+            case Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED:
+                $qty = (int)$this->getMagentoProduct()->getQty(false);
                 break;
-        }
 
-//        if (!$this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-//            if (!$this->getMagentoProduct()->getStockAvailability() ||
-//                $this->getMagentoProduct()->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_DISABLED)  {
-//                // Out of stock or disabled Item? Set QTY = 0
-//                $qty = 0;
-//            }
-//        }
+            case Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT:
+                $qty = (int)$this->getMagentoProduct()->getQty(true);
+                break;
+
+            default:
+                throw new Exception('Unknown mode in database.');
+        }
 
         $qty < 0 && $qty = 0;
 
@@ -295,11 +302,10 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
     {
         $price = 0;
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $mainProductInstance = $mainProduct->getTypeInstance()->setStoreFilter($this->getListing()->getStoreId());
+        $productTypeInstance = $this->getListingProduct()->getMagentoProduct()->getTypeInstance();
 
-        $productAttributes = $mainProductInstance->getUsedProductAttributes();
-        $configurableAttributes = $mainProductInstance->getConfigurableAttributesAsArray();
+        $productAttributes = $productTypeInstance->getUsedProductAttributes();
+        $configurableAttributes = $productTypeInstance->getConfigurableAttributesAsArray();
 
         $attribute = strtolower($this->getParentObject()->getAttribute());
         $option = strtolower($this->getParentObject()->getOption());
@@ -368,9 +374,9 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
     {
         $price = 0;
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $mainProductInstance = $mainProduct->getTypeInstance()->setStoreFilter($this->getListing()->getStoreId());
-        $bundleAttributes = $mainProductInstance->getOptionsCollection($mainProduct);
+        $product = $this->getListingProduct()->getMagentoProduct()->getProduct();
+        $productTypeInstance = $this->getListingProduct()->getMagentoProduct()->getTypeInstance();
+        $bundleAttributes = $productTypeInstance->getOptionsCollection($product);
 
         $attribute = strtolower($this->getParentObject()->getAttribute());
 
@@ -387,8 +393,8 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                 continue;
             }
 
-            $tempOptions = $mainProductInstance
-                ->getSelectionsCollection(array(0 => $tempAttribute->getId()), $mainProduct)
+            $tempOptions = $productTypeInstance
+                ->getSelectionsCollection(array(0 => $tempAttribute->getId()), $product)
                 ->getItems();
 
             foreach ($tempOptions as $tempOption) {
@@ -421,8 +427,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
     {
         $price = 0;
 
-        $mainProduct = $this->getListingProduct()->getMagentoProduct()->getProduct();
-        $simpleAttributes = $mainProduct->getOptions();
+        $simpleAttributes = $this->getListingProduct()->getMagentoProduct()->getProduct()->getOptions();
 
         $attribute = strtolower($this->getParentObject()->getAttribute());
         $option = strtolower($this->getParentObject()->getOption());
@@ -505,11 +510,13 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
                 $price = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
                 break;
 
-            default:
             case Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_PRODUCT:
                 $price = $this->getMagentoProduct()->getPrice();
                 $price = $this->getPlayListing()->convertPriceFromStoreToMarketplace($price,$currency);
                 break;
+
+            default:
+                throw new Exception('Unknown mode in database.');
         }
 
         $price < 0 && $price = 0;

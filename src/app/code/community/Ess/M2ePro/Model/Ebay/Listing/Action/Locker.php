@@ -11,14 +11,6 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Locker
 
     // ########################################
 
-    public function update()
-    {
-        if (!$this->getLockItem()->isExist()) {
-            $this->create();
-        }
-        $this->getLockItem()->activate();
-    }
-
     public function create()
     {
         $this->getLockItem()->create();
@@ -32,6 +24,16 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Locker
              $this->getLockItem()->remove();
         }
         $this->needRemove = false;
+    }
+
+    // ----------------------------------------
+
+    public function update()
+    {
+        if (!$this->getLockItem()->isExist()) {
+            $this->create();
+        }
+        $this->getLockItem()->activate();
     }
 
     // ########################################

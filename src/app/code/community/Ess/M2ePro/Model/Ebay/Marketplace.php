@@ -124,6 +124,11 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
         return (bool)(int)$this->getData('is_stp_advanced');
     }
 
+    public function isMapEnabled()
+    {
+        return (bool)(int)$this->getData('is_map');
+    }
+
     public function isLocalShippingRateTableEnabled()
     {
         return (bool)(int)$this->getData('is_local_shipping_rate_table');

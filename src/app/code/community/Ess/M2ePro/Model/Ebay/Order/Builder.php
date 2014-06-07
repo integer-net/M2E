@@ -6,22 +6,20 @@
 
 class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 {
+    // ##########################################################
+
     const STATUS_NOT_MODIFIED = 0;
     const STATUS_NEW          = 1;
     const STATUS_UPDATED      = 2;
 
-    const EBAY_CHECKOUT_STATUS_SINGLE_COMPLETE   = 'CheckoutComplete';
-    const EBAY_CHECKOUT_STATUS_COMBINED_COMPLETE = 'Complete';
-
-    const EBAY_PAYMENT_METHOD_NONE      = 'None';
-    const EBAY_PAYMENT_STATUS_SUCCEEDED = 'NoPaymentFailure';
-
     const UPDATE_COMPLETED_CHECKOUT = 1;
     const UPDATE_COMPLETED_PAYMENT  = 2;
     const UPDATE_COMPLETED_SHIPPING = 3;
-    const UPDATE_CHECKOUT_MESSAGE   = 4;
+    const UPDATE_BUYER_MESSAGE      = 4;
     const UPDATE_PAYMENT_DATA       = 5;
     const UPDATE_EMAIL              = 6;
+
+    // ##########################################################
 
     // ->__('Payment status was updated to Paid on eBay.');
     // ->__('Shipping status was updated to Shipped on eBay.');
@@ -72,78 +70,61 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
     protected function initializeData(array $data = array())
     {
-        // Init general data
         // ------------------
         $this->setData('account_id', $this->account->getId());
 
-        $this->setData('ebay_order_id', $data['ebay_order_id']);
-        $this->setData('selling_manager_record_number', $data['selling_manager_record_number']);
+        $this->setData('ebay_order_id', $data['identifiers']['ebay_order_id']);
+        $this->setData('selling_manager_id', $data['identifiers']['selling_manager_id']);
 
-        $this->setData('checkout_status', $this->helper->getCheckoutStatus($data['checkout_status']));
-        $this->setData('checkout_buyer_message', trim($data['checkout_buyer_message']));
+        $this->setData('checkout_status', $this->helper->getCheckoutStatus($data['statuses']['checkout']));
 
         $this->setData('purchase_update_date', $data['purchase_update_date']);
         $this->setData('purchase_create_date', $data['purchase_create_date']);
         // ------------------
 
-        // Init sale data
         // ------------------
-        //$this->setData('price', (float)$data['price']); // do we need this?
-        $this->setData('is_refund', (bool)$data['is_refund']);
-        $this->setData('paid_amount', (float)$data['paid_amount']);
-        $this->setData('saved_amount', (float)$data['saved_amount']);
-        $this->setData('currency', $data['currency']);
-        $this->setData('best_offer', (int)$data['best_offer']);
-        $this->setData('final_fee', (float)$data['final_fee']);
+        $this->setData('paid_amount', (float)$data['selling']['paid_amount']);
+        $this->setData('saved_amount', (float)$data['selling']['saved_amount']);
+        $this->setData('currency', $data['selling']['currency']);
+
+        if (empty($data['selling']['tax_details']) || !is_array($data['selling']['tax_details'])) {
+            $this->setData('tax_details', null);
+        } else {
+            $this->setData('tax_details', $data['selling']['tax_details']);
+        }
         // ------------------
 
-        // Init tax data
         // ------------------
-        $this->setData('tax_rate', (float)$data['tax_rate']);
-        $this->setData('tax_state', $data['tax_state']);
-        $this->setData('tax_amount', (float)$data['tax_amount']);
-        $this->setData('tax_includes_shipping', (int)$data['tax_includes_shipping']);
-        // ------------------
-
-        // Init customer data
-        // ------------------
-        $this->setData('buyer_user_id', trim($data['buyer_user_id']));
-        $this->setData('buyer_name', trim($data['buyer_name']));
-        $this->setData('buyer_email', trim($data['buyer_email']));
+        $this->setData('buyer_user_id', trim($data['buyer']['user_id']));
+        $this->setData('buyer_name', trim($data['buyer']['name']));
+        $this->setData('buyer_email', trim($data['buyer']['email']));
+        $this->setData('buyer_message', $data['buyer']['message']);
         // ------------------
 
-        // Init payment data
         // ------------------
-        $this->setData('payment_method', $data['payment_method']);
-        $this->setData('payment_status_ebay', $data['payment_status_ebay']);
-        $this->setData('payment_status_hold', $data['payment_status_hold']);
-        $this->setData('payment_date', $data['payment_date']);
+        $this->externalTransactions = $data['payment']['external_transactions'];
+        unset($data['payment']['external_transactions']);
+
+        $this->setData('payment_details', $data['payment']);
 
         $paymentStatus = $this->helper->getPaymentStatus(
-            $data['payment_method'], $data['payment_date'], $data['payment_status_ebay']
+            $data['payment']['method'], $data['payment']['date'], $data['payment']['status']
         );
         $this->setData('payment_status', $paymentStatus);
         // ------------------
 
-        // Init shipping data
         // ------------------
-        $this->setData('get_it_fast', (int)$data['get_it_fast']);
-        $this->setData('shipping_method', $data['shipping_method']);
-        $this->setData('shipping_method_selected', (int)$data['shipping_method_selected']);
-        $this->setData('shipping_address', $data['shipping_address']);
-        $this->setData('shipping_tracking_details', $data['shipping_tracking_details']);
-        $this->setData('shipping_price', (float)$data['shipping_price']);
-        $this->setData('shipping_type', $data['shipping_type']);
-        $this->setData('shipping_date', $data['shipping_date']);
+        $this->setData('shipping_details', $data['shipping']);
 
-        $shippingStatus = $this->helper->getShippingStatus($data['shipping_date'], $data['shipping_method_selected']);
+        $shippingStatus = $this->helper->getShippingStatus(
+            $data['shipping']['date'], !empty($data['shipping']['service'])
+        );
         $this->setData('shipping_status', $shippingStatus);
-
-        $this->setData('global_shipping_details', $data['global_shipping_details']);
         // ------------------
 
+        // ------------------
         $this->items = $data['items'];
-        $this->externalTransactions = $data['external_transactions'];
+        // ------------------
     }
 
     // ########################################
@@ -155,22 +136,25 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
         $item = reset($this->items);
         // ------------------
 
-        if (empty($item['item_site'])) {
+        if (empty($item['site'])) {
             return;
         }
 
-        $marketplace = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Marketplace',$item['item_site'], 'code');
+        $shippingDetails = $this->getData('shipping_details');
+        $paymentDetails = $this->getData('payment_details');
 
-        $shippingMethodName = $this->helper->getShippingMethodNameByCode(
-            $this->getData('shipping_method'), $marketplace->getId()
+        $marketplace = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Marketplace',$item['site'], 'code');
+
+        $shippingDetails['service'] = $this->helper->getShippingServiceNameByCode(
+            $shippingDetails['service'], $marketplace->getId()
         );
-        $paymentMethodName = $this->helper->getPaymentMethodNameByCode(
-            $this->getData('payment_method'), $marketplace->getId()
+        $paymentDetails['method'] = $this->helper->getPaymentMethodNameByCode(
+            $paymentDetails['method'], $marketplace->getId()
         );
 
         $this->setData('marketplace_id', $marketplace->getId());
-        $this->setData('shipping_method', $shippingMethodName);
-        $this->setData('payment_method', $paymentMethodName);
+        $this->setData('shipping_details', $shippingDetails);
+        $this->setData('payment_details', $paymentDetails);
     }
 
     // ########################################
@@ -255,7 +239,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             $itemBuilder = Mage::getModel('M2ePro/Ebay_Order_Item_Builder');
             $itemBuilder->initialize($itemData);
 
-            $item = $itemBuilder->process($this->order, $this->isNew(), $this->isCombined());
+            $item = $itemBuilder->process();
             $item->setOrder($this->order);
 
             $itemsCollection->removeItemByKey($item->getId());
@@ -287,27 +271,19 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
     // ########################################
 
-    /**
-     * @return bool
-     */
     public function isRefund()
     {
-        return $this->getData('is_refund');
+        $paymentDetails = $this->getData('payment_details');
+        return $paymentDetails['is_refund'];
     }
 
     // ----------------------------------------
 
-    /**
-     * @return bool
-     */
     public function isSingle()
     {
         return count($this->items) == 1;
     }
 
-    /**
-     * @return bool
-     */
     public function isCombined()
     {
         return count($this->items) > 1;
@@ -322,17 +298,11 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
     // ----------------------------------------
 
-    /**
-     * @return bool
-     */
     public function isNew()
     {
         return $this->status == self::STATUS_NEW;
     }
 
-    /**
-     * @return bool
-     */
     public function isUpdated()
     {
         return $this->status == self::STATUS_UPDATED;
@@ -340,9 +310,6 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
     // ########################################
 
-    /**
-     * @return bool
-     */
     private function canCreateOrUpdateOrder()
     {
         if ($this->isNew() && $this->isRefund()) {
@@ -359,9 +326,9 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
     {
         $this->prepareShippingAddress();
 
-        $this->setData('shipping_address', json_encode($this->getData('shipping_address')));
-        $this->setData('shipping_tracking_details', json_encode($this->getData('shipping_tracking_details')));
-        $this->setData('global_shipping_details', json_encode($this->getData('global_shipping_details')));
+        $this->setData('tax_details', json_encode($this->getData('tax_details')));
+        $this->setData('shipping_details', json_encode($this->getData('shipping_details')));
+        $this->setData('payment_details', json_encode($this->getData('payment_details')));
 
         $this->order->addData($this->getData());
         $this->order->save();
@@ -371,7 +338,9 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
     private function prepareShippingAddress()
     {
-        $shippingAddress = $this->getData('shipping_address');
+        $shippingDetails = $this->getData('shipping_details');
+        $shippingAddress = $shippingDetails['address'];
+
         $shippingAddress['company'] = '';
 
         if (!isset($shippingAddress['street']) || !is_array($shippingAddress['street'])) {
@@ -389,7 +358,8 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             $shippingAddress['company'] = array_shift($shippingAddress['street']);
         }
 
-        $this->setData('shipping_address', $shippingAddress);
+        $shippingDetails['address'] = $shippingAddress;
+        $this->setData('shipping_details', $shippingDetails);
     }
 
     // ########################################
@@ -440,7 +410,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
                 ));
 
                 Mage::getSingleton('M2ePro/Order_Log_Manager')->createLogRecord(
-                    Ess_M2ePro_Helper_Component_Ebay::NICK, null, $message, Ess_M2ePro_Model_Order_Log::TYPE_WARNING
+                    Ess_M2ePro_Helper_Component_Ebay::NICK, null, $message, Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING
                 );
 
                 try {
@@ -458,7 +428,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             ));
 
             Mage::getSingleton('M2ePro/Order_Log_Manager')->createLogRecord(
-                Ess_M2ePro_Helper_Component_Ebay::NICK, null, $message, Ess_M2ePro_Model_Order_Log::TYPE_WARNING
+                Ess_M2ePro_Helper_Component_Ebay::NICK, null, $message, Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING
             );
         }
     }
@@ -474,8 +444,8 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
         if ($this->hasUpdatedCompletedCheckout()) {
             $this->updates[] = self::UPDATE_COMPLETED_CHECKOUT;
         }
-        if ($this->hasUpdatedCheckoutMessage()) {
-            $this->updates[] = self::UPDATE_CHECKOUT_MESSAGE;
+        if ($this->hasUpdatedBuyerMessage()) {
+            $this->updates[] = self::UPDATE_BUYER_MESSAGE;
         }
         if ($this->hasUpdatedCompletedPayment()) {
             $this->updates[] = self::UPDATE_COMPLETED_PAYMENT;
@@ -502,17 +472,17 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
         return $this->getData('checkout_status') == Ess_M2ePro_Model_Ebay_Order::CHECKOUT_STATUS_COMPLETED;
     }
 
-    private function hasUpdatedCheckoutMessage()
+    private function hasUpdatedBuyerMessage()
     {
         if (!$this->isUpdated()) {
             return false;
         }
 
-        if ($this->getData('checkout_buyer_message') == '') {
+        if ($this->getData('buyer_message') == '') {
             return false;
         }
 
-        return $this->getData('checkout_buyer_message') != $this->order->getChildObject()->getCheckoutBuyerMessage();
+        return $this->getData('buyer_message') != $this->order->getChildObject()->getBuyerMessage();
     }
 
     // ----------------------------------------
@@ -547,8 +517,9 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
         /** @var $ebayOrder Ess_M2ePro_Model_Ebay_Order */
         $ebayOrder = $this->order->getChildObject();
+        $paymentDetails = $this->getData('payment_details');
 
-        if ($ebayOrder->getData('payment_method') != $this->getData('payment_method')) {
+        if ($ebayOrder->getPaymentMethod() != $paymentDetails['method']) {
             return true;
         }
 
@@ -642,7 +613,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             $magentoOrderUpdater->updateCustomerAddress($proxy->getAddressData());
         }
 
-        if ($this->hasUpdate(self::UPDATE_CHECKOUT_MESSAGE)) {
+        if ($this->hasUpdate(self::UPDATE_BUYER_MESSAGE)) {
             $magentoOrderUpdater->updateComments($proxy->getChannelComments());
         }
 

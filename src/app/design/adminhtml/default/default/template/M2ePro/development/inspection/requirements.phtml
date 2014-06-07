@@ -26,8 +26,6 @@
 
     <?php foreach($this->requirements as $key => $requirement) { ?>
 
-        <?php if ($key == 'magento_version' && $this->getIsSupportMode()) continue; ?>
-
         <tr>
             <td class="label">
                 <label><?php echo $requirement['title']; ?></label>

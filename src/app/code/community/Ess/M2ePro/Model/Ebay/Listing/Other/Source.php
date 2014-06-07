@@ -9,6 +9,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Source
     const QTY_SOURCE_NONE = 0;
     const QTY_SOURCE_PRODUCT = 1;
     const QTY_SOURCE_ATTRIBUTE = 2;
+    const QTY_SOURCE_PRODUCT_FIXED = 3;
 
     const PRICE_SOURCE_NONE = 0;
     const PRICE_SOURCE_PRODUCT = 1;
@@ -67,6 +68,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Source
     public function isQtySourceAttribute()
     {
         return $this->getQtySource() == self::QTY_SOURCE_ATTRIBUTE;
+    }
+
+    public function isQtySourceProductFixed()
+    {
+        return $this->getQtySource() == self::QTY_SOURCE_PRODUCT_FIXED;
     }
 
     //------------------------------------------

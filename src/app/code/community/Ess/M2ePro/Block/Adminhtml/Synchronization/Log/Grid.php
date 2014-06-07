@@ -16,13 +16,13 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
 
         $this->viewComponentHelper = Mage::helper('M2ePro/View')->getComponentHelper();
 
-        $synchTask = $this->getRequest()->getParam('synch_task');
+        $task = $this->getRequest()->getParam('task');
         $component = $this->getRequest()->getParam('component');
 
         // Initialization block
         //------------------------------
         $this->setId(
-            'synchronizationLogGrid'.(!is_null($synchTask) ? $synchTask : '').(!is_null($component) ? $component : '')
+            'synchronizationLogGrid'.(!is_null($task) ? $task : '').(!is_null($component) ? $component : '')
         );
         //------------------------------
 
@@ -34,8 +34,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
         $this->setUseAjax(true);
 
         $filters = array();
-        !is_null($synchTask) && $filters['synch_task'] = $synchTask;
-        !is_null($synchTask) && $filters['component_mode'] = $component;
+        !is_null($task) && $filters['task'] = $task;
+        !is_null($task) && $filters['component_mode'] = $component;
         $this->setDefaultFilter($filters);
         //------------------------------
     }
@@ -57,10 +57,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             && Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
 
             $excludeTasks = array(
-                Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_FEEDBACKS,
-                Ess_M2ePro_Model_Synchronization_Log::SYNCH_TASK_OTHER_LISTINGS
+                Ess_M2ePro_Model_Synchronization_Log::TASK_FEEDBACKS,
+                Ess_M2ePro_Model_Synchronization_Log::TASK_OTHER_LISTINGS
             );
-            $collection->getSelect()->where('synch_task NOT IN ('.implode(',', $excludeTasks).')');
+            $collection->getSelect()->where('task NOT IN ('.implode(',', $excludeTasks).')');
         }
 
         // we need sort by id also, because create_date may be same for some adjacents entries
@@ -100,14 +100,14 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             ));
         }
 
-        $this->addColumn('synch_task', array(
+        $this->addColumn('task', array(
             'header'    => Mage::helper('M2ePro')->__('Synchronization'),
             'align'     => 'left',
             'width'     => '200px',
             'type'      => 'options',
-            'index'     => 'synch_task',
+            'index'     => 'task',
             'sortable'  => false,
-            'filter_index' => 'main_table.synch_task',
+            'filter_index' => 'main_table.task',
             'options' => $this->getActionTitles()
         ));
 

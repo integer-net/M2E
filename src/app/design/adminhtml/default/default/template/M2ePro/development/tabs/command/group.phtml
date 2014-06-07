@@ -28,7 +28,13 @@ foreach($this->commands as $command) : ?>
 
                 <?php if (count($components) > 1): ?>
                     <?php foreach ($this->enabledComponents as $key => $component): ?>
-                        <?php echo $key == 0 ? '(' : ''; ?><a href="<?php echo rtrim($command['url'], '/') . '/component/' . $component . '/'; ?>" <?php if ($command['confirm'] != ''): ?>onclick="return confirm('<?php echo $command['confirm']; ?>');"<?php endif; ?>><?php echo $component; ?></a><?php echo isset($this->enabledComponents[$key + 1]) ? ', ' : ')'; ?>
+                        <?php
+                            $onClickJs = 'return confirm(\''.$command['confirm'].'\');';
+                            if($command['title'] == 'Marketplaces') {
+                                $onClickJs = 'var result = prompt(\''.$command['confirm'].'\'); if(result) window.location.href = $(this).getAttribute(\'href\') + \'?marketplace_id=\'+result; return false;';
+                            }
+                        ?>
+                        <?php echo $key == 0 ? '(' : ''; ?><a href="<?php echo rtrim($command['url'], '/') . '/component/' . $component . '/'; ?>" <?php if ($command['confirm'] != ''): ?>onclick="<?php echo $onClickJs; ?>"<?php endif; ?>><?php echo $component; ?></a><?php echo isset($this->enabledComponents[$key + 1]) ? ', ' : ')'; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </td>

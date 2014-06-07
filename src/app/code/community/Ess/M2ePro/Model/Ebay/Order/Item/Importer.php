@@ -22,7 +22,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
     {
         $params = array();
         $params['item_id'] = $this->item->getItemId();
-        count($this->item->getVariation()) > 0 && $params['variation_sku'] = $this->item->getSku();
+        $this->item->hasVariation() && $params['variation_sku'] = $this->item->getVariationSku();
 
         $itemData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
             ->processVirtual('item', 'get', 'info',

@@ -281,8 +281,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             $component, 'Listing_Product', $listingProductId
         );
 
-        if ($listingProduct->getChildObject()->isVariationProduct() &&
-            $listingProduct->getChildObject()->isVariationMatched()) {
+        if ($listingProduct->getChildObject()->isVariationsReady()) {
             $listingProduct = $listingProduct->duplicate();
         }
 
@@ -363,8 +362,8 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             ->getItems();
 
         foreach ($listingProducts as $listingProduct) {
-            if (!$listingProduct->getChildObject()->isVariationProduct() ||
-                !$listingProduct->getChildObject()->isVariationMatched()) {
+
+            if (!$listingProduct->getChildObject()->isVariationsReady()) {
                 continue;
             }
 

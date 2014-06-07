@@ -102,21 +102,21 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
 
     public function clearLogAction()
     {
-        $synchTask = $this->getRequest()->getParam('synch_task');
+        $task = $this->getRequest()->getParam('task');
         $component = $this->getRequest()->getParam('component');
 
         if (empty($component)) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Component can\'be empty'));
             return $this->_redirect('*/*/index');
         }
-        if (is_null($synchTask)) {
+        if (is_null($task)) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select item(s) to clear'));
             return $this->_redirect('*/*/index');
         }
 
         Mage::getModel('M2ePro/Synchronization_Log')
                 ->setComponentMode($component)
-                ->clearMessages($synchTask);
+                ->clearMessages($task);
 
         $this->_getSession()->addSuccess(
             Mage::helper('M2ePro')->__('The synchronization task log has been successfully cleaned.')
@@ -130,17 +130,21 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(json_decode($this->getRequest()->getParam('components')));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::TEMPLATES,
-            Ess_M2ePro_Model_Synchronization_Tasks::ORDERS,
-            Ess_M2ePro_Model_Synchronization_Tasks::OTHER_LISTINGS
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(json_decode($this->getRequest()->getParam('components')));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::TEMPLATES,
+            Ess_M2ePro_Model_Synchronization_Task::ORDERS,
+            Ess_M2ePro_Model_Synchronization_Task::OTHER_LISTINGS
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     //------------------------
@@ -149,45 +153,57 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(json_decode($this->getRequest()->getParam('components')));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::TEMPLATES
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(json_decode($this->getRequest()->getParam('components')));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::TEMPLATES
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     public function runNowOrdersAction()
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(json_decode($this->getRequest()->getParam('components')));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::ORDERS
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(json_decode($this->getRequest()->getParam('components')));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::ORDERS
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     public function runNowOtherListingsAction()
     {
         session_write_close();
 
-        $synchDispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-        $synchDispatcher->setInitiator(Ess_M2ePro_Model_Synchronization_Run::INITIATOR_USER);
-        $synchDispatcher->setComponents(json_decode($this->getRequest()->getParam('components')));
-        $synchDispatcher->setTasks(array(
-            Ess_M2ePro_Model_Synchronization_Tasks::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Tasks::OTHER_LISTINGS
+        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
+        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
+
+        $dispatcher->setAllowedComponents(json_decode($this->getRequest()->getParam('components')));
+        $dispatcher->setAllowedTasksTypes(array(
+            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
+            Ess_M2ePro_Model_Synchronization_Task::OTHER_LISTINGS
         ));
-        $synchDispatcher->setParams(array());
-        $synchDispatcher->process();
+
+        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
+        $dispatcher->setParams(array());
+
+        $dispatcher->process();
     }
 
     //#############################################

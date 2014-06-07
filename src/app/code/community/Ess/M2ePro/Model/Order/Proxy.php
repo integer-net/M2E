@@ -323,7 +323,7 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
         /** @var $currencyHelper Ess_M2ePro_Model_Currency */
         $currencyHelper = Mage::getSingleton('M2ePro/Currency');
-        $currencyConvertRate = $currencyHelper->getConvertRateFromBase($this->getCurrency(), $store);
+        $currencyConvertRate = $currencyHelper->getConvertRateFromBase($this->getCurrency(), $store, 4);
 
         if ($currencyHelper->isBase($this->getCurrency(), $store)) {
             return array();

@@ -214,12 +214,19 @@ class Ess_M2ePro_Model_Magento_Quote
             $product = $quoteItemBuilder->getProduct();
             $request = $quoteItemBuilder->getRequest();
 
+            // ----------------------------
+            $productOriginalPrice = $product->getPrice();
+
+            $price = $item->getBasePrice();
+            $product->setPrice($price);
+            $product->setSpecialPrice($price);
+            // ----------------------------
+
             // see Mage_Sales_Model_Observer::substractQtyFromQuotes
             $this->quote->setItemsCount($this->quote->getItemsCount() + 1);
             $this->quote->setItemsQty((float)$this->quote->getItemsQty() + $request->getQty());
 
             $result = $this->quote->addProduct($product, $request);
-
             if (is_string($result)) {
                 throw new Exception($result);
             }
@@ -227,7 +234,18 @@ class Ess_M2ePro_Model_Magento_Quote
             $quoteItem = $this->quote->getItemByProduct($product);
 
             if ($quoteItem !== false) {
+                $weight = $product->getTypeInstance()->getWeight();
+                if ($product->isConfigurable()) {
+                    // hack: for child product weight was not load
+                    $simpleProductId = $product->getCustomOption('simple_product')->getProductId();
+                    $weight = Mage::getResourceModel('catalog/product')->getAttributeRawValue(
+                        $simpleProductId, 'weight', 0
+                    );
+                }
+
                 $quoteItem->setOriginalCustomPrice($item->getPrice());
+                $quoteItem->setOriginalPrice($productOriginalPrice);
+                $quoteItem->setWeight($weight);
                 $quoteItem->setNoDiscount(1);
                 $quoteItem->setGiftMessageId($quoteItemBuilder->getGiftMessageId());
                 $quoteItem->setAdditionalData($quoteItemBuilder->getAdditionalData($quoteItem));

@@ -10,6 +10,11 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
     const STATUS_WARNING    = 2;
     const STATUS_SUCCESS    = 3;
 
+    const INITIATOR_UNKNOWN   = 0;
+    const INITIATOR_USER      = 1;
+    const INITIATOR_EXTENSION = 2;
+    const INITIATOR_DEVELOPER = 3;
+
     const CUSTOM_IDENTIFIER = 'm2epro_extension';
 
     // ########################################

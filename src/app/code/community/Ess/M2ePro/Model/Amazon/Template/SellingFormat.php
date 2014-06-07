@@ -9,10 +9,11 @@
  */
 class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
-    const QTY_MODE_PRODUCT   = 1;
-    const QTY_MODE_SINGLE    = 2;
-    const QTY_MODE_NUMBER    = 3;
-    const QTY_MODE_ATTRIBUTE = 4;
+    const QTY_MODE_PRODUCT       = 1;
+    const QTY_MODE_SINGLE        = 2;
+    const QTY_MODE_NUMBER        = 3;
+    const QTY_MODE_ATTRIBUTE     = 4;
+    const QTY_MODE_PRODUCT_FIXED = 5;
 
     const QTY_MAX_POSTED_MODE_OFF = 0;
     const QTY_MAX_POSTED_MODE_ON = 1;
@@ -95,6 +96,11 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
     public function isQtyModeAttribute()
     {
         return $this->getQtyMode() == self::QTY_MODE_ATTRIBUTE;
+    }
+
+    public function isQtyModeProductFixed()
+    {
+        return $this->getQtyMode() == self::QTY_MODE_PRODUCT_FIXED;
     }
 
     public function getQtyNumber()

@@ -25,7 +25,7 @@ class Ess_M2ePro_Model_Connector_Play_Orders_Update_Shipping
     {
         $params = array();
 
-        foreach ($this->params as $updateData) {
+        foreach ($this->params['items'] as $updateData) {
             $params[$updateData['order_id']] = array(
                 'order_id'        => $updateData['order_id'],
                 'carrier_name'    => $updateData['carrier_name'],
@@ -46,7 +46,7 @@ class Ess_M2ePro_Model_Connector_Play_Orders_Update_Shipping
     {
         $items = array();
 
-        foreach ($this->params as $updateData) {
+        foreach ($this->params['items'] as $updateData) {
             $items[] = array(
                 'order_id'        => $updateData['play_order_id'],
                 'carrier_name'    => $updateData['carrier_name'],
@@ -74,7 +74,7 @@ class Ess_M2ePro_Model_Connector_Play_Orders_Update_Shipping
         //------------------------------
         $changeIds = array();
 
-        foreach ($this->params as $updateData) {
+        foreach ($this->params['items'] as $updateData) {
             if (!is_array($updateData)) {
                 continue;
             }

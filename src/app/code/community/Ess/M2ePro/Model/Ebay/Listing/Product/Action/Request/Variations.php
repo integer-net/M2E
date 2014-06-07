@@ -71,6 +71,20 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
                 $item['price_discount_stp'] = $priceDiscountData;
             }
 
+            if ($this->getEbayListingProduct()->isPriceDiscountMap()) {
+                $priceDiscountMapData = array(
+                    'minimum_advertised_price' => $variation->getChildObject()->getPriceDiscountMap(),
+                );
+
+                $exposure = $variation->getChildObject()->
+                    getEbaySellingFormatTemplate()->getPriceDiscountMapExposureType();
+                $priceDiscountMapData['minimum_advertised_price_exposure'] =
+                    Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling::
+                        getPriceDiscountMapExposureType($exposure);
+
+                $item['price_discount_map'] = $priceDiscountMapData;
+            }
+
             $options = $variation->getOptions(true);
 
             foreach ($options as $option) {
@@ -190,9 +204,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
         $attributeLabels = array();
 
-        $configurableAttributes = $product->getTypeInstance()
-                                          ->setStoreFilter($this->getListing()->getStoreId())
-                                          ->getConfigurableAttributesAsArray($product);
+        $configurableAttributes = $this->getMagentoProduct()->getTypeInstance()
+                                       ->getConfigurableAttributesAsArray($product);
 
         foreach ($configurableAttributes as $configurableAttribute) {
             if ((int)$attributeData['attribute_id'] == (int)$configurableAttribute['attribute_id']) {
@@ -240,9 +253,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
                 /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
 
                 $foundAttributeLabel = false;
-                foreach ($attributeLabels as $attributeLabel) {
-                    if (strtolower($attributeLabel) == strtolower($option->getAttribute())) {
+                foreach ($attributeLabels as $tempLabel) {
+                    if (strtolower($tempLabel) == strtolower($option->getAttribute())) {
                         $foundAttributeLabel = $option->getAttribute();
+                        break;
                     }
                 }
 

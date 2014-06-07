@@ -163,13 +163,19 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
         $qty = 0;
 
         if ($this->getSourceModel()->isQtySourceProduct()) {
-            $qty = $this->getMagentoProduct()->getQty();
+            $qty = (int)$this->getMagentoProduct()->getQty(true);
+        }
+
+        if ($this->getSourceModel()->isQtySourceProductFixed()) {
+            $qty = (int)$this->getMagentoProduct()->getQty(false);
         }
 
         if ($this->getSourceModel()->isQtySourceAttribute()) {
             $attribute = $this->getSourceModel()->getQtyAttribute();
-            $qty = $this->getMagentoProduct()->getAttributeValue($attribute);
+            $qty = (int)$this->getMagentoProduct()->getAttributeValue($attribute);
         }
+
+        $qty < 0 && $qty = 0;
 
         return (int)floor($qty);
     }
@@ -262,17 +268,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
 
     public function reviseAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE,$params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,$params);
     }
 
     public function relistAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST,$params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,$params);
     }
 
     public function stopAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP,$params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Listing_Product::ACTION_STOP,$params);
     }
 
     //-----------------------------------------

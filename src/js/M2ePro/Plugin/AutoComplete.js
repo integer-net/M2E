@@ -159,6 +159,8 @@ Autocomplete.prototype = {
   },
 
   onKeyPress: function(e) {
+    if(this.el.value == '' && e.keyCode == Event.KEY_RETURN)
+      (this.options.onSelect || Prototype.emptyFunction)('', '');
     if (!this.enabled) {return;}
     // return will exit the function
     // and event will not fire
@@ -225,9 +227,10 @@ Autocomplete.prototype = {
   getSuggestions: function() {
     var cr = this.cachedResponse[this.currentValue];
     if (cr && Object.isArray(cr.suggestions)) {
-      this.suggestions = cr.suggestions;
-      this.data = cr.data;
-      this.suggest();
+        this.suggestions = cr.suggestions;
+        this.data = cr.data;
+        this.quantity = cr.quantity;
+        this.suggest();
     } else if (!this.isBadQuery(this.currentValue)) {
       new Ajax.Request(this.serviceUrl, {
         parameters: {

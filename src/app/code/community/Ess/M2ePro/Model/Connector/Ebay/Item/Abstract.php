@@ -155,13 +155,13 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
             switch ($this->params['status_changer']) {
                 case Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN:
-                    $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN;
+                    $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
                     break;
                 case Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER:
-                    $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_USER;
+                    $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
                     break;
                 default:
-                    $initiator = Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION;
+                    $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
                     break;
             }
 
@@ -255,13 +255,13 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
     private function getOrmActionType()
     {
         switch ($this->getActionType()) {
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_LIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_LIST:
                 return 'List';
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_RELIST:
                 return 'Relist';
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_REVISE:
                 return 'Revise';
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_STOP:
                 return 'Stop';
         }
 

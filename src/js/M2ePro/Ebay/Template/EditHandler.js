@@ -2,6 +2,8 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
 
     templateNick: null,
 
+    showConfirmMsg: true,
+
     //----------------------------------
 
     initialize: function()
@@ -106,30 +108,37 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
                 M2ePro.translator.translate('Do not show any more') +
             '</div>';
 
-        Dialog._openDialog(template.innerHTML, {
-            draggable: true,
-            resizable: true,
-            closable: true,
-            className: "magento",
-            title: 'Save Policy',
-            height: 80,
-            width: 650,
-            zIndex: 2100,
-            recenterAuto: false,
-            hideEffect: Element.hide,
-            showEffect: Element.show,
-            id: "save-template",
-            buttonClass: "form-button button",
-            ok: function() {
-                if ($('do_not_show_again').checked) {
-                    setCookie('ebay_template_'+templateNick+'_skip_save_confirmation', 1, 3*365, '/');
-                }
+        var me = this;
+        if(!me.isCreatedDialog) {
+            me.isCreatedDialog = true;
+            Dialog._openDialog(template.innerHTML, {
+                draggable: true,
+                resizable: true,
+                closable: true,
+                className: "magento",
+                title: 'Save Policy',
+                height: 80,
+                width: 650,
+                zIndex: 2100,
+                recenterAuto: false,
+                destroyOnClose: true,
+                hideEffect: Element.hide,
+                showEffect: Element.show,
+                id: "save-template",
+                buttonClass: "form-button button",
+                ok: function() {
+                    if ($('do_not_show_again').checked) {
+                        setCookie('ebay_template_'+templateNick+'_skip_save_confirmation', 1, 3*365, '/');
+                    }
 
-                okCallback();
-            },
-            cancel: function() {},
-            onClose: function() {}
-        });
+                    okCallback();
+                },
+                cancel: function() {},
+                onClose: function() {
+                    me.isCreatedDialog = false;
+                }
+            });
+        }
     },
 
     save_click: function($super, url, confirmText, templateNick)
@@ -138,7 +147,7 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
             return;
         }
 
-        if (confirmText) {
+        if (confirmText && this.showConfirmMsg) {
             this.confirm(templateNick, confirmText, function() { $super(url); });
             return;
         }
@@ -152,7 +161,7 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
             return;
         }
 
-        if (confirmText) {
+        if (confirmText && this.showConfirmMsg) {
             this.confirm(templateNick, confirmText, function() { $super(url); });
             return;
         }
@@ -162,6 +171,7 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
 
     duplicate_click: function($super, headId, chapter_when_duplicate_text, templateNick)
     {
+        this.showConfirmMsg = false;
         $$('input[name="'+templateNick+'[id]"]')[0].value = '';
 
         // we don't need it here, but parent method requires the formSubmitNew url to be defined

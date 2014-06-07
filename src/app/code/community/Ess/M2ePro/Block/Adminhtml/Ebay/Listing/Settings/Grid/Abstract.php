@@ -34,7 +34,26 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
 
     abstract protected function getGridHandlerJs();
 
-    abstract protected function getListingProductCollection();
+    protected function getListingProductCollection()
+    {
+        $collection = $this->getData('listing_product_collection');
+
+        if (is_null($collection)) {
+
+            $ids = array();
+
+            foreach ($this->getCollection()->getItems() as $item) {
+                $ids[] = $item->getData('listing_product_id');
+            }
+
+            $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+            $collection->addFieldToFilter('id', array('in' => $ids));
+
+            $this->setData('listing_product_collection',$collection);
+        }
+
+        return $collection;
+    }
 
     // ####################################
 

@@ -26,7 +26,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
 
     protected function getActionType()
     {
-        return Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP;
+        return Ess_M2ePro_Model_Listing_Product::ACTION_STOP;
     }
 
     // ########################################

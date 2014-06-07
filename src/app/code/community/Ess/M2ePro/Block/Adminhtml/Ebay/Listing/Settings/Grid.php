@@ -64,31 +64,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
 
     // ####################################
 
-    protected function getListingProductCollection()
-    {
-        $collection = $this->getData('listing_product_collection');
-
-        if (is_null($collection)) {
-
-            $listingProductIds = $this->getListing()->getData('product_add_ids');
-            $listingProductIds = array_filter((array)json_decode($listingProductIds));
-
-            /* @var $collection Ess_M2ePro_Model_Mysql4_Listing_Product_Collection */
-            $collection = Mage::helper('M2ePro/Component_Ebay')
-                ->getCollection('Listing_Product')
-                ->addFieldToFilter('id',array('in' => $listingProductIds));
-
-            $collection->setPageSize($this->getParam($this->getVarNameLimit(), $this->_defaultLimit));
-            $collection->setCurPage($this->getParam($this->getVarNamePage(), $this->_defaultPage));
-
-            $this->setData('listing_product_collection',$collection);
-        }
-
-        return $collection;
-    }
-
-    // ####################################
-
     protected function _prepareCollection()
     {
         $listingProductIds = $this->getListing()->getData('product_add_ids');
@@ -98,7 +73,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         //--------------------------------
         // Get collection
         //----------------------------
-        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
+        /** @var Mage_Core_Model_Mysql4_Collection_Abstract $collection */
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->addAttributeToSelect('sku');
         $collection->addAttributeToSelect('name');

@@ -16,10 +16,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Proxy extends Ess_M2ePro_Model_Order_Item
         $price = $this->item->getPrice();
 
         if ($this->getProxyOrder()->isTaxModeNone() && $this->hasTax()) {
-            $taxAmount = Mage::getSingleton('tax/calculation')
-                ->calcTaxAmount($price, $this->getTaxRate(), false, false);
-
-            $price += $taxAmount;
+            $price += $this->item->getTaxAmount();
         }
 
         return $price;
@@ -32,7 +29,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Proxy extends Ess_M2ePro_Model_Order_Item
 
     public function getTaxRate()
     {
-        return $this->item->getEbayOrder()->getTaxRate();
+        return $this->item->getTaxRate();
     }
 
     public function getAdditionalData()

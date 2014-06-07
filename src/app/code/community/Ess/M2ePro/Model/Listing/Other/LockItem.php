@@ -18,11 +18,7 @@ class Ess_M2ePro_Model_Listing_Other_LockItem extends Ess_M2ePro_Model_LockItem
             throw new Exception('Listing component is not defined.');
         }
 
-        $this->setNick('listing_other_'.$params['component']);
-
-        $maxDeactivateTime = (int)Mage::helper('M2ePro/Module')->getConfig()
-                                        ->getGroupValue('/listings/lockItem/','max_deactivate_time');
-        $this->setMaxDeactivateTime($maxDeactivateTime);
+        $this->setNick($params['component'].'_listing_other');
 
         parent::__construct($params);
     }

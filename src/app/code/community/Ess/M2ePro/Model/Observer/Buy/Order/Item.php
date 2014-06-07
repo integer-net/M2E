@@ -26,7 +26,7 @@ class Ess_M2ePro_Model_Observer_Buy_Order_Item
             if ($collection->getSize() > 0 && is_null($collection->getFirstItem()->getData('product_id'))) {
                 /** @var $productOtherInstance Ess_M2ePro_Model_Listing_Other */
                 $productOtherInstance = $collection->getFirstItem();
-                $productOtherInstance->mapProduct($productId, Ess_M2ePro_Model_Log_Abstract::INITIATOR_EXTENSION);
+                $productOtherInstance->mapProduct($productId, Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
             }
 
         } catch (Exception $exception) {

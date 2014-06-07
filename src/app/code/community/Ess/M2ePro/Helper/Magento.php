@@ -64,47 +64,25 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
 
     public function isProfessionalEdition()
     {
-        if ($this->isGoEdition()) {
-            return false;
-        }
-
-        $modules = $this->getModules();
-        if (in_array('Professional_License',$modules)) {
-            return true;
-        }
-
-        return false;
+        return Mage::getConfig()->getModuleConfig('Enterprise_Enterprise') &&
+               !Mage::getConfig()->getModuleConfig('Enterprise_AdminGws') &&
+               !Mage::getConfig()->getModuleConfig('Enterprise_Checkout') &&
+               !Mage::getConfig()->getModuleConfig('Enterprise_Customer');
     }
 
     public function isEnterpriseEdition()
     {
-        if ($this->isGoEdition()) {
-            return false;
-        }
-
-        $modules = $this->getModules();
-        if (in_array('Enterprise_License',$modules)) {
-            return true;
-        }
-
-        return false;
+        return Mage::getConfig()->getModuleConfig('Enterprise_Enterprise') &&
+               Mage::getConfig()->getModuleConfig('Enterprise_AdminGws') &&
+               Mage::getConfig()->getModuleConfig('Enterprise_Checkout') &&
+               Mage::getConfig()->getModuleConfig('Enterprise_Customer');
     }
 
     public function isCommunityEdition()
     {
-        if ($this->isGoEdition()) {
-            return false;
-        }
-
-        if ($this->isProfessionalEdition()) {
-            return false;
-        }
-
-        if ($this->isEnterpriseEdition()) {
-            return false;
-        }
-
-        return true;
+        return !$this->isGoEdition() &&
+               !$this->isProfessionalEdition() &&
+               !$this->isEnterpriseEdition();
     }
 
     //----------------------------------------
@@ -196,7 +174,12 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             '/Webtex_Fba/i' => '',
 
             '/MW_FreeGift/i' => 'last item in combined amazon orders has zero price
-                                 (observing event sales_quote_product_add_after)'
+                                 (observing event sales_quote_product_add_after)',
+
+            '/Unirgy_Dropship/i' => 'Rewrites stock item and in some cases return
+                                     always in stock for all products',
+
+            '/Aitoc_/i' => 'Stock management conflicts.'
         );
 
         $result = array();
@@ -361,31 +344,24 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
         $paths = array(
             'app/code/local/Mage',
             'app/code/local/Zend',
-            'app/code/local/Ess'
+            'app/code/local/Ess',
+            'app/code/local/Varien',
         );
 
         foreach ($paths as &$patch) {
             $patch = Mage::getBaseDir() . DS . $patch;
         }
 
-        $overwritesResult = array();
+        $overwrites = array();
         foreach ($paths as $path) {
-
-            $overwritesResult = array_merge(
-                $overwritesResult,
+            $overwrites = array_merge($overwrites,
                 $this->getLocalPoolOverwritesRec($path)
             );
         }
 
         $result = array();
-        foreach ($overwritesResult as $item) {
-
-            $isOriginalCoreFileExist = is_file(str_replace('/local/', '/core/', $item));
-            $isOriginalCommunityFileExist = is_file(str_replace('/local/', '/community/', $item));
-
-            if ($isOriginalCoreFileExist || $isOriginalCommunityFileExist) {
-                $result[] = str_replace(Mage::getBaseDir() . DS,'',$item);
-            }
+        foreach ($overwrites as $item) {
+            $this->isOriginalFileExists($item) && $result[] = str_replace(Mage::getBaseDir().DS,'',$item);
         }
 
         return $result;
@@ -393,28 +369,32 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
 
     private function getLocalPoolOverwritesRec($path)
     {
-        $overridesResult = array();
-
         if (!is_dir($path)) {
             return array();
         }
 
-        $folderItems = scandir($path);
-        foreach ($folderItems as $folderItem) {
+        $overrides = array();
+        foreach (scandir($path) as $folderItem) {
 
-            if (is_file($path . DS . $folderItem)) {
-                $overridesResult[] = $path . DS . $folderItem;
-            }
+            is_file($path . DS . $folderItem) && $overrides[] = $path . DS . $folderItem;
 
             if ($folderItem != '.' && $folderItem != '..' && is_dir($path . DS . $folderItem)) {
-                $overridesResult = array_merge(
-                    $overridesResult,
+                $overrides = array_merge($overrides,
                     $this->getLocalPoolOverwritesRec($path . DS . $folderItem)
                 );
             }
         }
 
-        return $overridesResult;
+        return $overrides;
+    }
+
+    private function isOriginalFileExists($overwritedFilename)
+    {
+        $isOriginalCoreFileExist = is_file(str_replace('/local/', '/core/', $overwritedFilename));
+        $isOriginalCommunityFileExist = is_file(str_replace('/local/', '/community/', $overwritedFilename));
+        $isOriginalLibFileExist = is_file(str_replace('app/code/local/', 'lib/', $overwritedFilename));
+
+        return $isOriginalCoreFileExist || $isOriginalCommunityFileExist || $isOriginalLibFileExist;
     }
 
     // ########################################

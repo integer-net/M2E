@@ -9,38 +9,6 @@ class Ess_M2ePro_Adminhtml_Development_Tools_MagentoController
 {
     //#############################################
 
-    private function getStyleHtml()
-    {
-        return <<<HTML
-<style type="text/css">
-
-    table.grid {
-        border-color: black;
-        border-style: solid;
-        border-width: 1px 0 0 1px;
-    }
-    table.grid th {
-        padding: 5px 20px;
-        border-color: black;
-        border-style: solid;
-        border-width: 0 1px 1px 0;
-        background-color: silver;
-        color: white;
-        font-weight: bold;
-    }
-    table.grid td {
-        padding: 3px 10px;
-        border-color: black;
-        border-style: solid;
-        border-width: 0 1px 1px 0;
-    }
-
-</style>
-HTML;
-    }
-
-    //---------------------------------------------
-
     /**
      * @title "Show Overwriten Models"
      * @description "Show Overwriten Models"
@@ -50,7 +18,7 @@ HTML;
         $overwrittenModels = Mage::helper('M2ePro/Magento')->getRewrites();
 
         if (count ($overwrittenModels) <= 0) {
-            echo '<h2 style="margin: 20px 0 0 10px">No Overwritten Models</span></h2>';
+            echo $this->getEmptyResultsHtml('No Overwritten Models');
             return;
         }
 
@@ -64,34 +32,21 @@ HTML;
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
-        <th style="width: 600px">
-            From
-        </th>
-        <th style="width: 600px">
-            To
-        </th>
+        <th style="width: 600px">From</th>
+        <th style="width: 600px">To</th>
     </tr>
 HTML;
         foreach ($overwrittenModels as $item) {
 
-            $rewritedFrom = $item['from'];
-            $rewritedTo = $item['to'];
-
             $html .= <<<HTML
 <tr>
-    <td>
-        $rewritedFrom
-    </td>
-    <td>
-        $rewritedTo
-    </td>
+    <td>{$item['from']}</td>
+    <td>{$item['to']}</td>
 </tr>
-
 HTML;
         }
 
         $html .= '</table>';
-
         print str_replace('%count%',count($overwrittenModels),$html);
     }
 
@@ -105,7 +60,7 @@ HTML;
         $localPoolOverwrites = Mage::helper('M2ePro/Magento')->getLocalPoolOverwrites();
 
         if (count($localPoolOverwrites) <= 0) {
-            echo '<h2 style="margin: 20px 0 0 10px">No Local Pool Overwrites</span></h2>';
+            echo $this->getEmptyResultsHtml('No Local Pool Overwrites');
             return;
         }
 
@@ -119,25 +74,19 @@ HTML;
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
-        <th style="width: 800px">
-            Path
-        </th>
+        <th style="width: 800px">Path</th>
     </tr>
 HTML;
         foreach ($localPoolOverwrites as $item) {
 
             $html .= <<<HTML
 <tr>
-    <td>
-        $item
-    </td>
+    <td>{$item}</td>
 </tr>
-
 HTML;
         }
 
         $html .= '</table>';
-
         print str_replace('%count%',count($localPoolOverwrites),$html);
     }
 
@@ -151,7 +100,7 @@ HTML;
         $installedModules = Mage::getConfig()->getNode('modules')->asArray();
 
         if (count($installedModules) <= 0) {
-            echo '<h2 style="margin: 20px 0 0 10px">No Installed Modules</span></h2>';
+            echo $this->getEmptyResultsHtml('No Installed Modules.');
             return;
         }
 
@@ -165,49 +114,29 @@ HTML;
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
-        <th style="width: 500px">
-            Module
-        </th>
-        <th style="width: 100px">
-            Status
-        </th>
-        <th style="width: 100px">
-            Code Pool
-        </th><th style="width: 100px">
-            Version
-        </th>
+        <th style="width: 500px">Module</th>
+        <th style="width: 100px">Status</th>
+        <th style="width: 100px">Code Pool</th>
+        <th style="width: 100px">Version</th>
     </tr>
 HTML;
         foreach ($installedModules as $module => $data) {
 
-            $status = $data['active']
-                ? 'Enabled'
-                : 'Disabled';
-
+            $status = $data['active'] ? 'Enabled' : 'Disabled';
             $codePool = $data['codePool'];
-            $version = $data['version']!=''?$data['version']:'&nbsp;';
+            $version = $data['version'] != '' ? $data['version'] : '&nbsp;';
 
             $html .= <<<HTML
 <tr>
-    <td>
-        $module
-    </td>
-    <td>
-        $status
-    </td>
-    <td>
-        $codePool
-    </td>
-    <td>
-        $version
-    </td>
+    <td>{$module}</td>
+    <td>{$status}</td>
+    <td>{$codePool}</td>
+    <td>{$version}</td>
 </tr>
-
 HTML;
         }
 
         $html .= '</table>';
-
         print str_replace('%count%',count($installedModules),$html);
     }
 
@@ -236,9 +165,10 @@ HTML;
     public function runCompilationAction()
     {
         try {
-            Mage::getModel('compiler/process')->run();
 
+            Mage::getModel('compiler/process')->run();
             $this->_getSession()->addSuccess('The compilation has completed.');
+
         } catch (Exception $e) {
             $this->_getSession()->addError('Compilation error');
         }
@@ -256,6 +186,20 @@ HTML;
         Mage::helper('M2ePro/Magento')->clearCache();
         $this->_getSession()->addSuccess('Magento cache was successfully cleared.');
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
+    }
+
+    //#############################################
+
+    private function getEmptyResultsHtml($messageText)
+    {
+        $backUrl = Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl();
+
+        return <<<HTML
+<h2 style="margin: 20px 0 0 10px">
+    {$messageText} <span style="color: grey; font-size: 10px;">
+    <a href="{$backUrl}">[back]</a>
+</h2>
+HTML;
     }
 
     //#############################################

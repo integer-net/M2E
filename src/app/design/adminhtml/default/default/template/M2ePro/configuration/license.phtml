@@ -77,7 +77,7 @@
     <br/>
     <hr style="color:#D6D6D6"/><br/>
     M2E Pro extension requires activation for its work.<br/><br/>
-    To get the License Key click the <span style="text-decoration: underline;">Get License Key</span> link and follow the instructions.<br/>
+    To get the License Key click the <span style="text-decoration: underline;">Manage License</span> link and follow the instructions.<br/>
     When you receive your License Key, press the Enter button, enter your License Key in appeared text field and press Confirm.
     <br/><br/>
     <b>Note:</b> If you have not received the License Key, please contact us %s.',
@@ -95,6 +95,10 @@
     M2ePro.url.add(<?php echo json_encode(array(
         'formSubmit' => $this->getUrl('M2ePro/adminhtml_configuration_license/confirmKey')
     )); ?>);
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'component_set_trial' => $this->getUrl('M2ePro/adminhtml_configuration_license/componentSetTrial')
+    ))?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
         'You must get valid Trial or Live license key.' => $this->__('You must get valid Trial or Live license key.')
@@ -168,7 +172,7 @@
                         <tr>
                             <td class="label"></td>
                             <td class="value">
-                                <a href="<?php echo Mage::helper('M2ePro/Module_Support')->getClientsPortalUrl();?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Get License Key'); ?></a>
+                                <a href="<?php echo Mage::helper('M2ePro/Module_Support')->getClientsPortalUrl();?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Manage License'); ?></a>
                             </td>
                         </tr>
 
@@ -181,7 +185,7 @@
 
     </div>
 
-    <?php if ($this->valid['domain'] != '' || $this->valid['ip'] != '' || $this->valid['directory'] != '') { ?>
+    <?php if ($this->licenseData['domain'] != '' || $this->licenseData['ip'] != '' || $this->licenseData['directory'] != '') { ?>
 
         <div class="entry-edit" id="magento_block_configuration_license_valid" collapseable="no">
 
@@ -199,7 +203,7 @@
 
                         <tbody>
 
-                            <?php if ($this->valid['domain'] != '') { ?>
+                            <?php if ($this->licenseData['domain'] != '') { ?>
 
                                 <tr>
                                     <td class="label">
@@ -210,7 +214,9 @@
                                             <span style="display: block; padding: 4px 0 0;">
                                         <?php } ?>
 
-                                        <?php echo $this->valid['domain']; ?>
+                                        <span <?php echo $this->licenseData['valid']['domain'] ? '' : 'style="color: red;"'?>>
+                                            <?php echo $this->licenseData['domain']; ?>
+                                        </span>
 
                                         <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
                                             </span>
@@ -220,7 +226,7 @@
 
                             <?php } ?>
 
-                            <?php if ($this->valid['ip'] != '') { ?>
+                            <?php if ($this->licenseData['ip'] != '') { ?>
 
                                 <tr>
                                     <td class="label">
@@ -231,7 +237,9 @@
                                             <span style="display: block; padding: 4px 0 0;">
                                         <?php } ?>
 
-                                        <?php echo $this->valid['ip']; ?>
+                                        <span <?php echo $this->licenseData['valid']['ip'] ? '' : 'style="color: red;"'?>>
+                                            <?php echo $this->licenseData['ip']; ?>
+                                        </span>
 
                                         <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
                                             </span>
@@ -241,7 +249,7 @@
 
                             <?php } ?>
 
-                            <?php if ($this->valid['directory'] != '') { ?>
+                            <?php if ($this->licenseData['directory'] != '') { ?>
 
                                 <tr>
                                     <td class="label">
@@ -252,7 +260,9 @@
                                             <span style="display: block; padding: 4px 0 0;">
                                         <?php } ?>
 
-                                        <?php echo $this->valid['directory']; ?>
+                                        <span <?php echo $this->licenseData['valid']['directory'] ? '' : 'style="color: red;"'?>>
+                                            <?php echo $this->licenseData['directory']; ?>
+                                        </span>
 
                                         <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
                                             </span>
@@ -349,17 +359,20 @@
                                         <?php } ?>
 
                                         <strong>
-                                            <?php if ($componentData['mode'] == Ess_M2ePro_Helper_Module_License::MODE_NONE) echo Mage::helper('M2ePro')->__('None License'); ?>
+                                            <?php if ($componentData['mode'] == Ess_M2ePro_Helper_Module_License::MODE_NONE) echo Mage::helper('M2ePro')->__('Not Activated License'); ?>
                                             <?php if ($componentData['mode'] == Ess_M2ePro_Helper_Module_License::MODE_TRIAL) echo Mage::helper('M2ePro')->__('Trial License'); ?>
+                                            <?php if ($componentData['mode'] == Ess_M2ePro_Helper_Module_License::MODE_FREE) echo Mage::helper('M2ePro')->__('Free License'); ?>
                                             <?php if ($componentData['mode'] == Ess_M2ePro_Helper_Module_License::MODE_LIVE) echo Mage::helper('M2ePro')->__('Live License'); ?>
                                         </strong>
 
                                         <?php if ($componentData['mode'] != Ess_M2ePro_Helper_Module_License::MODE_NONE &&
                                                  ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_SUSPENDED ||
-                                                  $componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CLOSED)) { ?>
+                                                  $componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CLOSED ||
+                                                  $componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CANCELED)) { ?>
                                                     <span style="color:red;">(
                                                         <?php if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_SUSPENDED) echo Mage::helper('M2ePro')->__('Suspended'); ?>
                                                         <?php if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CLOSED) echo Mage::helper('M2ePro')->__('Closed'); ?>
+                                                        <?php if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CANCELED) echo Mage::helper('M2ePro')->__('Canceled'); ?>
                                                     )</span>
                                         <?php } ?>
 
@@ -367,6 +380,11 @@
                                             </span>
                                         <?php } ?>
                                     </td>
+                                    <?php if ($componentData['mode'] == Ess_M2ePro_Helper_Module_License::MODE_NONE) {?>
+                                        <td id="component_<?php echo $componentName?>">
+                                            <?php echo $this->getChildHtml('set_trial_key'); ?>
+                                        </td>
+                                    <?php } ?>
                                 </tr>
 
                                 <?php if ($componentData['mode'] != Ess_M2ePro_Helper_Module_License::MODE_NONE) { ?>

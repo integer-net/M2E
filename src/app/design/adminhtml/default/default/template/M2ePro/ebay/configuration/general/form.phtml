@@ -74,21 +74,6 @@
 
                     <tbody>
 
-                    <tr>
-                        <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Cron'); ?>: </label>
-                        </td>
-                        <td class="value">
-                            <select name="cron_notification_mode">
-                                <option value="0" <?php if (!$this->cron_notification_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
-                                <option value="1" <?php if ($this->cron_notification_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
-                            </select>
-                            <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Notifies if cron is not run more than 12 hours.'); ?></span>
-                            </p>
-                        </td>
-                    </tr>
-
                     <tr id="negative_feedbacks_row">
                         <td class="label">
                             <label><?php echo Mage::helper('M2ePro')->__('Negative Feedback'); ?>: </label>

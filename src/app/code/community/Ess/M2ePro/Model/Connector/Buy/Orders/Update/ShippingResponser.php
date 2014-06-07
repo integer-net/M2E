@@ -30,9 +30,9 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
             $logs[] = array(
                 'order_id'       => (int)$orderId,
                 'message'        => $logMessage,
-                'type'           => Ess_M2ePro_Model_Order_Log::TYPE_ERROR,
+                'type'           => Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 'component_mode' => Ess_M2ePro_Helper_Component_Buy::NICK,
-                'initiator'      => Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION,
+                'initiator'      => Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 'create_date'    => $currentDate
             );
         }
@@ -67,9 +67,9 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
                     $logs[] = array(
                         'order_id'       => $orderId,
                         'message'        => $text,
-                        'type'           => Ess_M2ePro_Model_Order_Log::TYPE_ERROR,
+                        'type'           => Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                         'component_mode' => Ess_M2ePro_Helper_Component_Buy::NICK,
-                        'initiator'      => Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION,
+                        'initiator'      => Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                         'create_date'    => $currentDate
                     );
                 }
@@ -106,9 +106,9 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
                 $logs[] = array(
                     'order_id'       => $orderId,
                     'message'        => $text,
-                    'type'           => Ess_M2ePro_Model_Order_Log::TYPE_ERROR,
+                    'type'           => Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     'component_mode' => Ess_M2ePro_Helper_Component_Buy::NICK,
-                    'initiator'      => Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION,
+                    'initiator'      => Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                     'create_date'    => $currentDate
                 );
             }
@@ -125,9 +125,9 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
             $logs[] = array(
                 'order_id'       => (int)$orderId,
                 'message'        => 'Rakuten.com Order status was updated to Shipped.',
-                'type'           => Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS,
+                'type'           => Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                 'component_mode' => Ess_M2ePro_Helper_Component_Buy::NICK,
-                'initiator'      => Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION,
+                'initiator'      => Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 'create_date'    => $currentDate
             );
 
@@ -141,9 +141,9 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
             $logs[] = array(
                 'order_id'       => (int)$orderId,
                 'message'        => $logMessage,
-                'type'           => Ess_M2ePro_Model_Order_Log::TYPE_SUCCESS,
+                'type'           => Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                 'component_mode' => Ess_M2ePro_Helper_Component_Buy::NICK,
-                'initiator'      => Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION,
+                'initiator'      => Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 'create_date'    => $currentDate
             );
         }

@@ -7,7 +7,7 @@
 class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
 {
     private $nick = 'undefined';
-    private $maxDeactivateTime = 0;
+    private $maxInactiveTime = 1800; // 30 min
 
     //####################################
 
@@ -19,15 +19,9 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
 
     //####################################
 
-    public function setNick($nick)
+    public function setNick($value)
     {
-        $nick = (string)$nick;
-
-        if ($nick == '') {
-            throw new Exception('Wrong nick of lock item.');
-        }
-
-        $this->nick = $nick;
+        $this->nick = $value;
     }
 
     public function getNick()
@@ -35,54 +29,51 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
         return $this->nick;
     }
 
-    //-----------------------------------
+    // -----------------------------------
 
-    public function setMaxDeactivateTime($maxDeactivateTime)
+    public function setMaxInactiveTime($value)
     {
-        $maxDeactivateTime = (int)$maxDeactivateTime;
-
-        if ($maxDeactivateTime <= 0) {
-            throw new Exception('Wrong max deactivate lock item time.');
-        }
-
-        $this->maxDeactivateTime = $maxDeactivateTime;
+        $this->maxInactiveTime = (int)$value;
     }
 
-    public function getMaxDeactivateTime()
+    public function getMaxInactiveTime()
     {
-        return $this->maxDeactivateTime;
+        return $this->maxInactiveTime;
     }
 
     //####################################
 
-    public function create()
+    public function create($parentId = NULL)
     {
-        if ($this->isExist()) {
-            return false;
-        }
-
         $data = array(
-            'update_date' => Mage::helper('M2ePro')->getCurrentGmtDate()
-        );
-
-        $dataForAdd = array(
             'nick' => $this->nick,
-            'data' => json_encode($data)
+            'parent_id' => $parentId
         );
 
-        Mage::getModel('M2ePro/LockItem')->setData($dataForAdd)->save();
+        Mage::getModel('M2ePro/LockItem')->setData($data)->save();
 
         return true;
     }
 
     public function remove()
     {
-        if (!$this->isExist()) {
+        /** @var $lockModel Ess_M2ePro_Model_LockItem **/
+        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+
+        if (!$lockModel->getId()) {
             return false;
         }
 
-        $temp = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
-        $temp->getId() && $temp->delete();
+        $parentId = $lockModel->getData('parent_id');
+
+        if (!is_null($parentId)) {
+            /** @var $parentLockModel Ess_M2ePro_Model_LockItem **/
+            $parentLockModel = Mage::getModel('M2ePro/LockItem')->load($parentId);
+            $parentLockModel->setNick($parentLockModel->getData('nick'));
+            $parentLockModel->getId() && $parentLockModel->remove();
+        }
+
+        $lockModel->delete();
 
         return true;
     }
@@ -91,16 +82,17 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
 
     public function isExist()
     {
+        /** @var $lockModel Ess_M2ePro_Model_LockItem **/
         $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
 
         if (!$lockModel->getId()) {
             return false;
         }
 
-        $curTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-        $modificationTimestamp = strtotime($lockModel->getData('update_date'));
+        $currentTimestamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
+        $updateTimestamp = strtotime($lockModel->getData('update_date'));
 
-        if ($modificationTimestamp < $curTimeStamp - $this->maxDeactivateTime) {
+        if ($updateTimestamp < $currentTimestamp - $this->getMaxInactiveTime()) {
             $lockModel->delete();
             return false;
         }
@@ -110,40 +102,71 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
 
     public function activate()
     {
-        if (!$this->isExist()) {
+        /** @var $lockModel Ess_M2ePro_Model_LockItem **/
+        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+
+        if (!$lockModel->getId()) {
             return false;
         }
 
-        $this->setContentData('update_date',Mage::helper('M2ePro')->getCurrentGmtDate());
+        $parentId = $lockModel->getData('parent_id');
+
+        if (!is_null($parentId)) {
+            /** @var $parentLockModel Ess_M2ePro_Model_LockItem **/
+            $parentLockModel = Mage::getModel('M2ePro/LockItem')->load($parentId);
+            $parentLockModel->setNick($parentLockModel->getData('nick'));
+            $parentLockModel->getId() && $parentLockModel->activate();
+        }
+
+        $lockModel->setData('data',$lockModel->getData('data'))->save();
 
         return true;
     }
 
     //####################################
 
+    public function getRealId()
+    {
+        /** @var $lockModel Ess_M2ePro_Model_LockItem **/
+        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+        return $lockModel->getId() ? $lockModel->getId() : NULL;
+    }
+
+    //-----------------------------------
+
     public function setContentData($key, $value)
     {
-        if (!$this->isExist()) {
+        /** @var $lockModel Ess_M2ePro_Model_LockItem **/
+        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+
+        if (!$lockModel->getId()) {
             return false;
         }
 
-        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+        $data = array();
+        if ($lockModel->getData('data') != '') {
+            $data = json_decode($lockModel->getData('data'),true);
+        }
 
-        $data = json_decode($lockModel->getData('data'),true);
         $data[$key] = $value;
-        $data = json_encode($data);
+        $lockModel->setData('data',json_encode($data))->save();
 
-        $lockModel->addData(array('data'=>$data))->save();
         return true;
     }
 
     public function getContentData($key)
     {
-        if (!$this->isExist()) {
+        /** @var $lockModel Ess_M2ePro_Model_LockItem **/
+        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+
+        if (!$lockModel->getId()) {
             return NULL;
         }
 
-        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+        if ($lockModel->getData('data') == '') {
+            return NULL;
+        }
+
         $data = json_decode($lockModel->getData('data'),true);
 
         if (isset($data[$key])) {
@@ -153,11 +176,17 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
         return NULL;
     }
 
-    //-----------------------------------
+    //####################################
 
     public function makeShutdownFunction()
     {
-        $functionCode = "Mage::getModel('M2ePro/LockItem')->load('".$this->nick."','nick')->remove();";
+        if (!$this->isExist()) {
+            return false;
+        }
+
+        $functionCode = "\$object = Mage::getModel('M2ePro/LockItem');
+                         \$object->setNick('".$this->nick."');
+                         \$object->remove();";
 
         $shutdownDeleteFunction = create_function('', $functionCode);
         register_shutdown_function($shutdownDeleteFunction);

@@ -25,19 +25,19 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
 
         switch ($action) {
 
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_RELIST:
                 $result = $this->processProducts(
                     $products, 'Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single', $params
                 );
                 break;
 
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_STOP:
                 $result = $this->processProducts(
                     $products, 'Ess_M2ePro_Model_Connector_Ebay_OtherItem_Stop_Single', $params
                 );
                 break;
 
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE:
+            case Ess_M2ePro_Model_Listing_Product::ACTION_REVISE:
                 $result = $this->processProducts(
                     $products, 'Ess_M2ePro_Model_Connector_Ebay_OtherItem_Revise_Single', $params
                 );
@@ -111,7 +111,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
             $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
             $logModel->addGlobalMessage(
-                Ess_M2ePro_Model_Log_Abstract::INITIATOR_UNKNOWN,
+                Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                 $this->logsActionId,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_UNKNOWN,
                 Mage::helper('M2ePro')->__($exception->getMessage()),
@@ -156,27 +156,6 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
         }
 
         return $productsTemp;
-    }
-
-    // ########################################
-
-    public static function getActionTitle($action)
-    {
-        $title = Mage::helper('M2ePro')->__('Unknown');
-
-        switch ($action) {
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_RELIST:
-                $title = Mage::helper('M2ePro')->__('Relisting');
-                break;
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_REVISE:
-                $title = Mage::helper('M2ePro')->__('Revising');
-                break;
-            case Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher::ACTION_STOP:
-                $title = Mage::helper('M2ePro')->__('Stopping');
-                break;
-        }
-
-        return $title;
     }
 
     // ########################################

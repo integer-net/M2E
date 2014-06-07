@@ -45,7 +45,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
      */
     public function getActualMagentoProduct()
     {
-        if (!$this->isVariationProduct() || !$this->isVariationMatched()) {
+        if (!$this->isVariationsReady()) {
             return $this->getMagentoProduct();
         }
 
@@ -179,6 +179,11 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         return (int)($this->getData('is_variation_matched')) == self::IS_VARIATION_MATCHED_YES;
     }
 
+    public function isVariationsReady()
+    {
+        return $this->isVariationProduct() && $this->isVariationMatched();
+    }
+
     //-----------------------------------------
 
     public function getSku()
@@ -286,7 +291,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
             return NULL;
         }
 
-        if ($this->isVariationProduct() && $this->isVariationMatched()) {
+        if ($this->isVariationsReady()) {
             $variations = $this->getVariations(true);
             /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
             $variation = reset($variations);
@@ -672,7 +677,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
             return $price;
         }
 
-        if ($this->isVariationProduct() && $this->isVariationMatched()) {
+        if ($this->isVariationsReady()) {
 
             $variations = $this->getVariations(true);
             /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
@@ -708,7 +713,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
                 $price = $this->getMagentoProduct()->getAttributeValue($attribute);
                 break;
 
-            default:
             case Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_PRODUCT:
                 if ($this->getMagentoProduct()->isGroupedType()) {
                     $productPrice = Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_PRODUCT;
@@ -718,6 +722,9 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
                     $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);
                 }
                 break;
+
+            default:
+                throw new Exception('Unknown mode in database.');
         }
 
         $price < 0 && $price = 0;
@@ -729,9 +736,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
     {
         $price = 0;
 
-        $product = $this->getMagentoProduct()->getProduct();
-
-        foreach ($product->getTypeInstance()->getAssociatedProducts() as $tempProduct) {
+        foreach ($this->getMagentoProduct()->getTypeInstance()->getAssociatedProducts() as $tempProduct) {
 
             $tempPrice = 0;
 
@@ -764,48 +769,53 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
 
     // ########################################
 
-    public function getQty($productMode = false)
+    public function getQty($magentoMode = false)
     {
-        if ($this->isVariationMatched() && $this->isVariationProduct()) {
+        $qty = 0;
+        $src = $this->getBuySellingFormatTemplate()->getQtySource();
+
+        if ($this->isVariationsReady()) {
 
             $variations = $this->getVariations(true);
             /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
             $variation = reset($variations);
 
-            return (int)floor($variation->getChildObject()->getQty());
-        }
+            if ($magentoMode) {
+                return $variation->getChildObject()->getQty(true);
+            }
 
-        $qty = 0;
-        $src = $this->getBuySellingFormatTemplate()->getQtySource();
+            $qty = $variation->getChildObject()->getQty(false);
 
-        switch ($src['mode']) {
-            case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_SINGLE:
-                if ($productMode) {
-                    $qty = $this->getParentObject()->getQty();
-                } else {
+        } else {
+
+            if ($magentoMode) {
+                return (int)$this->getMagentoProduct()->getQty(true);
+            }
+
+            switch ($src['mode']) {
+                case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_SINGLE:
                     $qty = 1;
-                }
-                break;
+                    break;
 
-            case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_NUMBER:
-                if ($productMode) {
-                    $qty = $this->getParentObject()->getQty();
-                } else {
-                    $qty = $src['value'];
-                }
-                break;
+                case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_NUMBER:
+                    $qty = (int)$src['value'];
+                    break;
 
-            case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_ATTRIBUTE:
-                $qty = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-                break;
+                case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_ATTRIBUTE:
+                    $qty = (int)$this->getMagentoProduct()->getAttributeValue($src['attribute']);
+                    break;
 
-            default:
-            case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_PRODUCT:
-                $qty = $this->getParentObject()->getQty();
-                break;
+                case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED:
+                    $qty = (int)$this->getMagentoProduct()->getQty(false);
+                    break;
+
+                default:
+                case Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_PRODUCT:
+                    $qty = (int)$this->getMagentoProduct()->getQty(true);
+                    break;
+            }
         }
 
-        //-- Check max posted QTY on channel
         if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
             $qty = $src['qty_max_posted_value'];
         }
@@ -819,22 +829,22 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
 
     public function listAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_LIST, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Listing_Product::ACTION_LIST, $params);
     }
 
     public function relistAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_RELIST, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Listing_Product::ACTION_RELIST, $params);
     }
 
     public function reviseAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_REVISE, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $params);
     }
 
     public function stopAction(array $params = array())
     {
-        return $this->processDispatcher(Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher::ACTION_STOP, $params);
+        return $this->processDispatcher(Ess_M2ePro_Model_Listing_Product::ACTION_STOP, $params);
     }
 
     //-----------------------------------------

@@ -37,7 +37,7 @@ class Ess_M2ePro_Model_Observer_Invoice
             $this->createChange($order);
 
             Mage::getSingleton('M2ePro/Order_Log_Manager')
-                ->setInitiator(Ess_M2ePro_Model_Order_Log::INITIATOR_EXTENSION);
+                ->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
 
             $result = $order->getChildObject()->updatePaymentStatus();
 

@@ -9,35 +9,41 @@
         </td>
     </tr>
 
-    <?php if ($this->licenseDomain != ''): ?>
+    <?php if ($this->licenseData['domain'] != ''): ?>
         <tr>
             <td class="label">
                 <label><?php echo Mage::helper('M2ePro')->__('Valid Domain'); ?>: </label>
             </td>
             <td class="value">
-                <?php echo $this->licenseDomain; ?>
+                <span <?php echo $this->licenseData['valid']['domain'] ? '' : 'style="color:red;"' ?>>
+                    <?php echo $this->licenseData['domain']; ?>
+                </span>
             </td>
         </tr>
     <?php endif; ?>
 
-    <?php if ($this->licenseIp != ''): ?>
+    <?php if ($this->licenseData['ip'] != ''): ?>
         <tr>
             <td class="label">
                 <label><?php echo Mage::helper('M2ePro')->__('Valid IP'); ?>: </label>
             </td>
             <td class="value">
-                <?php echo $this->licenseIp; ?>
+                <span <?php echo $this->licenseData['valid']['ip'] ? '' : 'style="color:red;"' ?>>
+                    <?php echo $this->licenseData['ip']; ?>
+                </span>
             </td>
         </tr>
     <?php endif; ?>
 
-    <?php if ($this->licenseDirectory != ''): ?>
+    <?php if ($this->licenseData['directory'] != ''): ?>
         <tr>
             <td class="label">
                 <label><?php echo Mage::helper('M2ePro')->__('Valid Directory'); ?>: </label>
             </td>
             <td class="value">
-                <?php echo $this->licenseDirectory; ?>
+                <span <?php echo $this->licenseData['valid']['directory'] ? '' : 'style="color:red;"' ?>>
+                    <?php echo $this->licenseData['directory']; ?>
+                </span>
             </td>
         </tr>
     <?php endif; ?>

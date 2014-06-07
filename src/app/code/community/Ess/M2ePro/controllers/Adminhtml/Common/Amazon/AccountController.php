@@ -371,6 +371,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
 
                 if (!$isEdit) {
 
+                    Mage::helper('M2ePro/Module_License')->setTrial(Ess_M2ePro_Helper_Component_Amazon::NICK);
+
                     $params = array(
                         'title' => $post['title'],
                         'marketplace_id' => (int)$post['marketplace_id'],

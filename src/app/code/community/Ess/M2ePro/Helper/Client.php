@@ -18,18 +18,14 @@ class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
 
     public function getDomain()
     {
-        $backupDomain = Mage::helper('M2ePro/Module')->getCacheConfig()->getGroupValue('/location_info/', 'domain');
-
-        if (!is_null($backupDomain)) {
-            strpos($backupDomain,'www.') === 0 && $backupDomain = substr($backupDomain,4);
-            return strtolower(trim($backupDomain));
+        $domain = Mage::helper('M2ePro/Module')->getCacheConfig()->getGroupValue('/location_info/', 'domain');
+        if (is_null($domain) && isset($_SERVER['HTTP_HOST'])) {
+            $domain = $_SERVER['HTTP_HOST'];
         }
 
-        $serverDomain = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : NULL;
-
-        if (!is_null($serverDomain)) {
-            strpos($serverDomain,'www.') === 0 && $serverDomain = substr($serverDomain,4);
-            return strtolower(trim($serverDomain));
+        if (!is_null($domain)) {
+            strpos($domain,'www.') === 0 && $domain = substr($domain,4);
+            return strtolower(trim($domain));
         }
 
         throw new Exception('Server domain is not defined');
