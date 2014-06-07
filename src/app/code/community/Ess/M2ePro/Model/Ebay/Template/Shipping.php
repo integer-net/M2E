@@ -242,11 +242,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
     //---------------------------------------
 
-    public function isGetItFastEnabled()
-    {
-        return (bool)$this->getData('get_it_fast');
-    }
-
     public function isGlobalShippingProgramEnabled()
     {
         return (bool)$this->getData('global_shipping_program');
@@ -560,7 +555,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
             'local_shipping_rate_table_mode' => 0,
             'international_shipping_rate_table_mode' => 0,
 
-            'get_it_fast' => 0,
             'dispatch_time_mode' => self::DISPATCH_TIME_CUSTOM_VALUE,
             'dispatch_time_value' => 1,
             'dispatch_time_attribute' => '',

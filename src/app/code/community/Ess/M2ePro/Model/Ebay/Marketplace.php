@@ -139,11 +139,6 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
         return (bool)(int)$this->getData('is_international_shipping_rate_table');
     }
 
-    public function isGetItFastEnabled()
-    {
-        return (bool)(int)$this->getData('is_get_it_fast');
-    }
-
     public function isEnglishMeasurementSystemEnabled()
     {
         return (bool)(int)$this->getData('is_english_measurement_system');

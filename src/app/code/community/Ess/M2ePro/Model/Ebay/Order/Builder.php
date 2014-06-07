@@ -418,6 +418,10 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
                 } catch (Exception $e) {}
             }
 
+            if ($order->getReserve()->isPlaced()) {
+                $order->getReserve()->release();
+            }
+
             $orderId = $order->getData('ebay_order_id');
             $order->deleteInstance();
 

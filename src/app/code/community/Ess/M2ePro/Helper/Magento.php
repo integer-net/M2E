@@ -179,7 +179,9 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             '/Unirgy_Dropship/i' => 'Rewrites stock item and in some cases return
                                      always in stock for all products',
 
-            '/Aitoc_/i' => 'Stock management conflicts.'
+            '/Aitoc_/i' => 'Stock management conflicts.',
+
+            '/Eternalsoft_Ajaxcart/i' => 'Broke some ajax responses.'
         );
 
         $result = array();

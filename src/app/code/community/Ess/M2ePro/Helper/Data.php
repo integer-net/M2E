@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @copyright  Copyright (c) 2014 by  ESS-UA.
  */
 
 class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
@@ -16,6 +16,14 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
     const INITIATOR_DEVELOPER = 3;
 
     const CUSTOM_IDENTIFIER = 'm2epro_extension';
+
+    // ########################################
+
+    public function __()
+    {
+        $args = func_get_args();
+        return Mage::helper('M2ePro/Module_Translation')->translate($args);
+    }
 
     // ########################################
 
@@ -69,6 +77,19 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $tags[] = $modelName;
+
+        if (strpos($modelName,'_') !== false) {
+
+            $allComponents = Mage::helper('M2ePro/Component')->getComponents();
+            $modelNameComponent = substr($modelName,0,strpos($modelName,'_'));
+
+            if (in_array(strtolower($modelNameComponent),array_map('strtolower',$allComponents))) {
+                $modelNameOnlyModel = substr($modelName,strpos($modelName,'_')+1);
+                $tags[] = $modelNameComponent;
+                $tags[] = $modelNameOnlyModel;
+            }
+        }
+
         $tags = array_unique($tags);
         $tags = array_map('strtolower',$tags);
 
@@ -482,7 +503,7 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
         return $check % 10 == 0;
     }
 
-    //-----------------------------------------
+    // ########################################
 
     public function isUPC($upc)
     {
@@ -519,10 +540,12 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
 
         try {
             $validator = new Zend_Validate_Barcode($adapters[$type][$length]);
-            return $validator->isValid($worldWideId);
+            $result = $validator->isValid($worldWideId);
         } catch (Zend_Validate_Exception $e) {
-            return true;
+            return false;
         }
+
+        return $result;
     }
 
     // ########################################

@@ -56,6 +56,7 @@ JAVASCRIPT;
 
     protected function addAttributeSetFilter($collection)
     {
+        // todo fix this (filtering by account and marketplace)
         return;
     }
 

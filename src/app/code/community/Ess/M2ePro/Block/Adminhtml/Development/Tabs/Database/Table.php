@@ -20,7 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table extends Mage_Ad
         // Set header text
         //------------------------------
         $tableName = $this->getRequest()->getParam('table');
-        $this->_headerText = Mage::helper('M2ePro')->__('Manage Table "%s"', $tableName);
+        $this->_headerText = Mage::helper('M2ePro')->__('Manage Table "%table_name%"', $tableName);
         //------------------------------
 
         // Set buttons actions

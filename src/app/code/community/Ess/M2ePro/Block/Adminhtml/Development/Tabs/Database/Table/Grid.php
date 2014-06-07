@@ -40,8 +40,8 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
         );
 
         if (is_null($modelName)) {
-            throw new Exception(sprintf(
-                'Specified table "%s" cannot be managed.', $this->getRequest()->getParam('table')
+            throw new Exception(str_replace('%table_name%', $this->getRequest()->getParam('table'),
+                'Specified table "%table_name%" cannot be managed.'
             ));
         }
 

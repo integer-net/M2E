@@ -94,7 +94,22 @@ class Ess_M2ePro_Helper_Module_Support extends Mage_Core_Helper_Abstract
 
     public function getContactEmail()
     {
-        return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/support/', 'contact_email');
+        $email = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/support/', 'contact_email');
+
+        try {
+
+            $response = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
+                            ->processVirtual('settings','get','supportEmail');
+
+            if (!empty($response['email'])) {
+                $email = $response['email'];
+            }
+
+        } catch (Exception $exception) {
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
+        }
+
+        return $email;
     }
 
     //#############################################

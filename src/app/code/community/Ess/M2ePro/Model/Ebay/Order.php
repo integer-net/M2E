@@ -471,6 +471,23 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     // ########################################
 
+    public function beforeCreateMagentoOrder()
+    {
+        if ($this->isCheckoutCompleted() || strlen($this->getBuyerName()) > 0) {
+            return;
+        }
+
+        $buyerInfo = $this->getBuyerInfo();
+
+        $shippingDetails = $this->getShippingDetails();
+        $shippingDetails['address'] = $buyerInfo['address'];
+
+        $this->getParentObject()->setData('buyer_name', $buyerInfo['name']);
+        $this->getParentObject()->setSettings('shipping_details', $shippingDetails);
+
+        $this->getParentObject()->save();
+    }
+
     public function afterCreateMagentoOrder()
     {
         if ($this->getEbayAccount()->isMagentoOrdersCustomerNewNotifyWhenOrderCreated()) {
@@ -728,6 +745,26 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         }
 
         return $this->processConnector($action, $params);
+    }
+
+    // ########################################
+
+    private function getBuyerInfo()
+    {
+        /** @var Ess_M2ePro_Model_Order_Item $firstItem */
+        $firstItem = $this->getParentObject()->getItemsCollection()->getFirstItem();
+
+        $params = array(
+            'item_id' => $firstItem->getChildObject()->getItemId(),
+            'transaction_id' => $firstItem->getChildObject()->getTransactionId(),
+        );
+
+        $buyerInfo = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
+            ->processVirtual('sales', 'get', 'itemTransactions',
+                $params, 'buyer_info',
+                NULL, $this->getParentObject()->getAccount(), NULL);
+
+        return $buyerInfo;
     }
 
     // ########################################

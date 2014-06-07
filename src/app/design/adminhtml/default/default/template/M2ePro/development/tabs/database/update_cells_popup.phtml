@@ -13,8 +13,8 @@
 <div id="development_tabs_database_update_cells_popup" style="margin: 7px;">
 
     <h4>
-        <?php echo Mage::helper('M2ePro')->__('Table `%s`', $this->tableName); ?>
-        <span style="color: grey; font-style: italic; font-weight: lighter;">&nbsp;<?php echo Mage::helper('M2ePro')->__('(%s records)', count($this->rowsIds)); ?></span>
+        <?php echo Mage::helper('M2ePro')->__('Table `%table_name%`', $this->tableName); ?>
+        <span style="color: grey; font-style: italic; font-weight: lighter;">&nbsp;<?php echo Mage::helper('M2ePro')->__('(%amount% records)', count($this->rowsIds)); ?></span>
     </h4>
 
     <form id="development_tabs_database_update_cells_popup_form" action="<?php echo $this->getUrl('*/*/updateTableCells', array('table' => $this->tableName, 'model' => $this->modelName)); ?>" method="POST">

@@ -36,7 +36,7 @@ class Ess_M2ePro_Adminhtml_Development_Module_IntegrationController
             $urlHelper = Mage::helper('adminhtml');
 
             $runNowUrl = $urlHelper->getUrl('*/*/processReviseTotal', array('component' => $component));
-            $resetUrl = $urlHelper->getUrl('*/*/resetReviseTotalAction', array('component' => $component));
+            $resetUrl = $urlHelper->getUrl('*/*/resetReviseTotal', array('component' => $component));
 
             $html .= <<<HTML
 <div>
@@ -113,6 +113,8 @@ HTML;
         Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
             "/{$component}/templates/revise/total/", 'last_listing_product_id', null
         );
+
+        $this->_redirect('*/*/reviseTotal');
     }
 
     //#############################################

@@ -85,7 +85,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         if ($this->getShippingTemplate()->isLocalShippingFlatEnabled() ||
             $this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
 
-            $shippingData['get_it_fast'] = $this->getShippingTemplate()->isGetItFastEnabled();
             $shippingData['dispatch_time'] = $this->getShippingTemplate()->getDispatchTime();
 
             if ($shippingData['dispatch_time'] === '') {

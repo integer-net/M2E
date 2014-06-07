@@ -536,6 +536,22 @@ CommonAmazonTemplateNewProductHandler.prototype = Object.extend(new CommonHandle
         };
 
         handlers[element.value] && handlers[element.value].call(this);
+    },
+
+    //----------------------------------
+
+    closeBrowseCategoryPopup: function()
+    {
+        this.browse_category.close();
+        this.categoriesTr.hide();
+        this.nodeTitleEl.value = '';
+        this.confirmButton.hide();
+    },
+
+    closeSearchCategoryPopup: function()
+    {
+        this.search_category.close();
+        this.resetSearchClick();
     }
 
     //----------------------------------

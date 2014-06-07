@@ -95,7 +95,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             'dispatch_time_value',
             'dispatch_time_attribute',
             'global_shipping_program',
-            'get_it_fast',
             'local_shipping_rate_table_mode',
             'international_shipping_rate_table_mode',
             'local_shipping_mode',
@@ -132,7 +131,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
         }
 
         $modes = array(
-            'get_it_fast',
             'local_shipping_rate_table_mode',
             'international_shipping_rate_table_mode',
             'local_shipping_mode',

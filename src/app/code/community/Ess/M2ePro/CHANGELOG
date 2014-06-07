@@ -1,3 +1,18 @@
+* 6.1.6 (r6425) (19/05/2014)
+
+* Added: [eBay] support of multi-variations products for ebay.nl marketplace
+* Removed: [eBay] "Get It Fast" option in shipping policy (eBay no longer supports this feature)
+* Fix: major trouble with cache clearing by tag(s) (TwoLevel cache)
+* Fix: cron service doesn't work properly if web server is LiteSpeed
+* Fix: big size of m2epro_operation_history table was reduced
+* Fix: wrong UPC/EAN validation for magento versions with old Zend_Validate_Barcode
+* Fix: in some cases magento orders creates with wrong items
+* Fix: [eBay] problems with creating magento orders for configurable products in some cases
+* Fix: [eBay] empty shipping address information in order when checkout not completed
+* Fix: [eBay] reserved qty did not release during combine orders
+* Fix: [eBay] count of rows for Listing Other Grid was increased to 100 (from 20)
+* Fix: [Rakuten.com] update shipping status for orders did not work
+
 * 6.1.5 (r6329) (29/04/2014)
 
 * Added: [eBay] global shipping program for "eBay Motors" category "Parts & Accessories"

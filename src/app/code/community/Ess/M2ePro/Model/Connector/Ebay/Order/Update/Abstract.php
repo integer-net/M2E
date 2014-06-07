@@ -7,8 +7,9 @@
 abstract class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Abstract
     extends Ess_M2ePro_Model_Connector_Ebay_Abstract
 {
-    // ->__('eBay Order status was not updated. Reason: %msg%');
-    // ->__('Status of India site orders cannot be updated if the buyer uses PaisaPay payment method.');
+    // M2ePro_TRANSLATIONS
+    // eBay Order status was not updated. Reason: %msg%
+    // Status of India site orders cannot be updated if the buyer uses PaisaPay payment method.
 
     // ########################################
 

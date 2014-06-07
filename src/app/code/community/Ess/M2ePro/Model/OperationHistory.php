@@ -6,7 +6,7 @@
 
 class Ess_M2ePro_Model_OperationHistory extends Ess_M2ePro_Model_Abstract
 {
-    const MAX_LIFETIME_INTERVAL = 2592000; // 1 month
+    const MAX_LIFETIME_INTERVAL = 864000; // 10 days
 
     /**
      * @var Ess_M2ePro_Model_OperationHistory

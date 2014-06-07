@@ -487,23 +487,6 @@
 
             <table class="form-list" cellspacing="0" cellpadding="0">
 
-                <?php if ($showAdvancedMode && $this->canDisplayGetItFast()): ?>
-                    <tr id="get_it_fast_tr" class="local-shipping-tr">
-                        <td class="label">
-                            <label for="get_it_fast"><?php echo Mage::helper('M2ePro')->__('Get It Fast'); ?>:</label>
-                        </td>
-                        <td class="value" style="width: auto;">
-                            <select id="get_it_fast" name="shipping[get_it_fast]">
-                                <option value="0" <?php if (!$formData['get_it_fast']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
-                                <option value="1" <?php if ($formData['get_it_fast']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
-                            </select>
-                            <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('At least one qualifying shipping service and a single day dispatch time must be offered to enable this option.'); ?></span>
-                            </p>
-                        </td>
-                    </tr>
-                <?php endif; ?>
-
                 <input type="hidden" id="dispatch_time_mode" name="shipping[dispatch_time_mode]" value="<?php echo $formData['dispatch_time_mode']; ?>">
                 <input type="hidden" id="dispatch_time_value" name="shipping[dispatch_time_value]" value="<?php echo $formData['dispatch_time_value']; ?>">
                 <input type="hidden" id="dispatch_time_attribute" name="shipping[dispatch_time_attribute]" value="<?php echo $formData['dispatch_time_attribute']; ?>">

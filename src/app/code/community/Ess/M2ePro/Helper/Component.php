@@ -685,7 +685,7 @@ class Ess_M2ePro_Helper_Component extends Mage_Core_Helper_Abstract
             return $this->getComponentObject($mode,$modelName,$value,$field);
         }
 
-        $cacheKey = strtoupper($mode.'_'.$modelName.'_data_'.$field.'_'.$value);
+        $cacheKey = strtoupper('component_'.$mode.'_'.$modelName.'_data_'.$field.'_'.$value);
         $cacheData = Mage::helper('M2ePro/Data_Cache')->getValue($cacheKey);
 
         if ($cacheData !== false) {
@@ -694,6 +694,7 @@ class Ess_M2ePro_Helper_Component extends Mage_Core_Helper_Abstract
 
         $tags[] = $mode;
         $tags[] = $modelName;
+        $tags[] = $mode.'_'.$modelName;
         $tags = array_unique($tags);
         $tags = array_map('strtolower',$tags);
 

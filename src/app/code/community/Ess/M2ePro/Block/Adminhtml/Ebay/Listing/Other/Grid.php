@@ -27,6 +27,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Grid extends Mage_Adminhtml_
         $this->setPagerVisibility(false);
         $this->setUseAjax(true);
         $this->setFilterVisibility(false);
+        $this->setDefaultLimit(100);
         //------------------------------
     }
 

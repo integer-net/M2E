@@ -123,7 +123,6 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         //----------------------------------
 
         //----------------------------------
-        EbayTemplateShippingHandlerObj.updateGetItFastVisibility();
         EbayTemplateShippingHandlerObj.updateMeasurementVisibility();
         EbayTemplateShippingHandlerObj.updateCashOnDeliveryVisibility();
         EbayTemplateShippingHandlerObj.updateCrossBorderTradeVisibility();
@@ -290,21 +289,6 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
     },
 
     //----------------------------------
-
-    updateGetItFastVisibility: function()
-    {
-        if (!$('get_it_fast_tr')) {
-            return;
-        }
-
-        if (EbayTemplateShippingHandlerObj.isLocalShippingModeFlat()
-            || EbayTemplateShippingHandlerObj.isLocalShippingModeCalculated()
-        ) {
-            $('get_it_fast_tr').show();
-        } else {
-            $('get_it_fast_tr').hide();
-        }
-    },
 
     updateCrossBorderTradeVisibility: function()
     {
