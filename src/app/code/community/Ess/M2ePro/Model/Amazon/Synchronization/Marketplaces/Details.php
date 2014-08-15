@@ -44,7 +44,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
 
         $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),'Get details from Amazon');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
+                                                         'Get details from Amazon');
         $details = $this->receiveFromAmazon($marketplace);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 

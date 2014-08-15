@@ -22,16 +22,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
             $headerText = Mage::helper('M2ePro')->__(
                 'View %component_name% Listing "%listing_title%"',
-                $componentName,
+                Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE),
                 $this->escapeHtml($listingData['title'])
             );
         } else {
             $headerText = Mage::helper('M2ePro')->__(
-                'View Listing "%listing_title%"',
-                $this->escapeHtml($listingData['title']));
+                'View Listing "%listing_title%"', $this->escapeHtml($listingData['title'])
+            );
         }
 
         $this->_headerText = $headerText;
@@ -204,9 +203,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         $isNewAsinAvailable = json_encode($marketplaceInstance->getChildObject()->isNewAsinAvailable());
         $isMarketplaceSynchronized = json_encode($marketplaceInstance->getChildObject()->isSynchronized());
 
-        $logViewUrl = $this->getUrl('*/adminhtml_common_log/listing', array(
-            'id' =>$listingData['id'],
-            'back'=>$helper->makeBackUrlParam('*/adminhtml_common_amazon_listing/view', array('id' =>$listingData['id']))
+        $logViewUrl = $this->getUrl('*/adminhtml_common_log/listing',array(
+            'id' => $listingData['id'],
+            'back' => $helper->makeBackUrlParam('*/adminhtml_common_amazon_listing/view',
+                                                array('id' =>$listingData['id']))
         ));
         $checkLockListing = $this->getUrl('*/adminhtml_listing/checkLockListing', array('component' => $component));
         $lockListingNow = $this->getUrl('*/adminhtml_listing/lockListingNow', array('component' => $component));
@@ -245,15 +245,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         $taskCompletedSuccessMessage = $helper->escapeJs(
             $helper->__('"%task_title%" task has successfully submitted to be processed.')
         );
-        $taskCompletedWarningMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.')
-        );
-        $taskCompletedErrorMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.')
-        );
+        $taskCompletedWarningMessage = $helper->escapeJs($helper->__(
+            '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.'
+        ));
+        $taskCompletedErrorMessage = $helper->escapeJs($helper->__(
+            '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.'
+        ));
 
         $lockedObjNoticeMessage = $helper->escapeJs($helper->__('Some Amazon request(s) are being processed now.'));
-        $sendingDataToAmazonMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on Amazon.'));
+        $sendingDataToAmazonMessage = $helper->escapeJs($helper->__(
+            'Sending %product_title% product(s) data on Amazon.')
+        );
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = $helper->escapeJs(
@@ -467,8 +469,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
 JAVASCRIPT;
 
         $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_view_help');
-        $productSearchMenuBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_productSearch_menu');
-        $productSearchBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_productSearch_main');
+        $productSearchMenuBlock = $this->getLayout()
+                                       ->createBlock('M2ePro/adminhtml_common_amazon_listing_productSearch_menu');
+        $productSearchBlock = $this->getLayout()
+                                   ->createBlock('M2ePro/adminhtml_common_amazon_listing_productSearch_main');
 
         //------------------------------
         $data = array(

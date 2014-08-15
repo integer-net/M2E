@@ -149,6 +149,11 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
         return $this->getData('cost_additional_value');
     }
 
+    public function getCostSurchargeValue()
+    {
+        return $this->getData('cost_surcharge_value');
+    }
+
     //-----------------------------------------
 
     public function isCostModeFree()
@@ -185,6 +190,17 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
 
         if ($this->isCostModeCustomAttribute()) {
             $attributes[] = $this->getCostAdditionalValue();
+        }
+
+        return $attributes;
+    }
+
+    public function getCostSurchargeAttributes()
+    {
+        $attributes = array();
+
+        if ($this->isCostModeCustomAttribute()) {
+            $attributes[] = $this->getCostSurchargeValue();
         }
 
         return $attributes;
@@ -230,6 +246,25 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
         return round((float)$result,2);
     }
 
+    public function getCostSurcharge()
+    {
+        $result = 0;
+
+        switch ($this->getCostMode()) {
+            case self::COST_MODE_FREE:
+                $result = 0;
+                break;
+            case self::COST_MODE_CUSTOM_VALUE:
+                $result = $this->getCostSurchargeValue();
+                break;
+            case self::COST_MODE_CUSTOM_ATTRIBUTE:
+                $result = $this->getMagentoProduct()->getAttributeValue($this->getCostSurchargeValue());
+                break;
+        }
+
+        return round((float)$result,2);
+    }
+
     // #######################################
 
     public function getTrackingAttributes()
@@ -241,7 +276,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
     {
         return array_unique(array_merge(
             $this->getCostAttributes(),
-            $this->getCostAdditionalAttributes()
+            $this->getCostAdditionalAttributes(),
+            $this->getCostSurchargeAttributes()
         ));
     }
 

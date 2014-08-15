@@ -22,13 +22,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Product extends Mage_Adminht
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
             $headerText = Mage::helper('M2ePro')->__(
-                'Add Products To %component_name% Listing "%listing_title%" ',
-                $componentName,
-                $this->escapeHtml($listingData['title']));
+                'Add Products To %component_name% Listing "%listing_title%"',
+                Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE),
+                $this->escapeHtml($listingData['title'])
+            );
         } else {
-            $headerText = Mage::helper('M2ePro')->__('Add Products To Listing "%listing_title%" ');
+            $headerText = Mage::helper('M2ePro')->__('Add Products To Listing "%listing_title%"',
+                $this->escapeHtml($listingData['title'])
+            );
         }
 
         $this->_headerText = $headerText;

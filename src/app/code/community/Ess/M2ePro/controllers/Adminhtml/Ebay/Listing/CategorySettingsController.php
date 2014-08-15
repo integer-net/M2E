@@ -1402,22 +1402,22 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
     {
         $unique = array();
 
-        foreach ($templatesData as $listingProductId => $templateData) {
+        foreach ($templatesData as $listingProductId => $data) {
 
-            $hash = md5(json_encode($templateData));
+            $hash = md5(json_encode($data));
 
-            $templateData['identifier'] = NULL;
+            $data['identifier'] = NULL;
 
-            if ($templateData['category_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
-                $templateData['identifier'] = $templateData['category_main_id'];
+            if ($data['category_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
+                $data['identifier'] = $data['category_main_id'];
             }
-            if ($templateData['category_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
-                $templateData['identifier'] = $templateData['category_main_attribute'];
+            if ($data['category_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
+                $data['identifier'] = $data['category_main_attribute'];
             }
 
             !isset($unique[$hash]) && $unique[$hash] = array();
 
-            $unique[$hash] = array_merge($unique[$hash], $templateData);
+            $unique[$hash] = array_merge($unique[$hash], $data);
             $unique[$hash]['listing_products_ids'][] = $listingProductId;
         }
 
@@ -1451,56 +1451,56 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
     //#############################################
 
-    private function addCategoriesPath(&$templateData,Ess_M2ePro_Model_Listing $listing)
+    private function addCategoriesPath(&$data,Ess_M2ePro_Model_Listing $listing)
     {
         $marketplaceId = $listing->getData('marketplace_id');
         $accountId = $listing->getAccountId();
 
-        if (isset($templateData['category_main_mode'])) {
-            if ($templateData['category_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
-                $templateData['category_main_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
-                    $templateData['category_main_id'],
+        if (isset($data['category_main_mode'])) {
+            if ($data['category_main_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
+                $data['category_main_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
+                    $data['category_main_id'],
                     $marketplaceId
                 );
             } else {
-                $templateData['category_main_path'] = null;
+                $data['category_main_path'] = null;
             }
         }
 
-        if (isset($templateData['category_secondary_mode'])) {
-            if ($templateData['category_secondary_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
-                $templateData['category_secondary_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
-                    $templateData['category_secondary_id'],
+        if (isset($data['category_secondary_mode'])) {
+            if ($data['category_secondary_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
+                $data['category_secondary_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
+                    $data['category_secondary_id'],
                     $marketplaceId
                 );
             } else {
-                $templateData['category_secondary_path'] = null;
+                $data['category_secondary_path'] = null;
             }
         }
 
-        if (isset($templateData['store_category_main_mode'])) {
-            if ($templateData['store_category_main_mode'] ==
+        if (isset($data['store_category_main_mode'])) {
+            if ($data['store_category_main_mode'] ==
                     Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
-                $templateData['store_category_main_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Store')
+                $data['store_category_main_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Store')
                     ->getPath(
-                        $templateData['store_category_main_id'],
+                        $data['store_category_main_id'],
                         $accountId
                     );
             } else {
-                $templateData['store_category_main_path'] = null;
+                $data['store_category_main_path'] = null;
             }
         }
 
-        if (isset($templateData['store_category_secondary_mode'])) {
-            if ($templateData['store_category_secondary_mode'] ==
+        if (isset($data['store_category_secondary_mode'])) {
+            if ($data['store_category_secondary_mode'] ==
                     Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {
-                $templateData['store_category_secondary_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Store')
+                $data['store_category_secondary_path'] = Mage::helper('M2ePro/Component_Ebay_Category_Store')
                     ->getPath(
-                        $templateData['store_category_secondary_id'],
+                        $data['store_category_secondary_id'],
                         $accountId
                     );
             } else {
-                $templateData['store_category_secondary_path'] = null;
+                $data['store_category_secondary_path'] = null;
             }
         }
     }

@@ -123,6 +123,11 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         return $this->getData('buyer_message');
     }
 
+    public function getBuyerTaxId()
+    {
+        return $this->getData('buyer_tax_id');
+    }
+
     // -------------------------------------------
 
     public function getCurrency()

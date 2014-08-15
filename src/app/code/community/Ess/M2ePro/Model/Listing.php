@@ -44,6 +44,10 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
             return true;
         }
 
+        if ($this->isComponentModeEbay() && $this->getAccount()->getChildObject()->isModeSandbox()) {
+            return false;
+        }
+
         return (bool)Mage::getModel('M2ePro/Listing_Product')
                             ->getCollection()
                             ->addFieldToFilter('listing_id', $this->getId())

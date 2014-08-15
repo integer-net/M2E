@@ -83,7 +83,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs extends Mage_Adminhtml_Block_Widg
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_SYNCHRONIZATION) {
-            $tab['content'] = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_synchronization_log_help')->toHtml();
+            $tab['content'] = $this->getLayout()
+                                   ->createBlock('M2ePro/adminhtml_ebay_synchronization_log_help')->toHtml();
             $tab['content'] .= $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_synchronization_log')->toHtml();
         } else {
             $tab['url'] = $this->getUrl('*/adminhtml_ebay_log/synchronization');

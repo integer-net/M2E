@@ -792,8 +792,7 @@ HTML;
 
         foreach ($logRows as $row) {
 
-            $row['description'] = Mage::helper('M2ePro')->escapeHtml($row['description']);
-            $row['description'] = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row['description']);
+            $row['description'] = Mage::helper('M2ePro/View')->getModifiedLogMessage($row['description']);
 
             if ($row['action_id'] !== $lastActionId) {
                 if (count($tempActionRows) > 0) {

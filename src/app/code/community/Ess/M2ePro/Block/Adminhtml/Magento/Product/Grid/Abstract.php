@@ -258,7 +258,9 @@ HTML;
         //------------------------------
         $helper = Mage::helper('M2ePro');
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs(
+            $helper->__('Please select the products you want to perform the action on.')
+        );
         $createEmptyListingMessage = $helper->escapeJs($helper->__('Are you sure you want to create empty listing?'));
 
         $showAdvancedFilterButtonText = $helper->escapeJs($helper->__('Show Advanced Filter'));

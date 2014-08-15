@@ -211,8 +211,8 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
     private function addBrowserNotifications()
     {
-        // M2ePro_TRANSLATIONS
-        // We are sorry, Internet Explorer browser is not supported. Please, use another browser (Mozilla Firefox, Google Chrome, etc.
+// M2ePro_TRANSLATIONS
+// We are sorry, Internet Explorer browser is not supported. Please, use another browser (Mozilla Firefox, Google Chrome, etc.
         if (Mage::helper('M2ePro/Client')->isBrowserIE()) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__(
                 'We are sorry, Internet Explorer browser is not supported. Please, use'.
@@ -255,8 +255,8 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
             $url = Mage::helper('M2ePro/View_Configuration')->getLicenseUrl();
 
-            // M2ePro_TRANSLATIONS
-            // M2E Pro license key validation is failed for this domain. Go to the <a href="%url%" target="_blank">license page</a>.
+// M2ePro_TRANSLATIONS
+// M2E Pro license key validation is failed for this domain. Go to the <a href="%url%" target="_blank">license page</a>.
             $message = 'M2E Pro license key validation is failed for this domain. ';
             $message .= 'Go to the <a href="%url%" target="_blank">license page</a>.';
             $message = Mage::helper('M2ePro')->__($message,$url);
@@ -269,8 +269,8 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
             $url = Mage::helper('M2ePro/View_Configuration')->getLicenseUrl();
 
-            // M2ePro_TRANSLATIONS
-            // M2E Pro license key validation is failed for this IP. Go to the <a href="%url%" target="_blank">license page</a>.
+// M2ePro_TRANSLATIONS
+// M2E Pro license key validation is failed for this IP. Go to the <a href="%url%" target="_blank">license page</a>.
             $message = 'M2E Pro license key validation is failed for this IP. ';
             $message .= 'Go to the <a href="%url%" target="_blank">license page</a>.';
             $message = Mage::helper('M2ePro')->__($message, $url);

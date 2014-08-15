@@ -81,7 +81,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Edit_Tabs extends Mage_Ad
 
         //------------------------------
         if ($this->isTabAllowed('synchronization') && Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
-            $block = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_template_edit_tabs_synchronization');
+            $block = $this->getLayout()
+                          ->createBlock('M2ePro/adminhtml_ebay_listing_template_edit_tabs_synchronization');
             $this->addTab(
                 'synchronization',
                 array(

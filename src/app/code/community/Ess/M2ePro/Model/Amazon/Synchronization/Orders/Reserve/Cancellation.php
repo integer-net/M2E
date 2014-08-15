@@ -110,7 +110,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Reserve_Cancellation
 
         $reservationDays = (int)$account->getChildObject()->getQtyReservationDays();
         if ($reservationDays > 0) {
-            $minReservationStartDate = new DateTime(Mage::helper('M2ePro')->getCurrentGmtDate(), new DateTimeZone('UTC'));
+            $minReservationStartDate = new DateTime(Mage::helper('M2ePro')->getCurrentGmtDate(),
+                                                    new DateTimeZone('UTC'));
             $minReservationStartDate->modify('- ' . $reservationDays . ' days');
             $minReservationStartDate = $minReservationStartDate->format('Y-m-d H:i');
 

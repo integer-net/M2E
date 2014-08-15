@@ -89,11 +89,6 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
 
         $imageLink = $magentoProduct->getImageLink('image');
 
-        if ($imageLink == '') {
-            $text = str_replace($matches[0], '', $text);
-            return $text;
-        }
-
         $blockObj = Mage::getSingleton('core/layout')->createBlock(
             'M2ePro/adminhtml_renderer_description_image'
         );
@@ -104,7 +99,7 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
 
             $tempImageAttributes = explode(',', $matches[1][$key]);
             $realImageAttributes = array();
-            for ($i=0;$i<5;$i++) {
+            for ($i=0;$i<6;$i++) {
                 if (!isset($tempImageAttributes[$i])) {
                     $realImageAttributes[$i] = 0;
                 } else {
@@ -112,16 +107,22 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
                 }
             }
 
+            $tempImageLink = $realImageAttributes[5] == 0
+                ? $imageLink
+                : $magentoProduct->getGalleryImageLink($realImageAttributes[5]);
+
             $data = array(
-                'width' => $realImageAttributes[0],
-                'height' => $realImageAttributes[1],
-                'margin' => $realImageAttributes[2],
+                'width'       => $realImageAttributes[0],
+                'height'      => $realImageAttributes[1],
+                'margin'      => $realImageAttributes[2],
                 'linked_mode' => $realImageAttributes[3],
-                'watermark' => $realImageAttributes[4],
-                'src' => $imageLink
+                'watermark'   => $realImageAttributes[4],
+                'src'         => $tempImageLink
             );
             $search[] = $match;
-            $replace[] = preg_replace('/\s{2,}/', '', $blockObj->addData($data)->toHtml());
+            $replace[] = ($tempImageLink == '')
+                ? '' :
+                preg_replace('/\s{2,}/', '', $blockObj->addData($data)->toHtml());
         }
 
         $text = str_replace($search, $replace, $text);

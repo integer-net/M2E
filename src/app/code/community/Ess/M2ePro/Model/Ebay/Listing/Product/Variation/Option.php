@@ -362,9 +362,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
 
                 $tempOptionNames = array();
 
-                isset($configurableOption['label']) && $tempOptionNames[] = $configurableOption['label'];
-                isset($configurableOption['default_label']) && $tempOptionNames[] = $configurableOption['default_label'];
-                isset($configurableOption['store_label']) && $tempOptionNames[] = $configurableOption['store_label'];
+                isset($configurableOption['label']) &&
+                    $tempOptionNames[] = $configurableOption['label'];
+                isset($configurableOption['default_label']) &&
+                    $tempOptionNames[] = $configurableOption['default_label'];
+                isset($configurableOption['store_label']) &&
+                    $tempOptionNames[] = $configurableOption['store_label'];
 
                 foreach ($options as $option) {
                     if ((int)$option['value'] == (int)$configurableOption['value_index']) {
@@ -373,7 +376,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
                     }
                 }
 
-                if (!in_array($optionName,array_map('strtolower',array_filter($tempOptionNames)))){
+                $tempOptionNames = array_map('strtolower', array_filter($tempOptionNames));
+                foreach ($tempOptionNames as &$tempName) {
+                    $tempName = Mage::helper('M2ePro')->reduceWordsInString(
+                        $tempName, Ess_M2ePro_Helper_Component_Ebay::MAX_LENGTH_FOR_OPTION_VALUE
+                    );
+                }
+
+                if (!in_array($optionName, $tempOptionNames)){
                     continue;
                 }
 
@@ -461,25 +471,30 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
                 continue;
             }
 
-            $defaultTitle = $tempAttribute->getData('default_title');
-            $storeTitle = $tempAttribute->getData('store_title');
-            $title = $tempAttribute->getData('title');
+            $tempAttributeTitles = array($tempAttribute->getData('default_title'),
+                                         $tempAttribute->getData('store_title'),
+                                         $tempAttribute->getData('title'));
 
-            if ((is_null($defaultTitle) || strtolower($defaultTitle) != $attribute) &&
-                (is_null($storeTitle) || strtolower($storeTitle) != $attribute) &&
-                (is_null($title) || strtolower($title) != $attribute)) {
+            $tempAttributeTitles = array_map('strtolower', array_filter($tempAttributeTitles));
+
+            if (!in_array($attribute, $tempAttributeTitles)) {
                 continue;
             }
 
             foreach ($tempAttribute->getValues() as $tempOption) {
 
-                $defaultTitle = $tempOption->getData('default_title');
-                $storeTitle = $tempOption->getData('store_title');
-                $title = $tempOption->getData('title');
+                $tempOptionTitles = array($tempOption->getData('default_title'),
+                                          $tempOption->getData('store_title'),
+                                          $tempOption->getData('title'));
 
-                if ((is_null($defaultTitle) || strtolower($defaultTitle) != $option) &&
-                    (is_null($storeTitle) || strtolower($storeTitle) != $option) &&
-                    (is_null($title) || strtolower($title) != $option)) {
+                $tempOptionTitles = array_map('strtolower', array_filter($tempOptionTitles));
+                foreach ($tempOptionTitles as &$tempTitle) {
+                    $tempTitle = Mage::helper('M2ePro')->reduceWordsInString(
+                        $tempTitle, Ess_M2ePro_Helper_Component_Ebay::MAX_LENGTH_FOR_OPTION_VALUE
+                    );
+                }
+
+                if (!in_array($option, $tempOptionTitles )) {
                     continue;
                 }
 

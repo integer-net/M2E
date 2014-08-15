@@ -44,14 +44,16 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
 
         $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),'Get specifics from Amazon');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
+                                                         'Get specifics from Amazon');
         $specifics = $this->receiveFromAmazon($marketplace);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 
         $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
         $this->getActualLockItem()->activate();
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),'Save specifics to DB');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
+                                                         'Save specifics to DB');
 
         $this->saveSpecificsToDb($marketplace,$specifics);
 

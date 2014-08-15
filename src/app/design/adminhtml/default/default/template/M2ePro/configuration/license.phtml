@@ -106,6 +106,8 @@
 
     Event.observe(window, 'load', function() {
         LicenseHandlerObj = new ConfigurationLicenseHandler();
+        ControlPanelHandlerObj = new ControlPanelHandler();
+
         configEditForm = new varienForm('config_edit_form', '<?php echo $this->getValidationUrl(); ?>');
     });
     //-----------------------------

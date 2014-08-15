@@ -84,7 +84,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
 
         $listingProductCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
-        $listingProductCollection->addFieldToFilter('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
+        $listingProductCollection->addFieldToFilter('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
 
         $listingProductCollection->getSelect()->where(
             '`is_variation_product` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_NO.

@@ -162,6 +162,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
     {
         $fullDescription = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row->getData('description'));
         $row->setData('description', $fullDescription);
+
         $value = $column->getRenderer()->render($row);
 
         preg_match_all('/href="([^"]*)"/', $fullDescription, $matches);
@@ -197,6 +198,18 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
         }
 
         return $this->prepareLongText($fullDescription, $value);
+    }
+
+    protected function prepareLongText($fullText, $renderedText)
+    {
+        if (strlen($fullText) == strlen($renderedText)) {
+            return $renderedText;
+        }
+
+        $renderedText .= '&nbsp;(<a href="javascript:void(0)" onclick="LogHandlerObj.showFullText(this);">more</a>)
+                          <div style="display: none;"><br />'.$fullText.'<br /><br /></div>';
+
+        return $renderedText;
     }
 
     // ####################################

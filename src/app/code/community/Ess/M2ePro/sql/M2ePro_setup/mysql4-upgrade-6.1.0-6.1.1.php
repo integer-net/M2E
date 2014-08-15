@@ -101,7 +101,7 @@ if ($tempRow === false) {
     $installer->run(<<<SQL
 
 INSERT INTO m2epro_primary_config (`group`,`key`,`value`,`notice`,`update_date`,`create_date`) VALUES
-  ('/M2ePro/license/valid/', 'domain', NULL, '0 - Not valid\r\n1 - Valid', '2013-05-08 00:00:00', '2013-05-08 00:00:00'),
+  ('/M2ePro/license/valid/', 'domain', NULL, '0 - Not valid\r\n1 - Valid', '2013-05-08 00:00:00','2013-05-08 00:00:00'),
   ('/M2ePro/license/valid/', 'ip', NULL, '0 - Not valid\r\n1 - Valid', '2013-05-08 00:00:00', '2013-05-08 00:00:00'),
   ('/M2ePro/license/valid/', 'directory', NULL, '0 - Not valid\r\n1 - Valid',
    '2013-05-08 00:00:00', '2013-05-08 00:00:00');

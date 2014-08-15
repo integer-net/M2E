@@ -24,7 +24,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_StepFourCategory
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
             $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
-            $headerText = Mage::helper('M2ePro')->__("Add %component_name% Listing [Select Categories]", $componentName);
+            $headerText = Mage::helper('M2ePro')->__("Add %component_name% Listing [Select Categories]",
+                                                     $componentName);
         } else {
             $headerText = Mage::helper('M2ePro')->__("Add Listing [Select Categories]");
         }

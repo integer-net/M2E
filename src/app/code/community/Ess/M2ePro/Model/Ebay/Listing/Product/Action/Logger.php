@@ -43,13 +43,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger extends Ess_M2ePro_Mod
         }
 
         $this->getListingLog()
-             ->addListingMessage($this->listingId,
-                                 $this->initiator,
-                                 $this->actionId,
-                                 $this->action,
-                                 $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
-                                 $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
-                                 $priority);
+            ->addListingMessage($this->listingId,
+                                $this->initiator,
+                                $this->actionId,
+                                $this->action,
+                                $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
+                                $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
+                                $priority);
     }
 
     public function logListingProductMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
@@ -67,15 +67,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger extends Ess_M2ePro_Mod
         }
 
         $this->getListingLog()
-             ->addProductMessage($this->listingId ,
-                                 $listingProduct->getProductId() ,
-                                 $listingProduct->getId() ,
-                                 $this->initiator ,
-                                 $this->actionId ,
-                                 $this->action ,
-                                 $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
-                                 $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
-                                 $priority);
+            ->addProductMessage($this->listingId ,
+                                $listingProduct->getProductId() ,
+                                $listingProduct->getId() ,
+                                $this->initiator ,
+                                $this->actionId ,
+                                $this->action ,
+                                $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
+                                $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
+                                $priority);
     }
 
     // ########################################

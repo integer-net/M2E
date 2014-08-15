@@ -21,13 +21,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_Synchronization_Edit
 
         // Set header text
         //------------------------------
+        $helper = Mage::helper('M2ePro');
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
-            $headerTextEdit = Mage::helper('M2ePro')->__("Edit %component_name% Synchronization Template", $componentName);
-            $headerTextAdd = Mage::helper('M2ePro')->__("Add %component_name% Synchronization Template", $componentName);
+            $componentName = $helper->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $headerTextEdit = $helper->__("Edit %component_name% Synchronization Template", $componentName);
+            $headerTextAdd = $helper->__("Add %component_name% Synchronization Template", $componentName);
         } else {
-            $headerTextEdit = Mage::helper('M2ePro')->__("Edit Synchronization Template");
-            $headerTextAdd = Mage::helper('M2ePro')->__("Add Synchronization Template");
+            $headerTextEdit = $helper->__("Edit Synchronization Template");
+            $headerTextAdd = $helper->__("Add Synchronization Template");
         }
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data')

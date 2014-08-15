@@ -264,7 +264,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_NewProduct_Grid extends 
 
     public function getGridUrl()
     {
-        return $this->getUrl('*/adminhtml_common_amazon_template_newProduct/templateNewProductGrid', array('_current'=>true));
+        return $this->getUrl('*/adminhtml_common_amazon_template_newProduct/templateNewProductGrid',
+                             array('_current'=>true));
     }
 
     public function getRowUrl($row)

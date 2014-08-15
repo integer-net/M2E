@@ -38,17 +38,17 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion611_ConfigData
         UPDATE `m2epro_config` SET `value` = '53200' WHERE (`group` = '/cron/task/servicing/' AND `key` = 'interval');
 
         INSERT INTO `m2epro_config` (`group`,`key`,`value`,`notice`,`update_date`,`create_date`) VALUES
-            ('/cron/', 'type', 'service', NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
-            ('/cron/task/logs_cleaning/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
-            ('/cron/task/processing/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
-            ('/cron/task/servicing/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
-            ('/cron/task/synchronization/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
-            ('/cron/service/', 'endpoint', 'http://cron.m2epro.com/', NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
-            ('/cron/service/', 'auth_key', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00');
+        ('/cron/', 'type', 'service', NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
+        ('/cron/task/logs_cleaning/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
+        ('/cron/task/processing/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
+        ('/cron/task/servicing/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
+        ('/cron/task/synchronization/', 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
+        ('/cron/service/', 'endpoint', 'http://cron.m2epro.com/', NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
+        ('/cron/service/', 'auth_key', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00');
 
         INSERT INTO `m2epro_synchronization_config` (`group`,`key`,`value`,`notice`,`update_date`,`create_date`) VALUES
-            (NULL, 'last_access', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
-            (NULL, 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00');
+        (NULL, 'la  st_access', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00'),
+        (NULL, 'last_run', NULL, NULL, '2014-01-01 00:00:00', '2014-01-01 00:00:00');
 
         DELETE FROM `m2epro_synchronization_config` WHERE ((`key` = 'max_deactivate_time')
             OR (`group` = '/feedbacks/')

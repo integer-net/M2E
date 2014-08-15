@@ -41,11 +41,11 @@ class Ess_M2ePro_Model_Connector_Buy_Product_NewSku_MultipleResponser
             }
 
             Mage::getModel('M2ePro/Connector_Buy_Product_Helper')
-                        ->updateAfterNewSkuAction($listingProduct,
-                                                  $this->getListingProductRequestNativeData($listingProduct),
-                                                  array_merge($this->params,array(
-                                                      'general_id' => $this->responseBody['skus'][$listingProduct->getId().'-id']
-                                                  )));
+            ->updateAfterNewSkuAction($listingProduct,
+                                      $this->getListingProductRequestNativeData($listingProduct),
+                                      array_merge($this->params,array(
+                                          'general_id' => $this->responseBody['skus'][$listingProduct->getId().'-id']
+                                      )));
 
             // M2ePro_TRANSLATIONS
             // New SKU was successfully added

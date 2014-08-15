@@ -309,7 +309,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
         $linkInfo = json_decode($row->getData('link_info'),true);
         $url = Mage::helper('M2ePro/Component_Play')->getItemUrl($linkInfo['play_id'], $linkInfo['category_code']);
 
-        return '<strong>'.$generalIdType.': </strong><a href="'.$url.'" target="_blank">'.$value.'</a>';
+        return '<strong>'.$generalIdType.': </strong><br/><a href="'.$url.'" target="_blank">'.$value.'</a>';
     }
 
     public function callbackColumnAvailableQty($value, $row, $column, $isExport)

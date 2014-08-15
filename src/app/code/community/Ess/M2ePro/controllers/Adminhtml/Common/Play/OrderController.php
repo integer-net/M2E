@@ -73,7 +73,10 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $order);
 
-        $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_play_order_view_item')->toHtml();
+        $response = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_common_play_order_view_item')
+            ->toHtml();
         $this->getResponse()->setBody($response);
     }
 
@@ -84,7 +87,10 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $order);
 
-        $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_play_order_view_log')->toHtml();
+        $response = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_common_play_order_view_log')
+            ->toHtml();
         $this->getResponse()->setBody($response);
     }
 
@@ -99,8 +105,8 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
         $order = Mage::helper('M2ePro/Component_Play')->getObject('Order', (int)$id);
 
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
-            // M2ePro_TRANSLATIONS
-            // Magento Order is already created for this %component_name% Order. Press Create Order button to create new one.'
+    // M2ePro_TRANSLATIONS
+    // Magento Order is already created for this %component_name% Order. Press Create Order button to create new one.'
             $message = 'Magento Order is already created for this %component_name% Order. ' .
                        'Press Create Order button to create new one.';
 
@@ -118,10 +124,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
             $order->createMagentoOrder();
             $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Magento Order was created.'));
         } catch (Exception $e) {
-            $message = 'Magento Order was not created. Reason: %error_message%';
             $message = Mage::helper('M2ePro')->__(
-                $message, Mage::helper('M2ePro')->
-                    __( Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage()))
+                'Magento Order was not created. Reason: %error_message%',
+                Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage())
             );
             $this->_getSession()->addError($message);
         }

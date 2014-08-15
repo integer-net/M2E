@@ -125,7 +125,9 @@ class Ess_M2ePro_Helper_View_Common_Component extends Mage_Core_Helper_Abstract
 
     public function getDefaultComponent()
     {
-        $defaultComponent = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/common/component/', 'default');
+        $defaultComponent = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/view/common/component/', 'default'
+        );
         return in_array($defaultComponent, $this->getActiveComponents())
             ? $defaultComponent : Ess_M2ePro_Helper_Component_Amazon::NICK;
     }

@@ -16,7 +16,8 @@ class Ess_M2ePro_Model_Observer_Ebay_Product
             'Listing'
         );
         $collection->addFieldToFilter('auto_mode',Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_GLOBAL);
-        $collection->addFieldToFilter('auto_global_adding_mode',array('neq'=>Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE));
+        $collection->addFieldToFilter('auto_global_adding_mode',
+                                      array('neq'=>Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE));
         $listings = $collection->getItems();
 
         foreach ($listings as $listing) {
@@ -70,7 +71,8 @@ class Ess_M2ePro_Model_Observer_Ebay_Product
         );
 
         $collection->addFieldToFilter('auto_mode',Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_WEBSITE);
-        $collection->addFieldToFilter('auto_website_adding_mode',array('neq'=>Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE));
+        $collection->addFieldToFilter('auto_website_adding_mode',
+                                      array('neq'=>Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE));
         $collection->addFieldToFilter('store_id',array('in'=>$storeIds));
 
         $listings = $collection->getItems();

@@ -64,7 +64,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
 
         $this->_initAction()
-             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_template_sellingFormat_edit'))
+             ->_addContent(
+                 $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_template_sellingFormat_edit')
+             )
              ->renderLayout();
     }
 

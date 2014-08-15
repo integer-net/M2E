@@ -28,7 +28,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Module extends Mage_Adminhtml_
             $this->getLayout()->createBlock(
                 'M2ePro/adminhtml_development_tabs_command_group',
                 '',
-                array('controller_name' => Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_MODULE)
+                array('controller_name'=>Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_MODULE)
             )
         );
 
@@ -36,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Module extends Mage_Adminhtml_
             $this->getLayout()->createBlock(
                 'M2ePro/adminhtml_development_tabs_command_group',
                 '',
-                array('controller_name' => Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_SYNCHRONIZATION)
+                array('controller_name'=>Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_SYNCHRONIZATION)
             )
         );
 
@@ -44,7 +44,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Module extends Mage_Adminhtml_
             $this->getLayout()->createBlock(
                 'M2ePro/adminhtml_development_tabs_command_group',
                 '',
-                array('controller_name' => Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_INTEGRATION)
+                array('controller_name'=>Ess_M2ePro_Helper_View_Development_Command::CONTROLLER_MODULE_INTEGRATION)
             )
         );
 

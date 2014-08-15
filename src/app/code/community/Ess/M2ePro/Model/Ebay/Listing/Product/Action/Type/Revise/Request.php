@@ -212,7 +212,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
             // Duration field(s) was ignored because eBay doesn't allow revise the item if Best Offer is enabled.
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'Duration field(s) was ignored because'.
+                    'Duration field(s) was ignored because '.
                     'eBay doesn\'t allow revise the item if Best Offer is enabled.'
                 )
             );

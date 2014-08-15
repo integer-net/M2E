@@ -75,9 +75,27 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
             }
         }
 
+        $motorsSpecificsAttribute = $this->getRequest()->getParam('motors_specifics_attribute');
+        $motorsKtypesAttribute = $this->getRequest()->getParam('motors_ktypes_attribute');
+
+        if (!empty($motorsKtypesAttribute) && !empty($motorsSpecificsAttribute) &&
+            $motorsSpecificsAttribute == $motorsKtypesAttribute
+        ) {
+            $this->_getSession()->addError(
+                Mage::helper('M2ePro')->__('ePIDs and KTypes attributes can not be the same.')
+            );
+            $this->_redirectUrl($this->_getRefererUrl());
+            return;
+        }
+
         Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
             '/ebay/motor/', 'motors_specifics_attribute',
-            $this->getRequest()->getParam('motors_specifics_attribute')
+            $motorsSpecificsAttribute
+        );
+
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/ebay/motor/', 'motors_ktypes_attribute',
+            $motorsKtypesAttribute
         );
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Settings was successfully saved.'));

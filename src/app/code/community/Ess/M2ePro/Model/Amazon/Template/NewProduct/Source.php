@@ -138,7 +138,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
             $value = $specific[$specific['mode']];
 
             if ($specific['mode'] == 'custom_attribute') {
-                $value = $this->listingProduct->getActualMagentoProduct()->getAttributeValue($specific['custom_attribute']);
+                $value = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
+                    $specific['custom_attribute']
+                );
             }
 
             $specific['type'] == 'int' && $value = (int)$value;
@@ -154,7 +156,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
 
                 $attributeValue = $attributeData['mode'] == 'custom_value'
                     ? $attributeData['custom_value']
-                    : $this->listingProduct->getActualMagentoProduct()->getAttributeValue($attributeData['custom_attribute']);
+                    : $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
+                        $attributeData['custom_attribute']
+                    );
 
                 $attributes[$i] = array(
                     'name' => str_replace(' ','',$attributeName),
@@ -429,7 +433,9 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Source
         if ($this->templateNewProductDescription->isPackageWeightModeCustomValue()) {
             $packageWeight = $src['custom_value'];
         } else {
-            $packageWeight = $this->listingProduct->getActualMagentoProduct()->getAttributeValue($src['custom_attribute']);
+            $packageWeight = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
+                $src['custom_attribute']
+            );
         }
 
         $packageWeight = str_replace(',','.',$packageWeight);

@@ -16,7 +16,8 @@ $connection = $installer->getConnection();
     CHANGE COLUMN `dispatch_time_value` `dispatch_time` INT(11) UNSIGNED NOT NULL DEFAULT 0,
     CHANGE COLUMN `local_shipping_cash_on_delivery_cost_value` `cash_on_delivery_cost` VARCHAR(255) DEFAULT NULL,
     CHANGE COLUMN `local_shipping_combined_discount_profile_id` `local_shipping_discount_profile_id` TEXT DEFAULT NULL,
-    CHANGE COLUMN `international_shipping_combined_discount_profile_id` `international_shipping_discount_profile_id` TEXT DEFAULT NULL,
+    CHANGE COLUMN `international_shipping_combined_discount_profile_id`
+                  `international_shipping_discount_profile_id` TEXT DEFAULT NULL,
     DROP INDEX `international_trade`;
 
     ALTER TABLE `m2epro_ebay_template_selling_format`

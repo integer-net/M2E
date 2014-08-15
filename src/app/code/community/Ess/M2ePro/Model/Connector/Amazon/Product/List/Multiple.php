@@ -348,8 +348,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
         if (!empty($generalId)) {
             if (!$this->validateGeneralId($generalId)) {
-                // M2ePro_TRANSLATIONS
-                // ASIN/ISBN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.
+        // M2ePro_TRANSLATIONS
+        // ASIN/ISBN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
         'ASIN/ISBN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.',
@@ -365,8 +365,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
         if (!empty($worldWideId)) {
             if (!$this->validateWorldWideId($worldWideId)) {
-                // M2ePro_TRANSLATIONS
-                // UPC/EAN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.
+        // M2ePro_TRANSLATIONS
+        // UPC/EAN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
             'UPC/EAN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.',

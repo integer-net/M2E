@@ -181,6 +181,14 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
+    hasSurcharge: function(locationType)
+    {
+        var marketplaceId = $$('[name=shipping[marketplace_id]]')[0];
+        return locationType == 'local' && marketplaceId  && ['1', '9'].indexOf(marketplaceId.value) != -1;
+    },
+
+    //----------------------------------
+
     internationalShippingModeChange: function()
     {
         // clear selected shipping methods
@@ -660,6 +668,21 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         var row = $(this).up('tr');
 
         //----------------------------------
+        var surchargeRow = $('shipping_variant_cost_surcharge_' + this.name.match(/\d+/) + '_tr');
+
+        if (EbayTemplateShippingHandlerObj.isLocalShippingModeFlat() && surchargeRow) {
+            var inputCostSurchargeCV = surchargeRow.select('.shipping-cost-surcharge')[0];
+            var inputCostSurchargeCA = surchargeRow.select('.shipping-cost-surcharge-ca')[0];
+
+            if (/(FedEx|UPS)/.test(row.select('.shipping-service')[0].value)) {
+                surchargeRow.show();
+            } else {
+                surchargeRow.hide();
+            }
+        }
+        //----------------------------------
+
+        //----------------------------------
         var inputCostCV = row.select('.shipping-cost-cv')[0];
         var inputCostCA = row.select('.shipping-cost-ca')[0];
         var inputCostAddCV = row.select('.shipping-cost-additional')[0];
@@ -669,6 +692,11 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
         //----------------------------------
         [inputCostCV, inputCostCA, inputCostAddCV, inputCostAddCA].invoke('hide');
+        if (surchargeRow) {
+            inputCostSurchargeCV.hide();
+            inputCostSurchargeCA.hide();
+        }
+
         inputPriority.show();
         //----------------------------------
 
@@ -679,6 +707,11 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
             inputCostAddCV.show();
             inputCostAddCV.disabled = false;
+
+            if (surchargeRow) {
+                inputCostSurchargeCV.show();
+                inputCostSurchargeCV.disabled = false;
+            }
         }
         //----------------------------------
 
@@ -686,6 +719,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping_Service::COST_MODE_CUSTOM_ATTRIBUTE')) {
             inputCostCA.show();
             inputCostAddCA.show();
+            surchargeRow && inputCostSurchargeCA.show();
         }
         //----------------------------------
 
@@ -709,6 +743,13 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
                 inputCostAddCV.show();
                 inputCostAddCV.value = 0;
                 inputCostAddCV.disabled = true;
+            }
+
+            if (surchargeRow) {
+                inputCostSurchargeCV.hide();
+                inputCostSurchargeCA.hide();
+
+                surchargeRow.hide();
             }
         }
         //----------------------------------
@@ -779,6 +820,24 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
             tpl = tpl.replace(/%i%/g, i);
             $(id).insert(tpl);
             EbayTemplateShippingHandlerObj.renderShipToLocationCheckboxes(i);
+        }
+        //----------------------------------
+
+        //----------------------------------
+        if (EbayTemplateShippingHandlerObj.isLocalShippingModeFlat() && EbayTemplateShippingHandlerObj.hasSurcharge(type)) {
+            tpl = $$('#block_shipping_table_cost_surcharge_row_template_table tbody')[0].innerHTML;
+            tpl = tpl.replace(/%i%/g, i);
+            $(id).insert(tpl);
+
+            if (!EbayTemplateShippingHandlerObj.isSimpleViewMode || renderSaved) {
+                AttributeSetHandlerObj.renderAttributesWithEmptyOption(
+                    'shipping[shipping_cost_surcharge_attribute][' + i + ']',
+                    $('shipping_variant_cost_surcharge_' + i + '_tr').down('.shipping-cost-surcharge-ca'));
+
+                $('shipping[shipping_cost_surcharge_attribute][' + i + ']').appendChild(
+                    new Element('option', {selected: true})
+                ).insert(M2ePro.translator.translate('None'));
+            }
         }
         //----------------------------------
 
@@ -959,6 +1018,12 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
             $(this).up('tr').next().remove();
         }
 
+        if (EbayTemplateShippingHandlerObj.hasSurcharge(locationType)) {
+            var i = $(this).up('tr').id.match(/\d+/);
+            var next = $(this).up('tr').next('[id=shipping_variant_cost_surcharge_' + i + '_tr]');
+            next && next.remove();
+        }
+
         $(this).up('tr').remove();
 
         EbayTemplateShippingHandlerObj.counter[locationType]--;
@@ -1019,6 +1084,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
             var type = service.shipping_type == 1 ? 'international' : 'local';
             var row = EbayTemplateShippingHandlerObj.addRow(type, true);
+            var surchargeRow = $('shipping_variant_cost_surcharge_' + i + '_tr');
 
             row.down('.shipping-service').value = service.shipping_value;
             row.down('.cost-mode').value = service.cost_mode;
@@ -1026,6 +1092,10 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
             if (service.cost_mode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping_Service::COST_MODE_CUSTOM_VALUE')) {
                 row.down('.shipping-cost-cv').value = service.cost_value;
                 row.down('.shipping-cost-additional').value = service.cost_additional_value;
+
+                if (surchargeRow) {
+                    surchargeRow.down('.shipping-cost-surcharge').value = service.cost_surcharge_value;
+                }
 
                 if (EbayTemplateShippingHandlerObj.isSimpleViewMode) {
                     // remove custom attribute option
@@ -1047,6 +1117,10 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
                 row.down('.shipping-cost-ca select').value = service.cost_value;
                 row.down('.shipping-cost-additional-ca select').value = service.cost_additional_value;
+
+                if (surchargeRow) {
+                    surchargeRow.down('.shipping-cost-surcharge-ca select').value = service.cost_surcharge_value;
+                }
 
                 if (EbayTemplateShippingHandlerObj.isSimpleViewMode) {
                     EbayTemplateShippingHandlerObj.replaceSelectWithInputHidden(row.down('.cost-mode'));

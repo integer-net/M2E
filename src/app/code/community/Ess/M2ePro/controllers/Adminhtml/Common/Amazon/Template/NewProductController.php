@@ -86,7 +86,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_NewProductController
 
     public function templateNewProductGridAction()
     {
-        $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_template_newProduct_grid');
+        $block = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_common_amazon_template_newProduct_grid');
         $this->getResponse()->setBody($block->toHtml());
     }
 

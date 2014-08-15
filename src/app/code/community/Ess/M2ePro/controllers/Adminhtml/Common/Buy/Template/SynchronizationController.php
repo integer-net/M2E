@@ -53,7 +53,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SynchronizationController
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
 
         $this->_initAction()
-            ->_addLeft($this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_template_synchronization_edit_tabs'))
+            ->_addLeft(
+                $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_template_synchronization_edit_tabs')
+            )
             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_template_synchronization_edit'))
             ->renderLayout();
     }

@@ -170,12 +170,12 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
                            $string);
     }
 
-    public function escapeHtml($data, $allowedTags = null)
+    public function escapeHtml($data, $allowedTags = null, $flags = ENT_COMPAT)
     {
         if (is_array($data)) {
             $result = array();
             foreach ($data as $item) {
-                $result[] = $this->escapeHtml($item);
+                $result[] = $this->escapeHtml($item, $allowedTags, $flags);
             }
         } else {
             // process single item
@@ -183,10 +183,10 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
                 if (is_array($allowedTags) and !empty($allowedTags)) {
                     $allowed = implode('|', $allowedTags);
                     $result = preg_replace('/<([\/\s\r\n]*)(' . $allowed . ')([\/\s\r\n]*)>/si', '##$1$2$3##', $data);
-                    $result = htmlspecialchars($result);
+                    $result = htmlspecialchars($result, $flags);
                     $result = preg_replace('/##([\/\s\r\n]*)(' . $allowed . ')([\/\s\r\n]*)##/si', '<$1$2$3>', $result);
                 } else {
-                    $result = htmlspecialchars($data);
+                    $result = htmlspecialchars($data, $flags);
                 }
             } else {
                 $result = $data;
@@ -196,6 +196,48 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     // ########################################
+
+    public function reduceWordsInString($string, $neededLength, $longWord = 6)
+    {
+        // todo for the next version
+        return $string;
+
+        if (strlen($string) <= $neededLength) {
+            return $string;
+        }
+
+        $longWords = array();
+        $countOfLetters = 0;
+
+        foreach (explode(' ', $string) as $word) {
+            if (strlen($word) >= $longWord && !preg_match('/\.|[0-9]/', $word)) {
+                $longWords[] = $word;
+                $countOfLetters += strlen($word);
+            }
+        }
+
+        if (empty($longWords)) {
+            return $string;
+        }
+
+        $reduce = strlen($string) - $neededLength;
+        // count($longWords) means count of dots
+        $reduceForOneLetterOfWord = ($reduce + count($longWords)) / $countOfLetters;
+
+        foreach($longWords as $word) {
+
+            $reducedWordLen = strlen($word) - ceil($reduceForOneLetterOfWord * strlen($word));
+            $reducedWord = substr($word, 0, $reducedWordLen).'.';
+
+            $string = str_replace($word, $reducedWord, $string);
+
+            if (strlen($string) <= $neededLength) {
+                break;
+            }
+        }
+
+        return $string;
+    }
 
     public function convertStringToSku($title)
     {

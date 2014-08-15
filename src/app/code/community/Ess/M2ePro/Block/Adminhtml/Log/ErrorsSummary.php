@@ -46,8 +46,7 @@ class Ess_M2ePro_Block_Adminhtml_Log_ErrorsSummary extends Mage_Adminhtml_Block_
         $tempErrors = $connRead->fetchAll($dbSelect);
 
         foreach ($tempErrors as $row) {
-            $row['description'] = Mage::helper('M2ePro')->escapeHtml($row['description']);
-            $row['description'] = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row['description']);
+            $row['description'] = Mage::helper('M2ePro/View')->getModifiedLogMessage($row['description']);
             $newErrors[] = $row;
         }
 

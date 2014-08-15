@@ -455,7 +455,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_ListingController
         }
         //----------------------------
 
-        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', Mage::helper('M2ePro/Data_Session')->getValue('temp_data'));
+        Mage::helper('M2ePro/Data_Global')->setValue(
+            'temp_data', Mage::helper('M2ePro/Data_Session')->getValue('temp_data')
+        );
 
         $this->_initAction()
             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_add_stepTwo'))
@@ -495,7 +497,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_ListingController
         }
         //----------------------------
 
-        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', Mage::helper('M2ePro/Data_Session')->getValue('temp_data'));
+        Mage::helper('M2ePro/Data_Global')->setValue(
+            'temp_data', Mage::helper('M2ePro/Data_Session')->getValue('temp_data')
+        );
 
         $this->_initAction()
             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_add_stepThree'))
@@ -573,7 +577,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_ListingController
         if ($temp['source_products'] == Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CUSTOM) {
             $blockContent = $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_add_stepFourProduct');
         } else if ($temp['source_products'] == Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CATEGORIES) {
-            $blockContent = $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_add_stepFourCategory');
+            $blockContent = $this->getLayout()->createBlock(
+                'M2ePro/adminhtml_common_play_listing_add_stepFourCategory'
+            );
         } else {
             $this->_redirect('*/*/add',array('step'=>'1','clear'=>'yes'));
             return;
@@ -888,7 +894,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_ListingController
         $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) were successfully deleted', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
-        $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) have listed items and can not be deleted', $locked);
+        $tempString = Mage::helper('M2ePro')->__(
+            '%amount% listing(s) have listed items and can not be deleted', $locked
+        );
         $locked && $this->_getSession()->addError($tempString);
 
         $this->_redirect('*/adminhtml_common_listing/index');

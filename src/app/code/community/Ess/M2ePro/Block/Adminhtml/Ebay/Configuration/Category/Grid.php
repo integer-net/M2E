@@ -103,6 +103,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
 
         // Prepare store secondary category
         // ----------------------------------
+        $categoryModeEbay = Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY;
+        $categoryModeNone = Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE;
+
         $storeSecondarySelect = $connRead->select();
         $storeSecondarySelect->from(
                 array('etc' => Mage::getModel('M2ePro/Ebay_Template_OtherCategory')->getResource()->getMainTable())
@@ -111,7 +114,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
             ->columns(array(
                 'store_category_secondary_mode as mode',
                 new Zend_Db_Expr(
-                    'IF (`store_category_secondary_mode` = '.Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY.',
+                    'IF (`store_category_secondary_mode` = '.$categoryModeEbay.',
                          `store_category_secondary_id`,
                          `store_category_secondary_attribute`) as `value`'),
                 'store_category_secondary_path as path',
@@ -119,7 +122,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
                 new Zend_Db_Expr('\'\' as `marketplace`'),
                 'account_id as account',
             ))
-            ->where('store_category_secondary_mode != ?', Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE)
+            ->where('store_category_secondary_mode != ?', $categoryModeNone)
             ->group(array('mode', 'value', 'account'));
         // ----------------------------------
 
@@ -181,6 +184,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
 
     protected function _prepareColumns()
     {
+        $helper = Mage::helper('M2ePro');
+
         $this->addColumn('path', array(
             'header'        => Mage::helper('M2ePro')->__('Title'),
             'align'         => 'left',
@@ -194,13 +199,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
         ));
 
         $options = array(
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN => Mage::helper('M2ePro')->__('Primary'),
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY => Mage::helper('M2ePro')->__('Secondary'),
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN => Mage::helper('M2ePro')->__('Store Primary'),
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY => Mage::helper('M2ePro')->__('Store Secondary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN       => $helper->__('Primary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY  => $helper->__('Secondary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN      => $helper->__('Store Primary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY => $helper->__('Store Secondary'),
         );
         $this->addColumn('type', array(
-            'header'        => Mage::helper('M2ePro')->__('Type'),
+            'header'        => $helper->__('Type'),
             'align'         => 'left',
             'type'          => 'options',
             'width'         => '100px',
@@ -211,7 +216,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
         ));
 
         $this->addColumn('marketplace', array(
-            'header'        => Mage::helper('M2ePro')->__('eBay Site'),
+            'header'        => $helper->__('eBay Site'),
             'align'         => 'left',
             'type'          => 'options',
             'width'         => '100px',
@@ -223,7 +228,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
         ));
 
         $this->addColumn('account', array(
-            'header'        => Mage::helper('M2ePro')->__('Account'),
+            'header'        => $helper->__('Account'),
             'align'         => 'left',
             'type'          => 'options',
             'width'         => '100px',
@@ -235,7 +240,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
         ));
 
         $this->addColumn('state', array(
-            'header'        => Mage::helper('M2ePro')->__('State'),
+            'header'        => $helper->__('State'),
             'align'         => 'left',
             'type'          => 'options',
             'width'         => '100px',
@@ -245,13 +250,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
             'filter_condition_callback' => array($this, 'callbackFilterState'),
             'frame_callback'=> array($this, 'callbackColumnState'),
             'options'       => array(
-                1 => Mage::helper('M2ePro')->__('Active'),
-                0 => Mage::helper('M2ePro')->__('Removed'),
+                1 => $helper->__('Active'),
+                0 => $helper->__('Removed'),
             ),
         ));
 
         $this->addColumn('actions', array(
-            'header'    => Mage::helper('M2ePro')->__('Actions'),
+            'header'    => $helper->__('Actions'),
             'align'     => 'left',
             'width'     => '70px',
             'type'      => 'action',

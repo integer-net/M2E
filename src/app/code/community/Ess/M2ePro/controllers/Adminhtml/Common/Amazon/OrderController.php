@@ -55,7 +55,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
 
     public function gridAction()
     {
-        $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_order_grid')->toHtml();
+        $response = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_common_amazon_order_grid')
+            ->toHtml();
         $this->getResponse()->setBody($response);
     }
 
@@ -87,7 +90,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $order);
 
-        $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_order_view_item')->toHtml();
+        $response = $this->loadLayout()
+            ->getLayout()
+            ->createBlock('M2ePro/adminhtml_common_amazon_order_view_item')
+            ->toHtml();
         $this->getResponse()->setBody($response);
     }
 
@@ -123,8 +129,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
         } catch (Exception $e) {
             $message = Mage::helper('M2ePro')->__(
                 'Magento Order was not created. Reason: %error_message%',
-                Mage::helper('M2ePro')->__(Mage::getSingleton('M2ePro/Log_Abstract')->
-                    decodeDescription($e->getMessage()))
+                Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage())
             );
             $this->_getSession()->addError($message);
         }

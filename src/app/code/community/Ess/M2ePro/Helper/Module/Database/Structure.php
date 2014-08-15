@@ -68,6 +68,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_ebay_dictionary_category',
             'm2epro_ebay_dictionary_marketplace',
             'm2epro_ebay_dictionary_motor_specific',
+            'm2epro_ebay_dictionary_motor_ktype',
             'm2epro_ebay_dictionary_shipping',
             'm2epro_ebay_dictionary_shipping_category',
             'm2epro_ebay_feedback',
@@ -211,6 +212,84 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
         }
 
         return $result;
+    }
+
+    // --------------------------------------------
+
+    public function isTableExists($tableName)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        $databaseName = Mage::helper('M2ePro/Magento')->getDatabaseName();
+        $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+
+        $result = $connRead->query("SHOW TABLE STATUS FROM `{$databaseName}` WHERE `name` = '{$tableName}'")
+                           ->fetch() ;
+
+        return $result !== false;
+    }
+
+    public function isTableStatusOk($tableName)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        if (!$this->isTableExists($tableName)) {
+            throw new Exception("Table '{$tableName}' is not exists.");
+        }
+
+        $tableStatus = true;
+
+        try {
+
+            $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+            $connRead->select()->from($tableName, new Zend_Db_Expr('1'))
+                     ->limit(1)
+                     ->query();
+
+        } catch (Exception $e) {
+            $tableStatus = false;
+        }
+
+        return $tableStatus;
+    }
+
+    public function isTableReady($tableName)
+    {
+        return $this->isTableExists($tableName) && $this->isTableStatusOk($tableName);
+    }
+
+    // --------------------------------------------
+
+    public function getCountOfRecords($tableName)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+        $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+
+        $count = $connRead->select()->from($tableName, new Zend_Db_Expr('COUNT(*)'))
+                          ->query()
+                          ->fetchColumn();
+
+        return (int)$count;
+    }
+
+    public function getDataLength($tableName)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        $databaseName = Mage::helper('M2ePro/Magento')->getDatabaseName();
+        $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+
+        $dataLength = $connRead->select()->from('information_schema.tables', array('data_length'))
+                               ->where('`table_name` = ?', $tableName)
+                               ->where('`table_schema` = ?', $databaseName)
+                               ->query()
+                               ->fetchColumn();
+
+        return round($dataLength / 1024 / 1024, 2);
     }
 
     // --------------------------------------------

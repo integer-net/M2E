@@ -150,6 +150,8 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
                 self.selectedProductsIds = [];
                 self.selectedCategoriesData = {};
 
+                self.getGridObj().reload();
+
                 return true;
             }
         }, params);

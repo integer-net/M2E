@@ -68,7 +68,8 @@ class Ess_M2ePro_Model_Play_Search_Automatic
             if (!isset($result[0]['variations'])) {
 
                 $childListingProduct->setData('general_id',$result[0]['general_id']);
-                $childListingProduct->setData('general_id_type',Ess_M2ePro_Model_Play_Listing::GENERAL_ID_MODE_GENERAL_ID);
+                $childListingProduct->setData('general_id_type',
+                                              Ess_M2ePro_Model_Play_Listing::GENERAL_ID_MODE_GENERAL_ID);
                 $childListingProduct->setData('general_id_search_status', $statusAuto);
                 $childListingProduct->setData('general_id_search_suggest_data',NULL);
 
@@ -80,7 +81,8 @@ class Ess_M2ePro_Model_Play_Search_Automatic
                 reset($result[0]['variations']['play_ids']);
 
                 $childListingProduct->setData('general_id',key($result[0]['variations']['play_ids']));
-                $childListingProduct->setData('general_id_type',Ess_M2ePro_Model_Play_Listing::GENERAL_ID_MODE_GENERAL_ID);
+                $childListingProduct->setData('general_id_type',
+                                              Ess_M2ePro_Model_Play_Listing::GENERAL_ID_MODE_GENERAL_ID);
                 $childListingProduct->setData('general_id_search_status', $statusAuto);
                 $childListingProduct->setData('general_id_search_suggest_data',NULL);
 

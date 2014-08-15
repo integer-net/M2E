@@ -135,19 +135,40 @@ class Ess_M2ePro_Helper_Module_Database_Repair extends Mage_Core_Helper_Abstract
 
     //------------------------------------
 
+    /**
+     * @param $tableName
+     * @return string <p> OK if repair was successfully or Error Message if not. </p>
+     */
+    public function repairCrashedTable($tableName)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
+        $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+
+        $result = $connWrite->query("REPAIR TABLE `{$tableName}`")->fetch();
+        return $result['Msg_text'];
+    }
+
+    //------------------------------------
+
     public function fixColumnIndex($tableName, array $columnInfo)
     {
         if (!isset($columnInfo['name'], $columnInfo['key'])) {
             return;
         }
 
-        $indexType = Varien_Db_Adapter_Interface::INDEX_TYPE_PRIMARY;
-
-        $columnInfo['key'] == 'mul' && $indexType = Varien_Db_Adapter_Interface::INDEX_TYPE_INDEX;
-        $columnInfo['key'] == 'uni' && $indexType = Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE;
-
         $writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+
+        if (empty($columnInfo['key'])) {
+            $writeConnection->dropIndex($tableName, $columnInfo['name']);
+            return;
+        }
+
+        $indexType = Varien_Db_Adapter_Interface::INDEX_TYPE_PRIMARY;
+        $columnInfo['key'] == 'mul' && $indexType = Varien_Db_Adapter_Interface::INDEX_TYPE_INDEX;
+        $columnInfo['key'] == 'uni' && $indexType = Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE;
 
         $writeConnection->addIndex($tableName, $columnInfo['name'], $columnInfo['name'], $indexType);
     }

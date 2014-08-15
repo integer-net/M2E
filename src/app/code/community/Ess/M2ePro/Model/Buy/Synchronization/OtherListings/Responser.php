@@ -52,12 +52,12 @@ class Ess_M2ePro_Model_Buy_Synchronization_OtherListings_Responser
     protected function processResponseData($response)
     {
         $receivedItems = parent::processResponseData($response);
-        $this->processSucceededResponseData($receivedItems['data'], $receivedItems['next_part']);
+        $this->processSucceededResponseData($receivedItems['data']);
     }
 
     // --------------------------------------
 
-    private function processSucceededResponseData($receivedItems, $nextPart)
+    private function processSucceededResponseData($receivedItems)
     {
         $this->updateFirstSynchronizationTime();
 

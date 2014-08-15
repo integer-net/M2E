@@ -119,10 +119,11 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
         return $collection;
     }
 
-    public function updateMotorsSpecificsAttributesData($listingId,
-                                                        array $listingProductIds,
-                                                        $epids,
-                                                        $overwrite = false) {
+    public function updatePartsCompatibilityAttributesData($listingId,
+                                                           array $listingProductIds,
+                                                           $attribute,
+                                                           $data,
+                                                           $overwrite = false) {
         if (count($listingProductIds) == 0) {
             return;
         }
@@ -130,22 +131,17 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
         $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $listingId);
         $storeId = (int)$listing->getStoreId();
 
-        $attributeValue = implode(',', $epids);
-
         $listingProductsCollection = Mage::getModel('M2ePro/Listing_Product')->getCollection();
         $listingProductsCollection->addFieldToFilter('id', array('in' => $listingProductIds));
         $listingProductsCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
         $listingProductsCollection->getSelect()->columns(array('product_id'));
 
         $productIds = $listingProductsCollection->getColumnValues('product_id');
-        $motorsSpecificsAttribute = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/ebay/motor/','motors_specifics_attribute'
-        );
 
         if ($overwrite) {
             Mage::getSingleton('catalog/product_action')->updateAttributes(
                 $productIds,
-                array($motorsSpecificsAttribute => $attributeValue),
+                array($attribute => $data),
                 $storeId
             );
             return;
@@ -154,20 +150,20 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
         $productCollection = Mage::getModel('catalog/product')->getCollection();
         $productCollection->setStoreId($storeId);
         $productCollection->addFieldToFilter('entity_id', array('in' => $productIds));
-        $productCollection->addAttributeToSelect($motorsSpecificsAttribute);
+        $productCollection->addAttributeToSelect($attribute);
 
         foreach ($productCollection->getItems() as $itemId => $item) {
 
-            $currentAttributeValue = $item->getData($motorsSpecificsAttribute);
-            $newAttributeValue = $attributeValue;
+            $currentAttributeValue = $item->getData($attribute);
+            $newAttributeValue = $data;
 
             if (!empty($currentAttributeValue)) {
-                $newAttributeValue = $currentAttributeValue . ',' . $attributeValue;
+                $newAttributeValue = $currentAttributeValue . ',' . $data;
             }
 
             Mage::getSingleton('catalog/product_action')->updateAttributes(
                 array($itemId),
-                array($motorsSpecificsAttribute => $newAttributeValue),
+                array($attribute => $newAttributeValue),
                 $storeId
             );
         }

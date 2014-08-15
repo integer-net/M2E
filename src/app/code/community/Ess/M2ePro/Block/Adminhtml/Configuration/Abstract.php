@@ -23,11 +23,11 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Abstract extends Mage_Adminhtml_B
 
         $generalBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_general');
 
-        return $generalBlock->toHtml()
-               . '<div id="development_button_container" style="text-align: right; margin: -10px 0 8px 0; display:none;">'
-                   . $buttonBlock->toHtml()
-               . '</div>'
-               . parent::_toHtml();
+        return $generalBlock->toHtml().
+            '<div id="development_button_container" style="text-align: right; margin: -10px 0 8px 0; display:none;">'.
+                 $buttonBlock->toHtml().
+            '</div>'.
+            parent::_toHtml();
     }
 
     protected function _prepareLayout()
@@ -46,6 +46,8 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Abstract extends Mage_Adminhtml_B
         $this->getLayout()->getBlock('head')->addJs('M2ePro/Plugin/BlockNotice.js');
 
         $this->getLayout()->getBlock('head')->addJs('M2ePro/Initialization.js');
+
+        $this->getLayout()->getBlock('head')->addJs('M2ePro/Development/ControlPanelHandler.js');
 
         $this->getLayout()->getBlock('head')->addCss('M2ePro/css/main.css');
         $this->getLayout()->getBlock('head')->addCss('M2ePro/css/Plugin/BlockNotice.css');

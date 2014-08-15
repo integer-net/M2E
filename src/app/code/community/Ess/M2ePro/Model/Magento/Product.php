@@ -652,7 +652,8 @@ class Ess_M2ePro_Model_Magento_Product
                 $stockItem->getUseConfigBackorders()
             );
 
-            if ($lifeMode && (!$isInStock || $childProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED)) {
+            if ($lifeMode &&
+                (!$isInStock || $childProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED)) {
                 continue;
             }
 
@@ -684,7 +685,8 @@ class Ess_M2ePro_Model_Magento_Product
                 $stockItem->getUseConfigBackorders()
             );
 
-            if ($lifeMode && (!$isInStock || $childProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED)) {
+            if ($lifeMode &&
+                (!$isInStock || $childProduct->getStatus() != Mage_Catalog_Model_Product_Status::STATUS_ENABLED)) {
                 continue;
             }
 
@@ -735,7 +737,8 @@ class Ess_M2ePro_Model_Magento_Product
                 $itemInfoAsArray['stock_item']['use_config_backorders']
             );
 
-            if ($lifeMode && (!$isInStock || $itemInfoAsArray['status'] != Mage_Catalog_Model_Product_Status::STATUS_ENABLED)) {
+            if ($lifeMode &&
+                (!$isInStock || $itemInfoAsArray['status'] != Mage_Catalog_Model_Product_Status::STATUS_ENABLED)) {
                 continue;
             }
 
@@ -912,7 +915,8 @@ class Ess_M2ePro_Model_Magento_Product
         if (is_file($imagePathResized)) {
             $currentTime = Mage::helper('M2ePro')->getCurrentGmtDate(true);
             if (filemtime($imagePathResized) + self::THUMBNAIL_IMAGE_CACHE_TIME > $currentTime) {
-                $tempValue = str_replace(basename($imagePathOriginal),$prefixResizedImage.basename($imagePathOriginal),$tempPath);
+                $tempValue = str_replace(basename($imagePathOriginal),$prefixResizedImage.basename($imagePathOriginal),
+                                         $tempPath);
                 return Mage::app()->getStore($this->getStoreId())
                                         ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
                                         'catalog/product/'.ltrim($tempValue,'/');
@@ -937,7 +941,8 @@ class Ess_M2ePro_Model_Magento_Product
             return NULL;
         }
 
-        $tempValue = str_replace(basename($imagePathOriginal),$prefixResizedImage.basename($imagePathOriginal),$tempPath);
+        $tempValue = str_replace(basename($imagePathOriginal),$prefixResizedImage.basename($imagePathOriginal),
+                                 $tempPath);
 
         return Mage::app()->getStore($this->getStoreId())
                                         ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
@@ -951,6 +956,44 @@ class Ess_M2ePro_Model_Magento_Product
         }
 
         $imageUrl = $this->getAttributeValue($attribute);
+        return $this->prepareImageUrl($imageUrl);
+    }
+
+    public function getGalleryImageLink($position = 1)
+    {
+        $position = (int)$position;
+
+        if ($position <= 0) {
+            return '';
+        }
+
+        // need for correct sampling of the array
+        $position--;
+
+        $galleryImages = $this->getProduct()->getData('media_gallery');
+
+        if (!isset($galleryImages['images']) || !is_array($galleryImages['images'])) {
+            return '';
+        }
+
+        if (!isset($galleryImages['images'][$position])) {
+            return '';
+        }
+
+        $galleryImage = $galleryImages['images'][$position];
+
+        if (isset($galleryImage['disabled']) && (bool)$galleryImage['disabled']) {
+            return '';
+        }
+
+        if (!isset($galleryImage['file'])) {
+            return '';
+        }
+
+        $imageUrl = Mage::app()->getStore($this->getStoreId())
+                        ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
+                        'catalog/product/'.ltrim($galleryImage['file'],'/');
+
         return $this->prepareImageUrl($imageUrl);
     }
 
@@ -1263,7 +1306,6 @@ class Ess_M2ePro_Model_Magento_Product
             $attributes[$attribute->getAttributeCode()] = $attributeLabel;
         }
 
-        $set = array();
         $variations = array();
 
         foreach ($productTypeInstance->getUsedProducts(null, $product) as $childProduct) {
@@ -1291,10 +1333,18 @@ class Ess_M2ePro_Model_Magento_Product
 
             if (count($attributes) == count($variation)) {
                 $variations[] = $variation;
-                foreach ($variation as $option) {
-                    $set[$option['attribute']][] = $option['option'];
-                }
             }
+        }
+
+        $set = array();
+
+        foreach ($variations as $variation) {
+            foreach ($variation as $option) {
+                $set[$option['attribute']][] = $option['option'];
+            }
+        }
+        foreach ($set as &$options) {
+            $options = array_values(array_unique($options));
         }
 
         return array(
@@ -1527,7 +1577,7 @@ class Ess_M2ePro_Model_Magento_Product
             $configurableOption = array(
                 'option_id' => $configurableAttribute->getAttributeId(),
                 'labels' => array_filter(array_merge(
-                    array_values($attribute->getStoreLabels()),
+                    array_map('trim',array_values($attribute->getStoreLabels())),
                     array(
                         trim($configurableAttribute->getData('label')),
                         trim($attribute->getFrontendLabel())

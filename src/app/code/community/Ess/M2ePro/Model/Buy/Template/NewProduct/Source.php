@@ -188,7 +188,9 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
         if ($this->coreTemplate->isMfgPartNumberCustomValue()) {
             $mfgPartNumber = $src['custom_value'];
         } else {
-            $mfgPartNumber = $this->listingProduct->getActualMagentoProduct()->getAttributeValue($src['custom_attribute']);
+            $mfgPartNumber = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
+                $src['custom_attribute']
+            );
         }
 
         return $mfgPartNumber;
@@ -202,7 +204,9 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
         if ($this->coreTemplate->isProductSetIdCustomValue()) {
             $productSetId = $src['custom_value'];
         } elseif ($this->coreTemplate->isProductSetIdCustomAttribute()) {
-            $productSetId = $this->listingProduct->getActualMagentoProduct()->getAttributeValue($src['custom_attribute']);
+            $productSetId = $this->listingProduct->getActualMagentoProduct()->getAttributeValue(
+                $src['custom_attribute']
+            );
         }
 
         return $productSetId;
@@ -297,7 +301,9 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
 
         if ($this->coreTemplate->isAdditionalImageProduct()) {
             $limitImages = (int)$src['limit'];
-            $galleryImages = $this->listingProduct->getActualMagentoProduct()->getGalleryImagesLinks((int)$src['limit']);
+            $galleryImages = $this->listingProduct->getActualMagentoProduct()->getGalleryImagesLinks(
+                (int)$src['limit']
+            );
         }
 
         if ($this->coreTemplate->isAdditionalImageCustomAttribute()) {

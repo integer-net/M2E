@@ -27,8 +27,9 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
                 this.editSettings(id, 'synchronization');
             }.bind(this),
 
-            editMotorsSpecificsAction: function(id) {
-                this.openMotorsSpecificsPopup(id);
+            editPartsCompatibilityAction: function(id) {
+                EbayMotorCompatibilityHandlerObj.setMode('add');
+                this.openPartsCompatibilityPopup(id);
             }.bind(this)
 
         });
@@ -36,13 +37,27 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
 
     //----------------------------------
 
-    showEpidsDetails: function(content)
+    showCompatibilityDetails: function(listingProductId, compatibilityType)
     {
-        this.openPopUp(
-            M2ePro.translator.translate('Compatibility Attribute ePIDs'),
-            content,
-            {width: 500, height: 405}
-        );
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/motorViewDetails') ,
+        {
+            method: 'get',
+            asynchronous : true,
+            parameters : {
+                listing_product_id: listingProductId,
+                compatibility_type: compatibilityType
+            },
+            onSuccess: function (transport)
+            {
+                this.openPopUp(
+                    M2ePro.translator.translate('Compatibility Attribute'),
+                    transport.responseText,
+                    {width: 610, height: 310}
+                );
+
+                EbayMotorCompatibilityHandlerObj.setMode('view');
+            }.bind(this)
+        });
     },
 
     //----------------------------------
@@ -70,10 +85,12 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
         });
     },
 
-    openMotorsSpecificsPopup: function(id)
+    openPartsCompatibilityPopup: function(id)
     {
+        EbayMotorCompatibilityHandlerObj.savedNotes = {};
+
         this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
-        EbayMotorSpecificHandlerObj.openPopUp();
+        EbayMotorCompatibilityHandlerObj.openPopUp();
     },
 
     //----------------------------------

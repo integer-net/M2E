@@ -7,10 +7,9 @@
 class Ess_M2ePro_Block_Adminhtml_Development_Inspection_DatabaseBrokenTables
     extends Ess_M2ePro_Block_Adminhtml_Development_Inspection_Abstract
 {
-    public $emptyTables = array();
+    public $emptyTables        = array();
     public $notInstalledTables = array();
-
-    private $existsTables = array();
+    public $crashedTables      = array();
 
     // ########################################
 
@@ -32,40 +31,34 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_DatabaseBrokenTables
 
     protected function isShown()
     {
-        return !empty($this->emptyTables) || !empty($this->notInstalledTables);
+        return !empty($this->emptyTables) ||
+               !empty($this->notInstalledTables) ||
+               !empty($this->crashedTables);
     }
 
     // ########################################
 
     private function prepareTablesInfo()
     {
-        $this->emptyTables = $this->getEmptyTables();
+        $this->emptyTables        = $this->getEmptyTables();
         $this->notInstalledTables = $this->getNotInstalledTables();
+        $this->crashedTables      = $this->getCrashedTables();
     }
 
     // ########################################
 
     private function getEmptyTables()
     {
+        $helper = Mage::helper('M2ePro/Module_Database_Structure');
+
         $emptyTables = array();
-
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $resource = Mage::getSingleton('core/resource');
-
         foreach ($this->getGeneralTables() as $table) {
 
-            $moduleTable = $resource->getTableName($table);
-
-            if(!$this->isTableExists($moduleTable)) {
+            if(!$helper->isTableReady($table)) {
                 continue;
             }
 
-            $dbSelect = $connRead->select()->from($moduleTable, new Zend_Db_Expr('COUNT(*)'));
-
-            if ((int)$connRead->fetchOne($dbSelect) == 0) {
-                $emptyTables[] = $table;
-            }
+            !$helper->getCountOfRecords($table) && $emptyTables[] = $table;
         }
 
         return $emptyTables;
@@ -73,17 +66,26 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_DatabaseBrokenTables
 
     private function getNotInstalledTables()
     {
+        $helper = Mage::helper('M2ePro/Module_Database_Structure');
+
         $notInstalledTables = array();
-
-        $resource = Mage::getSingleton('core/resource');
-
-        foreach (Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables() as $tableName) {
-            if (!$this->isTableExists($resource->getTableName($tableName))) {
-                $notInstalledTables[] = $tableName;
-            }
+        foreach ($helper->getMySqlTables() as $tableName) {
+            !$helper->isTableExists($tableName) && $notInstalledTables[] = $tableName;
         }
 
         return $notInstalledTables;
+    }
+
+    private function getCrashedTables()
+    {
+        $helper = Mage::helper('M2ePro/Module_Database_Structure');
+
+        $crashedTables = array();
+        foreach ($helper->getMySqlTables() as $tableName) {
+            !$helper->isTableStatusOk($tableName) && $crashedTables[] = $tableName;
+        }
+
+        return $crashedTables;
     }
 
     // ########################################
@@ -101,22 +103,6 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_DatabaseBrokenTables
             'm2epro_buy_marketplace',
             'm2epro_play_marketplace'
         );
-    }
-
-    // ########################################
-
-    private function isTableExists($tableName)
-    {
-        if (isset($this->existsTables[$tableName])) {
-            return $this->existsTables[$tableName];
-        }
-
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $tableExistsSql = $connRead->quoteInto("SHOW TABLE STATUS LIKE ?", $tableName);
-
-        $this->existsTables[$tableName] = $connRead->fetchRow($tableExistsSql) !== false;
-
-        return $this->existsTables[$tableName];
     }
 
     // ########################################

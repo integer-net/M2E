@@ -43,7 +43,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
 
         $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),'Get details from eBay');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
+                                                         'Get details from eBay');
         $details = $this->receiveFromEbay($marketplace);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 

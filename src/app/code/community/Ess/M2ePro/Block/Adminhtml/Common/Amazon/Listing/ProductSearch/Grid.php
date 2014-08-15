@@ -133,8 +133,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Grid extend
 
     public function callbackColumnGeneralId($value, $product, $column, $isExport)
     {
-        $url = Mage::helper('M2ePro/Component_Amazon')
-                                         ->getItemUrl($value, Mage::helper('M2ePro/Data_Global')->getValue('marketplace_id'));
+        $url = Mage::helper('M2ePro/Component_Amazon')->getItemUrl(
+            $value, Mage::helper('M2ePro/Data_Global')->getValue('marketplace_id')
+        );
 
         return '<a id="asin_link_'.$product->getData('id').'" href="'.$url.'" target="_blank">'.$value.'</a>';
     }

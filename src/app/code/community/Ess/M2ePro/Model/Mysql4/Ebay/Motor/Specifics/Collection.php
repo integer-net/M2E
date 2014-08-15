@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Mysql4_Ebay_MotorSpecifics_Collection
+class Ess_M2ePro_Model_Mysql4_Ebay_Motor_Specifics_Collection
     extends Varien_Data_Collection_Db
 {
     // ########################################

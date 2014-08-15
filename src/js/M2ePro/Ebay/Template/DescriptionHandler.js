@@ -259,6 +259,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
     select_attributes_image_change: function()
     {
         $$('.all-products-images').invoke(this.value == 'media_gallery' ? 'show' : 'hide');
+        $$('.all-products-image').invoke(this.value == 'image' ? 'show' : 'hide');
         if (this.value == 'image') {
             $('display_products_images').value = 'custom_settings';
         }
@@ -354,6 +355,10 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
             template += ',1';
         } else {
             template += ',';
+        }
+
+        if ($('select_attributes_image').value == 'image') {
+            template += ',' + $('select_attributes_image_order_position').value;
         }
 
         template += ']#';

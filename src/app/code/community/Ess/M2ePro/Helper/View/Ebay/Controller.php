@@ -51,7 +51,8 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
 
         // M2ePro_TRANSLATIONS
         // New buyer negative feedback was received. Go to the <a href="%url%" target="blank">feedback page</a>.
-        $message = 'New buyer negative feedback was received. Go to the <a href="%url%" target="blank">feedback page</a>.';
+        $message = 'New buyer negative feedback was received. '
+            .'Go to the <a href="%url%" target="blank">feedback page</a>.';
         $message = Mage::helper('M2ePro')->__($message, $url);
 
         $controller->getSession()->addNotice($message);

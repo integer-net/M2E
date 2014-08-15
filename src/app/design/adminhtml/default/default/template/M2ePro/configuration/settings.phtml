@@ -11,6 +11,8 @@
     Event.observe(window, 'load', function() {
         SettingsHandlerObj = new ConfigurationSettingsHandler();
 
+        ControlPanelHandlerObj = new ControlPanelHandler();
+
         //------------------------------
 
         $('force_qty_mode').simulate('change');

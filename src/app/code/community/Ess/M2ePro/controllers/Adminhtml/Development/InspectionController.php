@@ -33,7 +33,7 @@ class Ess_M2ePro_Adminhtml_Development_InspectionController
         $block = $this->getLayout()->createBlock('M2ePro/adminhtml_development_inspection_cronScheduleTable');
 
         $this->_addContent($block);
-        $this->renderLayout();
+        return $this->renderLayout();
     }
 
     public function cronScheduleTableShowMessagesAction()
@@ -44,6 +44,22 @@ class Ess_M2ePro_Adminhtml_Development_InspectionController
         }
 
         return $this->getResponse()->setBody(Mage::getModel('cron/schedule')->load($id)->getMessages());
+    }
+
+    //---------------------------------------------
+
+    public function repairCrashedTableAction()
+    {
+        if (!$tableName = $this->getRequest()->getParam('table_name')) {
+            $this->_getSession()->addError('Table Name is not presented.');
+            return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageInspectionTabUrl());
+        }
+
+        $resultMessage = Mage::helper('M2ePro/Module_Database_Repair')->repairCrashedTable($tableName);
+        $resultMessage == 'OK' ? $this->_getSession()->addSuccess('Successfully repaired.')
+                               : $this->_getSession()->addError($resultMessage);
+
+        return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageInspectionTabUrl());
     }
 
     //#############################################

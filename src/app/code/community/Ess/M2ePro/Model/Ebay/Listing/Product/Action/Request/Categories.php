@@ -30,9 +30,18 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
 
         $data['attribute_set'] = $this->getAttributeSetData();
 
-        if ($this->getMarketplace()->getId() == Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_MOTORS) {
-            $tempData = $this->getMotorsSpecificsData();
+        if ($this->getCompatibilityHelper()->isMarketplaceSupportsSpecific($this->getMarketplace()->getId())) {
+            $tempData = $this->getPartsCompatibilityData(
+                Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC
+            );
             $tempData !== false && $data['motors_specifics'] = $tempData;
+        }
+
+        if ($this->getCompatibilityHelper()->isMarketplaceSupportsKtype($this->getMarketplace()->getId())) {
+            $tempData = $this->getPartsCompatibilityData(
+                Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_KTYPE
+            );
+            $tempData !== false && $data['motors_ktypes'] = $tempData;
         }
 
         return $data;
@@ -170,87 +179,155 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
         return $data;
     }
 
-    public function getMotorsSpecificsData()
+    // ----------------------------------------
+
+    public function getPartsCompatibilityData($type)
     {
-        if (!$this->isSetMotorsSpecificsAttribute()) {
-            return false;
-        }
-
-        $ebayAttributes = $this->getEbayMotorsSpecificsAttributes();
-
-        if (empty($ebayAttributes)) {
+        if (!$this->isSetCompatibilityAttribute($type)) {
             return false;
         }
 
         $this->searchNotFoundAttributes();
 
-        $savedAttributes = $this->getSavedMotorsSpecificsAttributes();
+        $rawData = $this->getRawCompatibilityData($type);
 
         if (!$this->processNotFoundAttributes('Compatibility')) {
             return false;
         }
 
-        $data = array();
-        $emptySavedAttributes = array();
-
-        foreach ($savedAttributes as $epid => $savedAttribute) {
-
-            $compatibilityList = array();
-
-            if($savedAttribute != null) {
-
-                $compatibilityData = $this->buildSpecificsCompatibilityData($savedAttribute);
-
-                foreach ($compatibilityData as $key => $value) {
-
-                    if ($value == '--') {
-                        unset($compatibilityData[$key]);
-                        continue;
-                    }
-
-                    $name = $key;
-
-                    foreach ($ebayAttributes as $ebayAttribute) {
-                        if ($ebayAttribute['title'] == $key) {
-                            $name = $ebayAttribute['ebay_id'];
-                            break;
-                        }
-                    }
-
-                    $compatibilityList[] = array(
-                        'name'  => $name,
-                        'value' => $value
-                    );
-                }
-            } else {
-                $emptySavedAttributes[] = $epid;
-            }
-
-            $data[] = $compatibilityList;
+        if ($type == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC) {
+            return $this->getPreparedMotorPartsCompatibilitySpecificData($rawData);
         }
 
-        if(count($emptySavedAttributes) > 0) {
-            $isSingleEpid = count($emptySavedAttributes) > 1;
-            $msg = 'The '.implode(', ', $emptySavedAttributes).' ePID'.($isSingleEpid ? 's' : '');
+        if ($type == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_KTYPE) {
+            return $this->getPreparedMotorPartsCompatibilityKtypeData($rawData);
+        }
+
+        return NULL;
+    }
+
+    // ########################################
+
+    private function getPreparedMotorPartsCompatibilitySpecificData($data)
+    {
+        $ebayAttributes = $this->getEbayMotorsSpecificsAttributes();
+
+        $preparedData = array();
+        $emptySavedEpids = array();
+
+        foreach ($data as $epid => $epidData) {
+            if (empty($epidData['info'])) {
+                $emptySavedEpids[] = $epid;
+                continue;
+            }
+
+            $compatibilityList = array();
+            $compatibilityData = $this->buildSpecificsCompatibilityData($epidData['info']);
+
+            foreach ($compatibilityData as $key => $value) {
+
+                if ($value == '--') {
+                    unset($compatibilityData[$key]);
+                    continue;
+                }
+
+                $name = $key;
+
+                foreach ($ebayAttributes as $ebayAttribute) {
+                    if ($ebayAttribute['title'] == $key) {
+                        $name = $ebayAttribute['ebay_id'];
+                        break;
+                    }
+                }
+
+                $compatibilityList[] = array(
+                    'name'  => $name,
+                    'value' => $value
+                );
+            }
+
+            $preparedData[] = array(
+                'list' => $compatibilityList,
+                'note' => $epidData['note'],
+            );
+        }
+
+        if(count($emptySavedEpids) > 0) {
+            $isSingleEpid = count($emptySavedEpids) > 1;
+            $msg = 'The '.implode(', ', $emptySavedEpids).' ePID'.($isSingleEpid ? 's' : '');
             $msg .= ' specified in the Compatibility Attribute';
             $msg .= ' were dropped out of the listing because '.($isSingleEpid ? 'it was' : 'they were');
             $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';
             $this->addWarningMessage($msg);
         }
 
-        return $data;
+        return $preparedData;
     }
 
-    // ########################################
-
-    private function isSetMotorsSpecificsAttribute()
+    private function getPreparedMotorPartsCompatibilityKtypeData($data)
     {
-        $attributeCode  = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/ebay/motor/', 'motors_specifics_attribute'
-        );
+        $preparedData = array();
+        $emptySavedKtypes = array();
 
+        foreach ($data as $ktype => $ktypeData) {
+            if (empty($ktypeData['info'])) {
+                $emptySavedKtypes[] = $ktype;
+                continue;
+            }
+
+            $preparedData[] = array(
+                'ktype' => $ktype,
+                'note' => $ktypeData['note'],
+            );
+        }
+
+        if(count($emptySavedKtypes) > 0) {
+            $isSingleKtype = count($emptySavedKtypes) > 1;
+            $msg = 'The '.implode(', ', $emptySavedKtypes).' KType'.($isSingleKtype ? 's' : '');
+            $msg .= ' specified in the Compatibility Attribute';
+            $msg .= ' were dropped out of the listing because '.($isSingleKtype ? 'it was' : 'they were');
+            $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';
+            $this->addWarningMessage($msg);
+        }
+
+        return $preparedData;
+    }
+
+    // ----------------------------------------
+
+    private function isSetCompatibilityAttribute($type)
+    {
+        $attributeCode  = $this->getCompatibilityAttribute($type);
         return !empty($attributeCode);
     }
+
+    private function getRawCompatibilityData($type)
+    {
+        $attributeValue = $this->getMagentoProduct()->getAttributeValue($this->getCompatibilityAttribute($type));
+        if (empty($attributeValue)) {
+            return array();
+        }
+
+        $compatibilityData = $this->getCompatibilityHelper()->parseAttributeValue($attributeValue);
+
+        $typeIdentifier = $this->getCompatibilityHelper()->getIdentifierKey($type);
+
+        $select = Mage::getResourceModel('core/config')->getReadConnection()
+            ->select()
+            ->from($this->getCompatibilityHelper()->getDictionaryTable($type))
+            ->where(
+                '`'.$typeIdentifier.'` IN (?)',
+                array_keys($compatibilityData)
+            );
+
+        foreach ($select->query()->fetchAll() as $attributeRow) {
+            $compatibilityData[$attributeRow[$typeIdentifier]]['info'] = $attributeRow;
+        }
+
+        return $compatibilityData;
+    }
+
+    // ----------------------------------------
 
     private function getEbayMotorsSpecificsAttributes()
     {
@@ -266,54 +343,18 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
         return $attributes;
     }
 
-    // ----------------------------------------
-
-    private function getSavedMotorsSpecificsAttributes()
-    {
-        $attributeCode  = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-            '/ebay/motor/', 'motors_specifics_attribute'
-        );
-
-        $attributeValue = $this->getMagentoProduct()->getAttributeValue($attributeCode);
-
-        if (empty($attributeValue)) {
-            return array();
-        }
-
-        $attributes = array();
-
-        $epids = explode(',', $attributeValue);
-
-        foreach ($epids as $epid) {
-            $attributes[$epid] = NULL;
-        }
-
-        $attributesSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                               ->select()
-                               ->from(Mage::getSingleton('core/resource')
-                                          ->getTableName('m2epro_ebay_dictionary_motor_specific'))
-                               ->where('`epid` IN (?)', $epids);
-
-        foreach ($attributesSelect->query()->fetchAll() as $attributeRow) {
-            $attributes[$attributeRow['epid']] = $attributeRow;
-        }
-
-        return $attributes;
-    }
-
     private function buildSpecificsCompatibilityData($resource)
     {
         $compatibilityData = array(
             'Make'  => $resource['make'],
             'Model' => $resource['model'],
-            'Year'  => $resource['year']
+            'Year'  => $resource['year'],
+            'Submodel' => $resource['submodel'],
         );
 
-        if ((int)$resource['product_type'] == Ess_M2ePro_Helper_Component_Ebay_MotorSpecific::TYPE_VEHICLE) {
+        if ($resource['product_type'] == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::PRODUCT_TYPE_VEHICLE) {
             $compatibilityData['Trim'] = $resource['trim'];
             $compatibilityData['Engine'] = $resource['engine'];
-        } else {
-            $compatibilityData['Submodel'] = $resource['submodel'];
         }
 
         return $compatibilityData;
@@ -345,6 +386,21 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
                                                 ->getOtherCategoryTemplate();
         }
         return $this->otherCategoryTemplate;
+    }
+
+    // ########################################
+
+    /**
+     * @return Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility
+     */
+    private function getCompatibilityHelper()
+    {
+        return Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility');
+    }
+
+    private function getCompatibilityAttribute($type)
+    {
+        return $this->getCompatibilityHelper()->getAttribute($type);
     }
 
     // ########################################

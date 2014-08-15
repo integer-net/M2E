@@ -416,8 +416,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_Grid extends Mage_A
 
         foreach ($logRows as $row) {
 
-            $row['description'] = Mage::helper('M2ePro')->escapeHtml($row['description']);
-            $row['description'] = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row['description']);
+            $row['description'] = Mage::helper('M2ePro/View')->getModifiedLogMessage($row['description']);
 
             if ($row['action_id'] !== $lastActionId) {
                 if (count($tempActionRows) > 0) {

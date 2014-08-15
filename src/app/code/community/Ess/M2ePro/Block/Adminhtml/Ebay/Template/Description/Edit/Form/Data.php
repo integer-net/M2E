@@ -163,12 +163,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
         //------------------------------
 
         $buttonBlock = $this->getLayout()
-            ->createBlock('adminhtml/widget_button')
-            ->setData( array(
-                'label'   => Mage::helper('M2ePro')->__('Preview'),
-                'onclick' => 'EbayTemplateDescriptionHandlerObj.preview_click(\''.implode(',', $this->attributeSets).'\')',
-                'class' => 'bt_preview',
-            ) );
+         ->createBlock('adminhtml/widget_button')
+         ->setData( array(
+            'label'   => Mage::helper('M2ePro')->__('Preview'),
+            'onclick' => 'EbayTemplateDescriptionHandlerObj.preview_click(\''.implode(',', $this->attributeSets).'\')',
+            'class' => 'bt_preview',
+         ) );
         $this->setChild('preview_button',$buttonBlock);
         //------------------------------
 

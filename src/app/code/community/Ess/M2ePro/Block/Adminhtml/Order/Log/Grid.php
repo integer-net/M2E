@@ -159,7 +159,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
 
     public function callbackColumnMessage($value, $row, $column, $isExport)
     {
-        return Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($row->getData('message'));
+        return Mage::helper('M2ePro/View')->getModifiedLogMessage($row->getData('message'));
     }
 
     public function callbackColumnType($value, $row, $column, $isExport)

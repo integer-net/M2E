@@ -138,7 +138,9 @@ Subject: {$subject}
 
 
 DATA;
-        $severity ? str_replace('%severity%', "Severity: {$severity}", $body) : str_replace('%severity%', '', $body);
+
+        $severity = $severity ? "Severity: {$severity}" : '';
+        $body = str_replace('%severity%', $severity, $body);
 
         $body .= $this->getSummaryInfo();
 

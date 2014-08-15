@@ -257,7 +257,10 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         }
 
         if (!empty($itemsGiftPrices)) {
-            $comment = '<u>'.Mage::helper('M2ePro')->__('The following items are purchased with gift wraps') . ':</u><br />';
+
+            $comment = '<u>'.
+                Mage::helper('M2ePro')->__('The following items are purchased with gift wraps') .
+                ':</u><br />';
 
             foreach ($itemsGiftPrices as $productInfo) {
                 $formattedCurrency = Mage::getSingleton('M2ePro/Currency')->formatPrice(

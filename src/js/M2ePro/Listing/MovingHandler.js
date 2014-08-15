@@ -45,15 +45,11 @@ ListingMovingHandler = Class.create(ActionHandler, {
 
     getGridHtml: function(selectedProducts)
     {
-        if (typeof init == 'function') {
-            init();
-        }
-
-        this.selectedProducts = selectedProducts;
-
         var self = this;
+
         MagentoMessageObj.clearAll();
 
+        self.selectedProducts = selectedProducts;
         self.gridHandler.unselectAll();
 
         var callback = function(response) {

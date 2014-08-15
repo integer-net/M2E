@@ -309,8 +309,8 @@ HTML;
 <tr>
     <td>{$tableName}</td>
     <td>{$resultRow['message']}</td>
-    <td>{$additionalInfo}</td>
-    <td>{$actionsHtml}</td>
+    <td>&nbsp;{$additionalInfo}&nbsp;</td>
+    <td>&nbsp;{$actionsHtml}&nbsp}</td>
 </tr>
 HTML;
             }

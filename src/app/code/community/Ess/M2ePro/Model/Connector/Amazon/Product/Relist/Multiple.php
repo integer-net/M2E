@@ -85,11 +85,13 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Relist_Multiple
             $qty = $listingProduct->getChildObject()->getQty();
 
             if ($qty <= 0) {
-            // M2ePro_TRANSLATIONS
-            // The quantity must be greater than 0. Please, check the Selling Format Template and Product settings.
+
+                // M2ePro_TRANSLATIONS
+                // The quantity must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
-                    'The quantity must be greater than 0. Please, check the Selling Format Template and Product settings.',
+                    'The quantity must be greater than 0. '.
+                    'Please, check the Selling Format Template and Product settings.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );

@@ -144,7 +144,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
             'index'     => 'action',
             'sortable'  => false,
             'filter_index' => 'main_table.action',
-            'options' => Mage::getModel('M2ePro/Listing_Other_Log')->getActionsTitles()
+            'options' => $this->getActionTitles(),
         ));
 
         $this->addColumn('description', array(
@@ -268,6 +268,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
     // ####################################
 
     abstract protected function getColumnTitles();
+
+    // ####################################
+
+    abstract protected function getActionTitles();
 
     // ####################################
 }

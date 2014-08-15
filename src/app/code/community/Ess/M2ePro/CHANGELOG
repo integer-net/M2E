@@ -1,3 +1,23 @@
+* 6.1.9 (r6919) (14/08/2014)
+
+* Added: Ability to click on the URLs in logs texts
+* Added: [eBay] Shipping Rate Table for eBay Motors marketplace
+* Added: [eBay] Parts compatibility K-Types support for UK, DE and AU marketplaces
+* Added: [eBay] Note for each Parts compatibility separately (for ePIDs, for K-Types)
+* Added: [eBay] Ability to add certain image from product media gallery into Custom Description
+* Added: [eBay] Buyer Tax ID value in orders (eBay order info, Magento order info)
+* Added: [eBay] Support of Shipping Surcharge for US and Motors
+* Improvement: [eBay] Allow to remove sandbox account with active listings and products
+* Improvement: [Amazon] Marketplace cannot be changed for existing accounts
+* Fix: Use Admin (Default) Store View when cron service is working
+* Fix: big amount of wrong messages in Listings and 3rd Party Listings logs
+* Fix: Full revise of product data was performed sometimes instead of revise only one certain criteria
+* Fix: [eBay] wrong calculating of configurable variations (incorrect set of options)
+* Fix: [eBay] The value <%value%> of type <EAN>/<UPC>/etc. does not exist in our Catalogue.
+* Fix: [Amazon / Rakuten.com / Play.com] it was not possible to move the 3rd party items into M2ePro listings manually
+* Fix: [Rakuten.com] Notice 'Undefined index: next_part' in some cases during 3rd party items synchronization
+* Removed: [Amazon / Rakuten.com / Play.com] Wrong types of log records in the grid filters
+
 * 6.1.8 (r6757) (01/08/2014)
 
 * Added: [eBay] ability to use GTIN and Brand/MPN as eBay Catalog Identifiers in description policy

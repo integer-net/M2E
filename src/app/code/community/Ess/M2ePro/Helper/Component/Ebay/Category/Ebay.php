@@ -137,7 +137,9 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
 
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $tableDictMarketplaces = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_marketplace');
+        $tableDictMarketplaces = Mage::getSingleton('core/resource')->getTableName(
+            'm2epro_ebay_dictionary_marketplace'
+        );
 
         $dbSelect = $connRead->select()
             ->from($tableDictMarketplaces,'categories_features_defaults')

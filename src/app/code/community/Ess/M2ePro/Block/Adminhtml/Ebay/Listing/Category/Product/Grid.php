@@ -533,7 +533,8 @@ HTML;
 
         $primaryCategory = array('selected' => array(), 'blank' => array());
         foreach ($sessionData['mode_product'] as $listingProductId => $listingProductData) {
-            if ($listingProductData['category_main_mode'] != Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE) {
+            if ($listingProductData['category_main_mode'] !=
+                    Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE) {
                 $primaryCategory['selected'][] = $listingProductId;
                 continue;
             }

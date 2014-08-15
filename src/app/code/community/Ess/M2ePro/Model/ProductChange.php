@@ -28,32 +28,52 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
     public function addCreateAction($productId, $creatorType = self::CREATOR_TYPE_UNKNOWN)
     {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $connWrite->delete($this->getResource()->getMainTable(),array('product_id = ?'=>(int)$productId));
+        $tempCollection = Mage::getModel('M2ePro/ProductChange')
+                                ->getCollection()
+                                ->addFieldToFilter('product_id', $productId)
+                                ->addFieldToFilter('action', self::ACTION_CREATE);
 
-        $dataForAdd = array('product_id' => $productId,
-                            'action' => self::ACTION_CREATE,
-                            'creator_type' => $creatorType );
+        $tempChanges = $tempCollection->toArray();
 
-        Mage::getModel('M2ePro/ProductChange')
-                 ->setData($dataForAdd)
-                 ->save();
+        if ($tempChanges['totalRecords'] <= 0) {
+
+            $dataForAdd = array('product_id' => $productId,
+                                'action' => self::ACTION_CREATE,
+                                'creator_type' => $creatorType);
+
+            Mage::getModel('M2ePro/ProductChange')
+                     ->setData($dataForAdd)
+                     ->save();
+
+            return true;
+        }
+
+        return false;
     }
 
     public function addDeleteAction($productId, $creatorType = self::CREATOR_TYPE_UNKNOWN)
     {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $connWrite->delete($this->getResource()->getMainTable(),array('product_id = ?'=>(int)$productId));
+        $tempCollection = Mage::getModel('M2ePro/ProductChange')
+                                ->getCollection()
+                                ->addFieldToFilter('product_id', $productId)
+                                ->addFieldToFilter('action', self::ACTION_DELETE);
 
-        $dataForAdd = array('product_id' => $productId,
-                            'action' => self::ACTION_DELETE,
-                            'creator_type' => $creatorType );
+        $tempChanges = $tempCollection->toArray();
 
-        Mage::getModel('M2ePro/ProductChange')
-                 ->setData($dataForAdd)
-                 ->save();
+        if ($tempChanges['totalRecords'] <= 0) {
+
+            $dataForAdd = array('product_id' => $productId,
+                                'action' => self::ACTION_DELETE,
+                                'creator_type' => $creatorType);
+
+            Mage::getModel('M2ePro/ProductChange')
+                     ->setData($dataForAdd)
+                     ->save();
+
+            return true;
+        }
+
+        return false;
     }
 
     public function addUpdateAction($productId, $creatorType = self::CREATOR_TYPE_UNKNOWN)
@@ -71,7 +91,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
             $dataForAdd = array('product_id' => $productId,
                                 'action' => self::ACTION_UPDATE,
                                 'attribute' => self::UPDATE_ATTRIBUTE_CODE,
-                                'creator_type' => $creatorType );
+                                'creator_type' => $creatorType);
 
             Mage::getModel('M2ePro/ProductChange')
                      ->setData($dataForAdd)
@@ -110,14 +130,14 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
                  return false;
              }
 
-             $dataForAdd = array( 'product_id' => $productId,
-                                  'store_id' => $storeId,
-                                  'action' => self::ACTION_UPDATE,
-                                  'attribute' => $attribute,
-                                  'value_old' => $valueOld,
-                                  'value_new' => $valueNew,
-                                  'count_changes' => 1,
-                                  'creator_type' => $creatorType );
+             $dataForAdd = array('product_id' => $productId,
+                                 'store_id' => $storeId,
+                                 'action' => self::ACTION_UPDATE,
+                                 'attribute' => $attribute,
+                                 'value_old' => $valueOld,
+                                 'value_new' => $valueNew,
+                                 'count_changes' => 1,
+                                 'creator_type' => $creatorType);
 
              Mage::getModel('M2ePro/ProductChange')
                      ->setData($dataForAdd)
@@ -136,9 +156,9 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
         } else if ($valueOld != $valueNew) {
 
-             $dataForUpdate = array( 'value_new' => $valueNew,
-                                     'count_changes' => $tempChanges['items'][0]['count_changes']+1,
-                                     'creator_type' => $creatorType );
+             $dataForUpdate = array('value_new' => $valueNew,
+                                    'count_changes' => $tempChanges['items'][0]['count_changes']+1,
+                                    'creator_type' => $creatorType);
 
              Mage::getModel('M2ePro/ProductChange')
                      ->load($tempChanges['items'][0]['id'])

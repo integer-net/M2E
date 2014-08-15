@@ -213,8 +213,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             );
 
             if ($this->getShippingTemplate()->isLocalShippingFlatEnabled()) {
+
                 $tempDataMethod['cost'] = $service->getCost();
                 $tempDataMethod['cost_additional'] = $service->getCostAdditional();
+
+                if (in_array($this->getShippingTemplate()->getMarketplaceId(), array(
+                        Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_US,
+                        Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_MOTORS,
+                    )) && preg_match('/(FedEx|UPS)/', $service->getShippingValue())) {
+
+                    $tempDataMethod['cost_surcharge'] = $service->getCostSurcharge();
+                }
             }
 
             if ($this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
@@ -247,7 +256,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         }
 
         if ($this->getShippingTemplate()->isInternationalShippingCalculatedEnabled()) {
-            $data['handing_cost'] = $this->getShippingTemplate()->getCalculatedShipping()->getInternationalHandlingCost();
+            $data['handing_cost'] = $this->getShippingTemplate()->getCalculatedShipping()
+                                            ->getInternationalHandlingCost();
         }
 
         $data['methods'] = $this->getInternationalServices();

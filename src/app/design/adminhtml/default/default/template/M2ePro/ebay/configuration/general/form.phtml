@@ -184,23 +184,18 @@
 
     </div>
 
-    <?php if ($this->is_motors_marketplace_enabled): ?>
-        <div class="entry-edit" id="magento_block_ebay_configuration_general_motors">
+    <?php if ($this->is_motors_specifics_marketplace_enabled || $this->is_motors_ktypes_marketplace_enabled): ?>
+        <div class="entry-edit" id="magento_block_ebay_configuration_general_parts_compatibility">
 
-            <div id="block_notice_ebay_category_specific_motors_specifics" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Compatibility'); ?>">
+            <div id="block_notice_ebay_category_parts_compatibility" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Compatibility'); ?>">
                 <?php echo Mage::helper('M2ePro')->__(
-                    'Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing.
-                    You can create one listing describing a single part and add a complete list of compatible vehicles.<br/><br/>
-                    To use this feature you need to:<br/>
-                    <ul>
-                        <li>1. Choose the attribute below that contains the Product Reference IDs (ePIDs) of compatible vehicles for the part.</li>
-                        <li>2. In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible items.</li>
-                    </ul>'
+                    'Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing.<br />
+                    You can create one listing describing a single part and add a complete list of compatible vehicles'
                 ); ?>
             </div>
 
             <div class="entry-edit-head">
-                <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('eBay Motors'); ?></h4>
+                <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Parts Compatibility'); ?></h4>
             </div>
 
             <div class="fieldset">
@@ -210,23 +205,30 @@
 
                         <tbody>
 
+                        <?php if ($this->is_motors_specifics_marketplace_enabled): ?>
+
                             <tr>
                                 <td class="label">
-                                    <label for="motors_specifics_attribute"><?php echo Mage::helper('M2ePro')->__('Compatibility Attribute'); ?>:</label>
+                                    <label for="motors_specifics_attribute"><?php echo Mage::helper('M2ePro')->__('ePIDs Attribute'); ?>:</label>
                                 </td>
 
-                                <?php if (count($this->attributes_for_motors_specifics) != 0): ?>
+                                <?php if (count($this->attributes_for_parts_compatibility) != 0): ?>
                                     <td class="value">
                                         <select id="motors_specifics_attribute" name="motors_specifics_attribute" class="select">
                                             <option value="">-- <?php echo Mage::helper('M2ePro')->__('Select Attribute'); ?> --</option>
-                                            <?php foreach ($this->attributes_for_motors_specifics as $attribute): ?>
+                                            <?php foreach ($this->attributes_for_parts_compatibility as $attribute): ?>
                                                 <option value="<?php echo $attribute['attribute_code']; ?>"<?php if ($attribute['attribute_code'] == $this->motors_specifics_attribute): ?> selected="selected"<?php endif; ?>><?php echo $attribute['frontend_label']; ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </td>
                                     <td id="motors_specifics_attribute_td_note">
                                         <p class="note">
-                                            <span><?php echo Mage::helper('M2ePro')->__('Only textarea attributes are shown.'); ?></span>
+                                            <span><?php echo Mage::helper('M2ePro')->__(
+                                                    'Choose the attribute below that contains the Product Reference IDs (ePIDs) of compatible vehicles for the part.<br />
+                                                     In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible items.
+                                                     <br /><br />
+                                                     Only textarea attributes are shown.'
+                                                ); ?></span>
                                         </p>
                                     </td>
                                 <?php else: ?>
@@ -237,6 +239,45 @@
                                     </td>
                                 <?php endif; ?>
                             </tr>
+
+                        <?php endif; ?>
+
+                        <?php if ($this->is_motors_ktypes_marketplace_enabled): ?>
+
+                            <tr>
+                                <td class="label">
+                                    <label for="motors_ktypes_attribute"><?php echo Mage::helper('M2ePro')->__('KTypes Attribute'); ?>:</label>
+                                </td>
+
+                                <?php if (count($this->attributes_for_parts_compatibility) != 0): ?>
+                                    <td class="value">
+                                        <select id="motors_ktypes_attribute" name="motors_ktypes_attribute" class="select">
+                                            <option value="">-- <?php echo Mage::helper('M2ePro')->__('Select Attribute'); ?> --</option>
+                                            <?php foreach ($this->attributes_for_parts_compatibility as $attribute): ?>
+                                                <option value="<?php echo $attribute['attribute_code']; ?>"<?php if ($attribute['attribute_code'] == $this->motors_ktypes_attribute): ?> selected="selected"<?php endif; ?>><?php echo $attribute['frontend_label']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </td>
+                                    <td id="motors_ktypes_attribute_td_note">
+                                        <p class="note">
+                                            <span><?php echo Mage::helper('M2ePro')->__(
+                                                    'Choose the attribute below that contains the KTypes of compatible vehicles for the part.<br />
+                                                     In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible items.
+                                                     <br /><br />
+                                                     Only textarea attributes are shown.'
+                                                ); ?></span>
+                                        </p>
+                                    </td>
+                                <?php else: ?>
+                                    <td class="value">
+                                        <div id="block_notice_ebay_configuration_motors_ktypes_attribute" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+                                            <?php echo Mage::helper('M2ePro')->__('You do not have textarea attributes.'); ?>
+                                        </div>
+                                    </td>
+                                <?php endif; ?>
+                            </tr>
+
+                        <?php endif; ?>
 
                         </tbody>
 

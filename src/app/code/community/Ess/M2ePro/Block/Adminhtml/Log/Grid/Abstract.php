@@ -117,10 +117,11 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
     public function callbackDescription($value, $row, $column, $isExport)
     {
         $fullDescription = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row->getData('description'));
-        $fullDescription = htmlentities($fullDescription);
-        $row->setData('description', $fullDescription);
-        $value = $column->getRenderer()->render($row);
+        $fullDescription = Mage::helper('M2ePro')->escapeHtml($fullDescription, array(), ENT_NOQUOTES);
 
+        $row->setData('description', $fullDescription);
+
+        $value = $column->getRenderer()->render($row);
         return $this->prepareLongText($fullDescription, $value);
     }
 
@@ -129,8 +130,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
     protected function prepareLongText($fullText, $renderedText)
     {
         if (strlen($fullText) == strlen($renderedText)) {
-            return $renderedText;
+            return Mage::helper('M2ePro/View')->getModifiedLogMessage($renderedText);
         }
+
+        $fullText = Mage::helper('M2ePro/View')->getModifiedLogMessage($fullText);
 
         $renderedText .= '&nbsp;(<a href="javascript:void(0)" onclick="LogHandlerObj.showFullText(this);">more</a>)
                           <div style="display: none;"><br />'.$fullText.'<br /><br /></div>';

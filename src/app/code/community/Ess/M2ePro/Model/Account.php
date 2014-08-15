@@ -22,6 +22,10 @@ class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstrac
             return true;
         }
 
+        if ($this->isComponentModeEbay() && $this->getChildObject()->isModeSandbox()) {
+            return false;
+        }
+
         return (bool)Mage::getModel('M2ePro/Listing')
                             ->getCollection()
                             ->addFieldToFilter('account_id', $this->getId())
@@ -37,6 +41,13 @@ class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstrac
         $otherListings = $this->getOtherListings(true);
         foreach ($otherListings as $otherListing) {
             $otherListing->deleteInstance();
+        }
+
+        if ($this->isComponentModeEbay() && $this->getChildObject()->isModeSandbox()) {
+            $listings = $this->getRelatedComponentItems('Listing', 'account_id', true);
+            foreach ($listings as $listing) {
+                $listing->deleteInstance();
+            }
         }
 
         $orders = $this->getOrders(true);

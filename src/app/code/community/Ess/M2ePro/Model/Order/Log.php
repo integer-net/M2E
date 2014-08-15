@@ -16,7 +16,8 @@ class Ess_M2ePro_Model_Order_Log extends Mage_Core_Model_Abstract
 
     // ########################################
 
-    public function add($componentMode, $orderId, $message, $type, $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN)
+    public function add($componentMode, $orderId, $message, $type,
+                        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN)
     {
         $validTypeValues = array(
             Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,

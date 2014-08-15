@@ -20,7 +20,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit_Tabs_General extends
 
     protected function _beforeToHtml()
     {
-        $this->isMarketplaceLocked = false;
         $this->synchronizeProcessing = false;
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data') &&
@@ -40,10 +39,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit_Tabs_General extends
                     Mage::helper('M2ePro/Component_Amazon')->getCachedObject('Account',$accountId)
                 );
             }
-
-            $this->isMarketplaceLocked = (bool)(int)Mage::getModel('M2ePro/Listing')->getCollection()
-                                           ->addFieldToFilter('account_id',$accountObj->getId())
-                                           ->getSize();
         }
 
         $marketplaces = Mage::helper('M2ePro/Component_Amazon')->getCollection('Marketplace')

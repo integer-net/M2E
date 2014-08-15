@@ -148,7 +148,7 @@
                         </td>
                         <td class="value" style="width: auto;">
 
-                            <select id="marketplace_id" name="marketplace_id" <?php if ($this->isMarketplaceLocked) { ?>disabled="disabled"<?php } ?> onchange="AmazonAccountHandlerObj.changeMarketplace(this.value);" class="required-entry">
+                            <select id="marketplace_id" name="marketplace_id" <?php if ($isEdit) { ?>disabled="disabled"<?php } ?> onchange="AmazonAccountHandlerObj.changeMarketplace(this.value);" class="required-entry">
 
                                 <?php if (!$isEdit) { ?>
                                     <option style="display:none;"></option>
@@ -162,7 +162,7 @@
 
                             </select>
 
-                            <?php if ($this->isMarketplaceLocked) : ?>
+                            <?php if ($isEdit) : ?>
                                 <input type="hidden" name="marketplace_id" value="<?php echo $formData['marketplace_id']; ?>" />
                                 <input type="hidden" name="merchant_id" value="<?php echo $formData['merchant_id']; ?>" />
                             <?php endif; ?>
@@ -196,7 +196,7 @@
                             <label><?php echo Mage::helper('M2ePro')->__('Merchant ID'); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value" style="width: auto;">
-                            <input type="text" class="M2ePro-marketplace-merchant-id input-text" name="merchant_id" <?php if ($isEdit) echo ' value="'.$formData['merchant_id'].'"'; ?> <?php if ($this->isMarketplaceLocked) echo ' disabled="disabled"'; ?> class="input-text M2ePro-required-when-visible" />
+                            <input type="text" class="M2ePro-marketplace-merchant-id input-text" name="merchant_id" <?php if ($isEdit) echo ' value="'.$formData['merchant_id'].'"'; ?> <?php if ($isEdit) echo ' disabled="disabled"'; ?> class="input-text M2ePro-required-when-visible" />
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__('Paste generated Merchant ID from Amazon. (It must look like: A15UFR7CZVW5YA).'); ?></span>
                             </p>

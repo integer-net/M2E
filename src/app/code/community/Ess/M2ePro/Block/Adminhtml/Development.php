@@ -95,7 +95,8 @@ class Ess_M2ePro_Block_Adminhtml_Development extends Mage_Adminhtml_Block_Widget
             'items' => $this->getDocumentationDropDownItems()
         );
 
-        $dropDownBlockDocumentation = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+        $dropDownBlockDocumentation = $this->getLayout()
+                                           ->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
 
         $data = array(
             'target_css_class' => 'button_video_tutorial',
@@ -103,7 +104,8 @@ class Ess_M2ePro_Block_Adminhtml_Development extends Mage_Adminhtml_Block_Widget
             'items' => $this->getVideoTutorialDropDownItems()
         );
 
-        $dropDownBlockVideoTutorial = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+        $dropDownBlockVideoTutorial = $this->getLayout()
+                                           ->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
 
         return parent::getHeaderHtml()
         . $dropDownBlockDocumentation->toHtml()

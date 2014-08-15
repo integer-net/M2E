@@ -77,11 +77,11 @@ class Ess_M2ePro_Model_Observer_Order
                 $qtyNew = $qtyOld - (int)$quoteItem->getTotalQty();
 
                 $rez = Mage::getModel('M2ePro/ProductChange')
-                         ->updateAttribute( $product->getId(), 'qty',
-                                            $qtyOld, $qtyNew,
-                                            Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+                         ->updateAttribute($product->getId(), 'qty',
+                                           $qtyOld, $qtyNew,
+                                           Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-                if ($rez !== false) {
+                if ($rez !== false && $qtyNew != $qtyOld) {
 
                       foreach ($listingsProductsArray as $listingProductArray) {
 
@@ -133,11 +133,11 @@ class Ess_M2ePro_Model_Observer_Order
                                                     ->getMinQty());
 
                 $rez = Mage::getModel('M2ePro/ProductChange')
-                                 ->updateAttribute( $product->getId(), 'stock_availability',
-                                                    (int)$stockAvailabilityOld, (int)$stockAvailabilityNew,
-                                                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+                                 ->updateAttribute($product->getId(), 'stock_availability',
+                                                   (int)$stockAvailabilityOld, (int)$stockAvailabilityNew,
+                                                   Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-                if ($rez !== false) {
+                if ($rez !== false && $stockAvailabilityOld != $stockAvailabilityNew) {
 
                       $stockAvailabilityOld = $stockAvailabilityOld ? 'IN Stock' : 'OUT of Stock';
                       $stockAvailabilityNew = $stockAvailabilityNew ? 'IN Stock' : 'OUT of Stock';

@@ -236,7 +236,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Grid extends Mag
 
     public function getGridUrl()
     {
-        return $this->getUrl('*/adminhtml_common_buy_template_newProduct/templateNewProductGrid', array('_current'=>true));
+        return $this->getUrl('*/adminhtml_common_buy_template_newProduct/templateNewProductGrid',
+                             array('_current'=>true));
     }
 
     public function getRowUrl($row)

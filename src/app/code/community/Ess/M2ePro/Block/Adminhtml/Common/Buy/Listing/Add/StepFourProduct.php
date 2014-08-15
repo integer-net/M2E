@@ -24,7 +24,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_StepFourProduct
             $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
             $headerText = Mage::helper('M2ePro')->__("Add %component_name% Listing [Select Products]", $componentName);
         } else {
-            $headerText = Mage::helper('M2ePro')->__("Add %component_name% Listing [Select Products]");
+            $headerText = Mage::helper('M2ePro')->__("Add Listing [Select Products]");
         }
 
         $this->_headerText = $headerText;

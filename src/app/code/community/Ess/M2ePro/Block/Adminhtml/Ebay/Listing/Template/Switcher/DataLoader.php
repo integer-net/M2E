@@ -40,7 +40,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Switcher_DataLoader
 
         $marketplace = NULL;
         if ($data['marketplace_id']) {
-            $marketplace = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Marketplace', $data['marketplace_id']);
+            $marketplace = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Marketplace',
+                                                                                  $data['marketplace_id']);
         }
 
         $storeId = (int)$data['store_id'];

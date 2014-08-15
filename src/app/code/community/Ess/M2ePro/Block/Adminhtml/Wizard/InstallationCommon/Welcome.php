@@ -13,7 +13,9 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Welcome
     {
         //------------------------------
         $descriptionBlock = $this->helper('M2ePro/Module_Wizard')->createBlock('welcome_description',$this->getNick());
-        $requirementsBlock = $this->helper('M2ePro/Module_Wizard')->createBlock('welcome_requirements',$this->getNick());
+        $requirementsBlock = $this->helper('M2ePro/Module_Wizard')->createBlock(
+            'welcome_requirements',$this->getNick()
+        );
         //------------------------------
 
         //------------------------------

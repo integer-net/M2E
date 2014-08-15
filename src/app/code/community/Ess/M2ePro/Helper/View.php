@@ -155,5 +155,23 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
         return Mage::helper('adminhtml')->getUrl("*/adminhtml_{$component}_{$controller}/{$action}", $params);
     }
 
+    public function getModifiedLogMessage($logMessage)
+    {
+        $fullDescription = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($logMessage);
+        $fullDescription = Mage::helper('M2ePro')->escapeHtml($fullDescription, array(), ENT_NOQUOTES);
+
+        //-- replace urls with links
+        preg_match_all('/(http|https)\:\/\/[a-z0-9\-\._\/+\?\&\%]+/i', $logMessage, $matches);
+        $matches = array_unique($matches[0]);
+
+        foreach ($matches as $url) {
+            $url = rtrim($url, '.() ');
+            $fullDescription = str_replace($url, "<a target=\"_blank\" href=\"{$url}\">{$url}</a>", $fullDescription);
+        }
+        //--
+
+        return $fullDescription;
+    }
+
     // ########################################
 }

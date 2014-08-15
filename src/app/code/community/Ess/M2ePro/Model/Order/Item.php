@@ -279,15 +279,16 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             return;
         }
 
-        /** @var $optionsFinder Ess_M2ePro_Model_Order_Item_OptionsFinder */
-        $optionsFinder = Mage::getModel('M2ePro/Order_Item_OptionsFinder', $variation);
-        $optionsFinder->setMagentoProduct($magentoProduct);
+        $magentoOptions = $this->prepareMagentoOptions($magentoProduct->getProductVariationsForOrder());
 
-        try {
-            $productDetails = $optionsFinder->getProductDetails();
-        } catch (Exception $e) {
-            throw $e;
-        }
+        /** @var $optionsFinder Ess_M2ePro_Model_Order_Item_OptionsFinder */
+        $optionsFinder = Mage::getModel('M2ePro/Order_Item_OptionsFinder');
+        $optionsFinder->setProductId($magentoProduct->getProductId());
+        $optionsFinder->setProductType($magentoProduct->getTypeId());
+        $optionsFinder->setChannelOptions($variation);
+        $optionsFinder->setMagentoOptions($magentoOptions);
+
+        $productDetails = $optionsFinder->getProductDetails();
 
         if (!isset($productDetails['associated_options'])) {
             return;
@@ -319,6 +320,15 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             // options were already mapped, but not all of them
             throw new LogicException('Selected options do not match the product options.');
         }
+    }
+
+    public function prepareMagentoOptions($options)
+    {
+        if (method_exists($this->getChildObject(), 'prepareMagentoOptions')) {
+            return $this->getChildObject()->prepareMagentoOptions($options);
+        }
+
+       return $options;
     }
 
     // ########################################
@@ -393,9 +403,13 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             $associatedProducts = reset($associatedProducts);
         }
 
+        $magentoOptions = $this->prepareMagentoOptions($magentoProduct->getProductVariationsForOrder());
+
         /** @var $optionsFinder Ess_M2ePro_Model_Order_Item_OptionsFinder */
         $optionsFinder = Mage::getModel('M2ePro/Order_Item_OptionsFinder');
-        $optionsFinder->setMagentoProduct($this->getMagentoProduct());
+        $optionsFinder->setProductId($magentoProduct->getProductId());
+        $optionsFinder->setProductType($magentoProduct->getTypeId());
+        $optionsFinder->setMagentoOptions($magentoOptions);
 
         $associatedProducts = $optionsFinder->prepareAssociatedProducts($associatedProducts);
 

@@ -103,6 +103,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
         $this->setData('buyer_name', trim($data['buyer']['name']));
         $this->setData('buyer_email', trim($data['buyer']['email']));
         $this->setData('buyer_message', $data['buyer']['message']);
+        $this->setData('buyer_tax_id', trim($data['buyer']['tax_id']));
         // ------------------
 
         // ------------------

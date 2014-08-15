@@ -61,11 +61,12 @@ class Ess_M2ePro_Model_Connector_Play_Product_Revise_Multiple
                 $priceGbr = $listingProduct->getChildObject()->getPriceGbr(true);
 
                 if ($priceGbr <= 0) {
-                // M2ePro_TRANSLATIONS
-                // The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.
+            // M2ePro_TRANSLATIONS
+            // The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.
                     $this->addListingsProductsLogsMessage(
                         $listingProduct,
-                        'The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.',
+                        'The price GBP must be greater than 0. '.
+                        'Please, check the Selling Format Template and Product settings.',
                         Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );

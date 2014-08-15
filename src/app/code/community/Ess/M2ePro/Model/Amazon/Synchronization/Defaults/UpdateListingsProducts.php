@@ -78,7 +78,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProdu
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
             // M2ePro_TRANSLATIONS
             // The "Update Listings Products" action for Amazon account: "%account_title%" is started. Please wait...
-            $status = 'The "Update Listings Products" action for Amazon account: "%account_title%" is started. Please wait...';
+            $status = 'The "Update Listings Products" action for Amazon account: "%account_title%" is started. ';
+            $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             if (!$this->isLockedAccount($account)) {
@@ -106,7 +107,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProdu
 
             // M2ePro_TRANSLATIONS
             // The "Update Listings Products" action for Amazon account: "%account_title%" is finished. Please wait...
-            $status = 'The "Update Listings Products" action for Amazon account: "%account_title%" is finished. Please wait...';
+            $status = 'The "Update Listings Products" action for Amazon account: "%account_title%" is finished. ';
+            $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
             $this->getActualLockItem()->activate();

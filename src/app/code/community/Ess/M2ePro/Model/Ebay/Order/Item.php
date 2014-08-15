@@ -267,6 +267,11 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
         return $product->getId();
     }
 
+    public function prepareMagentoOptions($options)
+    {
+        return Mage::helper('M2ePro/Component_Ebay')->reduceOptionsForOrders($options);
+    }
+
     private function validate()
     {
         $ebayItem = $this->getChannelItem();

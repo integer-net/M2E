@@ -416,7 +416,8 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         /** @var $optionsFinder Ess_M2ePro_Model_Order_Item_OptionsFinder */
         $optionsFinder = Mage::getModel('M2ePro/Order_Item_OptionsFinder');
-        $optionsFinder->setMagentoProduct($orderItem->getMagentoProduct());
+        $optionsFinder->setProductId($orderItem->getMagentoProduct()->getProductId());
+        $optionsFinder->setProductType($orderItem->getMagentoProduct()->getTypeId());
 
         $associatedProducts = $optionsFinder->prepareAssociatedProducts($associatedProducts);
 

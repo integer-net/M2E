@@ -206,7 +206,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
     protected function buildRequestDataObject(Ess_M2ePro_Model_Listing_Product $listingProduct, array $data)
     {
         if (!isset($this->requestsDataObjects[$listingProduct->getId()])) {
-            $this->requestsDataObjects[$listingProduct->getId()] = parent::makeRequestDataObject($listingProduct, $data);
+            $this->requestsDataObjects[$listingProduct->getId()] = parent::makeRequestDataObject($listingProduct,$data);
         }
         return $this->requestsDataObjects[$listingProduct->getId()];
     }

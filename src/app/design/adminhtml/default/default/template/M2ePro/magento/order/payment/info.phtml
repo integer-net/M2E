@@ -35,6 +35,13 @@
             <td><strong><?php echo !is_null($this->getOrder()) ? $this->getOrder()->formatPrice($this->getChannelFinalFee()) : $this->getChannelFinalFee(); ?></strong></td>
         </tr>
     <?php } ?>
+    <?php if ($this->getTaxId() != ''): ?>
+        <tr>
+            <?php $message = Mage::helper('M2ePro')->__('Buyer Tax ID'); ?>
+            <td style="width: 200px;"><?php echo Mage::helper('M2ePro')->__($message) ?>:</td>
+            <td><strong><?php echo $this->getTaxId(); ?></strong></td>
+        </tr>
+    <?php endif; ?>
     <?php $transactions = $this->getTransactions(); if (!empty($transactions)) { ?>
         <tr>
             <td class="grid" colspan="2">

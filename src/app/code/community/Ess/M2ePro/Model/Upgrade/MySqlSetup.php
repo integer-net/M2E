@@ -53,9 +53,16 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
     public function endSetup()
     {
         $this->removeConfigDuplicates();
-        $this->updateInstallationVersionHistory();
         Mage::helper('M2ePro/Module')->clearCache();
         return parent::endSetup();
+    }
+
+    // ----------------------------------
+
+    protected function _upgradeResourceDb($oldVersion, $newVersion)
+    {
+        parent::_upgradeResourceDb($oldVersion, $newVersion);
+        $this->updateInstallationVersionHistory($oldVersion, $newVersion);
     }
 
     //####################################
@@ -449,7 +456,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
     //####################################
 
-    private function updateInstallationVersionHistory()
+    private function updateInstallationVersionHistory($oldVersion, $newVersion)
     {
         $connection = $this->getConnection();
         $tableName = $this->getTable('m2epro_cache_config');
@@ -458,21 +465,12 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
             return;
         }
 
-        $debugBackTrace = debug_backtrace();
-
-        if (!isset($debugBackTrace[1]['file'])) {
-            return;
-        }
-
-        $currentFileName = $debugBackTrace[1]['file'];
-
-        $currentVersion = preg_replace('/^(.)*-|.php$/','',$currentFileName);
         $currentGmtDate = Mage::getModel('core/date')->gmtDate();
 
         $mysqlColumns = array('group','key','value','update_date','create_date');
         $mysqlData = array(
             'group'       => '/installation/version/history/',
-            'key'         => $currentVersion,
+            'key'         => $newVersion,
             'value'       => $currentGmtDate,
             'update_date' => $currentGmtDate,
             'create_date' => $currentGmtDate

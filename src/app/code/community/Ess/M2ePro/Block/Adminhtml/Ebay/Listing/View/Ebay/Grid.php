@@ -591,8 +591,7 @@ HTML;
 
         foreach ($logRows as $row) {
 
-            $row['description'] = Mage::helper('M2ePro')->escapeHtml($row['description']);
-            $row['description'] = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row['description']);
+            $row['description'] = Mage::helper('M2ePro/View')->getModifiedLogMessage($row['description']);
 
             if ($row['action_id'] !== $lastActionId) {
                 if (count($tempActionRows) > 0) {
@@ -807,16 +806,20 @@ HTML;
         $runStopAndRemoveProducts = $this->getUrl('*/adminhtml_ebay_listing/runStopAndRemoveProducts');
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
-        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__('"%task_title%" task has successfully completed.'));
+        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__(
+            '"%task_title%" task has successfully completed.'
+        ));
 
         // M2ePro_TRANSLATIONS
         // %task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
-        $tempString = '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.';
+        $tempString = '"%task_title%" task has completed with warnings. ';
+        $tempString .= '<a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__($tempString));
 
         // M2ePro_TRANSLATIONS
         // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
-        $tempString = '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.';
+        $tempString = '"%task_title%" task has completed with errors. ';
+        $tempString .= '<a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($tempString));
 
         $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on eBay.'));
@@ -847,7 +850,9 @@ HTML;
             Mage::helper('M2ePro')->__('Stopping On eBay And Removing From Listing Selected Items')
         );
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs(
+            $helper->__('Please select the products you want to perform the action on.')
+        );
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));

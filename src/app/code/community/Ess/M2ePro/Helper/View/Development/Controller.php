@@ -71,7 +71,9 @@ class Ess_M2ePro_Helper_View_Development_Controller extends Mage_Core_Helper_Abs
             include $controllerFileName;
 
             if (!class_exists($controllerClassName, false)) {
-                throw Mage::exception('Mage_Core', Mage::helper('core')->__('Controller file was loaded but class does not exist'));
+                throw Mage::exception(
+                    'Mage_Core', Mage::helper('core')->__('Controller file was loaded but class does not exist')
+                );
             }
         }
 

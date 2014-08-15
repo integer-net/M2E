@@ -14,10 +14,16 @@ class Ess_M2ePro_Model_Amazon_Search_Manual
         $validation = Mage::helper('M2ePro');
         $tempQuery = str_replace('-', '', $query);
 
-        if (Mage::helper('M2ePro/Component_Amazon')->isASIN($tempQuery) || $validation->isISBN10($tempQuery)) {
+        if (Mage::helper('M2ePro/Component_Amazon')->isASIN($tempQuery) ||
+            $validation->isISBN10($tempQuery)) {
+
             $query = $tempQuery;
             $searchMethod = 'byAsin';
-        } elseif ($validation->isEAN($tempQuery) || $validation->isUPC($tempQuery) || $validation->isISBN13($tempQuery)) {
+
+        } elseif ($validation->isEAN($tempQuery) ||
+                  $validation->isUPC($tempQuery) ||
+                  $validation->isISBN13($tempQuery)) {
+
             $query = $tempQuery;
             $searchMethod = 'byIdentifier';
         }

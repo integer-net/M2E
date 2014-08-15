@@ -16,6 +16,8 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Front_Action
         ob_get_level() && ob_end_flush();
         flush();
 
+        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+
         $cron = Mage::getModel('M2ePro/Cron_Type_Service');
         $cron->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
 

@@ -836,8 +836,22 @@
                                     </td>
                                     <td class="value">
                                         <select id="select_attributes_image" style="width: 200px;">
-                                            <option value="image" selected="selected"><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
+                                            <option value="image" selected="selected"><?php echo Mage::helper('M2ePro')->__('Product Image'); ?></option>
                                             <option value="media_gallery"><?php echo Mage::helper('M2ePro')->__('Product Images'); ?></option>
+                                        </select>
+                                    </td>
+                                </tr>
+
+                                <tr class="all-products-image" style="display: none;">
+                                    <td class="label">
+                                        <label for="select_attributes_image_order_position"><?php echo Mage::helper('M2ePro')->__('Image Position');?></label>
+                                    </td>
+                                    <td class="value">
+                                        <select id="select_attributes_image_order_position" style="width: 200px;">
+                                            <option value="0"><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
+                                            <?php for ($i = 1; $i <= 20; $i++):?>
+                                                <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                            <?php endfor; ?>
                                         </select>
                                     </td>
                                 </tr>

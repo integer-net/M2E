@@ -401,8 +401,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_Multiple
         if ($listingProductCollection->getSize() > 0) {
 
             if ($listingProduct->getChildObject()->getBuyListing()->isGenerateSkuModeNo()) {
-                // M2ePro_TRANSLATIONS
-                // The same Reference ID was found among M2E Listings. Reference ID must be unique the product to be listed.
+        // M2ePro_TRANSLATIONS
+        // The same Reference ID was found among M2E Listings. Reference ID must be unique the product to be listed.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
         'The same Reference ID was found among M2E Listings. Reference ID must be unique the product to be listed.',

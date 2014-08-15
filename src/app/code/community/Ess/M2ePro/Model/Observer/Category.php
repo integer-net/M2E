@@ -145,7 +145,8 @@ class Ess_M2ePro_Model_Observer_Category
 
                     if ($listing->isCategoriesDeleteActionStopRemove()) {
                         $listingProduct->isStoppable() && Mage::getModel('M2ePro/StopQueue')->add($listingProduct);
-                        $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
+                        $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))
+                                       ->save();
                         $listingProduct->deleteInstance();
                     }
 

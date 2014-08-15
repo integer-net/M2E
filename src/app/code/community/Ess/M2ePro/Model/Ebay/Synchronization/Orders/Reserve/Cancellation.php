@@ -71,7 +71,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Reserve_Cancellation
 
             // M2ePro_TRANSLATIONS
             // The "Reserve Cancellation" action for eBay account: "%account_title%" is started. Please wait...'
-            $status = 'The "Reserve Cancellation" action for eBay account: "%account_title%" is started. Please wait...';
+            $status = 'The "Reserve Cancellation" action for eBay account: "%account_title%" is started. ';
+            $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 
@@ -80,7 +81,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Reserve_Cancellation
             // ----------------------------------------------------------
             //M2ePro_TRANSLATIONS
             // The "Reserve Cancellation" action for eBay account: "%account_title%" is finished. Please wait...
-            $status = 'The "Reserve Cancellation" action for eBay account: "%account_title%" is finished. Please wait...';
+            $status = 'The "Reserve Cancellation" action for eBay account: "%account_title%" is finished. ';
+            $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
             $this->getActualLockItem()->activate();

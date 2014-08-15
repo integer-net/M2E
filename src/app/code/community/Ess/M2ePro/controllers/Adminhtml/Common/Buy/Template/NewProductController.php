@@ -131,7 +131,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         //----------------------------
         /** @var $buyTemplateNewProductInstance Ess_M2ePro_Model_Buy_Template_NewProduct */
         $buyTemplateNewProductInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct');
-        $post['category']['category_id'] && $buyTemplateNewProductInstance->loadInstance((int)$post['category']['category_id']);
+        if ($post['category']['category_id']) {
+            $buyTemplateNewProductInstance->loadInstance((int)$post['category']['category_id']);
+        }
 
         // Saving general data
         //-----------------------------

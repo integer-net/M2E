@@ -227,7 +227,8 @@ HTML;
             } elseif ($this->listing->getChildObject()->getEstimatedFees()) {
                 $preview = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_view_fee_preview');
                 $preview->setData('fees', $this->listing->getChildObject()->getEstimatedFees());
-                $preview->setData('product_name', $this->listing->getChildObject()->getEstimatedFeesSourceProductName());
+                $preview->setData('product_name',
+                                  $this->listing->getChildObject()->getEstimatedFeesSourceProductName());
 
                 $html .= $preview->toHtml();
             }
@@ -258,8 +259,10 @@ HTML;
         $translations = json_encode(array(
             'Automatic Actions' => Mage::helper('M2ePro')->__('Automatic Actions'),
             'Based on Magento Categories' => Mage::helper('M2ePro')->__('Based on Magento Categories'),
-            'You must select at least 1 category.' => Mage::helper('M2ePro')->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
+            'You must select at least 1 category.' =>
+                Mage::helper('M2ePro')->__('You must select at least 1 category.'),
+            'Rule with the same title already exists.' =>
+                Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
             'Compatibility Attribute' => Mage::helper('M2ePro')->__('Compatibility Attribute'),
         ));
         //------------------------------

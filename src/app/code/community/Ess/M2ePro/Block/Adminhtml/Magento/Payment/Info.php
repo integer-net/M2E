@@ -91,6 +91,11 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Payment_Info extends Mage_Payment_Block
         return (string)$this->getAdditionalData('channel_order_id');
     }
 
+    public function getTaxId()
+    {
+        return (string)$this->getAdditionalData('tax_id');
+    }
+
     public function getChannelOrderUrl()
     {
         $url = '';

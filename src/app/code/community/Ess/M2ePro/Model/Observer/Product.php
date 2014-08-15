@@ -198,12 +198,12 @@ class Ess_M2ePro_Model_Observer_Product
             }
 
             $rez = Mage::getModel('M2ePro/ProductChange')
-                        ->updateAttribute( $this->_productId, $attribute,
-                                           $statusOld, $statusNew,
-                                           Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
-                                           $listingProductArray['store_id'] );
+                        ->updateAttribute($this->_productId, $attribute,
+                                          $statusOld, $statusNew,
+                                          Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
+                                          $listingProductArray['store_id']);
 
-            if ($rez === false) {
+            if ($rez === false || $statusOld == $statusNew) {
                 continue;
             }
 
@@ -239,12 +239,12 @@ class Ess_M2ePro_Model_Observer_Product
             if (!isset($changedStores[$otherListingTemp['store_id']])) {
 
                 $rez = Mage::getModel('M2ePro/ProductChange')
-                            ->updateAttribute( $this->_productId, $attribute,
-                                               $statusOld, $statusNew,
-                                               Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
-                                               $otherListingTemp['store_id'] );
+                            ->updateAttribute($this->_productId, $attribute,
+                                              $statusOld, $statusNew,
+                                              Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
+                                              $otherListingTemp['store_id']);
 
-                if ($rez === false) {
+                if ($rez === false || $statusOld == $statusNew) {
                     continue;
                 }
             }
@@ -273,11 +273,11 @@ class Ess_M2ePro_Model_Observer_Product
         $priceNew = round((float)$productNew->getPrice(),2);
 
         $rez = Mage::getModel('M2ePro/ProductChange')
-                    ->updateAttribute( $this->_productId, 'price',
-                                       $priceOld, $priceNew,
-                                       Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
+                    ->updateAttribute($this->_productId, 'price',
+                                      $priceOld, $priceNew,
+                                      Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-        if ($rez === false) {
+        if ($rez === false || $priceOld == $priceNew) {
             return;
         }
 
@@ -328,11 +328,11 @@ class Ess_M2ePro_Model_Observer_Product
         $specialPriceNew = round((float)$productNew->getSpecialPrice(),2);
 
         $rez = Mage::getModel('M2ePro/ProductChange')
-                    ->updateAttribute( $this->_productId, 'special_price',
-                                       $specialPriceOld, $specialPriceNew,
-                                       Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
+                    ->updateAttribute($this->_productId, 'special_price',
+                                      $specialPriceOld, $specialPriceNew,
+                                      Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-        if ($rez === false) {
+        if ($rez === false || $specialPriceOld == $specialPriceNew) {
             return;
         }
 
@@ -383,11 +383,11 @@ class Ess_M2ePro_Model_Observer_Product
         $specialPriceFromDateNew = $productNew->getSpecialFromDate();
 
         $rez = Mage::getModel('M2ePro/ProductChange')
-                    ->updateAttribute( $this->_productId, 'special_price_from_date',
-                                       $specialPriceFromDateOld, $specialPriceFromDateNew,
-                                       Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
+                    ->updateAttribute($this->_productId, 'special_price_from_date',
+                                      $specialPriceFromDateOld, $specialPriceFromDateNew,
+                                      Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-        if ($rez === false) {
+        if ($rez === false || $specialPriceFromDateOld == $specialPriceFromDateNew) {
             return;
         }
 
@@ -454,11 +454,11 @@ class Ess_M2ePro_Model_Observer_Product
         $specialPriceToDateNew = $productNew->getSpecialToDate();
 
         $rez = Mage::getModel('M2ePro/ProductChange')
-                    ->updateAttribute( $this->_productId, 'special_price_to_date',
-                                       $specialPriceToDateOld, $specialPriceToDateNew,
-                                       Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+                    ->updateAttribute($this->_productId, 'special_price_to_date',
+                                      $specialPriceToDateOld, $specialPriceToDateNew,
+                                      Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-        if ($rez === false) {
+        if ($rez === false || $specialPriceToDateOld == $specialPriceToDateNew) {
             return;
         }
 
@@ -535,17 +535,18 @@ class Ess_M2ePro_Model_Observer_Product
 
                 foreach ($attribute['listings_products'] as $listingProductArray) {
 
-                    if (!$this->isAffectChangedAttributeOnItemStoreId($attribute['attribute'],$listingProductArray['store_id'])) {
+                    if (!$this->isAffectChangedAttributeOnItemStoreId($attribute['attribute'],
+                                                                      $listingProductArray['store_id'])) {
                         continue;
                     }
 
                     $rez = Mage::getModel('M2ePro/ProductChange')
-                                ->updateAttribute( $this->_productId, $attribute['attribute'],
-                                                   $customAttributeOld, $customAttributeNew,
-                                                   Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
-                                                   $listingProductArray['store_id']);
+                                ->updateAttribute($this->_productId, $attribute['attribute'],
+                                                  $customAttributeOld, $customAttributeNew,
+                                                  Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
+                                                  $listingProductArray['store_id']);
 
-                    if ($rez === false) {
+                    if ($rez === false || $customAttributeOld == $customAttributeNew) {
                         continue;
                     }
 
@@ -580,19 +581,20 @@ class Ess_M2ePro_Model_Observer_Product
 
                 foreach ($this->_otherListingsArray as $otherListingTemp) {
 
-                    if (!$this->isAffectChangedAttributeOnItemStoreId($attribute['attribute'],$otherListingTemp['store_id'])) {
+                    if (!$this->isAffectChangedAttributeOnItemStoreId($attribute['attribute'],
+                                                                      $otherListingTemp['store_id'])) {
                         continue;
                     }
 
                     if (!isset($changedStores[$otherListingTemp['store_id']])) {
 
                         $rez = Mage::getModel('M2ePro/ProductChange')
-                                    ->updateAttribute( $this->_productId, $attribute['attribute'],
-                                                       $customAttributeOld, $customAttributeNew,
-                                                       Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
-                                                       $otherListingTemp['store_id'] );
+                                    ->updateAttribute($this->_productId, $attribute['attribute'],
+                                                      $customAttributeOld, $customAttributeNew,
+                                                      Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER,
+                                                      $otherListingTemp['store_id']);
 
-                        if ($rez === false) {
+                        if ($rez === false || $customAttributeOld == $customAttributeNew) {
                             continue;
                         }
                     }
@@ -793,7 +795,7 @@ class Ess_M2ePro_Model_Observer_Product
         }
     }
 
-    private function cutAttributeTitleLength($attribute, $length = 50)
+    private function cutAttributeTitleLength($attribute, $length = 150)
     {
         if (strlen($attribute) > $length) {
             return substr($attribute, 0, $length) . ' ...';

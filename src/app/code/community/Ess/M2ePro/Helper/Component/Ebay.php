@@ -13,9 +13,13 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 
     const MARKETPLACE_US     = 1;
     const MARKETPLACE_MOTORS = 9;
-    const MARKETPLACE_AUSTRALIA = 4;
+    const MARKETPLACE_AU = 4;
+    const MARKETPLACE_UK = 3;
+    const MARKETPLACE_DE = 8;
 
     const LISTING_DURATION_GTC = 100;
+
+    const MAX_LENGTH_FOR_OPTION_VALUE = 50;
 
     // ########################################
 
@@ -189,6 +193,44 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
             '30' => $helper->__('30 days'),
             self::LISTING_DURATION_GTC => $helper->__('Good Till Cancelled'),
         );
+    }
+
+    // ########################################
+
+    public function reduceOptionsForVariations(array $options)
+    {
+        foreach ($options['set'] as &$optionsSet) {
+            foreach ($optionsSet as &$singleOption) {
+                $singleOption = Mage::helper('M2ePro')->reduceWordsInString(
+                    $singleOption, self::MAX_LENGTH_FOR_OPTION_VALUE
+                );
+            }
+        }
+
+        foreach ($options['variations'] as &$variation) {
+            foreach ($variation as &$singleOption) {
+                $singleOption['option'] = Mage::helper('M2ePro')->reduceWordsInString(
+                    $singleOption['option'], self::MAX_LENGTH_FOR_OPTION_VALUE
+                );
+            }
+        }
+
+        return $options;
+    }
+
+    public function reduceOptionsForOrders(array $options)
+    {
+        foreach ($options as &$singleOption) {
+            foreach ($singleOption['values'] as &$singleOptionValue) {
+                foreach ($singleOptionValue['labels'] as &$singleOptionLabel) {
+                    $singleOptionLabel = Mage::helper('M2ePro')->reduceWordsInString(
+                        $singleOptionLabel, self::MAX_LENGTH_FOR_OPTION_VALUE
+                    );
+                }
+            }
+        }
+
+        return $options;
     }
 
     // ########################################

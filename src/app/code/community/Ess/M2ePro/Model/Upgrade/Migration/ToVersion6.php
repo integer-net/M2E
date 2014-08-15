@@ -1016,7 +1016,8 @@ WHERE object_type NOT IN (2,4);
 SQL
 );
         $listingTable = $this->installer->getTable('m2epro'.self::PREFIX_TABLE_BACKUP.'_listing');
-        $templateSellingFormatTable = $this->installer->getTable('m2epro'.self::PREFIX_TABLE_BACKUP.'_template_selling_format');
+        $templateSellingFormatTable =
+            $this->installer->getTable('m2epro'.self::PREFIX_TABLE_BACKUP.'_template_selling_format');
 
         $this->installer->getConnection()->multi_query(<<<SQL
 
@@ -2380,11 +2381,11 @@ SELECT `{$templateGeneral}`.`id`,
        `{$ebayTemplateGeneral}`.`postal_code`,
        `{$ebayTemplateGeneral}`.`address`,
        `{$ebayTemplateGeneral}`.`vat_percent`,
-       IF(`{$ebayTemplateGeneral}`.`dispatch_time` = 7, 10, `{$ebayTemplateGeneral}`.`dispatch_time`) AS `dispatch_time`,
+     IF(`{$ebayTemplateGeneral}`.`dispatch_time` = 7, 10, `{$ebayTemplateGeneral}`.`dispatch_time`) AS `dispatch_time`,
        `{$ebayTemplateGeneral}`.`get_it_fast`,
        `{$ebayTemplateGeneral}`.`use_ebay_tax_table` AS `tax_table_mode`,
        `{$ebayTemplateGeneral}`.`use_ebay_local_shipping_rate_table` AS `local_shipping_rate_table_mode`,
-       `{$ebayTemplateGeneral}`.`use_ebay_international_shipping_rate_table` AS `international_shipping_rate_table_mode`,
+     `{$ebayTemplateGeneral}`.`use_ebay_international_shipping_rate_table` AS `international_shipping_rate_table_mode`,
        `{$ebayTemplateGeneral}`.`local_shipping_mode`,
        `{$ebayTemplateGeneral}`.`local_shipping_discount_mode`,
        `{$ebayTemplateGeneral}`.`local_shipping_combined_discount_profile_id`,
@@ -2426,7 +2427,8 @@ SQL
     private function processEbayTemplateShippingCalculatedTable()
     {
         $newTable = $this->installer->getTable('m2epro_ebay_template_shipping_calculated');
-        $oldTable = $this->installer->getTable('m2epro'.self::PREFIX_TABLE_BACKUP.'_ebay_template_general_calculated_shipping');
+        $oldTable =
+            $this->installer->getTable('m2epro'.self::PREFIX_TABLE_BACKUP.'_ebay_template_general_calculated_shipping');
 
         $this->installer->getConnection()->multi_query(<<<SQL
 

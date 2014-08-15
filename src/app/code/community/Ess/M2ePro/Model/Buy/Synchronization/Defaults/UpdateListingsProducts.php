@@ -75,8 +75,8 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts
         foreach ($accounts as $account) {
 
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
-            // M2ePro_TRANSLATIONS
-            // The "Update Listings Products" action for Rakuten.com account: "%account_title%" is started. Please wait...
+        // M2ePro_TRANSLATIONS
+        // The "Update Listings Products" action for Rakuten.com account: "%account_title%" is started. Please wait...
             $status = 'The "Update Listings Products" action for Rakuten.com account: "%account_title%" is started.';
             $status .= ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
@@ -104,8 +104,8 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts
                 $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
             }
 
-            // M2ePro_TRANSLATIONS
-            // The "Update Listings Products" action for Rakuten.com account: "%account_title%" is finished. Please wait...
+        // M2ePro_TRANSLATIONS
+        // The "Update Listings Products" action for Rakuten.com account: "%account_title%" is finished. Please wait...
             $status = 'The "Update Listings Products" action for Rakuten.com account: "%account_title%" is finished.'.
                 ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));

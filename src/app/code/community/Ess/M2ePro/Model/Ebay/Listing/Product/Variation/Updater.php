@@ -18,6 +18,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
         }
 
         $rawMagentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
+        $rawMagentoVariations = Mage::helper('M2ePro/Component_Ebay')
+                                            ->reduceOptionsForVariations($rawMagentoVariations);
         $rawMagentoVariations = $this->validateLimitsConditions($rawMagentoVariations,$listingProduct);
 
         $magentoVariations = $this->prepareMagentoVariations($rawMagentoVariations);

@@ -44,14 +44,16 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Categories
 
         $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),'Get categories from Amazon');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
+                                                         'Get categories from Amazon');
         $categories = $this->receiveFromAmazon($marketplace);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 
         $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
         $this->getActualLockItem()->activate();
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),'Save categories to DB');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
+                                                         'Save categories to DB');
         $this->saveCategoriesToDb($marketplace,$categories);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
 

@@ -87,7 +87,8 @@ final class Ess_M2ePro_Model_Play_Synchronization_OtherListings
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
             // M2ePro_TRANSLATIONS
             // The "3rd Party Listings" action for Play.com account: "%account_title%" is started. Please wait...
-            $status = 'The "3rd Party Listings" action for Play.com account: "%account_title%" is started. Please wait...';
+            $status = 'The "3rd Party Listings" action for Play.com account: "%account_title%" is started. ';
+            $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             if (!$this->isLockedAccount($account)) {
@@ -107,7 +108,8 @@ final class Ess_M2ePro_Model_Play_Synchronization_OtherListings
 
             // M2ePro_TRANSLATIONS
             // The "3rd Party Listings" action for Play.com account: "%account_title%" is finished. Please wait...
-            $status = 'The "3rd Party Listings" action for Play.com account: "%account_title%" is finished. Please wait...';
+            $status = 'The "3rd Party Listings" action for Play.com account: "%account_title%" is finished. ';
+            $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
             $this->getActualLockItem()->activate();

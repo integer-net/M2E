@@ -37,64 +37,38 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
 
     protected function _prepareCollection()
     {
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        $moduleTables = Mage::helper('M2ePro/Module_Database_Structure')->getGroupedMySqlTables();
-        $magentoTables = Mage::helper('M2ePro/Magento')->getMySqlTables();
-        $databaseName = Mage::helper('M2ePro/Magento')->getDatabaseName();
+        $helper = Mage::helper('M2ePro/Module_Database_Structure');
 
         $collection = new Varien_Data_Collection();
-        foreach ($moduleTables as $moduleTable => $group) {
+        foreach ($helper->getGroupedMySqlTables() as $moduleTable => $group) {
 
             $tableRow = array(
                 'table_name' => $moduleTable,
                 'component'  => 'general',
                 'group'      => $group,
-                'is_exist'   => false,
+                'is_exist'   => $helper->isTableExists($moduleTable),
+                'is_crashed' => !$helper->isTableStatusOk($moduleTable),
                 'records'    => 0,
                 'size'       => 0,
-                'model'      => Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($moduleTable)
+                'model'      => $helper->getTableModel($moduleTable)
             );
 
-            // Set component
-            //--------------------
             foreach (Mage::helper('M2ePro/Component')->getComponents() as $component) {
                 if (strpos(strtolower($moduleTable),strtolower($component)) !== false) {
                     $tableRow['component'] = $component;
                     break;
                 }
             }
-            //--------------------
 
-            // Set is exist
-            //--------------------
-            $moduleTable = Mage::getSingleton('core/resource')->getTableName($moduleTable);
-            $tableRow['is_exist'] = in_array($moduleTable, $magentoTables);
-            //--------------------
-
-            // Set table size/rows count
-            //--------------------
-            if ($tableRow['is_exist']) {
-
-                $dbSelect = $connRead->select()->from('information_schema.tables',array('data_length'))
-                                               ->where('`table_name` = ?',$moduleTable)
-                                               ->where('`table_schema` = ?',$databaseName);
-
-                $tempRow = $connRead->fetchRow($dbSelect);
-                $tableRow['size'] = round($tempRow['data_length'] / 1024 / 1024, 2);
-
-                $dbSelect = $connRead->select()->from($moduleTable, array('count' => 'COUNT(*)'));
-                $tempRow = $connRead->fetchRow($dbSelect);
-                $tableRow['records'] = $tempRow['count'];
+            if ($tableRow['is_exist'] && !$tableRow['is_crashed']) {
+                $tableRow['size']    = $helper->getDataLength($moduleTable);
+                $tableRow['records'] = $helper->getCountOfRecords($moduleTable);
             }
-            //--------------------
 
             $collection->addItem(new Varien_Object($tableRow));
         }
 
         $this->setCollection($collection);
-
         return parent::_prepareCollection();
     }
 
@@ -176,12 +150,19 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
 
     public function callbackColumnTableName($value, $row, $column, $isExport)
     {
-        $style= '';
+        if (!$row->getData('is_exist')) {
+            return "<p style=\"color: red; font-weight: bold;\">{$value} [table is not exists]</p>";
+        }
 
-        is_null($row->getData('model')) && $style = 'color: #878787;';
-        !$row->getData('is_exist') && $style = 'color: red; font-weight: bold;';
+        if ($row->getData('is_crashed')) {
+            return "<p style=\"color: orange; font-weight: bold;\">{$value} [table is crashed]</p>";
+        }
 
-        return "<p style=\"{$style}\">{$value}</p>";
+        if (!$row->getData('model')) {
+            return "<p style=\"color: #878787;\">{$value}</p>";
+        }
+
+        return "<p>{$value}</p>";
     }
 
     // ########################################
@@ -233,9 +214,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
        '#developmentDatabaseGrid_table select[name="status"]',
        '#developmentDatabaseGrid_table select[name="group"]').each(function(el)
         {
-            el.observe('change', function(){
-                $gridJsObj.doFilter();
-            });
+            el.observe('change', function(){ $gridJsObj.doFilter(); });
         });
 
 </script>
@@ -253,15 +232,12 @@ JAVASCRIPT;
 
     public function getRowUrl($row)
     {
-        if ($row->getData('is_exist') && $row->getData('model')) {
-            return $this->getUrl(
-                '*/adminhtml_development_database/manageTable',
-                array(
-                    'table' => $row->getData('table_name'),
-                )
-            );
+        if (!$row->getData('is_exist') || $row->getData('is_crashed') || !$row->getData('model')) {
+            return false;
         }
-        return false;
+
+        return $this->getUrl('*/adminhtml_development_database/manageTable',
+                             array('table' => $row->getData('table_name')));
     }
 
     // ####################################

@@ -23,6 +23,8 @@
         LogCleaningHandlerObj.changeModeLog('<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>');
         LogCleaningHandlerObj.changeModeLog('<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>');
 
+        ControlPanelHandlerObj = new ControlPanelHandler();
+
         configEditForm = new varienForm('config_edit_form', '<?php echo $this->getValidationUrl(); ?>');
     });
     //-----------------------------

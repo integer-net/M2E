@@ -313,7 +313,7 @@ HTML;
         foreach ($orderLogsCollection as $log) {
             $logRows[] = array(
                 'type' => $log->getData('type'),
-                'text' => Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($log->getData('message')),
+                'text' => Mage::helper('M2ePro/View')->getModifiedLogMessage($log->getData('message')),
                 'initiator' => $this->getInitiatorForAction($log->getData('initiator')),
                 'date' => Mage::app()->getLocale()->date(strtotime($log->getData('create_date')))->toString($format)
             );

@@ -175,8 +175,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
         /** @var Mage_Core_Model_Mysql4_Collection_Abstract $collection */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $collection->addFieldToFilter('main_table.id',array('gt'=>$lastListingProductId));
-        $collection->addFieldToFilter('main_table.status',array('neq'=>Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED));
-        $collection->addFieldToFilter('main_table.status',array('neq'=>Ess_M2ePro_Model_Listing_Product::STATUS_LISTED));
+        $collection->addFieldToFilter('main_table.status',
+                    array('neq'=>Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED));
+        $collection->addFieldToFilter('main_table.status',
+                    array('neq'=>Ess_M2ePro_Model_Listing_Product::STATUS_LISTED));
         $collection->getSelect()->order('main_table.id', Zend_Db_Select::SQL_ASC);
         $collection->getSelect()->limit(100);
 

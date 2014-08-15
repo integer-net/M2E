@@ -63,6 +63,10 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
             return true;
         }
 
+        if ($this->isComponentModeEbay() && $this->getAccount()->getChildObject()->isModeSandbox()) {
+            return false;
+        }
+
         if ($this->getStatus() == self::STATUS_LISTED) {
             return true;
         }

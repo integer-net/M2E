@@ -82,7 +82,7 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_License_Form extends Ess_M2ePro_B
         //-------------------------------
         $data = array(
             'label'   => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick' => 'setLocation(\'' . $this->getUrl('M2ePro/adminhtml_configuration_license/refreshStatus') . '\');',
+            'onclick' => 'setLocation(\''.$this->getUrl('M2ePro/adminhtml_configuration_license/refreshStatus').'\');',
             'class'   => 'refresh_status'
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);

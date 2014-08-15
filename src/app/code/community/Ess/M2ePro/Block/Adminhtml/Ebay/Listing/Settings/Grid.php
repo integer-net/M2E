@@ -171,9 +171,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         //------------------------------
         $urls = Mage::helper('M2ePro')->getControllerActions(
             'adminhtml_ebay_listing_autoAction',
-            array(
-                'listing_id' => $this->getListing()->getId()
-            )
+            array('listing_id' => $this->getListing()->getId())
         );
 
         $path = 'adminhtml_ebay_listing_categorySettings';
@@ -188,12 +186,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         $urls = json_encode($urls);
         //------------------------------
 
+        $helper = Mage::helper('M2ePro');
         //------------------------------
         $translations = json_encode(array(
-            'Automatic Actions' => Mage::helper('M2ePro')->__('Automatic Actions'),
-            'Based on Magento Categories' => Mage::helper('M2ePro')->__('Based on Magento Categories'),
-            'You must select at least 1 category.' => Mage::helper('M2ePro')->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
+            'Automatic Actions'                        => $helper->__('Automatic Actions'),
+            'Based on Magento Categories'              => $helper->__('Based on Magento Categories'),
+            'You must select at least 1 category.'     => $helper->__('You must select at least 1 category.'),
+            'Rule with the same title already exists.' => $helper->__('Rule with the same title already exists.'),
         ));
         //------------------------------
 

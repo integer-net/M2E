@@ -170,7 +170,9 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
 
         $receivedPrices = array();
         foreach ($priceIds as $priceId) {
-            if ($template->getData($priceId . '_mode') == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE) {
+
+            if ($template->getData($priceId . '_mode') ==
+                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE) {
                 continue;
             }
 
@@ -205,7 +207,9 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
 
         $receivedPrices = array();
         foreach ($priceIds as $priceId) {
-            if ($template->getData($priceId . '_mode') == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE) {
+
+            if ($template->getData($priceId . '_mode') ==
+                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE) {
                 continue;
             }
 
@@ -239,13 +243,16 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
         );
 
         $migrationData = $this->getMigrationData('selling_format_currencies', Ess_M2ePro_Helper_Component_Play::NICK);
+
         if (!isset($migrationData[(int)$template->getId()])) {
             return array();
         }
 
         $receivedPrices = array();
         foreach ($priceIds as $priceId) {
-            if ($template->getData($priceId . '_mode') == Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_ATTRIBUTE) {
+
+            if ($template->getData($priceId . '_mode') ==
+                Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_ATTRIBUTE) {
                 continue;
             }
 

@@ -235,6 +235,10 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             unset($data['shipping_cost_value']['%i%']);
         }
 
+        if (isset($data['shipping_cost_surcharge_value']['%i%'])) {
+            unset($data['shipping_cost_surcharge_value']['%i%']);
+        }
+
         if (isset($data['shipping_cost_additional_value']['%i%'])) {
             unset($data['shipping_cost_additional_value']['%i%']);
         }
@@ -263,6 +267,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
                 $costAdditional = isset($data['shipping_cost_additional_attribute'][$i])
                     ? $data['shipping_cost_additional_attribute'][$i]
                     : '';
+
             } else {
 
                 $cost = isset($data['shipping_cost_value'][$i])
@@ -274,6 +279,22 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
                     : '';
             }
 
+            if ($costMode == Ess_M2ePro_Model_Ebay_Template_Shipping_Service::COST_MODE_CUSTOM_ATTRIBUTE) {
+
+                $costSurcharge = isset($data['shipping_cost_surcharge_attribute'][$i])
+                    ? $data['shipping_cost_surcharge_attribute'][$i]
+                    : '';
+
+            } else if ($costMode == Ess_M2ePro_Model_Ebay_Template_Shipping_Service::COST_MODE_CUSTOM_VALUE) {
+
+                $costSurcharge = isset($data['shipping_cost_surcharge_value'][$i])
+                    ? $data['shipping_cost_surcharge_value'][$i]
+                    : '';
+
+            } else {
+                $costSurcharge = '';
+            }
+
             $services[] = array(
                 'template_shipping_id'  => $templateShippingId,
                 'cost_mode'             => $costMode,
@@ -281,6 +302,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
                 'shipping_value'        => $data['shipping_service'][$i],
                 'shipping_type'         => $shippingType,
                 'cost_additional_value' => $costAdditional,
+                'cost_surcharge_value'  => $costSurcharge,
                 'priority'              => $data['shipping_priority'][$i],
                 'locations'             => json_encode($locations)
             );

@@ -999,19 +999,19 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
     public function isProductDetailsIncludeDescription()
     {
         $productDetails = $this->getProductDetails();
-        return isset($productDetails['include_description']) ? (bool)$productDetails['include_description'] : false;
+        return isset($productDetails['include_description']) ? (bool)$productDetails['include_description'] : true;
     }
 
     public function isProductDetailsIncludeImage()
     {
         $productDetails = $this->getProductDetails();
-        return isset($productDetails['include_image']) ? (bool)$productDetails['include_image'] : false;
+        return isset($productDetails['include_image']) ? (bool)$productDetails['include_image'] : true;
     }
 
     public function isProductDetailsListIfNoProduct()
     {
         $productDetails = $this->getProductDetails();
-        return isset($productDetails['list_if_no_product']) ? (bool)$productDetails['list_if_no_product'] : false;
+        return isset($productDetails['list_if_no_product']) ? (bool)$productDetails['list_if_no_product'] : true;
     }
 
     // #######################################

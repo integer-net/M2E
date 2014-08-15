@@ -17,4 +17,10 @@
             <action method="addCss"><stylesheet>M2ePro/css/Plugin/BlockNotice.css</stylesheet></action>
         </reference>
     </m2epro>
+    <m2epro_adminhtml_ebay_listing_motorviewgrid>
+        <remove name="footer"/>
+        <remove name="header"/>
+        <remove name="menu"/>
+        <remove name="notifications"/>
+    </m2epro_adminhtml_ebay_listing_motorviewgrid>
 </layout>

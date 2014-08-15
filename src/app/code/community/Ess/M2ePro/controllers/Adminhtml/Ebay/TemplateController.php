@@ -126,7 +126,9 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
                     $templates[] = array(
                         'nick' => $nick,
                         'id' => (int)$template->getId(),
-                        'title' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($template->getTitle()))
+                        'title' => Mage::helper('M2ePro')->escapeJs(
+                            Mage::helper('M2ePro')->escapeHtml($template->getTitle())
+                        )
                     );
                 }
             }

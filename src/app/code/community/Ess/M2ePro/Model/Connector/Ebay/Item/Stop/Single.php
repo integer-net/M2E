@@ -46,7 +46,9 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Single
                                                              Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
             } else {
-                $this->listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
+                $this->listingProduct->addData(
+                    array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED)
+                )->save();
                 $this->listingProduct->deleteInstance();
             }
 

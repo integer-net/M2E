@@ -62,7 +62,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
             // M2ePro_TRANSLATIONS
             // The "Update Listings Products" action for eBay account: "%account_title%" is started. Please wait...
-            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is started. Please wait...';
+            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is started. ';
+            $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             $this->getActualOperationHistory()->addTimePoint(
@@ -168,7 +169,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
                 $updateData = array(
                     'online_price' => (float)$changeVariation['price'] < 0 ? 0 : (float)$changeVariation['price'],
                     'online_qty' => (int)$changeVariation['quantity'] < 0 ? 0 : (int)$changeVariation['quantity'],
-                    'online_qty_sold' => (int)$changeVariation['quantitySold'] < 0 ? 0 : (int)$changeVariation['quantitySold']
+                    'online_qty_sold' => (int)$changeVariation['quantitySold'] < 0 ?
+                                                                0 : (int)$changeVariation['quantitySold']
                 );
 
                 if ($updateData['online_qty'] <= $updateData['online_qty_sold']) {

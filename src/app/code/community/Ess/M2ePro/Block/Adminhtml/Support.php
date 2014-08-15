@@ -131,14 +131,18 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
             'style' => 'max-height: 120px; overflow: auto; width: 150px;',
             'items' => $this->getDocumentationDropDownItems()
         );
-        $dropDownBlockDocumentation = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+
+        $dropDownBlockDocumentation = $this->getLayout()
+                                           ->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
 
         $data = array(
             'target_css_class' => 'button_video_tutorial',
             'style' => 'max-height: 120px; overflow: auto; width: 150px;',
             'items' => $this->getVideoTutorialDropDownItems()
         );
-        $dropDownBlockVideoTutorial = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+
+        $dropDownBlockVideoTutorial = $this->getLayout()
+                                           ->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
 
         return parent::getHeaderHtml()
             .$dropDownBlockDocumentation->toHtml()

@@ -381,7 +381,8 @@ class Ess_M2ePro_Model_Amazon_Template_NewProduct_Description extends Ess_M2ePro
 
     public function isShippingWeightUnitOfMeasureModeCustomAttribute()
     {
-        return $this->getShippingWeightUnitOfMeasureMode() == self::SHIPPING_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE;
+        return $this->getShippingWeightUnitOfMeasureMode() ==
+                self::SHIPPING_WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE;
     }
 
     public function getShippingWeightUnitOfMeasureSource()

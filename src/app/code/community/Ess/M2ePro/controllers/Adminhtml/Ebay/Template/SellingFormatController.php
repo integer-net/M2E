@@ -12,7 +12,9 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_SellingFormatController
         $this->loadLayout();
 
         try {
-            $searchBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_template_sellingFormat_searchCharity');
+            $searchBlock = $this->getLayout()->createBlock(
+                'M2ePro/adminhtml_ebay_template_sellingFormat_searchCharity'
+            );
             $this->getResponse()->setBody($searchBlock->toHtml());
         } catch (Exception $e) {
             $this->getResponse()->setBody(json_encode(array('error' => $e->getMessage())));

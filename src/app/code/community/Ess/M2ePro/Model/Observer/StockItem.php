@@ -41,11 +41,11 @@ class Ess_M2ePro_Model_Observer_StockItem
                     $qtyNew = (int)$observer->getData('item')->getData('qty');
 
                     $rez = Mage::getModel('M2ePro/ProductChange')
-                                 ->updateAttribute( $productId, 'qty',
-                                                    $qtyOld, $qtyNew,
-                                                    Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+                                 ->updateAttribute($productId, 'qty',
+                                                   $qtyOld, $qtyNew,
+                                                   Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-                    if ($rez !== false) {
+                    if ($rez !== false && $qtyOld != $qtyNew) {
 
                           foreach ($listingsProductsArray as $listingProductArray) {
 
@@ -95,11 +95,11 @@ class Ess_M2ePro_Model_Observer_StockItem
                     $stockAvailabilityNew = (bool)$observer->getData('item')->getData('is_in_stock');
 
                     $rez = Mage::getModel('M2ePro/ProductChange')
-                                     ->updateAttribute( $productId, 'stock_availability',
-                                                        (int)$stockAvailabilityOld, (int)$stockAvailabilityNew,
-                                                        Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER );
+                                     ->updateAttribute($productId, 'stock_availability',
+                                                       (int)$stockAvailabilityOld, (int)$stockAvailabilityNew,
+                                                       Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_OBSERVER);
 
-                    if ($rez !== false) {
+                    if ($rez !== false && $stockAvailabilityOld != $stockAvailabilityNew) {
 
                           $stockAvailabilityOld = $stockAvailabilityOld ? 'IN Stock' : 'OUT of Stock';
                           $stockAvailabilityNew = $stockAvailabilityNew ? 'IN Stock' : 'OUT of Stock';

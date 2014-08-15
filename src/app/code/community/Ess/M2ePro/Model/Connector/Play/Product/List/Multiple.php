@@ -160,10 +160,11 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
         if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER &&
             (empty($addingGeneralId) || empty($addingGeneralIdType))) {
 
-        $message  = 'You can list a product only with assigned Play.com Identifier. ';
-        $message .= 'Please, use the Search Play.com Identifier tool:  ';
-        $message .= 'press the icon in Play.com Identifier column or choose appropriate command in the Actions dropdown.';
-        $message .= ' Assigned Play.com Identifier will be displayed in Play.com Identifier column.';
+            $message  = 'You can list a product only with assigned Play.com Identifier. ';
+            $message .= 'Please, use the Search Play.com Identifier tool:  ';
+            $message .= 'press the icon in Play.com Identifier column or choose appropriate command ';
+            $message .= 'in the Actions dropdown.';
+            $message .= ' Assigned Play.com Identifier will be displayed in Play.com Identifier column.';
 
             $this->addListingsProductsLogsMessage($listingProduct, $message,
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -172,8 +173,10 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             return false;
         }
 
-        empty($addingGeneralId) && $addingGeneralId = $listingProduct->getChildObject()->getAddingGeneralId();
-        empty($addingGeneralIdType) && $addingGeneralIdType = $listingProduct->getChildObject()->getAddingGeneralIdType();
+        empty($addingGeneralId) &&
+            $addingGeneralId = $listingProduct->getChildObject()->getAddingGeneralId();
+        empty($addingGeneralIdType) &&
+            $addingGeneralIdType = $listingProduct->getChildObject()->getAddingGeneralIdType();
 
         if (empty($addingGeneralId) || empty($addingGeneralIdType)) {
 
@@ -247,7 +250,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             // M2ePro_TRANSLATIONS
             // Delivery Region is invalid or missed. Please, check Listing Channel and product settings.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'Delivery Region is invalid or missed. Please, check Listing Channel and product settings.',
+                $listingProduct,
+                'Delivery Region is invalid or missed. Please, check Listing Channel and product settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -262,7 +266,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             // M2ePro_TRANSLATIONS
             // Dispatch Country is invalid or missed. Please, check Listing Channel and product settings.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'Dispatch Country is invalid or missed. Please, check Listing Channel and product settings.',
+                $listingProduct,
+                'Dispatch Country is invalid or missed. Please, check Listing Channel and product settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -276,11 +281,12 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             $priceGbr = $listingProduct->getChildObject()->getPriceGbr(true);
 
             if ($priceGbr <= 0) {
-            // M2ePro_TRANSLATIONS
-            // The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.
+                // M2ePro_TRANSLATIONS
+                // The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
-                    'The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.',
+                    'The price GBP must be greater than 0. '.
+                    'Please, check the Selling Format Template and Product settings.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -295,11 +301,12 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             $priceEuro = $listingProduct->getChildObject()->getPriceEuro(true);
 
             if ($priceEuro <= 0) {
-            // M2ePro_TRANSLATIONS
-            // The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.
+                // M2ePro_TRANSLATIONS
+                // The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
-                    'The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.',
+                    'The price EUR must be greater than 0. '.
+                    'Please, check the Selling Format Template and Product settings.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );

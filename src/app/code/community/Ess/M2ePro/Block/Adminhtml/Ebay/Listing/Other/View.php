@@ -114,12 +114,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
-        $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.', $logViewUrl)
-        );
-        $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.', $logViewUrl)
-        );
+        $productsWereNotMovedMessage = $helper->escapeJs($helper->__(
+            'Products were not moved. <a target="_blank" href="%url%">View log</a> for details.', $logViewUrl
+        ));
+        $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
+            'Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.',$logViewUrl
+        ));
 
         $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully mapped.'));
         $mappingProductMessage = $helper->escapeJs($helper->__('Mapping Product'));
@@ -146,16 +146,20 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $runStopProducts = $this->getUrl('*/adminhtml_ebay_listing_other/runStopProducts');
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
-        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__('"%task_title%" task has successfully completed.'));
+        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__(
+            '"%task_title%" task has successfully completed.')
+        );
 
         // M2ePro_TRANSLATIONS
         // "%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
-        $temp = '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.';
+        $temp = '"%task_title%" task has completed with warnings. ';
+        $temp .= '<a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__($temp));
 
         // M2ePro_TRANSLATIONS
         // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
-        $temp = '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.';
+        $temp = '"%task_title%" task has completed with errors. ';
+        $temp .= '<a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($temp));
 
         $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on eBay.'));
@@ -194,7 +198,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
             $helper->__('Selected items must belong to the same Account and Marketplace.')
         );
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select the products you want to perform the action on.'));
+        $selectItemsMessage = $helper->escapeJs($helper->__(
+            'Please select the products you want to perform the action on.'
+        ));
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
         $javascript = <<<JAVASCRIPT

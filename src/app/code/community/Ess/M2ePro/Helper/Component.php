@@ -30,19 +30,21 @@ class Ess_M2ePro_Helper_Component extends Mage_Core_Helper_Abstract
 
     public function getComponentsTitles()
     {
+        $helper = Mage::helper('M2ePro');
         return array(
-            Ess_M2ePro_Helper_Component_Ebay::NICK   => Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE),
-            Ess_M2ePro_Helper_Component_Amazon::NICK => Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE),
-            Ess_M2ePro_Helper_Component_Buy::NICK    => Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE),
-            Ess_M2ePro_Helper_Component_Play::NICK   => Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE)
+            Ess_M2ePro_Helper_Component_Ebay::NICK   => $helper->__(Ess_M2ePro_Helper_Component_Ebay::TITLE),
+            Ess_M2ePro_Helper_Component_Amazon::NICK => $helper->__(Ess_M2ePro_Helper_Component_Amazon::TITLE),
+            Ess_M2ePro_Helper_Component_Buy::NICK    => $helper->__(Ess_M2ePro_Helper_Component_Buy::TITLE),
+            Ess_M2ePro_Helper_Component_Play::NICK   => $helper->__(Ess_M2ePro_Helper_Component_Play::TITLE)
         );
     }
 
     public function getRakutenComponentsTitles()
     {
+        $helper = Mage::helper('M2ePro');
         return array(
-            Ess_M2ePro_Helper_Component_Buy::NICK  => Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE),
-            Ess_M2ePro_Helper_Component_Play::NICK => Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE)
+            Ess_M2ePro_Helper_Component_Buy::NICK  => $helper->__(Ess_M2ePro_Helper_Component_Buy::TITLE),
+            Ess_M2ePro_Helper_Component_Play::NICK => $helper->__(Ess_M2ePro_Helper_Component_Play::TITLE)
         );
     }
 

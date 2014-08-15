@@ -129,7 +129,8 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
             try {
                 $this->autoGlobalAddingCategoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
-                    'Ebay_Template_Category', (int)$this->getAutoGlobalAddingTemplateCategoryId(), NULL, array('template')
+                    'Ebay_Template_Category', (int)$this->getAutoGlobalAddingTemplateCategoryId(),
+                    NULL, array('template')
                 );
             } catch (Exception $exception) {
                 return $this->autoGlobalAddingCategoryTemplateModel;
@@ -158,7 +159,8 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
             try {
                 $this->autoGlobalAddingOtherCategoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
-                    'Ebay_Template_OtherCategory', (int)$this->getAutoGlobalAddingTemplateOtherCategoryId(), NULL, array('template')
+                    'Ebay_Template_OtherCategory', (int)$this->getAutoGlobalAddingTemplateOtherCategoryId(),
+                    NULL, array('template')
                 );
             } catch (Exception $exception) {
                 return $this->autoGlobalAddingOtherCategoryTemplateModel;
@@ -187,7 +189,8 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
             try {
                 $this->autoWebsiteAddingCategoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
-                    'Ebay_Template_Category', (int)$this->getAutoWebsiteAddingTemplateCategoryId(), NULL, array('template')
+                    'Ebay_Template_Category', (int)$this->getAutoWebsiteAddingTemplateCategoryId(),
+                    NULL, array('template')
                 );
             } catch (Exception $exception) {
                 return $this->autoWebsiteAddingCategoryTemplateModel;
@@ -216,7 +219,8 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
             try {
                 $this->autoWebsiteAddingOtherCategoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
-                    'Ebay_Template_OtherCategory', (int)$this->getAutoWebsiteAddingTemplateOtherCategoryId(), NULL, array('template')
+                    'Ebay_Template_OtherCategory', (int)$this->getAutoWebsiteAddingTemplateOtherCategoryId(),
+                    NULL, array('template')
                 );
             } catch (Exception $exception) {
                 return $this->autoWebsiteAddingOtherCategoryTemplateModel;

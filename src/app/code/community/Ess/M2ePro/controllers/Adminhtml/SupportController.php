@@ -17,6 +17,7 @@ class Ess_M2ePro_Adminhtml_SupportController
 
         $this->getLayout()->getBlock('head')
             ->addJs('M2ePro/SupportHandler.js')
+            ->addJs('M2ePro/Development/ControlPanelHandler.js')
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addCss('M2ePro/css/Plugin/DropDown.css');
 

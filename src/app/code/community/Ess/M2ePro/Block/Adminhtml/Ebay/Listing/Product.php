@@ -114,15 +114,15 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product extends Mage_Adminhtml_Blo
         return <<<HTML
 <div id="video_tutorial_pop_up" style="display: none;">
     <div class="player_container" style="margin: 20px 5px; ">
-        <object width="853" height="480">
-            <param name="movie" value="http://www.youtube.com/v/{$videoId}?version=3&amp;hl=ru_RU&amp;rel=0&amp;vq=hd720"/>
-            <param name="allowFullScreen" value="true"/>
-            <param name="allowscriptaccess" value="always"/>
-            <embed src="http://www.youtube.com/v/{$videoId}?version=3&amp;hl=ru_RU&amp;rel=0&amp;vq=hd720"
-                   type="application/x-shockwave-flash" width="853" height="480"
-                   allowscriptaccess="always" allowfullscreen="true">
-            </embed>
-       </object>
+    <object width="853" height="480">
+        <param name="movie" value="http://www.youtube.com/v/{$videoId}?version=3&amp;hl=ru_RU&amp;rel=0&amp;vq=hd720"/>
+        <param name="allowFullScreen" value="true"/>
+        <param name="allowscriptaccess" value="always"/>
+        <embed src="http://www.youtube.com/v/{$videoId}?version=3&amp;hl=ru_RU&amp;rel=0&amp;vq=hd720"
+               type="application/x-shockwave-flash" width="853" height="480"
+               allowscriptaccess="always" allowfullscreen="true">
+        </embed>
+    </object>
     </div>
 </div>
 HTML;

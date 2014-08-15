@@ -29,12 +29,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Logger extends Ess_M2ePro_Model
         }
 
         $this->getListingOtherLog()
-             ->addGlobalMessage( $this->initiator,
-                                 $this->actionId,
-                                 $this->action,
-                                 $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
-                                 $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
-                                 $priority);
+             ->addGlobalMessage($this->initiator,
+                                $this->actionId,
+                                $this->action,
+                                $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
+                                $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
+                                $priority);
     }
 
     public function logListingOtherMessage(Ess_M2ePro_Model_Listing_Other $listingOther,
@@ -52,13 +52,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Logger extends Ess_M2ePro_Model
         }
 
         $this->getListingOtherLog()
-             ->addProductMessage($listingOther->getId() ,
-                                 $this->initiator ,
-                                 $this->actionId ,
-                                 $this->action ,
-                                 $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
-                                 $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
-                                 $priority);
+            ->addProductMessage($listingOther->getId() ,
+                                $this->initiator ,
+                                $this->actionId ,
+                                $this->action ,
+                                $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
+                                $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
+                                $priority);
     }
 
     // ########################################

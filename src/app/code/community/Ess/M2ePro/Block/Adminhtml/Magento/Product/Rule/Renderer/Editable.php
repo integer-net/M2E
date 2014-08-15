@@ -54,8 +54,8 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule_Renderer_Editable
 
             if ($element->getExplicitApply()) {
                 $html .= ' <a href="javascript:void(0)" class="rule-param-apply"><img src="'
-                    . $this->getSkinUrl('images/rule_component_apply.gif') . '" class="v-middle" alt="'
-                    . Mage::helper('M2ePro')->__('Apply') . '" title="' . Mage::helper('M2ePro')->__('Apply') . '" /></a> ';
+                . $this->getSkinUrl('images/rule_component_apply.gif') . '" class="v-middle" alt="'
+                . Mage::helper('M2ePro')->__('Apply') . '" title="' . Mage::helper('M2ePro')->__('Apply') . '" /></a> ';
             }
 
             $html .= '</span></span>&nbsp;';

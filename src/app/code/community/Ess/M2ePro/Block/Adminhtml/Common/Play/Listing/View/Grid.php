@@ -683,7 +683,7 @@ HTML;
 
         if ((int)$row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
             return (isset($url)) ?
-                '<strong>'.$generalIdType.': </strong><a href="'.$url.'" target="_blank">'.$generalId.'</a>' :
+                '<strong>'.$generalIdType.': </strong><br/><a href="'.$url.'" target="_blank">'.$generalId.'</a>' :
                 '<strong>'.$generalIdType.': </strong><p>'.$generalId.'</p>';
         }
 
@@ -764,8 +764,7 @@ HTML;
 
         foreach ($logRows as $row) {
 
-            $row['description'] = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($row['description']);
-            $row['description'] = Mage::helper('M2ePro')->escapeHtml($row['description']);
+            $row['description'] = Mage::helper('M2ePro/View')->getModifiedLogMessage($row['description']);
 
             if ($row['action_id'] !== $lastActionId) {
                 if (count($tempActionRows) > 0) {

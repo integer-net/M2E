@@ -272,8 +272,6 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
 
     private function mergeParams($existedParams, $newParams)
     {
-        $result = array();
-
         foreach ($newParams as $key => $value) {
 
             if (isset($existedParams[$key]) && is_array($existedParams[$key]) && is_array($value)) {
@@ -283,7 +281,7 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
             }
         }
 
-        return $result;
+        return $existedParams;
     }
 
     private function isConsistsParams($existedParams, $checkedParams)

@@ -180,7 +180,8 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             'payment_method'    => $paymentMethodTitle,
             'channel_order_id'  => $this->order->getEbayOrderId(),
             'channel_final_fee' => $this->convertPrice($this->order->getFinalFee()),
-            'transactions'      => $this->getPaymentTransactions()
+            'transactions'      => $this->getPaymentTransactions(),
+            'tax_id'            => $this->order->getBuyerTaxId(),
         );
 
         return $paymentData;

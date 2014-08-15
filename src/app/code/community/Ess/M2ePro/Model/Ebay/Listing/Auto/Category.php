@@ -91,7 +91,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Auto_Category extends Ess_M2ePro_Model_Compo
 
             try {
                 $this->otherCategoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
-                    'Ebay_Template_OtherCategory', (int)$this->getAddingTemplateOtherCategoryId(), NULL, array('template')
+                    'Ebay_Template_OtherCategory', (int)$this->getAddingTemplateOtherCategoryId(),
+                    NULL, array('template')
                 );
             } catch (Exception $exception) {
                 return $this->otherCategoryTemplateModel;

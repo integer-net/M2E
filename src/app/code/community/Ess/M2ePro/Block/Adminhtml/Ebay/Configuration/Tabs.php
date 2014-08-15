@@ -128,8 +128,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_GENERAL) {
-            $tab['content'] = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_configuration_general_help')->toHtml();
-            $tab['content'] .= $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_configuration_general')->toHtml();
+            $tab['content'] = $this->getLayout()
+                                   ->createBlock('M2ePro/adminhtml_ebay_configuration_general_help')->toHtml();
+            $tab['content'] .= $this->getLayout()
+                                    ->createBlock('M2ePro/adminhtml_ebay_configuration_general')->toHtml();
         } else {
             $tab['url'] = $this->getUrl('*/adminhtml_ebay_configuration/index');
         }

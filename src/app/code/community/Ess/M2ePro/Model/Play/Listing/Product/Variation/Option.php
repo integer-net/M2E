@@ -338,9 +338,12 @@ class Ess_M2ePro_Model_Play_Listing_Product_Variation_Option extends Ess_M2ePro_
 
                 $tempOptionNames = array();
 
-                isset($configurableOption['label']) && $tempOptionNames[] = $configurableOption['label'];
-                isset($configurableOption['default_label']) && $tempOptionNames[] = $configurableOption['default_label'];
-                isset($configurableOption['store_label']) && $tempOptionNames[] = $configurableOption['store_label'];
+                isset($configurableOption['label']) &&
+                    $tempOptionNames[] = $configurableOption['label'];
+                isset($configurableOption['default_label']) &&
+                    $tempOptionNames[] = $configurableOption['default_label'];
+                isset($configurableOption['store_label']) &&
+                    $tempOptionNames[] = $configurableOption['store_label'];
 
                 foreach ($options as $option) {
                     if ((int)$option['value'] == (int)$configurableOption['value_index']) {

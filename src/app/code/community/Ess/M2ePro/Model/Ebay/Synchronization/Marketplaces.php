@@ -82,6 +82,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces
         $result = !$this->processTask('Marketplaces_Details') ? false : $result;
         $result = !$this->processTask('Marketplaces_Categories') ? false : $result;
         $result = !$this->processTask('Marketplaces_MotorsSpecifics') ? false : $result;
+        $result = !$this->processTask('Marketplaces_MotorsKtypes') ? false : $result;
 
         Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
 

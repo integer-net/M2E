@@ -216,9 +216,9 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
 
         if ($src['mode'] == self::DIMENSION_CUSTOM_ATTRIBUTE) {
 
-            $widthValue = str_replace(',', '.', $this->getMagentoProduct()->getAttributeValue($src['width_attribute']));
-            $lengthValue = str_replace(',', '.', $this->getMagentoProduct()->getAttributeValue($src['length_attribute']));
-            $depthValue = str_replace(',', '.', $this->getMagentoProduct()->getAttributeValue($src['depth_attribute']));
+            $widthValue = str_replace(',','.',$this->getMagentoProduct()->getAttributeValue($src['width_attribute']));
+            $lengthValue = str_replace(',','.',$this->getMagentoProduct()->getAttributeValue($src['length_attribute']));
+            $depthValue = str_replace(',','.',$this->getMagentoProduct()->getAttributeValue($src['depth_attribute']));
 
             return array(
                 'width' => $widthValue,

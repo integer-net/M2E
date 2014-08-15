@@ -139,7 +139,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Feedbacks_Response
 
         $this->getActualOperationHistory()->appendText('Send feedback for "'.$feedback->getData('buyer_name').'"');
         $this->getActualOperationHistory()->appendText(
-            'His feedback "'.$feedback->getData('buyer_feedback_text').'" ('.$feedback->getData('buyer_feedback_type').')'
+            'His feedback "'.$feedback->getData('buyer_feedback_text').
+            '" ('.$feedback->getData('buyer_feedback_type').')'
         );
         $this->getActualOperationHistory()->appendText('Our feedback "'.$body.'"');
 

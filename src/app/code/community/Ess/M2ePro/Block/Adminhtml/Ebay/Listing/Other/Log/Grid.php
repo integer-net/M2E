@@ -23,4 +23,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Log_Grid extends Ess_M2ePro_
     }
 
     // ########################################
+
+    protected function getActionTitles()
+    {
+        return Mage::getModel('M2ePro/Listing_Other_Log')->getActionsTitles();
+    }
+
+    // ########################################
 }

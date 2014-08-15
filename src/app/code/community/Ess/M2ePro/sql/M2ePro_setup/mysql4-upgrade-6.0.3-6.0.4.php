@@ -14,7 +14,8 @@ $connection = $installer->getConnection();
     ALTER TABLE `m2epro_ebay_marketplace`
     DROP COLUMN `categories_version`,
     CHANGE COLUMN `currency` `currency` VARCHAR(70) NOT NULL DEFAULT 'USD',
-    ADD COLUMN `is_metric_measurement_system` TINYINT(2) UNSIGNED NOT NULL DEFAULT 0 AFTER `is_english_measurement_system`,
+    ADD COLUMN `is_metric_measurement_system` TINYINT(2) UNSIGNED NOT NULL DEFAULT 0
+                AFTER `is_english_measurement_system`,
     ADD INDEX `is_metric_measurement_system` (`is_metric_measurement_system`);
 
     ALTER TABLE `m2epro_ebay_template_synchronization`

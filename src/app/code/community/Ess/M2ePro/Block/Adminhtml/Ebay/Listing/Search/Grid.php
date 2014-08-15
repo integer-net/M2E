@@ -179,8 +179,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     protected function _prepareColumns()
     {
+        $helper = Mage::helper('M2ePro');
+
         $this->addColumn('product_id', array(
-            'header'    => Mage::helper('M2ePro')->__('Product ID'),
+            'header'    => $helper->__('Product ID'),
             'align'     => 'right',
             'width'     => '100px',
             'type'      => 'number',
@@ -190,7 +192,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('product_name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / SKU'),
+            'header'    => $helper->__('Product Title / Listing / SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -201,7 +203,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('is_in_stock', array(
-            'header'    => Mage::helper('M2ePro')->__('Stock Availability'),
+            'header'    => $helper->__('Stock Availability'),
             'align'     => 'left',
             'width'     => '90px',
             'type'      => 'options',
@@ -209,28 +211,28 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             'index'     => 'is_in_stock',
             'filter_index' => 'is_in_stock',
             'options' => array(
-                '1' => Mage::helper('M2ePro')->__('In Stock'),
-                '0' => Mage::helper('M2ePro')->__('Out of Stock')
+                '1' => $helper->__('In Stock'),
+                '0' => $helper->__('Out of Stock')
             ),
             'frame_callback' => array($this, 'callbackColumnIsInStock')
         ));
 
         if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
             $this->addColumn('is_m2epro_listing', array(
-                'header'    => Mage::helper('M2ePro')->__('Listing Type'),
+                'header'    => $helper->__('Listing Type'),
                 'align'     => 'left',
                 'width'     => '100px',
                 'type'      => 'options',
                 'index'     => 'is_m2epro_listing',
                 'options'   => array(
-                    1 => Mage::helper('M2ePro')->__('M2E Pro'),
-                    0 => Mage::helper('M2ePro')->__('3rd Party')
+                    1 => $helper->__('M2E Pro'),
+                    0 => $helper->__('3rd Party')
                 )
             ));
         }
 
         $this->addColumn('ebay_item_id', array(
-            'header'    => Mage::helper('M2ePro')->__('eBay Item ID'),
+            'header'    => $helper->__('eBay Item ID'),
             'align'     => 'left',
             'width'     => '100px',
             'type'      => 'text',
@@ -240,7 +242,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('online_qty', array(
-            'header'    => Mage::helper('M2ePro')->__('eBay Available QTY'),
+            'header'    => $helper->__('eBay Available QTY'),
             'align'     => 'right',
             'width'     => '50px',
             'type'      => 'number',
@@ -250,7 +252,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('online_qty_sold', array(
-            'header'    => Mage::helper('M2ePro')->__('eBay Sold QTY'),
+            'header'    => $helper->__('eBay Sold QTY'),
             'align'     => 'right',
             'width'     => '50px',
             'type'      => 'number',
@@ -260,7 +262,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('online_buyitnow_price', array(
-            'header'    => Mage::helper('M2ePro')->__('"Buy It Now" Price'),
+            'header'    => $helper->__('"Buy It Now" Price'),
             'align'     =>'right',
             'width'     => '50px',
             'type'      => 'number',
@@ -271,27 +273,26 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
         $this->addColumn('status',
             array(
-                'header'=> Mage::helper('M2ePro')->__('Status'),
+                'header'=> $helper->__('Status'),
                 'width' => '100px',
                 'index' => 'status',
                 'filter_index' => 'status',
                 'type'  => 'options',
                 'sortable'  => false,
                 'options' => array(
-                    Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN    => Mage::helper('M2ePro')->__('Unknown'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED => Mage::helper('M2ePro')->__('Not Listed'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_LISTED     => Mage::helper('M2ePro')->__('Listed'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN     => Mage::helper('M2ePro')->__('Listed (Hidden)'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_SOLD       => Mage::helper('M2ePro')->__('Sold'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED    => Mage::helper('M2ePro')->__('Stopped'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED   => Mage::helper('M2ePro')->__('Finished'),
-                    Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED    => Mage::helper('M2ePro')->__('Pending')
+                    Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED => $helper->__('Not Listed'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_LISTED     => $helper->__('Listed'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN     => $helper->__('Listed (Hidden)'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_SOLD       => $helper->__('Sold'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED    => $helper->__('Stopped'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED   => $helper->__('Finished'),
+                    Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED    => $helper->__('Pending')
                 ),
                 'frame_callback' => array($this, 'callbackColumnStatus')
         ));
 
         $this->addColumn('goto_listing_item', array(
-            'header'    => Mage::helper('M2ePro')->__('Manage'),
+            'header'    => $helper->__('Manage'),
             'align'     => 'center',
             'width'     => '50px',
             'type'      => 'text',
@@ -489,7 +490,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
     {
         switch ($row->getData('status')) {
 
-            case Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN:
             case Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED:
                 $value = '<span style="color: gray;">'.$value.'</span>';
                 break;

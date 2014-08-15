@@ -8,7 +8,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
     extends Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
 {
     /** @var Mage_Eav_Model_Entity_Attribute_Abstract */
-    private $motorsSpecificsAttribute = NULL;
+    private $partsCompatibilityAttribute = NULL;
 
     // ####################################
 
@@ -21,13 +21,28 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
         $this->setId('ebayListingViewSettingsGrid'.$this->getListing()->getId());
         //------------------------------
 
-        if ($this->isMotorsSpecificsAvailable()) {
-            $attributeCode = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
-                '/ebay/motor/', 'motors_specifics_attribute'
-            );
-            $this->motorsSpecificsAttribute = Mage::getModel('catalog/product')->getResource()
+        if ($this->isPartsCompatibilityAvailable()) {
+            $attributeCode = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility')
+                ->getAttribute($this->getCompatibilityType());
+
+            $this->partsCompatibilityAttribute = Mage::getModel('catalog/product')->getResource()
                                                                                ->getAttribute($attributeCode);
         }
+    }
+
+    // ####################################
+
+    public function getCompatibilityType()
+    {
+        if (!$this->isPartsCompatibilityAvailable()) {
+            return null;
+        }
+
+        if ($this->isMotorSpecificsAvailable()) {
+            return Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC;
+        }
+
+        return Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_KTYPE;
     }
 
     // ####################################
@@ -168,16 +183,16 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
             'left'
         );
 
-        if ($this->motorsSpecificsAttribute) {
-            $collection->addAttributeToSelect($this->motorsSpecificsAttribute->getAttributeCode());
+        if ($this->partsCompatibilityAttribute) {
+            $collection->addAttributeToSelect($this->partsCompatibilityAttribute->getAttributeCode());
 
             $collection->joinTable(
                 array('eea' => Mage::getSingleton('core/resource')->getTableName('eav_entity_attribute')),
                 'attribute_set_id=attribute_set_id',
                 array(
-                    'is_motors_attribute_in_product_attribute_set' => 'entity_attribute_id',
+                    'is_parts_compatibility_attribute_in_product_attribute_set' => 'entity_attribute_id',
                 ),
-                '{{table}}.attribute_id = ' . $this->motorsSpecificsAttribute->getAttributeId(),
+                '{{table}}.attribute_id = ' . $this->partsCompatibilityAttribute->getAttributeId(),
                 'left'
             );
         }
@@ -205,20 +220,20 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
             'filter_condition_callback' => array($this, 'callbackFilterTitle')
         ), 'product_id');
 
-        if ($this->isMotorsSpecificsAvailable() && $this->motorsSpecificsAttribute) {
-            $this->addColumnAfter('motors_specifics_attribute_value', array(
+        if ($this->isPartsCompatibilityAvailable() && $this->partsCompatibilityAttribute) {
+            $this->addColumnAfter('parts_compatibility_attribute_value', array(
                 'header'    => Mage::helper('M2ePro')->__('Compatibility'),
                 'align'     => 'left',
                 'width'     => '100px',
                 'type'      => 'options',
-                'index'     => $this->motorsSpecificsAttribute->getAttributeCode(),
+                'index'     => $this->partsCompatibilityAttribute->getAttributeCode(),
                 'sortable'  => false,
                 'options'   => array(
                     1 => Mage::helper('M2ePro')->__('Filled'),
                     0 => Mage::helper('M2ePro')->__('Empty')
                 ),
-                'frame_callback' => array($this, 'callbackColumnMotorsSpecificsAttribute'),
-                'filter_condition_callback' => array($this, 'callbackFilterMotorsSpecificsAttribute'),
+                'frame_callback' => array($this, 'callbackColumnPartsCompatibilityAttribute'),
+                'filter_condition_callback' => array($this, 'callbackFilterPartsCompatibilityAttribute'),
             ), 'name');
         }
 
@@ -251,8 +266,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
 
         parent::_prepareMassaction();
 
-        if ($this->isMotorsSpecificsAvailable()) {
-            $this->getMassactionBlock()->addItem('editMotorsSpecifics', array(
+        if ($this->isPartsCompatibilityAvailable() && $this->partsCompatibilityAttribute) {
+            $this->getMassactionBlock()->addItem('editPartsCompatibility', array(
                 'label' => Mage::helper('M2ePro')->__('Add Compatible Vehicles'),
                 'url'   => ''
             ));
@@ -283,46 +298,51 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
 
         $value .= $this->getEbayCategoryInfoHtml($row,'category_secondary',$helper->__('eBay Secondary Category'));
 
-        $value .= $this->getStoreCategoryInfoHtml($row,'category_main',$helper->__('eBay Store Primary Category'));
-        $value .= $this->getStoreCategoryInfoHtml($row,'category_secondary',$helper->__('eBay Store Secondary Category'));
+        $value .= $this->getStoreCategoryInfoHtml($row,'category_main',
+                                                  $helper->__('eBay Store Primary Category'));
+        $value .= $this->getStoreCategoryInfoHtml($row,'category_secondary',
+                                                  $helper->__('eBay Store Secondary Category'));
         $value .= '<br>';
 
         return $value;
     }
 
-    public function callbackColumnMotorsSpecificsAttribute($value, $row, $column, $isExport)
+    public function callbackColumnPartsCompatibilityAttribute($value, $row, $column, $isExport)
     {
-        if (!$this->motorsSpecificsAttribute) {
+        if (!$this->partsCompatibilityAttribute) {
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        if (!$row->getData('is_motors_attribute_in_product_attribute_set')) {
+        if (!$row->getData('is_parts_compatibility_attribute_in_product_attribute_set')) {
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        $attributeCode = $this->motorsSpecificsAttribute->getAttributeCode();
+        $attributeCode = $this->partsCompatibilityAttribute->getAttributeCode();
         $attributeValue = $row->getData($attributeCode);
-        $explodedAttributeValue = (explode(',', $attributeValue));
 
-        (!isset($explodedAttributeValue[0]) || empty($explodedAttributeValue[0]))
-            ? $countOfValues = 0
-            : $countOfValues = count($explodedAttributeValue);
+        $parsedValue = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility')->parseAttributeValue($attributeValue);
+        $countOfValues = count($parsedValue);
+
+        if ($this->getCompatibilityType() == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC) {
+            $partsCompatibilityTypeTitle = 'ePIDs';
+        } else {
+            $partsCompatibilityTypeTitle = 'KTypes';
+        }
 
         $html = <<<HTML
-    <div style="padding: 4px; color: #666666">
-        <span style="text-decoration: underline; font-weight: bold">ePIDs:</span>&nbsp;
+        <div style="padding: 4px; color: #666666">
+        <span style="text-decoration: underline; font-weight: bold">{$partsCompatibilityTypeTitle}</span>&nbsp;
         <span>{$countOfValues}</span><br/>
 HTML;
         if ($countOfValues) {
 
             $label = Mage::helper('M2ePro')->__('Show');
-            $popupContent = Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml(
-                $this->getMotorsSpecificsEpidsHtml($row, $attributeCode, $explodedAttributeValue)
-            ));
 
             $html .= <<<HTML
         [<a href="javascript:void(0);"
-            onclick="EbayListingSettingsGridHandlerObj.showEpidsDetails('{$popupContent}');">{$label}</a>]
+            onclick="EbayListingSettingsGridHandlerObj.showCompatibilityDetails(
+                {$row->getData('id')}, '{$this->getCompatibilityType()}'
+            );">{$label}</a>]
 HTML;
         }
         return $html.'</div>';
@@ -358,7 +378,7 @@ HTML;
         }
     }
 
-    public function callbackFilterMotorsSpecificsAttribute(Varien_Data_Collection_Db $collection, $column)
+    public function callbackFilterPartsCompatibilityAttribute(Varien_Data_Collection_Db $collection, $column)
     {
         $value = $column->getFilter()->getValue();
 
@@ -366,22 +386,30 @@ HTML;
             return;
         }
 
-        if (!$this->motorsSpecificsAttribute) {
+        if (!$this->partsCompatibilityAttribute) {
             return;
         }
 
-        $attributeCode = $this->motorsSpecificsAttribute->getAttributeCode();
-
         if ($value == 1) {
+            $attributeCode = $this->partsCompatibilityAttribute->getAttributeCode();
+
             $collection->addFieldToFilter($attributeCode,array('notnull'=>true));
             $collection->addFieldToFilter($attributeCode,array('neq'=>'\'\''));
-            $collection->addFieldToFilter('is_motors_attribute_in_product_attribute_set',array('notnull'=>true));
+            $collection->addFieldToFilter(
+                'is_parts_compatibility_attribute_in_product_attribute_set',array('notnull'=>true)
+            );
         } else {
-            $collection->addFieldToFilter(array(
-                array('attribute'=>$attributeCode,'null'=>true),
-                array('attribute'=>$attributeCode,'eq'=>'\'\''),
-                array('attribute'=>'is_motors_attribute_in_product_attribute_set','null'=>true)
-            ));
+            $attributeId = $this->partsCompatibilityAttribute->getId();
+            $storeId = $this->getListing()->getStoreId();
+
+            $collection->getSelect()->joinLeft(
+                array('eaa' => Mage::getSingleton('core/resource')->getTableName('catalog_product_entity_text')),
+                'eaa.entity_id = e.entity_id and eaa.attribute_id = '.$attributeId.' and eaa.store_id = '.$storeId
+            );
+
+            $collection->getSelect()->orWhere('eaa.value IS NULL');
+            $collection->getSelect()->orWhere('eaa.value = \'\'');
+            $collection->getSelect()->orWhere('eea.entity_attribute_id IS NULL');
         }
     }
 
@@ -462,36 +490,6 @@ HTML;
 HTML;
     }
 
-    // ------------------------------------
-
-    private function getMotorsSpecificsEpidsHtml($row, $attributeCode, $explodedAttributeValue)
-    {
-        $helper = Mage::helper('M2ePro');
-
-        $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeCode);
-        $attributeValue = implode(', ',$explodedAttributeValue);
-
-        return <<<HTML
-    <div style="padding-top: 10px;">
-        <div style="margin: 2px 0;">
-            <span style="font-weight: bold;">{$helper->__('Product')}:</span>&nbsp;
-            <span style="color: grey;">{$row->getData('name')}</span>
-        </div>
-        <div style="margin: 2px 0 6px 0;">
-            <span style="font-weight: bold;">{$helper->__('Attribute')}:</span>&nbsp;
-            <span style="color: grey;">{$attributeLabel}</span><br/>
-        </div>
-        <div style="margin: 2px 0; height: 300px; overflow-x: auto;">
-            <span style="text-decoration: underline; font-weight: bold">{$helper->__('ePIDs')}:</span>
-            <p style="margin-top: 2px;">{$attributeValue}</p>
-        </div>
-    </div>
-    <div style="float: right; margin-top: 10px;">
-        <a href="javascript:void(0);" onclick="Windows.getFocusedWindow().close()">{$helper->__('Close')}<a/>
-    </div>
-HTML;
-    }
-
     // ####################################
 
     protected function getActionColumnOptions()
@@ -515,10 +513,10 @@ HTML;
             'value' => 'editPrimaryCategorySettings'
         ));
 
-        if ($this->isMotorsSpecificsAvailable()) {
+        if ($this->isPartsCompatibilityAvailable() && $this->partsCompatibilityAttribute) {
             $options[] =  array(
                 'label' => Mage::helper('M2ePro')->__('Add Compatible Vehicles'),
-                'value'   => 'editMotorsSpecifics'
+                'value' => 'editPartsCompatibility'
             );
         }
 
@@ -584,14 +582,23 @@ HTML;
         //------------------------------
 
         //------------------------------
-        if ($this->isMotorsSpecificsAvailable()) {
-            $motorsSpecificsBlock = $this->getLayout()->createBlock(
-                'M2ePro/adminhtml_ebay_motor_specific_generateAttributeValue', '', array(
-                    'products_grid_id' => $this->getId()
-                )
+        if ($this->isPartsCompatibilityAvailable()) {
+
+            if ($this->isMotorSpecificsAvailable()) {
+                $compatibilityType = Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC;
+            } else {
+                $compatibilityType = Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_KTYPE;
+            }
+
+            /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add $partsCompatibilityBlock */
+            $partsCompatibilityBlock = $this->getLayout()->createBlock(
+                'M2ePro/adminhtml_ebay_motor_add'
             );
 
-            $html .= $motorsSpecificsBlock->toHtml();
+            $partsCompatibilityBlock->setCompatibilityType($compatibilityType);
+            $partsCompatibilityBlock->setProductGridId($this->getId());
+
+            $html .= $partsCompatibilityBlock->toHtml();
         }
         //------------------------------
 
@@ -600,13 +607,23 @@ HTML;
 
     // ####################################
 
-    private function isMotorsSpecificsAvailable()
+    private function isPartsCompatibilityAvailable()
     {
-        if ($this->getListing()->getMarketplaceId() != Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_MOTORS) {
-            return false;
-        }
+        return $this->isMotorSpecificsAvailable() || $this->isMotorKtypesAvailable();
+    }
 
-        return true;
+    private function isMotorSpecificsAvailable()
+    {
+        return Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility')->isMarketplaceSupportsSpecific(
+            $this->getListing()->getMarketplaceId()
+        );
+    }
+
+    private function isMotorKtypesAvailable()
+    {
+        return Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility')->isMarketplaceSupportsKtype(
+            $this->getListing()->getMarketplaceId()
+        );
     }
 
     // ####################################

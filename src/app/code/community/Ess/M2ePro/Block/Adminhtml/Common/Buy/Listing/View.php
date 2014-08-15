@@ -22,16 +22,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View extends Mage_Adminhtml_
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
             $headerText = Mage::helper('M2ePro')->__(
                 'View %component_name% Listing "%listing_title%"',
-                $componentName,
+                Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE),
                 $this->escapeHtml($listingData['title'])
             );
         } else {
            $headerText = Mage::helper('M2ePro')->__(
-               'View Listing "%listing_title%"',
-               $this->escapeHtml($listingData['title'])
+               'View Listing "%listing_title%"', $this->escapeHtml($listingData['title'])
            );
         }
 
@@ -231,17 +229,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View extends Mage_Adminhtml_
         $taskCompletedSuccessMessage = $helper->escapeJs(
             $helper->__('"%task_title%" task has successfully submitted to be processed.')
         );
-        $taskCompletedWarningMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.')
-        );
-        $taskCompletedErrorMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.')
-        );
+        $taskCompletedWarningMessage = $helper->escapeJs($helper->__(
+            '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.'
+        ));
+        $taskCompletedErrorMessage = $helper->escapeJs($helper->__(
+            '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.'
+        ));
 
         $lockedObjNoticeMessage = $helper->escapeJs(
             $helper->__('Some Rakuten.com request(s) are being processed now.')
         );
-        $sendingDataToBuyMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on Rakuten.com.'));
+        $sendingDataToBuyMessage = $helper->escapeJs($helper->__(
+            'Sending %product_title% product(s) data on Rakuten.com.'
+        ));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = $helper->escapeJs(

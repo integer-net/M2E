@@ -223,7 +223,7 @@ $tempTable = $installer->getTable('m2epro_ebay_template_synchronization');
 
 if ($connection->tableColumnExists($tempTable, 'revise_update_gallery') !== false &&
     $connection->tableColumnExists($tempTable, 'revise_update_images') === false) {
-    $connection->changeColumn($tempTable,'revise_update_gallery','revise_update_images', 'TINYINT(2) UNSIGNED NOT NULL');
+    $connection->changeColumn($tempTable,'revise_update_gallery','revise_update_images','TINYINT(2) UNSIGNED NOT NULL');
 }
 
 //---------------------------------------------

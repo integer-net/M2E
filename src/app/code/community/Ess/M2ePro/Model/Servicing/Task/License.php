@@ -54,7 +54,8 @@ class Ess_M2ePro_Model_Servicing_Task_License implements Ess_M2ePro_Model_Servic
 
         if (isset($validationData['directory'])) {
             Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/','directory',(string)$validationData['directory']
+                '/'.Mage::helper('M2ePro/Module')->getName().'/license/',
+                'directory',(string)$validationData['directory']
             );
         }
     }
@@ -63,19 +64,22 @@ class Ess_M2ePro_Model_Servicing_Task_License implements Ess_M2ePro_Model_Servic
     {
         if (isset($validationValidData['domain'])) {
             Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/','domain',(int)$validationValidData['domain']
+                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/',
+                'domain',(int)$validationValidData['domain']
             );
         }
 
         if (isset($validationValidData['ip'])) {
             Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/','ip',(int)$validationValidData['ip']
+                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/',
+                'ip',(int)$validationValidData['ip']
             );
         }
 
         if (isset($validationValidData['directory'])) {
             Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/','directory',(int)$validationValidData['directory']
+                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/',
+                'directory',(int)$validationValidData['directory']
             );
         }
     }

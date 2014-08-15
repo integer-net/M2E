@@ -24,7 +24,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit_Tabs extends Mage_Admin
         $this->addTab('general', array(
             'label'   => Mage::helper('M2ePro')->__('General'),
             'title'   => Mage::helper('M2ePro')->__('General'),
-            'content' => $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_account_edit_tabs_general')->toHtml(),
+            'content' => $this->getLayout()
+                              ->createBlock('M2ePro/adminhtml_common_buy_account_edit_tabs_general')
+                              ->toHtml(),
         ));
 
         $this->addTab('listingOther', array(
@@ -38,7 +40,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit_Tabs extends Mage_Admin
         $this->addTab('orders', array(
             'label'   => Mage::helper('M2ePro')->__('Orders'),
             'title'   => Mage::helper('M2ePro')->__('Orders'),
-            'content' => $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_account_edit_tabs_order')->toHtml(),
+            'content' => $this->getLayout()
+                              ->createBlock('M2ePro/adminhtml_common_buy_account_edit_tabs_order')
+                              ->toHtml(),
         ));
 
         $this->setActiveTab($this->getRequest()->getParam('tab', 'general'));

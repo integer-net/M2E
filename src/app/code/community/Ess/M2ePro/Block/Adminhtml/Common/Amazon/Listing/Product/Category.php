@@ -24,10 +24,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Product_Category extends 
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName =  Ess_M2ePro_Helper_Component_Amazon::TITLE;
             $headerText = Mage::helper('M2ePro')->__(
                 'Add Products To %component_name% Listing "%listing_title%" From Categories',
-                $componentName,
+                Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE),
                 $this->escapeHtml($listingData['title'])
             );
         } else {
@@ -136,8 +135,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Product_Category extends 
                 'tree_settings' => $treeSettings
             )
         );
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_product_category_help');
-        $categoryBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_product_category_edit');
+
+        $helpBlock = $this->getLayout()
+                          ->createBlock('M2ePro/adminhtml_common_amazon_listing_product_category_help');
+
+        $categoryBlock = $this->getLayout()
+                              ->createBlock('M2ePro/adminhtml_common_amazon_listing_product_category_edit');
 
         return '<div id="add_products_progress_bar"></div>'.
             '<div id="add_products_container">'.

@@ -233,7 +233,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection()->getItems() as $template) {
-            $attributesForProductChange = array_merge($attributesForProductChange, $template->getDescriptionAttributes());
+            $attributesForProductChange = array_merge($attributesForProductChange,
+                                                      $template->getDescriptionAttributes());
         }
 
         $changedListingsProducts = $this->getChangesHelper()->getInstancesByListingProduct(
@@ -347,7 +348,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
         $listingProductCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
-        $listingProductCollection->addFieldToFilter('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
+        $listingProductCollection->addFieldToFilter('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
 
         $listingProductCollection->getSelect()->limit(100);
 
