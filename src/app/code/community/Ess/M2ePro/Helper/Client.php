@@ -220,7 +220,7 @@ class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
 
     public function getMysqlTotals()
     {
-        $moduleTables = Mage::helper('M2ePro/Module_Database')->getMySqlTables();
+        $moduleTables = Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables();
         $magentoTables = Mage::helper('M2ePro/Magento')->getMySqlTables();
 
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */

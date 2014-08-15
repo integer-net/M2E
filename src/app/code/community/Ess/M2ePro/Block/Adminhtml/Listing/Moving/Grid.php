@@ -43,6 +43,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Moving_Grid extends Mage_Adminhtml_Bloc
             $collection->addFieldToFilter('`main_table`.`id`', array('neq'=>$listingId));
         }
 
+        $this->addAccountAndMarketplaceFilter($collection);
         $this->addAttributeSetFilter($collection);
 
         $this->setCollection($collection);
@@ -162,7 +163,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Moving_Grid extends Mage_Adminhtml_Bloc
         $confirmMessage = Mage::helper('M2ePro')->__('Are you sure?');
         $actions = '&nbsp;<a href="javascript:void(0);" onclick="confirm(\''.$confirmMessage.'\') && ';
         $actions .= $this->getMovingHandlerJs() . '.tryToSubmit('.$row->getData('listing_id').');">';
-        $actions .= 'Move To This Listing</a>';
+        $actions .= Mage::helper('M2ePro')->__('Move To This Listing') . '</a>';
         return $actions;
     }
 
@@ -226,10 +227,17 @@ JAVASCRIPT;
 
     // ####################################
 
-    protected function addAttributeSetFilter($collection)
+    protected function addAccountAndMarketplaceFilter($collection)
     {
         $accountId = Mage::helper('M2ePro/Data_Global')->getValue('accountId');
         $marketplaceId = Mage::helper('M2ePro/Data_Global')->getValue('marketplaceId');
+
+        $collection->addFieldToFilter('`main_table`.`marketplace_id`', $marketplaceId);
+        $collection->addFieldToFilter('`main_table`.`account_id`', $accountId);
+    }
+
+    protected function addAttributeSetFilter($collection)
+    {
         $attrSetId = Mage::helper('M2ePro/Data_Global')->getValue('attrSetId');
 
         $collection->getSelect()
@@ -246,8 +254,6 @@ JAVASCRIPT;
             $collection->addFieldToFilter('`as`.`attribute_set_id`', $attrSetId);
         }
 
-        $collection->addFieldToFilter('`main_table`.`marketplace_id`', $marketplaceId);
-        $collection->addFieldToFilter('`main_table`.`account_id`', $accountId);
         $collection->addFieldToFilter('`as`.`object_type`', Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_LISTING);
     }
 

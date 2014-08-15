@@ -18,7 +18,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Notes extends Mage_Adminht
         //------------------------------
 
         $this->_headerText = Mage::helper('M2ePro')->__(
-            'M2E Pro Migration to v. %s', Mage::helper('M2ePro/Module')->getVersion()
+            'M2E Pro Migration to v. %version%', Mage::helper('M2ePro/Module')->getVersion()
         );
 
         $this->setTemplate('widget/form/container.phtml');

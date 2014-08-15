@@ -6,6 +6,8 @@
 
 abstract class Ess_M2ePro_Model_Order_Item_Proxy
 {
+    // ########################################
+
     /** @var Ess_M2ePro_Model_Ebay_Order_Item|Ess_M2ePro_Model_Amazon_Order_Item|
      * Ess_M2ePro_Model_Buy_Order_Item|Ess_M2ePro_Model_Play_Order_Item */
     protected $item = NULL;
@@ -94,11 +96,6 @@ abstract class Ess_M2ePro_Model_Order_Item_Proxy
 
     // ########################################
 
-    /**
-     * Return product associated with order item
-     *
-     * @return Mage_Catalog_Model_Product
-     */
     public function getProduct()
     {
         return $this->item->getParentObject()->getProduct();
@@ -128,40 +125,18 @@ abstract class Ess_M2ePro_Model_Order_Item_Proxy
 
     // ########################################
 
-    /**
-     * Return price converted to the base store currency
-     *
-     * @return float
-     */
     public function getBasePrice()
     {
         return $this->getProxyOrder()->convertPriceToBase($this->getPrice());
     }
 
-    /**
-     * Return price in channel currency
-     *
-     * @return float
-     */
     public function getPrice()
     {
         return $this->subtotal / $this->getQty();
     }
 
-    /**
-     * Return item purchase price
-     *
-     * @abstract
-     * @return float
-     */
     abstract public function getOriginalPrice();
 
-    /**
-     * Return item purchase qty
-     *
-     * @abstract
-     * @return int
-     */
     abstract public function getOriginalQty();
 
     public function setQty($qty)
@@ -183,34 +158,26 @@ abstract class Ess_M2ePro_Model_Order_Item_Proxy
         return $this->getOriginalQty();
     }
 
-    /**
-     * Return item tax rate
-     *
-     * @return float
-     */
-    public function getTaxRate()
-    {
-        return $this->item->getParentObject()->getOrder()->getProxy()->getTaxRate();
-    }
+    // ########################################
 
-    /**
-     * Check whether item has Tax
-     *
-     * @return bool
-     */
     public function hasTax()
     {
         return $this->getProxyOrder()->hasTax();
     }
 
-    /**
-     * Check whether item has VAT (value added tax)
-     *
-     * @return bool
-     */
-    public function hasVat()
+    public function isSalesTax()
     {
-        return $this->getProxyOrder()->hasVat();
+        return $this->getProxyOrder()->isSalesTax();
+    }
+
+    public function isVatTax()
+    {
+        return $this->getProxyOrder()->isVatTax();
+    }
+
+    public function getTaxRate()
+    {
+        return $this->getProxyOrder()->getProductPriceTaxRate();
     }
 
     // ########################################

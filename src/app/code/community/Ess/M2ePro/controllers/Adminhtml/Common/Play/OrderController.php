@@ -99,12 +99,14 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
         $order = Mage::helper('M2ePro/Component_Play')->getObject('Order', (int)$id);
 
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
-            $message = 'Magento Order is already created for this %s Order. ' .
+            // M2ePro_TRANSLATIONS
+            // Magento Order is already created for this %component_name% Order. Press Create Order button to create new one.'
+            $message = 'Magento Order is already created for this %component_name% Order. ' .
                        'Press Create Order button to create new one.';
 
             // todo replace hardcoded string with constant, when Play will be stable (no "Beta" in component title)
             $this->_getSession()->addWarning(
-                sprintf(Mage::helper('M2ePro')->__($message), 'Play.com')
+                Mage::helper('M2ePro')->__($message, 'Play.com')
             );
             $this->_redirect('*/*/view', array('id' => $id));
             return;
@@ -116,9 +118,10 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
             $order->createMagentoOrder();
             $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Magento Order was created.'));
         } catch (Exception $e) {
-            $message = 'Magento Order was not created. Reason: %s';
+            $message = 'Magento Order was not created. Reason: %error_message%';
             $message = Mage::helper('M2ePro')->__(
-                $message, Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage())
+                $message, Mage::helper('M2ePro')->
+                    __( Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage()))
             );
             $this->_getSession()->addError($message);
         }

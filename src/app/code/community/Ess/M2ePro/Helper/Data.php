@@ -94,7 +94,10 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
         $tags = array_map('strtolower',$tags);
 
         $cacheData = $this->getObject($modelName,$value,$field);
-        Mage::helper('M2ePro/Data_Cache')->setValue($cacheKey,$cacheData,$tags,60*60*24);
+
+        if (!empty($cacheData)) {
+            Mage::helper('M2ePro/Data_Cache')->setValue($cacheKey,$cacheData,$tags,60*60*24);
+        }
 
         return $cacheData;
     }

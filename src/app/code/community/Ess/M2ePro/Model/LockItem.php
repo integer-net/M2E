@@ -64,13 +64,14 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
             return false;
         }
 
-        $parentId = $lockModel->getData('parent_id');
+        $childrenCollection = Mage::getModel('M2ePro/LockItem')->getCollection();
+        $childrenCollection->addFieldToFilter('parent_id', $lockModel->getId());
 
-        if (!is_null($parentId)) {
-            /** @var $parentLockModel Ess_M2ePro_Model_LockItem **/
-            $parentLockModel = Mage::getModel('M2ePro/LockItem')->load($parentId);
-            $parentLockModel->setNick($parentLockModel->getData('nick'));
-            $parentLockModel->getId() && $parentLockModel->remove();
+        foreach ($childrenCollection->getItems() as $childLockModel) {
+            /** @var $childLockModel Ess_M2ePro_Model_LockItem **/
+            $childLockModel = Mage::getModel('M2ePro/LockItem')->load($childLockModel->getId());
+            $childLockModel->setNick($childLockModel->getData('nick'));
+            $childLockModel->getId() && $childLockModel->remove();
         }
 
         $lockModel->delete();
@@ -116,6 +117,11 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
             $parentLockModel = Mage::getModel('M2ePro/LockItem')->load($parentId);
             $parentLockModel->setNick($parentLockModel->getData('nick'));
             $parentLockModel->getId() && $parentLockModel->activate();
+        }
+
+        if ($lockModel->getData('kill_now')) {
+            $this->remove();
+            exit('kill now.');
         }
 
         $lockModel->setData('data',$lockModel->getData('data'))->save();

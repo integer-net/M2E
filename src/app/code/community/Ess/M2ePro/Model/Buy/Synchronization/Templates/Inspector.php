@@ -75,7 +75,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
         }
         //--------------------
 
-        $productsIdsForEachVariation = NULL;
+        $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
         // Check filters
         //--------------------
@@ -85,18 +85,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return false;
             } else if ($listingProduct->getChildObject()->isVariationsReady()) {
 
-                if (is_null($productsIdsForEachVariation)) {
-                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
-                }
+                $temp = $variationResource->isAllStatusesDisabled(
+                    $listingProduct->getId(),
+                    $listingProduct->getListing()->getStoreId()
+                );
 
-                if (count($productsIdsForEachVariation) > 0) {
-
-                    $tempStatuses = $listingProduct->getVariationsStatuses($productsIdsForEachVariation);
-
-                    // all variations are disabled
-                    if ((int)min($tempStatuses) == Mage_Catalog_Model_Product_Status::STATUS_DISABLED) {
-                        return false;
-                    }
+                if (!is_null($temp) && $temp) {
+                    return false;
                 }
             }
         }
@@ -107,18 +102,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return false;
             } else if ($listingProduct->getChildObject()->isVariationsReady()) {
 
-                if (is_null($productsIdsForEachVariation)) {
-                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
-                }
+                $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
+                    $listingProduct->getId(),
+                    $listingProduct->getListing()->getStoreId()
+                );
 
-                if (count($productsIdsForEachVariation) > 0) {
-
-                    $tempStocks = $listingProduct->getVariationsStockAvailabilities($productsIdsForEachVariation);
-
-                    // all variations are out of stock
-                    if (!(int)max($tempStocks)) {
-                        return false;
-                    }
+                if (!is_null($temp) && $temp) {
+                    return false;
                 }
             }
         }
@@ -210,7 +200,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
         }
         //--------------------
 
-        $productsIdsForEachVariation = NULL;
+        $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
         // Check filters
         //--------------------
@@ -220,18 +210,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return false;
             } else if ($listingProduct->getChildObject()->isVariationsReady()) {
 
-                if (is_null($productsIdsForEachVariation)) {
-                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
-                }
+                $temp = $variationResource->isAllStatusesDisabled(
+                    $listingProduct->getId(),
+                    $listingProduct->getListing()->getStoreId()
+                );
 
-                if (count($productsIdsForEachVariation) > 0) {
-
-                    $tempStatuses = $listingProduct->getVariationsStatuses($productsIdsForEachVariation);
-
-                    // all variations are disabled
-                    if ((int)min($tempStatuses) == Mage_Catalog_Model_Product_Status::STATUS_DISABLED) {
-                        return false;
-                    }
+                if (!is_null($temp) && $temp) {
+                    return false;
                 }
             }
         }
@@ -242,18 +227,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return false;
             } else if ($listingProduct->getChildObject()->isVariationsReady()) {
 
-                if (is_null($productsIdsForEachVariation)) {
-                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
-                }
+                $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
+                    $listingProduct->getId(),
+                    $listingProduct->getListing()->getStoreId()
+                );
 
-                if (count($productsIdsForEachVariation) > 0) {
-
-                    $tempStocks = $listingProduct->getVariationsStockAvailabilities($productsIdsForEachVariation);
-
-                    // all variations are out of stock
-                    if (!(int)max($tempStocks)) {
-                        return false;
-                    }
+                if (!is_null($temp) && $temp) {
+                    return false;
                 }
             }
         }
@@ -336,7 +316,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
         }
         //--------------------
 
-        $productsIdsForEachVariation = NULL;
+        $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
         // Check filters
         //--------------------
@@ -346,18 +326,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return true;
             } else if ($listingProduct->getChildObject()->isVariationsReady()) {
 
-                if (is_null($productsIdsForEachVariation)) {
-                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
-                }
+                $temp = $variationResource->isAllStatusesDisabled(
+                    $listingProduct->getId(),
+                    $listingProduct->getListing()->getStoreId()
+                );
 
-                if (count($productsIdsForEachVariation) > 0) {
-
-                    $tempStatuses = $listingProduct->getVariationsStatuses($productsIdsForEachVariation);
-
-                    // all variations are disabled
-                    if ((int)min($tempStatuses) == Mage_Catalog_Model_Product_Status::STATUS_DISABLED) {
-                        return true;
-                    }
+                if (!is_null($temp) && $temp) {
+                    return true;
                 }
             }
         }
@@ -368,18 +343,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return true;
             } else if ($listingProduct->getChildObject()->isVariationsReady()) {
 
-                if (is_null($productsIdsForEachVariation)) {
-                    $productsIdsForEachVariation = $listingProduct->getProductsIdsForEachVariation();
-                }
+                $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
+                    $listingProduct->getId(),
+                    $listingProduct->getListing()->getStoreId()
+                );
 
-                if (count($productsIdsForEachVariation) > 0) {
-
-                    $tempStocks = $listingProduct->getVariationsStockAvailabilities($productsIdsForEachVariation);
-
-                    // all variations are out of stock
-                    if (!(int)max($tempStocks)) {
-                        return true;
-                    }
+                if (!is_null($temp) && $temp) {
+                    return true;
                 }
             }
         }

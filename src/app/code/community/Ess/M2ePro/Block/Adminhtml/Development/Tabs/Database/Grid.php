@@ -40,7 +40,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
-        $moduleTables = Mage::helper('M2ePro/Module_Database')->getGroupedMySqlTables();
+        $moduleTables = Mage::helper('M2ePro/Module_Database_Structure')->getGroupedMySqlTables();
         $magentoTables = Mage::helper('M2ePro/Magento')->getMySqlTables();
         $databaseName = Mage::helper('M2ePro/Magento')->getDatabaseName();
 
@@ -54,7 +54,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
                 'is_exist'   => false,
                 'records'    => 0,
                 'size'       => 0,
-                'model'      => Mage::helper('M2ePro/Module_Database')->getTableModel($moduleTable)
+                'model'      => Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($moduleTable)
             );
 
             // Set component
@@ -127,17 +127,17 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
 
         //--------------------
         $options = array(
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_CONFIGS        => 'Configs',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_ACCOUNTS       => 'Accounts',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_MARKETPLACES   => 'Marketplaces',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_LISTINGS       => 'Listings',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_LISTINGS_OTHER => 'Listings Other',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_LOGS           => 'Logs',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_ITEMS          => 'Items',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_DICTIONARY     => 'Dictionary',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_ORDERS         => 'Orders',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_TEMPLATES      => 'Templates',
-            Ess_M2ePro_Helper_Module_Database::TABLE_GROUP_OTHER          => 'Other'
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_CONFIGS        => 'Configs',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_ACCOUNTS       => 'Accounts',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_MARKETPLACES   => 'Marketplaces',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_LISTINGS       => 'Listings',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_LISTINGS_OTHER => 'Listings Other',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_LOGS           => 'Logs',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_ITEMS          => 'Items',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_DICTIONARY     => 'Dictionary',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_ORDERS         => 'Orders',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_TEMPLATES      => 'Templates',
+            Ess_M2ePro_Helper_Module_Database_Structure::TABLE_GROUP_OTHER          => 'Other'
         );
 
         $this->addColumn('group', array(

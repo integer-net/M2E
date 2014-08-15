@@ -65,11 +65,14 @@ class Ess_M2ePro_Helper_Server extends Mage_Core_Helper_Abstract
         curl_setopt($curlObject, CURLOPT_TIMEOUT, $timeout);
 
         $response = curl_exec($curlObject);
+        $errorNumber = curl_errno($curlObject);
+
         curl_close($curlObject);
 
         if ($response === false) {
 
-            if ($this->switchEndpoint() && !$secondAttempt) {
+            if ($errorNumber !== CURLE_OPERATION_TIMEOUTED &&
+                !$secondAttempt && $this->switchEndpoint()) {
                 return $this->sendRequest($postData,$headers,$timeout,true);
             }
 

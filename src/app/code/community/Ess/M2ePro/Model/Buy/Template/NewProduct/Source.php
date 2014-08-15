@@ -85,7 +85,6 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
             switch ($src['mode']) {
                 case Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute::ATTRIBUTE_MODE_CUSTOM_VALUE:
                     $value = $src['custom_value'];
-                    //$value = str_replace(',','^',$src['custom_value']);
                     break;
 
                 case Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute::ATTRIBUTE_MODE_CUSTOM_ATTRIBUTE:

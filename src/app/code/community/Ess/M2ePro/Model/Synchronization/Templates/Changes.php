@@ -77,11 +77,11 @@ class Ess_M2ePro_Model_Synchronization_Templates_Changes
         $listingProductsIds = array();
         $resultListingProducts = array();
 
-        $changedListingsProducts = Mage::getModel('M2ePro/Listing_Product')->$fetchFunction(
-            $attributes,
-            $this->getComponent(),
-            $withStoreFilter
-        );
+        $changedListingsProducts =
+            Mage::getResourceModel('M2ePro/'.ucfirst($this->getComponent()).'_Listing_Product')->$fetchFunction(
+                $attributes,
+                $withStoreFilter
+            );
 
         foreach ($changedListingsProducts as $key => $listingProductData) {
 

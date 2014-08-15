@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Model_Magento_Quote_Item
 {
+    // ########################################
+
     /** @var Mage_Sales_Model_Quote */
     private $quote = NULL;
 
@@ -75,24 +77,24 @@ class Ess_M2ePro_Model_Magento_Quote_Item
     private function getProductTaxClassId()
     {
         $proxyOrder = $this->proxyItem->getProxyOrder();
-        $taxRate = $this->proxyItem->getTaxRate();
-        $isOrderHasRate = $this->proxyItem->getProxyOrder()->getTaxRate() > 0;
+        $itemTaxRate = $this->proxyItem->getTaxRate();
+        $isOrderHasTax = $this->proxyItem->getProxyOrder()->hasTax();
         $hasRatesForCountry = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
             ->hasRatesForCountry($this->quote->getShippingAddress()->getCountryId());
         $calculationBasedOnOrigin = Mage::getSingleton('M2ePro/Magento_Tax_Helper')
             ->isCalculationBasedOnOrigin($this->quote->getStore());
 
         if ($proxyOrder->isTaxModeNone()
-            || ($proxyOrder->isTaxModeChannel() && $taxRate == 0)
+            || ($proxyOrder->isTaxModeChannel() && $itemTaxRate <= 0)
             || ($proxyOrder->isTaxModeMagento() && !$hasRatesForCountry && !$calculationBasedOnOrigin)
-            || ($proxyOrder->isTaxModeMixed() && $taxRate == 0 && $isOrderHasRate)
+            || ($proxyOrder->isTaxModeMixed() && $itemTaxRate <= 0 && $isOrderHasTax)
         ) {
             return Ess_M2ePro_Model_Magento_Product::TAX_CLASS_ID_NONE;
         }
 
         if ($proxyOrder->isTaxModeMagento()
-            || $taxRate == 0
-            || $taxRate == $this->getProductTaxRate()
+            || $itemTaxRate <= 0
+            || $itemTaxRate == $this->getProductTaxRate()
         ) {
             return $this->getProduct()->getTaxClassId();
         }
@@ -102,7 +104,7 @@ class Ess_M2ePro_Model_Magento_Quote_Item
         /** @var $taxRuleBuilder Ess_M2ePro_Model_Magento_Tax_Rule_Builder */
         $taxRuleBuilder = Mage::getModel('M2ePro/Magento_Tax_Rule_Builder');
         $taxRuleBuilder->buildTaxRule(
-            $taxRate,
+            $itemTaxRate,
             $this->quote->getShippingAddress()->getCountryId(),
             $this->quote->getCustomerTaxClassId()
         );

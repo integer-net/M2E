@@ -61,35 +61,35 @@
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-            'Search For Charities' => $this->__('Search For Charities')
-        )) ?>);
+        'Search For Charities' => Mage::helper('M2ePro')->__('Search For Charities')
+    )) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-            'Please select a percentage of donation' => $this->__('Please select a percentage of donation')
-        )) ?>);
+        'Please select a percentage of donation' => Mage::helper('M2ePro')->__('Please select a percentage of donation')
+    )) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-            'If you do not see the organization you were looking for, try to enter another keywords and run the search again.' => $this->__('If you do not see the organization you were looking for, try to enter another keywords and run the search again.')
-        )) ?>);
+        'If you do not see the organization you were looking for, try to enter another keywords and run the search again.' => Mage::helper('M2ePro')->__('If you do not see the organization you were looking for, try to enter another keywords and run the search again.')
+    )) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-            'Please, enter the organization name or ID.' => $this->__('Please, enter the organization name or ID.')
-        ))?>);
+        'Please, enter the organization name or ID.' => Mage::helper('M2ePro')->__('Please, enter the organization name or ID.')
+    ))?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Wrong value. Must be no more than 30. Max applicable length is 6 characters, including the decimal (e.g., 12.345).' => $this->__('Wrong value. Must be no more than 30. Max applicable length is 6 characters, including the decimal (e.g., 12.345).'),
+        'Wrong value. Must be no more than 30. Max applicable length is 6 characters, including the decimal (e.g., 12.345).' => Mage::helper('M2ePro')->__('Wrong value. Must be no more than 30. Max applicable length is 6 characters, including the decimal (e.g., 12.345).'),
 
-        'Price Change is not valid.' => $this->__('Price Change is not valid.'),
-        'Wrong value. Only integer numbers.' => $this->__('Wrong value. Only integer numbers.'),
+        'Price Change is not valid.' => Mage::helper('M2ePro')->__('Price Change is not valid.'),
+        'Wrong value. Only integer numbers.' => Mage::helper('M2ePro')->__('Wrong value. Only integer numbers.'),
 
-        'Price' => $this->__('Price'),
-        '"Buy It Now" Price' => $this->__('"Buy It Now" Price'),
+        'Price' => Mage::helper('M2ePro')->__('Price'),
+        '"Buy It Now" Price' => Mage::helper('M2ePro')->__('"Buy It Now" Price'),
 
-        'The fixed price for immediate purchase.' => $this->__('The fixed price for immediate purchase.'),
-        'The fixed price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now price</a> to your listing.' => $this->__('The fixed price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now price</a> to your listing.'),
+        'The fixed price for immediate purchase.' => Mage::helper('M2ePro')->__('The fixed price for immediate purchase.'),
+        'The fixed price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now price</a> to your listing.' => Mage::helper('M2ePro')->__('The fixed price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now price</a> to your listing.'),
 
-        '% of Price' => $this->__('% of Price'),
-        '% of "Buy It Now" Price' => $this->__('% of "Buy It Now" Price')
+        '% of Price' => Mage::helper('M2ePro')->__('% of Price'),
+        '% of "Buy It Now" Price' => Mage::helper('M2ePro')->__('% of "Buy It Now" Price')
 
     )); ?>);
 
@@ -214,7 +214,7 @@
 
     .price_coefficient_container {
          position: absolute;
-         left: 215px;
+         left: 230px;
          top: 0;
      }
 
@@ -290,8 +290,14 @@
                         </select>
 
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Is your item for sale <a href="http://sellercentre.ebay.co.uk/auction-style-or-fixed-price-listing" target="_blank">auction-style, or fixed price</a>?'); ?></span>
-                            <span class="simple_mode_disallowed"><?php echo Mage::helper('M2ePro')->__('<br/>Attribute must contain ID. ID for Fixed price is FixedPriceItem, for Auction is Chinese.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose whether products listed with this policy on eBay auction-style or fixed price.<br/>
+                                Auction-style listings are best if you are unsure of the value of your item, eg because it is unique. Fixed price listings are good if you know the price you want to get for your item.'
+                            ); ?></span>
+                            <span class="simple_mode_disallowed"><?php echo Mage::helper('M2ePro')->__(
+                                '<br/><br/>Alternatively, you can specify a Magento attribute to set the listing type depending on the attribute value set for each product.<br/>
+                                For fixed price listings, set the attribute value to <b>FixedPriceItem</b>; for auction-style listings, set the attribute value to <b>Chinese</b>.'
+                            ); ?></span>
                         </p>
 
                         <input type="hidden" name="selling_format[listing_type_attribute]" id="listing_type_attribute" />
@@ -309,7 +315,11 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_IS_PRIVATE_YES; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_IS_PRIVATE_YES == $formData['listing_is_private']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The buyer will be anonymous to other eBay users in a Private Listing.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Making your listing private means that the details of the listing won\'t be shown on the Feedback Profile page for you or the buyer.<br/><br/>
+                                This can be useful in cases where you or the buyer might want to be discreet about the item and/or the final price - such as the sale of high-priced items or approved pharmaceutical products.
+                                You should only make your listing private for a specific reason.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -375,6 +385,32 @@
                     </td>
                 </tr>
 
+                <tr id="out_of_stock_control_tr" class="simple_mode_disallowed">
+
+                    <td class="label">
+                        <label for="out_of_stock_control_mode"><?php echo Mage::helper('M2ePro')->__('Out Of Stock Control'); ?>:</label>
+                    </td>
+
+                    <td class="value">
+
+                        <select id="out_of_stock_control_mode" name="selling_format[out_of_stock_control]">
+                            <option value="0" <?php echo ($formData['out_of_stock_control'] == 0) ? ' selected="selected"' : ''; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="1" <?php echo ($formData['out_of_stock_control'] == 1) ? ' selected="selected"' : ''; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'This is useful if you have run out of stock of an item that you have listed on eBay.
+                                If you choose <b>Yes</b>, the eBay listing is hidden temporarily instead of being ended completely.
+                                When new stock for the item arrives, you can use automatic or manual Revise rules to update the inventory and the eBay listing will appear again.<br/><br/>
+                                <b>Note:</b> Once you list a product with this option it cannot be changed. To cancel it you should end the eBay listing before listing the item again.'
+                            ); ?></span>
+                        </p>
+
+                    </td>
+
+                </tr>
+
                 <tr class="simple_mode_disallowed" id="qty_mode_tr">
                     <td class="label">
                         <label for="qty_mode"><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: </label>
@@ -401,7 +437,13 @@
 
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The number of items you have for sale.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'The number of items you want to sell on eBay.<br/><br/>
+                                <b>Product QTY:</b> the number of items on eBay will be the same as in Magento.<br/>
+                                <b>Single Item:</b> only one item will be available on eBay.<br/>
+                                <b>Custom QTY Number:</b> set a quantity in the policy here.<br/>
+                                <b>Magento Attribute:</b> takes the number from the attribute you specify.'
+                            ); ?></span>
                         </p>
 
                         <input type="hidden" name="selling_format[qty_custom_attribute]" id="qty_custom_attribute" />
@@ -418,6 +460,22 @@
                     </td>
                 </tr>
 
+                <tr id="qty_percentage_tr" class="simple_mode_disallowed">
+                    <td class="label">
+                        <label for="qty_percentage"><?php echo Mage::helper('M2ePro')->__('QTY Percentage'); ?>: </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="qty_percentage" name="selling_format[qty_percentage]" class="required-entry">
+                            <?php for ($i = 100; $i >= 5; $i -= 5) : ?>
+                                <option value="<?php echo $i; ?>" <?php if ($formData['qty_percentage'] == $i) : echo ' selected="selected"'; endif; ?>><?php echo $i; ?> %</option>
+                            <?php endfor; ?>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of items number to be listed on eBay basing on product quantity or magento attribute. E.g., if qty percentage is set to 10% and product quantity is 100, the quantity to be listed on eBay will be calculated as <br>100 *10%  = 10.</br>'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
                 <!-- Max Posted QTY-->
                 <tr id="qty_max_posted_value_mode_tr" class="simple_mode_disallowed" style="display: none;">
                     <td class="label">
@@ -429,7 +487,11 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON; ?>" <?php if ($formData['qty_max_posted_value_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose specifically the number of items available for sale on eBay.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose whether to limit the amount of stock you list on eBay, eg because you want to set some stock aside for sales off eBay.<br/><br/>
+                                If this setting is <b>Enabled</b> you can specify the maximum quantity to be listed.
+                                If this setting is <b>Disabled</b> all stock for the product will be listed as available on eBay.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -447,31 +509,6 @@
                     </td>
                 </tr>
 
-                <tr id="out_of_stock_control_tr" class="simple_mode_disallowed">
-
-                    <td class="label">
-                        <label for="out_of_stock_control_mode"><?php echo Mage::helper('M2ePro')->__('Out Of Stock Control'); ?>:</label>
-                    </td>
-
-                    <td class="value">
-
-                        <select id="out_of_stock_control_mode" name="selling_format[out_of_stock_control]">
-                            <option value="0" <?php echo ($formData['out_of_stock_control'] == 0) ? ' selected="selected"' : ''; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
-                            <option value="1" <?php echo ($formData['out_of_stock_control'] == 1) ? ' selected="selected"' : ''; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
-                        </select>
-
-                        <p class="note">
-                            <span>
-                                <?php echo Mage::helper('M2ePro')->__('This is useful if you are waiting for additional stock of an item with the same eBay item ID. Instead of ending the listing and then recreating it when the inventory arrives, you can use this flag to hide the listing. Then when you have the item available, automatic or manual Revise will update the inventory and the listing will appear again.
-                                <br><b>Note:</b> Once you list a product with this option it cannot be changed. To cancel it you should end and list the item again.'
-                                ); ?>
-                            </span>
-                        </p>
-
-                    </td>
-
-                </tr>
-
                 <tr id="ignore_variations_value_tr" class="simple_mode_disallowed" style="display: none;">
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Ignore Variations')?></label>
@@ -482,8 +519,10 @@
                             <option value="1" <?php if (1 == $formData['ignore_variations']) : echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes')?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Select \'Yes\' to list Configurable, Grouped, Bundle and Simple with Custom options products as Simple (without variations).')?>
-                            </span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose how you want to list Configurable, Grouped, Bundle and Simple With Custom Options products.<br/>
+                                Choosing <b>Yes</b> will list these types of products as if they are Simple products without variations.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -515,7 +554,10 @@
                     <td class="value" style="width: auto;">
                         <input name="selling_format[vat_percent]" value="<?php echo $formData['vat_percent']; ?>" type="text" class="M2ePro-validate-vat input-text" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__("To specify a VAT rate, you must have an eBay business account and list the item on a VAT-enabled site: Ireland, India, Switzerland, Spain, Holland, Belgium, Italy, Germany, France, Austria or England. The item's VAT information appears on the item's listing page."); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'To specify a VAT rate, you must have an eBay business account and list the item on a VAT-enabled site: Ireland, India, Switzerland, Spain, Holland, Belgium, Italy, Germany, France, Austria or United Kingdom.
+                                The item\'s VAT information appears on the item\'s listing page.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -530,7 +572,11 @@
                             <option value="1" <?php if ($formData['tax_table_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Charges sales tax according to the tax table of your eBay account. Available only for Canada, Canada (Fr), USA and eBay Motors.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose if you want to use the tax table for your eBay account to charge sales tax.
+                                Tax tables are set up directly on eBay, not in M2E Pro. To set up or edit tax tables, log in to your seller account on eBay.
+                                They are available only for Canada, Canada (Fr), USA and eBay Motors.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -599,7 +645,7 @@
     </div>
 
     <div class="fieldset">
-        <div class="hor-scroll">
+        <div class="hor-scroll" style="padding-bottom: 25px;">
 
             <div id="template_selling_format_messages">
                 <?php echo $this->getCurrencyAvailabilityMessage(); ?>
@@ -616,7 +662,7 @@
                     <li class="notice-msg">
                         <span>
                             <?php echo Mage::helper('M2ePro')->__(
-                                'eBay %s supports %s currencies. To switch the currency you want to sell for, go to %s > Configuration > <a target="_blank" href="%s">General</a>',
+                                'eBay %marketplace_title% supports %currency_code% currencies. To switch the currency you want to sell for, go to %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>',
                                 $this->getMarketplace()->getTitle(),
                                 $currencies,
                                 Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
@@ -640,7 +686,15 @@
                             <option value="1" <?php if ($formData['price_increase_vat_percent']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Increases the price that will be sent on eBay by VAT Rate (%).<br>e.g., VAT Rate = 19%, Magento Price = £10, Percentage increase = 2%;<br>eBay Price will be counted as (£10 + 19%) + 2% = £12.14'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose whether you want to add VAT to the price when a product is listed on eBay, using the VAT rate or eBay Tax Table in the Taxation section above.<br/><br/>
+                                 <b>Example:</b> For a product with Magento price = £10, VAT rate = 19%, price change percentage increase = 2%, the final eBay price will be £12.14.<br/>
+                                 Magento price: £10<br/>
+                                 VAT 19%: £10 * 19% = £1.90<br/>
+                                 Magento price + VAT = £10 + £1.90 = £11.90<br/>
+                                 add percentage increase 2% = £11.90 * 2% = £0.24<br/><br/>
+                                 <b>Final price on eBay</b>: £11.90 + £0.24 = £12.14'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -663,7 +717,9 @@
                                                 <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
                                                 <span class="tool-tip-message" style="font-size: 12px; display: none;">
                                                     <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
-                                                    <span><?php echo Mage::helper('M2ePro')->__('The accepted currency for the item. This has been determined by the eBay site you chose earlier.'); ?></span>
+                                                    <span><?php echo Mage::helper('M2ePro')->__(
+                                                        'The currency for eBay listings. Automatically set based on the eBay site you chose earlier.'
+                                                    ); ?></span>
                                             </span>
                                         </th>
                                     <?php endif; ?>
@@ -675,37 +731,20 @@
                                             <span class="tool-tip-message" style="font-size: 12px; display: none; width: 400px">
                                                 <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
                                                 <span>
-                                                    <?php $currencyPlaceholder = is_null($currency)
-                                                        ? Mage::helper('M2ePro')->__('[CURRENCY]')
-                                                        : Mage::app()->getLocale()->currency($currency)->getSymbol(); ?>
+                                                    <?php $currencyPlaceholder = is_null($currency) ? Mage::helper('M2ePro')->__('[CURRENCY]') : Mage::app()->getLocale()->currency($currency)->getSymbol(); ?>
 
-                                                    <?php echo str_replace('#currency_placeholder#', $currencyPlaceholder, Mage::helper('M2ePro')->__('
-                                                        A value you want the Magento Price to be modified while listing on eBay.
-                                                        <br/>
-                                                        <br/><b>Absolute Value increase</b>
-                                                        <br/>This will increase the price on eBay compared to the price on Magento,
-                                                        <br/>e.g. if you wish to increase the price of an item selling on eBay
-                                                        <br/>by #currency_placeholder#1.50, type “1.5” into the box.
-                                                        <br/>
-                                                        <br/><b>Absolute Value decrease</b>
-                                                        <br/>This will reduce the price on eBay compared to the price on Magento,
-                                                        <br/>e.g. if you wish to reduce the price of an item selling on eBay
-                                                        <br/>by #currency_placeholder#1.50, type “1.5” into the box.
-                                                        <br/>
-                                                        <br/><b>Percentage increase (%)</b>
-                                                        <br/>This will increase the price on eBay compared to the price on Magento,
-                                                        <br/>e.g. you wish to increase by 10% the price
-                                                        <br/>of a #currency_placeholder#2.00 item selling on your Magento store.
-                                                        <br/>In the box type “10”. The item will then go on sale
-                                                        <br/>for #currency_placeholder#2.2 on eBay.
-                                                        <br/>
-                                                        <br/><b>Percentage decrease (%)</b>
-                                                        <br/>This will reduce the price on eBay compared to the price on Magento,
-                                                        <br/>e.g. you wish to reduce by 10% the price of a #currency_placeholder#2.00 item selling
-                                                        <br/>on your Magento store.
-                                                        <br/>In the box type: “10”. The item will then go on sale for #currency_placeholder#1.80
-                                                        <br/>on eBay.
-                                                    ')); ?>
+                                                    <?php echo Mage::helper('M2ePro')->__(
+                                                        'A value you want the Magento Price to be modified while listing on eBay.<br/>
+                                                        Price change settings apply after VAT has been added.<br/><br/>
+                                                        <b>Absolute Value increase</b><br/>
+                                                        This will increase the price on eBay compared to the price on Magento.<br/>
+                                                        <b>Absolute Value decrease</b><br/>
+                                                        This will reduce the price on eBay compared to the price on Magento.<br/>
+                                                        <b>Percentage increase (%)</b><br/>
+                                                        This will increase the price on eBay compared to the price on Magento.<br/>
+                                                        <b>Percentage decrease (%)</b><br/>
+                                                        This will reduce the price on eBay compared to the price on Magento.',
+                                                    $currencyPlaceholder); ?>
                                                 </span>
                                             </span>
                                         </span>
@@ -771,13 +810,33 @@
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE; ?>" <?php if (preg_match('/^\+[0-9.,]*%$/',$formData['start_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage increase'); ?></option>
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE; ?>" <?php if (preg_match('/^\-[0-9.,]*%$/',$formData['start_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage decrease'); ?></option>
                                             </select>
+                                            <span id="start_price_example_container">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                                <span class="tool-tip-message" style="font-size: 12px; display: none; width: 400px">
+                                                    <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                    <span class="start_price_example" id="start_price_example_absolute_increase"><?php echo Mage::helper('M2ePro')->__(
+                                                        'If you wish to increase the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="start_price_example" id="start_price_example_absolute_decrease"><?php echo Mage::helper('M2ePro')->__(
+                                                        'If you wish to reduce the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="start_price_example" id="start_price_example_percentage_increase"><?php echo Mage::helper('M2ePro')->__(
+                                                        'You wish to increase by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
+                                                        In the box type “10”. The item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="start_price_example" id="start_price_example_percentage_decrease"><?php echo Mage::helper('M2ePro')->__(
+                                                        'You wish to reduce by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
+                                                        In the box type: “10”. The item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                </span>
+                                            </span>
                                         </div>
 
                                         <div id="start_price_coefficient_input_div" class="price_coefficient_container">
                                             <div style="width: 10px;">
                                                 <span id="start_price_coefficient_sign_span"></span>
                                             </div>
-                                            <input name="selling_format[start_price_coefficient]" value="<?php echo $this->escapeHtml(preg_replace('/(%$|^[+-])/','',$formData['start_price_coefficient'])); ?>" type="text" class="input-text coef" />
+                                            <input name="selling_format[start_price_coefficient]" value="<?php echo $this->escapeHtml(preg_replace('/(%$|^[+-])/','',$formData['start_price_coefficient'])); ?>" type="text" class="M2ePro-validation-float input-text coef" />
                                             <span id="start_price_coefficient_percent_span" style="padding-left: 2px;"></span>
                                         </div>
                                     </div>
@@ -841,13 +900,33 @@
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE; ?>" <?php if (preg_match('/^\+[0-9.,]*%$/',$formData['buyitnow_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage increase'); ?></option>
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE; ?>" <?php if (preg_match('/^\-[0-9.,]*%$/',$formData['buyitnow_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage decrease'); ?></option>
                                             </select>
+                                            <span id="buyitnow_price_example_container">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                                <span class="tool-tip-message tip-left" style="font-size: 12px; display: none; width: 400px">
+                                                    <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                    <span class="buyitnow_price_example" id="buyitnow_price_example_absolute_increase"><?php echo Mage::helper('M2ePro')->__(
+                                                        'If you wish to increase the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="buyitnow_price_example" id="buyitnow_price_example_absolute_decrease"><?php echo Mage::helper('M2ePro')->__(
+                                                        'If you wish to reduce the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="buyitnow_price_example" id="buyitnow_price_example_percentage_increase"><?php echo Mage::helper('M2ePro')->__(
+                                                        'You wish to increase by 10% the price of a %currency% 2.00 item selling on your Magento store.
+                                                        In the box type “10”. The item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="buyitnow_price_example" id="buyitnow_price_example_percentage_decrease"><?php echo Mage::helper('M2ePro')->__(
+                                                        'You wish to reduce by 10% the price of a %currency% 2.00 item selling on your Magento store.
+                                                        In the box type: “10”. The item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                </span>
+                                            </span>
                                         </div>
 
                                         <div id="buyitnow_price_coefficient_input_div" class="price_coefficient_container">
                                             <div style="width: 10px;">
                                                 <span id="buyitnow_price_coefficient_sign_span"></span>
                                             </div>
-                                            <input name="selling_format[buyitnow_price_coefficient]" value="<?php echo $this->escapeHtml(preg_replace('/(%$|^[+-])/','',$formData['buyitnow_price_coefficient'])); ?>" type="text" class="input-text coef" />
+                                            <input name="selling_format[buyitnow_price_coefficient]" value="<?php echo $this->escapeHtml(preg_replace('/(%$|^[+-])/','',$formData['buyitnow_price_coefficient'])); ?>" type="text" class="M2ePro-validation-float input-text coef" />
                                             <span id="buyitnow_price_coefficient_percent_span" style="padding-left: 2px;"></span>
                                         </div>
                                     </div>
@@ -870,7 +949,7 @@
                                         <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
                                             <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
-                                            <span><?php echo Mage::helper('M2ePro')->__('This determines where the price for Configurable and Bundle products options should be taken from.'); ?></span>
+                                            <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento product attribute to use for the price for Configurable and Bundle products options.'); ?></span>
                                         </span>
                                     </div>
                                 </td>
@@ -933,13 +1012,33 @@
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE; ?>" <?php if (preg_match('/^\+[0-9.,]*%$/',$formData['reserve_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage increase'); ?></option>
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE; ?>" <?php if (preg_match('/^\-[0-9.,]*%$/',$formData['reserve_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage decrease'); ?></option>
                                             </select>
+                                            <span id="reserve_price_example_container">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                                <span class="tool-tip-message" style="font-size: 12px; display: none; width: 400px">
+                                                    <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                    <span class="reserve_price_example" id="reserve_price_example_absolute_increase"><?php echo Mage::helper('M2ePro')->__(
+                                                        'If you wish to increase the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="reserve_price_example" id="reserve_price_example_absolute_decrease"><?php echo Mage::helper('M2ePro')->__(
+                                                        'If you wish to reduce the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="reserve_price_example" id="reserve_price_example_percentage_increase"><?php echo Mage::helper('M2ePro')->__(
+                                                        'You wish to increase by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
+                                                        In the box type “10”. The item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                    <span class="reserve_price_example" id="reserve_price_example_percentage_decrease"><?php echo Mage::helper('M2ePro')->__(
+                                                        'You wish to reduce by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
+                                                        In the box type: “10”. The item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
+                                                    ); ?></span>
+                                                </span>
+                                            </span>
                                         </div>
 
                                         <div id="reserve_price_coefficient_input_div" class="price_coefficient_container">
                                             <div style="width: 10px;">
                                                 <span id="reserve_price_coefficient_sign_span"></span>
                                             </div>
-                                            <input name="selling_format[reserve_price_coefficient]" value="<?php echo $this->escapeHtml(preg_replace('/(%$|^[+-])/','',$formData['reserve_price_coefficient'])); ?>" type="text" class="input-text coef" />
+                                            <input name="selling_format[reserve_price_coefficient]" value="<?php echo $this->escapeHtml(preg_replace('/(%$|^[+-])/','',$formData['reserve_price_coefficient'])); ?>" type="text" class="M2ePro-validation-float input-text coef" />
                                             <span id="reserve_price_coefficient_percent_span" style="padding-left: 2px;" ></span>
                                         </div>
                                     </div>
@@ -950,7 +1049,7 @@
                             <tr id="price_discount_stp_tr" class="simple_mode_disallowed">
 
                                 <td class="value remove_bottom_border">
-                                    <label><?php echo Mage::helper('M2ePro')->__('Strike Through Price'); ?>: </label>
+                                    <label><?php echo Mage::helper('M2ePro')->__('Strike-Through Price'); ?>: </label>
                                 </td>
 
                                 <?php if (!is_null($currency)) : ?>
@@ -988,8 +1087,9 @@
                                             <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
-                                                    'This determines where the price displayed with a line through should be taken from.<br/>
-                                                     Discount pricing is available to qualified sellers who participate in the Discount Pricing Program.'
+                                                    'The strike-through price is the original price of a product that is discounted shown with a line through it.
+                                                    It is only available to certain sellers who have been pre-approved by eBay.<br/><br/>
+                                                    If you qualify to display strike-through price choose the Magento attribute you want to use for it.'
                                                 ); ?>
                                             </span>
                                         </span>
@@ -1083,7 +1183,7 @@
                                             <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
-                                                    'This determines where Minimum Advertised Price should be taken from.'
+                                                    'This determines where the Minimum Advertised Price should be taken from.'
                                                 ); ?>
                                             </span>
                                         </span>
@@ -1216,7 +1316,7 @@
 
                             <p class="note">
                                 <span>
-                                    <?php echo Mage::helper('M2ePro')->__('Allows you to support your favourite <a href="http://pages.ebay.co.uk/help/sell/nonprofit.html" target="_blank">charities</a>.'); ?>
+                                    <?php echo Mage::helper('M2ePro')->__('Choose whether to donate a percentage of your eBay sales to a non-profit/charity.'); ?>
                                 </span>
                             </p>
                         </td>
@@ -1288,7 +1388,8 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'The <a href="http://sellercentre.ebay.co.uk/accept-best-offers" target="_blank">Best Offer option </a> option allows you to accept offers from buyers and negotiate a price. You can accept Best Offers on fixed price and Classified Ads in certain eBay categories, such as eBay Motors.'
+                                    'The Best Offer option allows you to accept offers from buyers and negotiate a price.
+                                    You can accept Best Offers on fixed price and Classified Ads in certain categories, such as eBay Motors.'
                                 ); ?>
                             </span>
                         </p>

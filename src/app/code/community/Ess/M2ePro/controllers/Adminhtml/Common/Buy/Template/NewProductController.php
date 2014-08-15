@@ -393,7 +393,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
         if ($countOfSuccessfullyDeletedTemplates == count($buyTemplateNewProductInstances)) {
             $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__(
-                '%s record(s) were successfully deleted.', $countOfSuccessfullyDeletedTemplates
+                '%amount% record(s) were successfully deleted.', $countOfSuccessfullyDeletedTemplates
             ));
             return $this->_redirectUrl($this->_getRefererUrl());
         }

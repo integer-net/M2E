@@ -4,11 +4,10 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-/**
- * Provides all needed information for order creation in magento.
- */
 abstract class Ess_M2ePro_Model_Order_Proxy
 {
+    // ########################################
+
     const CHECKOUT_GUEST    = 'guest';
     const CHECKOUT_REGISTER = 'register';
 
@@ -34,8 +33,6 @@ abstract class Ess_M2ePro_Model_Order_Proxy
     // ########################################
 
     /**
-     * Return proxy objects for order items
-     *
      * @return Ess_M2ePro_Model_Order_Item_Proxy[]
      */
     public function getItems()
@@ -44,7 +41,12 @@ abstract class Ess_M2ePro_Model_Order_Proxy
             $items = array();
 
             foreach ($this->order->getParentObject()->getItemsCollection()->getItems() as $item) {
-                $items[] = $item->getProxy();
+                $proxyItem = $item->getProxy();
+                if ($proxyItem->getQty() <= 0) {
+                    continue;
+                }
+
+                $items[] = $proxyItem;
             }
 
             $this->items = $this->mergeItems($items);
@@ -93,24 +95,12 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
-    /**
-     * Set store where order will be imported to
-     *
-     * @param Mage_Core_Model_Store $store
-     * @return Ess_M2ePro_Model_Order_Proxy
-     */
     public function setStore(Mage_Core_Model_Store $store)
     {
         $this->store = $store;
-
         return $this;
     }
 
-    /**
-     * Return store order will be imported to
-     *
-     * @return Mage_Core_Model_Store
-     */
     public function getStore()
     {
         if (is_null($this->store)) {
@@ -122,19 +112,8 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
-    /**
-     * Return checkout method
-     *
-     * @abstract
-     * @return string
-     */
     abstract public function getCheckoutMethod();
 
-    /**
-     * Check whether checkout method is guest
-     *
-     * @return bool
-     */
     public function isCheckoutMethodGuest()
     {
         return $this->getCheckoutMethod() == self::CHECKOUT_GUEST;
@@ -142,18 +121,21 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
-    /**
-     * Return buyer email
-     *
-     * @abstract
-     * @return string
-     */
+    abstract public function isOrderNumberPrefixSourceMagento();
+
+    abstract public function isOrderNumberPrefixSourceChannel();
+
+    abstract public function getChannelOrderNumber();
+
+    abstract public function getOrderNumberPrefix();
+
+    // ########################################
+
     abstract public function getBuyerEmail();
 
+    // ########################################
+
     /**
-     * Return customer object
-     *
-     * @abstract
      * @return Mage_Customer_Model_Customer
      */
     abstract public function getCustomer();
@@ -172,11 +154,8 @@ abstract class Ess_M2ePro_Model_Order_Proxy
         return $addressData['lastname'];
     }
 
-    /**
-     * Return shipping address info
-     *
-     * @return array
-     */
+    // ########################################
+
     public function getAddressData()
     {
         if (empty($this->addressData)) {
@@ -210,11 +189,6 @@ abstract class Ess_M2ePro_Model_Order_Proxy
         return $this->getAddressData();
     }
 
-    /**
-     * Check whether the billing address information should be validated or not
-     *
-     * @return bool
-     */
     public function shouldIgnoreBillingAddressValidation()
     {
         return false;
@@ -240,12 +214,6 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
-    /**
-     * Return order currency code
-     *
-     * @abstract
-     * @return string
-     */
     abstract public function getCurrency();
 
     public function convertPrice($price)
@@ -262,29 +230,14 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
-    /**
-     * Return payment data
-     *
-     * @abstract
-     * @return array
-     */
     abstract public function getPaymentData();
 
-    /**
-     * Return shipping data
-     *
-     * @abstract
-     * @return array
-     */
+    // ########################################
+
     abstract public function getShippingData();
 
     abstract protected function getShippingPrice();
 
-    /**
-     * Return shipping price converted to the base store currency
-     *
-     * @return float
-     */
     protected function getBaseShippingPrice()
     {
         return $this->convertPriceToBase($this->getShippingPrice());
@@ -292,31 +245,16 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
-    /**
-     * Return comments, which should be added to the order history
-     *
-     * @return array
-     */
     public function getComments()
     {
         return array_merge($this->getGeneralComments(), $this->getChannelComments());
     }
 
-    /**
-     * Return channel related order comments
-     *
-     * @return array
-     */
     public function getChannelComments()
     {
         return array();
     }
 
-    /**
-     * Return general order comments
-     *
-     * @return array
-     */
     public function getGeneralComments()
     {
         $store = $this->getStore();
@@ -358,68 +296,32 @@ COMMENT;
 
     // ########################################
 
-    /**
-     * Return tax rate
-     *
-     * @abstract
-     * @return float
-     */
-    abstract public function getTaxRate();
-
-    /**
-     * Check whether order has Tax (not VAT)
-     *
-     * @abstract
-     * @return bool
-     */
     abstract public function hasTax();
 
-    /**
-     * Check whether order has VAT (value added tax)
-     *
-     * @abstract
-     * @return bool
-     */
-    abstract public function hasVat();
+    abstract public function isSalesTax();
 
-    /**
-     * Check whether shipping price includes tax
-     *
-     * @abstract
-     * @return bool
-     */
-    abstract public function isShippingPriceIncludesTax();
+    abstract public function isVatTax();
 
-    /**
-     * Check whether tax mode option is set to "None" in Account settings
-     *
-     * @abstract
-     * @return bool
-     */
+    // -----------------------------------------
+
+    abstract public function getProductPriceTaxRate();
+
+    abstract public function getShippingPriceTaxRate();
+
+    // -----------------------------------------
+
+    abstract public function isProductPriceIncludeTax();
+
+    abstract public function isShippingPriceIncludeTax();
+
+    // -----------------------------------------
+
     abstract public function isTaxModeNone();
 
-    /**
-     * Check whether tax mode option is set to "Channel" in Account settings
-     *
-     * @abstract
-     * @return bool
-     */
     abstract public function isTaxModeChannel();
 
-    /**
-     * Check whether tax mode option is set to "Magento" in Account settings
-     *
-     * @abstract
-     * @return bool
-     */
     abstract public function isTaxModeMagento();
 
-    /**
-     * Check whether tax mode option is set to "Mixed" in Account settings
-     *
-     * @abstract
-     * @return bool
-     */
     public function isTaxModeMixed()
     {
         return !$this->isTaxModeNone() &&

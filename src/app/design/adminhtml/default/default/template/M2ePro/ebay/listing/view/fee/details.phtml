@@ -39,7 +39,7 @@
         <?php foreach ($fees as $feeCode => $fee): ?>
             <?php if ($feeCode != 'listing_fee'): ?>
                 <div class="row">
-                    <div class="cell label"><?php echo Mage::helper('M2ePro')->escapeHtml($fee['label']) ?>:</div>
+                    <div class="cell label"><?php echo Mage::helper('M2ePro')->__(Mage::helper('M2ePro')->escapeHtml($fee['label'])) ?>:</div>
                     <div class="cell value"><?php echo Mage::helper('M2ePro')->escapeHtml($fee['value']) ?></div>
                 </div>
             <?php endif; ?>

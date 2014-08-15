@@ -41,7 +41,7 @@ class Ess_M2ePro_Model_Servicing_Task_Marketplaces implements Ess_M2ePro_Model_S
         foreach ($enabledMarketplaces as $marketplace) {
 
             if (!isset($versions[$marketplace->getNativeId()])) {
-                throw new Exception();
+                continue;
             }
 
             $serverVersion = (int)$versions[$marketplace->getNativeId()];

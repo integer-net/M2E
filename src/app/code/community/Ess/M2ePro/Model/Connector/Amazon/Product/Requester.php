@@ -334,7 +334,8 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
                 if ($listingProduct->getChildObject()->isVariationProduct() &&
                     !$listingProduct->getChildObject()->isVariationMatched()) {
 
-                    // ->__('You have to select variation.');
+                    // M2ePro_TRANSLATIONS
+                    // You have to select variation.
                     $this->addListingsProductsLogsMessage(
                         $listingProduct, 'You have to select variation.',
                         Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -350,7 +351,8 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
                 $listingProduct->isLockedObject('in_action') ||
                 $listingProduct->isLockedObject($this->getActionIdentifier().'_action')) {
 
-                // ->__('Another action is being processed. Try again when the action is completed.');
+                // M2ePro_TRANSLATIONS
+                // Another action is being processed. Try again when the action is completed.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct, 'Another action is being processed. Try again when the action is completed.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,

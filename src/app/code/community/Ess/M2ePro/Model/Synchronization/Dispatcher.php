@@ -232,7 +232,6 @@ final class Ess_M2ePro_Model_Synchronization_Dispatcher
 
         $this->checkAndPrepareProductChange();
 
-        // todo investigate
         if (in_array(Ess_M2ePro_Model_Synchronization_Task::ORDERS, $this->getAllowedTasksTypes())) {
             Mage::dispatchEvent('m2epro_synchronization_before_start', array());
         }
@@ -240,7 +239,6 @@ final class Ess_M2ePro_Model_Synchronization_Dispatcher
 
     protected function afterEnd()
     {
-        // todo investigate
         if (in_array(Ess_M2ePro_Model_Synchronization_Task::ORDERS, $this->getAllowedTasksTypes())) {
             Mage::dispatchEvent('m2epro_synchronization_after_end', array());
         }

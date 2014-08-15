@@ -74,10 +74,10 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Options_Mapping extends Mage
     protected function _beforeToHtml()
     {
         //------------------------------
-        $channelOptions = array();
-        if ($this->getOrderItem()->hasRepairInput()) {
-            $repairInput = $this->getOrderItem()->getChildObject()->getRepairInput();
+        $repairInput = $this->getOrderItem()->getChildObject()->getRepairInput();
 
+        $channelOptions = array();
+        if (!empty($repairInput)) {
             foreach ($repairInput as $channelOptionLabel => $channelValueLabel) {
                 $channelOptions[] = array('label' => $channelOptionLabel, 'value' => $channelValueLabel);
             }

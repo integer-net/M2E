@@ -77,7 +77,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_DatabaseBrokenTables
 
         $resource = Mage::getSingleton('core/resource');
 
-        foreach (Mage::helper('M2ePro/Module_Database')->getMySqlTables() as $tableName) {
+        foreach (Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables() as $tableName) {
             if (!$this->isTableExists($resource->getTableName($tableName))) {
                 $notInstalledTables[] = $tableName;
             }

@@ -111,7 +111,8 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
             'value'     => $this->getQtyNumber(),
             'attribute' => $this->getData('qty_custom_attribute'),
             'qty_max_posted_value_mode' => $this->getQtyMaxPostedValueMode(),
-            'qty_max_posted_value'      => $this->getQtyMaxPostedValue()
+            'qty_max_posted_value'      => $this->getQtyMaxPostedValue(),
+            'qty_percentage'            => $this->getQtyPercentage()
         );
     }
 
@@ -125,6 +126,13 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
         }
 
         return $attributes;
+    }
+
+    //-------------------------
+
+    public function getQtyPercentage()
+    {
+        return (int)$this->getData('qty_percentage');
     }
 
     //-------------------------
@@ -245,12 +253,8 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
 
     // ########################################
 
-    public function getAffectedListingProducts($asObjects = false, $key = NULL)
+    public function getAffectedListingsProducts($asObjects = false)
     {
-        if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
-        }
-
         $listingCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing');
         $listingCollection->addFieldToFilter('template_selling_format_id', $this->getId());
         $listingCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
@@ -259,27 +263,18 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
         $listingProductCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id',array('in' => $listingCollection->getSelect()));
 
-        if (!is_null($key)) {
-            $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($key);
-        }
-
-        $listingProducts = $asObjects ? $listingProductCollection->getItems() : $listingProductCollection->getData();
-
-        if (is_null($key)) {
-            return $listingProducts;
-        }
-
-        $return = array();
-        foreach ($listingProducts as $listingProduct) {
-            isset($listingProduct[$key]) && $return[] = $listingProduct[$key];
-        }
-
-        return $return;
+        return $asObjects ? (array)$listingProductCollection->getItems() : (array)$listingProductCollection->getData();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $this->getParentObject()->setSynchStatusNeed($newData, $oldData);
+        $listingsProducts = $this->getAffectedListingsProducts(false);
+
+        if (!$listingsProducts) {
+            return;
+        }
+
+        $this->getResource()->setSynchStatusNeed($newData,$oldData,$listingsProducts);
     }
 
     // ########################################

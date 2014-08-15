@@ -80,6 +80,16 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
         });
     },
 
+    forceShowContactSupportForm: function()
+    {
+        $('support_other_container').show();
+        $('support_support_form').simulate('click');
+
+        if ($('support_results_content').innerHTML == '') {
+            $('support_results').hide();
+        }
+    },
+
     keyPressQuery: function(event)
     {
         var self = SupportHandlerObj;

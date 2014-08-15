@@ -20,16 +20,23 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Edit extends Mage_Adminhtml_
 
         // Set header text
         //------------------------------
+        $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
+
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $headerText =Mage::helper('M2ePro')->__(
+                'Edit "%listing_title%" %component_name% Listing [Settings]',
+                $this->escapeHtml($listingData['title']),
+                $componentName
+            );
         } else {
-            $componentName = '';
+            $headerText =Mage::helper('M2ePro')->__(
+                'Edit "%listing_title%" %component_name% Listing [Settings]',
+                $this->escapeHtml($listingData['title'])
+            );
         }
 
-        $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
-        $this->_headerText = Mage::helper('M2ePro')->__('Edit "%s"%s Listing [Settings]',
-                                                        $this->escapeHtml($listingData['title']),
-                                                        $componentName);
+        $this->_headerText = $headerText;
         //------------------------------
 
         // Set buttons actions

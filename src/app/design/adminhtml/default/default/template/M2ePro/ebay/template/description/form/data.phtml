@@ -58,8 +58,8 @@
     M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_template_description')); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Adding Image' => $this->__('Adding Image'),
-        'Condition description must be less then 1000 symbols.' => $this->__('Condition description must be less then 1000 symbols.')
+        'Adding Image' => Mage::helper('M2ePro')->__('Adding Image'),
+        'Condition description must be less then 1000 symbols.' => Mage::helper('M2ePro')->__('Condition description must be less then 1000 symbols.')
     )); ?>);
 
     EbayTemplateDescriptionHandlerObj = new EbayTemplateDescriptionHandler();
@@ -193,13 +193,16 @@
                         </select>
                         <p class="note">
                             <?php
-                            $conditionModeNote = 'Condition is one of the top factors buyers consider when deciding whether to purchase an item.
-                                                      <br/>When you create your listing, let your buyers know exactly what they\'ll be receiving by specifying its condition.
-                                                      <br/>
-                                                      <br/>The Condition may be displayed differently on eBay. For example, the condition <b>\'New\'</b> for clothing categories appears as <b>\'New: With Tags\'</b>, <b>\'New Other\'</b> as <b>\'New: Without Tags\'</b>, etc.';
+                            // M2ePro_TRANSLATIONS
+                            // Condition is one of the top factors buyers consider when deciding whether to purchase an item. When you create your listing, let your buyers know exactly what they\'ll be receiving by specifying its condition. Some conditions, such as \'new\', are grouped as single selections because they appear on eBay under slightly different names depending on the category of the item.
+                            // Condition is one of the top factors buyers consider when deciding whether to purchase an item. When you create your listing, let your buyers know exactly what they\'ll be receiving by specifying its condition. Some conditions, such as \'new\', are grouped as single selections because they appear on eBay under slightly different names depending on the category of the item.<br/><br/>If you choose to use a Magento attribute to set the condition per product, the attribute value must be an Item Condition ID.See <a href="http://developer.ebay.com/devzone/finding/callref/Enums/conditionIdList.html">the eBay API reference: Item Condition IDs and Names</a> for more details.
+                            $conditionModeNote = 'Condition is one of the top factors buyers consider when deciding whether to purchase an item. ';
+                            $conditionModeNote .= 'When you create your listing, let your buyers know exactly what they\'ll be receiving by specifying its condition. ';
+                            $conditionModeNote .= 'Some conditions, such as \'new\', are grouped as single selections because they appear on eBay under slightly different names depending on the category of the item.';
 
                             Mage::helper('M2ePro/View_Ebay')->isAdvancedMode() &&
-                            $conditionModeNote .= '<br/><br/><b>Note:</b> The attribute must contain an <a href="http://developer.ebay.com/devzone/finding/callref/Enums/conditionIdList.html" target="_blank">ID of the Item Condition</a>.';
+                                $conditionModeNote .= '<br/><br/>If you choose to use a Magento attribute to set the condition per product, the attribute value must be an Item Condition ID. ';
+                                $conditionModeNote .= 'See <a href="http://developer.ebay.com/devzone/finding/callref/Enums/conditionIdList.html">the eBay API reference: Item Condition IDs and Names</a> for more details.';
                             ?>
                             <span><?php echo Mage::helper('M2ePro')->__($conditionModeNote); ?></span>
                         </p>
@@ -303,7 +306,10 @@
         <td class="value">
             <input id="default_image_url" name="description[default_image_url]" type="text" class="input-text" value="<?php echo $formData['default_image_url']; ?>" />
             <p class="note">
-                <span><?php echo Mage::helper('M2ePro')->__('From 30 October 2013 eBay does not allow to list products without images. If a product does not have the Main Image this image will be used instead.<br><b>Note:</b> Use absolute url. e.g. http://mymagentostore.com/images/defaultimage.jpg'); ?></span>
+                <span><?php echo Mage::helper('M2ePro')->__(
+                    'Enter the full URL of the image - eg http://mymagentostore.com/images/defaultimage.jpg - to use for the eBay listing if there is no image available from the Magento attribute you specified for <b>Main Image</b>.
+                    All eBay listings must have an image.'
+                ); ?></span>
             </p>
         </td>
     </tr>
@@ -318,7 +324,10 @@
                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::USE_SUPERSIZE_IMAGES_YES; ?>" <?php if ($formData['use_supersize_images'] == Ess_M2ePro_Model_Ebay_Template_Description::USE_SUPERSIZE_IMAGES_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
             </select>
             <p class="note">
-                <span><?php echo Mage::helper('M2ePro')->__('Displays larger, more detailed pictures (up to 800w x 800h pixels - 800 pixels on the longest side). <br/><b>Note:</b> This feature may come with additional fee.'); ?></span>
+                <span><?php echo Mage::helper('M2ePro')->__(
+                    'Displays larger images (up to 800w x 800h pixels - 800 pixels on the longest side).<br/><br/>
+                    <b>Note:</b> An additional fee may be charged for an item subtitle.'
+                ); ?></span>
             </p>
         </td>
     </tr>
@@ -371,7 +380,9 @@
                 <?php endforeach; ?>
             </select>
             <p class="note">
-                <span><?php echo Mage::helper('M2ePro')->__('Allows changing images for selected option of multi variation items.(Applicable for Configurable products only).'); ?></span>
+                <span><?php echo Mage::helper('M2ePro')->__(
+                    'This option only applies to configurable products. Allows you to have different images for multi-variation items, with changes based on the attribute you choose.'
+                ); ?></span>
             </p>
         </td>
     </tr>
@@ -398,7 +409,9 @@
                         <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_YES ?>" <?php if ($formData['watermark_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::WATERMARK_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                     </select>
                     <p class="note">
-                        <span><?php echo Mage::helper('M2ePro')->__('Automatically adds your custom watermark to gallery images.'); ?></span>
+                        <span><?php echo Mage::helper('M2ePro')->__(
+                            'Choose if you want to add a watermark to your gallery images. More options will be available if you select <b>Yes</b>.'
+                        ); ?></span>
                     </p>
                 </td>
             </tr>
@@ -547,8 +560,9 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'Adding subtitle to eBay item.
-                                    <br/><b>Note:</b> An additional fee may be charged for an item subtitle. Find out more about <a href="http://sellercentre.ebay.co.uk/insertion-fees-business-sellers" target="_blank">eBay Insertion Fees</a>.'
+                                    'Choose if you want to add a subtitle to your eBay listing.
+                                    Adding a subtitle to your listing can increase buyer interest by providing more descriptive information about an item.<br/><br/>
+                                    <b>Note:</b> An additional fee may be charged for an item subtitle.'
                                 ); ?>
                             </span>
                         </p>
@@ -611,13 +625,6 @@
     <div class="fieldset">
         <div class="hor-scroll">
 
-            <div id="block_notice_ebay_template_description_description" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Description'); ?>">
-                <?php echo Mage::helper('M2ePro')->__(
-                    'It is possible to choose a Product Description or Product Short Description, which will be taken from Magento.
-                    <br/>Or you can create a Custom Description by adding necessary information, appropriate attributes from dropdown lists and image tags.'
-                ); ?>
-            </div>
-
             <table class="form-list" cellspacing="0" cellpadding="0">
 
                 <tr>
@@ -631,15 +638,14 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_CUSTOM; ?>" <?php if ($formData['description_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::DESCRIPTION_MODE_CUSTOM): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Description'); ?></option>
                         </select>
                         <p class="note">
-                                        <span>
-                                            <?php echo Mage::helper('M2ePro')->__(
-                                                'Item\'s description source for eBay Listing.
-                                                <br/>
-                                                <br/>It is possible to create custom description in 2 modes:
-                                                <br/><b>WYSIWYG</b> - allows creating simple good looking product description. No HTML knowledge is required.
-                                                <br/><b>HTML</b> - allows using HTML tags and CSS styles for the description. You can create much more complex, improved and advanced item\'s description using this mode.'
-                                            ); ?>
-                                        </span>
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose whether to use the Magento <b>Product Description</b> or <b>Product Short Description</b> for the eBay listing description<br/><br/>
+                                    Alternatively, you can create a <b>Custom Description</b> to apply to all items listed on eBay using this M2E Pro listing.
+                                    If using a custom description Clicking <b>Show/Hide Editor</b> to toggle between using a WYSIWG editor (for simple descriptions)
+                                    or HTML mode (requires knowledge of HTML/CSS, allowing more complex formatting).'
+                                ); ?>
+                            </span>
                         </p>
                     </td>
                     <td class="value">
@@ -992,7 +998,10 @@
                         </select>
                         <p class="note">
                             <span>
-                                <?php echo Mage::helper('M2ePro')->__('European Article Number, (now called International Article Number). This barcode is a superset of the UPC.'); ?>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose the Magento attribute that contains the EAN for a product.<br/><br/>
+                                    The EAN or European Article Number, now renamed International Article Number, is the 13 digit unique identifier for a product.'
+                                ); ?>
                             </span>
                         </p>
                     </td>
@@ -1013,7 +1022,10 @@
                         </select>
                         <p class="note">
                             <span>
-                                <?php echo Mage::helper('M2ePro')->__('The Universal Product Code is a barcode usually consisting of 12 numerical digits, which are unique for each item.'); ?>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose the Magento attribute that contains the UPC for a product.<br/><br/>
+                                    The UPC or Universal Product Code is a 12 digit unique identifier for a product.'
+                                ); ?>
                             </span>
                         </p>
                     </td>
@@ -1055,7 +1067,10 @@
                         </select>
                         <p class="note">
                             <span>
-                                <?php echo Mage::helper('M2ePro')->__('The International Standard Book Number is a uniquenumeric book identifier.'); ?>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose the Magento attribute that contains the ISBN for a product.<br/><br/>
+                                    The ISBN or International Standard Book Number is a unique identifier for a book.'
+                                ); ?>
                             </span>
                         </p>
                     </td>

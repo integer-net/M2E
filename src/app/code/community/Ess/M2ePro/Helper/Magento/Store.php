@@ -96,7 +96,7 @@ class Ess_M2ePro_Helper_Magento_Store extends Mage_Core_Helper_Abstract
     public function getStorePath($storeId)
     {
         if ($storeId == Mage_Core_Model_App::ADMIN_STORE_ID) {
-            return $this->__('Admin (Default Values)');
+            return Mage::helper('M2ePro')->__('Admin (Default Values)');
         }
 
         try {

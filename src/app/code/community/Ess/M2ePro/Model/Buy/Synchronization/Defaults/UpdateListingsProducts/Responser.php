@@ -163,11 +163,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
                 $tempLogMessage = '';
                 switch ($newData['status']) {
                     case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
-                        // Parser hack ->__('Item status was successfully changed to "Active".');
+                        // M2ePro_TRANSLATIONS
+                        // Item status was successfully changed to "Active".
                         $tempLogMessage = 'Item status was successfully changed to "Active".';
                         break;
                     case Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED:
-                        // Parser hack ->__('Item status was successfully changed to "Inactive".');
+                        // M2ePro_TRANSLATIONS
+                        // Item status was successfully changed to "Inactive".
                         $tempLogMessage = 'Item status was successfully changed to "Inactive".';
                         break;
                 }
@@ -202,29 +204,26 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
 
         /** @var $collection Varien_Data_Collection_Db */
         $dbSelect = $connWrite->select();
-        $dbSelect->from(array('lp' => $listingProductTable), array());
-        $dbSelect->join(array('l' => $listingTable), 'lp.listing_id = l.id', array());
-        $dbSelect->where('l.account_id = ?',(int)$this->getAccount()->getId());
-        $dbSelect->where('lp.component_mode = ?',Ess_M2ePro_Helper_Component_Buy::NICK);
+        $dbSelect->from(array('lp' => $listingProductTable), array())
+                 ->join(array('l' => $listingTable), 'lp.listing_id = l.id', array())
+                 ->where('l.account_id = ?',(int)$this->getAccount()->getId())
+                 ->where('lp.component_mode = ?',Ess_M2ePro_Helper_Component_Buy::NICK)
+                 ->reset(Zend_Db_Select::COLUMNS)
+                 ->columns(array('lp.id'));
 
-        $dbSelect->reset(Zend_Db_Select::COLUMNS)->columns(array('lp.id'));
-
-        $listingProductTable = Mage::getResourceModel('M2ePro/Buy_Listing_Product')->getMainTable();
-
-        $bind = array(
-            'ignore_next_inventory_synch' => 0
+        $connWrite->update(
+            Mage::getResourceModel('M2ePro/Buy_Listing_Product')->getMainTable(),
+            array('ignore_next_inventory_synch' => 0),
+            new Zend_Db_Expr('`listing_product_id` IN ('.$dbSelect->__toString().')')
         );
-        $where = new Zend_Db_Expr('`listing_product_id` IN ('.$dbSelect->__toString().')');
-
-        $connWrite->update($listingProductTable,$bind,$where);
     }
 
     // ########################################
 
     protected function getPdoStatementExistingListings($withData = false)
     {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
 
@@ -233,7 +232,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
         $collection->getSelect()->join(array('l' => $listingTable), 'main_table.listing_id = l.id', array());
         $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
         $collection->getSelect()->where('`main_table`.`status` != ?',
-            (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
+                                        (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
         $collection->getSelect()->where("`second_table`.`sku` is not null and `second_table`.`sku` != ''");
 
         $dbSelect = $collection->getSelect();
@@ -256,7 +255,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
         $dbSelect->reset(Zend_Db_Select::COLUMNS)->columns($tempColumns);
 
         /** @var $stmtTemp Zend_Db_Statement_Pdo */
-        $stmtTemp = $connWrite->query($dbSelect->__toString());
+        $stmtTemp = $connRead->query($dbSelect->__toString());
 
         return $stmtTemp;
     }

@@ -105,37 +105,6 @@ class Ess_M2ePro_Model_Template_SellingFormat extends Ess_M2ePro_Model_Component
 
     // #######################################
 
-    public function setSynchStatusNeed($newData, $oldData)
-    {
-        if (!$this->getChildObject()->getResource()->isDifferent($newData,$oldData)) {
-            return;
-        }
-
-        $ids = $this->getChildObject()->getAffectedListingProducts(false,'id');
-
-        if (empty($ids)) {
-            return;
-        }
-
-        $templates = array('sellingFormatTemplate');
-
-        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
-            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
-            array(
-                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
-                'synch_reasons' => new Zend_Db_Expr(
-                    "IF(synch_reasons IS NULL,
-                        '".implode(',',$templates)."',
-                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
-                    )"
-                )
-            ),
-            array('id IN ('.implode(',', $ids).')')
-        );
-    }
-
-    // #######################################
-
     public function save()
     {
         Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');

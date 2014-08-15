@@ -2,7 +2,6 @@ ListingOtherRemovingHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    // todo next (temp solution)
     options: {},
 
     setOptions: function (options)

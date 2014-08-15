@@ -121,7 +121,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
 
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        // ->__('The "Categories" action for eBay Site: "%mrk%" has been successfully completed.');
+        // M2ePro_TRANSLATIONS
+        // The "Categories" action for eBay Site: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Categories" action for eBay Site: "%mrk%" has been successfully completed.',

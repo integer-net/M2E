@@ -354,7 +354,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_View_Grid extends Mage_Admi
         if (!$row->getChildObject()->isVariationMatched()) {
 
             $popupTitle = Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml(
-                Mage::helper('M2ePro')->__('Manage "%s" Options', $productTitle))
+                Mage::helper('M2ePro')->__('Manage "%product_title%" Options', $productTitle))
             );
             $linkTitle = Mage::helper('M2ePro')->__('Manage Options');
             $linkContent = '<img height="12" width="12" src="'.$this->getSkinUrl('M2ePro').'/images/add.png'.'">';
@@ -393,7 +393,7 @@ HTML;
         if (!$hasInActionLock) {
 
             $popupTitle = Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml(
-                Mage::helper('M2ePro')->__('Edit "%s" Variation', $productTitle))
+                Mage::helper('M2ePro')->__('Edit "%product_title%" Variation', $productTitle))
             );
             $linkTitle  = Mage::helper('M2ePro')->__('Edit');
             $linkContent = '<img width="12" height="12" src="'.$this->getSkinUrl('M2ePro').'/images/pencil.png'.'">';
@@ -411,7 +411,7 @@ HTML;
         }
 
         $popupTitle = Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml(
-            Mage::helper('M2ePro')->__('Add Another "%s" Variations', $productTitle))
+            Mage::helper('M2ePro')->__('Add Another "%product_title%" Variations', $productTitle))
         );
         $linkTitle  = Mage::helper('M2ePro')->__('Add Another Variation');
         $linkContent = '<img width="12" height="12" src="'.$this->getSkinUrl('M2ePro').'/images/add.png'.'">';

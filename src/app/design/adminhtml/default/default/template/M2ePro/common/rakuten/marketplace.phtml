@@ -39,7 +39,7 @@
                                 <option value="<?php echo Ess_M2ePro_Model_Marketplace::STATUS_ENABLE; ?>"<?php if (Ess_M2ePro_Model_Marketplace::STATUS_ENABLE == $marketplace['instance']->getStatus()) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__($marketplace['instance']->getData('url')); ?></span>
+                                <span><?php echo $marketplace['instance']->getData('url'); ?></span>
                             </p>
                         </td>
                         <?php if ($this->getParentBlock()->canShowUpdateNowButton()): ?>
@@ -74,7 +74,7 @@
                                     <option value="0"><?php echo Mage::helper('M2ePro')->__('Disabled - Coming Soon'); ?></option>
                                 </select>
                                 <p class="note">
-                                    <span><?php echo Mage::helper('M2ePro')->__('rakuten.de'); ?></span>
+                                    <span><?php echo 'rakuten.de'; ?></span>
                                 </p>
                             </td>
                         </tr>

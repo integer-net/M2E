@@ -1,41 +1,27 @@
-<?php
-$number = 0;
-foreach($this->commands as $command) : ?>
+<?php foreach($this->commands as $index => $command) : ?>
+
+    <?php
+        $components = array();
+        if ($command['components']) {
+            $components = $command['components'] === true ? $this->enabledComponents : $command['components'];
+        }
+    ?>
 
     <table>
-
-        <?php
-        $number++;
-        ?>
-
         <tr>
-            <td class="group_number_td">
-                <b><?php echo $number; ?>.</b>
-            </td>
-            <td style="width: 10px;">
-                |
-            </td>
+            <td class="group_number_td"><b><?php echo $index + 1; ?>.</b></td>
+            <td style="width: 10px;">|</td>
             <td>
-
-                <a href="<?php echo $command['url']; ?>" <?php if ($command['confirm'] != ''): ?>onclick="return confirm('<?php echo $command['confirm']; ?>');"<?php endif; ?> <?php if ($command['new_window']): ?>target="_blank"<?php endif; ?> title="<?php echo $command['description']; ?>" alt="<?php echo $command['description']; ?>"><?php echo $command['title']; ?></a>
-
-                <?php
-                $components = array();
-                if ($command['components']) {
-                    $components = $command['components'] === true ? $this->enabledComponents : $command['components'];
-                }
-                ?>
+                <?php echo $this->getCommandLauncherHtml($command); ?>
 
                 <?php if (count($components) > 1): ?>
-                    <?php foreach ($this->enabledComponents as $key => $component): ?>
-                        <?php
-                            $onClickJs = 'return confirm(\''.$command['confirm'].'\');';
-                            if($command['title'] == 'Marketplaces') {
-                                $onClickJs = 'var result = prompt(\''.$command['confirm'].'\'); if(result) window.location.href = $(this).getAttribute(\'href\') + \'?marketplace_id=\'+result; return false;';
-                            }
-                        ?>
-                        <?php echo $key == 0 ? '(' : ''; ?><a href="<?php echo rtrim($command['url'], '/') . '/component/' . $component . '/'; ?>" <?php if ($command['confirm'] != ''): ?>onclick="<?php echo $onClickJs; ?>"<?php endif; ?>><?php echo $component; ?></a><?php echo isset($this->enabledComponents[$key + 1]) ? ', ' : ')'; ?>
-                    <?php endforeach; ?>
+                <?php foreach ($this->enabledComponents as $key => $component): ?>
+
+<?php echo $key == 0 ? '(' : ''; ?>
+<?php echo $this->getCommandLauncherHtml($command, $component); ?>
+<?php echo isset($this->enabledComponents[$key + 1]) ? ', ' : ')'; ?>
+
+                <?php endforeach; ?>
                 <?php endif; ?>
             </td>
         </tr>

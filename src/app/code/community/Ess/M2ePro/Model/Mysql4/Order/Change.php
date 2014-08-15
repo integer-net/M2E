@@ -26,8 +26,6 @@ class Ess_M2ePro_Model_Mysql4_Order_Change
         );
     }
 
-    // ########################################
-
     public function deleteByOrderAction($orderId, $action)
     {
         $this->_getWriteAdapter()->delete(
@@ -38,8 +36,6 @@ class Ess_M2ePro_Model_Mysql4_Order_Change
             )
         );
     }
-
-    // ########################################
 
     public function deleteByProcessingAttemptCount($count = 3, $component = NULL)
     {

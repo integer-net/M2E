@@ -27,22 +27,122 @@ class Ess_M2ePro_Model_Mysql4_Play_Listing
         $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
         $buyListingProductTable = Mage::getResourceModel('M2ePro/Play_Listing_Product')->getMainTable();
 
-        $dbExpr = new Zend_Db_Expr('SUM(`online_qty`)');
-        $dbSelect = $this->_getWriteAdapter()
-            ->select()
-            ->from(array('lp' => $listingProductTable),$dbExpr)
-            ->join(array('plp' => $buyListingProductTable),'lp.id = plp.listing_product_id',array())
-            ->where("`listing_id` = `{$listingTable}`.`id`")
-            ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
+        $select = $this->_getReadAdapter()
+                       ->select()
+                       ->from(
+                           array('lp' => $listingProductTable),
+                           new Zend_Db_Expr('SUM(`online_qty`)')
+                       )
+                       ->join(
+                           array('plp' => $buyListingProductTable),
+                           'lp.id = plp.listing_product_id',
+                           array()
+                       )
+                       ->where("`listing_id` = `{$listingTable}`.`id`")
+                       ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
 
         $query = "UPDATE `{$listingTable}`
-                  SET `items_active_count` =  IFNULL((".$dbSelect->__toString()."),0)
-                  WHERE `component_mode` = 'play'";
+                  SET `items_active_count` =  IFNULL((".$select->__toString()."),0)
+                  WHERE `component_mode` = '".Ess_M2ePro_Helper_Component_Play::NICK."'";
 
         $this->_getWriteAdapter()->query($query);
     }
 
     // ########################################
+
+    public function setSynchStatusNeed($newData, $oldData, $listingProducts)
+    {
+        $this->setSynchStatusNeedByListing($newData,$oldData,$listingProducts);
+        $this->setSynchStatusNeedBySellingFormatTemplate($newData,$oldData,$listingProducts);
+        $this->setSynchStatusNeedBySynchronizationTemplate($newData,$oldData,$listingProducts);
+    }
+
+    // ----------------------------------------
+
+    public function setSynchStatusNeedByListing($newData, $oldData, $listingsProducts)
+    {
+        $listingsProductsIds = array();
+        foreach ($listingsProducts as $listingProduct) {
+            $listingsProductsIds[] = (int)$listingProduct['id'];
+        }
+
+        if (empty($listingsProductsIds)) {
+            return;
+        }
+
+        unset(
+            $newData['template_selling_format_id'], $oldData['template_selling_format_id'],
+            $newData['template_synchronization_id'], $oldData['template_synchronization_id']
+        );
+
+        if (!$this->isDifferent($newData,$oldData)) {
+            return;
+        }
+
+        $templates = array('listing');
+
+        $this->_getWriteAdapter()->update(
+            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
+            array(
+                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
+                'synch_reasons' => new Zend_Db_Expr(
+                    "IF(synch_reasons IS NULL,
+                        '".implode(',',$templates)."',
+                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
+                    )"
+                )
+            ),
+            array('id IN ('.implode(',', $listingsProductsIds).')')
+        );
+    }
+
+    public function setSynchStatusNeedBySellingFormatTemplate($newData, $oldData, $listingsProducts)
+    {
+        $newSellingFormatTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            Ess_M2ePro_Helper_Component_Play::NICK,
+            'Template_SellingFormat',
+            $newData['template_selling_format_id'],
+            NULL, array('template')
+        );
+
+        $oldSellingFormatTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            Ess_M2ePro_Helper_Component_Play::NICK,
+            'Template_SellingFormat',
+            $oldData['template_selling_format_id'],
+            NULL, array('template')
+        );
+
+        Mage::getResourceModel('M2ePro/Play_Template_SellingFormat')->setSynchStatusNeed(
+            $newSellingFormatTemplate->getDataSnapshot(),
+            $oldSellingFormatTemplate->getDataSnapshot(),
+            $listingsProducts
+        );
+    }
+
+    public function setSynchStatusNeedBySynchronizationTemplate($newData, $oldData, $listingsProducts)
+    {
+        $newSynchTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            Ess_M2ePro_Helper_Component_Play::NICK,
+            'Template_Synchronization',
+            $newData['template_synchronization_id'],
+            NULL, array('template')
+        );
+
+        $oldSynchTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            Ess_M2ePro_Helper_Component_Play::NICK,
+            'Template_Synchronization',
+            $oldData['template_synchronization_id'],
+            NULL, array('template')
+        );
+
+        Mage::getResourceModel('M2ePro/Play_Template_Synchronization')->setSynchStatusNeed(
+            $newSynchTemplate->getDataSnapshot(),
+            $oldSynchTemplate->getDataSnapshot(),
+            $listingsProducts
+        );
+    }
+
+    // ----------------------------------------
 
     public function isDifferent($newData, $oldData)
     {

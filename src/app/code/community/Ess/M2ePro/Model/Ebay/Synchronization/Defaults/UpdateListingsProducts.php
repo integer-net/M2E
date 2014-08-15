@@ -60,8 +60,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
             /** @var $account Ess_M2ePro_Model_Account **/
 
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
-            // ->__('The "Update Listings Products" action for eBay account: "%s" is started. Please wait...')
-            $status = 'The "Update Listings Products" action for eBay account: "%s" is started. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Update Listings Products" action for eBay account: "%account_title%" is started. Please wait...
+            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is started. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             $this->getActualOperationHistory()->addTimePoint(
@@ -73,8 +74,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
 
-            // ->__('The "Update Listings Products" action for eBay account: "%s" is finished. Please wait...')
-            $status = 'The "Update Listings Products" action for eBay account: "%s" is finished. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Update Listings Products" action for eBay account: "%account_title%" is finished. Please wait...
+            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is finished.'.
+                ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
             $this->getActualLockItem()->activate();
@@ -239,14 +242,13 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
     {
         $data = array();
 
-        /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
-        $ebayListingProduct = $listingProduct->getChildObject();
+        $listingType = $this->getActualListingType($listingProduct, $change);
 
-        if ($ebayListingProduct->isListingTypeFixed()) {
+        if ($listingType == Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED) {
             $data['online_buyitnow_price'] = (float)$change['currentPrice'] < 0 ? 0 : (float)$change['currentPrice'];
         }
 
-        if ($ebayListingProduct->isListingTypeAuction()) {
+        if ($listingType == Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION) {
             $data['online_start_price'] = (float)$change['currentPrice'] < 0 ? 0 : (float)$change['currentPrice'];
         }
 
@@ -263,7 +265,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
         /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
         $ebayListingProduct = $listingProduct->getChildObject();
 
-        if ($ebayListingProduct->isListingTypeAuction()) {
+        $listingType = $this->getActualListingType($listingProduct, $change);
+
+        if ($listingType == Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION) {
             $data['online_qty'] = 1;
             $data['online_bids'] = (int)$change['bidCount'] < 0 ? 0 : (int)$change['bidCount'];
         }
@@ -334,19 +338,23 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
         switch ($status) {
             case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Listed".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Listed".
                 $message = 'Item status was successfully changed to "Listed".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_SOLD:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Sold".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Sold".
                 $message = 'Item status was successfully changed to "Sold".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Stopped".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Stopped".
                 $message = 'Item status was successfully changed to "Stopped".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Finished".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Finished".
                 $message = 'Item status was successfully changed to "Finished".';
                 break;
         }
@@ -458,7 +466,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
         $this->setConfigValue($this->getFullSettingsPath(), 'since_time', $time);
     }
 
-    // ----------------------------------
+    //####################################
 
     private function getListingLogActionId()
     {
@@ -466,6 +474,31 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
             $this->listingLogActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
         }
         return $this->listingLogActionId;
+    }
+
+    private function getActualListingType(Ess_M2ePro_Model_Listing_Product $listingProduct, array $change)
+    {
+        $validEbayValues = array(
+            Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling::LISTING_TYPE_AUCTION,
+            Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling::LISTING_TYPE_FIXED
+        );
+
+        if (isset($change['listingType']) && in_array($change['listingType'],$validEbayValues)) {
+
+            switch ($change['listingType']) {
+                case Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling::LISTING_TYPE_AUCTION:
+                    $result = Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION;
+                    break;
+                case Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling::LISTING_TYPE_FIXED:
+                    $result = Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED;
+                    break;
+            }
+
+        } else {
+            $result = $listingProduct->getChildObject()->getListingType();
+        }
+
+        return $result;
     }
 
     //####################################

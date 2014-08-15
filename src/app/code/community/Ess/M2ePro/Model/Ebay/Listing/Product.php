@@ -850,8 +850,21 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
                 throw new Exception('Unknown mode in database.');
         }
 
-        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
-            $qty = $src['qty_max_posted_value'];
+        if ($src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE ||
+            $src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+            $src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) {
+
+            if ($qty > 0 && $src['qty_percentage'] > 0 && $src['qty_percentage'] < 100) {
+
+                $roundingFunction = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                        ->getGroupValue('/qty/percentage/','rounding_greater') ? 'ceil' : 'floor';
+
+                $qty = (int)$roundingFunction(($qty/100)*$src['qty_percentage']);
+            }
+
+            if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
+                $qty = $src['qty_max_posted_value'];
+            }
         }
 
         $qty < 0 && $qty = 0;
@@ -1019,176 +1032,26 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
         return array_unique($attributes);
     }
 
-    // ########################################
-
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $this->setSynchStatusNeedByTemplates($newData,$oldData);
-        $this->setSynchStatusNeedByCategoryTemplate($newData,$oldData);
-        $this->setSynchStatusNeedBySynchronizationTemplate($newData,$oldData);
-    }
-
-    // ---------------------------------------
-
-    private function setSynchStatusNeedByTemplates($newData,$oldData)
-    {
-        $newTemplates = $this->getTemplates($newData);
-        $oldTemplates = $this->getTemplates($oldData);
-
-        $changedTemplates = array();
-        foreach (array_keys($newTemplates) as $templateNick) {
-
-            $newTemplateSnapshot = array();
-            if ($newTemplates[$templateNick]) {
-                $newTemplateSnapshot = $newTemplates[$templateNick]->getDataSnapshot();
-            }
-
-            $oldTemplateSnapshot = array();
-            if ($oldTemplates[$templateNick]) {
-                $oldTemplateSnapshot = $oldTemplates[$templateNick]->getDataSnapshot();
-            }
-
-            $isDifferent = $newTemplates[$templateNick]->getResource()->isDifferent(
-                $newTemplateSnapshot, $oldTemplateSnapshot
-            );
-
-            $isDifferent && $changedTemplates[] = $templateNick;
-        }
-
-        if (empty($changedTemplates)) {
-            return;
-        }
-
-        foreach ($changedTemplates as &$template) {
-            if ($template == Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT) {
-                $template = 'sellingFormatTemplate';
-            } else {
-                $template .= 'Template';
-            }
-        }
-        unset($template);
-
-        $synchReasons = $this->getParentObject()->getSynchReasons();
-        $synchReasons = array_unique(array_merge($synchReasons,$changedTemplates));
-
-        $this->getParentObject()->setData('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
-        $this->getParentObject()->setData('synch_reasons', implode(',',$synchReasons));
-
-        $this->getParentObject()->save();
-    }
-
-    private function setSynchStatusNeedByCategoryTemplate($newData,$oldData)
-    {
-        $newCategoryTemplateData = array();
-
-        try {
-            $newCategoryTemplateData = Mage::helper('M2ePro')
-                ->getCachedObject('Ebay_Template_Category',$newData['template_category_id'],NULL, array('template'))
-                ->getDataSnapshot();
-        } catch (Exception $exception) {}
-
-        $oldCategoryTemplateData = array();
-
-        try {
-            $oldCategoryTemplateData = Mage::helper('M2ePro')
-                ->getCachedObject('Ebay_Template_Category',$oldData['template_category_id'],NULL, array('template'))
-                ->getDataSnapshot();
-        } catch (Exception $exception) {}
-
-        // ------------------------------------
-
-        $newCategoryOtherTemplateData = array();
-
-        try {
-            $newCategoryOtherTemplateData = Mage::helper('M2ePro')
-                ->getCachedObject('Ebay_Template_OtherCategory',
-                                  $newData['template_other_category_id'],
-                                  NULL,array('template'))
-                ->getDataSnapshot();
-        } catch (Exception $exception) {}
-
-        $oldCategoryOtherTemplateData = array();
-
-        try {
-            $oldCategoryOtherTemplateData = Mage::helper('M2ePro')
-                ->getCachedObject('Ebay_Template_OtherCategory',
-                                  $oldData['template_other_category_id'],
-                                  NULL, array('template'))
-                ->getDataSnapshot();
-        } catch (Exception $exception) {}
-
-        // ------------------------------------
-
-        $isDifferentCategoryTemplate = Mage::getResourceModel('M2ePro/Ebay_Template_Category')
-            ->isDifferent($newCategoryTemplateData,$oldCategoryTemplateData);
-
-        $isDifferentOtherCategoryTemplate = Mage::getResourceModel('M2ePro/Ebay_Template_OtherCategory')
-            ->isDifferent($newCategoryOtherTemplateData,$oldCategoryOtherTemplateData);
-
-        if (!$isDifferentCategoryTemplate && !$isDifferentOtherCategoryTemplate) {
-            return;
-        }
-
-        $changedTemplates = array('categoryTemplate');
-
-        $synchReasons = $this->getParentObject()->getSynchReasons();
-        $synchReasons = array_unique(array_merge($synchReasons,$changedTemplates));
-
-        $this->getParentObject()->setData('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
-        $this->getParentObject()->setData('synch_reasons', implode(',',$synchReasons));
-
-        $this->getParentObject()->save();
-    }
-
-    private function setSynchStatusNeedBySynchronizationTemplate($newData,$oldData)
-    {
-        if (!$this->getParentObject()->isSynchStatusSkip()) {
-            return;
-        }
-
-        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
-
         $templateManager = Mage::getSingleton('M2ePro/Ebay_Template_Manager');
 
-        $newSynchTemplate = $templateManager->getTemplatesFromData($newData,array($template));
-        $newSynchTemplate = reset($newSynchTemplate);
+        $newTemplates = $templateManager->getTemplatesFromData($newData);
+        $oldTemplates = $templateManager->getTemplatesFromData($oldData);
 
-        $oldSynchTemplate = $templateManager->getTemplatesFromData($oldData,array($template));
-        $oldSynchTemplate = reset($oldSynchTemplate);
+        foreach ($templateManager->getAllTemplates() as $template) {
 
-        $newSynchTemplateSnapshot = $newSynchTemplate->getDataSnapshot();
-        $oldSynchTemplateSnapshot = $oldSynchTemplate->getDataSnapshot();
+            $templateManager->setTemplate($template);
 
-        $settings = $newSynchTemplate->getFullReviseSettingWhichWereEnabled(
-            $newSynchTemplateSnapshot, $oldSynchTemplateSnapshot
-        );
-
-        if (!$settings) {
-            return;
+            $templateManager->getTemplateModel(true)->getResource()->setSynchStatusNeed(
+                $newTemplates[$template]->getDataSnapshot(),
+                $oldTemplates[$template]->getDataSnapshot(),
+                array($this->getData())
+            );
         }
 
-        $reasons = $this->getParentObject()->getSynchReasons();
-        foreach ($settings as $reason => $setting) {
-            if (in_array($reason, $reasons)) {
-                $this->getParentObject()
-                     ->setData('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED)
-                     ->save();
-                break;
-            }
-        }
-    }
-
-    // ########################################
-
-    private function getTemplates($data)
-    {
-        $templates = array(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION);
-
-        return Mage::getModel('M2ePro/Ebay_Template_Manager')->getTemplatesFromData($data,$templates);
+        $this->getResource()->setSynchStatusNeedByCategoryTemplate($newData,$oldData,$this->getData());
+        $this->getResource()->setSynchStatusNeedByOtherCategoryTemplate($newData,$oldData,$this->getData());
     }
 
     // ########################################

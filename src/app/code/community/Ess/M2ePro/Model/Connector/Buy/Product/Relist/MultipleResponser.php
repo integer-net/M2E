@@ -20,7 +20,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Relist_MultipleResponser
                                                   $this->getListingProductRequestNativeData($listingProduct),
                                                   $this->params);
 
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully relisted');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully relisted
             $this->addListingsProductsLogsMessage($listingProduct, 'Item was successfully relisted',
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                                                   Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);

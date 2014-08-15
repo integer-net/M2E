@@ -8,25 +8,25 @@
  */
 class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 {
-    // ->__('Magento Order was not created. Reason: %msg%');
-    // ->__('Magento Order #%order_id% was created.');
-    // ->__('Payment Transaction was not created. Reason: %msg%');
-    // ->__('Invoice was not created. Reason: %msg%');
-    // ->__('Invoice #%invoice_id% was created.');
-    // ->__('Shipment was not created. Reason: %msg%');
-    // ->__('Shipment #%shipment_id% was created.');
-    // ->__('Tracking details were not imported. Reason: %msg%');
-    // ->__('Tracking details were imported.');
-    // ->__('Magento Order #%order_id% was canceled.');
-    // ->__('Magento Order #%order_id% was not canceled. Reason: %msg%');
-    // ->__('Store does not exist.');
-    // ->__('Payment method "M2E Pro Payment" is disabled in magento configuration.')
-    // ->__('Shipping method "M2E Pro Shipping" is disabled in magento configuration.')
+    // M2ePro_TRANSLATIONS
+    // Magento Order was not created. Reason: %msg%
+    // Magento Order #%order_id% was created.
+    // Payment Transaction was not created. Reason: %msg%
+    // Invoice was not created. Reason: %msg%
+    // Invoice #%invoice_id% was created.
+    // Shipment was not created. Reason: %msg%
+    // Shipment #%shipment_id% was created.
+    // Tracking details were not imported. Reason: %msg%
+    // Tracking details were imported.
+    // Magento Order #%order_id% was canceled.
+    // Magento Order #%order_id% was not canceled. Reason: %msg%
+    // Store does not exist.
+    // Payment method "M2E Pro Payment" is disabled in magento configuration.
+    // Shipping method "M2E Pro Shipping" is disabled in magento configuration.
 
     // ########################################
 
-    const STATE_NORMAL          = 0;
-    const STATE_ACTION_REQUIRED = 1;
+    const ADDITIONAL_DATA_KEY_IN_ORDER = 'm2epro_order';
 
     // ########################################
 
@@ -104,11 +104,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         return $this->getData('store_id');
     }
 
-    public function getState()
-    {
-        return (int)$this->getData('state');
-    }
-
     public function getReservationState()
     {
         return (int)$this->getData('reservation_state');
@@ -158,25 +153,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         }
 
         return $this->marketplace;
-    }
-
-    // ########################################
-
-    /**
-     * Mark whole order as one that requires user action
-     *
-     * @param $required
-     * @return $this
-     */
-    public function setActionRequired($required)
-    {
-        $this->setData('state', $required ? self::STATE_ACTION_REQUIRED : self::STATE_NORMAL);
-        return $this;
-    }
-
-    public function isActionRequired()
-    {
-        return $this->getState() == self::STATE_ACTION_REQUIRED;
     }
 
     // ########################################
@@ -390,7 +366,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         $store = Mage::getModel('core/store')->load($storeId);
 
         if (is_null($store->getId())) {
-            $this->setActionRequired(true)->save();
             throw new Exception('Store does not exist.');
         }
 
@@ -399,12 +374,10 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         }
 
         if (!Mage::getStoreConfig('payment/m2epropayment/active', $store) && $strict) {
-            $this->setActionRequired(true)->save();
             throw new Exception('Payment method "M2E Pro Payment" is disabled in magento configuration.');
         }
 
         if (!Mage::getStoreConfig('carriers/m2eproshipping/active', $store) && $strict) {
-            $this->setActionRequired(true)->save();
             throw new Exception('Shipping method "M2E Pro Shipping" is disabled in magento configuration.');
         }
     }
@@ -519,6 +492,9 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
             /** @var $magentoOrderBuilder Ess_M2ePro_Model_Magento_Order */
             $magentoOrderBuilder = Mage::getModel('M2ePro/Magento_Order', $magentoQuoteBuilder->getQuote());
+            $magentoOrderBuilder->setAdditionalData(array(
+                self::ADDITIONAL_DATA_KEY_IN_ORDER => $this
+            ));
             $magentoOrderBuilder->buildOrder();
 
             $this->magentoOrder = $magentoOrderBuilder->getOrder();
@@ -542,14 +518,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
             throw $e;
         }
-
-        $this->setData('magento_order_id', $this->magentoOrder->getId());
-        $this->setActionRequired(false);
-        $this->save();
-
-        $this->afterCreateMagentoOrder();
-
-        return $this->magentoOrder;
     }
 
     public function afterCreateMagentoOrder()

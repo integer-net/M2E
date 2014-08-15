@@ -29,7 +29,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Edit extends Mage_Adminht
         // Set header text
         //------------------------------
         if ($listing) {
-            $this->_headerText = sprintf(Mage::helper('M2ePro')->__('Edit Listing Settings "%s"'), $listing->getTitle());
+            $this->_headerText = Mage::helper('M2ePro')->__('Edit Listing Settings "%listing_title%"', $listing->getTitle());
         } else {
             $this->_headerText = Mage::helper('M2ePro')->__('Creating A New M2E Listing');
         }

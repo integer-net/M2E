@@ -34,14 +34,14 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
     {
         $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
 
-        $dbSelect = $this->_getWriteAdapter()
-                             ->select()
-                             ->from($listingProductTable,new Zend_Db_Expr('COUNT(*)'))
-                             ->where("`listing_id` = `{$this->getMainTable()}`.`listing_id`")
-                             ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_SOLD);
+        $select = $this->_getReadAdapter()
+                       ->select()
+                       ->from($listingProductTable,new Zend_Db_Expr('COUNT(*)'))
+                       ->where("`listing_id` = `{$this->getMainTable()}`.`listing_id`")
+                       ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_SOLD);
 
         $query = "UPDATE `{$this->getMainTable()}`
-                  SET `products_sold_count` =  (".$dbSelect->__toString().")";
+                  SET `products_sold_count` =  (".$select->__toString().")";
 
         $this->_getWriteAdapter()->query($query);
     }
@@ -52,17 +52,23 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
         $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
         $ebayListingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
 
-        $dbExpr = new Zend_Db_Expr('SUM(`online_qty` - `online_qty_sold`)');
-        $dbSelect = $this->_getWriteAdapter()
-                             ->select()
-                             ->from(array('lp' => $listingProductTable),$dbExpr)
-                             ->join(array('elp' => $ebayListingProductTable),'lp.id = elp.listing_product_id',array())
-                             ->where("`listing_id` = `{$listingTable}`.`id`")
-                             ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
+        $select = $this->_getReadAdapter()
+                       ->select()
+                       ->from(
+                          array('lp' => $listingProductTable),
+                          new Zend_Db_Expr('SUM(`online_qty` - `online_qty_sold`)')
+                       )
+                       ->join(
+                          array('elp' => $ebayListingProductTable),
+                          'lp.id = elp.listing_product_id',
+                          array()
+                       )
+                       ->where("`listing_id` = `{$listingTable}`.`id`")
+                       ->where("`status` = ?",(int)Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
 
         $query = "UPDATE `{$listingTable}`
-                  SET `items_active_count` =  IFNULL((".$dbSelect->__toString()."),0)
-                  WHERE `component_mode` = 'ebay'";
+                  SET `items_active_count` =  IFNULL((".$select->__toString()."),0)
+                  WHERE `component_mode` = '".Ess_M2ePro_Helper_Component_Ebay::NICK."'";
 
         $this->_getWriteAdapter()->query($query);
     }
@@ -72,51 +78,51 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing
         $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
         $ebayListingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
 
-        $dbExpr = new Zend_Db_Expr('SUM(`online_qty_sold`)');
-        $dbSelect = $this->_getWriteAdapter()
-                             ->select()
-                             ->from(array('lp' => $listingProductTable),$dbExpr)
-                             ->join(array('elp' => $ebayListingProductTable),'lp.id = elp.listing_product_id',array())
-                             ->where("`listing_id` = `{$this->getMainTable()}`.`listing_id`");
+        $select = $this->_getReadAdapter()
+                       ->select()
+                       ->from(
+                            array('lp' => $listingProductTable),
+                            new Zend_Db_Expr('SUM(`online_qty_sold`)')
+                       )
+                       ->join(
+                            array('elp' => $ebayListingProductTable),
+                            'lp.id = elp.listing_product_id',
+                            array()
+                       )
+                       ->where("`listing_id` = `{$this->getMainTable()}`.`listing_id`");
 
         $query = "UPDATE `{$this->getMainTable()}`
-                  SET `items_sold_count` =  (".$dbSelect->__toString().")";
+                  SET `items_sold_count` =  (".$select->__toString().")";
 
         $this->_getWriteAdapter()->query($query);
     }
 
     // ########################################
 
-    public function getCatalogProductCollection($listingId)
+    public function getProductCollection($listingId)
     {
         $collection = Mage::getResourceModel('catalog/product_collection');
+
         $collection->joinTable(
             array('lp' => 'M2ePro/Listing_Product'),
             'product_id=entity_id',
-            array(
-                'id' => 'id'
-            ),
+            array('id' => 'id'),
             '{{table}}.listing_id='.(int)$listingId
         );
+
         $collection->joinTable(
             array('elp' => 'M2ePro/Ebay_Listing_Product'),
             'listing_product_id=id',
-            array(
-                'listing_product_id' => 'listing_product_id'
-            )
+            array('listing_product_id' => 'listing_product_id')
         );
 
         return $collection;
     }
 
-    // ########################################
-
-    public function updateMotorsSpecificsAttributesData(
-        $listingId,
-        array $listingProductIds,
-        $epids,
-        $overwrite = false
-    ) {
+    public function updateMotorsSpecificsAttributesData($listingId,
+                                                        array $listingProductIds,
+                                                        $epids,
+                                                        $overwrite = false) {
         if (count($listingProductIds) == 0) {
             return;
         }

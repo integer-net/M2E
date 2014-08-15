@@ -265,6 +265,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
     {
         $price = 0;
 
+        $src = $this->getBuySellingFormatTemplate()->getPriceSource();
+
+        if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_NONE) {
+            return $price;
+        }
+
         // Configurable product
         if ($this->getListingProduct()->getMagentoProduct()->isConfigurableType()) {
 
@@ -286,6 +292,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
         // Simple with custom options
         } else if ($this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
             $price = $this->getSimpleWithCustomOptionsPrice();
+
         // Grouped product
         } else if ($this->getListingProduct()->getMagentoProduct()->isGroupedType()) {
             $price = $this->getBaseProductPrice();
@@ -300,63 +307,62 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Option extends Ess_M2ePro_M
     {
         $price = 0;
 
-        $productTypeInstance = $this->getListingProduct()->getMagentoProduct()->getTypeInstance();
+        $magentoProductParent = $this->getListingProduct()->getMagentoProduct();
 
-        $productAttributes = $productTypeInstance->getUsedProductAttributes();
-        $configurableAttributes = $productTypeInstance->getConfigurableAttributesAsArray();
+        /** @var $productTypeInstance Mage_Catalog_Model_Product_Type_Configurable */
+        $productTypeInstance = $magentoProductParent->getTypeInstance();
 
-        $attribute = strtolower($this->getParentObject()->getAttribute());
-        $option = strtolower($this->getParentObject()->getOption());
+        $attributeName = strtolower($this->getParentObject()->getAttribute());
+        $optionName = strtolower($this->getParentObject()->getOption());
 
-        foreach ($configurableAttributes as $configurableAttribute) {
+        foreach ($productTypeInstance->getConfigurableAttributes() as $configurableAttribute) {
 
-            $label = isset($configurableAttribute['label']) ? strtolower($configurableAttribute['label']) : '';
-            $frontLabel = isset($configurableAttribute['frontend_label']) ?
-                                strtolower($configurableAttribute['frontend_label']) : '';
-            $storeLabel = isset($configurableAttribute['store_label']) ?
-                                strtolower($configurableAttribute['store_label']) : '';
+            /** @var $configurableAttribute Mage_Catalog_Model_Product_Type_Configurable_Attribute */
+            $configurableAttribute->setStoteId($magentoProductParent->getStoreId());
 
-            if ($label != $attribute && $frontLabel != $attribute && $storeLabel != $attribute) {
+            /** @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
+            $attribute = $configurableAttribute->getProductAttribute();
+            $attribute->setStoreId($magentoProductParent->getStoreId());
+
+            $tempAttributeNames = array_values($attribute->getStoreLabels());
+            $tempAttributeNames[] = $configurableAttribute->getData('label');
+            $tempAttributeNames[] = $attribute->getFrontendLabel();
+
+            if (!in_array($attributeName,array_map('strtolower',array_filter($tempAttributeNames)))){
                 continue;
             }
 
-            if (!isset($productAttributes[(int)$configurableAttribute['attribute_id']])) {
-                continue;
-            }
+            $options = $attribute->getSource()->getAllOptions(false);
 
-            $productAttribute = $productAttributes[(int)$configurableAttribute['attribute_id']];
-            $productAttribute->setStoreId($this->getListing()->getStoreId());
+            foreach ((array)$configurableAttribute->getPrices() as $configurableOption) {
 
-            $productAttributesOptions = $productAttribute->getSource()->getAllOptions(false);
+                $tempOptionNames = array();
 
-            foreach ($configurableAttribute['values'] as $configurableOption) {
+                isset($configurableOption['label']) && $tempOptionNames[] = $configurableOption['label'];
+                isset($configurableOption['default_label']) && $tempOptionNames[] = $configurableOption['default_label'];
+                isset($configurableOption['store_label']) && $tempOptionNames[] = $configurableOption['store_label'];
 
-                $label = isset($configurableOption['label']) ? strtolower($configurableOption['label']) : '';
-                $defaultLabel = isset($configurableOption['default_label']) ?
-                                    strtolower($configurableOption['default_label']) : '';
-                $storeLabel = isset($configurableOption['store_label']) ?
-                                    strtolower($configurableOption['store_label']) : '';
-
-                foreach ($productAttributesOptions as $productAttributesOption) {
-                    if ((int)$productAttributesOption['value'] == (int)$configurableOption['value_index']) {
-                        $storeLabel = strtolower($productAttributesOption['label']);
+                foreach ($options as $option) {
+                    if ((int)$option['value'] == (int)$configurableOption['value_index']) {
+                        $tempOptionNames[] = $option['label'];
                         break;
                     }
                 }
 
-                if ($label != $option && $defaultLabel != $option && $storeLabel != $option) {
+                if (!in_array($optionName,array_map('strtolower',array_filter($tempOptionNames)))){
                     continue;
                 }
 
                 if ((bool)(int)$configurableOption['is_percent']) {
+
                     // Base Price of Main product.
 
                     $src = $this->getBuySellingFormatTemplate()->getPriceSource();
 
                     $basePrice = $this->getBuyListingProduct()->getBaseProductPrice($src['mode'],
                                                                                     $src['attribute']);
-
                     $price = ($basePrice * (float)$configurableOption['pricing_value']) / 100;
+
                 } else {
                     $price = (float)$configurableOption['pricing_value'];
                     $price = $this->getBuyListing()->convertPriceFromStoreToMarketplace($price);

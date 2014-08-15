@@ -115,10 +115,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
 
         $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Products were not moved. <a target="_blank" href="%s">View log</a> for details.', $logViewUrl)
+            $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.', $logViewUrl)
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some of the products were not moved. <a target="_blank" href="%s">View log</a> for details.', $logViewUrl)
+            $helper->__('Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.', $logViewUrl)
         );
 
         $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully mapped.'));
@@ -129,11 +129,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
         $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
 
-        // ->__('Current eBay version only supports simple products in mapping. Please, choose simple product.')
+        // M2ePro_TRANSLATIONS
+        // Current eBay version only supports simple products in mapping. Please, choose simple product.
         $temp = 'Current eBay version only supports simple products in mapping. Please, choose simple product.';
         $selectSimpleProductMessage = $helper->escapeJs($helper->__($temp));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %s product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
 
         $checkLockListing = $this->getUrl('*/adminhtml_listing_other/checkLockListing', array('component'=>$component));
         $lockListingNow = $this->getUrl('*/adminhtml_listing_other/lockListingNow', array('component'=>$component));
@@ -145,17 +146,19 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $runStopProducts = $this->getUrl('*/adminhtml_ebay_listing_other/runStopProducts');
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
-        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__('"%s" task has successfully completed.'));
+        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__('"%task_title%" task has successfully completed.'));
 
-        // ->__('"%s" task has completed with warnings. <a target="_blank" href="%s">View log</a> for details.')
-        $temp = '"%s" task has completed with warnings. <a target="_blank" href="%s">View log</a> for details.';
+        // M2ePro_TRANSLATIONS
+        // "%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
+        $temp = '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__($temp));
 
-        // ->__('"%s" task has completed with errors. <a target="_blank" href="%s">View log</a> for details.')
-        $temp = '"%s" task has completed with errors. <a target="_blank" href="%s">View log</a> for details.';
+        // M2ePro_TRANSLATIONS
+        // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
+        $temp = '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($temp));
 
-        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %s product(s) data on eBay.'));
+        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on eBay.'));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = Mage::helper('M2ePro')->escapeJs(
@@ -191,7 +194,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
             $helper->__('Selected items must belong to the same Account and Marketplace.')
         );
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs($helper->__('Please select the products you want to perform the action on.'));
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
         $javascript = <<<JAVASCRIPT

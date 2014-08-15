@@ -88,6 +88,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SellingFormatController
             'qty_mode',
             'qty_custom_value',
             'qty_custom_attribute',
+            'qty_percentage',
             'qty_max_posted_value_mode',
             'qty_max_posted_value',
 
@@ -116,8 +117,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SellingFormatController
         }
 
         $data['title'] = strip_tags($data['title']);
-
-        $data['price_coefficient'] = str_replace(',', '.', $data['price_coefficient']);
         //--------------------
 
         // Add or update model

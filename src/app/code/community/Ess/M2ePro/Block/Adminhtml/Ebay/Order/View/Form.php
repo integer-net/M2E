@@ -34,6 +34,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
         $this->order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
     }
 
+    // ##########################################################
+
     protected function _beforeToHtml()
     {
         // Magento order data
@@ -87,6 +89,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
         return parent::_beforeToHtml();
     }
 
+    // ##########################################################
+
     private function getStore()
     {
         if (is_null($this->order->getData('store_id'))) {
@@ -129,4 +133,42 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
 
         return $currencyHelper->getConvertRateFromBase($this->order->getChildObject()->getCurrency(), $store) != 0;
     }
+
+    // ##########################################################
+
+    public function getSubtotalPrice()
+    {
+        return $this->order->getChildObject()->getSubtotalPrice();
+    }
+
+    public function getShippingPrice()
+    {
+        $shippingPrice = $this->order->getChildObject()->getShippingPrice();
+        if (!$this->order->getChildObject()->isVatTax()) {
+            return $shippingPrice;
+        }
+
+        $shippingPrice -= Mage::getSingleton('tax/calculation')->calcTaxAmount(
+            $shippingPrice, $this->order->getChildObject()->getTaxRate(), true, false
+        );
+
+        return $shippingPrice;
+    }
+
+    public function getTaxAmount()
+    {
+        $taxAmount = $this->order->getChildObject()->getTaxAmount();
+        if (!$this->order->getChildObject()->isVatTax()) {
+            return $taxAmount;
+        }
+
+        $shippingPrice = $this->order->getChildObject()->getShippingPrice();
+        $shippingTaxAmount = Mage::getSingleton('tax/calculation')->calcTaxAmount(
+            $shippingPrice, $this->order->getChildObject()->getTaxRate(), true, false
+        );
+
+        return $taxAmount + $shippingTaxAmount;
+    }
+
+    // ##########################################################
 }

@@ -25,7 +25,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widg
             $accountTitle = Mage::getModel('M2ePro/Account')->load((int)$accountId)->getTitle();
         }
 
-        $this->_headerText = Mage::helper('M2ePro')->__('Feedback for account "%s"', $accountTitle);
+        $this->_headerText = Mage::helper('M2ePro')->__('Feedback for account "%account_title%"', $accountTitle);
         //------------------------------
 
         // Set buttons actions

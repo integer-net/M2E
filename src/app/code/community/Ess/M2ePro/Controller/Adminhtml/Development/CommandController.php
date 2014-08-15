@@ -18,7 +18,10 @@ abstract class Ess_M2ePro_Controller_Adminhtml_Development_CommandController
 
     protected function getStyleHtml()
     {
+        $baseUrl = Mage::helper('M2ePro/Magento')->getBaseUrl();
+
         return <<<HTML
+<script type="text/javascript" src="{$baseUrl}js/prototype/prototype.js"></script>
 
 <style type="text/css">
 

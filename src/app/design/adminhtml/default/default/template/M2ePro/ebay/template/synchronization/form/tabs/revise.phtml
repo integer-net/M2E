@@ -27,13 +27,12 @@
 </script>
 
 <div id="block_notice_ebay_template_synchronization_form_data_revise" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Revise Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Set preferences for revising items.
-                                           <ul class="list">
-                                              <li><b>Partial Revise</b> - updates particular data you specified.
-                                              </li>
-                                              <li><b>Full Revise</b> - set \'Yes\' in the policy option which data change will launch updating data on eBay.
-                                              </li></ul>
-                                           '); ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        'Set the conditions when M2E Pro should revise items on eBay.<br/><br/>
+        <b>Partial Revise</b> - if conditions here are met, eBay items will be updated with just the specific data that has changed.<br/>
+        <b>Full Revise</b> - conditions here relate to changes that are made to the policies made in the M2E Pro listing.
+        If conditions here are met, eBay items will be updated in full, with all data being sent to eBay.'
+    ); ?>
 </div>
 
 <div class="entry-edit" id="magento_block_ebay_template_synchronization_form_data_revise_products">
@@ -57,7 +56,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_QTY_YES; ?>" <?php if ($formData['revise_update_qty'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_QTY_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay quantity if there is a change to the quantity (or attribute for quantity) in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay quantity if there is a change to the quantity (or the attribute used for quantity) in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -73,8 +72,8 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON; ?>" <?php if ($formData['revise_update_qty_max_applied_value_mode'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                     <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Only revises the quantity on eBay when they meet the specific conditions you set.'); ?></span>
-                        </p>
+                        <span><?php echo Mage::helper('M2ePro')->__('Choose if you want to revise quantities on eBay only when certain conditions are met.'); ?></span>
+                    </p>
                     </td>
                 </tr>
 
@@ -85,7 +84,9 @@
                     <td id="revise_update_qty_max_applied_value_td" class="value" style="width: auto;">
                         <input id="revise_update_qty_max_applied_value" name="synchronization[revise_update_qty_max_applied_value]" value="<?php echo $this->escapeHtml($formData['revise_update_qty_max_applied_value']); ?>" type="text" class="input-text validate-qty input-text M2ePro-required-when-visible" />
                     <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('We recommend not setting this value too high. Initially try a value from 10 - 20.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Set the quantity of stock when revise rules should be triggered. We recommend keeping this value relatively low, with an initial value of anything from 10 to 20.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -107,7 +108,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_PRICE_YES; ?>" <?php if ($formData['revise_update_price'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_PRICE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                          <p class="note">
-                             <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay item price if there is a change to the price (or attribute for price) in Magento.'); ?></span>
+                             <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item price if there is a change to the price (or the attribute used for price) in Magento.'); ?></span>
                          </p>
                     </td>
                 </tr>
@@ -122,7 +123,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_TITLE_YES; ?>" <?php if ($formData['revise_update_title'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_TITLE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                          <p class="note">
-                             <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay item title if there is a change to the title (or attribute for title) in Magento.'); ?></span>
+                             <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item title if there is a change to the title (or the attribute used for title) in Magento.'); ?></span>
                          </p>
                     </td>
                 </tr>
@@ -137,7 +138,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_SUB_TITLE_YES; ?>" <?php if ($formData['revise_update_sub_title'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_SUB_TITLE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                          <p class="note">
-                             <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay item subtitle if there is a change to the subtitle (or attribute for subtitle) in Magento.'); ?></span>
+                             <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item subtitle if there is a change to the subtitle (or the attribute used for subtitle) in Magento.'); ?></span>
                          </p>
                     </td>
                 </tr>
@@ -152,7 +153,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_DESCRIPTION_YES; ?>" <?php if ($formData['revise_update_description'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_DESCRIPTION_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay item description if there is a change to the description (or attribute for description) in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item description if there is a change to the description (or the attribute used for description) in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -167,7 +168,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_IMAGES_YES; ?>" <?php if ($formData['revise_update_images'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_IMAGES_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay item gallery if there is a change to the gallery (or attribute for gallery) in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item gallery if there is a change to the gallery (or the attribute used for gallery) in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -200,7 +201,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_selling_format_template'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay listing if there is a change to the Price, Quantity and Format policy.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item if there is a change to the Price, Quantity and Format policy in this M2E Pro listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -215,7 +216,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_description_template'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay listing if there is a change to the Description  policy.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item if there is a change to the description policy in this M2E Pro listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -230,7 +231,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_CATEGORY_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_category_template'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_CATEGORY_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay listing if there is a change to the category/specifics in its settings.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item if there is a change to the category/specifics made in Magento or M2E Pro.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -245,7 +246,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_PAYMENT_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_payment_template'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_PAYMENT_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay listing if there is a change to the Payment policy.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item if there is a change to the payment policy in this M2E Pro listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -260,7 +261,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_SHIPPING_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_shipping_template'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_SHIPPING_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay listing if there is a change to the Shipping policy.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item if there is a change to the Shipping policy in this M2E Pro listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -275,7 +276,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_RETURN_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_return_template'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_CHANGE_RETURN_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises the eBay listing if there is a change to the Return policy.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revise the eBay item if there is a change to the Return policy in this M2E Pro listing.'); ?></span>
                         </p>
                     </td>
                 </tr>

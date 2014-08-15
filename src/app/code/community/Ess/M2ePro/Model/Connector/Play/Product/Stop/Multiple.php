@@ -56,7 +56,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_Multiple
             if (!$listingProduct->isListed()) {
 
                 if (!isset($this->params['remove']) || !(bool)$this->params['remove']) {
-                    // Parser hack -> Mage::helper('M2ePro')->__('Item is not listed or not available');
+                    // M2ePro_TRANSLATIONS
+                    // Item is not listed or not available
                     $this->addListingsProductsLogsMessage($listingProduct, 'Item is not listed or not available',
                                                           Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                                                           Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
@@ -74,11 +75,12 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_Multiple
                 $priceGbr = $listingProduct->getChildObject()->getPriceGbr(true);
 
                 if ($priceGbr <= 0) {
-
-                // ->__('The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.');
+                // M2ePro_TRANSLATIONS
+                // The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.
                     $this->addListingsProductsLogsMessage(
                         $listingProduct,
-                        'The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.',
+                        'The price GBP must be greater than 0. Please, '.
+                        'check the Selling Format Template and Product settings.',
                         Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );
@@ -93,11 +95,12 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_Multiple
                 $priceEuro = $listingProduct->getChildObject()->getPriceEuro(true);
 
                 if ($priceEuro <= 0) {
-
-                // ->__('The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.');
+                // M2ePro_TRANSLATIONS
+                // The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.
                     $this->addListingsProductsLogsMessage(
                         $listingProduct,
-                        'The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.',
+                        'The price EUR must be greater than 0. Please, '.
+                        'check the Selling Format Template and Product settings.',
                         Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );

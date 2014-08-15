@@ -8,14 +8,10 @@
  */
 class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abstract
 {
-    // ->__('Product does not exist.');
-    // ->__('Product is disabled.');
-    // ->__('Order Import does not support product type: %type%.');
-
-    // ########################################
-
-    const STATE_NORMAL          = 0;
-    const STATE_ACTION_REQUIRED = 1;
+    // M2ePro_TRANSLATIONS
+    // Product does not exist.
+    // Product is disabled.
+    // Order Import does not support product type: %type%.
 
     // ########################################
 
@@ -80,11 +76,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         return $this->getData('product_id');
     }
 
-    public function getState()
-    {
-        return (int)$this->getData('state');
-    }
-
     public function getQtyReserved()
     {
         return (int)$this->getData('qty_reserved');
@@ -121,37 +112,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
     public function getReservedProducts()
     {
         return $this->getSetting('product_details', 'reserved_products', array());
-    }
-
-    /**
-     * Checks whether an order item has the data (variation info, sku etc), by which variations can be repaired
-     *
-     * @return bool
-     */
-    public function hasRepairInput()
-    {
-        $repairInput = $this->getChildObject()->getRepairInput();
-
-        return count($repairInput) > 0;
-    }
-
-    // ########################################
-
-    /**
-     * Mark order item as one that requires user action
-     *
-     * @param $required
-     * @return $this
-     */
-    public function setActionRequired($required)
-    {
-        $this->setData('state', $required ? self::STATE_ACTION_REQUIRED : self::STATE_NORMAL);
-        return $this;
-    }
-
-    public function isActionRequired()
-    {
-        return $this->getState() == self::STATE_ACTION_REQUIRED;
     }
 
     // ########################################
@@ -270,8 +230,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         }
 
         if (!in_array($this->getMagentoProduct()->getTypeId(), self::$supportedProductTypes)) {
-            $this->setActionRequired(true)->save();
-
             $message = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                 'Order Import does not support product type: %type%.', array(
                     'type' => $this->getMagentoProduct()->getTypeId()
@@ -284,7 +242,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         $this->associateVariationWithOptions();
 
         if (!$this->getMagentoProduct()->isStatusEnabled()) {
-            $this->setActionRequired(true)->save();
             throw new Exception('Product is disabled.');
         }
     }
@@ -329,7 +286,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         try {
             $productDetails = $optionsFinder->getProductDetails();
         } catch (Exception $e) {
-            $this->setActionRequired(true)->save();
             throw $e;
         }
 
@@ -349,8 +305,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             }
 
             if ($optionsFinder->hasFailedOptions()) {
-                $this->setActionRequired(true)->save();
-
                 throw new LogicException(
                     sprintf('Product option(s) "%s" not found.', implode(', ', $optionsFinder->getFailedOptions()))
                 );
@@ -363,8 +317,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         if (count(array_diff($foundOptionsIds, $existOptionsIds)) > 0) {
             // options were already mapped, but not all of them
-            $this->setActionRequired(true)->save();
-
             throw new LogicException('Selected options do not match the product options.');
         }
     }
@@ -384,7 +336,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             $this->setData('product_id', null);
             $this->setAssociatedProducts($associatedProducts);
             $this->setAssociatedOptions($associatedOptions);
-            $this->setActionRequired(true);
             $this->save();
 
             throw new InvalidArgumentException('Product does not exist.');
@@ -392,8 +343,10 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         $this->setData('product_id', (int)$productId);
 
-        if ($this->hasRepairInput()) {
-            $orderRepairHash = Ess_M2ePro_Model_Order_Repair::generateHash($this->getChildObject()->getRepairInput());
+        $repairInput = $this->getChildObject()->getRepairInput();
+
+        if (!empty($repairInput)) {
+            $orderRepairHash = Ess_M2ePro_Model_Order_Repair::generateHash($repairInput);
 
             /** @var $orderRepair Ess_M2ePro_Model_Order_Repair */
             $orderRepair = Mage::getModel('M2ePro/Order_Repair')
@@ -448,7 +401,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         $this->setAssociatedProducts($associatedProducts);
         $this->setAssociatedOptions($associatedOptions);
-        $this->setActionRequired(false);
         $this->save();
     }
 

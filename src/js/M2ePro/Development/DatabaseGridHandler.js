@@ -6,7 +6,7 @@ DatabaseGridHandler = Class.create(GridHandler, {
     {
         this.actions = {
             deleteTableRowsAction: function(id) { this.deleteTableRows(id); }.bind(this),
-            updateTableCellsAction: function() { this.openUpdateTableCellsPopup(); }.bind(this)
+            updateTableCellsAction: function() { this.openTableCellsPopup('update'); }.bind(this)
         }
     },
 
@@ -34,9 +34,11 @@ DatabaseGridHandler = Class.create(GridHandler, {
             });
     },
 
-    openUpdateTableCellsPopup: function()
+    openTableCellsPopup: function(mode)
     {
         var self = DevelopmentDatabaseGridHandlerObj;
+
+        var popupTitle = mode == 'update' ? 'Edit Table Records' : 'Add Table Row';
 
         var popup = new Window({
             draggable: true,
@@ -44,7 +46,7 @@ DatabaseGridHandler = Class.create(GridHandler, {
             closable: true,
             className: "magento",
             windowClassName: "popup-window",
-            title: 'Edit Table Records',
+            title: popupTitle,
             top: 50,
             width: 635,
             minHeight: 200,
@@ -56,11 +58,12 @@ DatabaseGridHandler = Class.create(GridHandler, {
             showEffect: Element.show
         });
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/getUpdateCellsPopupHtml') ,
+        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/getTableCellsPopupHtml') ,
             {
                 method: 'post',
                 parameters: {
-                    ids: self.getSelectedProductsString()
+                    ids: self.getSelectedProductsString(),
+                    mode: mode
                 },
                 onSuccess: function(transport)
                 {
@@ -71,10 +74,10 @@ DatabaseGridHandler = Class.create(GridHandler, {
         popup.showCenter(true);
     },
 
-    confirmUpdateTableCellsPopup: function()
+    confirmUpdateCells: function()
     {
         if (!DevelopmentDatabaseGridHandlerObj.isAnySwitcherEnabled()) {
-            alert('You should select columns for update.');
+            alert('You should select columns.');
             return;
         }
 
@@ -82,7 +85,27 @@ DatabaseGridHandler = Class.create(GridHandler, {
             {
                 method: 'post',
                 asynchronous : false,
-                parameters : Form.serialize($('development_tabs_database_update_cells_popup_form')),
+                parameters : Form.serialize($('development_tabs_database_table_cells_popup_form')),
+                onSuccess: function(transport)
+                {
+                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
+                    Windows.getFocusedWindow().close();
+                }
+            });
+    },
+
+    confirmAddRow: function()
+    {
+        if (!DevelopmentDatabaseGridHandlerObj.isAnySwitcherEnabled()) {
+            alert('You should select columns.');
+            return;
+        }
+
+        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/addTableRow') ,
+            {
+                method: 'post',
+                asynchronous : false,
+                parameters : Form.serialize($('development_tabs_database_table_cells_popup_form')),
                 onSuccess: function(transport)
                 {
                     DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
@@ -179,10 +202,10 @@ DatabaseGridHandler = Class.create(GridHandler, {
     {
         var result = false;
 
-        $$('#development_tabs_database_update_cells_popup .input_switcher').each(function(el){
+        $$('#development_tabs_database_table_cells_popup .input_switcher').each(function(el){
             if (el.checked) {
                 result = true;
-                return;
+                return true;
             }
         });
 

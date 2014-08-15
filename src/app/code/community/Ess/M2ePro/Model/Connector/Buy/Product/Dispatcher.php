@@ -157,7 +157,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
                     if (!isset($params['status_changer']) ||
                         $params['status_changer'] != Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER
                     ) {
-                        // Parser hack -> Mage::helper('M2ePro')->__('Listing "%listingId%" locked by other process.');
+                        // M2ePro_TRANSLATIONS
+                        // Listing "%listing_id%" locked by other process.
                         throw new LogicException('Listing "'.$product->getListingId().'" locked by other process.');
                     }
                     $lockItem->activate();

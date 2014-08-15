@@ -220,6 +220,28 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Co
             $qty = min($optionsQtyList);
         }
 
+        if (!$magentoMode) {
+
+            $src = $this->getBuySellingFormatTemplate()->getQtySource();
+
+            if ($src['mode'] == Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_ATTRIBUTE ||
+                $src['mode'] == Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+                $src['mode'] == Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_PRODUCT) {
+
+                if ($qty > 0 && $src['qty_percentage'] > 0 && $src['qty_percentage'] < 100) {
+
+                    $roundingFunction = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                            ->getGroupValue('/qty/percentage/','rounding_greater') ? 'ceil' : 'floor';
+
+                    $qty = (int)$roundingFunction(($qty/100)*$src['qty_percentage']);
+                }
+
+                if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
+                    $qty = $src['qty_max_posted_value'];
+                }
+            }
+        }
+
         $qty < 0 && $qty = 0;
 
         return (int)floor($qty);

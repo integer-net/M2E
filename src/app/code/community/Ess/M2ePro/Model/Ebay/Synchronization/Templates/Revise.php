@@ -367,15 +367,22 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
                 if (in_array($reason, array(
                     'categoryTemplate',
+                    'otherCategoryTemplate',
+                    'descriptionTemplate',
                     'paymentTemplate',
                     'returnTemplate',
-                    'shippingTemplate',
-                    'descriptionTemplate'
+                    'shippingTemplate'
                 ))) {
                     $neededSynchTemplate = $synchTemplate->getChildObject();
                 }
 
-                $method = 'isRevise' . ucfirst($reason);
+                if ($reason == 'otherCategoryTemplate') {
+                    $methodSuffix = 'categoryTemplate';
+                } else {
+                    $methodSuffix = $reason;
+                }
+
+                $method = 'isRevise' . ucfirst($methodSuffix);
 
                 if (!method_exists($neededSynchTemplate,$method)) {
                     continue;

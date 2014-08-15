@@ -1,6 +1,36 @@
+* 6.1.7 (r6732) (29/07/2014)
+
+* Added: ability to set percent of qty to sell on channel in selling format template
+* Added: managing of magento order number created by module (new settings block in account settings)
+* Improvement: major translations improvements (development part / locale files)
+* Improvement: [eBay] variation will not be sold if it has status disabled or out of stock
+* Removed: [eBay] Sweden marketplace was removed because it is not supported already by eBay
+* Removed: [eBay] possibility to use values from magento attributes for fields: "Handling cost", "Dispatch Time", "Cash On Delivery"
+* Fix: duplicates of Magento orders in some cases
+* Fix: cron service didn't work sometimes if eBay Sweden marketplace was enabled
+* Fix: cron service didn't work properly if web server is LiteSpeed v 6.3
+* Fix: some errors like 'Duplicated [Channel] orders with ID #[id].'
+* Fix: "Call to undefined method Mage_Catalog_Model_Resource_Product_Flat::loadAllAttributes()" error during synchronization
+* Fix: [eBay] invalid weight value in magento order
+* Fix: [eBay] wrong listings were shown in the grid during of 3rd party items moving
+* Fix: [eBay] some bugs during Motor marketplace synchronization
+* Fix: [eBay] wrong calculating of configurable variations for more than one Store View
+* Fix: [eBay] qty calculation issue if eBay item type was changed dynamically
+* Fix: [eBay] wrong shipping price in magento order in some cases
+* Fix: [eBay] disable sorting by available_qty field on the eBay view if magento version <= 1.4.2
+* Fix: [eBay] empty shipping address information in order when checkout not completed
+* Fix: [eBay] value "0" instead of Item ID when item has been moved in M2E listing from 3rd party
+* Fix: [eBay] usage of unsecure urls for images on eBay only
+* Fix: [eBay] ability to revise title of the fixed price listing, even if the listing has a sale
+* Fix: [eBay] unable to select the value for required eBay item specific
+* Fix: [eBay] wrong transaction amount in payment information block in order, when eBay and store currencies are different
+* Fix: [Amazon] fatal error: Class 'Ess_M2ePro_Model_Amazon_Synchronization_Orders_Responser' not found
+* Fix: [Amazon / Rakuten.com / Play.com] 3rd party listings was not mapped and moved manually in some cases
+
 * 6.1.6 (r6425) (19/05/2014)
 
 * Added: [eBay] support of multi-variations products for ebay.nl marketplace
+* Improvement: major translations improvements (development part / locale files)
 * Removed: [eBay] "Get It Fast" option in shipping policy (eBay no longer supports this feature)
 * Fix: major trouble with cache clearing by tag(s) (TwoLevel cache)
 * Fix: cron service doesn't work properly if web server is LiteSpeed
@@ -104,7 +134,7 @@
 * Added: [eBay] ability to use Strike-Through Pricing on US, UK and DE marketplaces
 * Added: [Amazon] information about gift wrapping in magento order
 * Improvement: recommended value for cron job interval was changed to 5 minutes
-* Improvement: other content will be blocked until the configuration wizard will not be finished
+* c: other content will be blocked until the configuration wizard will not be finished
 * Improvement: ability to unmap and remove products in bulk from 3rd party listings
 * Improvement: [eBay] taxation block was moved from shipping to selling format policy
 * Improvement: [eBay] use warehouse address as shipping address in Global Shipping Program orders

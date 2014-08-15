@@ -70,6 +70,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Switcher extends Mage_Adm
                 break;
 
             case Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION:
+                $width = 140;
+                break;
+
             default:
                 $width = 100;
                 break;

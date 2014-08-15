@@ -31,7 +31,7 @@
     // Data for current tab
     //-----------------------------
     M2ePro.translator.add(<?php echo json_encode(array(
-        'If Yes is chosen, you must select at least one attribute for product mapping.' => $this->__('If Yes is chosen, you must select at least one attribute for product mapping.')
+        'If Yes is chosen, you must select at least one attribute for product mapping.' => Mage::helper('M2ePro')->__('If Yes is chosen, you must select at least one attribute for product mapping.')
     )); ?>);
     //-----------------------------
 
@@ -70,15 +70,15 @@
         echo Mage::helper('M2ePro')->__('
 The 3rd Party Listings are the items, which were listed on Amazon without using M2E Pro extension. <br/><br/>
 To allow importing of these listings for the current Amazon Account, set Import 3rd Party Listings to <i>Yes</i>.<br/>
-Imported Listings can be found in %1$s > Manage Listings > 3rd Party Listings.<br/><br/>
-<b>Note:</b> The 3rd Party Listings Synchronization must be enabled in %1$s > Configuration > Synchronization.<br/><br/>
+Imported Listings can be found in %menu_label% > Manage Listings > 3rd Party Listings.<br/><br/>
+<b>Note:</b> The 3rd Party Listings Synchronization must be enabled in %menu_label% > Configuration > Synchronization.<br/><br/>
 To map the products of the 3rd Party Listings with existing products in Magento by ASIN, ISBN, SKU or Title, set Product Mapping to <i>Yes</i> and choose appropriate attribute(s).
 A Magento product will be mapped if at least one of the chosen attributes meets the same value in Amazon Listing as it has in Magento.
 <br/><br/>
 After mapping the Amazon Listing can be automatically moved from the 3rd Party Listings to M2E Pro Listings for further management.<br/><br/>
 
 <b>Note:</b> Auto mapping and moving actions are performed only once during the first 3rd Party Listings Synchronization.
-Afterwards, it can be performed manually on the 3rd Party Listings page (%1$s > Manage Listings > 3rd Party Listings).
+Afterwards, it can be performed manually on the 3rd Party Listings page (%menu_label% > Manage Listings > 3rd Party Listings).
 ', $menuLabel);
     ?>
 </div>

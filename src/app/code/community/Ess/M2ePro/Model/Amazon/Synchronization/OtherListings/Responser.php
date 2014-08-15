@@ -163,15 +163,18 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Responser
                 $tempLogMessage = '';
                 switch ($newData['status']) {
                     case Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN:
-                        // Parser hack ->__('Item status was successfully changed to "Unknown".');
+                        // M2ePro_TRANSLATIONS
+                        // Item status was successfully changed to "Unknown".
                         $tempLogMessage = 'Item status was successfully changed to "Unknown".';
                         break;
                     case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
-                        // Parser hack ->__('Item status was successfully changed to "Active".');
+                        // M2ePro_TRANSLATIONS
+                        // Item status was successfully changed to "Active".
                         $tempLogMessage = 'Item status was successfully changed to "Active".';
                         break;
                     case Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED:
-                        // Parser hack ->__('Item status was successfully changed to "Inactive".');
+                        // M2ePro_TRANSLATIONS
+                        // Item status was successfully changed to "Inactive".
                         $tempLogMessage = 'Item status was successfully changed to "Inactive".';
                         break;
                 }
@@ -265,7 +268,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Responser
                                          Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                          NULL,
                                          Ess_M2ePro_Model_Listing_Other_Log::ACTION_ADD_LISTING,
-                                         // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully added');
+                                         // M2ePro_TRANSLATIONS
+                                         // Item was successfully added
                                          'Item was successfully added',
                                          Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                          Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW);
@@ -349,7 +353,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Responser
                     Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                     $this->getLogActionId(),
                     Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_STATUS_ON_CHANNEL,
-                    // Parser hack ->__('Item status was successfully changed to "Inactive (Blocked)".');
+                    // M2ePro_TRANSLATIONS
+                    // Item status was successfully changed to "Inactive (Blocked)".
                     'Item status was successfully changed to "Inactive (Blocked)".',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
@@ -376,8 +381,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Responser
 
     protected function filterReceivedOnlyOtherListings(array $receivedItems)
     {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
@@ -389,12 +394,14 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Responser
         $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
 
         /** @var $stmtTemp Zend_Db_Statement_Pdo */
-        $stmtTemp = $connWrite->query($collection->getSelect()->__toString());
+        $stmtTemp = $connRead->query($collection->getSelect()->__toString());
 
         while ($existListingProduct = $stmtTemp->fetch()) {
+
             if (empty($existListingProduct['sku'])) {
                 continue;
             }
+
             if (isset($receivedItems[$existListingProduct['sku']])) {
                 unset($receivedItems[$existListingProduct['sku']]);
             }

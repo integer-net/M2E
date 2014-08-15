@@ -23,7 +23,7 @@ class Ess_M2ePro_Block_Adminhtml_Support_Tabs extends Mage_Adminhtml_Block_Widge
         $isFromError = $this->getIsFromError();
 
         $this->addTab('results', array(
-            'label'     => $this->__('Search Results'),
+            'label'     => Mage::helper('M2ePro')->__('Search Results'),
             'content'   => '',
             'active'    => !$isFromError,
         ));
@@ -35,21 +35,21 @@ class Ess_M2ePro_Block_Adminhtml_Support_Tabs extends Mage_Adminhtml_Block_Widge
         }
 
         $this->addTab('documentation', array(
-            'label'     => $this->__('Documentation'),
+            'label'     => Mage::helper('M2ePro')->__('Documentation'),
             'url'       => $this->getUrl('*/adminhtml_support/documentation', $params),
             'active'    => false,
             'class'     => 'ajax',
         ));
 
         $this->addTab('articles', array(
-            'label'     => $this->__('Knowledge Base'),
+            'label'     => Mage::helper('M2ePro')->__('Knowledge Base'),
             'url'       => $this->getUrl('*/adminhtml_support/knowledgeBase'),
             'active'    => false,
             'class'     => 'ajax',
         ));
 
         $this->addTab('support_form', array(
-            'label'     => $this->__('Contact Support'),
+            'label'     => Mage::helper('M2ePro')->__('Contact Support'),
             'content'   => $this->getLayout()->createBlock('M2ePro/adminhtml_support_contactForm')->toHtml(),
             'active'    => $isFromError,
         ));

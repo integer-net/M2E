@@ -99,13 +99,14 @@ class Ess_M2ePro_Model_Observer_Shipment
                 ->getUrl('M2ePro/adminhtml_common_log/order', array('order_id' => $order->getId()));
         }
 
-        $startLink = '<a href="' . $url . '" target="_blank">';
-        $endLink = '</a>';
         $channel = $order->getComponentTitle();
-
+        // M2ePro_TRANSLATIONS
+        // Shipping Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank" >order log</a> for more details.
         $message = Mage::helper('M2ePro')->__(
-            'Shipping Status for %s Order was not updated. View %sorder log%s for more details.',
-            $channel, $startLink, $endLink
+            'Shipping Status for %chanel_title% Order was not updated.'.
+            ' View <a href="%url% target="_blank" >order log</a>'.
+            ' for more details.',
+            $channel, $url
         );
 
         Mage::getSingleton('adminhtml/session')->addError($message);

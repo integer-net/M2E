@@ -6,7 +6,8 @@
 
 class Ess_M2ePro_Helper_View_Configuration extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Configuration');
+    // M2ePro_TRANSLATIONS
+    // Configuration
 
     const NICK  = 'configuration';
     const TITLE = 'Configuration';

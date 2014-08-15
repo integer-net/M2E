@@ -38,8 +38,8 @@
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Step' => $this->__('Step'),
-        'Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.' => $this->__('Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.'),
+        'Step' => Mage::helper('M2ePro')->__('Step'),
+        'Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.' => Mage::helper('M2ePro')->__('Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.'),
     )); ?>);
 
     WizardHandlerObj = new WizardHandler('<?php echo $this->getStatus(); ?>','<?php echo $this->getStep(); ?>');

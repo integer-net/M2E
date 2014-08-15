@@ -13,7 +13,8 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
     const UPDATE_STATUS = 0;
     const UPDATE_EMAIL  = 1;
 
-    // Parser hack -> Mage::helper('M2ePro')->__('Duplicated Amazon orders with ID #%id%.');
+    // M2ePro_TRANSLATIONS
+    // Duplicated Amazon orders with ID #%id%.
 
     // ########################################
 
@@ -69,8 +70,8 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
         // Init sale data
         // ------------------
         $this->setData('paid_amount', (float)$data['paid_amount']);
-        $this->setData('tax_amount', (float)$data['tax_amount']);
-        $this->setData('discount_amount', (float)$data['discount_amount']);
+        $this->setData('tax_details', json_encode($data['tax_details']));
+        $this->setData('discount_details', json_encode($data['discount_details']));
         $this->setData('currency', $data['currency']);
         $this->setData('qty_shipped', $data['qty_shipped']);
         $this->setData('qty_unshipped', $data['qty_unshipped']);
@@ -98,15 +99,35 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
             ->getCollection('Order')
             ->addFieldToFilter('account_id', $this->account->getId())
             ->addFieldToFilter('amazon_order_id', $this->getData('amazon_order_id'))
+            ->setOrder('id', Varien_Data_Collection_Db::SORT_ORDER_DESC)
             ->getItems();
         $existOrdersNumber = count($existOrders);
 
+        // duplicated M2ePro orders. remove m2e order without magento order id or newest order
+        // --------------------
         if ($existOrdersNumber > 1) {
-            $message = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Duplicated Amazon orders with ID #%id%.', array('!id' => $this->getData('amazon_order_id'))
-            );
-            throw new Exception($message);
+            $isDeleted = false;
+
+            foreach ($existOrders as $key => $order) {
+                /** @var Ess_M2ePro_Model_Order $order */
+
+                $magentoOrderId = $order->getData('magento_order_id');
+                if (!empty($magentoOrderId)) {
+                    continue;
+                }
+
+                $order->deleteInstance();
+                unset($existOrders[$key]);
+                $isDeleted = true;
+                break;
+            }
+
+            if (!$isDeleted) {
+                $orderForRemove = reset($existOrders);
+                $orderForRemove->deleteInstance();
+            }
         }
+        // --------------------
 
         // New order
         // --------------------

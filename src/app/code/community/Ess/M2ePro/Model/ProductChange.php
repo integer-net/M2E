@@ -195,15 +195,15 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
     public function clearOutdated($maxLifeTime)
     {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $tempDate = new DateTime('now', new DateTimeZone('UTC'));
         $tempDate->modify('-'.$maxLifeTime.' seconds');
         $tempDate = Mage::helper('M2ePro')->getDate($tempDate->format('U'));
 
         Mage::getModel('M2ePro/ProductChange')->clear(
-            'update_date <= ' . $connWrite->quote($tempDate)
+            'update_date <= ' . $connRead->quote($tempDate)
         );
     }
 

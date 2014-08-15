@@ -24,12 +24,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Ebay_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
+            $componentName =Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
+            $headerText = Mage::helper('M2ePro')->__("Edit %component_name% 3rd Party Synchronization Settings",
+                $componentName);
         } else {
-            $componentName = '';
+            $headerText = Mage::helper('M2ePro')->__("Edit 3rd Party Synchronization Settings");
         }
 
-        $this->_headerText = Mage::helper('M2ePro')->__("Edit%s 3rd Party Synchronization Settings", $componentName);
+        $this->_headerText = $headerText;
         //------------------------------
 
         // Set buttons actions

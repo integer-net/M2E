@@ -41,7 +41,7 @@ $menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
                             Now you can continue working with extension.
                             <br/>
                             You can see below the short instructions, you may follow to start
-                            listing on Rakuten.com quickly.<br/> The more detailed information can be found in the <a href="%s" target="_blank">Documentation</a>.<br/><br/>',
+                            listing on Rakuten.com quickly.<br/> The more detailed information can be found in the <a href="%url%" target="_blank">Documentation</a>.<br/><br/>',
                             $docsLink
                         );
                     ?>
@@ -57,20 +57,20 @@ $menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
                 '<strong>The next steps you need to perform are:</strong><br/><br/>
 
                 <span style="text-decoration: underline;"><strong>1)</strong> Selling Format Template creation:</span><br/>
-                Navigate to %s > Templates > <a href="%s" target="_blank">Selling Format Templates</a>,
+                Navigate to %menu_label_1% > Templates > <a href="%url_1%" target="_blank">Selling Format Templates</a>,
                 Press on the Add Selling Format Template button;
                 Fill in all necessary data;
                 Save the template.<br/><br/>
 
                 <span style="text-decoration: underline;"><strong>2)</strong> Synchronization Template creation:</span><br/>
-                Navigate to %s > Templates > <a href="%s" target="_blank">Synchronization Templates</a>;
+                Navigate to %menu_label_2% > Templates > <a href="%url_2%" target="_blank">Synchronization Templates</a>;
                 Press on the Add Synchronization Template button;
                 Fill in all necessary data;
                 Save the template.<br/><br/>
 
-                After completing these two necessary steps, you can start to create Listings (%s > Manage
+                After completing these two necessary steps, you can start to create Listings (%menu_lable_3% > Manage
 
-                Listings > <a href="%s" target="_blank">Listings</a>), add Magento products to them and list on Rakuten.com.<br/><br/>
+                Listings > <a href="%url_3%" target="_blank">Listings</a>), add Magento products to them and list on Rakuten.com.<br/><br/>
                 <em>Thank you for choosing M2E Pro.</em>',
                 $menuLabel, $sellingFormatTemplatesUrl, $menuLabel, $synchronizationTemplatesUrl, $menuLabel, $listingsUrl
             );

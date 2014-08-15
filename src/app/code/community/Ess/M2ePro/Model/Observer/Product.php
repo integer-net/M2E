@@ -56,9 +56,9 @@ class Ess_M2ePro_Model_Observer_Product
             $this->_productCategoryIdsOld = $productOld->getCategoryIds();
 
             $this->_listingsProductsArray = Mage::getResourceModel('M2ePro/Listing_Product')
-                                              ->getItemsWhereIsProduct($this->_productId);
+                                              ->getItemsByProductId($this->_productId);
             $this->_otherListingsArray = Mage::getResourceModel('M2ePro/Listing_Other')
-                                            ->getItemsWhereIsProduct($this->_productId);
+                                            ->getItemsByProductId($this->_productId);
 
             if (count($this->_listingsProductsArray) > 0 || count($this->_otherListingsArray) > 0) {
 
@@ -179,8 +179,9 @@ class Ess_M2ePro_Model_Observer_Product
         $statusOld = (int)$this->_productStatusOld;
         $statusNew = (int)$productNew->getStatus();
 
-        // Parser hack -> Mage::helper('M2ePro')->__('Enabled');
-        // Parser hack -> Mage::helper('M2ePro')->__('Disabled');
+        // M2ePro_TRANSLATIONS
+        // Enabled
+        // Disabled
 
         $statusOld = ($statusOld == Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             ? 'Enabled' : 'Disabled';
@@ -217,7 +218,8 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STATUS,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%].');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%].
 
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%].',
@@ -254,7 +256,8 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STATUS,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%].');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%].
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',array('from'=>$statusOld,'to'=>$statusNew)
                 ),
@@ -289,7 +292,8 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_PRICE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',array('!from'=>$priceOld,'!to'=>$priceNew)
                 ),
@@ -307,7 +311,8 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_PRICE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',array('!from'=>$priceOld,'!to'=>$priceNew)
                 ),
@@ -342,7 +347,8 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',array('!from'=>$specialPriceOld,'!to'=>$specialPriceNew)
                 ),
@@ -360,7 +366,8 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',array('!from'=>$specialPriceOld,'!to'=>$specialPriceNew)
                 ),
@@ -407,8 +414,9 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_FROM_DATE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
-                // Parser hack -> Mage::helper('M2ePro')->__('None');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
+                // None
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',
                     array('!from'=>$specialPriceFromDateOld,'!to'=>$specialPriceFromDateNew)
@@ -427,8 +435,9 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_FROM_DATE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
-                // Parser hack -> Mage::helper('M2ePro')->__('None');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
+                // None
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',
                     array('!from'=>$specialPriceFromDateOld,'!to'=>$specialPriceFromDateNew)
@@ -476,8 +485,9 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
-                // Parser hack -> Mage::helper('M2ePro')->__('None');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
+                // None;
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',
                     array('!from'=>$specialPriceToDateOld,'!to'=>$specialPriceToDateNew)
@@ -496,8 +506,9 @@ class Ess_M2ePro_Model_Observer_Product
                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE,
-                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
-                // Parser hack -> Mage::helper('M2ePro')->__('None');
+                // M2ePro_TRANSLATIONS
+                // From [%from%] to [%to%]
+                // None
                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                     'From [%from%] to [%to%]',
                     array('!from'=>$specialPriceToDateOld,'!to'=>$specialPriceToDateNew)
@@ -549,7 +560,8 @@ class Ess_M2ePro_Model_Observer_Product
                         Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                         NULL,
                         Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_CUSTOM_ATTRIBUTE,
-                        // ->__('Attribute "%attr%" from [%from%] to [%to%].');
+                        // M2ePro_TRANSLATIONS
+                        // Attribute "%attr%" from [%from%] to [%to%]
                         Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                             'Attribute "%attr%" from [%from%] to [%to%].',
                             array(
@@ -592,7 +604,8 @@ class Ess_M2ePro_Model_Observer_Product
                         Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                         NULL,
                         Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_CUSTOM_ATTRIBUTE,
-                        // ->__('Attribute "%attr%" from [%from%] to [%to%].');
+                        // M2ePro_TRANSLATIONS
+                        // Attribute "%attr%" from [%from%] to [%to%].
                         Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                             'Attribute "%attr%" from [%from%] to [%to%].',
                             array(

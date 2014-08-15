@@ -33,7 +33,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single
         if (!$this->otherListing->isRelistable()) {
 
             $message = array(
-                // ->__('The item either is listed or not available');
+                // M2ePro_TRANSLATIONS
+                // The item either is listed or not available
                 parent::MESSAGE_TEXT_KEY => 'The item either is listed or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
@@ -71,7 +72,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single
             $responseObject->processAlreadyActive($response);
 
             $message = array(
-                // Parser hack -> Mage::helper('M2ePro')->__('Item was already started on eBay');
+                // M2ePro_TRANSLATIONS
+                // Item was already started on eBay
                 parent::MESSAGE_TEXT_KEY => 'Item was already started on eBay',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
@@ -81,7 +83,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single
             $this->getResponseObject()->processSuccess($response);
 
             $message = array(
-                // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully relisted');
+                // M2ePro_TRANSLATIONS
+                // Item was successfully relisted
                 parent::MESSAGE_TEXT_KEY => 'Item was successfully relisted',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
             );

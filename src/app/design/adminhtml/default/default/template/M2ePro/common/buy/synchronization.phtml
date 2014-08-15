@@ -12,7 +12,7 @@
                 <div id="block_notice_buy_synchronization_stock_level" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
                     <?php $inspectorMode = ($this->inspectorMode == 1)?'<span style="color: green"> (enabled) </span>':''; ?>
                     <?php echo Mage::helper('M2ePro')->__('If catalog updates in your magento performed using import/export tools, custom scripts or direct changes in database,
-                    then, you can use <a target="_blank" href="%s#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> %s functionality to detect changes in products\' price and quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl(), $inspectorMode) ?>
+                    then, you can use <a target="_blank" href="%url%#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> %mode_status% functionality to detect changes in products\' price and quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl(), $inspectorMode) ?>
                 </div>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -60,10 +60,9 @@
                     <div id="block_notice_buy_synchronization_revise_all" style="<?php if (!$templates_mode) echo 'display: none'; ?>" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
                         <?php echo Mage::helper('M2ePro')->__(
-        'If your Rakuten.com listings for some reason were asynchronized with the products in Magento, <a href="javascript:" onclick="%s">turn on</a> the Revise All action to catch data up.
+        'If your Rakuten.com listings for some reason were asynchronized with the products in Magento, <a href="javascript:" onclick="%script_code%">turn on</a> the Revise All action to catch data up.
         <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
-    <br><br>
-        ',
+    <br><br>',
     'SynchronizationHandlerObj.showReviseAllConfirmPopup(\''.Ess_M2ePro_Helper_Component_Buy::NICK.'\');'
                         )?>
 

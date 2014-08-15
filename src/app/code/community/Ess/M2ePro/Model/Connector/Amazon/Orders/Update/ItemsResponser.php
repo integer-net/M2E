@@ -7,9 +7,12 @@
 class Ess_M2ePro_Model_Connector_Amazon_Orders_Update_ItemsResponser
     extends Ess_M2ePro_Model_Connector_Amazon_Responser
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Amazon Order status was not updated. Reason: %msg%');
-    // Parser hack -> Mage::helper('M2ePro')->__('Amazon Order status was updated to Shipped.');
-    // Parser hack -> Mage::helper('M2ePro')->__('Tracking number "%num%" for "%code%" has been sent to Amazon.');
+    // M2ePro_TRANSLATIONS
+    //Amazon Order status was not updated. Reason: %msg%
+    // M2ePro_TRANSLATIONS
+    // Amazon Order status was updated to Shipped.
+    // M2ePro_TRANSLATIONS
+    // Tracking number "%num%" for "%code%" has been sent to Amazon.
 
     private $orders = NULL;
 

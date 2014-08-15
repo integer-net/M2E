@@ -57,11 +57,11 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_GeneralController
         $tableNames = $this->getRequest()->getParam('table', array());
 
         if (!empty($tableNames)) {
-            Mage::helper('M2ePro/Module_Database_RepairTables')->repairBrokenTables($tableNames);
+            Mage::helper('M2ePro/Module_Database_Repair')->repairBrokenTables($tableNames);
             $this->_redirectUrl(Mage::helper('adminhtml')->getUrl('*/*/checkTables/'));
         }
 
-        $brokenTables = Mage::helper('M2ePro/Module_Database_RepairTables')->getBrokenTablesInfo();
+        $brokenTables = Mage::helper('M2ePro/Module_Database_Repair')->getBrokenTablesInfo();
 
         if ($brokenTables['total_count'] <= 0) {
             echo $this->getEmptyResultsHtml('No Broken Tables');
@@ -189,7 +189,7 @@ HTML;
 
         $tableName = array_pop($tableNames);
 
-        $info = Mage::helper('M2ePro/Module_Database_RepairTables')->getBrokenRecordsInfo($tableName);
+        $info = Mage::helper('M2ePro/Module_Database_Repair')->getBrokenRecordsInfo($tableName);
         return '<pre>' . print_r($info);
     }
 

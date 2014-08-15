@@ -57,9 +57,10 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsResponser extends Ess_M2
 
             $order['currency'] = isset($orderData['currency']) ? trim($orderData['currency']) : '';
             $order['paid_amount'] = isset($orderData['amount_paid']) ? (float)$orderData['amount_paid'] : 0;
-            $order['tax_amount'] = isset($orderData['price']['tax']) ? (float)$orderData['price']['tax'] : 0;
-            $order['discount_amount'] = isset($orderData['price']['discount'])
-                ? (float)$orderData['price']['discount'] : 0;
+            $order['tax_details'] = isset($orderData['price']['taxes']) ? $orderData['price']['taxes'] : array();
+
+            $order['discount_details'] = isset($orderData['price']['discounts'])
+                ? $orderData['price']['discounts'] : array();
 
             $order['items'] = array();
 
@@ -75,8 +76,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsResponser extends Ess_M2
                     'gift_type'            => trim($item['gift_type']),
                     'gift_message'         => trim($item['gift_message']),
                     'currency'             => trim($item['prices']['product']['currency']),
-                    'tax_amount'           => (float)$item['taxes']['product']['value'],
-                    'discount_amount'      => (float)$item['discounts']['total']['value'],
+                    'tax_details'          => $item['taxes'],
+                    'discount_details'     => $item['discounts'],
                     'qty_purchased'        => (int)$item['qty']['ordered'],
                     'qty_shipped'          => (int)$item['qty']['shipped']
                 );

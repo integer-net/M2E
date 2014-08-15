@@ -7,7 +7,7 @@
         requirementsPopup = Dialog.info(null, {
             className: "magento",
             windowClassName: "popup-window",
-            title: '<?php echo $this->__('System Requirements'); ?>',
+            title: '<?php echo Mage::helper('M2ePro')->__('System Requirements'); ?>',
             top: 100,
             width: 500,
             height: 235,
@@ -36,7 +36,7 @@
 
     Event.observe(window,'load',function() {
         MagentoMessageObj.addError('<?php echo Mage::helper('M2ePro')->__(
-            'M2E Pro has detected, that your System Configuration does not meet minimum requirements, so there might be problems with its work. Please <a href="javascript:" onclick="%s">check it</a> and amend appropriate settings.',
+            'M2E Pro has detected, that your System Configuration does not meet minimum requirements, so there might be problems with its work. Please <a href="javascript:" onclick="%script_code%">check it</a> and amend appropriate settings.',
             'showRequirementsPopup()') ?>'
         )
     })

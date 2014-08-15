@@ -39,11 +39,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Return magento quote object
-     *
-     * @return Mage_Sales_Model_Quote|null
-     */
     public function getQuote()
     {
         return $this->quote;
@@ -51,11 +46,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Build quote object
-     *
-     * @throws Exception
-     */
     public function buildQuote()
     {
         try {
@@ -75,7 +65,8 @@ class Ess_M2ePro_Model_Magento_Quote
 
             //$this->quote->setTotalsCollectedFlag(false);
             $this->quote->collectTotals()->save();
-            $this->quote->reserveOrderId();
+
+            $this->prepareOrderNumber();
             // --------------------
         } catch (Exception $e) {
             $this->quote->setIsActive(false)->save();
@@ -85,9 +76,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Initialize quote objects
-     */
     private function initializeQuote()
     {
         $this->quote = Mage::getModel('sales/quote');
@@ -102,9 +90,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Assign customer
-     */
     private function initializeCustomer()
     {
         if ($this->proxyOrder->isCheckoutMethodGuest()) {
@@ -122,9 +107,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Initialize shipping and billing address data
-     */
     private function initializeAddresses()
     {
         // ----------
@@ -152,9 +134,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Initialize currency
-     */
     private function initializeCurrency()
     {
         /** @var $currencyHelper Ess_M2ePro_Model_Currency */
@@ -196,11 +175,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Initialize quote items objects
-     *
-     * @throws Exception
-     */
     private function initializeQuoteItems()
     {
         foreach ($this->proxyOrder->getItems() as $item) {
@@ -215,7 +189,7 @@ class Ess_M2ePro_Model_Magento_Quote
             $request = $quoteItemBuilder->getRequest();
 
             // ----------------------------
-            $productOriginalPrice = $product->getPrice();
+            $productOriginalPrice = (float)$product->getPrice();
 
             $price = $item->getBasePrice();
             $product->setPrice($price);
@@ -243,10 +217,18 @@ class Ess_M2ePro_Model_Magento_Quote
                     );
                 }
 
+                $quoteItem->setStoreId($this->quote->getStoreId());
                 $quoteItem->setOriginalCustomPrice($item->getPrice());
                 $quoteItem->setOriginalPrice($productOriginalPrice);
+                $quoteItem->setBaseOriginalPrice($productOriginalPrice);
                 $quoteItem->setWeight($weight);
-                $quoteItem->setGiftMessageId($quoteItemBuilder->getGiftMessageId());
+                $quoteItem->setNoDiscount(1);
+
+                $giftMessageId = $quoteItemBuilder->getGiftMessageId();
+                if (!empty($giftMessageId)) {
+                    $quoteItem->setGiftMessageId($giftMessageId);
+                }
+
                 $quoteItem->setAdditionalData($quoteItemBuilder->getAdditionalData($quoteItem));
             }
         }
@@ -270,9 +252,6 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Initialize data for M2E Shipping Method
-     */
     private function initializeShippingMethodData()
     {
         Mage::helper('M2ePro/Data_Global')->unsetValue('shipping_data');
@@ -281,13 +260,48 @@ class Ess_M2ePro_Model_Magento_Quote
 
     // ########################################
 
-    /**
-     * Initialize data for M2E Payment Method
-     */
     private function initializePaymentMethodData()
     {
         $quotePayment = $this->quote->getPayment();
         $quotePayment->importData($this->proxyOrder->getPaymentData());
+    }
+
+    // ########################################
+
+    private function prepareOrderNumber()
+    {
+        if ($this->proxyOrder->isOrderNumberPrefixSourceChannel()) {
+            $orderNumber = $this->addPrefixToOrderNumberIfNeed($this->proxyOrder->getChannelOrderNumber());
+            if (Mage::helper('M2ePro/Magento')->isMagentoOrderIdUsed($orderNumber)) {
+                $orderNumber .= '(1)';
+            }
+
+            $this->quote->setReservedOrderId($orderNumber);
+            return;
+        }
+
+        $orderNumber = $this->quote->getReservedOrderId();
+        if (empty($orderNumber)) {
+            $orderNumber = $this->quote->getResource()->getReservedOrderId($this->quote);
+        }
+
+        $orderNumber = $this->addPrefixToOrderNumberIfNeed($orderNumber);
+
+        if ($this->quote->getResource()->isOrderIncrementIdUsed($orderNumber)) {
+            $orderNumber = $this->quote->getResource()->getReservedOrderId($this->quote);
+        }
+
+        $this->quote->setReservedOrderId($orderNumber);
+    }
+
+    private function addPrefixToOrderNumberIfNeed($orderNumber)
+    {
+        $prefix = $this->proxyOrder->getOrderNumberPrefix();
+        if (empty($prefix)) {
+            return $orderNumber;
+        }
+
+        return $prefix.$orderNumber;
     }
 
     // ########################################

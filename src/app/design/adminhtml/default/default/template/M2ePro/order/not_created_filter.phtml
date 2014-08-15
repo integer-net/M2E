@@ -1,7 +1,7 @@
 <p class="switcher">
     <label>
         <input type="checkbox" name="" <?php if ($this->isChecked()): ?>checked="checked"<?php endif; ?> onclick="setLocation('<?php echo $this->getFilterUrl(); ?>');">
-        &nbsp;<?php echo Mage::helper('M2ePro')->__('Not created orders only'); ?>
+        &nbsp;<?php echo Mage::helper('M2ePro')->__('Show orders without Magento orders'); ?>
     </label>
     <span>
         <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
@@ -9,10 +9,10 @@
         <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
             <span>
                 <?php echo Mage::helper('M2ePro')->__(
-                    'Using this, you can  see the records for which order(s) were not created in magento.
-                    <br/>It might happened, because particular product(s) or product option(s) were not found and some action is required for such orders.
-                    <br/>
-                    <br/>When you open order detail, you can use appropriate options <b>Map to Magento Product</b> or <b>Set Options</b> to correct missing information and create order in magento.'
+                    'Check this box to filter for orders that don\'t have a matching Magento order.<br/>
+                    Magento orders might not be created for eBay orders for a number of reasons, including incomplete information or
+                    further action being required to complete the order.<br/><br/>
+                    <b>View Order Details</b> for detailed information on individual orders and the action needed to create the matching Magento order.'
                 ); ?>
         </span>
     </span>

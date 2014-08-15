@@ -21,20 +21,23 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Account_Edit extends Mage_Adminhtml
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $headerTextEdit = Mage::helper('M2ePro')->__("Edit %component_name% Account", $componentName);
+            $headerTextAdd = Mage::helper('M2ePro')->__("Add %component_name% Account", $componentName);
         } else {
-            $componentName = '';
+            $headerTextEdit = Mage::helper('M2ePro')->__("Edit Account");
+            $headerTextAdd = Mage::helper('M2ePro')->__("Add Account");
         }
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data') &&
             Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getId()
         ) {
-            $this->_headerText = Mage::helper('M2ePro')->__("Edit%s Account", $componentName);
+            $this->_headerText = $headerTextEdit;
             $this->_headerText .= ' "'.$this->escapeHtml(
                 Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getTitle()
             ).'"';
         } else {
-            $this->_headerText = Mage::helper('M2ePro')->__("Add%s Account", $componentName);
+            $this->_headerText = $headerTextAdd;
         }
         //------------------------------
 

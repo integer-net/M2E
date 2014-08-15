@@ -50,8 +50,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabMarketplace()
     {
         $tab = array(
-            'label' => $this->__('eBay Sites'),
-            'title' => $this->__('eBay Sites')
+            'label' => Mage::helper('M2ePro')->__('eBay Sites'),
+            'title' => Mage::helper('M2ePro')->__('eBay Sites')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_MARKETPLACE) {
@@ -67,8 +67,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabSynchronization()
     {
         $tab = array(
-            'label' => $this->__('Synchronization'),
-            'title' => $this->__('Synchronization')
+            'label' => Mage::helper('M2ePro')->__('Synchronization'),
+            'title' => Mage::helper('M2ePro')->__('Synchronization')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_SYNCHRONIZATION) {
@@ -84,8 +84,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabTemplate()
     {
         $tab = array(
-            'label' => $this->__('Policies'),
-            'title' => $this->__('Policies')
+            'label' => Mage::helper('M2ePro')->__('Policies'),
+            'title' => Mage::helper('M2ePro')->__('Policies')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_TEMPLATE) {
@@ -101,8 +101,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabCategory()
     {
         $tab = array(
-            'label' => $this->__('Categories In Use'),
-            'title' => $this->__('Categories In Use')
+            'label' => Mage::helper('M2ePro')->__('Categories In Use'),
+            'title' => Mage::helper('M2ePro')->__('Categories In Use')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_CATEGORY) {
@@ -123,8 +123,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabGeneral()
     {
         $tab = array(
-            'label' => $this->__('General'),
-            'title' => $this->__('General')
+            'label' => Mage::helper('M2ePro')->__('General'),
+            'title' => Mage::helper('M2ePro')->__('General')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_GENERAL) {
@@ -140,8 +140,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabAccount()
     {
         $tab = array(
-            'label' => $this->__('Account Settings'),
-            'title' => $this->__('Account Settings')
+            'label' => Mage::helper('M2ePro')->__('Account Settings'),
+            'title' => Mage::helper('M2ePro')->__('Account Settings')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_ACCOUNT) {
@@ -157,8 +157,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabGlobal()
     {
         $tab = array(
-            'label' => $this->__('Global Settings'),
-            'title' => $this->__('Global Settings')
+            'label' => Mage::helper('M2ePro')->__('Global Settings'),
+            'title' => Mage::helper('M2ePro')->__('Global Settings')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_GLOBAL) {

@@ -31,6 +31,7 @@ $default = array(
     'qty_mode' => Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_PRODUCT,
     'qty_custom_value' => 1,
     'qty_custom_attribute' => '',
+    'qty_percentage' => 100,
     'qty_max_posted_value_mode' => Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON,
     'qty_max_posted_value' => Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MAX_POSTED_DEFAULT_VALUE,
 
@@ -70,17 +71,17 @@ $isEdit = !!$this->getRequest()->getParam('id');
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'QTY' => $this->__('QTY'),
+        'QTY' => Mage::helper('M2ePro')->__('QTY'),
 
-        'The price of products in Rakuten.com listing(s).' => $this->__('The price of products in Rakuten.com listing(s).'),
-        'The price of products in Rakuten.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.' => $this->__('The price of products in Rakuten.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.'),
+        'The price of products in Rakuten.com listing(s).' => Mage::helper('M2ePro')->__('The price of products in Rakuten.com listing(s).'),
+        'The price of products in Rakuten.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.' => Mage::helper('M2ePro')->__('The price of products in Rakuten.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.'),
 
-        'Add Selling Format Template.' => $this->__('Add Selling Format Template.'),
-        'The specified title is already used for other template. Template title must be unique.' => $this->__('The specified title is already used for other template. Template title must be unique.'),
-        'You should select Attribute Sets first and press Confirm button.' => $this->__('You should select Attribute Sets first and press Confirm button.'),
-        'Coefficient is not valid.' => $this->__('Coefficient is not valid.'),
+        'Add Selling Format Template.' => Mage::helper('M2ePro')->__('Add Selling Format Template.'),
+        'The specified title is already used for other template. Template title must be unique.' => Mage::helper('M2ePro')->__('The specified title is already used for other template. Template title must be unique.'),
+        'You should select Attribute Sets first and press Confirm button.' => Mage::helper('M2ePro')->__('You should select Attribute Sets first and press Confirm button.'),
+        'Coefficient is not valid.' => Mage::helper('M2ePro')->__('Coefficient is not valid.'),
 
-        'Wrong value. Only integer numbers.' => $this->__('Wrong value. Only integer numbers.')
+        'Wrong value. Only integer numbers.' => Mage::helper('M2ePro')->__('Wrong value. Only integer numbers.')
     )); ?>);
 
     M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
@@ -252,6 +253,24 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         <label><?php echo Mage::helper('M2ePro')->__('Custom QTY Attribute'); ?>: </label>
                     </td>
                     <td id="qty_custom_attribute_td" class="value" style="width: auto;"></td>
+                </tr>
+
+                <tr id="qty_percentage_tr" style="display: none;">
+                    <td class="label">
+                        <label for="qty_percentage"><?php echo Mage::helper('M2ePro')->__('QTY Percentage'); ?>: </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="qty_percentage" name="qty_percentage" class="required-entry">
+                            <?php for ($i = 100; $i >= 5; $i -= 5) : ?>
+                                <option value="<?php echo $i; ?>" <?php if ($formData['qty_percentage'] == $i) : echo ' selected="selected"'; endif; ?>><?php echo $i; ?> %</option>
+                            <?php endfor; ?>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of items number to be listed on Buy.com basing on product quantity or magento attribute.
+<br>E.g., if qty percentage is set to 10% and product quantity is 100, the quantity to be listed on Buy.com will be calculated as 100 *10%  = 10.</br>
+'); ?></span>
+                        </p>
+                    </td>
                 </tr>
 
                 <!-- Max Posted QTY-->

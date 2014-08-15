@@ -21,13 +21,14 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
     // ##########################################################
 
-    // ->__('Payment status was updated to Paid on eBay.');
-    // ->__('Shipping status was updated to Shipped on eBay.');
-    // ->__('Buyer has changed the shipping address of this order at the time of completing payment on eBay.');
-    // ->__('Duplicated eBay orders with ID #%id%.');
-    // ->__('Order Creation Rules were not met. Press Create Order button at Order view page to create it anyway.');
-    // ->__('Magento Order #%order_id% should be canceled as new combined eBay order #%new_id% was created.');
-    // ->__('eBay Order #%old_id% was deleted as new combined order #%new_id% was created.');
+    // M2ePro_TRANSLATIONS
+    // Payment status was updated to Paid on eBay.
+    // Shipping status was updated to Shipped on eBay.
+    // Buyer has changed the shipping address of this order at the time of completing payment on eBay.
+    // Duplicated eBay orders with ID #%id%.
+    // Order Creation Rules were not met. Press Create Order button at Order view page to create it anyway.
+    // Magento Order #%order_id% should be canceled as new combined eBay order #%new_id% was created.
+    // eBay Order #%old_id% was deleted as new combined order #%new_id% was created.
 
     // ########################################
 
@@ -47,6 +48,8 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
     private $status = self::STATUS_NOT_MODIFIED;
 
     private $updates = array();
+
+    private $relatedOrders = array();
 
     // ########################################
 
@@ -76,6 +79,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
         $this->setData('ebay_order_id', $data['identifiers']['ebay_order_id']);
         $this->setData('selling_manager_id', $data['identifiers']['selling_manager_id']);
 
+        $this->setData('order_status', $this->helper->getOrderStatus($data['statuses']['order']));
         $this->setData('checkout_status', $this->helper->getCheckoutStatus($data['statuses']['checkout']));
 
         $this->setData('purchase_update_date', $data['purchase_update_date']);
@@ -167,15 +171,9 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             ->getCollection('Order')
             ->addFieldToFilter('account_id', $this->account->getId())
             ->addFieldToFilter('ebay_order_id', $this->getData('ebay_order_id'))
+            ->setOrder('id', Varien_Data_Collection_Db::SORT_ORDER_DESC)
             ->getItems();
         $existOrdersNumber = count($existOrders);
-
-        if ($existOrdersNumber > 1) {
-            $message = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Duplicated eBay orders with ID #%id%.', array('!id' => $this->getData('ebay_order_id'))
-            );
-            throw new Exception($message);
-        }
 
         // New order
         // --------------------
@@ -184,7 +182,40 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             $this->order = Mage::helper('M2ePro/Component_Ebay')->getModel('Order');
             $this->order->setStatusUpdateRequired(true);
 
+            if ($this->isCombined()) {
+                $this->relatedOrders = Mage::getResourceModel('M2ePro/Ebay_Order')->getOrdersContainingItemsFromOrder(
+                    $this->account->getId(), $this->items
+                );
+            }
+
             return;
+        }
+        // --------------------
+
+        // duplicated M2ePro orders. remove m2e order without magento order id or newest order
+        // --------------------
+        if ($existOrdersNumber > 1) {
+
+            $isDeleted = false;
+
+            foreach ($existOrders as $key => $order) {
+                /** @var Ess_M2ePro_Model_Order $order */
+
+                $magentoOrderId = $order->getData('magento_order_id');
+                if (!empty($magentoOrderId)) {
+                    continue;
+                }
+
+                $order->deleteInstance();
+                unset($existOrders[$key]);
+                $isDeleted = true;
+                break;
+            }
+
+            if (!$isDeleted) {
+                $orderForRemove = reset($existOrders);
+                $orderForRemove->deleteInstance();
+            }
         }
         // --------------------
 
@@ -316,6 +347,13 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             return false;
         }
 
+        if ($this->isCombined()
+            && $this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED
+            && !empty($this->relatedOrders)
+        ) {
+            false;
+        }
+
         return true;
     }
 
@@ -396,11 +434,7 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 
     private function processOrdersContainingItemsFromCurrentOrder()
     {
-        /** @var $relatedOrders Ess_M2ePro_Model_Order[] */
-        $relatedOrders = Mage::getResourceModel('M2ePro/Ebay_Order')
-            ->getOrdersContainingItemsFromOrder($this->order);
-
-        foreach ($relatedOrders as $order) {
+        foreach ($this->relatedOrders as $order) {
             if ($order->canCancelMagentoOrder()) {
                 $message = 'Magento Order #%order_id% should be canceled '.
                            'as new combined eBay order #%new_id% was created.';

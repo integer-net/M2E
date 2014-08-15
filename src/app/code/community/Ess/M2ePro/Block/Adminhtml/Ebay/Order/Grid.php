@@ -97,7 +97,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Wi
             'header' => Mage::helper('M2ePro')->__('Magento Order #'),
             'align'  => 'left',
             'index'  => 'so.increment_id',
-            'width'  => '110px',
+            'width'  => '200px',
             'frame_callback' => array($this, 'callbackColumnMagentoOrder')
         ));
 

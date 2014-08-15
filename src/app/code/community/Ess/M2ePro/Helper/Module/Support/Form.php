@@ -9,7 +9,7 @@ class Ess_M2ePro_Helper_Module_Support_Form extends Mage_Core_Helper_Abstract
 {
     //#############################################
 
-    public function send($component, $fromEmail, $fromName, $subject, $description)
+    public function send($component, $fromEmail, $fromName, $subject, $description, $severity)
     {
         $attachments = array();
 
@@ -35,7 +35,7 @@ class Ess_M2ePro_Helper_Module_Support_Form extends Mage_Core_Helper_Abstract
 
         $toEmail = Mage::helper('M2ePro/Module_Support')->getContactEmail();
         $componentTitle = Mage::helper('M2ePro/Component')->getComponentTitle($component);
-        $body = $this->createBody($subject,$componentTitle,$description);
+        $body = $this->createBody($subject,$componentTitle,$description,$severity);
 
         $this->sendMailNow($toEmail, $fromEmail, $fromName, $subject, $body, $attachments);
     }
@@ -122,7 +122,7 @@ DATA;
 
     //#############################################
 
-    private function createBody($subject, $component, $description)
+    private function createBody($subject, $component, $description, $severity)
     {
         $currentDate = Mage::helper('M2ePro')->getCurrentGmtDate();
 
@@ -134,9 +134,11 @@ DATA;
 Date: {$currentDate}
 Component: {$component}
 Subject: {$subject}
+%severity%
 
 
 DATA;
+        $severity ? str_replace('%severity%', "Severity: {$severity}", $body) : str_replace('%severity%', '', $body);
 
         $body .= $this->getSummaryInfo();
 

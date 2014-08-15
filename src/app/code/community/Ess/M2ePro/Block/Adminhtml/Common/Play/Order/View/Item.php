@@ -144,10 +144,7 @@ HTML;
                 $action = Mage::helper('M2ePro')->__('Set Options');
             }
 
-            $class = '';
-            if (!$row->isActionRequired()) {
-                $class = 'class="gray"';
-            }
+            $class = 'class="gray"';
 
             $js = "{OrderEditItemHandlerObj.edit('{$gridId}', {$orderItemId});}";
             $editLink = '<a href="javascript:void(0);" onclick="'.$js.'" '.$class.'>'.$action.'</a>';

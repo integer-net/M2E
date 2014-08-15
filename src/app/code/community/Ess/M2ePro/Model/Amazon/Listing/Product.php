@@ -654,6 +654,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
 
         switch ($mode) {
 
+            case Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_NONE:
+                $price = 0;
+                break;
+
             case Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_SPECIAL:
                 if ($this->getMagentoProduct()->isGroupedType()) {
                     $specialPrice = Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_SPECIAL;
@@ -747,44 +751,51 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
             /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
             $variation = reset($variations);
 
-            if ($magentoMode) {
-                return $variation->getChildObject()->getQty(true);
-            }
-
-            $qty = $variation->getChildObject()->getQty(false);
-
-        } else {
-
-            if ($magentoMode) {
-                return (int)$this->getMagentoProduct()->getQty(true);
-            }
-
-            switch ($src['mode']) {
-                case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_SINGLE:
-                    $qty = 1;
-                    break;
-
-                case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_NUMBER:
-                    $qty = (int)$src['value'];
-                    break;
-
-                case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_ATTRIBUTE:
-                    $qty = (int)$this->getMagentoProduct()->getAttributeValue($src['attribute']);
-                    break;
-
-                case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED:
-                    $qty = (int)$this->getMagentoProduct()->getQty(false);
-                    break;
-
-                default:
-                case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT:
-                    $qty = (int)$this->getMagentoProduct()->getQty(true);
-                    break;
-            }
+            return $variation->getChildObject()->getQty($magentoMode);
         }
 
-        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
-            $qty = $src['qty_max_posted_value'];
+        if ($magentoMode) {
+            return (int)$this->getMagentoProduct()->getQty(true);
+        }
+
+        switch ($src['mode']) {
+            case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_SINGLE:
+                $qty = 1;
+                break;
+
+            case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_NUMBER:
+                $qty = (int)$src['value'];
+                break;
+
+            case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_ATTRIBUTE:
+                $qty = (int)$this->getMagentoProduct()->getAttributeValue($src['attribute']);
+                break;
+
+            case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED:
+                $qty = (int)$this->getMagentoProduct()->getQty(false);
+                break;
+
+            default:
+            case Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT:
+                $qty = (int)$this->getMagentoProduct()->getQty(true);
+                break;
+        }
+
+        if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_ATTRIBUTE ||
+            $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+            $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT) {
+
+            if ($qty > 0 && $src['qty_percentage'] > 0 && $src['qty_percentage'] < 100) {
+
+                $roundingFunction = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                        ->getGroupValue('/qty/percentage/','rounding_greater') ? 'ceil' : 'floor';
+
+                $qty = (int)$roundingFunction(($qty/100)*$src['qty_percentage']);
+            }
+
+            if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
+                $qty = $src['qty_max_posted_value'];
+            }
         }
 
         $qty < 0 && $qty = 0;
@@ -869,61 +880,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
     public function getTrackingAttributes()
     {
         return $this->getListing()->getTrackingAttributes();
-    }
-
-    // ########################################
-
-    public function getChangedItems(array $attributes,
-                                    $withStoreFilter = false)
-    {
-        return Mage::getModel('M2ePro/Listing_Product')->getChangedItems(
-            $attributes,
-            $this->getComponentMode(),
-            $withStoreFilter,
-            array($this,'dbSelectModifier')
-        );
-    }
-
-    public function getChangedItemsByListingProduct(array $attributes,
-                                                    $withStoreFilter = false)
-    {
-        return Mage::getModel('M2ePro/Listing_Product')->getChangedItemsByListingProduct(
-            $attributes,
-            $this->getComponentMode(),
-            $withStoreFilter,
-            array($this,'dbSelectModifier')
-        );
-    }
-
-    public function getChangedItemsByVariationOption(array $attributes,
-                                                     $withStoreFilter = false)
-    {
-        return Mage::getModel('M2ePro/Listing_Product')->getChangedItemsByVariationOption(
-            $attributes,
-            $this->getComponentMode(),
-            $withStoreFilter,
-            array($this,'dbSelectModifier')
-        );
-    }
-
-    // --------------------------------------------------
-
-    public function dbSelectModifier(Varien_Db_Select $dbSelect) {
-
-        $dbSelect->join(
-            array('alp' => Mage::getResourceModel('M2ePro/Amazon_Listing_Product')->getMainTable()),
-            '`lp`.`id` = `alp`.`listing_product_id`',
-            array()
-        );
-
-        $dbSelect->where(
-            '`alp`.`is_variation_product` = '.self::IS_VARIATION_PRODUCT_NO.
-            ' OR ('.
-                '`alp`.`is_variation_product` = '.self::IS_VARIATION_PRODUCT_YES.
-                ' AND `alp`.`is_variation_matched` = '.self::IS_VARIATION_MATCHED_YES.
-            ')'
-        );
-
     }
 
     // ########################################

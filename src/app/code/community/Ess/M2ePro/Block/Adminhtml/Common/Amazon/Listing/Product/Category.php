@@ -21,15 +21,23 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Product_Category extends 
 
         // Set header text
         //------------------------------
+        $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
+
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Ess_M2ePro_Helper_Component_Amazon::TITLE;
+            $componentName =  Ess_M2ePro_Helper_Component_Amazon::TITLE;
+            $headerText = Mage::helper('M2ePro')->__(
+                'Add Products To %component_name% Listing "%listing_title%" From Categories',
+                $componentName,
+                $this->escapeHtml($listingData['title'])
+            );
         } else {
-            $componentName = '';
+            $headerText =  Mage::helper('M2ePro')->__(
+                'Add Products To Listing "%listing_title%" From Categories',
+                 $this->escapeHtml($listingData['title'])
+            );
         }
 
-        $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
-        $this->_headerText = Mage::helper('M2ePro')->__('Add Products To%s Listing "%s" From Categories',
-                                                        $componentName, $this->escapeHtml($listingData['title']));
+        $this->_headerText = $headerText;
         //------------------------------
 
         // Set buttons actions

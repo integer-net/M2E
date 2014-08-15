@@ -1,13 +1,5 @@
-<div id="block_notice_ebay_accounts_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('You can add an eBay Production (live environment) or Sandbox (test environment) account.<br/><br/>
-    <b>Note:</b> A Production eBay account only works in a live environment. A Sandbox account only works in a test environment. To register for a Sandbox account go to <a href="http://www.developer.ebay.com" target="_blank">www.developer.ebay.com</a><br/>
-    <br/>After completing the General Information, click the <span style="text-decoration: underline;">Get Token</span> button where you\'ll be redirected to the eBay website. Simply sign-in and press <i>I Agree</i> to allow my eBay account to connect to M2E Pro.
-    <br/><br/>Once the Token is successfully accepted, the status will say <i>“Yes”</i>. Click the button “Save And Continue Edit” to proceed.'); ?>
-</div>
-
 <?php
     $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
-
     $ebayUserId = null;
 
     if (isset($formData['ebay_info']) && $ebayInfo = json_decode($formData['ebay_info'], true)) {
@@ -34,6 +26,29 @@
     $isEdit = !!$this->getRequest()->getParam('id');
 ?>
 
+<div id="block_notice_ebay_accounts_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Account Details'); ?>">
+<?php if (!$isEdit) { ?>
+
+    <?php echo Mage::helper('M2ePro')->__(
+        'Add an eBay account to M2E Pro by choosing the eBay environment and granting access to your eBay account.<br/><br/>
+        First choose the <b>Environment</b> of the eBay account you want to work in. If you want to add an eBay account to list for real on eBay sites,
+        choose <b>Production (Live)</b>. If you want to add an eBay Sandbox account that\'s been set up for test or development purposes,
+        choose <b>Sandbox (Test)</b>. Then click <b>Get Token</b> to sign in to eBay and <b>Agree</b> to allow your eBay account to connect to M2E Pro.<br/><br/>
+        Once you\'ve successfully authorised M2E Pro to access your account, the <b>Activated</b> status will change to \'Yes\' and you can click <b>Save and Continue Edit</b>.<br/><br/>
+        <b>Note:</b> A Production (Live) eBay account only works on a live eBay site. A Sandbox (Test) account only works on the eBay Sandbox test environment.
+        To register for a Sandbox account, register at <a href="https://developer.ebay.com/join/" target="_blank">developer.ebay.com/join</a>.'
+    ); ?>
+
+<?php } else { ?>
+
+    <?php echo Mage::helper('M2ePro')->__(
+        'This page shows the environment for your eBay account and details of the authorisation for M2E Pro to connect to your eBay account.<br/><br/>
+        If your token has expired or is not activated, click <b>Get Token</b>.'
+    ); ?>
+
+<?php } ?>
+</div>
+
 <script type="text/javascript">
 
     // General for all tabs
@@ -52,10 +67,11 @@
     M2ePro.url.set('adminhtml_ebay_account/update_account_title','<?php echo $this->getUrl('*/adminhtml_ebay_account/updateTitle'); ?>');
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => $this->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'),
-        'No Customer entry is found for specified ID.' => $this->__('No Customer entry is found for specified ID.'),
-        'If Yes is chosen, you must select at least one attribute for product mapping.' => $this->__('If Yes is chosen, you must select at least one attribute for product mapping.'),
-        'You should create at least one response template.' => $this->__('You should create at least one response template.')
+        'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => Mage::helper('M2ePro')->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'),
+        'No Customer entry is found for specified ID.' => Mage::helper('M2ePro')->__('No Customer entry is found for specified ID.'),
+        'If Yes is chosen, you must select at least one attribute for product mapping.' => Mage::helper('M2ePro')->__('If Yes is chosen, you must select at least one attribute for product mapping.'),
+        'You should create at least one response template.' => Mage::helper('M2ePro')->__('You should create at least one response template.'),
+        'Prefix length should not be greater than 5 characters.' => Mage::helper('M2ePro')->__('Prefix length should not be greater than 5 characters.')
     )); ?>);
 
     M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
@@ -73,7 +89,7 @@
     // Data for current tab
     //-----------------------------
     M2ePro.translator.add(<?php echo json_encode(array(
-        'You must get token.' => $this->__('You must get token.')
+        'You must get token.' => Mage::helper('M2ePro')->__('You must get token.')
     )); ?>);
 
     M2ePro.formData.mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['mode']); ?>';
@@ -97,7 +113,7 @@
 <div class="entry-edit" id="magento_block_ebay_accounts_general_general">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php if (!$isEdit) { echo $helper->__('Choose Environment'); } else { echo $helper->__('Environment of eBay account'); } ?></h4>
     </div>
 
     <div class="fieldset">
@@ -125,19 +141,25 @@
 
                 <tr>
                     <td class="label">
-                        <label for="mode"><?php echo Mage::helper('M2ePro')->__('Mode'); ?>: <span class="required">*</span></label>
+                        <label for="mode"><?php echo Mage::helper('M2ePro')->__('Environment'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select <?php if($formData['token_session'] != ''): ?>disabled="disabled"<?php else: ?>id="mode" name="mode"<?php endif; ?> class="required-entry">
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION; ?>" <?php if ($formData['mode'] == Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Production (Live eBay)'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX; ?>" <?php if ($formData['mode'] == Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX ): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Sandbox (Test eBay)'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION; ?>" <?php if ($formData['mode'] == Ess_M2ePro_Model_Ebay_Account::MODE_PRODUCTION): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Production (Live)'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX; ?>" <?php if ($formData['mode'] == Ess_M2ePro_Model_Ebay_Account::MODE_SANDBOX ): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Sandbox (Test)'); ?></option>
                         </select>
                         <?php if($formData['token_session'] != ''): ?>
                             <input id="mode" name="mode" value="<?php echo $formData['mode']; ?>" type="hidden" class="required-entry" />
                         <?php endif; ?>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Environment of eBay account.'); ?></span>
-                        </p>
+                        <p class="note"><span>
+                            <?php if (!$isEdit) {
+                                echo $helper->__('Choose \'Production (Live)\' to use an eBay account to list for real on eBay sites.<br/>
+                                                  Choose \'Sandbox (Test)\' to use an eBay Sandbox account for testing purposes.');
+                            } else {
+                                echo $helper->__('<b>Production (Live):</b> an eBay account listing for real on eBay sites.<br/>
+                                                  <b>Sandbox (Test):</b> an eBay Sandbox account for testing purposes.');
+                            } ?>
+                        </span></p>
                     </td>
                 </tr>
 
@@ -151,7 +173,7 @@
 <div class="entry-edit" id="magento_block_ebay_accounts_general_token">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Token'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Token Details'); ?></h4>
     </div>
 
     <div class="fieldset">
@@ -168,7 +190,7 @@
                         <p class="note note-no-tool-tip">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'Ensure you acquire your token within 5 minutes, or you may exceed your time limit and have to start again.'
+                                    'You need to finish the token process within 5 minutes. If not, just click <b>Get Token</b> and try again.'
                                 ); ?>
                             </span>
                         </p>

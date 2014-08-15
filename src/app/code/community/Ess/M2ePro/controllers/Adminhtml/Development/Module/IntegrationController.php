@@ -148,5 +148,30 @@ HTML;
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 
+    /**
+     * @title "Reset eBay Images Hashes"
+     * @description "Clear eBay images hashes for listing product"
+     * @prompt "Please enter Listing Product ID."
+     * @prompt_var "listing_product_id"
+     */
+    public function resetEbayImagesHashesAction()
+    {
+        $listingProductId = (int)$this->getRequest()->getParam('listing_product_id');
+
+        if (!$listingProduct = Mage::getModel('M2ePro/Listing_Product')->load($listingProductId)) {
+            $this->_getSession()->addError('Failed to load by ID.');
+            return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
+        }
+
+        $additionalData = $listingProduct->getAdditionalData();
+        unset($additionalData['ebay_product_images_hash'], $additionalData['ebay_product_variation_images_hash']);
+
+        $listingProduct->setData('additional_data', json_encode($additionalData))
+                       ->save();
+
+        $this->_getSession()->addSuccess('Successfully removed.');
+        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
+    }
+
     //#############################################
 }

@@ -5,10 +5,10 @@
     M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_order')) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Orders migration' => $this->__('Orders migration'),
-        'Starting orders migration...' => $this->__('Starting orders migration...'),
-        'Orders migration is finished' => $this->__('Orders migration is finished'),
-        'Orders migration is in process...' => $this->__('Orders migration is in process...'),
+        'Orders migration' => Mage::helper('M2ePro')->__('Orders migration'),
+        'Starting orders migration...' => Mage::helper('M2ePro')->__('Starting orders migration...'),
+        'Orders migration is finished' => Mage::helper('M2ePro')->__('Orders migration is finished'),
+        'Orders migration is in process...' => Mage::helper('M2ePro')->__('Orders migration is in process...'),
     )); ?>);
 
     Event.observe(window,'load',function() {

@@ -2,8 +2,6 @@ ListingMovingHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    // todo next (temp solution)
-
     options: {},
 
     setOptions: function(options)
@@ -47,6 +45,10 @@ ListingMovingHandler = Class.create(ActionHandler, {
 
     getGridHtml: function(selectedProducts)
     {
+        if (typeof init == 'function') {
+            init();
+        }
+
         this.selectedProducts = selectedProducts;
 
         var self = this;
@@ -183,7 +185,7 @@ ListingMovingHandler = Class.create(ActionHandler, {
                     self.gridHandler.unselectAllAndReload();
                 }
 
-                MagentoMessageObj.addError(str_replace('%s', self.options.url.logViewUrl, message));
+                MagentoMessageObj.addError(str_replace('%url%', self.options.url.logViewUrl, message));
             }
         });
     },

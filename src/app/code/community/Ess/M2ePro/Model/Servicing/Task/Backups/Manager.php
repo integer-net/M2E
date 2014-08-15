@@ -88,7 +88,7 @@ class Ess_M2ePro_Model_Servicing_Task_Backups_Manager
 
     public function canBackupTable($tableName)
     {
-        if (!in_array($tableName, Mage::helper('M2ePro/Module_Database')->getMySqlTables())) {
+        if (!in_array($tableName, Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables())) {
             return false;
         }
 

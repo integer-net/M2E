@@ -32,7 +32,7 @@
                 </td>
                 <td>
                     <?php foreach ($row['currencies'] as $currency): ?>
-                        <?php echo Mage::helper('M2ePro')->__('Store Currency (%s)', $currency['store']); ?> -> <?php echo Mage::helper('M2ePro')->__('Marketplace Currency (%s)', $currency['marketplace']); ?><br />
+                        <?php echo Mage::helper('M2ePro')->__('Store Currency (%currency_code%)', $currency['store']); ?> -> <?php echo Mage::helper('M2ePro')->__('Marketplace Currency (%currency_code%)', $currency['marketplace']); ?><br />
 
                         <?php if ($currency['rate'] <= 0): ?>
                             <span style="color: green; font-style: italic; font-size: 12px;">&nbsp;&nbsp;&nbsp;
@@ -62,7 +62,7 @@
                             <input type="text" name="ebay[<?php echo $coefficient; ?>_coefficient_<?php echo $id; ?>]" value="<?php echo $row['prices'][$coefficient]['coefficient']; ?>" class="M2ePro-ebay-coefficient-validation" style="width: 40px">
                             <?php if ($row['prices'][$coefficient]['is_changed']): ?>
                                 <p style="color: red">
-                                    <?php echo Mage::helper('M2ePro')->__('converted from %s', $row['prices'][$coefficient]['old_coefficient']); ?>
+                                    <?php echo Mage::helper('M2ePro')->__('converted from %value%', $row['prices'][$coefficient]['old_coefficient']); ?>
                                 </p>
                             <?php endif; ?>
                         <?php endif; ?>

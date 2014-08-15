@@ -20,12 +20,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_StepFive extends Mage_Ad
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $headerText = Mage::helper('M2ePro')->__("Add %component_name% Listing [Select Categories Products]",
+                $componentName);
         } else {
-            $componentName = '';
+            $headerText = Mage::helper('M2ePro')->__("Add Listing [Select Categories Products]");
         }
 
-        $this->_headerText = Mage::helper('M2ePro')->__("Add%s Listing [Select Categories Products]", $componentName);
+        $this->_headerText = $headerText;
         //------------------------------
 
         // Set buttons actions

@@ -8,10 +8,37 @@ class Ess_M2ePro_Model_Ebay_Order_Helper
 {
     // ##########################################################
 
+    const EBAY_ORDER_STATUS_ACTIVE    = 'Active';
+    const EBAY_ORDER_STATUS_COMPLETED = 'Completed';
+    const EBAY_ORDER_STATUS_CANCELLED = 'Cancelled';
+
     const EBAY_CHECKOUT_STATUS_COMPLETE = 'Complete';
 
     const EBAY_PAYMENT_METHOD_NONE      = 'None';
     const EBAY_PAYMENT_STATUS_SUCCEEDED = 'NoPaymentFailure';
+
+    // ##########################################################
+
+    public function getOrderStatus($orderStatusEbay)
+    {
+        $orderStatus = null;
+
+        switch ($orderStatusEbay) {
+            case self::EBAY_ORDER_STATUS_ACTIVE:
+                $orderStatus = Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_ACTIVE;
+                break;
+
+            case self::EBAY_ORDER_STATUS_COMPLETED:
+                $orderStatus = Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_COMPLETED;
+                break;
+
+            case self::EBAY_ORDER_STATUS_CANCELLED:
+                $orderStatus = Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED;
+                break;
+        }
+
+        return $orderStatus;
+    }
 
     // ##########################################################
 

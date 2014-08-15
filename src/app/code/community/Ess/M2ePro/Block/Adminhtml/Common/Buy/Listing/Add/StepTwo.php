@@ -21,12 +21,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_StepTwo extends Mage_Adm
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $headerText = Mage::helper('M2ePro')->__("Add %component_name% Listing [Channel Settings]", $componentName);
         } else {
-            $componentName = '';
+            $headerText = Mage::helper('M2ePro')->__("Add Listing [Channel Settings]");
         }
 
-        $this->_headerText = Mage::helper('M2ePro')->__("Add%s Listing [Channel Settings]", $componentName);
+        $this->_headerText = $headerText;
         //------------------------------
 
         // Set buttons actions

@@ -6,7 +6,8 @@
 
 class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Sell On eBay');
+    // M2ePro_TRANSLATIONS
+    // Sell On eBay
 
     const NICK  = 'ebay';
     const TITLE = 'Sell On eBay';
@@ -21,7 +22,7 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
 
     public function getMenuRootNodeLabel()
     {
-        return $this->__(self::TITLE);
+        return Mage::helper('M2ePro')->__(self::TITLE);
     }
 
     // ########################################

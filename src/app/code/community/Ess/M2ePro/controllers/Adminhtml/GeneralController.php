@@ -371,4 +371,14 @@ class Ess_M2ePro_Adminhtml_GeneralController
     }
 
     //#############################################
+
+    public function checkCustomerIdAction()
+    {
+        $customerId = $this->getRequest()->getParam('customer_id');
+        return $this->getResponse()->setBody(json_encode(array(
+            'ok' => (bool)Mage::getModel('customer/customer')->load($customerId)->getId()
+        )));
+    }
+
+    //#############################################
 }

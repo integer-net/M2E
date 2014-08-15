@@ -12,6 +12,10 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 {
     // ##########################################################
 
+    const ORDER_STATUS_ACTIVE    = 0;
+    const ORDER_STATUS_COMPLETED = 1;
+    const ORDER_STATUS_CANCELLED = 2;
+
     const CHECKOUT_STATUS_INCOMPLETE = 0;
     const CHECKOUT_STATUS_COMPLETED  = 1;
 
@@ -26,8 +30,9 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     // ##########################################################
 
-    // ->__('Magento Order was canceled.');
-    // ->__('Magento Order cannot be canceled.');
+    // M2ePro_TRANSLATIONS
+    // Magento Order was canceled.
+    // Magento Order cannot be canceled.
 
     // ########################################
 
@@ -96,7 +101,7 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         return $this->getData('selling_manager_id');
     }
 
-    // ----------------------------------------------------------
+    // ------------------------------------------
 
     public function getBuyerName()
     {
@@ -118,7 +123,7 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         return $this->getData('buyer_message');
     }
 
-    // ----------------------------------------------------------
+    // -------------------------------------------
 
     public function getCurrency()
     {
@@ -148,7 +153,7 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         return $this->getData('saved_amount');
     }
 
-    // ----------------------------------------------------------
+    // --------------------------------------------
 
     public function getTaxDetails()
     {
@@ -175,15 +180,21 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         return (float)$taxDetails['amount'];
     }
 
-    public function isShippingPriceIncludesTax()
+    public function isShippingPriceHasTax()
     {
-        if ($this->getTaxRate() <= 0) {
+        if (!$this->hasTax()) {
             return false;
+        }
+
+        if ($this->isVatTax()) {
+            return true;
         }
 
         $taxDetails = $this->getTaxDetails();
         return isset($taxDetails['includes_shipping']) ? (bool)$taxDetails['includes_shipping'] : false;
     }
+
+    // --------------------------------------------
 
     public function hasTax()
     {
@@ -191,17 +202,27 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
         return !empty($taxDetails['rate']);
     }
 
-    public function hasVat()
+    public function isSalesTax()
     {
-        $taxDetails = $this->getTaxDetails();
-        if (empty($taxDetails)) {
+        if (!$this->hasTax()) {
             return false;
         }
 
+        $taxDetails = $this->getTaxDetails();
+        return !$taxDetails['is_vat'];
+    }
+
+    public function isVatTax()
+    {
+        if (!$this->hasTax()) {
+            return false;
+        }
+
+        $taxDetails = $this->getTaxDetails();
         return $taxDetails['is_vat'];
     }
 
-    // ----------------------------------------------------------
+    // --------------------------------------------
 
     public function getShippingDetails()
     {
@@ -261,7 +282,7 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     public function isUseGlobalShippingProgram()
     {
-        return count($this->getGlobalShippingDetails()) != 0;
+        return count($this->getGlobalShippingDetails()) > 0;
     }
 
     /**
@@ -473,7 +494,8 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     public function beforeCreateMagentoOrder()
     {
-        if ($this->isCheckoutCompleted() || strlen($this->getBuyerName()) > 0) {
+        $buyerName = $this->getBuyerName();
+        if (!empty($buyerName)) {
             return;
         }
 

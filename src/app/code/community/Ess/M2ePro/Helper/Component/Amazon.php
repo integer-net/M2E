@@ -6,8 +6,8 @@
 
 class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Amazon (Beta)');
-
+    // M2ePro_TRANSLATIONS
+    // Amazon (Beta)
     const NICK  = 'amazon';
     const TITLE = 'Amazon (Beta)';
 

@@ -77,7 +77,7 @@
                 <span class="label">
                     <?php echo Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Magento Store View')); ?>:&nbsp;
                 </span>
-                <span class="value">
+                <span class="value" title="<?php echo Mage::helper('M2ePro')->escapeHtml($this->getStoreViewBreadcrumb(false)); ?>">
                     <?php echo Mage::helper('M2ePro')->escapeHtml($this->getStoreViewBreadcrumb()); ?>
                 </span>
             </label>

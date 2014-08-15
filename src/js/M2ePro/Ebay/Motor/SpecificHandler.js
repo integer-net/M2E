@@ -51,7 +51,7 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
 
         grid.massaction.apply = function () {
             if (this.getCheckedValues() == '') {
-                alert(M2ePro.translator.translate('Please select items.'));
+                alert(M2ePro.translator.translate('Please select the products you want to perform the action on.'));
                 return;
             }
 

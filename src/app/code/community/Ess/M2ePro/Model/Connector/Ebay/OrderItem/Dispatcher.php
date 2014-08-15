@@ -6,7 +6,8 @@
 
 class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Dispatcher extends Mage_Core_Model_Abstract
 {
-    // ->__('Action was not completed (Item: %item_id%, Transaction: %trn_id%). Reason: %msg%')
+    // M2ePro_TRANSLATIONS
+    // Action was not completed (Item: %item_id%, Transaction: %trn_id%). Reason: %msg%
 
     const ACTION_ADD_DISPUTE   = 1;
     const ACTION_UPDATE_STATUS = 2;

@@ -343,8 +343,21 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
 
         $src = $this->getEbaySellingFormatTemplate()->getQtySource();
 
-        if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
-            $qty = $src['qty_max_posted_value'];
+        if ($src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE ||
+            $src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+            $src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) {
+
+            if ($qty > 0 && $src['qty_percentage'] > 0 && $src['qty_percentage'] < 100) {
+
+                $roundingFunction = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                        ->getGroupValue('/qty/percentage/','rounding_greater') ? 'ceil' : 'floor';
+
+                $qty = (int)$roundingFunction(($qty/100)*$src['qty_percentage']);
+            }
+
+            if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
+                $qty = $src['qty_max_posted_value'];
+            }
         }
 
         $qty < 0 && $qty = 0;

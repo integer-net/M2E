@@ -91,54 +91,46 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             'country',
             'postal_code',
             'address',
-            'dispatch_time_mode',
-            'dispatch_time_value',
-            'dispatch_time_attribute',
+            'dispatch_time',
             'global_shipping_program',
             'local_shipping_rate_table_mode',
             'international_shipping_rate_table_mode',
             'local_shipping_mode',
             'local_shipping_discount_mode',
-            'local_shipping_cash_on_delivery_cost_mode',
-            'local_shipping_cash_on_delivery_cost_value',
-            'local_shipping_cash_on_delivery_cost_attribute',
             'international_shipping_mode',
             'international_shipping_discount_mode',
-            'international_trade',
+            'cross_border_trade',
         );
 
         foreach ($keys as $key) {
             $prepared[$key] = isset($data[$key]) ? $data[$key] : '';
         }
 
-        if (isset($data['local_shipping_combined_discount_profile_id'])) {
-            $prepared['local_shipping_combined_discount_profile_id'] =
-                json_encode(array_diff($data['local_shipping_combined_discount_profile_id'], array('')));
+        if (isset($data['local_shipping_discount_profile_id'])) {
+            $prepared['local_shipping_discount_profile_id'] =
+                json_encode(array_diff($data['local_shipping_discount_profile_id'], array('')));
         }
 
-        if (isset($data['international_shipping_combined_discount_profile_id'])) {
-            $prepared['international_shipping_combined_discount_profile_id'] =
-                json_encode(array_diff($data['international_shipping_combined_discount_profile_id'], array('')));
+        if (isset($data['international_shipping_discount_profile_id'])) {
+            $prepared['international_shipping_discount_profile_id'] =
+                json_encode(array_diff($data['international_shipping_discount_profile_id'], array('')));
         }
 
         if (isset($data['excluded_locations'])) {
             $prepared['excluded_locations'] = $data['excluded_locations'];
         }
 
-        $key = 'local_shipping_cash_on_delivery_cost_value';
-        if ($prepared[$key] !== '') {
-            $prepared[$key] = str_replace(',', '.', $prepared[$key]);
-        }
+        $key = 'cash_on_delivery_cost';
+        $prepared[$key] = (isset($data[$key]) && $data[$key] != '') ? $data[$key] : NULL;
 
         $modes = array(
             'local_shipping_rate_table_mode',
             'international_shipping_rate_table_mode',
             'local_shipping_mode',
             'local_shipping_discount_mode',
-            'local_shipping_cash_on_delivery_cost_mode',
             'international_shipping_mode',
             'international_shipping_discount_mode',
-            'international_trade'
+            'cross_border_trade'
         );
 
         foreach ($modes as $mode) {
@@ -168,7 +160,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
 
         $keys = array(
             'measurement_system',
-            'originating_postal_code',
 
             'package_size_mode',
             'package_size_value',
@@ -176,28 +167,29 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
 
             'dimension_mode',
             'dimension_width_value',
-            'dimension_height_value',
+            'dimension_length_value',
             'dimension_depth_value',
             'dimension_width_attribute',
-            'dimension_height_attribute',
+            'dimension_length_attribute',
             'dimension_depth_attribute',
 
             'weight_mode',
             'weight_minor',
             'weight_major',
-            'weight_attribute',
-
-            'local_handling_cost_mode',
-            'local_handling_cost_value',
-            'local_handling_cost_attribute',
-
-            'international_handling_cost_mode',
-            'international_handling_cost_value',
-            'international_handling_cost_attribute'
+            'weight_attribute'
         );
 
         foreach ($keys as $key) {
             $prepared[$key] = isset($data[$key]) ? $data[$key] : '';
+        }
+
+        $nullKeys = array(
+            'local_handling_cost',
+            'international_handling_cost'
+        );
+
+        foreach ($nullKeys as $key) {
+            $prepared[$key] = (isset($data[$key]) && $data[$key] != '') ? $data[$key] : NULL;
         }
 
         return $prepared;

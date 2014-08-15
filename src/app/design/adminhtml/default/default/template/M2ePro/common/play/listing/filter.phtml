@@ -3,7 +3,7 @@
 <p class="<?php echo Mage::helper('M2ePro/Magento')->isGoEdition() ? '' : 'switcher'; ?>">
 
     <?php if (count($this->sellingFormatTemplates) > 1 || !$this->sellingFormatTemplatesDropDown): ?>
-    <label for="play_selling_format_template_switcher"><?php echo $this->__('Selling Format Template'); ?>:</label>
+    <label for="play_selling_format_template_switcher"><?php echo Mage::helper('M2ePro')->__('Selling Format Template'); ?>:</label>
     <?php if ($this->sellingFormatTemplatesDropDown): ?>
         <select id="play_selling_format_template_switcher" name="play_selling_format_template_switcher" style="min-width: 100px; width: 130px;" onchange="return switchTemplate(this,'<?php echo $this->sellingFormatTemplateUrl; ?>','filter_play_selling_format_template');">
             <option value="0" <?php if ($this->selectedSellingFormatTemplate == 0) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('All Templates') ?></option>
@@ -30,7 +30,7 @@
     <?php endif; ?>
 
     <?php if (count($this->synchronizationsTemplates) > 1 || !$this->synchronizationsTemplatesDropDown): ?>
-    <label for="play_synchronization_template_switcher" style="margin-left: 30px;"><?php echo $this->__('Synchronization Template') ?>:</label>
+    <label for="play_synchronization_template_switcher" style="margin-left: 30px;"><?php echo Mage::helper('M2ePro')->__('Synchronization Template') ?>:</label>
     <?php if ($this->synchronizationsTemplatesDropDown): ?>
         <select id="play_synchronization_template_switcher" name="play_synchronization_template_switcher" style="min-width: 100px; width: 130px;" onchange="return switchTemplate(this,'<?php echo $this->synchronizationTemplateUrl; ?>','filter_play_synchronization_template');">
             <option value="0" <?php if ($this->selectedSynchronizationTemplate == 0) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('All Templates') ?></option>

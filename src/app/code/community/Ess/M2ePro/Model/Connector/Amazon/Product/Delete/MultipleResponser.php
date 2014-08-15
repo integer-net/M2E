@@ -20,7 +20,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Delete_MultipleResponser
                                                   $this->getListingProductRequestNativeData($listingProduct),
                                                   $this->params);
 
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully deleted');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully deleted
             $this->addListingsProductsLogsMessage($listingProduct, 'Item was successfully deleted',
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                                                   Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);

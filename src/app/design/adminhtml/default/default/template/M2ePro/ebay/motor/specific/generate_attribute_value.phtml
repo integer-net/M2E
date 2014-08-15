@@ -4,9 +4,9 @@
     );
 
     $translations = array();
-
-    // ->__('Please specify eBay motors compatibility attribute in %s > Configuration > <a target="_blank" href="%s">General</a>')
-    $text = 'Please specify eBay motors compatibility attribute in %s > Configuration > <a target="_blank" href="%s">General</a>';
+    // M2ePro_TRANSLATIONS
+    // Please specify eBay motors compatibility attribute in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>
+    $text = 'Please specify eBay motors compatibility attribute in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>';
     $translations[$text] = Mage::helper('M2ePro')->__(
         $text,
         Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
@@ -98,7 +98,7 @@
         <?php echo Mage::helper('M2ePro')->__(
 'Select the items, compatible with your part and choose one of three actions in the Actions dropdown:
 <ul class=list>
-    <li><b>Overwrite ePIDs in Compatibility Attribute</b> - replaces items ePIDs in the Compatibility Attribute chosen in %s > Configuration > <a target="_blank" href="%s">General</a> with selected ones.</li>
+    <li><b>Overwrite ePIDs in Compatibility Attribute</b> - replaces items ePIDs in the Compatibility Attribute chosen in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a> with selected ones.</li>
     <li><b>Add ePIDs to Compatibility Attribute</b> - adds selected items ePIDs to existing ones in Compatibility Attribute chosen in the General settings.</li>
 </ul>
 <b>Note:</b> Compatibility items can not be replaced or removed from eBay.',

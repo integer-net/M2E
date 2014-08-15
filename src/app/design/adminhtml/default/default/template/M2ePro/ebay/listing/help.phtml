@@ -1,6 +1,8 @@
 <div id="<?php echo $this->getContainerId(); ?>" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('M2E Pro Listings'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This page contains all created M2E Listings.<br>
-You can perform different Actions on a single Listing or on a group of Listings.<br>
-Actions for a single Listing you can find in the Action column of the grid. Choose a necessary option in the appropriate Listing dropdown to execute it.
-<br>Mass actions are in the Actions dropdown at the top right corner of the grid. Select check-boxes of appropriate items, choose an Action from the dropdown and press the Submit button.'); ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        'This page shows the M2E Pro listings you\'ve set up.<br/><br/>
+        Click a line in the table below to manage the products current listed using that M2E Pro listing.
+        Otherwise use the dropdown menu in the <b>Actions</b> column for more options.<br/><br/>
+        To clear the logs or delete more than one M2E Pro listing at a time, use the <b>Actions</b> dropdown at the very top of the table.'
+    ); ?>
 </div>

@@ -389,7 +389,7 @@ which is used to search and assign Play ID for a single product or in a bulk.
                         </select>
                         <p class="note">
                             <span>
-                                <?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains <a href="%s" target="_blank">identifier</a>.', $docsLinkDispatchTo); ?>
+                                <?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains <a href="%url%" target="_blank">identifier</a>.', $docsLinkDispatchTo); ?>
                             </span>
                         </p>
                     </td>
@@ -475,7 +475,7 @@ which is used to search and assign Play ID for a single product or in a bulk.
                         <label for="shipping_price_gbr_value"><?php echo Mage::helper('M2ePro')->__('Cost Value, GBP') ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <input type="text" name="shipping_price_gbr_value" id="shipping_price_gbr_value" class="input-text M2ePro-validate-shipping-value-positive" value="<?php echo $formData['shipping_price_gbr_value']; ?>">
+                        <input type="text" name="shipping_price_gbr_value" id="shipping_price_gbr_value" class="input-text M2ePro-validation-float M2ePro-validate-shipping-value-positive" value="<?php echo $formData['shipping_price_gbr_value']; ?>">
                     </td>
                 </tr>
 
@@ -513,7 +513,7 @@ which is used to search and assign Play ID for a single product or in a bulk.
                         <label for="shipping_price_euro_value"><?php echo Mage::helper('M2ePro')->__('Cost Value, EUR') ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <input type="text" name="shipping_price_euro_value" id="shipping_price_euro_value" class="input-text M2ePro-validate-shipping-value-positive" value="<?php echo $formData['shipping_price_euro_value']; ?>">
+                        <input type="text" name="shipping_price_euro_value" id="shipping_price_euro_value" class="input-text M2ePro-validation-float M2ePro-validate-shipping-value-positive" value="<?php echo $formData['shipping_price_euro_value']; ?>">
                     </td>
                 </tr>
 
@@ -610,7 +610,7 @@ which is used to search and assign Play ID for a single product or in a bulk.
                         </select>
                         <p class="note">
                             <span>
-                            <?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Condition <a href="%s" target="_blank">identifier</a>.', $docsLinkCondition); ?>
+                            <?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Condition <a href="%url%" target="_blank">identifier</a>.', $docsLinkCondition); ?>
                             </span>
                         </p>
                     </td>

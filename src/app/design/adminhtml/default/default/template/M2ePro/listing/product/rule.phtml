@@ -27,16 +27,19 @@
                         <table>
                             <tr>
                                 <td>
-                                    <label for="hide_products_others_listings"><?php echo Mage::helper('M2ePro')->__('Products Presented In Other Listings'); ?>:&nbsp;</label>
+                                    <label for="hide_products_others_listings"><?php echo Mage::helper('M2ePro')->__('Products already in M2E Pro listings'); ?>:&nbsp;</label>
                                 </td>
                                 <td>
                                     <select id="hide_products_others_listings" name="hide_products_others_listings" style="width: 80px">
                                         <option value="0" <?php if ($hideParam == 0): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Show');  ?></option>
-                                        <option value="1" <?php if ($hideParam == 1): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Not Show'); ?></option>
+                                        <option value="1" <?php if ($hideParam == 1): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Hide'); ?></option>
                                     </select>
                                     <?php if (Mage::helper('M2ePro/View')->isCurrentViewEbay()) : ?>
                                         <p class="note show-left">
-                                            <?php echo Mage::helper('M2ePro')->__('Makes the filter result more precise:<br/><b>Show</b> - all products will be displayed;<br><b>Not Show</b> - the products, which are not included in any listing, will be only displayed.'); ?>
+                                            <?php echo Mage::helper('M2ePro')->__(
+                                                '<b>Show</b> - show all products<br/>
+                                                <b>Hide</b> - show only products that have not already been added to an M2E Pro listing'
+                                            ); ?>
                                         </p>
                                     <?php endif; ?>
                                 </td>

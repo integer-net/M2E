@@ -6,7 +6,8 @@
 
 class Ess_M2ePro_Helper_View_Development extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Control Panel (M2E Pro)');
+    // M2ePro_TRANSLATIONS
+    // Control Panel (M2E Pro)
 
     const NICK            = 'development';
     const TITLE           = 'Control Panel (M2E Pro)';

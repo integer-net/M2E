@@ -27,7 +27,7 @@ class Ess_M2ePro_Helper_Module_Translation extends Mage_Core_Helper_Abstract
 
         if (count($this->placeholders) <= 0) {
             array_unshift($this->args, $this->text);
-            return call_user_func_array(array('parent','__'), $this->args);
+            return call_user_func_array(array($this,'__'), $this->args);
         }
 
         $this->translatedText = parent::__($this->text);
@@ -40,7 +40,7 @@ class Ess_M2ePro_Helper_Module_Translation extends Mage_Core_Helper_Abstract
             return $this->translatedText;
         }
 
-        return $this->translatedText;
+        return vsprintf($this->translatedText, $unprocessedArgs);
     }
 
     // ##################################
@@ -81,7 +81,7 @@ class Ess_M2ePro_Helper_Module_Translation extends Mage_Core_Helper_Abstract
     {
         foreach ($this->values as $placeholder=>$value) {
 
-            $newText = str_replace('%'.$placeholder.'%', $value, $this->$translatedText, $count);
+            $newText = str_replace('%'.$placeholder.'%', $value, $this->translatedText, $count);
 
             if ($count <= 0) {
                 continue;

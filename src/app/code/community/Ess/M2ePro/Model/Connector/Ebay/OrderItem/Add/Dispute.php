@@ -7,11 +7,12 @@
 class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Add_Dispute
     extends Ess_M2ePro_Model_Connector_Ebay_Abstract
 {
-    // ->__('Dispute cannot be opened. Reason: Dispute explanation is not defined.')
-    // ->__('Dispute cannot be opened. Reason: Dispute reason is not defined.')
-    // ->__('Unpaid Item Process was not open for item #%id%. Reason: %msg%')
-    // ->__('Unpaid Item Process was not open for item #%id%. Reason: eBay failure. Please try again later.')
-    // ->__('Unpaid Item Process for item #%id% has been initiated.')
+    // M2ePro_TRANSLATIONS
+    // Dispute cannot be opened. Reason: Dispute explanation is not defined.
+    // Dispute cannot be opened. Reason: Dispute reason is not defined.
+    // Unpaid Item Process was not open for item #%id%. Reason: %msg%
+    // Unpaid Item Process was not open for item #%id%. Reason: eBay failure. Please try again later.
+    // Unpaid Item Process for item #%id% has been initiated.
 
     const DISPUTE_EXPLANATION_BUYER_HAS_NOT_PAID = 'BuyerNotPaid';
 

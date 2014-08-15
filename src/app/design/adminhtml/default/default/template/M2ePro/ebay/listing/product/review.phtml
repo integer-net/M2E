@@ -11,9 +11,13 @@
 
 <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
-    <?php echo Mage::helper('M2ePro')->__("<b>%s</b> product(s) were successfully added to the M2E Listing.<br/>
-    You can Review them in the Listing or Start listing on eBay right now.<br><br>
-    <b>Note:</b> The products without Primary eBay Category specified will not be listed. You can specify it later in the listing settings.", $this->products_count) ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        '<b>%amount%</b> product(s) were successfully added to the M2E Listing.<br/><br/>
+        You can <b>Review Your Items</b> before listing them on eBay or <b>List Your Items Now</b>.<br/><br/>
+        <b>Note:</b> Products that do not have a primary eBay category specified will not be listed.
+        You will have a chance to set the primary eBay category later in the listing settings if you need to.',
+        $this->products_count
+    ); ?>
 
     <div style="margin-top: 10px">
         <?php echo $this->getChildHtml('review'); ?>

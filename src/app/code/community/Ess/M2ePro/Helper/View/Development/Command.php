@@ -65,62 +65,63 @@ class Ess_M2ePro_Helper_View_Development_Command extends Mage_Core_Helper_Abstra
 
             $commentsString = $this->getMethodComments($reflectionMethod);
 
-            preg_match('/@hidden/', $commentsString, $matchesHidden);
-
-            if (isset($matchesHidden[0])) {
+            preg_match('/@hidden/', $commentsString, $matches);
+            if (isset($matches[0])) {
                 continue;
             }
 
-            preg_match('/@title[\s]*\"(.*)\"/', $commentsString, $matchesTitle);
-
-            $methodTitle = '';
-            if (isset($matchesTitle[1])) {
-                $methodTitle = $matchesTitle[1];
-            } else {
-                $methodTitle = $action;
-            }
-
-            preg_match('/@description[\s]*\"(.*)\"/', $commentsString, $matchesDescription);
+            $methodTitle = $action;
+            preg_match('/@title[\s]*\"(.*)\"/', $commentsString, $matches);
+            isset($matches[1]) && $methodTitle = $matches[1];
 
             $methodDescription = '';
-            if (isset($matchesDescription[1])) {
-                $methodDescription = $matchesDescription[1];
-            }
-
-            $methodUrl = Mage::helper('adminhtml')->getUrl('*/'.$controller.'/'.$action);
+            preg_match('/@description[\s]*\"(.*)\"/', $commentsString, $matches);
+            isset($matches[1]) && $methodDescription = $matches[1];
 
             $methodContent = '';
             $fileContent = file($reflectionMethod->getFileName());
-            for($i=$reflectionMethod->getStartLine()+2;$i<$reflectionMethod->getEndLine();$i++) {
+            for($i = $reflectionMethod->getStartLine() + 2; $i < $reflectionMethod->getEndLine(); $i++) {
                 $methodContent .= $fileContent[$i-1];
             }
 
-            preg_match('/@new_line/', $commentsString, $matchesNewLine);
-            $methodNewLine = isset($matchesNewLine[0]);
+            $methodNewLine = false;
+            preg_match('/@new_line/', $commentsString, $matches);
+            isset($matches[0]) && $methodNewLine = true;
 
-            preg_match('/@confirm[\s]*\"(.*)\"/', $commentsString, $matchesConfirm);
-            $methodConfirm = '';
-            if (isset($matchesConfirm[1])) {
-                $methodConfirm = $matchesConfirm[1];
-            }
+            $methodConfirm = false;
+            preg_match('/@confirm[\s]*\"(.*)\"/', $commentsString, $matches);
+            isset($matches[1]) && $methodConfirm = $matches[1];
 
-            preg_match('/@components[ ]*(.*)/', $commentsString, $matchesComponents);
-            $methodComponents = isset($matchesComponents[0])
-                ? (!empty($matchesComponents[1]) ? explode(',', $matchesComponents[1]) : true)
-                : false;
+            $methodPrompt = false;
+            preg_match('/@prompt[\s]*\"(.*)\"/', $commentsString, $matches);
+            isset($matches[1]) && $methodPrompt = $matches[1];
 
-            preg_match('/new_window/', $commentsString, $matchesNewWindow);
-            $methodNewWindow = isset($matchesNewWindow[0]);
+            $methodPromptVar = '';
+            preg_match('/@prompt_var[\s]*\"(.*)\"/', $commentsString, $matches);
+            isset($matches[1]) && $methodPromptVar = $matches[1];
+
+            $methodComponents = false;
+            preg_match('/@components[ ]*(.*)/', $commentsString, $matches);
+            isset($matches[0]) && $methodComponents = true;
+            !empty($matches[1]) && $methodComponents = explode(',', $matches[1]);
+
+            $methodNewWindow = false;
+            preg_match('/new_window/', $commentsString, $matches);
+            isset($matches[0]) && $methodNewWindow = true;
 
             $methods[] = array(
-                'title' => $methodTitle,
+                'title'       => $methodTitle,
                 'description' => $methodDescription,
-                'url' => $methodUrl,
-                'content' => $methodContent,
-                'new_line' => $methodNewLine,
-                'confirm' => $methodConfirm,
-                'components' => $methodComponents,
-                'new_window' => $methodNewWindow
+                'url'         => Mage::helper('adminhtml')->getUrl('*/'.$controller.'/'.$action),
+                'content'     => $methodContent,
+                'new_line'    => $methodNewLine,
+                'confirm'     => $methodConfirm,
+                'prompt'      => array(
+                    'text' => $methodPrompt,
+                    'var'  => $methodPromptVar
+                ),
+                'components'  => $methodComponents,
+                'new_window'  => $methodNewWindow
             );
         }
         //----------------------------------

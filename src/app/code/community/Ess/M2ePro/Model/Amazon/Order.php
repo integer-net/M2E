@@ -10,7 +10,8 @@
  */
 class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Order Status cannot be Updated. Reason: %msg%');
+    // M2ePro_TRANSLATIONS
+    // Order Status cannot be Updated. Reason: %msg%
 
     const STATUS_PENDING             = 0;
     const STATUS_UNSHIPPED           = 1;
@@ -104,14 +105,72 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
         return (float)$this->getData('paid_amount');
     }
 
-    public function getTaxAmount()
+    // ########################################
+
+    public function getTaxDetails()
     {
-        return (float)$this->getData('tax_amount');
+        return $this->getSettings('tax_details');
     }
 
-    public function getDiscountAmount()
+    public function getProductPriceTaxAmount()
     {
-        return (float)$this->getData('discount_amount');
+        $taxDetails = $this->getTaxDetails();
+        return !empty($taxDetails['product']) ? (float)$taxDetails['product'] : 0.0;
+    }
+
+    public function getShippingPriceTaxAmount()
+    {
+        $taxDetails = $this->getTaxDetails();
+        return !empty($taxDetails['shipping']) ? (float)$taxDetails['shipping'] : 0.0;
+    }
+
+    public function getGiftPriceTaxAmount()
+    {
+        $taxDetails = $this->getTaxDetails();
+        return !empty($taxDetails['gift']) ? (float)$taxDetails['gift'] : 0.0;
+    }
+
+    public function getProductPriceTaxRate()
+    {
+        $taxAmount = $this->getProductPriceTaxAmount() + $this->getGiftPriceTaxAmount();
+        if ($taxAmount <= 0) {
+            return 0;
+        }
+
+        $taxRate = ($taxAmount / $this->getSubtotalPrice()) * 100;
+
+        return round($taxRate, 4);
+    }
+
+    public function getShippingPriceTaxRate()
+    {
+        $taxAmount = $this->getShippingPriceTaxAmount();
+        if ($taxAmount <= 0) {
+            return 0;
+        }
+
+        $taxRate = ($taxAmount / $this->getShippingPrice()) * 100;
+
+        return round($taxRate, 4);
+    }
+
+    // ########################################
+
+    public function getDiscountDetails()
+    {
+        return $this->getSettings('discount_details');
+    }
+
+    public function getPromotionDiscountAmount()
+    {
+        $discountDetails = $this->getDiscountDetails();
+        return !empty($discountDetails['promotion']) ? $discountDetails['promotion'] : 0.0;
+    }
+
+    public function getShippingDiscountAmount()
+    {
+        $discountDetails = $this->getDiscountDetails();
+        return !empty($discountDetails['shipping']) ? $discountDetails['shipping'] : 0.0;
     }
 
     // ########################################
@@ -173,9 +232,11 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
     {
         if (is_null($this->grandTotalPrice)) {
             $this->grandTotalPrice = $this->getSubtotalPrice();
+            $this->grandTotalPrice += $this->getProductPriceTaxAmount();
             $this->grandTotalPrice += $this->getShippingPrice();
-            $this->grandTotalPrice += $this->getTaxAmount();
-            $this->grandTotalPrice -= $this->getDiscountAmount();
+            $this->grandTotalPrice += $this->getGiftPriceTaxAmount();
+            $this->grandTotalPrice -= $this->getPromotionDiscountAmount();
+            $this->grandTotalPrice -= $this->getShippingDiscountAmount();
         }
 
         return round($this->grandTotalPrice, 2);

@@ -30,8 +30,8 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             if (!coefficient.up('div').visible()) {
                 return true;
             }
-
-            if (!coefficient.value.match(/^\d+[.,]?\d*?$/g) || parseFloat(coefficient.value) <= 0) {
+            var floatValidator = Validation.get('M2ePro-validation-float');
+            if (floatValidator.test($F(coefficient), coefficient) && parseFloat(coefficient.value) <= 0) {
                 coefficient.addClassName('price_unvalidated');
                 return false;
             }
@@ -58,6 +58,10 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             }
 
             if (value.length > 6) {
+                return false;
+            }
+
+            if (value < 0) {
                 return false;
             }
 
@@ -141,13 +145,14 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             bestOfferMode.simulate('change');
         }
 
-        self.updateQtyMode(this.value);
-        self.updateIgnoreVariations(this.value);
-        self.updateListingDuration(this.value);
-        self.updateBuyItNowPrice(this.value);
-        self.updatePriceDiscountStpVisibility(this.value);
-        self.updatePriceDiscountMapVisibility(this.value);
-        self.updateVariationPriceTrVisibility(this.value);
+        self.updateQtyMode();
+        self.updateQtyPercentage();
+        self.updateIgnoreVariations();
+        self.updateListingDuration();
+        self.updateBuyItNowPrice();
+        self.updatePriceDiscountStpVisibility();
+        self.updatePriceDiscountMapVisibility();
+        self.updateVariationPriceTrVisibility();
     },
 
     duration_mode_change : function()
@@ -166,34 +171,58 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         }
     },
 
-    updateQtyMode : function(listingType)
+    updateQtyMode : function()
     {
         var qtyMode   = $('qty_mode'),
             qtyModeTr = $('qty_mode_tr');
 
         qtyModeTr.show();
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
             qtyMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_SINGLE');
             qtyMode.simulate('change');
             qtyModeTr.hide();
         }
     },
 
-    updateIgnoreVariations : function(listingType)
+    updateQtyPercentage : function()
+    {
+        var qtyPercentageTr = $('qty_percentage_tr');
+
+        qtyPercentageTr.hide();
+
+        if (EbayTemplateSellingFormatHandlerObj.isSimpleMode()) {
+            return;
+        }
+
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
+            return;
+        }
+
+        var qtyMode = $('qty_mode').value;
+
+        if (qtyMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_SINGLE') ||
+            qtyMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_NUMBER')) {
+            return;
+        }
+
+        qtyPercentageTr.show();
+    },
+
+    updateIgnoreVariations : function()
     {
         var ignoreVariationsValueTr = $('ignore_variations_value_tr'),
             ignoreVariationsValue = $('ignore_variations_value');
 
         ignoreVariationsValueTr.hide();
 
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
             ignoreVariationsValue.value = 0;
         } else {
             ignoreVariationsValueTr.show();
         }
     },
 
-    updateListingDuration : function(listingType)
+    updateListingDuration : function()
     {
         var durationMode          = $('duration_mode'),
             durationAttribute     = $('duration_attribute'),
@@ -208,7 +237,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         durationAttribute.hide();
         durationAttributeNote.hide();
 
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED')) {
 
             durationMode.value = 3;
 
@@ -220,7 +249,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             durationMode.simulate('change');
         }
 
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
 
             durationMode.value = 3;
 
@@ -237,7 +266,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             }
         }
 
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_ATTRIBUTE')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_ATTRIBUTE')) {
             durationMode.hide();
             if (!EbayTemplateSellingFormatHandlerObj.isSimpleMode()) {
                 durationAttribute.show();
@@ -249,7 +278,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         }
     },
 
-    updateVariationPriceTrVisibility : function(listingType)
+    updateVariationPriceTrVisibility : function()
     {
         var removeBottomBorderTds = $$('#buyitnow_price_tr td.remove_bottom_border'),
             addRowspanTds         = $$('#buyitnow_price_tr td.add_rowspan'),
@@ -261,7 +290,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         addRowspanTds.invoke('removeAttribute','rowspan');
 
         if (!EbayTemplateSellingFormatHandlerObj.isSimpleMode() &&
-            listingType != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
+            $('listing_type').value != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
             variationPriceTr.show();
             addRowspanTds.invoke('setAttribute','rowspan','2');
             if(priceModeSelect.value != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE')) {
@@ -270,7 +299,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         }
     },
 
-    updateBuyItNowPrice : function(listingType)
+    updateBuyItNowPrice : function()
     {
         var priceNoneOption                 = $('buyitnow_price_mode_none_option'),
             priceModeSelect                 = $('buyitnow_price_mode'),
@@ -287,7 +316,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         bestOfferAcceptPercentageOption.innerHTML = M2ePro.translator.translate('% of "Buy It Now" Price');
         bestOfferRejectPercentageOption.innerHTML = M2ePro.translator.translate('% of "Buy It Now" Price');
 
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED')) {
 
             priceNoneOption.hide();
 
@@ -303,7 +332,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         }
     },
 
-    updatePriceDiscountStpVisibility: function(listingType)
+    updatePriceDiscountStpVisibility: function()
     {
         var priceDiscTrStp = $('price_discount_stp_tr'),
             priceDiscStpMode = $('price_discount_stp_mode');
@@ -313,14 +342,14 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             priceDiscTrStp.show();
         }
 
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
             priceDiscTrStp.hide();
             priceDiscStpMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE');
             priceDiscStpMode.simulate('change');
         }
     },
 
-    updatePriceDiscountMapVisibility: function(listingType)
+    updatePriceDiscountMapVisibility: function()
     {
         var priceDiscTrMap = $('price_discount_map_tr'),
             priceDiscMapMode = $('price_discount_map_mode');
@@ -330,7 +359,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             priceDiscTrMap.show();
         }
 
-        if (listingType == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
+        if ($('listing_type').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION')) {
             priceDiscTrMap.hide();
             priceDiscMapMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE');
             priceDiscMapMode.simulate('change');
@@ -372,6 +401,8 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         }
 
         maxPostedValueMode.simulate('change');
+
+        self.updateQtyPercentage();
     },
 
     isMaxPostedQtyAvailable: function(qtyMode)
@@ -480,39 +511,58 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
     {
         var coefficientInputDiv = $(this.id.replace('mode','') + 'input_div'),
             signSpan            = $(this.id.replace('mode','') + 'sign_span'),
-            percentSpan         = $(this.id.replace('mode','') + 'percent_span');
+            percentSpan         = $(this.id.replace('mode','') + 'percent_span'),
+            examplesContainer   = $(this.id.replace('coefficient_mode','') + 'example_container');
 
         //-----------------------------
         coefficientInputDiv.show();
+
+        console.log(examplesContainer);
+        examplesContainer.show();
+
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_NONE')) {
             coefficientInputDiv.hide();
+            examplesContainer.hide();
         }
         //-----------------------------
 
         //-----------------------------
-        signSpan.innerHTML = '';
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_INCREASE') ||
-            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE')) {
-            signSpan.innerHTML = '+';
-        }
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_DECREASE') ||
-            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE')) {
-            signSpan.innerHTML = '-';
-        }
-        //-----------------------------
-
-        //-----------------------------
+        signSpan.innerHTML    = '';
         percentSpan.innerHTML = '';
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE') ||
-            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE')) {
-            percentSpan.innerHTML = '%';
-        }
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_DECREASE') ||
-            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_INCREASE')) {
+        $$('.' + this.id.replace('coefficient_mode','') + 'example').invoke('hide');
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_INCREASE')) {
+            signSpan.innerHTML = '+';
 
             if (typeof M2ePro.formData.currency != 'undefined') {
                 percentSpan.innerHTML = M2ePro.formData.currency;
             }
+
+            $(this.id.replace('coefficient_mode','') + 'example_absolute_increase').show();
+        }
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_ABSOLUTE_DECREASE')) {
+            signSpan.innerHTML = '-';
+
+            if (typeof M2ePro.formData.currency != 'undefined') {
+                percentSpan.innerHTML = M2ePro.formData.currency;
+            }
+
+            $(this.id.replace('coefficient_mode','') + 'example_absolute_decrease').show();
+        }
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_INCREASE')) {
+            signSpan.innerHTML = '+';
+            percentSpan.innerHTML = '%';
+
+            $(this.id.replace('coefficient_mode','') + 'example_percentage_increase').show();
+        }
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE')) {
+            signSpan.innerHTML = '-';
+            percentSpan.innerHTML = '%';
+
+            $(this.id.replace('coefficient_mode','') + 'example_percentage_decrease').show();
         }
         //-----------------------------
     },

@@ -79,13 +79,13 @@ class Ess_M2ePro_Model_Observer_Invoice
         $url = Mage::helper('adminhtml')
             ->getUrl('M2ePro/adminhtml_ebay_log/order', array('order_id' => $order->getId()));
 
-        $startLink = '<a href="' . $url . '" target="_blank">';
-        $endLink = '</a>';
         $channel = $order->getComponentTitle();
-
+        // M2ePro_TRANSLATIONS
+        // Payment Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank">order log</a> for more details.
         $message  = Mage::helper('M2ePro')->__(
-            'Payment Status for %s Order was not updated. View %sorder log%s for more details.',
-            $channel, $startLink, $endLink
+            'Payment Status for %chanel_title% Order was not updated.'.
+            ' View <a href="%url%" target="_blank">order log</a> for more details.'.
+            $channel, $url
         );
 
         Mage::getSingleton('adminhtml/session')->addError($message);

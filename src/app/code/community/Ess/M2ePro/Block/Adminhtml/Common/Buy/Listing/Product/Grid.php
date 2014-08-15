@@ -36,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Product_Grid extends Mage_Ad
 
         // Get collection
         //----------------------------
-        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
+        /* @var $collection Mage_Catalog_Model_Resource_Product_Collection */
         $collection = Mage::getModel('catalog/product')->getCollection()
             ->addAttributeToSelect('sku')
             ->addAttributeToSelect('name')
@@ -142,24 +142,25 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Product_Grid extends Mage_Ad
                 $dbExcludeSelect->where('`listing_id` = ?',(int)$listingData['id']);
             }
 
+            // default sql select
             $collection->getSelect()
                 ->joinLeft(array('sq' => $dbExcludeSelect), 'sq.product_id = e.entity_id', array())
                 ->where('sq.product_id IS NULL');
-        }
 
-//        $collection->getSelect()->where('`e`.`entity_id` NOT IN ('.$dbSelect->__toString().')');
+            // alternatively sql select (for mysql v.5.1)
+            // $collection->getSelect()->where('`e`.`entity_id` NOT IN ('.$dbExcludeSelect->__toString().')');
+        }
         //----------------------------
 
         // Add categories filter
         //----------------------------
         $categoriesData = Mage::helper('M2ePro/Data_Global')->getValue('temp_listing_categories');
 
-        if (count($categoriesData) > 0)
-        {
+        if (count($categoriesData) > 0) {
             $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
                 ->select()
                 ->from(Mage::getSingleton('core/resource')->getTableName('catalog_category_product'),
-                new Zend_Db_Expr('DISTINCT `product_id`'))
+                       new Zend_Db_Expr('DISTINCT `product_id`'))
                 ->where('`category_id` IN ('.implode(',',$categoriesData).')');
 
             $collection->getSelect()->where('`e`.`entity_id` IN ('.$dbSelect->__toString().')');
@@ -487,7 +488,9 @@ STYLE;
 
         $isShowRuleBlock = json_encode($this->isShowRuleBlock());
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs(
+            $helper->__('Please select the products you want to perform the action on.')
+        );
         $createEmptyListingMessage = $helper->escapeJs($helper->__('Are you sure you want to create empty listing?'));
 
         $showAdvancedFilterButtonText = $helper->escapeJs($helper->__('Show Advanced Filter'));

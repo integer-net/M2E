@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Model_Buy_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 {
+    // ########################################
+
     /** @var $order Ess_M2ePro_Model_Buy_Order */
     protected $order = NULL;
 
@@ -21,10 +23,40 @@ class Ess_M2ePro_Model_Buy_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         return self::CHECKOUT_GUEST;
     }
 
+    // ########################################
+
+    public function isOrderNumberPrefixSourceChannel()
+    {
+        return $this->order->getBuyAccount()->isMagentoOrdersNumberSourceChannel();
+    }
+
+    public function isOrderNumberPrefixSourceMagento()
+    {
+        return $this->order->getBuyAccount()->isMagentoOrdersNumberSourceMagento();
+    }
+
+    public function getChannelOrderNumber()
+    {
+        return $this->order->getBuyOrderId();
+    }
+
+    public function getOrderNumberPrefix()
+    {
+        if (!$this->order->getBuyAccount()->isMagentoOrdersNumberPrefixEnable()) {
+            return '';
+        }
+
+        return $this->order->getBuyAccount()->getMagentoOrdersNumberPrefix();
+    }
+
+    // ########################################
+
     public function getBuyerEmail()
     {
         return $this->order->getBuyerEmail();
     }
+
+    // ########################################
 
     public function getCustomer()
     {
@@ -67,10 +99,14 @@ class Ess_M2ePro_Model_Buy_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         return $customer;
     }
 
+    // ########################################
+
     public function getCurrency()
     {
         return $this->order->getCurrency();
     }
+
+    // ########################################
 
     public function getPaymentData()
     {
@@ -85,6 +121,8 @@ class Ess_M2ePro_Model_Buy_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 
         return $paymentData;
     }
+
+    // ########################################
 
     public function getShippingData()
     {
@@ -102,25 +140,46 @@ class Ess_M2ePro_Model_Buy_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 
     // ########################################
 
-    public function getTaxRate()
-    {
-        return 0;
-    }
-
-    public function hasVat()
-    {
-        return true;
-    }
-
     public function hasTax()
     {
         return false;
     }
 
-    public function isShippingPriceIncludesTax()
+    public function isSalesTax()
     {
-        return true;
+        return false;
     }
+
+    public function isVatTax()
+    {
+        return false;
+    }
+
+    // -----------------------------------------
+
+    public function getProductPriceTaxRate()
+    {
+        return 0;
+    }
+
+    public function getShippingPriceTaxRate()
+    {
+        return 0;
+    }
+
+    // -----------------------------------------
+
+    public function isProductPriceIncludeTax()
+    {
+        return false;
+    }
+
+    public function isShippingPriceIncludeTax()
+    {
+        return false;
+    }
+
+    // -----------------------------------------
 
     public function isTaxModeNone()
     {

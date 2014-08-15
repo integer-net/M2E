@@ -20,7 +20,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_MultipleResponser
                                                 $this->getListingProductRequestNativeData($listingProduct),
                                                 $this->params);
 
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully listed');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully listed
             $this->addListingsProductsLogsMessage($listingProduct, 'Item was successfully listed',
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                                                   Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);

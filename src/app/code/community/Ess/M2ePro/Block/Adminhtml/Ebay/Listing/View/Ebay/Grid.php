@@ -84,7 +84,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
         //--------------------------------
         // Get collection
         //----------------------------
-        /** @var Mage_Core_Model_Mysql4_Collection_Abstract $collection */
+        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->addAttributeToSelect('sku');
         $collection->addAttributeToSelect('name');
@@ -173,6 +173,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             'width'     => '50px',
             'type'      => 'number',
             'index'     => 'available_qty',
+            'sortable'  => (bool)version_compare(Mage::helper('M2ePro/Magento')->getVersion(), '1.4.2'),
             'filter'    => false,
             'frame_callback' => array($this, 'callbackColumnOnlineAvailableQty')
         ));
@@ -806,17 +807,19 @@ HTML;
         $runStopAndRemoveProducts = $this->getUrl('*/adminhtml_ebay_listing/runStopAndRemoveProducts');
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
-        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__('"%s" task has successfully completed.'));
+        $taskCompletedSuccessMessage = $helper->escapeJs($helper->__('"%task_title%" task has successfully completed.'));
 
-        // ->__('"%s" task has completed with warnings. <a target="_blank" href="%s">View log</a> for details.')
-        $tempString = '"%s" task has completed with warnings. <a target="_blank" href="%s">View log</a> for details.';
+        // M2ePro_TRANSLATIONS
+        // %task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
+        $tempString = '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__($tempString));
 
-        // ->__('"%s" task has completed with errors. <a target="_blank" href="%s">View log</a> for details.')
-        $tempString = '"%s" task has completed with errors. <a target="_blank" href="%s">View log</a> for details.';
+        // M2ePro_TRANSLATIONS
+        // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
+        $tempString = '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($tempString));
 
-        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %s product(s) data on eBay.'));
+        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on eBay.'));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = Mage::helper('M2ePro')->escapeJs(
@@ -861,28 +864,31 @@ HTML;
 
         $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Product(s) was not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some product(s) was not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Some product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
 
         $popupTitle = $helper->escapeJs($helper->__('Moving eBay Items.'));
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $translations = json_encode(array(
-            'eBay Categories' => $this->__('eBay Categories'),
-            'Specifics' => $this->__('Specifics'),
-            'Estimated Fee Details' => $this->__('Estimated Fee Details'),
+            'eBay Categories' => Mage::helper('M2ePro')->__('eBay Categories'),
+            'Specifics' => Mage::helper('M2ePro')->__('Specifics'),
+            'Estimated Fee Details' => Mage::helper('M2ePro')->__('Estimated Fee Details'),
         ));
 
         $isSimpleViewMode = json_encode(Mage::helper('M2ePro/View_Ebay')->isSimpleMode());
         $showAutoAction   = json_encode((bool)$this->getRequest()->getParam('auto_actions'));
 
         $showMotorNotification= json_encode((bool)$this->isShowMotorNotification());
+
+        // M2ePro_TRNSLATIONS
+        // Please check eBay Motors compatibility attribute.You can find it in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>.
         $motorNotification = $helper->escapeJs($helper->__(
-            'Please check eBay Motors compatibility attribute.
-            You can find it in %s > Configuration > <a target="_blank" href="%s">General</a>.',
+            'Please check eBay Motors compatibility attribute.'.
+            'You can find it in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>.',
             Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
             $this->getUrl('*/adminhtml_ebay_configuration')
         ));
@@ -961,7 +967,6 @@ HTML;
         EbayListingEbayGridHandlerObj.afterInitPage();
         EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
 
-        // todo next (temp solution)
         EbayListingEbayGridHandlerObj.actionHandler.setOptions(M2ePro);
         EbayListingEbayGridHandlerObj.movingHandler.setOptions(M2ePro);
 

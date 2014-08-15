@@ -4,9 +4,6 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-/**
- * @property Ess_M2ePro_Model_Play_Order_Item $item
- */
 class Ess_M2ePro_Model_Play_Order_Item_Proxy extends Ess_M2ePro_Model_Order_Item_Proxy
 {
     // ########################################
@@ -20,6 +17,8 @@ class Ess_M2ePro_Model_Play_Order_Item_Proxy extends Ess_M2ePro_Model_Order_Item
     {
         return $this->item->getQtyPurchased();
     }
+
+    // ########################################
 
     public function getAdditionalData()
     {

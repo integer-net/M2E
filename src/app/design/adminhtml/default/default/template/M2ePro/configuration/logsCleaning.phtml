@@ -1,11 +1,8 @@
 <div id="block_notice_configuration_logs_cleaning" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Logs Clearing'); ?>">
-    <?php
-        $menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
-        echo Mage::helper('M2ePro')->__('Set preferences for automatic logs clearing and Save configuration.
-        <br>
-        To launch a task manually press Run Now. To clear all log records of the certain Log press Clear All button.',
-        $menuLabel);
-    ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        'Set preferences for automatic clearing of log data then click <b>Save Config</b>.<br/><br/>
+        To clear a log completely, click <b>Clear All</b>. To clear a log of data more than a certain number of days old, choose the number of days then click <b>Run Now</b>.'
+    ); ?>
 </div>
 
 <script type="text/javascript">
@@ -78,7 +75,7 @@
                                 <option value="1"<?php if ($mode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Enables automatic clearing of log data. Can help reduce database size.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -102,7 +99,7 @@
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">
@@ -146,7 +143,7 @@
                                 <option value="1"<?php if (1 == $mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Enables automatic clearing of log data. Can help reduce database size.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -170,7 +167,7 @@
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">
@@ -214,7 +211,7 @@
                                 <option value="1"<?php if (1 == $mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Enables automatic clearing of log data. Can help reduce database size.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -238,7 +235,7 @@
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">
@@ -282,7 +279,7 @@
                                 <option value="1"<?php if (1 == $mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Activates log clearing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Enables automatic clearing of log data. Can help reduce database size.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -306,7 +303,7 @@
                         <td class="value">
                             <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS]; ?>" type="text" disabled="disabled" class="M2ePro-required-when-visible input-text" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Saves records for the definite number of days.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>
                         </td>
                         <td colspan="2">

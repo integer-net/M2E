@@ -54,15 +54,19 @@ class Ess_M2ePro_Adminhtml_Configuration_LogsCleaningController
             switch ($task) {
                 case 'run_now':
                     Mage::getModel('M2ePro/Log_Cleaning')->clearOldRecords($log);
-                    $tempString = Mage::helper('M2ePro')->__('Log for %s has been successfully cleared.',
-                                                             str_replace('_',' ',$log));
+                    $tempString = Mage::helper('M2ePro')->__(
+                        'Log for %title% has been successfully cleared.',
+                         str_replace('_',' ',$log)
+                    );
                     $this->_getSession()->addSuccess($tempString);
                     break;
 
                 case 'clear_all':
                     Mage::getModel('M2ePro/Log_Cleaning')->clearAllLog($log);
-                    $tempString = Mage::helper('M2ePro')->__('All log for %s has been successfully cleared.',
-                                                             str_replace('_',' ',$log));
+                    $tempString = Mage::helper('M2ePro')->__(
+                        'All log for %title% has been successfully cleared.',
+                         str_replace('_',' ',$log)
+                    );
                     $this->_getSession()->addSuccess($tempString);
                     break;
             }

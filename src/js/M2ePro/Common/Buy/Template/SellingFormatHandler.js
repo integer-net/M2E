@@ -21,7 +21,7 @@ CommonBuyTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandle
                 return false;
             }
 
-            return value.match(/^[+-]?\d+[.,]?\d*[%]?$/g);
+            return value.match(/^[+-]?\d+[.]?\d*[%]?$/g);
         });
 
         Validation.add('validate-qty', M2ePro.translator.translate('Wrong value. Only integer numbers.'), function(value, el)
@@ -106,7 +106,7 @@ CommonBuyTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandle
 
     qty_mode_change: function()
     {
-        $('qty_custom_attribute_tr', 'qty_custom_value_tr', 'qty_max_posted_value_mode_tr').invoke('hide');
+        $('qty_custom_attribute_tr', 'qty_custom_value_tr', 'qty_percentage_tr', 'qty_max_posted_value_mode_tr').invoke('hide');
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_NUMBER')) {
             $('qty_custom_value_tr').show();
@@ -133,6 +133,12 @@ CommonBuyTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandle
         }
 
         $('qty_max_posted_value_mode').simulate('change');
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_PRODUCT') ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODE_ATTRIBUTE')) {
+
+            $('qty_percentage_tr').show();
+        }
     },
 
     qtyMaxPostedMode_change: function()

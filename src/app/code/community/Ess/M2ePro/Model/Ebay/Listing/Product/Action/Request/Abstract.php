@@ -38,10 +38,12 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Abstract
                                        ->getAttributeLabel($attribute,
                                                            $this->getListing()->getStoreId());
         }
-
+        // M2ePro_TRANSLATIONS
+        // %attribute_title%: attribute(s) %attribute_set_title% were not found in this product and its value was not sent.
         $this->addWarningMessage(
             Mage::helper('M2ePro')->__(
-                '%s: attribute(s) %s were not found in this product and its value was not sent.',
+                '%attribute_title%: attribute(s) %attribute_set_title% were not found'.
+                ' in this product and its value was not sent.',
                 Mage::helper('M2ePro')->__($title), implode(',',$attributesTitles)
             )
         );

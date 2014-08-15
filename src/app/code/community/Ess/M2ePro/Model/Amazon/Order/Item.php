@@ -9,9 +9,10 @@
  */
 class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
-    // ->__('Product import is disabled in Amazon Account settings.');
-    // ->__('Product for Amazon Item "%id%" was created in Magento catalog.');
-    // ->__('Product for Amazon Item "%title%" was created in Magento catalog.');
+    // M2ePro_TRANSLATIONS
+    // Product import is disabled in Amazon Account settings.
+    // Product for Amazon Item "%id%" was created in Magento catalog.
+    // Product for Amazon Item "%title%" was created in Magento catalog.
 
     // ########################################
 
@@ -71,6 +72,8 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         return $this->getData('amazon_order_item_id');
     }
 
+    // ----------------------------------------
+
     public function getTitle()
     {
         return $this->getData('title');
@@ -91,10 +94,24 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         return (int)$this->getData('is_isbn_general_id');
     }
 
+    // ----------------------------------------
+
     public function getPrice()
     {
         return (float)$this->getData('price');
     }
+
+    public function getCurrency()
+    {
+        return $this->getData('currency');
+    }
+
+    public function getQtyPurchased()
+    {
+        return (int)$this->getData('qty_purchased');
+    }
+
+    // ----------------------------------------
 
     public function getGiftPrice()
     {
@@ -111,25 +128,34 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         return $this->getData('gift_message');
     }
 
+    // ----------------------------------------
+
+    public function getTaxDetails()
+    {
+        return $this->getSettings('tax_details');
+    }
+
     public function getTaxAmount()
     {
-        return (float)$this->getData('tax_amount');
+        $taxDetails = $this->getTaxDetails();
+        return isset($taxDetails['product']['value']) ? (float)$taxDetails['product']['value'] : 0.0;
+    }
+
+    // ----------------------------------------
+
+    public function getDiscountDetails()
+    {
+        return $this->getSettings('discount_details');
     }
 
     public function getDiscountAmount()
     {
-        return (float)$this->getData('discount_amount');
+        $discountDetails = $this->getDiscountDetails();
+        return !empty($discountDetails['promotion']['value'])
+            ? ($discountDetails['promotion']['value'] / $this->getQtyPurchased()) : 0.0;
     }
 
-    public function getCurrency()
-    {
-        return $this->getData('currency');
-    }
-
-    public function getQtyPurchased()
-    {
-        return (int)$this->getData('qty_purchased');
-    }
+    // ----------------------------------------
 
     public function getRepairInput()
     {
@@ -183,6 +209,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         $sku = $this->getSku();
         if ($sku != '' && strlen($sku) <= 64) {
             $product = Mage::getModel('catalog/product')
+                ->setStoreId($this->getEbayOrder()->getAssociatedStoreId())
                 ->getCollection()
                     ->addAttributeToSelect('sku')
                     ->addAttributeToFilter('sku', $sku)

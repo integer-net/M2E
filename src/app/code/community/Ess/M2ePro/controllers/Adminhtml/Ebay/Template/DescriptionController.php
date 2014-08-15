@@ -193,6 +193,10 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
 
     // --------------------------------------------
 
+    /**
+     * @param $productId
+     * @return Ess_M2ePro_Model_Magento_Product|null
+     */
     private function getMagentoProduct($productId)
     {
         $product = Mage::getModel('catalog/product')->load($productId);

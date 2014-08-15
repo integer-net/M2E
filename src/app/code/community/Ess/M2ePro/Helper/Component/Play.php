@@ -6,8 +6,8 @@
 
 class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Play.com (Beta)');
-
+    // M2ePro_TRANSLATIONS
+    // Play.com (Beta)
     const NICK  = 'play';
     const TITLE = 'Play.com (Beta)';
 

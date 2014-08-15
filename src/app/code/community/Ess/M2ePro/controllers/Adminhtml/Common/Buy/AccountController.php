@@ -217,6 +217,26 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
         }
         //--------------------
 
+        // order number settings
+        //--------------------
+        $tempKey = 'number';
+        $tempSettings = !empty($post['magento_orders_settings'][$tempKey])
+            ? $post['magento_orders_settings'][$tempKey] : array();
+
+        $data['magento_orders_settings'][$tempKey]['source'] = $tempSettings['source'];
+
+        $prefixKeys = array(
+            'mode',
+            'prefix',
+        );
+        $tempSettings = !empty($tempSettings['prefix']) ? $tempSettings['prefix'] : array();
+        foreach ($prefixKeys as $key) {
+            if (isset($tempSettings[$key])) {
+                $data['magento_orders_settings'][$tempKey]['prefix'][$key] = $tempSettings[$key];
+            }
+        }
+        //--------------------
+
         // tax settings
         //--------------------
         $tempKey = 'tax';
@@ -386,9 +406,10 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
 
-            // ->__('The Rakuten.com access obtaining is currently unavailable.<br />Reason: %s')
-            $error = 'The Rakuten.com access obtaining is currently unavailable.<br />Reason: %s';
-            $error = Mage::helper('M2ePro')->__($error, $exception->getMessage());
+            // M2ePro_TRANSLATIONS
+            // The Rakuten.com access obtaining is currently unavailable.<br />Reason: %error_message%
+            $error = 'The Rakuten.com access obtaining is currently unavailable.<br />Reason: %error_message%';
+            $error = Mage::helper('M2ePro')->__($error, Mage::helper('M2ePro')->__($exception->getMessage()));
 
             $this->_getSession()->addError($error);
             $model->deleteInstance();

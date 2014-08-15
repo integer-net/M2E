@@ -24,8 +24,12 @@
 </script>
 
 <div id="block_notice_ebay_template_synchronization_form_data_list" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('List Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('List Action - at first this action to be executed for each item, that has Not Listed status and its settings meet the List Condition. If an item is not listed for some reason, autosynchronization will attempt to list it again according to the Schedule in case the Product Status, Stock Availability or Quantity is changed.
-                                           '); ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        'If <b>List Action</b> is enabled, M2E Pro will list items that haven\'t been listed yet on eBay if they meet the conditions you set.
+        (List action will not list items that were listed previously but have been stopped.)<br/><br/>
+        If the automatic listing doesn\'t work (usually because eBay has sent back errors),
+        M2E Pro will only attempt to list the item again if the product status, stock availabiliy or quantity is changed.'
+    ); ?>
 </div>
 
 <div class="entry-edit" id="magento_block_ebay_template_synchronization_form_data_list">
@@ -49,7 +53,10 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_MODE_YES; ?>" <?php if ($formData['list_mode'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Enables automatic listing of unlisted items if they meet List Conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Enables automatic listing of unlisted items if they meet List Conditions.
+                                Choose whether you want an item that isn\'t currently listed on eBay to be listed if the list conditions are met.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -82,9 +89,10 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_STATUS_ENABLED_YES; ?>" <?php if ($formData['list_status_enabled'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_STATUS_ENABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('<b>Enabled</b> – M2E Listing items automatically list on eBay if this status is set to Enabled.<br>
-<b>Any</b> – M2E Listing items automatically list on eBay regardless of its status.
-'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                '<b>Enabled:</b> List items automatically on eBay if they have a Magento product status of enabled.<br/>
+                                <b>Any:</b> List items with any Magento product status automatically on eBay.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -101,8 +109,8 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    '<b>In Stock</b> - M2E Listing items list automatically, if the products are in stock.
-                                    <br/><b>Any</b> - M2E Listing items list automatically, regardless of the stock availability.'
+                                    '<b>In Stock:</b> List items automatically if products are in stock. (Recommended.)<br/>
+                                    <b>Any:</b> List items automatically, regardless of stock availability.'
                                 ); ?>
                             </span>
                         </p>
@@ -123,9 +131,9 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'M2E Pro will automatically list M2E Listings items if they meet defined conditions.
-                                    <br/><b>More or Equal</b> – the number of Magento products are more than, or equal to, the item quantity chosen.
-                                    <br/><b>Between</b> – the number of Magento products are between the two numbers chosen.'
+                                    '<b>Any:</b> List items automatically with any quantity available.<br/>
+                                    <b>More or Equal: </b> List items automatically if the quantity available in Magento is at least equal to the number you set.<br/>
+                                    <b>Between:</b> List items automatically if the quantity available in Magento is between the minimum and maximum numbers you set.'
                                 ); ?>
                             </span>
                         </p>

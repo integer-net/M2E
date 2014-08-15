@@ -263,7 +263,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'value'     => $this->getQtyNumber(),
             'attribute' => $this->getData('qty_custom_attribute'),
             'qty_max_posted_value_mode' => $this->getQtyMaxPostedValueMode(),
-            'qty_max_posted_value'      => $this->getQtyMaxPostedValue()
+            'qty_max_posted_value'      => $this->getQtyMaxPostedValue(),
+            'qty_percentage'            => $this->getQtyPercentage()
         );
     }
 
@@ -277,6 +278,13 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
         }
 
         return $attributes;
+    }
+
+    //-------------------------
+
+    public function getQtyPercentage()
+    {
+        return (int)$this->getData('qty_percentage');
     }
 
     //-------------------------
@@ -890,6 +898,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'qty_mode' => self::QTY_MODE_PRODUCT,
             'qty_custom_value' => 1,
             'qty_custom_attribute' => '',
+            'qty_percentage' => 100,
             'qty_max_posted_value_mode' => self::QTY_MAX_POSTED_MODE_OFF,
             'qty_max_posted_value' => self::QTY_MAX_POSTED_DEFAULT_VALUE,
 
@@ -949,51 +958,46 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     // #######################################
 
-    public function getAffectedListingProducts($asObjects = false, $key = NULL)
+    public function getAffectedListingsProducts($asObjects = false)
     {
-        if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
-        }
-
-        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT;
-
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
-        $templateManager->setTemplate($template);
+        $templateManager->setTemplate(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT);
 
-        $listingProducts = $templateManager->getAffectedItems(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
-            $this->getId(), array(), $asObjects, $key
+        $listingsProducts = $templateManager->getAffectedOwnerObjects(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asObjects
         );
 
-        $ids = array();
-        foreach ($listingProducts as $listingProduct) {
-            $ids[] = is_null($key) ? $listingProduct['id'] : $listingProduct;
-        }
-
-        $listingProducts && $listingProducts = array_combine($ids, $listingProducts);
-
-        $listings = $templateManager->getAffectedItems(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
-            $this->getId()
+        $listings = $templateManager->getAffectedOwnerObjects(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING, $this->getId(), true
         );
 
         foreach ($listings as $listing) {
 
-            $tempListingProducts = $listing->getChildObject()
-                                           ->getAffectedListingProducts($template,$asObjects,$key);
+            $tempListingsProducts = $listing->getChildObject()
+                                            ->getAffectedListingsProductsByTemplate(
+                                                Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
+                                                $asObjects
+                                            );
 
-            foreach ($tempListingProducts as $listingProduct) {
-                $id = is_null($key) ? $listingProduct['id'] : $listingProduct;
-                !isset($listingProducts[$id]) && $listingProducts[$id] = $listingProduct;
+            foreach ($tempListingsProducts as $listingProduct) {
+                if (!isset($listingsProducts[$listingProduct['id']])) {
+                    $listingsProducts[$listingProduct['id']] = $listingProduct;
+                }
             }
         }
 
-        return array_values($listingProducts);
+        return $listingsProducts;
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $this->getParentObject()->setSynchStatusNeed($newData, $oldData);
+        $listingsProducts = $this->getAffectedListingsProducts(false);
+
+        if (!$listingsProducts) {
+            return;
+        }
+
+        $this->getResource()->setSynchStatusNeed($newData,$oldData,$listingsProducts);
     }
 
     // #######################################

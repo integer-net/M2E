@@ -416,8 +416,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
             return;
         }
 
-        // ->__('Duplicated item %s was found and stopped on eBay.');
-        $duplicateDeletedMessage = sprintf('Duplicated item %s was found and stopped on eBay.', $duplicateItemId);
+        // M2ePro_TRANSLATIONS
+        // Duplicated item %item_id% was found and stopped on eBay.;
+        $textToTranslate = 'Duplicated item %item_id% was found and stopped on eBay.';
+        $duplicateDeletedMessage = Mage::helper('M2ePro')->__($textToTranslate, $duplicateItemId);
 
         $logModel->addProductMessage(
             $listingProduct->getData('listing_id'),
@@ -465,8 +467,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
             return;
         }
 
-        // ->__('Duplicated item %s was found and stopped on eBay.');
-        $duplicateDeletedMessage = sprintf('Duplicated item %s was found and stopped on eBay.', $duplicateItemId);
+        // M2ePro_TRANSLATIONS
+        // Duplicated item %item_id% was found and stopped on eBay.
+
+        $textToTranslate = 'Duplicated item %item_id% was found and stopped on eBay.';
+        $duplicateDeletedMessage = Mage::helper('M2ePro')->__($textToTranslate, $duplicateItemId);
 
         $logModel->addProductMessage(
             $listingOther->getId(),
@@ -486,27 +491,33 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
         $message = '';
         switch ($status) {
             case Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Not Listed".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Not Listed".
                 $message = 'Item status was successfully changed to "Not Listed".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Listed".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Listed".
                 $message = 'Item status was successfully changed to "Listed".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Hidden".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Hidden".
                 $message = 'Item status was successfully changed to "Listed (Hidden)".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_SOLD:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Sold".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Sold".
                 $message = 'Item status was successfully changed to "Sold".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Stopped".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Stopped".
                 $message = 'Item status was successfully changed to "Stopped".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED:
-                // Parser hack -> Mage::helper('M2ePro')->__('Item status was successfully changed to "Finished".');
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Finished".
                 $message = 'Item status was successfully changed to "Finished".';
                 break;
         }

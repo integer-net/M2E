@@ -78,7 +78,7 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
                 $expirationDate = Mage::helper('M2ePro/Module_License')->getTextExpirationDate($component);
                 $this->_getSession()->addSuccess(
                      Mage::helper('M2ePro')->__(
-                         'Trial license key was successfully obtained. It will be valid until %s.',
+                         'Trial license key was successfully obtained. It will be valid until %date%.',
                          $expirationDate
                      )
                 );

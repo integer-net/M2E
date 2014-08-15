@@ -157,6 +157,7 @@ class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_B
         $sku = $this->getSku();
         if ($sku != '' && strlen($sku) <= 64) {
             $product = Mage::getModel('catalog/product')
+                ->setStoreId($this->getEbayOrder()->getAssociatedStoreId())
                 ->getCollection()
                     ->addAttributeToSelect('sku')
                     ->addAttributeToFilter('sku', $sku)

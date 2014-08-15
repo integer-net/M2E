@@ -14,7 +14,7 @@
     <?php if ($this->getChannelOrderId() != '') { ?>
         <tr>
             <?php
-                $message = Mage::helper('M2ePro')->__('%s Order ID', $this->getChannelTitle());
+                $message = Mage::helper('M2ePro')->__('%channel_title% Order ID', $this->getChannelTitle());
             ?>
             <td style="width: 200px;"><?php echo Mage::helper('M2ePro')->__($message) ?>:</td>
             <td>
@@ -29,7 +29,7 @@
     <?php if ($this->getChannelFinalFee() > 0) { ?>
         <tr>
             <?php
-                $message = Mage::helper('M2ePro')->__('%s Final Fee', $this->getChannelTitle());
+                $message = Mage::helper('M2ePro')->__('%channel_title% Final Fee', $this->getChannelTitle());
             ?>
             <td style="width: 200px;"><?php echo Mage::helper('M2ePro')->__($message) ?>:</td>
             <td><strong><?php echo !is_null($this->getOrder()) ? $this->getOrder()->formatPrice($this->getChannelFinalFee()) : $this->getChannelFinalFee(); ?></strong></td>
@@ -53,7 +53,6 @@
                         <?php foreach ($transactions as $key => $transaction) { ?>
                             <tr class="<?php echo $key % 2 ? 'odd' : 'even' ?>">
                                 <td>
-                                    <?php // todo Ebay ?>
                                     <?php if (strtolower($this->getPaymentMethod()) == 'paypal') { ?>
                                         <a href="<?php echo Mage::helper('adminhtml')->getUrl('M2ePro/adminhtml_ebay_order/goToPaypal', array('transaction_id' => $transaction['transaction_id'])); ?>" target="_blank"><?php echo $transaction['transaction_id']; ?></a>
                                     <?php } else { ?>

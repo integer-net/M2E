@@ -25,7 +25,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Mage_Adminhtml_Bloc
 
         // Set header text
         //------------------------------
-        $this->_headerText = 'Listings';
+        $this->_headerText = Mage::helper('M2ePro')->__('Listings');
         //------------------------------
 
         // Set buttons actions
@@ -77,8 +77,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Mage_Adminhtml_Bloc
     private function prepareListingTab()
     {
         $tab = array(
-            'label' => $this->__('M2E Pro'),
-            'title' => $this->__('M2E Pro')
+            'label' => Mage::helper('M2ePro')->__('M2E Pro'),
+            'title' => Mage::helper('M2ePro')->__('M2E Pro')
         );
 
         if ($this->getActiveTab() != self::TAB_ID_LISTING) {
@@ -94,8 +94,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Mage_Adminhtml_Bloc
     private function prepareListingOtherTab()
     {
         $tab = array(
-            'label' => $this->__('3rd Party'),
-            'title' => $this->__('3rd Party')
+            'label' => Mage::helper('M2ePro')->__('3rd Party'),
+            'title' => Mage::helper('M2ePro')->__('3rd Party')
         );
 
         if ($this->getActiveTab() != self::TAB_ID_LISTING_OTHER) {
@@ -111,8 +111,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Mage_Adminhtml_Bloc
     private function prepareSearchTab()
     {
         $tab = array(
-            'label' => $this->__('Search'),
-            'title' => $this->__('Search')
+            'label' => Mage::helper('M2ePro')->__('Search'),
+            'title' => Mage::helper('M2ePro')->__('Search')
         );
 
         if ($this->getActiveTab() != self::TAB_ID_SEARCH) {

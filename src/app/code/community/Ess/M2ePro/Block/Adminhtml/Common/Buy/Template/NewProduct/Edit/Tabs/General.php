@@ -145,7 +145,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Tabs_Genera
         $data = array(
             'id'      => 'close_browse_popup_button',
             'label'   => Mage::helper('M2ePro')->__('Close'),
-            'onclick' => 'BuyTemplateNewProductHandlerObj.browse_category.close()',
+            'onclick' => 'BuyTemplateNewProductHandlerObj.closeBrowseCategoryPopup()',
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('close_browse_popup_button',$buttonBlock);
@@ -155,7 +155,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Tabs_Genera
         $data = array(
             'id'      => 'close_search_popup_button',
             'label'   => Mage::helper('M2ePro')->__('Close'),
-            'onclick' => 'BuyTemplateNewProductHandlerObj.search_category.close()',
+            'onclick' => 'BuyTemplateNewProductHandlerObj.closeSearchCategoryPopup()',
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('close_search_popup_button',$buttonBlock);

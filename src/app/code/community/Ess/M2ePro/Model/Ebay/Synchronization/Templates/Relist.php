@@ -94,7 +94,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
             }
 
             $listingsProducts = array();
-            $affectedListingsProductIds = NULL;
+            $affectedListingsProducts = NULL;
 
             do {
 
@@ -104,20 +104,28 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
                     break;
                 }
 
-                if (is_null($affectedListingsProductIds)) {
-                    $affectedListingsProductIds = $ebaySynchTemplate->getAffectedListingProducts(false,'id');
-                    $affectedListingsProductIds = array_map('intval',$affectedListingsProductIds);
-                    $affectedListingsProductIds = array_flip(array_unique($affectedListingsProductIds));
+                if (is_null($affectedListingsProducts)) {
+                    $affectedListingsProducts = $ebaySynchTemplate->getAffectedListingsProducts(false);
                 }
 
-                if (count($affectedListingsProductIds) <= 0) {
+                if (count($affectedListingsProducts) <= 0) {
                     break;
                 }
 
                 foreach ($tempListingsProducts as $tempListingProduct) {
-                    if (!isset($affectedListingsProductIds[(int)$tempListingProduct->getId()])) {
+
+                    $found = false;
+                    foreach ($affectedListingsProducts as $affectedListingProduct) {
+                        if ((int)$tempListingProduct->getId() == $affectedListingProduct['id']) {
+                            $found = true;
+                            break;
+                        }
+                    }
+
+                    if (!$found) {
                         continue;
                     }
+
                     $listingsProducts[] = $tempListingProduct;
                 }
 

@@ -64,8 +64,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             /** @var $account Ess_M2ePro_Model_Account **/
 
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
-            // ->__('The "Update 3rd Party Listings" action for eBay account: "%s" is started. Please wait...')
-            $status = 'The "Update 3rd Party Listings" action for eBay account: "%s" is started. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Update 3rd Party Listings" action for eBay account: "%account_title%" is started. Please wait...
+            $status = 'The "Update 3rd Party Listings" action for eBay account: "%account_title%" is started. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             if (!$this->isLockedAccount($account)) {
@@ -80,8 +81,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
                 $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
             }
 
-            // ->__('The "Update 3rd Party Listings" action for eBay account: "%s" is finished. Please wait...')
-            $status = 'The "Update 3rd Party Listings" action for eBay account: "%s" is finished. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Update 3rd Party Listings" action for eBay account: "%account_title%" is finished. Please wait...
+            $status = 'The "Update 3rd Party Listings" action for eBay account: "%account_title%" is finished. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
             $this->getActualLockItem()->activate();
@@ -143,8 +145,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             /** @var $account Ess_M2ePro_Model_Account **/
 
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
-            // ->__('The "Update 3rd Party SKU(s)" action for eBay account: "%s" is started. Please wait...')
-            $status = 'The "Update 3rd Party SKU(s)" action for eBay account: "%s" is started. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Update 3rd Party SKU(s)" action for eBay account: "%account_title%" is started. Please wait...
+            $status = 'The "Update 3rd Party SKU(s)" action for eBay account: "%account_title%" is started. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             if (!$this->isLockedAccount($account)) {
@@ -158,9 +161,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
 
                 $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
             }
-
-            // ->__('The "Update 3rd Party SKU(s)" action for eBay account: "%s" is finished. Please wait...')
-            $status = 'The "Update 3rd Party SKU(s)" action for eBay account: "%s" is finished. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Update 3rd Party SKU(s)" action for eBay account: "%account_title%" is finished. Please wait...
+            $status = 'The "Update 3rd Party SKU(s)" action for eBay account: "%account_title%" is finished.'.
+                ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2 +
                                                     $iteration * $percentsForOneStep);
@@ -277,8 +281,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
         $sinceTime = $sinceTime->format('Y-m-d H:i:s');
 
         $inputData = array(
-            'since_time' => $sinceTime,
-            'getting_inventory_part' => true,
+            'since_time'    => $sinceTime,
             'only_one_page' => true
         );
 

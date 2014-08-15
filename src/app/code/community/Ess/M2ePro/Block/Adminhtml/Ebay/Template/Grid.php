@@ -162,12 +162,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Grid extends Mage_Adminhtml_Block
         ));
 
         $options = array(
-            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT => $this->__('Payment'),
-            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING => $this->__('Shipping'),
-            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN => $this->__('Return'),
-            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT => $this->__('Price, Quantity and Format'),
-            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION => $this->__('Description'),
-            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION => $this->__('Synchronization')
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT => Mage::helper('M2ePro')->__('Payment'),
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING => Mage::helper('M2ePro')->__('Shipping'),
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN => Mage::helper('M2ePro')->__('Return'),
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT => Mage::helper('M2ePro')->__('Price, Quantity and Format'),
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION => Mage::helper('M2ePro')->__('Description'),
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION => Mage::helper('M2ePro')->__('Synchronization')
         );
         $this->addColumn('nick', array(
             'header'        => Mage::helper('M2ePro')->__('Type'),

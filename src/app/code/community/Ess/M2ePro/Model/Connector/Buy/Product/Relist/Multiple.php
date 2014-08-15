@@ -42,8 +42,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Relist_Multiple
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
             if (!$listingProduct->isStopped()) {
-
-                // ->__('The item either is listed, or not listed yet or not available');
+                // M2ePro_TRANSLATIONS
+                // The item either is listed, or not listed yet or not available
                 $this->addListingsProductsLogsMessage(
                     $listingProduct, 'The item either is listed, or not listed yet or not available',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -55,8 +55,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Relist_Multiple
 
             if ($listingProduct->getChildObject()->getGeneralId() <= 0 ||
                 (int)$listingProduct->getChildObject()->getCondition() <= 0) {
-
-                // ->__('Rakuten.com data was not received yet. Please wait and try again later.');
+                // M2ePro_TRANSLATIONS
+                // Rakuten.com data was not received yet. Please wait and try again later.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,'Rakuten.com data was not received yet. Please wait and try again later.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -69,8 +69,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Relist_Multiple
             $price = $listingProduct->getChildObject()->getPrice();
 
             if ($price <= 0) {
-
-        // ->__('The price must be greater than 0. Please, check the Selling Format Template and Product settings.');
+        // M2ePro_TRANSLATIONS
+        // The price must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
                 'The price must be greater than 0. Please, check the Selling Format Template and Product settings.',
@@ -84,8 +84,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Relist_Multiple
             $qty = $listingProduct->getChildObject()->getQty();
 
             if ($qty <= 0) {
-
-            // ->__('The quantity must be greater than 0. Please, check the Selling Format Template and Product settings.');
+            // M2ePro_TRANSLATIONS
+            // The quantity must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
                     'The quantity must be greater than 0. Please, check the Selling Format Template and Product settings.',

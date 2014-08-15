@@ -101,13 +101,15 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
         /** @var $order Ess_M2ePro_Model_Order */
         $order = Mage::helper('M2ePro/Component_Amazon')->getObject('Order', (int)$id);
 
+        // M2ePro_TRANSLATIONS
+        // Magento Order is already created for this %component_name% Order.
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
-            $message = 'Magento Order is already created for this %s Order. ' .
+            $message = 'Magento Order is already created for this  %component_name% Order. ' .
                        'Press Create Order button to create new one.';
 
             // todo replace hardcoded string with constant, when Amazon will be stable (no "Beta" in component title)
             $this->_getSession()->addWarning(
-                sprintf(Mage::helper('M2ePro')->__($message), 'Amazon')
+                Mage::helper('M2ePro')->__($message), 'Amazon'
             );
             $this->_redirect('*/*/view', array('id' => $id));
             return;
@@ -120,8 +122,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
             $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Magento Order was created.'));
         } catch (Exception $e) {
             $message = Mage::helper('M2ePro')->__(
-                'Magento Order was not created. Reason: %s',
-                Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage())
+                'Magento Order was not created. Reason: %error_message%',
+                Mage::helper('M2ePro')->__(Mage::getSingleton('M2ePro/Log_Abstract')->
+                    decodeDescription($e->getMessage()))
             );
             $this->_getSession()->addError($message);
         }

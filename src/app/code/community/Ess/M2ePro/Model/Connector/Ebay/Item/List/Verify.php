@@ -59,7 +59,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Verify
         if (!$this->listingProduct->isListable()) {
 
             $message = array(
-                // Parser hack -> Mage::helper('M2ePro')->__('Item is listed or not available');
+                // M2ePro_TRANSLATIONS
+                // Item is listed or not available
                 parent::MESSAGE_TEXT_KEY => 'Item is listed or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
@@ -73,7 +74,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Verify
         if(!$this->listingProduct->getChildObject()->isSetCategoryTemplate()) {
 
             $message = array(
-                // Parser hack -> Mage::helper('M2ePro')->__('Categories settings are not set');
+                // M2ePro_TRANSLATIONS
+                // Categories settings are not set
                 parent::MESSAGE_TEXT_KEY => 'Categories settings are not set',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );

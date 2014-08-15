@@ -2,7 +2,6 @@ ListingOtherAutoMappingHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    // todo next (temp solution)
     options: {},
 
     setOptions: function(options)
@@ -84,7 +83,7 @@ ListingOtherAutoMappingHandler = Class.create(ActionHandler, {
         var partExecuteString = part.length;
         partExecuteString += '';
 
-        ListingProgressBarObj.setStatus(str_replace('%s', partExecuteString, self.options.text.processing_data_message));
+        ListingProgressBarObj.setStatus(str_replace('%product_title%', partExecuteString, self.options.text.processing_data_message));
 
         new Ajax.Request(self.options.url.mapAutoToProduct, {
             method: 'post',

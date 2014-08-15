@@ -6,8 +6,8 @@
 
 class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('eBay');
-
+    // M2ePro_TRANSLATIONS
+    // eBay
     const NICK  = 'ebay';
     const TITLE = 'eBay';
 

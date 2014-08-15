@@ -36,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Category_Grid extends Ess
 
     protected function _prepareCollection()
     {
-        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
+        /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
         $collection = Mage::getModel('catalog/category')->getCollection();
         $collection->addAttributeToSelect('name');
 
@@ -262,7 +262,7 @@ HTML;
             $info.= '&nbsp;('.$data[$key.'_id'].')';
         } elseif ($data[$key.'_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
             $info = Mage::helper('M2ePro')->__(
-                'Magento Attribute -> %s',
+                'Magento Attribute -> %attribute_label%',
                 Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $data[$key.'_attribute'],
                     $this->listing->getStoreId()
@@ -282,7 +282,7 @@ HTML;
             $info.= '&nbsp;('.$data[$key.'_id'].')';
         } elseif ($data[$key.'_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
             $info = Mage::helper('M2ePro')->__(
-                'Magento Attribute -> %s',
+                'Magento Attribute -> %attribute_label%',
                 Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $data[$key.'_attribute'],
                     $this->listing->getStoreId()
@@ -335,15 +335,16 @@ HTML;
         //------------------------------
         $translations = array();
 
-        // ->__('Done')
+        // M2ePro_TRANSLATIONS
+        // Done
         $text = 'Done';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('Cancel')
+        // M2ePro_TRANSLATIONS
+        // Cancel
         $text = 'Cancel';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('Set eBay Categories')
+        // M2ePro_TRANSLATIONS
+        // Set eBay Categories
         $text = 'Set eBay Categories';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
 

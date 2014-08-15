@@ -10,17 +10,17 @@
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Template_Synchronization'); ?>,'Ess_M2ePro_Model_Template_Synchronization');
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Wrong value. Only integer numbers.' => $this->__('Wrong value. Only integer numbers.'),
+        'Wrong value. Only integer numbers.' => Mage::helper('M2ePro')->__('Wrong value. Only integer numbers.'),
 
-        'Must be greater than "Min".' => $this->__('Must be greater than "Min".'),
-        'Inconsistent settings in Revise and Stop rules.' => $this->__('Inconsistent settings in Revise and Stop rules.'),
+        'Must be greater than "Min".' => Mage::helper('M2ePro')->__('Must be greater than "Min".'),
+        'Inconsistent settings in Revise and Stop rules.' => Mage::helper('M2ePro')->__('Inconsistent settings in Revise and Stop rules.'),
 
-        'Require to select at least one day of week.' => $this->__('Require to select at least one day of week.'),
-        'You should specify time.' => $this->__('You should specify time.'),
+        'You need to choose at set at least one time for the schedule to run.' => Mage::helper('M2ePro')->__('You need to choose at set at least one time for the schedule to run.'),
+        'You should specify time.' => Mage::helper('M2ePro')->__('You should specify time.'),
 
-        'Wrong value.' => $this->__('Wrong value.'),
-        'Must be greater than "Active From" Date.' => $this->__('Must be greater than "Active From" Date.'),
-        'Must be greater than "From Time".' => $this->__('Must be greater than "From Time".')
+        'Wrong value.' => Mage::helper('M2ePro')->__('Wrong value.'),
+        'Must be greater than "Active From" Date.' => Mage::helper('M2ePro')->__('Must be greater than "Active From" Date.'),
+        'Must be greater than "From Time".' => Mage::helper('M2ePro')->__('Must be greater than "From Time".')
     )); ?>);
 
 </script>

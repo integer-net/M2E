@@ -257,7 +257,10 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
         } else if ($encodeType == self::SETTING_FIELD_TYPE_SERIALIZATION) {
             $settings = @unserialize($settings);
         } else {
-            throw new LogicException(Mage::helper('M2ePro')->__('Encoding type "%s" is not supported.', $encodeType));
+            throw new LogicException(Mage::helper('M2ePro')->__(
+                'Encoding type "%encode_type%" is not supported.',
+                $encodeType
+                ));
         }
 
         return is_array($settings) ? $settings : array();
@@ -317,7 +320,10 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
         } else if ($encodeType == self::SETTING_FIELD_TYPE_SERIALIZATION) {
             $settings = serialize($settings);
         } else {
-            throw new LogicException(Mage::helper('M2ePro')->__('Encoding type "%s" is not supported.', $encodeType));
+            throw new LogicException(Mage::helper('M2ePro')->__(
+                'Encoding type "%encode_type%" is not supported.',
+                $encodeType
+            ));
         }
 
         $this->setData((string)$fieldName, $settings);

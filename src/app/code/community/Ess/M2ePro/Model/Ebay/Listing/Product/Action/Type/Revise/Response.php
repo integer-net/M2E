@@ -68,53 +68,62 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
     public function getSuccessfulMessage()
     {
         if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully revised');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully revised
             return 'Item was successfully revised';
         }
 
         $sequenceString = '';
 
         if ($this->getRequestData()->hasVariationsData()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('variations');
+            // M2ePro_TRANSLATIONS
+            // variations
             $sequenceString .= 'variations,';
         }
 
         if ($this->getRequestData()->hasQtyData()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('qty');
+            // M2ePro_TRANSLATIONS
+            // qty
             $sequenceString .= 'qty,';
         }
 
         if ($this->getRequestData()->hasPriceData()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('price');
+            // M2ePro_TRANSLATIONS
+            // price
             $sequenceString .= 'price,';
         }
 
         if ($this->getRequestData()->hasTitleData()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('title');
+            // M2ePro_TRANSLATIONS
+            // title
             $sequenceString .= 'title,';
         }
 
         if ($this->getRequestData()->hasSubtitleData()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('subtitle');
+            // M2ePro_TRANSLATIONS
+            // subtitle
             $sequenceString .= 'subtitle,';
         }
 
         if ($this->getRequestData()->hasDescriptionData()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('description');
+            // M2ePro_TRANSLATIONS
+            // description
             $sequenceString .= 'description,';
         }
 
         if ($this->getRequestData()->hasImagesData()) {
-            // Parser hack -> Mage::helper('M2ePro')->__('images');
+            // M2ePro_TRANSLATIONS
+            // images
             $sequenceString .= 'images,';
         }
 
         if (empty($sequenceString)) {
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully revised');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully revised
             return 'Item was successfully revised';
         }
-
-        // Parser hack -> Mage::helper('M2ePro')->__('was successfully revised');
+        // M2ePro_TRANSLATIONS
+        // was successfully revised
         return ucfirst(trim($sequenceString,',')).' was successfully revised';
     }
 

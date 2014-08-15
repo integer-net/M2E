@@ -43,7 +43,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Revise_Multiple
 
             if (!$listingProduct->isListed()) {
 
-                // Parser hack -> Mage::helper('M2ePro')->__('Item is not listed or not available');
+                // M2ePro_TRANSLATIONS
+                // Item is not listed or not available
                 $this->addListingsProductsLogsMessage($listingProduct, 'Item is not listed or not available',
                                                       Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                                                       Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
@@ -53,8 +54,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Revise_Multiple
 
             if ($listingProduct->getChildObject()->getGeneralId() <= 0 ||
                 (int)$listingProduct->getChildObject()->getCondition() <= 0) {
-
-                // ->__('Rakuten.com data was not received yet. Please wait and try again later.');
+                // M2ePro_TRANSLATIONS
+                // Rakuten.com data was not received yet. Please wait and try again later.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,'Rakuten.com data was not received yet. Please wait and try again later.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -67,8 +68,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Revise_Multiple
             $price = $listingProduct->getChildObject()->getPrice();
 
             if ($price <= 0) {
-
-        // ->__('The price must be greater than 0. Please, check the Selling Format Template and Product settings.');
+        // M2ePro_TRANSLATIONS
+        // The price must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
                 'The price must be greater than 0. Please, check the Selling Format Template and Product settings.',

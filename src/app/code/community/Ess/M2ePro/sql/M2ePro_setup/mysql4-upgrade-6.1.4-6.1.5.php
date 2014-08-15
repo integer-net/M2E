@@ -150,7 +150,7 @@ SQL
     }
 
     if ($connection->tableColumnExists($dictionaryCategoryTableName, 'parent_id') !== false &&
-        $connection->tableColumnExists($dictionaryCategoryTableName, 'parent_category_id') == false) {
+        $connection->tableColumnExists($dictionaryCategoryTableName, 'parent_category_id') === false) {
         $connection->changeColumn(
                    $dictionaryCategoryTableName,
                        'parent_id',

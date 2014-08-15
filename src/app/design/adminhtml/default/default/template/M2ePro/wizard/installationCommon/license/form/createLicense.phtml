@@ -5,7 +5,7 @@
     M2ePro.url.add(<?php echo json_encode(array('formSubmit' => $this->getUrl('*/*/createLicense'))); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Error create license.' => $this->__('License creation is failed. Please contact M2E Pro support for resolution.')
+        'Error create license.' => Mage::helper('M2ePro')->__('License creation is failed. Please contact M2E Pro support for resolution.')
     )); ?>);
 
     var init = function() {

@@ -412,7 +412,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
         //------------------------------
 
         //------------------------------
-        $collection = Mage::getResourceModel('M2ePro/Ebay_Listing')->getCatalogProductCollection($listingId);
+        $collection = Mage::getResourceModel('M2ePro/Ebay_Listing')->getProductCollection($listingId);
         $collection->addAttributeToSelect('name');
         $collection->getSelect()->where('lp.id IN (?)', $listingProductIds);
         $collection->load();

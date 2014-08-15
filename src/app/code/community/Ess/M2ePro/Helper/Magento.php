@@ -171,7 +171,7 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             '/Idev_OneStepCheckout/i' => '',
 
             '/Mercent_Sales/i' => '',
-            '/Webtex_Fba/i' => '',
+            '/Webtex_Fba/i' => 'Breaks creation Amazon Fba orders.',
 
             '/MW_FreeGift/i' => 'last item in combined amazon orders has zero price
                                  (observing event sales_quote_product_add_after)',
@@ -181,7 +181,8 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
 
             '/Aitoc_/i' => 'Stock management conflicts.',
 
-            '/Eternalsoft_Ajaxcart/i' => 'Broke some ajax responses.'
+            '/Eternalsoft_Ajaxcart/i' => 'Broke some ajax responses.',
+            '/Amasty_Shiprestriction/i' => '"Please specify a shipping method" error for some orders.'
         );
 
         $result = array();
@@ -397,6 +398,97 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
         $isOriginalLibFileExist = is_file(str_replace('app/code/local/', 'lib/', $overwritedFilename));
 
         return $isOriginalCoreFileExist || $isOriginalCommunityFileExist || $isOriginalLibFileExist;
+    }
+
+    // ########################################
+
+    public function getAreas()
+    {
+        return array(
+            Mage_Core_Model_App_Area::AREA_GLOBAL,
+            Mage_Core_Model_App_Area::AREA_ADMIN,
+            Mage_Core_Model_App_Area::AREA_FRONTEND,
+            'adminhtml',
+            'crontab',
+        );
+    }
+
+    public function getAllEventObservers()
+    {
+        $eventObservers = array();
+        foreach ($this->getAreas() as $area) {
+            $areaNode = Mage::getConfig()->getNode($area);
+            if (empty($areaNode)) {
+                continue;
+            }
+
+            $areaEvents = $areaNode->events;
+            if (empty($areaEvents)) {
+                continue;
+            }
+
+            foreach ($areaEvents->asArray() as $eventName => $eventData) {
+
+                foreach ($eventData['observers'] as $observerConfig) {
+                    $eventObservers[$area][$eventName][] = $observerConfig['class'].'::'.$observerConfig['method'];
+                }
+
+            }
+        }
+
+        return $eventObservers;
+    }
+
+    // ########################################
+
+    public function getNextMagentoOrderId()
+    {
+        $orderEntityType = Mage::getSingleton('eav/config')->getEntityType('order');
+        $defaultStoreId = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
+
+        if (!$orderEntityType->getIncrementModel()) {
+            return false;
+        }
+
+        $entityStoreConfig = Mage::getModel('eav/entity_store')->loadByEntityStore(
+            $orderEntityType->getId(), $defaultStoreId
+        );
+
+        if (!$entityStoreConfig->getId()) {
+            $entityStoreConfig
+                ->setEntityTypeId($orderEntityType->getId())
+                ->setStoreId($defaultStoreId)
+                ->setIncrementPrefix($defaultStoreId)
+                ->save();
+        }
+
+        $incrementInstance = Mage::getModel($orderEntityType->getIncrementModel())
+            ->setPrefix($entityStoreConfig->getIncrementPrefix())
+            ->setPadLength($orderEntityType->getIncrementPadLength())
+            ->setPadChar($orderEntityType->getIncrementPadChar())
+            ->setLastId($entityStoreConfig->getIncrementLastId())
+            ->setEntityTypeId($entityStoreConfig->getEntityTypeId())
+            ->setStoreId($entityStoreConfig->getStoreId());
+
+        return $incrementInstance->getNextId();
+    }
+
+    public function isMagentoOrderIdUsed($orderId)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+        $select    = $connRead->select();
+
+        $table = Mage::getModel('sales/order')->getResource()->getMainTable();
+
+        $select->from($table, 'entity_id')->where('increment_id = :increment_id');
+
+        $result = $connRead->fetchOne($select, array(':increment_id' => $orderId));
+        if ($result > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     // ########################################

@@ -1,4 +1,7 @@
-<?php echo $this->getChildHtml('item_edit'); ?>
+<?php
+    /** @var $this Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View */
+    echo $this->getChildHtml('item_edit');
+?>
 
 <!-- ########################################################################################### -->
 
@@ -32,7 +35,7 @@
                     <tbody>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Magento Order #');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Magento Order #');?>:</td>
                             <td class="value">
                                 <strong>
                                     <?php if (!is_null($this->realMagentoOrderId)) { ?>
@@ -53,24 +56,24 @@
                         </tr>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Sale Time');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Sale Time');?>:</td>
                             <td class="value"><strong><?php echo Mage::helper('core')->formatDate($this->order->getData('purchase_create_date'), 'medium', true); ?></strong></td>
                         </tr>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Update Time');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Update Time');?>:</td>
                             <td class="value"><strong><?php echo Mage::helper('core')->formatDate($this->order->getData('purchase_update_date'), 'medium', true); ?></strong></td>
                         </tr>
 
                         <?php if (!is_null($this->order->getData('reservation_start_date'))): ?>
-                        <tr>
-                                <td class="label"><?php echo Mage::helper('M2ePro')->__('Reservation Time') ?></td>
+                            <tr>
+                                <td class="label"><?php echo Mage::helper('M2ePro')->__('Reservation Time') ?>:</td>
                                 <td class="value"><strong><?php echo Mage::helper('core')->formatDate($this->order->getData('reservation_start_date'), 'medium', true); ?></strong></td>
                             </tr>
                         <?php endif; ?>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Order Status'); ?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Order Status'); ?>:</td>
                             <td class="value">
                                 <strong>
 
@@ -111,7 +114,7 @@
                         </tr>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Account');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Account');?>:</td>
                             <td class="value">
                                 <strong>
 
@@ -156,28 +159,31 @@
                     <tbody>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Customer Name'); ?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Customer Name'); ?>:</td>
                             <td class="value">
                                 <strong>
-
-                                    <?php
-                                        if ($this->order->getData('buyer_name') == '') {
-                                            echo Mage::helper('M2ePro')->__('N/A');
-                                        } else {
-                                            echo Mage::helper('M2ePro')->escapeHtml($this->order->getData('buyer_name'));
-                                        }
-
-                                        if ($this->order->getData('buyer_email') != '') {
-                                            echo '<br />&lt;' . Mage::helper('M2ePro')->escapeHtml($this->order->getData('buyer_email')) . '&gt;';
-                                        }
-                                    ?>
-
+                                    <?php if ($this->order->getData('buyer_name') == '') {
+                                        echo Mage::helper('M2ePro')->__('N/A');
+                                    } else {
+                                        echo Mage::helper('M2ePro')->escapeHtml($this->order->getData('buyer_name'));
+                                    } ?>
                                 </strong>
                             </td>
                         </tr>
 
+                        <?php if ($this->order->getData('buyer_email') != '') { ?>
+                            <tr>
+                                <td class="label"><?php echo Mage::helper('M2ePro')->__('Buyer Email');?>:</td>
+                                <td class="value">
+                                    <strong>
+                                        &lt;<?php echo Mage::helper('M2ePro')->escapeHtml($this->order->getData('buyer_email')); ?>&gt;
+                                    </strong>
+                                </td>
+                            </tr>
+                        <?php } ?>
+
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Address');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Address');?>:</td>
                             <td class="value">
                                 <strong>
 
@@ -247,7 +253,7 @@
                 <table cellspacing="0" class="form-list">
                     <tbody>
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Order Currency');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Order Currency');?>:</td>
                             <td class="value">
                                 <?php if ($this->order->getData('currency')): ?>
                                     <strong>
@@ -291,7 +297,7 @@
                     <tbody>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Service');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Service');?>:</td>
                             <td class="value">
                                 <strong>
                                     <?php if (is_null($this->order->getData('shipping_service'))) { ?>
@@ -304,7 +310,7 @@
                         </tr>
 
                         <tr>
-                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Cost');?></td>
+                            <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping Cost');?>:</td>
                             <td class="value">
                                 <strong>
                                     <?php if (!$this->order->getData('shipping_price')) { ?>
@@ -356,7 +362,7 @@
     <div class="entry-edit" id="magento_block_amazon_orders_history" collapseable="no">
 
         <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Log History');?></h4>
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Order Log');?></h4>
             <div class="form-buttons"></div>
         </div>
 
@@ -381,7 +387,7 @@
             <tbody>
 
                 <tr>
-                    <td class="label"><?php echo Mage::helper('M2ePro')->__('Subtotal').$this->getTaxSuffix(); ?></td>
+                    <td class="label"><?php echo Mage::helper('M2ePro')->__('Subtotal'); ?></td>
                     <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getChildObject()->getSubtotalPrice());?></span></td>
                 </tr>
 
@@ -392,12 +398,12 @@
 
                 <tr>
                     <td class="label"><?php echo Mage::helper('M2ePro')->__('Promotions'); ?></td>
-                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getData('discount_amount')); ?></span></td>
+                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getChildObject()->getPromotionDiscountAmount() + $this->order->getChildObject()->getShippingDiscountAmount()); ?></span></td>
                 </tr>
 
                 <tr>
                     <td class="label"><?php echo Mage::helper('M2ePro')->__('Tax'); ?></td>
-                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getData('tax_amount')); ?></span></td>
+                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getChildObject()->getProductPriceTaxAmount()); ?></span></td>
                 </tr>
 
             </tbody>

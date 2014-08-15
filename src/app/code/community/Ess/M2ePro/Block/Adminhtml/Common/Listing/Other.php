@@ -123,10 +123,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
 
         $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Products were not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some of the products were not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
@@ -135,10 +135,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs(
+            $helper->__('Please select the products you want to perform the action on.')
+        );
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %s product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
 
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
         $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped products must be selected.'));
@@ -213,7 +215,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
             'amazon'
         );
 
-        // todo next (temp solution)
         AmazonListingOtherGridHandlerObj.movingHandler.setOptions(M2eProAmazon);
         AmazonListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProAmazon);
         AmazonListingOtherGridHandlerObj.removingHandler.setOptions(M2eProAmazon);
@@ -308,10 +309,10 @@ JAVASCRIPT;
 
         $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Products were not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some of the products were not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data.'));
@@ -320,10 +321,12 @@ JAVASCRIPT;
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs(
+            $helper->__('Please select the products you want to perform the action on.')
+        );
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %s product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -397,7 +400,7 @@ JAVASCRIPT;
             'buy'
         );
 
-        // todo next (temp solution)
+        // todo next
         BuyListingOtherGridHandlerObj.movingHandler.setOptions(M2eProBuy);
         BuyListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProBuy);
         BuyListingOtherGridHandlerObj.removingHandler.setOptions(M2eProBuy);
@@ -497,10 +500,10 @@ JAVASCRIPT;
 
         $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Products were not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some of the products were not moved. <a target="_blank" href="%s">View log</a> for details.')
+            $helper->__('Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
@@ -509,10 +512,12 @@ JAVASCRIPT;
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log'));
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs(
+            $helper->__('Please select the products you want to perform the action on.')
+        );
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %s product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -586,7 +591,6 @@ JAVASCRIPT;
             'play'
         );
 
-        // todo next (temp solution)
         PlayListingOtherGridHandlerObj.movingHandler.setOptions(M2eProPlay);
         PlayListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProPlay);
         PlayListingOtherGridHandlerObj.removingHandler.setOptions(M2eProPlay);
@@ -652,8 +656,8 @@ JAVASCRIPT;
                 'Current version only supports simple products. Please, choose simple product.'
             ),
 
-            'Item was not mapped as the chosen %s Simple Product has Custom Options.' => $helper->__(
-                'Item was not mapped as the chosen %s Simple Product has Custom Options.'
+            'Item was not mapped as the chosen %product_id% Simple Product has Custom Options.' => $helper->__(
+                'Item was not mapped as the chosen %product_id% Simple Product has Custom Options.'
             )
 
         ));

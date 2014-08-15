@@ -597,32 +597,32 @@ HTML;
 
         //------------------------------
         $translations = array();
-
-        // ->__('You have not selected the Primary eBay Category for some products.')
+        // M2ePro_TRANSLATIONS
+        // You have not selected the Primary eBay Category for some products.
         $text = 'You have not selected the Primary eBay Category for some products.';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('Are you sure?')
+        // M2ePro_TRANSLATIONS
+        // Are you sure?
         $text = 'Are you sure?';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('eBay could not assign categories for %s products.')
-        $text = 'eBay could not assign categories for %s products.';
+        // M2ePro_TRANSLATIONS
+        // eBay could not assign categories for %product_tite% products.
+        $text = 'eBay could not assign categories for %product_title% products.';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('Suggested Categories were successfully received for %s product(s).')
-        $text = 'Suggested Categories were successfully received for %s product(s).';
+        // M2ePro_TRANSLATIONS
+        // Suggested Categories were successfully received for %product_title% product(s).
+        $text = 'Suggested Categories were successfully received for %product_title% product(s).';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('Set eBay Category')
+        // M2ePro_TRANSLATIONS
+        // Set eBay Category
         $text = 'Set eBay Category';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('Set eBay Category for Product(s)')
+        // M2ePro_TRANSLATIONS
+        // Set eBay Category for Product(s)
         $text = 'Set eBay Category for Product(s)';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
-
-        // ->__('Set eBay Primary Category for Product(s)')
+        // M2ePro_TRANSLATIONS
+        // Set eBay Primary Category for Product(s)
         $text = 'Set eBay Primary Category for Product(s)';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
 

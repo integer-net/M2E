@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    // ########################################
+
     public function __construct()
     {
         parent::__construct();
@@ -43,15 +45,18 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table extends Mage_Ad
         //------------------------------
 
         //------------------------------
-        $url = $this->getUrl(
-            '*/*/truncateTables',
-            array(
-                'tables' => $this->getRequest()->getParam('table')
-            )
-        );
+        $url = $this->getUrl('*/*/truncateTables', array('tables' => $this->getRequest()->getParam('table')));
         $this->_addButton('delete_all', array(
             'label'     => Mage::helper('M2ePro')->__('Truncate Table'),
             'onclick'   => 'deleteConfirm(\'Are you sure?\', \''.$url.'\')',
+            'class'     => 'delete_all'
+        ));
+        //------------------------------
+
+        //------------------------------
+        $this->_addButton('add_row', array(
+            'label'     => Mage::helper('M2ePro')->__('Append Row'),
+            'onclick'   => 'DevelopmentDatabaseGridHandlerObj.openTableCellsPopup(\'add\')',
             'class'     => 'delete_all'
         ));
         //------------------------------
@@ -64,4 +69,6 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table extends Mage_Ad
         ));
         //------------------------------
     }
+
+    // ########################################
 }

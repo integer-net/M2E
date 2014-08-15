@@ -35,7 +35,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
             return $this->modelName;
         }
 
-        $modelName = Mage::helper('M2ePro/Module_Database')->getTableModel(
+        $modelName = Mage::helper('M2ePro/Module_Database_Structure')->getTableModel(
             $this->getRequest()->getParam('table')
         );
 
@@ -62,28 +62,26 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
     protected function _prepareColumns()
     {
         $resourceModel = Mage::getResourceModel('M2ePro/'.$this->getModelName());
-        $tableAction = Mage::getSingleton('core/resource')->getTableName($this->getRequest()->getParam('table'));
+        $table = Mage::getSingleton('core/resource')->getTableName($this->getRequest()->getParam('table'));
 
-        $columns = $resourceModel->getReadConnection()->fetchAll('SHOW COLUMNS FROM '.$tableAction);
+        $columns = $resourceModel->getReadConnection()->fetchAll("SHOW COLUMNS FROM {$table}");
 
         foreach ($columns as $column) {
 
-            $header = '<big>'.$column['Field'].'</big> &nbsp;
-                       <small style="font-weight:normal;">('.$column['Type'].')</small>';
-
-            $columnType = $this->getColumnType($column);
+            $header = "<big>{$column['Field']}</big> &nbsp;
+                       <small style=\"font-weight:normal;\">({$column['Type']})</small>";
 
             $params = array(
-                'header'    => $header,
-                'align'     => 'left',
-                'type'      => $columnType,
-                'string_limit' => 10000,
-                'index'     => strtolower($column['Field']),
-                'filter_index' => 'main_table.'.strtolower($column['Field']),
+                'header'         => $header,
+                'align'          => 'left',
+                'type'           => $this->getColumnType($column),
+                'string_limit'   => 10000,
+                'index'          => strtolower($column['Field']),
+                'filter_index'   => 'main_table.'.strtolower($column['Field']),
                 'frame_callback' => array($this, 'callbackColumnData'),
             );
 
-            if ($columnType == 'datetime') {
+            if ($this->getColumnType($column) == 'datetime') {
                 $params = array_merge($params, array(
                     'filter_time' => true,
                     'align'       => 'right',
@@ -117,18 +115,16 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
 
     protected function _toHtml()
     {
-        $gridId = $this->getId();
-
         $urlParams = array(
-            'model' => $this->getModelName(),
-            'table' => $this->getRequest()->getParam('table')
+            'model' => $this->getModelName(), 'table' => $this->getRequest()->getParam('table')
         );
 
         $root = 'adminhtml_development_database';
         $urls = json_encode(array(
-            $root.'/deleteTableRows' => $this->getUrl('*/*/deleteTableRows', $urlParams),
-            $root.'/updateTableCells' => $this->getUrl('*/*/updateTableCells', $urlParams),
-            $root.'/getUpdateCellsPopupHtml' => $this->getUrl('*/*/getUpdateCellsPopupHtml', $urlParams)
+            $root.'/deleteTableRows'        => $this->getUrl('*/*/deleteTableRows', $urlParams),
+            $root.'/updateTableCells'       => $this->getUrl('*/*/updateTableCells', $urlParams),
+            $root.'/addTableRow'            => $this->getUrl('*/*/addTableRow', $urlParams),
+            $root.'/getTableCellsPopupHtml' => $this->getUrl('*/*/getTableCellsPopupHtml', $urlParams)
         ));
 
         $commonJs = <<<HTML
@@ -142,7 +138,7 @@ HTML;
 <script type="text/javascript">
 
    M2ePro.url.add({$urls});
-   DevelopmentDatabaseGridHandlerObj = new DatabaseGridHandler('{$gridId}');
+   DevelopmentDatabaseGridHandlerObj = new DatabaseGridHandler('{$this->getId()}');
 
 </script>
 HTML;
@@ -191,13 +187,12 @@ HTML;
         }
 
         $inputValue = 'NULL';
-        if (!is_null($value)) {
-            $inputValue = Mage::helper('M2ePro')->escapeHtml($value);
-        }
+        !is_null($value) && $inputValue = Mage::helper('M2ePro')->escapeHtml($value);
 
         return <<<HTML
-<div id="{$cellId}" onmouseover="DevelopmentDatabaseGridHandlerObj.mouseOverCell('{$cellId}');"
-                    onmouseout="DevelopmentDatabaseGridHandlerObj.mouseOutCell('{$cellId}');">
+<div style="min-height: 20px;" id="{$cellId}"
+     onmouseover="DevelopmentDatabaseGridHandlerObj.mouseOverCell('{$cellId}');"
+     onmouseout="DevelopmentDatabaseGridHandlerObj.mouseOutCell('{$cellId}');">
 
     <span id="{$cellId}_view_container">{$tempValue}</span>
 

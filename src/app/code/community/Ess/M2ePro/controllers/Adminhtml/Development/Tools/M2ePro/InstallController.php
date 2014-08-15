@@ -18,8 +18,10 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_InstallController
     {
         /** @var $cacheConfigCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $cacheConfigCollection = Mage::helper('M2ePro/Module')->getCacheConfig()->getCollection();
-        $cacheConfigCollection->addFieldToFilter('`group`', '/installation/version/history/')
-                              ->setOrder('create_date','DESC');
+        $cacheConfigCollection->addFieldToFilter('`group`', '/installation/version/history/');
+        $cacheConfigCollection->getSelect()->order(
+            array('create_date DESC', 'key DESC')
+        );
 
         $history = $cacheConfigCollection->toArray();
         $history = $history['items'];
@@ -32,6 +34,11 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_InstallController
         $html = $this->getStyleHtml();
 
         $html .= <<<HTML
+<style>
+    .grid td.color-first  { background-color: rgba(211, 255, 167, 0.90); }
+    .grid td.color-second { background-color: rgba(211, 255, 167, 0.33); }
+</style>
+
 <h2 style="margin: 20px 0 0 10px">Installation History
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
@@ -43,18 +50,25 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_InstallController
         <th>Date</th>
     </tr>
 HTML;
+        $previousItemDate = $history[0]['value'];
+        $tdClass = 'color-first';
+
         foreach ($history as $item) {
+
+            if ((strtotime($previousItemDate) - strtotime($item['value'])) > 360) {
+                $tdClass = $tdClass != 'color-second' ? 'color-second' : 'color-first';
+            }
+            $previousItemDate = $item['value'];
 
             $html .= <<<HTML
 <tr>
-    <td>{$item['key']}</td>
-    <td>{$item['value']}</td>
+    <td class="{$tdClass}">{$item['key']}</td>
+    <td class="{$tdClass}">{$item['value']}</td>
 </tr>
 HTML;
         }
 
         $html .= '</table>';
-
         print str_replace('%count%', count($history), $html);
     }
 
@@ -105,9 +119,14 @@ HTML;
             /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
             $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
 
-            $coreResourceTable = Mage::getSingleton('core/resource')->getTableName('core_resource');
-            $bind = array('version'=>$version,'data_version'=>$version);
-            $connWrite->update($coreResourceTable,$bind,array('code = ?'=>'M2ePro_setup'));
+            $connWrite->update(
+                Mage::getSingleton('core/resource')->getTableName('core_resource'),
+                array(
+                    'version'      => $version,
+                    'data_version' => $version
+                ),
+                array('code = ?' => 'M2ePro_setup')
+            );
 
             Mage::helper('M2ePro/Magento')->clearCache();
 
@@ -208,7 +227,6 @@ HTML;
         }
 
         $html .= '</table>';
-
         print str_replace('%count%',count($problems),$html);
     }
 
@@ -247,6 +265,7 @@ HTML;
         <th style="width: 400px">Table</th>
         <th>Problem</th>
         <th style="width: 300px">Info</th>
+        <th style="width: 100px">Actions</th>
     </tr>
 HTML;
 
@@ -262,11 +281,36 @@ HTML;
                     }
                 }
 
+                $actionsHtml = '';
+                $urlParams = array(
+                    'table_name'  => $tableName,
+                    'column_info' => json_encode($resultRow['info']['original_data'])
+                );
+
+                $diffData = isset($resultRow['info']['diff_data']) ? $resultRow['info']['diff_data'] : array();
+                $confirmFunc = "return confirm('Be attentive. The data will not migrated.');";
+
+                if (empty($resultRow['info']['current_data']) ||
+                    (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
+
+                    $urlParams['mode'] = 'properties';
+                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                    $actionsHtml .= "<a onclick=\"{$confirmFunc}\" href=\"{$url}\">Fix Properties</a>";
+                }
+
+                if (isset($resultRow['info']['diff_data']) && isset($diffData['key'])) {
+
+                    $urlParams['mode'] = 'index';
+                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                    $actionsHtml .= "<a onclick=\"{$confirmFunc}\" href=\"{$url}\">Fix Index</a>";
+                }
+
                 $html .= <<<HTML
 <tr>
     <td>{$tableName}</td>
     <td>{$resultRow['message']}</td>
     <td>{$additionalInfo}</td>
+    <td>{$actionsHtml}</td>
 </tr>
 HTML;
             }
@@ -274,6 +318,123 @@ HTML;
 
         $html .= '</table>';
         print str_replace('%count%',count($responseData['diff']),$html);
+    }
+
+    /**
+     * @title "Check Configs Validity"
+     * @description "Check Configs Validity"
+     */
+    public function checkConfigsValidityAction()
+    {
+        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
+                                ->processVirtual('configs','get','info');
+
+        if (!isset($responseData['configs_info'])) {
+            echo $this->getEmptyResultsHtml('No configs info for this M2E version on server.');
+            return;
+        }
+
+        $helper = Mage::helper('M2ePro/Module_Database_Structure');
+        $differenses = array();
+
+        foreach ($responseData['configs_info'] as $tableName => $configInfo) {
+
+            $currentInfo = $helper->getConfigSnapshot($tableName);
+            foreach ($configInfo as $codeHash => $item) {
+                !array_key_exists($codeHash, $currentInfo) && $differenses[] = array(
+                    'table' => $tableName,
+                    'item'  => $item
+                );
+            }
+        }
+
+        if (count($differenses) <= 0) {
+            echo $this->getEmptyResultsHtml('All Configs are valid.');
+            return;
+        }
+
+        $html = $this->getStyleHtml();
+
+        $html .= <<<HTML
+<h2 style="margin: 20px 0 0 10px">Configs Validity
+    <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
+</h2>
+<br>
+
+<table class="grid" cellpadding="0" cellspacing="0">
+    <tr>
+        <th style="width: 400px">Table</th>
+        <th>Group</th>
+        <th>Key</th>
+        <th style="width: 100px">Actions</th>
+    </tr>
+HTML;
+
+        foreach ($differenses as $index => $row) {
+
+            $url = $this->getUrl('*/adminhtml_development_database/addTableRow', array(
+                'table'  => $row['table'],
+                'model'  => Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($row['table']),
+            ));
+
+            $onclickAction = <<<JS
+var elem = $(this.id);
+new Ajax.Request( '{$url}' , {
+    method: 'get',
+    asynchronous : false,
+    parameters : Form.serialize(elem.up('form')),
+    onSuccess: function(transport) { elem.up('tr').remove(); }
+});
+JS;
+        $html .= <<<HTML
+<tr>
+    <td>{$row['table']}</td>
+    <td>{$row['item']['group']}</td>
+    <td>{$row['item']['key']}</td>
+    <td>
+        <form style="margin-bottom: 0;">
+            <input type="checkbox" name="cells[]" value="group" style="display: none;" checked="checked">
+            <input type="checkbox" name="cells[]" value="key" style="display: none;" checked="checked">
+            <input type="checkbox" name="cells[]" value="value" style="display: none;" checked="checked">
+
+            <input type="hidden" name="value_group" value="{$row['item']['group']}">
+            <input type="hidden" name="value_key" value="{$row['item']['key']}">
+            <input type="text" name="value_value" value="{$row['item']['value']}">
+
+            <a id="insert_id_{$index}" onclick="{$onclickAction}" href="javascript:void(0);">Insert</a>
+        </form>
+    </td>
+</tr>
+HTML;
+        }
+
+        $html .= '</table>';
+        print str_replace('%count%',count($differenses),$html);
+    }
+
+    // ----------------------------------------
+
+    /**
+     * @hidden
+     */
+    public function fixColumnAction()
+    {
+        $tableName  = $this->getRequest()->getParam('table_name');
+        $columnInfo = $this->getRequest()->getParam('column_info');
+        $columnInfo = (array)json_decode($columnInfo, true);
+
+        $repairMode = $this->getRequest()->getParam('mode');
+
+        if (!$tableName || !$repairMode || empty($columnInfo)) {
+            $this->_redirect('*/*/checkTablesStructureValidity');
+            return;
+        }
+
+        $helper = Mage::helper('M2ePro/Module_Database_Repair');
+        $repairMode == 'index' && $helper->fixColumnIndex($tableName, $columnInfo);
+        $repairMode == 'properties' && $helper->fixColumnProperties($tableName, $columnInfo);
+
+        $this->_redirect('*/*/checkTablesStructureValidity');
     }
 
     /**
@@ -348,7 +509,6 @@ HTML;
         }
 
         $html .= '</table>';
-
         print str_replace('%count%',count($unWritableDirectories),$html);
     }
 
@@ -423,7 +583,7 @@ HTML;
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
 
-        $moduleTables = Mage::helper('M2ePro/Module_Database')->getMySqlTables();
+        $moduleTables = Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables();
 
         $excludeTables = array(
             'm2epro_primary_config',

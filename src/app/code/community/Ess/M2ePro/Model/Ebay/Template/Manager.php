@@ -430,7 +430,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         return $name;
     }
 
-    public function getTemplateModel()
+    public function getTemplateModel($returnChildModel = false)
     {
         $model = NULL;
 
@@ -444,10 +444,15 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
 
             case self::TEMPLATE_SELLING_FORMAT:
             case self::TEMPLATE_SYNCHRONIZATION:
-                $model = Mage::helper('M2ePro/Component')->getComponentModel(
-                    Ess_M2ePro_Helper_Component_Ebay::NICK,
-                    $this->getTemplateModelName()
-                );
+                if ($returnChildModel) {
+                    $modelPath = ucfirst(Ess_M2ePro_Helper_Component_Ebay::NICK).'_'.$this->getTemplateModelName();
+                    $model = Mage::getModel('M2ePro/'.$modelPath);
+                } else {
+                    $model = Mage::helper('M2ePro/Component')->getComponentModel(
+                        Ess_M2ePro_Helper_Component_Ebay::NICK,
+                        $this->getTemplateModelName()
+                    );
+                }
                 break;
         }
 
@@ -486,8 +491,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         return $collection;
     }
 
-    //----------------------------------------
-
     public function getTemplateBuilder()
     {
         $model = NULL;
@@ -522,29 +525,12 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
 
     // #######################################
 
-    public function getAffectedItems($itemType, $templateId, $filters = array(), $asObject = true, $key = NULL)
+    public function getAffectedOwnerObjects($ownerObjectModel, $templateId, $asObjects = false)
     {
-        if (is_null($this->templateNick)) {
-            throw new LogicException('Template nick is not set.');
-        }
+        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
+        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection($ownerObjectModel);
 
-        if (!in_array($itemType, array(self::OWNER_LISTING,self::OWNER_LISTING_PRODUCT))) {
-            throw new LogicException('Item type is invalid "' . $itemType .'"');
-        }
-
-        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection($itemType);
-
-        if (!is_null($key)) {
-            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($key);
-        }
-
-        foreach ($filters as $field => $filter) {
-            $collection->addFieldToFilter($field, $filter);
-        }
-
-        $where = '';
-
-        $where .= "({$this->getModeColumnName()} = " . Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM;
+        $where = "({$this->getModeColumnName()} = " . Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM;
         $where .= " AND {$this->getCustomIdColumnName()} = " . (int)$templateId . ")";
 
         $where .= ' OR ';
@@ -552,35 +538,17 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         $where .= "({$this->getModeColumnName()} = " . Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE;
         $where .= " AND {$this->getTemplateIdColumnName()} = " . (int)$templateId . ")";
 
-        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection->getSelect()->where($where);
 
-        $items = $asObject ? $collection->getItems() : $collection->getData();
-
-        if (is_null($key)) {
-            return $items;
-        }
-
-        $return = array();
-        foreach ($items as $item) {
-            isset($item[$key]) && $return[] = $item[$key];
-        }
-
-        return $return;
+        return $asObjects ? (array)$collection->getItems() : (array)$collection->getData();
     }
 
-    // #######################################
-
-    public function getTemplatesFromData($data, $templates = array(self::TEMPLATE_PAYMENT,
-                                                                   self::TEMPLATE_SHIPPING,
-                                                                   self::TEMPLATE_RETURN,
-                                                                   self::TEMPLATE_SELLING_FORMAT,
-                                                                   self::TEMPLATE_DESCRIPTION,
-                                                                   self::TEMPLATE_SYNCHRONIZATION))
+    public function getTemplatesFromData($data)
     {
-        $templates = array_combine($templates,array_fill(0,count($templates),NULL));
+        $resultTemplates = array();
 
-        foreach (array_keys($templates) as $template) {
+        foreach ($this->getAllTemplates() as $template) {
+
             $this->setTemplate($template);
 
             $templateMode = $data[$this->getModeColumnName()];
@@ -593,9 +561,10 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
                 $templateId = $data[$this->getIdColumnNameByMode($templateMode)];
             }
 
-            $templateModelName = $this->getTemplateModelName();
             if ($templateMode == self::MODE_POLICY) {
                 $templateModelName = 'Ebay_Template_Policy';
+            } else {
+                $templateModelName = $this->getTemplateModelName();
             }
 
             if ($this->isHorizontalTemplate()) {
@@ -608,10 +577,10 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
                 );
             }
 
-            $templates[$template] = $templateModel;
+            $resultTemplates[$template] = $templateModel;
         }
 
-        return $templates;
+        return $resultTemplates;
     }
 
     // #######################################

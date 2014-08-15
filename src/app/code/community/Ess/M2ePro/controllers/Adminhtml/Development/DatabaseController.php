@@ -44,7 +44,7 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $response = '';
         foreach ($tables as $table) {
 
-            if (is_null($model = Mage::helper('M2ePro/Module_Database')->getTableModel($table))) {
+            if (is_null($model = Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($table))) {
                 continue;
             }
 
@@ -112,7 +112,7 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
 
         foreach ($tables as $table) {
 
-            $model = Mage::helper('M2ePro/Module_Database')->getTableModel($table);
+            $model = Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($table);
             $tableName  = Mage::getSingleton('core/resource')->getTableName($table);
 
             Mage::getSingleton('core/resource')->getConnection('core_write')->delete($tableName);
@@ -123,7 +123,8 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
 
         if (count($tables) == 1) {
             $tableName = array_shift($tables);
-            $this->redirectToTablePage($tableName, Mage::helper('M2ePro/Module_Database')->getTableModel($tableName));
+            $this->redirectToTablePage($tableName,
+                                       Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($tableName));
         }
 
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
@@ -131,12 +132,49 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
 
     public function updateTableCellsAction()
     {
-        $ids = $this->getRequest()->getParam('ids');
-        $ids = explode(',', $ids);
+        $ids = explode(',', $this->getRequest()->getParam('ids'));
 
         $table = $this->getRequest()->getParam('table');
         $model = $this->getRequest()->getParam('model');
 
+        $cellsValues = $this->prepareCellsValuesArray();
+
+        if (is_null($table) || is_null($model) || empty($ids) || empty($cellsValues)) {
+            return;
+        }
+
+        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
+            return;
+        }
+
+        Mage::getSingleton('core/resource')->getConnection('core_write')->update(
+            Mage::getSingleton('core/resource')->getTableName($table),
+            $cellsValues,
+            "`{$modelInstance->getIdFieldName()}` IN (".implode(',', $ids).")"
+        );
+
+        $this->afterTableAction($model);
+    }
+
+    public function addTableRowAction()
+    {
+        $table = $this->getRequest()->getParam('table');
+        $model = $this->getRequest()->getParam('model');
+
+        $cellsValues = $this->prepareCellsValuesArray();
+
+        if (is_null($table) || is_null($model) || empty($cellsValues)) {
+            return;
+        }
+        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
+            return;
+        }
+
+        $modelInstance->setData($cellsValues)->save();
+    }
+
+    private function prepareCellsValuesArray()
+    {
         $cells = $this->getRequest()->getParam('cells', array());
         is_string($cells) && $cells = array($cells);
 
@@ -147,36 +185,12 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
                 continue;
             }
 
-            if (strtolower($columnValue) == 'null') {
-                $columnValue = NULL;
-            }
-
+            strtolower($columnValue) == 'null' && $columnValue = NULL;
             $bindArray[$columnName] = $columnValue;
         }
 
-        if (is_null($table) || is_null($model) || empty($cells) || empty($ids) || empty($bindArray)) {
-            $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
-            return;
-        }
-
-        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
-            $this->_getSession()->addError("Failed to get model {$model}.");
-            $this->redirectToTablePage($table, $model);
-        }
-
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-
-        $tableName  = Mage::getSingleton('core/resource')->getTableName($table);
-
-        $connWrite->update(
-            $tableName, $bindArray, "`{$modelInstance->getIdFieldName()}` IN (".implode(',', $ids).")"
-        );
-
-        $this->afterTableAction($model);
+        return $bindArray;
     }
-
-    //#############################################
 
     private function afterTableAction($model)
     {
@@ -211,11 +225,11 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $this->getResponse()->setBody($response);
     }
 
-    public function getUpdateCellsPopupHtmlAction()
+    public function getTableCellsPopupHtmlAction()
     {
         $response = $this->loadLayout()
             ->getLayout()
-            ->createBlock('M2ePro/adminhtml_development_tabs_database_table_UpdateCellsPopup')->toHtml();
+            ->createBlock('M2ePro/adminhtml_development_tabs_database_table_tableCellsPopup')->toHtml();
 
         $this->getResponse()->setBody($response);
     }

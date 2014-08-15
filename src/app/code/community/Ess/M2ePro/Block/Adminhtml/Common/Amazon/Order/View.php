@@ -6,6 +6,9 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View extends Mage_Adminhtml_Block_Widget_Form_Container
 {
+    /** @var $order Ess_M2ePro_Model_Order */
+    protected $order = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -23,7 +26,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View extends Mage_Adminhtml
         $this->_headerText = Mage::helper('M2ePro')->__('View Order Details');
         //------------------------------
 
-        /** @var $order Ess_M2ePro_Model_Order */
         $this->order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         // Set buttons actions

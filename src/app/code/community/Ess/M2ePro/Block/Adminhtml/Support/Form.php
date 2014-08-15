@@ -32,6 +32,24 @@ class Ess_M2ePro_Block_Adminhtml_Support_Form extends Mage_Adminhtml_Block_Widge
         //-------------------------------
 
         //-------------------------------
+        $cronInfoBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_development_inspection_cron',
+            '',
+            array('is_support_mode' => true)
+        );
+        $this->setChild('cron_info', $cronInfoBlock);
+        //-------------------------------
+
+        //-------------------------------
+        $systemRequirementsBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_development_inspection_requirements',
+            '',
+            array('is_support_mode' => true)
+        );
+        $this->setChild('system_requirements', $systemRequirementsBlock);
+        //-------------------------------
+
+        //-------------------------------
         $data = array(
             'label'   => Mage::helper('M2ePro')->__('Search'),
             'onclick' => 'SupportHandlerObj.searchUserVoiceData();',
@@ -42,9 +60,18 @@ class Ess_M2ePro_Block_Adminhtml_Support_Form extends Mage_Adminhtml_Block_Widge
         //-------------------------------
 
         //-------------------------------
+        $data = array(
+            'label'   => Mage::helper('M2ePro')->__('Contact Support'),
+            'onclick' => 'SupportHandlerObj.forceShowContactSupportForm();',
+            'id'      => 'force_show_contact_support_button'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $this->setChild('force_show_contact_support_button',$buttonBlock);
+        //-------------------------------
+
+        //-------------------------------
         $tabsBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_support_tabs',
-            '',
+            'M2ePro/adminhtml_support_tabs', '',
             array('is_from_error' => $this->isFromError)
         );
         $this->setChild('tabs', $tabsBlock);

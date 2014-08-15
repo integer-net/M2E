@@ -6,8 +6,8 @@
 
 class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Rakuten.com (Beta)');
-
+    // M2ePro_TRANSLATIONS
+    // Rakuten.com (Beta)
     const NICK  = 'buy';
     const TITLE = 'Rakuten.com (Beta)';
 

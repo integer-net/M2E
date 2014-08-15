@@ -112,7 +112,7 @@ EbayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHandler()
             return el.value.match('^[0-9]{4}-[0-9]{2}-[0-9]{1,2}$');
         });
 
-        Validation.add('M2ePro-validate-schedule-week-days', M2ePro.translator.translate('Require to select at least one day of week.'), function(value, el)
+        Validation.add('M2ePro-validate-schedule-week-days', M2ePro.translator.translate('You need to choose at set at least one time for the schedule to run.'), function(value, el)
         {
             var countOfCheckedDays = 0;
 

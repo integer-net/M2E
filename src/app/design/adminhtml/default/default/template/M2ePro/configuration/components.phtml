@@ -13,8 +13,8 @@
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'You should enable at least one component.' => $this->__('You should enable at least one component.'),
-        'Default component should be enabled.' => $this->__('Default component should be enabled.')
+        'You should enable at least one component.' => Mage::helper('M2ePro')->__('You should enable at least one component.'),
+        'Default component should be enabled.' => Mage::helper('M2ePro')->__('Default component should be enabled.')
     )); ?>);
 
     Event.observe(window, 'load', function() {
@@ -49,7 +49,7 @@
     <div id="magento_block_configuration_ebay_channel">
 
         <div id="block_notice_configuration_ebay_channel" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Channels'); ?>">
-            <p><?php echo Mage::helper('M2ePro')->__('Enable channels you are going to work with and Save configuration.'); ?></p>
+            <p><?php echo Mage::helper('M2ePro')->__('<b>Enable</b> the channels you want to sell on, then click <b>Save Config</b>.'); ?></p>
         </div>
 
         <div class="entry-edit" id="magento_block_configuration_channel_status">

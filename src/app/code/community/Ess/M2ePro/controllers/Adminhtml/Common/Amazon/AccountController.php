@@ -215,6 +215,26 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
         }
         //--------------------
 
+        // order number settings
+        //--------------------
+        $tempKey = 'number';
+        $tempSettings = !empty($post['magento_orders_settings'][$tempKey])
+            ? $post['magento_orders_settings'][$tempKey] : array();
+
+        $data['magento_orders_settings'][$tempKey]['source'] = $tempSettings['source'];
+
+        $prefixKeys = array(
+            'mode',
+            'prefix',
+        );
+        $tempSettings = !empty($tempSettings['prefix']) ? $tempSettings['prefix'] : array();
+        foreach ($prefixKeys as $key) {
+            if (isset($tempSettings[$key])) {
+                $data['magento_orders_settings'][$tempKey]['prefix'][$key] = $tempSettings[$key];
+            }
+        }
+        //--------------------
+
         // qty reservation
         //--------------------
         $tempKey = 'qty_reservation';
@@ -404,8 +424,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
 
-            // ->__('The Amazon access obtaining is currently unavailable.<br />Reason: %s')
-            $error = 'The Amazon access obtaining is currently unavailable.<br />Reason: %s';
+            // M2ePro_TRANSLATIONS
+            // The Amazon access obtaining is currently unavailable.<br />Reason: %error_message%
+
+            $error = 'The Amazon access obtaining is currently unavailable.<br />Reason: %error_message%';
             $error = Mage::helper('M2ePro')->__($error, $exception->getMessage());
 
             $this->_getSession()->addError($error);

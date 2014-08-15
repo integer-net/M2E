@@ -165,38 +165,37 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
             return $data;
         }
 
-        $deleteFlag = (is_null($this->getEbayListingProduct()->getOnlineQtySold())
-                           ? false
-                           : $this->getEbayListingProduct()->getOnlineQtySold() > 0)
-                      ||
-                      ($this->getEbayListingProduct()->isListingTypeAuction()
-                           && $this->getEbayListingProduct()->getOnlineBids() > 0);
+        $deleteByAuctionFlag = $this->getEbayListingProduct()->isListingTypeAuction() &&
+                               $this->getEbayListingProduct()->getOnlineBids() > 0;
 
-        $warningMessageReasons = array();
+        $deleteByFixedFlag = $this->getEbayListingProduct()->isListingTypeFixed() &&
+                             $this->getEbayListingProduct()->getOnlineQtySold() > 0;
 
-        if (isset($data['title']) && $deleteFlag) {
+        if (isset($data['title']) && $deleteByAuctionFlag) {
             $warningMessageReasons[] = Mage::helper('M2ePro')->__('Title');
             unset($data['title']);
         }
-        if (isset($data['subtitle']) && $deleteFlag) {
+        if (isset($data['subtitle']) && ($deleteByAuctionFlag || $deleteByFixedFlag)) {
             $warningMessageReasons[] = Mage::helper('M2ePro')->__('Subtitle');
             unset($data['subtitle']);
         }
-        if (isset($data['duration']) && $deleteFlag) {
+        if (isset($data['duration']) && ($deleteByAuctionFlag || $deleteByFixedFlag)) {
             $warningMessageReasons[] = Mage::helper('M2ePro')->__('Duration');
             unset($data['duration']);
         }
-        if (isset($data['is_private']) && $deleteFlag) {
+        if (isset($data['is_private']) && ($deleteByAuctionFlag || $deleteByFixedFlag)) {
             $warningMessageReasons[] = Mage::helper('M2ePro')->__('Private Listing');
             unset($data['is_private']);
         }
 
         if (!empty($warningMessageReasons)) {
 
+            // M2ePro_TRANSLATIONS
+            // %field_title% field(s) were ignored because eBay doesn't allow revise the item if it has sales, bids for auction type or less than 12 hours remain before the item end.
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    '%s field(s) were ignored because eBay doesn\'t allow revise the item if it has sales,
-                    bids for auction type or less than 12 hours remain before the item end.',
+                    '%field_title% field(s) were ignored because eBay doesn\'t allow revise the item if it has sales, '.
+                    'bids for auction type or less than 12 hours remain before the item end.',
                     implode(', ', $warningMessageReasons)
                 )
             );
@@ -209,10 +208,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
     {
         if (isset($data['bestoffer_mode']) && $data['bestoffer_mode']) {
 
+            // M2ePro_TRANSLATIONS
+            // Duration field(s) was ignored because eBay doesn't allow revise the item if Best Offer is enabled.
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'Duration field(s) was ignored because
-                    eBay doesn\'t allow revise the item if Best Offer is enabled.'
+                    'Duration field(s) was ignored because'.
+                    'eBay doesn\'t allow revise the item if Best Offer is enabled.'
                 )
             );
             unset($data['duration']);

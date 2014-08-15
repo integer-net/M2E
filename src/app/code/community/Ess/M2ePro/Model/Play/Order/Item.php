@@ -9,9 +9,10 @@
  */
 class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_Play_Abstract
 {
-    // ->__('Product import is disabled in Play Account settings.');
-    // ->__('Product for Play Item "%id%" was created in Magento catalog.');
-    // ->__('Product for Play Item "%title%" was created in Magento catalog.');
+    // M2ePro_TRANSLATIONS
+    // Product import is disabled in Play Account settings.
+    // Product for Play Item "%id%" was created in Magento catalog.
+    // Product for Play Item "%title%" was created in Magento catalog.
 
     // ########################################
 
@@ -158,6 +159,7 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
         $sku = $this->getSku();
         if ($sku != '' && strlen($sku) <= 64) {
             $product = Mage::getModel('catalog/product')
+                ->setStoreId($this->getEbayOrder()->getAssociatedStoreId())
                 ->getCollection()
                     ->addAttributeToSelect('sku')
                     ->addAttributeToFilter('sku', $sku)

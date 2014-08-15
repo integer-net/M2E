@@ -15,12 +15,11 @@ $startWizardLink = $this->getUrl("*/adminhtml_wizard_installationEbay");
         <?php
 
         echo Mage::helper('M2ePro')->__(
-            'You have successfully installed <strong>M2E Pro v. %s</strong>.<br/>
+            'You have successfully installed <strong>M2E Pro v. %version%</strong>.<br/>
              Click
-             <a href="%s">Start Configuration</a> Wizard to quickly set up main settings',
+             <a href="%url%">Start Configuration</a> Wizard to quickly set up main settings',
             $version,
-            $startWizardLink,
-            'javascript:'
+            $startWizardLink
         );
 
         ?>

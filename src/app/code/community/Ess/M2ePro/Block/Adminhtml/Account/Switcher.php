@@ -12,7 +12,7 @@ class Ess_M2ePro_Block_Adminhtml_Account_Switcher extends Ess_M2ePro_Block_Admin
 
     public function getLabel()
     {
-        return Mage::helper('M2ePro')->__($this->getComponentLabel('Choose %component% Account'));
+        return Mage::helper('M2ePro')->__($this->getComponentLabel('%component% Account'));
     }
 
     public function getItems()

@@ -89,7 +89,8 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
                                     Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_LISTING,
-                                    // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully deleted');
+                                    // M2ePro_TRANSLATIONS
+                                    // Item was successfully deleted
                                     'Item was successfully deleted',
                                     Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
@@ -139,8 +140,8 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
         }
 
         return $this->magentoProductModel = Mage::getModel('M2ePro/Magento_Product_Cache')
-                ->setStoreId($this->getListing()->getStoreId())
-                ->setProductId($this->getData('product_id'));
+                                                    ->setStoreId($this->getListing()->getStoreId())
+                                                    ->setProductId($this->getData('product_id'));
     }
 
     /**
@@ -376,161 +377,6 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     // ########################################
 
-    public function getChangedItems(array $attributes,
-                                    $componentMode = NULL,
-                                    $withStoreFilter = false,
-                                    $dbSelectModifier = NULL)
-    {
-        $resultsByListingProduct = $this->getChangedItemsByListingProduct($attributes,
-                                                                          $componentMode,
-                                                                          $withStoreFilter,
-                                                                          $dbSelectModifier);
-        $resultsByVariationOption = $this->getChangedItemsByVariationOption($attributes,
-                                                                            $componentMode,
-                                                                            $withStoreFilter,
-                                                                            $dbSelectModifier);
-
-        $finalResults = array();
-
-        foreach ($resultsByListingProduct as $item) {
-            if (isset($finalResults[$item['id'].'_'.$item['changed_attribute']])) {
-                continue;
-            }
-            $finalResults[$item['id'].'_'.$item['changed_attribute']] = $item;
-        }
-
-        foreach ($resultsByVariationOption as $item) {
-            if (isset($finalResults[$item['id'].'_'.$item['changed_attribute']])) {
-                continue;
-            }
-            $finalResults[$item['id'].'_'.$item['changed_attribute']] = $item;
-        }
-
-        return array_values($finalResults);
-    }
-
-    public function getChangedItemsByListingProduct(array $attributes,
-                                                    $componentMode = NULL,
-                                                    $withStoreFilter = false,
-                                                    $dbSelectModifier = NULL)
-    {
-        if (count($attributes) <= 0) {
-            return array();
-        }
-
-        $productsChangesTable = Mage::getResourceModel('M2ePro/ProductChange')->getMainTable();
-
-        $listingsTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $listingsProductsTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
-
-        $fields = array(
-            'changed_attribute'=>'attribute',
-            'changed_to_value'=>'value_new',
-        );
-
-        $limit = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-            '/settings/product_change/', 'max_count_per_one_time'
-        );
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from($productsChangesTable,'*')
-                             ->order(array('id ASC'))
-                             ->limit($limit);
-
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from(array('pc' => $dbSelect),$fields)
-                             ->join(array('lp' => $listingsProductsTable),'`pc`.`product_id` = `lp`.`product_id`','id')
-                             ->where('`pc`.`action` = ?',(string)Ess_M2ePro_Model_ProductChange::ACTION_UPDATE)
-                             ->where("`pc`.`attribute` IN ('".implode("','",$attributes)."')");
-
-        $withStoreFilter && $dbSelect->join(array('l' => $listingsTable),'`lp`.`listing_id` = `l`.`id`',array());
-        $withStoreFilter && $dbSelect->where("`l`.`store_id` = `pc`.`store_id`");
-
-        !is_null($componentMode) && $dbSelect->where("`lp`.`component_mode` = ?",(string)$componentMode);
-
-        is_callable($dbSelectModifier) && call_user_func($dbSelectModifier,$dbSelect);
-
-        $tempResult = Mage::getResourceModel('core/config')
-                                ->getReadConnection()
-                                ->fetchAll($dbSelect);
-
-        $finalResults = array();
-        foreach ($tempResult as $item) {
-            if (isset($finalResults[$item['id'].'_'.$item['changed_attribute']])) {
-                continue;
-            }
-            $finalResults[$item['id'].'_'.$item['changed_attribute']] = $item;
-        }
-
-        return array_values($finalResults);
-    }
-
-    public function getChangedItemsByVariationOption(array $attributes,
-                                                     $componentMode = NULL,
-                                                     $withStoreFilter = false,
-                                                     $dbSelectModifier = NULL)
-    {
-        if (count($attributes) <= 0) {
-            return array();
-        }
-
-        $productsChangesTable = Mage::getResourceModel('M2ePro/ProductChange')->getMainTable();
-
-        $listingsTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $listingsProductsTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
-        $variationsTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation')->getMainTable();
-        $optionsTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')->getMainTable();
-
-        $fields = array(
-            'changed_attribute'=>'attribute',
-            'changed_to_value'=>'value_new',
-        );
-
-        $limit = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-            '/settings/product_change/', 'max_count_per_one_time'
-        );
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from($productsChangesTable,'*')
-                             ->order(array('id ASC'))
-                             ->limit($limit);
-
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from(array('pc' => $dbSelect),$fields)
-                             ->join(array('lpvo' => $optionsTable),'`pc`.`product_id` = `lpvo`.`product_id`',array())
-                             ->join(array('lpv' => $variationsTable),
-                                          '`lpvo`.`listing_product_variation_id` = `lpv`.`id`',array())
-                             ->join(array('lp' => $listingsProductsTable),
-                                          '`lpv`.`listing_product_id` = `lp`.`id`',array('id'))
-                             ->where('`pc`.`action` = ?',(string)Ess_M2ePro_Model_ProductChange::ACTION_UPDATE)
-                             ->where("`pc`.`attribute` IN ('".implode("','",$attributes)."')");
-
-        $withStoreFilter && $dbSelect->join(array('l' => $listingsTable),'`lp`.`listing_id` = `l`.`id`',array());
-        $withStoreFilter && $dbSelect->where("`l`.`store_id` = `pc`.`store_id`");
-
-        !is_null($componentMode) && $dbSelect->where("`lpvo`.`component_mode` = ?",(string)$componentMode);
-
-        is_callable($dbSelectModifier) && call_user_func($dbSelectModifier,$dbSelect);
-
-        $tempResult = Mage::getResourceModel('core/config')
-                                ->getReadConnection()
-                                ->fetchAll($dbSelect);
-
-        $finalResults = array();
-        foreach ($tempResult as $item) {
-            if (isset($finalResults[$item['id'].'_'.$item['changed_attribute']])) {
-                continue;
-            }
-            $finalResults[$item['id'].'_'.$item['changed_attribute']] = $item;
-        }
-
-        return array_values($finalResults);
-    }
-
-    // ########################################
-
     public function duplicate()
     {
         $duplicatedListingProduct = $this->getListing()->addProduct($this->getProductId(),false,false);
@@ -555,114 +401,6 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
     public function getTrackingAttributes()
     {
         return $this->getChildObject()->getTrackingAttributes();
-    }
-
-    // ########################################
-
-    public function getProductsIdsForEachVariation()
-    {
-        $listingProductVariationTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation')
-            ->getMainTable();
-        $listingProductVariationOptionTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')
-            ->getMainTable();
-
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-            ->select()
-                ->from(array('lpv' => $listingProductVariationTable),array('variation_id' => 'id'))
-                ->join(
-                    array('lpvo' => $listingProductVariationOptionTable),
-                    '`lpv`.`id` = `lpvo`.`listing_product_variation_id`',
-                    array('product_id')
-                )
-                ->where('`lpv`.`listing_product_id` = ?',(int)$this->getId());
-
-        $variationData = (array)Mage::getResourceModel('core/config')
-                                            ->getReadConnection()
-                                            ->fetchAll($dbSelect);
-
-        foreach ($variationData as $key => $value) {
-            $variationData[$value['variation_id']][] = $value['product_id'];
-            unset($variationData[$key]);
-        }
-
-        return $variationData;
-    }
-
-    public function getVariationsStatuses($productsIdsForEachVariation = NULL)
-    {
-        $ids = array();
-        foreach ($productsIdsForEachVariation as $productsIds) {
-            foreach ($productsIds as $id) {
-                $ids[] = $id;
-            }
-        }
-        $ids = array_values(array_unique($ids));
-
-        $statuses = Mage::getSingleton('M2ePro/Magento_Product_Status')->getProductStatus(
-            $ids, $this->getListing()->getStoreId()
-        );
-
-        $productsStatusesForEachVariation = array();
-        foreach ($productsIdsForEachVariation as $key => $productsIds) {
-            foreach ($productsIds as $id) {
-                $productsStatusesForEachVariation[$key][] = $statuses[$id];
-            }
-        }
-
-        $variationsStatuses = array();
-        foreach ($productsStatusesForEachVariation as $key => $optionsStatuses) {
-            $variationsStatuses[$key] = max($optionsStatuses);
-        }
-
-        return $variationsStatuses;
-    }
-
-    public function getVariationsStockAvailabilities($productsIdsForEachVariation = NULL)
-    {
-        $ids = array();
-        foreach ($productsIdsForEachVariation as $productsIds) {
-            foreach ($productsIds as $id) {
-                $ids[] = $id;
-            }
-        }
-        $ids = array_values(array_unique($ids));
-
-        $catalogInventoryTable = Mage::getSingleton('core/resource')->getTableName('cataloginventory_stock_item');
-
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from(array('cisi' => $catalogInventoryTable),
-                                    array('product_id','is_in_stock', 'manage_stock', 'use_config_manage_stock'))
-                             ->where('cisi.product_id IN ('.implode(',',$ids).')');
-
-        $stocks = Mage::getResourceModel('core/config')
-                                            ->getReadConnection()
-                                            ->fetchall($dbSelect);
-
-        $productsStocksForEachVariation = array();
-        foreach ($productsIdsForEachVariation as $key => $productsIds) {
-            foreach ($productsIds as $id) {
-                $count = count($stocks);
-                for($i = 0; $i < $count; $i++){
-                    if($stocks[$i]['product_id'] == $id) {
-                        $stockAvailability = Ess_M2ePro_Model_Magento_Product::calculateStockAvailability(
-                            $stocks[$i]['is_in_stock'],
-                            $stocks[$i]['manage_stock'],
-                            $stocks[$i]['use_config_manage_stock']
-                        );
-                        $productsStocksForEachVariation[$key][] = $stockAvailability;
-                        break;
-                    }
-                }
-            }
-        }
-
-        $variationsStocks = array();
-        foreach ($productsStocksForEachVariation as $key => $optionsStatuses) {
-            $variationsStocks[$key] = min($optionsStatuses);
-        }
-
-        return $variationsStocks;
     }
 
     // ########################################

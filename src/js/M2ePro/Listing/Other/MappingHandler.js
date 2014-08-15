@@ -15,6 +15,7 @@ ListingOtherMappingHandler.prototype = Object.extend(new CommonHandler(), {
 
     openPopUp: function(productTitle, otherProductId)
     {
+        this.attachEvents();
         this.gridHandler.unselectAll();
 
         this.popUp = Dialog.info(null, {
@@ -111,7 +112,7 @@ ListingOtherMappingHandler.prototype = Object.extend(new CommonHandler(), {
                 } else if (transport.responseText == 3) {
                     self.popUp.close();
                     self.scroll_page_to_top();
-                    MagentoMessageObj.addError(str_replace('%s', productId, M2ePro.translator.translate('Item was not mapped as the chosen %s Simple Product has Custom Options.')));
+                    MagentoMessageObj.addError( M2ePro.translator.translate('Item was not mapped as the chosen %product_id% Simple Product has Custom Options.', productId));
                 }
             }
         });

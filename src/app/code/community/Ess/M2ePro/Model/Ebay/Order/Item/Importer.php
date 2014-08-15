@@ -22,7 +22,11 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
     {
         $params = array();
         $params['item_id'] = $this->item->getItemId();
-        $this->item->hasVariation() && $params['variation_sku'] = $this->item->getVariationSku();
+
+        $variationSku = $this->item->getVariationSku();
+        if (!empty($variationSku)) {
+            $params['variation_sku'] = $variationSku;
+        }
 
         $itemData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
             ->processVirtual('item', 'get', 'info',
@@ -132,7 +136,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         $destinationFolder .= DS . $baseTmpImageName{0} . DS . $baseTmpImageName{1};
 
         if (!(@is_dir($destinationFolder) || @mkdir($destinationFolder, 0777, true))) {
-            // Parser hack -> Mage::helper('M2ePro')->__('Unable to create directory '%directory%'.');
+            // M2ePro_TRANSLATIONS
+            // Unable to create directory '%directory%'.
             throw new Exception("Unable to create directory '{$destinationFolder}'.");
         }
 
@@ -170,7 +175,8 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         $imageInfo = is_file($imagePath) ? getimagesize($imagePath) : NULL;
 
         if (empty($imageInfo)) {
-            // Parser hack -> Mage::helper('M2ePro')->__('Image %url% was not downloaded.');
+            // M2ePro_TRANSLATIONS
+            // Image %url% was not downloaded.
             throw new Exception("Image {$url} was not downloaded.");
         }
         // ---------

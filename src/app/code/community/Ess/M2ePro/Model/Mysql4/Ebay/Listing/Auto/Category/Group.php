@@ -47,7 +47,7 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Listing_Auto_Category_Group
             $this->getMainTable(),
             array(
                 'listing_id = ?' => $listingId,
-                'id NOT IN (?)' => $this->getReadConnection()
+                'id NOT IN (?)' => $this->_getReadAdapter()
                     ->select()
                     ->from(
                         array('melac' => Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category')->getMainTable()),

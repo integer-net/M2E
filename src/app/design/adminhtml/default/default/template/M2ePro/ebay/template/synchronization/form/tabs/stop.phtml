@@ -23,10 +23,11 @@
 </script>
 
 <div id="block_notice_ebay_template_synchronization_form_data_stop" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Stop Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Define the conditions when you want eBay items stopped.
-                                           <br/>
-                                           <br/><b>Note:</b> If all options are set to No or No Action, then the stop action for eBay items, which use this Synchronization Policy, is disabled.<br>
-If all options are enabled, then an item will be stopped if at least one of the Stop Conditions is met.'); ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        'Set the conditions when M2E Pro should stop listings on eBay.<br/><br/>
+        If all conditions are set to No or No Action then no eBay items using this Synchronization Policy will be stopped.
+        If all options are enabled, then an item will be stopped if at least one of the stop conditions is met.'
+    ); ?>
 </div>
 
 <div class="entry-edit" id="magento_block_ebay_template_synchronization_form_data_stop_rules">

@@ -7,9 +7,10 @@
 class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Shipping
     extends Ess_M2ePro_Model_Connector_Ebay_Order_Update_Abstract
 {
-    // ->__('Shipping status for eBay order was not updated. Reason: eBay Failure.');
-    // ->__('Tracking number "%num%" for "%code%" has been sent to eBay.');
-    // ->__('Shipping status for eBay order was updated to Shipped.');
+    // M2ePro_TRANSLATIONS
+    // Shipping status for eBay order was not updated. Reason: eBay Failure.
+    // Tracking number "%num%" for "%code%" has been sent to eBay.
+    // Shipping status for eBay order was updated to Shipped.
 
     // ########################################
 

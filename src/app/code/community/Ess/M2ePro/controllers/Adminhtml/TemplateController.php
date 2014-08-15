@@ -38,7 +38,6 @@ class Ess_M2ePro_Adminhtml_TemplateController extends Ess_M2ePro_Controller_Admi
                 $template = $manager->getTemplateModel()->load($id);
                 break;
             default:
-                // todo temporary solution
                 if ($nick == Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT) {
                     $template = Mage::helper('M2ePro/Component')
                         ->getComponentModel($component, 'Template_SellingFormat')

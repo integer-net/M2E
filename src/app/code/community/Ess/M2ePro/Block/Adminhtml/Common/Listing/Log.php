@@ -25,13 +25,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block
 
         if (isset($listingData['id'])) {
 
-            $component = '';
-
             if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-                $component = ' ' . Mage::helper('M2ePro/Component')->getComponentTitle($listingData['component_mode']);
+                $component =  Mage::helper('M2ePro/Component')->getComponentTitle($listingData['component_mode']);
+                $headerText = Mage::helper('M2ePro')->__("Log For %component_name% Listing", $component);
+            } else {
+                $headerText = Mage::helper('M2ePro')->__("Log For Listing");
             }
 
-            $this->_headerText = Mage::helper('M2ePro')->__("Log For%s Listing", $component);
+            $this->_headerText = $headerText;
             $this->_headerText .= ' "'.$this->escapeHtml($listingData['title']).'"';
         } else {
             $this->_headerText = Mage::helper('M2ePro')->__('Listings Log');

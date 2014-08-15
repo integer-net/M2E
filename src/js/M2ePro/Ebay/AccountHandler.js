@@ -16,7 +16,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
                 return true;
             }
 
-            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/checkCustomerId'),
+            new Ajax.Request(M2ePro.url.get('adminhtml_general/checkCustomerId'),
             {
                 method: 'post',
                 asynchronous : false,
@@ -31,6 +31,14 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             });
 
             return checkResult;
+        });
+
+        Validation.add('M2ePro-account-order-number-prefix', M2ePro.translator.translate('Prefix length should not be greater than 5 characters.'), function(value) {
+            if ($('magento_orders_number_prefix_mode').value == 0) {
+                return true;
+            }
+
+            return value.length <= 5;
         });
 
         Validation.add('M2ePro-account-feedback-templates', M2ePro.translator.translate('You should create at least one response template.'), function(value) {
@@ -406,6 +414,46 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
+    magentoOrdersNumberSourceChange : function()
+    {
+        var self = EbayAccountHandlerObj;
+        self.renderOrderNumberExample();
+    },
+
+    magentoOrdersNumberPrefixModeChange : function()
+    {
+        var self = EbayAccountHandlerObj;
+
+        if ($('magento_orders_number_prefix_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_YES')) {
+            $('magento_orders_number_prefix_container').show();
+        } else {
+            $('magento_orders_number_prefix_container').hide();
+            $('magento_orders_number_prefix_prefix').value = '';
+        }
+
+        self.renderOrderNumberExample();
+    },
+
+    magentoOrdersNumberPrefixPrefixChange : function()
+    {
+        var self = EbayAccountHandlerObj;
+        self.renderOrderNumberExample();
+    },
+
+    renderOrderNumberExample : function()
+    {
+        var orderNumber = $('sample_magento_order_id').value;
+        if ($('magento_orders_number_source').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_NUMBER_SOURCE_CHANNEL')) {
+            orderNumber = $('sample_ebay_order_id').value;
+        }
+
+        if ($('magento_orders_number_prefix_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_YES')) {
+            orderNumber = $('magento_orders_number_prefix_prefix').value + orderNumber;
+        }
+
+        $('order_number_example_container').update(orderNumber);
+    },
+
     magentoOrdersCustomerModeChange : function()
     {
         var customerMode = $('magento_orders_customer_mode').value;
@@ -471,6 +519,11 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         if ($('magento_orders_listings_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO') &&
             $('magento_orders_listings_other_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO')) {
 
+            $('magento_block_ebay_accounts_magento_orders_number').hide();
+            $('magento_orders_number_source').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_NUMBER_SOURCE_MAGENTO');
+            $('magento_orders_number_prefix_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_NO');
+            self.magentoOrdersNumberPrefixModeChange();
+
             $('magento_block_ebay_accounts_magento_orders_customer').hide();
             $('magento_orders_customer_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_MODE_GUEST');
             self.magentoOrdersCustomerModeChange();
@@ -480,11 +533,14 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             self.magentoOrdersStatusMappingModeChange();
 
             $('magento_block_ebay_accounts_magento_orders_rules').hide();
-            $('magento_orders_creation_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_CHECKOUT');
+            $('magento_orders_creation_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CREATE_CHECKOUT_AND_PAID');
+            $('magento_orders_creation_reservation_days').value = 0;
+            $('magento_orders_qty_reservation_days').value = 0;
 
             $('magento_block_ebay_accounts_magento_orders_tax').hide();
             $('magento_orders_tax_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_TAX_MODE_MIXED');
         } else {
+            $('magento_block_ebay_accounts_magento_orders_number').show();
             $('magento_block_ebay_accounts_magento_orders_customer').show();
             $('magento_block_ebay_accounts_magento_orders_status_mapping').show();
             $('magento_block_ebay_accounts_magento_orders_rules').show();

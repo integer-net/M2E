@@ -79,7 +79,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
         //--------------------------------
         // Get collection
         //----------------------------
-        /** @var Mage_Core_Model_Mysql4_Collection_Abstract $collection */
+        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->addAttributeToSelect('sku');
         $collection->addAttributeToSelect('name');
@@ -499,19 +499,19 @@ HTML;
         $options = parent::getActionColumnOptions();
 
         array_unshift($options,array(
-            'label' => $this->__('Edit eBay Categories Settings'),
+            'label' => Mage::helper('M2ePro')->__('Edit eBay Categories Settings'),
             'value' => 'editCategorySettings'
         ));
 
         if ($this->getListing()->getAccount()->getChildObject()->getEbayStoreCategories()) {
             array_unshift($options,array(
-                'label' => $this->__('Edit eBay Store Primary Categories Settings'),
+                'label' => Mage::helper('M2ePro')->__('Edit eBay Store Primary Categories Settings'),
                 'value' => 'editStorePrimaryCategorySettings'
             ));
         }
 
         array_unshift($options,array(
-            'label' => $this->__('Edit eBay Primary Categories Settings'),
+            'label' => Mage::helper('M2ePro')->__('Edit eBay Primary Categories Settings'),
             'value' => 'editPrimaryCategorySettings'
         ));
 
@@ -552,9 +552,9 @@ HTML;
 
         //------------------------------
         $translations = json_encode(array(
-            'eBay Categories' => $this->__('eBay Categories'),
-            'Specifics' => $this->__('Specifics'),
-            'Compatibility Attribute ePIDs' => $this->__('Compatibility Attribute ePIDs')
+            'eBay Categories' => Mage::helper('M2ePro')->__('eBay Categories'),
+            'Specifics' => Mage::helper('M2ePro')->__('Specifics'),
+            'Compatibility Attribute ePIDs' => Mage::helper('M2ePro')->__('Compatibility Attribute ePIDs')
         ));
         //------------------------------
 

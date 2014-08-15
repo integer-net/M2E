@@ -28,7 +28,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     // Data for current tab
     //-----------------------------
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Wrong value. Only integer numbers.' => $this->__('Wrong value. Only integer numbers.')
+        'Wrong value. Only integer numbers.' => Mage::helper('M2ePro')->__('Wrong value. Only integer numbers.')
     )); ?>);
 
     M2ePro.formData.revise_update_qty = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['revise_update_qty']); ?>';

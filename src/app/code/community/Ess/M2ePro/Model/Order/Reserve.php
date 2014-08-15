@@ -256,7 +256,6 @@ class Ess_M2ePro_Model_Order_Reserve
                 } catch (Exception $e) {
                     $result = false;
 
-                    $this->order->setActionRequired(true);
                     $this->order->addErrorLog(
                         'Qty for product "%name%" cannot be reserved. Reason: %msg%',
                         array(

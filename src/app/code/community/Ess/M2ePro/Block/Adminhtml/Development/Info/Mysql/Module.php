@@ -30,19 +30,27 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Mysql_Module extends Mage_Admi
             $this->getAdditionalTables()
         );
 
-        $tablesInfo = array();
-
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        foreach ($tablesData as $category=>$tables) {
+        $existTables = Mage::helper('M2ePro/Magento')->getMySqlTables();
+
+        $tablesInfo = array();
+        foreach ($tablesData as $category => $tables) {
             foreach ($tables as $table) {
+
+                if(!in_array($table, $existTables)) {
+                    $tablesInfo[$category][$table] = array(
+                        'count' => 0, 'url'   => '#'
+                    );
+                    continue;
+                }
+
                 $moduleTable = Mage::getSingleton('core/resource')->getTableName($table);
-                $dbSelect = $connRead->select()->from($moduleTable,new Zend_Db_Expr('COUNT(*)'));
+                $dbSelect = $connRead->select()->from($moduleTable, new Zend_Db_Expr('COUNT(*)'));
 
                 $tablesInfo[$category][$table]['count'] = $connRead->fetchOne($dbSelect);
                 $tablesInfo[$category][$table]['url'] = $this->getUrl(
-                    '*/adminhtml_development_database/manageTable',
-                    array('table' => $table)
+                    '*/adminhtml_development_database/manageTable', array('table' => $table)
                 );
             }
         }
@@ -56,9 +64,9 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Mysql_Module extends Mage_Admi
     {
         return array(
             'Config' => array(
-            'm2epro_primary_config',
-            'm2epro_config',
-            'm2epro_synchronization_config'
+                'm2epro_primary_config',
+                'm2epro_config',
+                'm2epro_synchronization_config'
             )
         );
     }

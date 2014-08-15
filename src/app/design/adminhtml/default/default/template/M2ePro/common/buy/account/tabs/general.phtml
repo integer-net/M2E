@@ -44,8 +44,8 @@ $isEdit = !!$this->getRequest()->getParam('id');
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => $this->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'),
-        'Invalid format of Seller ID field. It must be numeric.' => $this->__('Invalid format of Seller ID field. It must be numeric.')
+        'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => Mage::helper('M2ePro')->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'),
+        'Invalid format of Seller ID field. It must be numeric.' => Mage::helper('M2ePro')->__('Invalid format of Seller ID field. It must be numeric.')
     )); ?>);
 
     M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
@@ -68,10 +68,10 @@ $isEdit = !!$this->getRequest()->getParam('id');
     // Data for current tab
     //-----------------------------
     M2ePro.translator.add(<?php echo json_encode(array(
-        'The specified title is already used for other account. Account title must be unique.' => $this->__('The specified title is already used for other account. Account title must be unique.'),
-        'You must enable marketplace first.' => $this->__('You must enable marketplace first.'),
-        'M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.' => $this->__('M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.'),
-        'M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com FTP login and password.' => $this->__('M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com FTP login and password.')
+        'The specified title is already used for other account. Account title must be unique.' => Mage::helper('M2ePro')->__('The specified title is already used for other account. Account title must be unique.'),
+        'You must enable marketplace first.' => Mage::helper('M2ePro')->__('You must enable marketplace first.'),
+        'M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.'),
+        'M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com FTP login and password.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com FTP login and password.')
     )); ?>);
 
     M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';

@@ -51,6 +51,12 @@ class Ess_M2ePro_Model_Buy_Account extends Ess_M2ePro_Model_Component_Child_Buy_
     const MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE = 0;
     const MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT = 1;
 
+    const MAGENTO_ORDERS_NUMBER_SOURCE_MAGENTO = 'magento';
+    const MAGENTO_ORDERS_NUMBER_SOURCE_CHANNEL = 'channel';
+
+    const MAGENTO_ORDERS_NUMBER_PREFIX_MODE_NO  = 0;
+    const MAGENTO_ORDERS_NUMBER_PREFIX_MODE_YES = 1;
+
     const MAGENTO_ORDERS_TAX_MODE_NONE    = 0;
     const MAGENTO_ORDERS_TAX_MODE_CHANNEL = 1;
     const MAGENTO_ORDERS_TAX_MODE_MAGENTO = 2;
@@ -471,6 +477,41 @@ class Ess_M2ePro_Model_Buy_Account extends Ess_M2ePro_Model_Component_Child_Buy_
         $setting = $this->getSetting('magento_orders_settings', array('listing_other', 'product_tax_class_id'));
 
         return (int)$setting;
+    }
+
+    //-----------------------------------------
+
+    public function getMagentoOrdersNumberSource()
+    {
+        $setting = $this->getSetting(
+            'magento_orders_settings', array('number', 'source'), self::MAGENTO_ORDERS_NUMBER_SOURCE_MAGENTO
+        );
+        return $setting;
+    }
+
+    public function isMagentoOrdersNumberSourceMagento()
+    {
+        return $this->getMagentoOrdersNumberSource() == self::MAGENTO_ORDERS_NUMBER_SOURCE_MAGENTO;
+    }
+
+    public function isMagentoOrdersNumberSourceChannel()
+    {
+        return $this->getMagentoOrdersNumberSource() == self::MAGENTO_ORDERS_NUMBER_SOURCE_CHANNEL;
+    }
+
+    //-----------------------------------------
+
+    public function isMagentoOrdersNumberPrefixEnable()
+    {
+        $setting = $this->getSetting(
+            'magento_orders_settings', array('number', 'prefix', 'mode'), self::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_NO
+        );
+        return $setting == self::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_YES;
+    }
+
+    public function getMagentoOrdersNumberPrefix()
+    {
+        return $this->getSetting('magento_orders_settings', array('number', 'prefix', 'prefix'), '');
     }
 
     //-----------------------------------------

@@ -50,20 +50,14 @@ class Ess_M2ePro_Adminhtml_Development_Module_ModuleController
     //#############################################
 
     /**
-     * @title "Update License"
-     * @description "Send update license request to server"
+     * @title "Process Servicing"
+     * @description "Process Servicing Task"
      */
-    public function licenseUpdateAction()
+    public function processServicingAction()
     {
-        $dispatcher = Mage::getModel('M2ePro/Servicing_Dispatcher');
-        $licenseTaskNick = Mage::getModel('M2ePro/Servicing_Task_License')->getPublicNick();
-        $result = $dispatcher->processTask($licenseTaskNick);
-
-        if ($result) {
-            $this->_getSession()->addSuccess('License status was successfully updated.');
-        } else {
-            $this->_getSession()->addError('License status was updated with errors.');
-        }
+        Mage::getModel('M2ePro/Servicing_Dispatcher')->process()
+            ? $this->_getSession()->addSuccess('Processing was successfully executed.')
+            : $this->_getSession()->addError('Processing was executed with errors.');
 
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }

@@ -338,7 +338,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         )) {
             return $this->getResponse()->setBody(json_encode(array(
                 'result' => 'error',
-                'message' => Mage::helper('M2ePro')->__('Unknown Mode "%s"', $mode)
+                'message' => Mage::helper('M2ePro')->__('Unknown Mode "%mode%"', $mode)
             )));
         }
 

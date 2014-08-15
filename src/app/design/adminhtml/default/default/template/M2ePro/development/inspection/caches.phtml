@@ -39,19 +39,17 @@
         </td>
     </tr>
 
-    <?php if (Mage::helper('M2ePro/Client_Cache')->isWrongSlowBackendType()) { ?>
-        <tr>
-            <td class="label">
-                <label><?php echo Mage::helper('M2ePro')->__('Slow Cache Backend'); ?>: </label>
-            </td>
-            <td class="value">
-                <span class="red"><b><?php echo ucfirst(Mage::helper('M2ePro/Client_Cache')->getSlowBackend()); ?></b></span>
-            </td>
-            <td class="value">
-                <a style="margin-left: 10px;" href="<?php echo $this->getUrl('*/adminhtml_development_inspection/cacheSettings'); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Show Settings'); ?></a>
-            </td>
-        </tr>
-    <?php } ?>
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Cache Backend'); ?>: </label>
+        </td>
+        <td class="value">
+            <span <?php if (Mage::helper('M2ePro/Client_Cache')->isWrongCacheConfiguration()) : echo 'style="color: red; font-weight: bold;"'; endif; ?>><?php echo get_class(Mage::app()->getCache()->getBackend()); ?></span>
+        </td>
+        <td class="value">
+            <a style="margin-left: 10px;" href="<?php echo $this->getUrl('*/adminhtml_development_inspection/cacheSettings'); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Show Settings'); ?></a>
+        </td>
+    </tr>
 
     <tr>
         <td class="label">

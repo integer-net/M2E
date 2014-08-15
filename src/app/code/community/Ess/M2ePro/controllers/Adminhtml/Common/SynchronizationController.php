@@ -81,7 +81,7 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
                                                              (int)$this->getRequest()
                                                                         ->getParam('buy_other_listings_mode'));
 
-            }  elseif ($component == Ess_M2ePro_Helper_Component_Play::NICK) {
+            } elseif ($component == Ess_M2ePro_Helper_Component_Play::NICK) {
 
                 Mage::helper('M2ePro/Module')->getSynchronizationConfig()
                                              ->setGroupValue('/play/templates/',

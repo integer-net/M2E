@@ -194,10 +194,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
         ));
 
         $options = array(
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN => $this->__('Primary'),
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY => $this->__('Secondary'),
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN => $this->__('Store Primary'),
-            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY => $this->__('Store Secondary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN => Mage::helper('M2ePro')->__('Primary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY => Mage::helper('M2ePro')->__('Secondary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_MAIN => Mage::helper('M2ePro')->__('Store Primary'),
+            Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_STORE_SECONDARY => Mage::helper('M2ePro')->__('Store Secondary'),
         );
         $this->addColumn('type', array(
             'header'        => Mage::helper('M2ePro')->__('Type'),
@@ -245,8 +245,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
             'filter_condition_callback' => array($this, 'callbackFilterState'),
             'frame_callback'=> array($this, 'callbackColumnState'),
             'options'       => array(
-                1 => $this->__('Active'),
-                0 => $this->__('Removed'),
+                1 => Mage::helper('M2ePro')->__('Active'),
+                0 => Mage::helper('M2ePro')->__('Removed'),
             ),
         ));
 

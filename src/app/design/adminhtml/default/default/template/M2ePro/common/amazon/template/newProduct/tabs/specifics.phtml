@@ -5,22 +5,22 @@
 <script type="text/javascript">
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Total digits (not more):' => $this->__('Total digits (not more):'),
-        'Type: Numeric.' => $this->__('Type: Numeric.'),
-        'Min:'           => $this->__('Min:'),
-        'Max:'           => $this->__('Max:'),
+        'Total digits (not more):' => Mage::helper('M2ePro')->__('Total digits (not more):'),
+        'Type: Numeric.' => Mage::helper('M2ePro')->__('Type: Numeric.'),
+        'Min:'           => Mage::helper('M2ePro')->__('Min:'),
+        'Max:'           => Mage::helper('M2ePro')->__('Max:'),
 
-        'Can take any value.' => $this->__('Can take any value.'),
+        'Can take any value.' => Mage::helper('M2ePro')->__('Can take any value.'),
 
-        'Two uppercase letters or "unknown".' => $this->__('Two uppercase letters or "unknown".'),
-        'Type: String.' => $this->__('Type: String.'),
-        'Min length:'   => $this->__('Min length:'),
-        'Max length:'   => $this->__('Max length:'),
+        'Two uppercase letters or "unknown".' => Mage::helper('M2ePro')->__('Two uppercase letters or "unknown".'),
+        'Type: String.' => Mage::helper('M2ePro')->__('Type: String.'),
+        'Min length:'   => Mage::helper('M2ePro')->__('Min length:'),
+        'Max length:'   => Mage::helper('M2ePro')->__('Max length:'),
 
-        'Type: Date time. Format: YYYY-MM-DD hh:mm:ss' => $this->__('Type: Date time. Format: YYYY-MM-DD hh:mm:ss'),
+        'Type: Date time. Format: YYYY-MM-DD hh:mm:ss' => Mage::helper('M2ePro')->__('Type: Date time. Format: YYYY-MM-DD hh:mm:ss'),
 
-        'Type: Numeric floating point.' => $this->__('Type: Numeric floating point.'),
-        'Decimal places (not more):' => $this->__('Decimal places (not more):')
+        'Type: Numeric floating point.' => Mage::helper('M2ePro')->__('Type: Numeric floating point.'),
+        'Decimal places (not more):' => Mage::helper('M2ePro')->__('Decimal places (not more):')
     )); ?>);
 
     Event.observe(window, 'load', function() {

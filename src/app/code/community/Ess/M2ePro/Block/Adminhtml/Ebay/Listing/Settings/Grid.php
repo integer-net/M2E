@@ -73,7 +73,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         //--------------------------------
         // Get collection
         //----------------------------
-        /** @var Mage_Core_Model_Mysql4_Collection_Abstract $collection */
+        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->addAttributeToSelect('sku');
         $collection->addAttributeToSelect('name');
@@ -141,7 +141,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         $options = parent::getActionColumnOptions();
 
         array_push($options,array(
-            'label' => $this->__('Remove Item'),
+            'label' => Mage::helper('M2ePro')->__('Remove Item'),
             'value' => 'removeItem'
         ));
 
@@ -190,10 +190,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
 
         //------------------------------
         $translations = json_encode(array(
-            'Automatic Actions' => $this->__('Automatic Actions'),
-            'Based on Magento Categories' => $this->__('Based on Magento Categories'),
-            'You must select at least 1 category.' => $this->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => $this->__('Rule with the same title already exists.'),
+            'Automatic Actions' => Mage::helper('M2ePro')->__('Automatic Actions'),
+            'Based on Magento Categories' => Mage::helper('M2ePro')->__('Based on Magento Categories'),
+            'You must select at least 1 category.' => Mage::helper('M2ePro')->__('You must select at least 1 category.'),
+            'Rule with the same title already exists.' => Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
         ));
         //------------------------------
 

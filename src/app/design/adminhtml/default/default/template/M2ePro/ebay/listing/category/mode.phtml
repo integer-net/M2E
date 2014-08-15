@@ -9,7 +9,7 @@
 
 <?php echo $this->getChildHtml('view_header'); ?>
 
-<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('You have to set eBay Categories before you can List Items on eBay.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('You need to choose eBay categories for products in order to list them on eBay.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
     <div style="padding: 2px"></div>
 
@@ -24,11 +24,11 @@
         <div style="margin:15px 0 0 10px">
 
             <input id="same" name="mode" type="radio" value="same">&nbsp;&nbsp;
-            <label style="font-weight: bold" for="same"><?php echo Mage::helper('M2ePro')->__('The same category'); ?></label>
+            <label style="font-weight: bold" for="same"><?php echo Mage::helper('M2ePro')->__('All products same category'); ?></label>
 
             <div style="margin-left: 22px">
                 <div style="margin: 7px 0">
-                    <?php echo Mage::helper('M2ePro')->__('The Products will all have the same category.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Products will be listed using the same eBay category.'); ?>
                 </div>
                 <div style="margin-left: 0px; margin-bottom: 10px;">
                     <input name="mode_same_remember_checkbox" type="checkbox" id="mode_same_remember_checkbox">&nbsp;
@@ -43,7 +43,7 @@
                 <label style="font-weight: bold" for="category"><?php echo Mage::helper('M2ePro')->__('Based on Magento categories'); ?></label>
 
                 <div style="margin: 10px 22px">
-                    <?php echo Mage::helper('M2ePro')->__('The products will all have the eBay categories that are based on Magento categories.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Products will have eBay categories set according to the Magento categories.'); ?>
                 </div>
 
             <?php } ?>
@@ -52,7 +52,7 @@
             <label style="font-weight: bold" for="product"><?php echo Mage::helper('M2ePro')->__('Get suggested categories'); ?></label>
 
             <div style="margin: 10px 22px">
-                <?php echo Mage::helper('M2ePro')->__('eBay suggests the best categories for your products based on title and attribute set of product.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('Get eBay to suggest categories for your products based on the title and Magento attribute set.'); ?>
             </div>
 
             <?php if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) { ?>
@@ -61,7 +61,7 @@
                 <label style="font-weight: bold" for="manually"><?php echo Mage::helper('M2ePro')->__('Set manually for each product'); ?></label>
 
                 <div style="margin: 10px 22px">
-                    <?php echo Mage::helper('M2ePro')->__('You have complete freedom to choose (individually, or by grouping a set of products together) the most suitable eBay category for your products.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Set eBay categories for each product (or a group of products) manually.'); ?>
                 </div>
 
             <?php } ?>

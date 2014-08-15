@@ -144,7 +144,10 @@ EbayListingCategorySpecificHandler.prototype = Object.extend(new CommonHandler()
                 var specificValueMode = $(self.uniqId+'item_specifics_value_mode_' + counter);
 
                 if (specific.required) {
-                    specificValueMode.select('option[value="'+M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_NONE')+'"]')[0].remove();
+                    if (specificValueMode.select('option[value="'+M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_NONE')+'"]').length > 0) {
+                        specificValueMode.select('option[value="'+M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_NONE')+'"]')[0].remove();
+                    }
+
                     specificValueMode.select('option')[0].selected = 1;
                 }
 

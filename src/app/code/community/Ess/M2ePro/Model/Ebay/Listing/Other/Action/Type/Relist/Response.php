@@ -12,7 +12,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Relist_Response
     public function processSuccess(array $response, array $responseParams = array())
     {
         if ((int)$this->getListingOther()->getProductId() > 0) {
-            $this->createEbayItem($this->getListingOther(),$response['ebay_item_id']);
+            $this->createEbayItem($response['ebay_item_id']);
         }
 
         $data = array(

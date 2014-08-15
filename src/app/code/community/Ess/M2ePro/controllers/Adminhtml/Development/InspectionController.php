@@ -16,7 +16,7 @@ class Ess_M2ePro_Adminhtml_Development_InspectionController
 
     public function cacheSettingsAction()
     {
-        echo '<pre>'.print_r(Mage::app()->getCache()->getBackend(), true);
+        echo '<pre>'.print_r(Mage::app()->getCache(), true);
     }
 
     //#############################################

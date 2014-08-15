@@ -89,8 +89,9 @@ $isEdit = !!$this->getRequest()->getParam('id');
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Amazon_Template_NewProduct_Description'); ?>,'Ess_M2ePro_Model_Amazon_Template_NewProduct_Description');
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Please enter a number 0 or greater in this field.' => $this->__('Please enter a number 0 or greater in this field.'),
-        'Please enter a number 0.01 or greater in this field.' => $this->__('Please enter a number 0.01 or greater in this field.')
+        'Please enter a number 0 or greater in this field.' => Mage::helper('M2ePro')->__('Please enter a number 0 or greater in this field.'),
+        'Please enter a number 0.01 or greater in this field.' => Mage::helper('M2ePro')->__('Please enter a number 0.01 or greater in this field.'),
+         'Invalid input data. Decimal value required. Example 12.05' => Mage::helper('M2ePro')->__('Invalid input data. Decimal value required. Example 12.05'),
     )); ?>);
 
     Event.observe(window, 'load', function() {
@@ -100,8 +101,6 @@ $isEdit = !!$this->getRequest()->getParam('id');
             if (!el.up('tr').visible()) {
                 return true;
             }
-
-            value = str_replace(',','.',value);
 
             var numValue = parseNumber(value);
             if (isNaN(numValue)) {
@@ -116,8 +115,6 @@ $isEdit = !!$this->getRequest()->getParam('id');
             if (!el.up('tr').visible()) {
                 return true;
             }
-
-            value = str_replace(',','.',value);
 
             var numValue = parseNumber(value);
             if (isNaN(numValue)) {
@@ -420,8 +417,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                                 <br>
                                 <strong>For ex.</strong>, if you are selling a case of 10 packages of socks,
                                 and each package contains
-                                <br>3 pairs of socks, the case would have Package Quantity = 10 and Number of Items = 30.
-                            '); ?>
+                                <br>3 pairs of socks, the case would have Package Quantity = 10 and Number of Items = 30.'); ?>
                         </p>
                     </td>
                 </tr>
@@ -474,7 +470,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <input id="package_weight_custom_value" name="description[package_weight_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['package_weight_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validate-package-weight"/>
+                        <input id="package_weight_custom_value" name="description[package_weight_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['package_weight_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validation-float M2ePro-validate-package-weight"/>
                     </td>
                 </tr>
 
@@ -551,7 +547,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <input id="shipping_weight_custom_value" name="description[shipping_weight_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['shipping_weight_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validate-shipping-weight"/>
+                        <input id="shipping_weight_custom_value" name="description[shipping_weight_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['description']['shipping_weight_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validation-float M2ePro-validate-shipping-weight"/>
                     </td>
                 </tr>
 
@@ -671,7 +667,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <?php for ($i = 0; $i < 5; $i++): ?>
                     <tr class="search_terms_tr" style="display: none;">
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Value #%s', $i + 1); ?>:</label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Value #%number%', $i + 1); ?>:</label>
                         </td>
                         <td class="value">
                             <input id="search_terms_<?php echo $i; ?>"
@@ -826,7 +822,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <?php for ($i = 0; $i < 5; $i++): ?>
                     <tr class="bullet_points_tr" style="display: none;">
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Value #%s', $i + 1); ?>:</label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Value #%number%', $i + 1); ?>:</label>
                         </td>
                         <td class="value">
                             <input id="bullet_points_<?php echo $i; ?>"

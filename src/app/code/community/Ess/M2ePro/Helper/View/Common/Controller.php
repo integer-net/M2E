@@ -23,12 +23,12 @@ class Ess_M2ePro_Helper_View_Common_Controller extends Mage_Core_Helper_Abstract
         $url = 'http://support.m2epro.com/knowledgebase/articles/';
         $url .= '162927-why-cron-job-is-required-for-amazon-and-rakuten-co';
 
-        $startLinkArticle = '<a href="'.$url.'" target="_blank">';
-        $endLink = '</a>';
-
+        // M2ePro_TRANSLATIONS
+        // Attention! AUTOMATIC synchronization is not running at the moment.<br/>Please check this <a href="%url% target="_blank">article</a> to learn why it is required.
         $message = 'Attention! AUTOMATIC synchronization is not running at the moment.';
-        $message .= '<br/>Please check this %sarticle%s to learn why it is required.';
-        $message = $this->__($message, $startLinkArticle, $endLink);
+        $message .= '<br/>Please check this <a href="%url% target="_blank">article</a> ';
+        $message .= 'to learn why it is required.';
+        $message = Mage::helper('M2ePro')->__($message, $url);
 
         $controller->getSession()->addError($message);
     }

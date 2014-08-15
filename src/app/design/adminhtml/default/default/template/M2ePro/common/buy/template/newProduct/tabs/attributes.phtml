@@ -5,21 +5,21 @@
 <script type="text/javascript">
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'At least one of the following attributes must be chosen:' => $this->__('At least one of the following attributes must be chosen:'),
-        'At least one of these attributes is required.' => $this->__('At least one of these attributes is required.'),
-        'Multiple values ​​must be separated by comma.' => $this->__('Multiple values ​​must be separated by comma.'),
+        'At least one of the following attributes must be chosen:' => Mage::helper('M2ePro')->__('At least one of the following attributes must be chosen:'),
+        'At least one of these attributes is required.' => Mage::helper('M2ePro')->__('At least one of these attributes is required.'),
+        'Multiple values ​​must be separated by comma.' => Mage::helper('M2ePro')->__('Multiple values ​​must be separated by comma.'),
 
-        'None' => $this->__('None'),
-        'Recommended Values' => $this->__('Recommended Values'),
-        'Allowed Values' => $this->__('Allowed Values'),
-        'Custom Value' => $this->__('Custom Value'),
-        'Custom Attribute' => $this->__('Custom Attribute'),
+        'None' => Mage::helper('M2ePro')->__('None'),
+        'Recommended Values' => Mage::helper('M2ePro')->__('Recommended Values'),
+        'Allowed Values' => Mage::helper('M2ePro')->__('Allowed Values'),
+        'Custom Value' => Mage::helper('M2ePro')->__('Custom Value'),
+        'Custom Attribute' => Mage::helper('M2ePro')->__('Custom Attribute'),
 
-        'Any integer value' => $this->__('Any integer value'),
-        'Any decimal value' => $this->__('Any decimal value'),
-        'Any string value' => $this->__('Any string value'),
+        'Any integer value' => Mage::helper('M2ePro')->__('Any integer value'),
+        'Any decimal value' => Mage::helper('M2ePro')->__('Any decimal value'),
+        'Any string value' => Mage::helper('M2ePro')->__('Any string value'),
 
-        'The category does not have attributes.' => $this->__('The category does not have attributes.')
+        'The category does not have attributes.' => Mage::helper('M2ePro')->__('The category does not have attributes.')
     )); ?>);
 
     Event.observe(window, 'load', function() {

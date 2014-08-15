@@ -8,6 +8,27 @@ class Ess_M2ePro_Model_Observer_Order
 {
     //####################################
 
+    public function salesOrderSaveAfter(Varien_Event_Observer $observer)
+    {
+        /** @var Mage_Sales_Model_Order $magentoOrder */
+        $magentoOrder = $observer->getEvent()->getOrder();
+
+        /** @var Ess_M2ePro_Model_Order $order */
+        $order = $magentoOrder->getData(Ess_M2ePro_Model_Order::ADDITIONAL_DATA_KEY_IN_ORDER);
+        if (empty($order)) {
+            return;
+        }
+
+        if ($order->getData('magento_order_id') == $magentoOrder->getId()) {
+            return;
+        }
+
+        $order->setData('magento_order_id', $magentoOrder->getId());
+        $order->save();
+
+        $order->afterCreateMagentoOrder();
+    }
+
     public function salesConvertQuoteItemToOrderItem(Varien_Event_Observer $observer)
     {
         try {
@@ -32,9 +53,9 @@ class Ess_M2ePro_Model_Observer_Order
 
             // Get listings products, other listings where is product
             $listingsProductsArray = Mage::getResourceModel('M2ePro/Listing_Product')
-                                                ->getItemsWhereIsProduct($product->getId());
+                                                ->getItemsByProductId($product->getId());
             $otherListingsArray = Mage::getResourceModel('M2ePro/Listing_Other')
-                                                ->getItemsWhereIsProduct($product->getId());
+                                                ->getItemsByProductId($product->getId());
 
             if (count($listingsProductsArray) > 0 || count($otherListingsArray) > 0) {
 
@@ -73,7 +94,8 @@ class Ess_M2ePro_Model_Observer_Order
                                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_QTY,
-                                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                                // M2ePro_TRANSLATIONS
+                                // From [%from%] to [%to%]
                                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                                     'From [%from%] to [%to%]',array('!from'=>$qtyOld,'!to'=>$qtyNew)
                                 ),
@@ -91,7 +113,8 @@ class Ess_M2ePro_Model_Observer_Order
                                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_QTY,
-                                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
+                                // M2ePro_TRANSLATIONS
+                                // From [%from%] to [%to%]
                                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                                     'From [%from%] to [%to%]',array('!from'=>$qtyOld,'!to'=>$qtyNew)
                                 ),
@@ -130,9 +153,10 @@ class Ess_M2ePro_Model_Observer_Order
                                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
-                                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
-                                // Parser hack -> Mage::helper('M2ePro')->__('IN Stock');
-                                // Parser hack -> Mage::helper('M2ePro')->__('OUT of Stock');
+                                // M2ePro_TRANSLATIONS
+                                // From [%from%] to [%to%]
+                                // IN Stock
+                                // OUT of Stock
                                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                                     'From [%from%] to [%to%]',
                                     array('from'=>$stockAvailabilityOld,'to'=>$stockAvailabilityNew)
@@ -151,9 +175,10 @@ class Ess_M2ePro_Model_Observer_Order
                                 Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                 NULL,
                                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY,
-                                // Parser hack -> Mage::helper('M2ePro')->__('From [%from%] to [%to%]');
-                                // Parser hack -> Mage::helper('M2ePro')->__('IN Stock');
-                                // Parser hack -> Mage::helper('M2ePro')->__('OUT of Stock');
+                                // M2ePro_TRANSLATIONS
+                                // From [%from%] to [%to%]
+                                // IN Stock
+                                // OUT of Stock
                                 Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                                     'From [%from%] to [%to%]',
                                     array('from'=>$stockAvailabilityOld,'to'=>$stockAvailabilityNew)

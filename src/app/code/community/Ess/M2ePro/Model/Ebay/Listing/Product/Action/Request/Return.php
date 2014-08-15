@@ -17,13 +17,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Return
     public function getData()
     {
         return array(
-            'return_policy' => array(
+            'return' => array(
                 'accepted'      => $this->getReturnTemplate()->getAccepted(),
                 'option'        => $this->getReturnTemplate()->getOption(),
                 'within'        => $this->getReturnTemplate()->getWithin(),
                 'description'   => $this->getReturnTemplate()->getDescription(),
-                'shippingcost'  => $this->getReturnTemplate()->getShippingCost(),
-                'restockingfee' => $this->getReturnTemplate()->getRestockingFee()
+                'shipping_cost'  => $this->getReturnTemplate()->getShippingCost(),
+                'restocking_fee' => $this->getReturnTemplate()->getRestockingFee()
             )
         );
     }

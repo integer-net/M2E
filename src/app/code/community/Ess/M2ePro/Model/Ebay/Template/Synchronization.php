@@ -534,74 +534,46 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
     // #######################################
 
-    public function getAffectedListingProducts($asObjects = false, $key = NULL)
+    public function getAffectedListingsProducts($asObjects = false)
     {
-        if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
-        }
-
-        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
-
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
-        $templateManager->setTemplate($template);
+        $templateManager->setTemplate(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION);
 
-        $listingProducts = $templateManager->getAffectedItems(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT,
-            $this->getId(), array(), $asObjects, $key
+        $listingsProducts = $templateManager->getAffectedOwnerObjects(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asObjects
         );
 
-        $ids = array();
-        foreach ($listingProducts as $listingProduct) {
-            $ids[] = is_null($key) ? $listingProduct['id'] : $listingProduct;
-        }
-
-        $listingProducts && $listingProducts = array_combine($ids, $listingProducts);
-
-        $listings = $templateManager->getAffectedItems(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING,
-            $this->getId()
+        $listings = $templateManager->getAffectedOwnerObjects(
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING, $this->getId(), true
         );
 
         foreach ($listings as $listing) {
 
-            $tempListingProducts = $listing->getChildObject()
-                                           ->getAffectedListingProducts($template,$asObjects,$key);
+            $tempListingsProducts = $listing->getChildObject()
+                                            ->getAffectedListingsProductsByTemplate(
+                                                Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION,
+                                                $asObjects
+                                            );
 
-            foreach ($tempListingProducts as $listingProduct) {
-                $id = is_null($key) ? $listingProduct['id'] : $listingProduct;
-                !isset($listingProducts[$id]) && $listingProducts[$id] = $listingProduct;
+            foreach ($tempListingsProducts as $listingProduct) {
+                if (!isset($listingsProducts[$listingProduct['id']])) {
+                    $listingsProducts[$listingProduct['id']] = $listingProduct;
+                }
             }
         }
 
-        return array_values($listingProducts);
+        return $listingsProducts;
     }
-
-    // #######################################
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $this->getParentObject()->setSynchStatusNeed(
-            $newData, $oldData,
-            array('sellingFormatTemplate' => 'revise_change_selling_format_template',
-                  'descriptionTemplate'   => 'revise_change_description_template',
-                  'categoryTemplate'      => 'revise_change_category_template',
-                  'paymentTemplate'       => 'revise_change_payment_template',
-                  'shippingTemplate'      => 'revise_change_shipping_template',
-                  'returnTemplate'        => 'revise_change_return_template')
-        );
-    }
+        $listingsProducts = $this->getAffectedListingsProducts(false);
 
-    public function getFullReviseSettingWhichWereEnabled($newData, $oldData)
-    {
-        return $this->getParentObject()->getFullReviseSettingWhichWereEnabled(
-            $newData, $oldData,
-            array('sellingFormatTemplate' => 'revise_change_selling_format_template',
-                  'descriptionTemplate'   => 'revise_change_description_template',
-                  'categoryTemplate'      => 'revise_change_category_template',
-                  'paymentTemplate'       => 'revise_change_payment_template',
-                  'shippingTemplate'      => 'revise_change_shipping_template',
-                  'returnTemplate'        => 'revise_change_return_template')
-        );
+        if (!$listingsProducts) {
+            return;
+        }
+
+        $this->getResource()->setSynchStatusNeed($newData,$oldData,$listingsProducts);
     }
 
     // #######################################

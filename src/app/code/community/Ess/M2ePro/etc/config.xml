@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>6.1.6</version>
+            <version>6.1.7</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -470,6 +470,16 @@
                     </ess_M2ePro_observer_stock_item>
                 </observers>
             </cataloginventory_stock_item_save_after>
+
+            <sales_order_save_after>
+                <observers>
+                    <ess_M2ePro_observer_order>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Order</class>
+                        <method>salesOrderSaveAfter</method>
+                    </ess_M2ePro_observer_order>
+                </observers>
+            </sales_order_save_after>
 
             <sales_order_invoice_pay>
                 <observers>

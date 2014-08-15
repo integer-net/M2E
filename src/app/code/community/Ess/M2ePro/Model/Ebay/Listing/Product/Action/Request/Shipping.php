@@ -15,9 +15,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
     const MEASUREMENT_SYSTEM_ENGLISH = 'English';
     const MEASUREMENT_SYSTEM_METRIC  = 'Metric';
 
-    const INTERNATIONAL_TRADE_NONE           = 'None';
-    const INTERNATIONAL_TRADE_NORTH_AMERICA  = 'North America';
-    const INTERNATIONAL_TRADE_UNITED_KINGDOM = 'UK';
+    const CROSS_BORDER_TRADE_NONE           = 'None';
+    const CROSS_BORDER_TRADE_NORTH_AMERICA  = 'North America';
+    const CROSS_BORDER_TRADE_UNITED_KINGDOM = 'UK';
 
     /**
      * @var Ess_M2ePro_Model_Ebay_Template_Shipping
@@ -33,27 +33,40 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         $data = array(
             'country' => $this->getShippingTemplate()->getCountry(),
             'address' => $this->getShippingTemplate()->getAddress(),
-            'postal_code' => $this->getShippingTemplate()->getPostalCode(),
-            'international_trade' => $this->getInternationalTrade()
+            'postal_code' => $this->getShippingTemplate()->getPostalCode()
         );
 
         if ($this->getShippingTemplate()->isLocalShippingFlatEnabled() ||
             $this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
 
-            $data['use_local_shipping_rate_table'] =
-                $this->getShippingTemplate()->isLocalShippingRateTableEnabled();
+            $data['dispatch_time'] = $this->getShippingTemplate()->getDispatchTime();
 
-            if ($this->getShippingTemplate()->isInternationalShippingFlatEnabled() ||
-                $this->getShippingTemplate()->isInternationalShippingCalculatedEnabled()) {
+            // there are permissions by marketplace (interface management)
+            $data['cash_on_delivery_cost'] = $this->getShippingTemplate()->getCashOnDeliveryCost();
 
-                $data['use_international_shipping_rate_table'] =
-                    $this->getShippingTemplate()->isInternationalShippingRateTableEnabled();
+            // there are permissions by marketplace (interface management)
+            if ($this->getShippingTemplate()->isCrossBorderTradeNorthAmerica()) {
+                $data['cross_border_trade'] = self::CROSS_BORDER_TRADE_NORTH_AMERICA;
+            } else if ($this->getShippingTemplate()->isCrossBorderTradeUnitedKingdom()) {
+                $data['cross_border_trade'] = self::CROSS_BORDER_TRADE_UNITED_KINGDOM;
+            } else {
+                $data['cross_border_trade'] = self::CROSS_BORDER_TRADE_NONE;
             }
+
+            foreach ($this->getShippingTemplate()->getExcludedLocations() as $location) {
+                $data['excluded_locations'][] = $location['code'];
+            }
+
+            // there are permissions by marketplace (interface management)
+            $data['global_shipping_program'] = $this->getShippingTemplate()->isGlobalShippingProgramEnabled();
         }
 
-        $data['shipping'] = $this->getShippingData();
-
-        return $data;
+        return array(
+            'shipping' => array_merge(
+                $data,
+                $this->getShippingData()
+            )
+        );
     }
 
     // ########################################
@@ -64,14 +77,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
 
         $shippingData['local'] = $this->getLocalShippingData();
 
+        if ($this->getShippingTemplate()->isLocalShippingLocalEnabled() ||
+            $this->getShippingTemplate()->isLocalShippingFreightEnabled()) {
+            return $shippingData;
+        }
+
         if ($this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
             $shippingData['calculated'] = $this->getCalculatedData();
         }
 
-        if (($this->getShippingTemplate()->isLocalShippingFlatEnabled() ||
-             $this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) &&
-            ($this->getShippingTemplate()->isInternationalShippingFlatEnabled() ||
-             $this->getShippingTemplate()->isInternationalShippingCalculatedEnabled())) {
+        if ($this->getShippingTemplate()->isInternationalShippingFlatEnabled() ||
+            $this->getShippingTemplate()->isInternationalShippingCalculatedEnabled()) {
 
             $shippingData['international'] = $this->getInternationalShippingData();
 
@@ -82,31 +98,19 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             }
         }
 
-        if ($this->getShippingTemplate()->isLocalShippingFlatEnabled() ||
-            $this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
+        if (!isset($shippingData['calculated'])) {
 
-            $shippingData['dispatch_time'] = $this->getShippingTemplate()->getDispatchTime();
+            if (($this->getShippingTemplate()->isLocalShippingFlatEnabled() &&
+                 $this->getShippingTemplate()->isLocalShippingRateTableEnabled()) ||
+                ($this->getShippingTemplate()->isInternationalShippingFlatEnabled() &&
+                 $this->getShippingTemplate()->isInternationalShippingRateTableEnabled())) {
 
-            if ($shippingData['dispatch_time'] === '') {
-                unset($shippingData['dispatch_time']);
+                $calculatedData = $this->getCalculatedData();
+                unset($calculatedData['package_size']);
+                unset($calculatedData['dimensions']);
+                $shippingData['calculated'] = $calculatedData;
             }
         }
-
-        // get Measurement System and Weight Source if calculated is disabled
-        if ($this->getShippingTemplate()->isLocalShippingFlatEnabled() &&
-            $this->getShippingTemplate()->isLocalShippingRateTableEnabled() &&
-            !$this->getShippingTemplate()->isInternationalShippingCalculatedEnabled() &&
-            !isset($shippingData['calculated'])
-        ) {
-            $calculatedData = $this->getCalculatedData();
-            unset($calculatedData['package_size']);
-            unset($calculatedData['originating_postal_code']);
-            unset($calculatedData['dimensions']);
-            $shippingData['calculated'] = $calculatedData;
-        }
-
-        $shippingData['excluded_locations'] = $this->getExcludedLocations();
-        $shippingData['global_shipping_program'] = $this->getShippingTemplate()->isGlobalShippingProgramEnabled();
 
         return $shippingData;
     }
@@ -124,19 +128,18 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         }
 
         $data = array(
-            'originating_postal_code' => $calculated->getOriginatingPostalCode(),
             'package_size' => $calculated->getPackageSize(),
             'dimensions' => $calculated->getDimension(),
             'weight' => $calculated->getWeight()
         );
 
-        $measurementSystem = $calculated->getMeasurementSystem();
-
-        if ($measurementSystem == Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::MEASUREMENT_SYSTEM_ENGLISH) {
-            $data['measurement_system'] = self::MEASUREMENT_SYSTEM_ENGLISH;
-        }
-        if ($measurementSystem == Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::MEASUREMENT_SYSTEM_METRIC) {
-            $data['measurement_system'] = self::MEASUREMENT_SYSTEM_METRIC;
+        switch ($calculated->getMeasurementSystem()) {
+            case Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::MEASUREMENT_SYSTEM_ENGLISH:
+                $data['measurement_system'] = self::MEASUREMENT_SYSTEM_ENGLISH;
+                break;
+            case Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::MEASUREMENT_SYSTEM_METRIC:
+                $data['measurement_system'] = self::MEASUREMENT_SYSTEM_METRIC;
+                break;
         }
 
         return $this->calculatedShippingData = $data;
@@ -155,17 +158,19 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             return $data;
         }
 
-        $data['discount'] = $this->getShippingTemplate()->isLocalShippingDiscountEnabled();
-        $data['combined_discount_profile'] = $this->getShippingTemplate()
-                                                  ->getLocalShippingCombinedDiscountProfileId(
-                                                      $this->getListingProduct()->getListing()->getAccountId()
-                                                  );
+        $data['discount_enabled'] = $this->getShippingTemplate()->isLocalShippingDiscountEnabled();
+        $data['discount_profile_id'] = $this->getShippingTemplate()
+                                            ->getLocalShippingDiscountProfileId(
+                                                $this->getListingProduct()->getListing()->getAccountId()
+                                            );
 
-        $data['cash_on_delivery'] = $this->getShippingTemplate()->isLocalShippingCashOnDeliveryEnabled();
-        $data['cash_on_delivery_cost'] = $this->getShippingTemplate()->getLocalShippingCashOnDeliveryCost();
+        if ($this->getShippingTemplate()->isLocalShippingFlatEnabled()) {
+            // there are permissions by marketplace (interface management)
+            $data['rate_table_enabled'] = $this->getShippingTemplate()->isLocalShippingRateTableEnabled();
+        }
 
         if ($this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
-            $data['handing_fee'] = $this->getShippingTemplate()->getCalculatedShipping()->getLocalHandling();
+            $data['handing_cost'] = $this->getShippingTemplate()->getCalculatedShipping()->getLocalHandlingCost();
         }
 
         $data['methods'] = $this->getLocalServices();
@@ -177,11 +182,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
 
     private function getLocalType()
     {
-        if ($this->getShippingTemplate()->isLocalShippingFreightEnabled()) {
-            return self::SHIPPING_TYPE_FREIGHT;
-        }
         if ($this->getShippingTemplate()->isLocalShippingLocalEnabled()) {
             return self::SHIPPING_TYPE_LOCAL;
+        }
+        if ($this->getShippingTemplate()->isLocalShippingFreightEnabled()) {
+            return self::SHIPPING_TYPE_FREIGHT;
         }
         if ($this->getShippingTemplate()->isLocalShippingFlatEnabled()) {
             return self::SHIPPING_TYPE_FLAT;
@@ -227,16 +232,22 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
     public function getInternationalShippingData()
     {
         $data = array(
-            'type' => $this->getInternationalType(),
-            'discount' => $this->getShippingTemplate()->isInternationalShippingDiscountEnabled(),
-            'combined_discount_profile' => $this->getShippingTemplate()
-                                                ->getInternationalShippingCombinedDiscountProfileId(
-                                                    $this->getListingProduct()->getListing()->getAccountId()
-                                                )
+            'type' => $this->getInternationalType()
         );
 
+        $data['discount_enabled'] = $this->getShippingTemplate()->isInternationalShippingDiscountEnabled();
+        $data['discount_profile_id'] = $this->getShippingTemplate()
+                                            ->getInternationalShippingDiscountProfileId(
+                                                $this->getListingProduct()->getListing()->getAccountId()
+                                            );
+
+        if ($this->getShippingTemplate()->isInternationalShippingFlatEnabled()) {
+            // there are permissions by marketplace (interface management)
+            $data['rate_table_enabled'] = $this->getShippingTemplate()->isInternationalShippingRateTableEnabled();
+        }
+
         if ($this->getShippingTemplate()->isInternationalShippingCalculatedEnabled()) {
-            $data['handing_fee'] = $this->getShippingTemplate()->getCalculatedShipping()->getInternationalHandling();
+            $data['handing_cost'] = $this->getShippingTemplate()->getCalculatedShipping()->getInternationalHandlingCost();
         }
 
         $data['methods'] = $this->getInternationalServices();
@@ -283,32 +294,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         }
 
         return $services;
-    }
-
-    // ########################################
-
-    private function getInternationalTrade()
-    {
-        if ($this->getShippingTemplate()->isInternationalTradeNorthAmerica()) {
-            $internationalTrade = self::INTERNATIONAL_TRADE_NORTH_AMERICA;
-        } else if ($this->getShippingTemplate()->isInternationalTradeUnitedKingdom()) {
-            $internationalTrade = self::INTERNATIONAL_TRADE_UNITED_KINGDOM;
-        } else {
-            $internationalTrade = self::INTERNATIONAL_TRADE_NONE;
-        }
-
-        return $internationalTrade;
-    }
-
-    private function getExcludedLocations()
-    {
-        $data = array();
-
-        foreach ($this->getShippingTemplate()->getExcludedLocations() as $location) {
-            $data[] = $location['code'];
-        }
-
-        return $data;
     }
 
     // ########################################

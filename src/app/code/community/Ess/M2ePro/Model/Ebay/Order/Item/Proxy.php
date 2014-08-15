@@ -4,9 +4,6 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-/**
- * @property Ess_M2ePro_Model_Ebay_Order_Item $item
- */
 class Ess_M2ePro_Model_Ebay_Order_Item_Proxy extends Ess_M2ePro_Model_Order_Item_Proxy
 {
     // ########################################
@@ -15,7 +12,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Proxy extends Ess_M2ePro_Model_Order_Item
     {
         $price = $this->item->getPrice();
 
-        if ($this->getProxyOrder()->isTaxModeNone() && $this->hasTax()) {
+        if (($this->getProxyOrder()->isTaxModeNone() && $this->hasTax()) || $this->isVatTax()) {
             $price += $this->item->getTaxAmount();
         }
 
@@ -27,10 +24,14 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Proxy extends Ess_M2ePro_Model_Order_Item
         return $this->item->getQtyPurchased();
     }
 
+    // ########################################
+
     public function getTaxRate()
     {
         return $this->item->getTaxRate();
     }
+
+    // ########################################
 
     public function getAdditionalData()
     {

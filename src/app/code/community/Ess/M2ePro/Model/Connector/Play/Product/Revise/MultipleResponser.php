@@ -20,7 +20,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Revise_MultipleResponser
                                                   $this->getListingProductRequestNativeData($listingProduct),
                                                   $this->params);
 
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully revised');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully revised
             $this->addListingsProductsLogsMessage($listingProduct, $this->getSuccessfullyMessage(),
                                                   Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                                                   Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
@@ -31,7 +32,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Revise_MultipleResponser
 
     protected function getSuccessfullyMessage()
     {
-        // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully revised');
+        // M2ePro_TRANSLATIONS
+        // Item was successfully revised
         $defaultMessage = 'Item was successfully revised';
 
         if (isset($this->params['params']['all_data']) || !isset($this->params['params']['only_data'])) {
@@ -42,7 +44,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Revise_MultipleResponser
 
         if (isset($this->params['params']['only_data']['qty'])) {
 
-            // Parser hack -> Mage::helper('M2ePro')->__('qty');
+            // M2ePro_TRANSLATIONS
+            // qty
             $tempStr = 'qty';
             $tempOnlyString == '' && $tempStr = ucwords($tempStr);
             $tempOnlyString != '' && $tempOnlyString .= ', ';
@@ -50,8 +53,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Revise_MultipleResponser
         }
 
         if (isset($this->params['params']['only_data']['price'])) {
-
-            // Parser hack -> Mage::helper('M2ePro')->__('price');
+            // M2ePro_TRANSLATIONS
+            // price
             $tempStr = 'price';
             $tempOnlyString == '' && $tempStr = ucwords($tempStr);
             $tempOnlyString != '' && $tempOnlyString .= ', ';
@@ -59,7 +62,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Revise_MultipleResponser
         }
 
         if ($tempOnlyString != '') {
-            // Parser hack -> Mage::helper('M2ePro')->__('was successfully revised');
+            // M2ePro_TRANSLATIONS
+            // was successfully revised
             return $tempOnlyString.' was successfully revised';
         }
 

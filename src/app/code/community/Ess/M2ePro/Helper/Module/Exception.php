@@ -107,7 +107,7 @@ class Ess_M2ePro_Helper_Module_Exception extends Mage_Core_Helper_Abstract
 
     public function getUserMessage(Exception $exception)
     {
-        return $this->__('Fatal error occurred').': "'.$exception->getMessage().'".';
+        return Mage::helper('M2ePro')->__('Fatal error occurred').': "'.$exception->getMessage().'".';
     }
 
     // ########################################

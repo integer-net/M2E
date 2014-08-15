@@ -379,7 +379,7 @@ which is used to search and assign Rakuten.com SKU for a single product or in a 
                                                 <option value="<?php echo $attribute['code']; ?>"<?php if ($formData['shipping_standard_custom_attribute'] == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <input type="text" name="shipping_standard_value" id="shipping_standard_value" style="width: 295px;" class="input-text M2ePro-validate-shipping-value-positive M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_standard_value']; ?>">
+                                        <input type="text" name="shipping_standard_value" id="shipping_standard_value" style="width: 295px;" class="input-text M2ePro-validation-float M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_standard_value']; ?>">
                                     </td>
                                 </tr>
                                 <tr>
@@ -403,7 +403,7 @@ which is used to search and assign Rakuten.com SKU for a single product or in a 
                                             <option value="<?php echo $attribute['code']; ?>"<?php if ($formData['shipping_expedited_custom_attribute'] == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <input type="text" name="shipping_expedited_value" id="shipping_expedited_value" style="width: 295px;" class="input-text M2ePro-validate-shipping-value-positive M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_expedited_value']; ?>">
+                                        <input type="text" name="shipping_expedited_value" id="shipping_expedited_value" style="width: 295px;" class="input-text M2ePro-validation-float M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_expedited_value']; ?>">
                                     </td>
                                 </tr>
                                 <tr>
@@ -427,7 +427,7 @@ which is used to search and assign Rakuten.com SKU for a single product or in a 
                                             <option value="<?php echo $attribute['code']; ?>"<?php if ($formData['shipping_two_day_custom_attribute'] == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <input type="text" name="shipping_two_day_value" id="shipping_two_day_value" style="width: 295px;" class="input-text M2ePro-validate-shipping-value-positive M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_two_day_value']; ?>">
+                                        <input type="text" name="shipping_two_day_value" id="shipping_two_day_value" style="width: 295px;" class="input-text M2ePro-validation-float M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_two_day_value']; ?>">
                                     </td>
                                 </tr>
                                 <tr>
@@ -451,7 +451,7 @@ which is used to search and assign Rakuten.com SKU for a single product or in a 
                                             <option value="<?php echo $attribute['code']; ?>"<?php if ($formData['shipping_one_day_custom_attribute'] == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <input type="text" name="shipping_one_day_value" id="shipping_one_day_value" style="width: 295px;" class="input-text M2ePro-validate-shipping-value-positive M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_one_day_value']; ?>">
+                                        <input type="text" name="shipping_one_day_value" id="shipping_one_day_value" style="width: 295px;" class="input-text M2ePro-validation-float M2ePro-required-when-visible-and-enabled" value="<?php echo (float)$formData['shipping_one_day_value']; ?>">
                                     </td>
                                 </tr>
                             </tbody>
@@ -534,7 +534,7 @@ which is used to search and assign Rakuten.com SKU for a single product or in a 
                         </select>
                         <p class="note">
                             <span>
-                            <?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Condition <a href="%s" target="_blank">identifier</a>.', $docsLink); ?>
+                            <?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Condition <a href="%url%" target="_blank">identifier</a>.', $docsLink); ?>
                             </span>
                         </p>
                     </td>

@@ -65,26 +65,26 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
         /** @var Ess_M2ePro_Model_Ebay_Template_Manager $templateManager */
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager')->setTemplate($templateNick);
 
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
 
-        $unionSelectListingTemplate = $connWrite->select()
+        $unionSelectListingTemplate = $connRead->select()
                     ->from($listingTable,array('result_field'=>$templateManager->getTemplateIdColumnName()))
                     ->where($templateManager->getTemplateIdColumnName().' IS NOT NULL');
-        $unionSelectListingCustom = $connWrite->select()
+        $unionSelectListingCustom = $connRead->select()
                      ->from($listingTable,array('result_field'=>$templateManager->getCustomIdColumnName()))
                      ->where($templateManager->getCustomIdColumnName().' IS NOT NULL');
-        $unionSelectListingProductTemplate = $connWrite->select()
+        $unionSelectListingProductTemplate = $connRead->select()
                      ->from($listingProductTable,array('result_field'=>$templateManager->getTemplateIdColumnName()))
                      ->where($templateManager->getTemplateIdColumnName().' IS NOT NULL');
-        $unionSelectListingProductCustom = $connWrite->select()
+        $unionSelectListingProductCustom = $connRead->select()
                      ->from($listingProductTable,array('result_field'=>$templateManager->getCustomIdColumnName()))
                      ->where($templateManager->getCustomIdColumnName().' IS NOT NULL');
 
-        $unionSelect = $connWrite->select()->union(array(
+        $unionSelect = $connRead->select()->union(array(
             $unionSelectListingTemplate,
             $unionSelectListingCustom,
             $unionSelectListingProductTemplate,
@@ -113,8 +113,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
     {
         $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Remove Unused "Category" Templates');
 
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
@@ -123,20 +123,20 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
         $minCreateDate = Mage::helper('M2ePro')->getCurrentGmtDate(true) - self::SAFE_CREATE_DATE_INTERVAL;
         $minCreateDate = Mage::helper('M2ePro')->getDate($minCreateDate);
 
-        $unionListingAutoGlobalSelect = $connWrite->select()
+        $unionListingAutoGlobalSelect = $connRead->select()
                     ->from($listingTable,array('result_field'=>'auto_global_adding_template_category_id'))
                     ->where('auto_global_adding_template_category_id IS NOT NULL');
-        $unionListingAutoWebsiteSelect = $connWrite->select()
+        $unionListingAutoWebsiteSelect = $connRead->select()
                     ->from($listingTable,array('result_field'=>'auto_website_adding_template_category_id'))
                     ->where('auto_website_adding_template_category_id IS NOT NULL');
-        $unionListingAutoCategorySelect = $connWrite->select()
+        $unionListingAutoCategorySelect = $connRead->select()
                     ->from($listingAutoCategoryTable,array('result_field'=>'adding_template_category_id'))
                     ->where('adding_template_category_id IS NOT NULL');
-        $unionSelectListingProductTemplate = $connWrite->select()
+        $unionSelectListingProductTemplate = $connRead->select()
                     ->from($listingProductTable,array('result_field'=>'template_category_id'))
                     ->where('template_category_id IS NOT NULL');
 
-        $unionSelect = $connWrite->select()->union(array(
+        $unionSelect = $connRead->select()->union(array(
             $unionListingAutoGlobalSelect,
             $unionListingAutoWebsiteSelect,
             $unionListingAutoCategorySelect,
@@ -159,8 +159,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
     {
         $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Remove Unused "Other Category" Templates');
 
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
@@ -169,20 +169,20 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
         $minCreateDate = Mage::helper('M2ePro')->getCurrentGmtDate(true) - self::SAFE_CREATE_DATE_INTERVAL;
         $minCreateDate = Mage::helper('M2ePro')->getDate($minCreateDate);
 
-        $unionListingAutoGlobalSelect = $connWrite->select()
+        $unionListingAutoGlobalSelect = $connRead->select()
                     ->from($listingTable,array('result_field'=>'auto_global_adding_template_other_category_id'))
                     ->where('auto_global_adding_template_other_category_id IS NOT NULL');
-        $unionListingAutoWebsiteSelect = $connWrite->select()
+        $unionListingAutoWebsiteSelect = $connRead->select()
                     ->from($listingTable,array('result_field'=>'auto_website_adding_template_other_category_id'))
                     ->where('auto_website_adding_template_other_category_id IS NOT NULL');
-        $unionListingAutoCategorySelect = $connWrite->select()
+        $unionListingAutoCategorySelect = $connRead->select()
                     ->from($listingAutoCategoryTable,array('result_field'=>'adding_template_other_category_id'))
                     ->where('adding_template_other_category_id IS NOT NULL');
-        $unionSelectListingProductTemplate = $connWrite->select()
+        $unionSelectListingProductTemplate = $connRead->select()
                     ->from($listingProductTable,array('result_field'=>'template_other_category_id'))
                     ->where('template_other_category_id IS NOT NULL');
 
-        $unionSelect = $connWrite->select()->union(array(
+        $unionSelect = $connRead->select()->union(array(
             $unionListingAutoGlobalSelect,
             $unionListingAutoWebsiteSelect,
             $unionListingAutoCategorySelect,

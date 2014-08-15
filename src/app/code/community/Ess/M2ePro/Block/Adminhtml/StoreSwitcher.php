@@ -19,7 +19,7 @@ class Ess_M2ePro_Block_Adminhtml_StoreSwitcher extends Mage_Adminhtml_Block_Temp
         $this->setTemplate('M2ePro/store_switcher.phtml');
         $this->setUseConfirm(true);
         $this->setUseAjax(true);
-        $this->setDefaultStoreName($this->__('Admin (Default Values)'));
+        $this->setDefaultStoreName(Mage::helper('M2ePro')->__('Admin (Default Values)'));
     }
 
     // ########################################

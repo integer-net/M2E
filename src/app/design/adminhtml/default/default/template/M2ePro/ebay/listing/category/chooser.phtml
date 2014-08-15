@@ -25,15 +25,15 @@
         'Ess_M2ePro_Helper_Component_Ebay_Category'
     );
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Select' => Mage::helper('M2ePro')->escapeJs($this->__('Select')),
-        'Reset' => Mage::helper('M2ePro')->escapeJs($this->__('Reset')),
-        'No recently used categories' => Mage::helper('M2ePro')->escapeJs($this->__('No recently used categories')),
-        'Change' => Mage::helper('M2ePro')->escapeJs($this->__('Change')),
-        'Category' => Mage::helper('M2ePro')->escapeJs($this->__('Category')),
-        'Not Selected' => Mage::helper('M2ePro')->escapeJs($this->__('Not Selected')),
-        'No results' => Mage::helper('M2ePro')->escapeJs($this->__('No results')),
-        'Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshEbayCategories()">update eBay sites data</a> and repeate the search.' => $this->__('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshEbayCategories()">update eBay sites data</a> and repeate the search.'),
-        'Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshStoreCategories()">refresh eBay store data</a> and repeate the search.' => $this->__('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshStoreCategories()">refresh eBay store data</a> and repeate the search.'),
+        'Select' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Select')),
+        'Reset' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Reset')),
+        'No recently used categories' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('No recently used categories')),
+        'Change' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Change')),
+        'Category' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Category')),
+        'Not Selected' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Not Selected')),
+        'No results' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('No results')),
+        'Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshEbayCategories()">update eBay sites data</a> and repeate the search.' => Mage::helper('M2ePro')->__('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshEbayCategories()">update eBay sites data</a> and repeate the search.'),
+        'Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshStoreCategories()">refresh eBay store data</a> and repeate the search.' => Mage::helper('M2ePro')->__('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshStoreCategories()">refresh eBay store data</a> and repeate the search.'),
     )); ?>);
 
     EbayListingCategoryChooserHandlerObj = new EbayListingCategoryChooserHandler('<?php echo $this->getDivId(); ?>', '<?php echo $this->getMarketplaceId(); ?>', '<?php echo $this->getAccountId(); ?>');

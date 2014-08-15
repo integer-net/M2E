@@ -23,17 +23,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log extends Mage_Adminhtml
 
         if (isset($otherListingData['id'])) {
 
-            $component = '';
-
             if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-                $component = ' ' . Mage::helper('M2ePro/Component')->getComponentTitle($otherListingData['component_mode']);
+                $component =  Mage::helper('M2ePro/Component')->getComponentTitle($otherListingData['component_mode']);
+                $headerText = Mage::helper('M2ePro')->__("Log For %component_name% 3rd Party Listing", $component);
+            } else {
+                $headerText = Mage::helper('M2ePro')->__("Log For 3rd Party Listing");
             }
 
             $tempTitle = Mage::helper('M2ePro/Component_'.ucfirst($otherListingData['component_mode']))
                 ->getObject('Listing_Other',$otherListingData['id'])
                 ->getChildObject()->getTitle();
 
-            $this->_headerText = Mage::helper('M2ePro')->__("Log For%s 3rd Party Listing", $component);
+            $this->_headerText = $headerText;
             $this->_headerText .= ' "' . $this->escapeHtml($tempTitle) . '"';
         } else {
             $this->_headerText = Mage::helper('M2ePro')->__('3rd Party Listings Log');

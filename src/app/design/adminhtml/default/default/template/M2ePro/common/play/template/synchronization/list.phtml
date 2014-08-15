@@ -44,11 +44,11 @@ $isEdit = !!$this->getRequest()->getParam('id');
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Add Synchronization Template.' => $this->__('Add Synchronization Template.'),
-        'Wrong time format string.' => $this->__('Wrong time format string.'),
+        'Add Synchronization Template.' => Mage::helper('M2ePro')->__('Add Synchronization Template.'),
+        'Wrong time format string.' => Mage::helper('M2ePro')->__('Wrong time format string.'),
 
-        'Must be greater than "Min".' => $this->__('Must be greater than "Min".'),
-        'Inconsistent settings in Revise and Stop rules.' => $this->__('Inconsistent settings in Revise and Stop rules.')
+        'Must be greater than "Min".' => Mage::helper('M2ePro')->__('Must be greater than "Min".'),
+        'Inconsistent settings in Revise and Stop rules.' => Mage::helper('M2ePro')->__('Inconsistent settings in Revise and Stop rules.')
     )); ?>);
 
     M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
@@ -66,7 +66,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     // Data for current tab
     //-----------------------------
     M2ePro.translator.add(<?php echo json_encode(array(
-        'The specified title is already used for other template. Template title must be unique.' => $this->__('The specified title is already used for other template. Template title must be unique.')
+        'The specified title is already used for other template. Template title must be unique.' => Mage::helper('M2ePro')->__('The specified title is already used for other template. Template title must be unique.')
     )); ?>);
 
     M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';

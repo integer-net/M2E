@@ -66,13 +66,14 @@ abstract class Ess_M2ePro_Model_Connector_Requester extends Ess_M2ePro_Model_Con
         // Create request
         //------------------
         $dataForAdd = array(
-            'hash' => $this->createNewRandomHash(),
-            'processing_hash' => $processingId,
-            'component' => strtolower($this->getComponent()),
-            'perform_type' => $this->getPerformType(),
-            'request_body' => json_encode($this->request),
-            'responser_model' => $this->makeResponserModel(),
-            'responser_params' => json_encode((array)$this->getResponserParams())
+            'hash'             => $this->createNewRandomHash(),
+            'processing_hash'  => $processingId,
+            'component'        => strtolower($this->getComponent()),
+            'perform_type'     => $this->getPerformType(),
+            'request_body'     => json_encode($this->request),
+            'responser_model'  => $this->makeResponserModel(),
+            'responser_params' => json_encode((array)$this->getResponserParams()),
+            'expiration_date'  => $this->getProcessingExpirationDate()
         );
 
         return Mage::getModel('M2ePro/Processing_Request')->setData($dataForAdd)->save();
@@ -83,6 +84,19 @@ abstract class Ess_M2ePro_Model_Connector_Requester extends Ess_M2ePro_Model_Con
     protected function makeResponserModel()
     {
         return 'M2ePro/Connector_'.(string)$this->getResponserModel();
+    }
+
+    //-----------------------------------------
+
+    protected function getProcessingExpirationDate()
+    {
+        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
+        return Mage::helper('M2ePro')->getDate($currentTimeStamp + $this->getProcessingExpirationInterval());
+    }
+
+    protected function getProcessingExpirationInterval()
+    {
+        return Ess_M2ePro_Model_Processing_Request::MAX_LIFE_TIME_INTERVAL;
     }
 
     protected function getPerformType()

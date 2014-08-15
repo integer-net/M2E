@@ -22,12 +22,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_StepFourCategory extends
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentName = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $headerText = Mage::helper('M2ePro')->__("Add %component_name% Listing [Select Categories]", $componentName);
         } else {
-            $componentName = '';
+            $headerText = Mage::helper('M2ePro')->__("Add Listing [Select Categories]");
         }
 
-        $this->_headerText = Mage::helper('M2ePro')->__("Add%s Listing [Select Categories]", $componentName);
+        $this->_headerText = $headerText;
         //------------------------------
 
         // Set buttons actions

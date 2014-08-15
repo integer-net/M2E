@@ -85,7 +85,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
         if ($lockItem->isExist()) {
             if (!isset($params['status_changer']) ||
                 $params['status_changer'] != Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
-                // Parser hack -> Mage::helper('M2ePro')->__('Other listings locked by other process.');
+                // M2ePro_TRANSLATIONS
+                // Other listings locked by other process.
                 throw new LogicException("Other listings locked by other process.");
             }
             $lockItem->activate();

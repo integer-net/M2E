@@ -44,7 +44,7 @@
         <div id="step_<?php echo $step; ?>" class="left breadcrumb <?php if ($step == $currentStep) echo 'selected' ?>">
 
             <span class="<?php if ($step == $currentStep) echo 'selected' ?>">
-                <?php echo Mage::helper('M2ePro')->__('Step %d', $stepCounter) ?>:
+                <?php echo Mage::helper('M2ePro')->__('Step %number%', $stepCounter) ?>:
             </span>
             <span>
                 <?php echo $stepTitles[$step]; ?>

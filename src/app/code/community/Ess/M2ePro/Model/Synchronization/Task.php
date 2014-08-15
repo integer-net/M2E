@@ -501,7 +501,9 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
         $this->getActualLockItem()->setPercents($this->getPercentsStart());
 
-        $status = 'Task "%s" is started. Please wait...';
+        // M2ePro_TRANSLATIONS
+        // Task "%task_title%" is started. Please wait...
+        $status = 'Task "%task_title%" is started. Please wait...';
         $title = ($this->isComponentLauncherTask() || $this->isContainerTask()) ?
                     $this->getTitle().' '.$suffix : $this->getTitle();
 
@@ -530,7 +532,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
         $this->getActualLockItem()->setPercents($this->getPercentsEnd());
 
-        $status = 'Task "%s" is finished. Please wait...';
+        $status = 'Task "%task_title%" is finished. Please wait...';
         $title = ($this->isComponentLauncherTask() || $this->isContainerTask()) ?
                     $this->getTitle().' '.$suffix : $this->getTitle();
 

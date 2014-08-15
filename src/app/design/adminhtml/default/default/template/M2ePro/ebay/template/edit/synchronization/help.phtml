@@ -1,16 +1,13 @@
 <div id="ebay_template_edit_synchronization_help" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Synchronization Settings'); ?>">
-    <p><?php echo Mage::helper('M2ePro')->__('Sync your accounts so you are always on top of your stock control and inventory.'); ?></p>
-    <p><?php echo Mage::helper('M2ePro')->__('Remember, you can amend Synchronization Settings at any time.'); ?></p>
+    <p><?php echo Mage::helper('M2ePro')->__('Sync your eBay accounts and Magento inventory so you are always in control of your stock  and inventory.'); ?></p>
     <?php echo Mage::helper('M2ePro')->__(
-        'There are 4 rule settings:
-        <br/>
+        'There are 4 sets of synchronisation rules:<br/>
         <ul class="list">
-            <li style="list-style: decimal !important;">List Rules</li>
-            <li style="list-style: decimal !important;">Revise Rules</li>
-            <li style="list-style: decimal !important;">Relist Rules</li>
-            <li style="list-style: decimal !important;">Stop Rules</li>
+            <li style="list-style: decimal !important;">List Rules - define which items to list on eBay</li>
+            <li style="list-style: decimal !important;">Revise Rules - define when eBay listings should be revised</li>
+            <li style="list-style: decimal !important;">Relist Rules - define when eBay listings should be relisted</li>
+            <li style="list-style: decimal !important;">Stop Rules - define when eBay listings should be stopped</li>
         </ul>
-        <b>Note:</b> Inventory Synchronization setting must be enabled in Synchronization (Configuration > Synchronization).
-        Otherwise, Synchronization Policy Rules will not take effect.'
+        <b>Note:</b> Settings made here only take effect if <b>Inventory Synchronization</b> is enabled in Configuration > Synchronization.'
     ); ?>
 </div>

@@ -15,21 +15,4 @@ class Ess_M2ePro_Model_Mysql4_Order
     }
 
     // ########################################
-
-    protected function _afterSave(Mage_Core_Model_Abstract $object)
-    {
-        if ($object->getOrigData('magento_order_id') != $object->getData('magento_order_id')
-            && !is_null($object->getData('magento_order_id'))
-        ) {
-            $this->_getWriteAdapter()->update(
-                Mage::getResourceModel('M2ePro/Order_Item')->getMainTable(),
-                array('state' => Ess_M2ePro_Model_Order_Item::STATE_NORMAL),
-                array('order_id = ?' => $object->getId())
-            );
-        }
-
-        return parent::_afterSave($object);
-    }
-
-    // ########################################
 }

@@ -81,7 +81,7 @@ class Ess_M2ePro_Block_Adminhtml_Template_Messages extends Mage_Adminhtml_Block_
         }
 
         $productIds = Mage::getResourceModel('M2ePro/Listing_Product')
-            ->getCatalogProductIds($this->getListingProductIds());
+            ->getProductIds($this->getListingProductIds());
         $attributeSets = Mage::helper('M2ePro/Magento_Attribute')
             ->getSetsFromProductsWhichLacksAttributes($this->getUsedAttributes(), $productIds);
 
@@ -91,12 +91,14 @@ class Ess_M2ePro_Block_Adminhtml_Template_Messages extends Mage_Adminhtml_Block_
 
         $attributeSetsNames = Mage::helper('M2ePro/Magento_AttributeSet')->getNames($attributeSets);
 
-        return sprintf(
+        // M2ePro_TRANSLATIONS
+        // Some attributes which are used in this policy were not found in products settings. Please, check if all of them are in [%set_name%] Attribute Set(s) as it can cause List, Revise or Relist issues.
+        return
             Mage::helper('M2ePro')->__(
                 'Some attributes which are used in this policy were not found in products settings.'
-                . ' Please, check if all of them are in [%s] Attribute Set(s)'
+                . ' Please, check if all of them are in [%set_name%] Attribute Set(s)'
                 . ' as it can cause List, Revise or Relist issues.'
-            ),
+            ,
             implode('", "', $attributeSetsNames)
         );
     }

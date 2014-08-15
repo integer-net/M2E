@@ -50,21 +50,24 @@ class Ess_M2ePro_Helper_Client_Cache extends Ess_M2ePro_Helper_Magento_Abstract
         return strtolower((string)Mage::getConfig()->getNode('global/cache/slow_backend'));
     }
 
-    //---------------------------------
+    // ################################
 
     public function isApcEnabled()
     {
-        return $this->getBackend() == self::BACKEND_TYPE_APC;
+        return $this->getBackend() == self::BACKEND_TYPE_APC ||
+               $this->getFastBackend() == self::BACKEND_TYPE_APC;
     }
 
     public function isMemchachedEnabled()
     {
-        return $this->getBackend() == self::BACKEND_TYPE_MEMCACHED;
+        return $this->getBackend() == self::BACKEND_TYPE_MEMCACHED ||
+               $this->getFastBackend() == self::BACKEND_TYPE_MEMCACHED;
     }
 
     public function isRedisEnabled()
     {
-        return $this->getBackend() == self::BACKEND_TYPE_REDIS;
+        return $this->getBackend() == self::BACKEND_TYPE_REDIS ||
+               $this->getFastBackend() == self::BACKEND_TYPE_REDIS;
     }
 
     public function isTwoLevelsCacheEnabled()
@@ -72,12 +75,21 @@ class Ess_M2ePro_Helper_Client_Cache extends Ess_M2ePro_Helper_Magento_Abstract
         return Mage::app()->getCache()->getBackend() instanceof Zend_Cache_Backend_TwoLevels;
     }
 
+    public function isAutoRefreshCacheEnabled()
+    {
+       return (bool)Mage::getConfig()->getNode('global/cache/auto_refresh_fast_cache');
+    }
+
     //---------------------------------
 
-    public function isWrongSlowBackendType()
+    public function isWrongCacheConfiguration()
     {
         if (!$this->isTwoLevelsCacheEnabled()) {
             return false;
+        }
+
+        if ($this->isAutoRefreshCacheEnabled()) {
+            return true;
         }
 
         if ($this->getSlowBackend() != '' &&

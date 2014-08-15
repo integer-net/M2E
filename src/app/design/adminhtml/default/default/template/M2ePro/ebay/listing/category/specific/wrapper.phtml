@@ -63,7 +63,7 @@
                 $title = $categoryData['category_main_path'] . ' ('.$category.')';
             } else {
                 $category = $categoryData['category_main_attribute'];
-                $title = Mage::helper('M2ePro')->__('Magento Attribute -> %s', Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
+                $title = Mage::helper('M2ePro')->__('Magento Attribute -> %attribute_label%', Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $category,
                     $this->getData('store_id')
                 ));

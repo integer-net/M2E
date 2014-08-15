@@ -141,7 +141,8 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
                                      Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_MOVE_LISTING,
-                                     // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully moved');
+                                     // M2ePro_TRANSLATIONS
+                                     // Item was successfully moved
                                      'Item was successfully moved',
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
@@ -154,7 +155,8 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
                                      Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_FROM_OTHER_LISTING,
-                                     // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully moved');
+                                     // M2ePro_TRANSLATIONS
+                                     // Item was successfully moved
                                      'Item was successfully moved',
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);

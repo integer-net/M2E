@@ -114,19 +114,23 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
                     $tempLogMessage = '';
                     switch ($newData['status']) {
                         case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
-                            // Parser hack ->__('Item status was successfully changed to "Listed".');
+                            // M2ePro_TRANSLATIONS
+                            // Item status was successfully changed to "Listed".
                             $tempLogMessage = 'Item status was successfully changed to "Listed".';
                             break;
                         case Ess_M2ePro_Model_Listing_Product::STATUS_SOLD:
-                            // Parser hack ->__('Item status was successfully changed to "Sold".');
+                            // M2ePro_TRANSLATIONS
+                            // Item status was successfully changed to "Sold".
                             $tempLogMessage = 'Item status was successfully changed to "Sold".';
                             break;
                         case Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED:
-                            // Parser hack ->__('Item status was successfully changed to "Stopped".');
+                            // M2ePro_TRANSLATIONS
+                            // Item status was successfully changed to "Stopped".
                             $tempLogMessage = 'Item status was successfully changed to "Stopped".';
                             break;
                         case Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED:
-                            // Parser hack ->__('Item status was successfully changed to "Finished".');
+                            // M2ePro_TRANSLATIONS
+                            // Item status was successfully changed to "Finished".
                             $tempLogMessage = 'Item status was successfully changed to "Finished".';
                             break;
                     }
@@ -154,7 +158,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
                      Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                      NULL,
                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_ADD_LISTING,
-                     // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully added');
+                    // M2ePro_TRANSLATIONS
+                    // Item was successfully added
                      'Item was successfully added',
                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW);
@@ -202,8 +207,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
 
     protected function filterReceivedOnlyOtherListings(array $receivedItems)
     {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
@@ -222,7 +227,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
         );
 
         /** @var $stmtTemp Zend_Db_Statement_Pdo */
-        $stmtTemp = $connWrite->query($collection->getSelect()->__toString());
+        $stmtTemp = $connRead->query($collection->getSelect()->__toString());
 
         $receivedItemsByItemId = array();
         foreach ($receivedItems as $receivedItem) {
@@ -238,8 +243,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
 
     protected function filterReceivedOnlyCurrentOtherListings(array $receivedItems)
     {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $resultItems = array();
 
@@ -264,7 +269,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
             }
 
             /** @var $stmtTemp Zend_Db_Statement_Pdo */
-            $stmtTemp = $connWrite->query($collection->getSelect()->__toString());
+            $stmtTemp = $connRead->query($collection->getSelect()->__toString());
 
             while ($existItem = $stmtTemp->fetch()) {
                 $oldItems = trim(trim($existItem['old_items'],','));

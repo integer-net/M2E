@@ -20,10 +20,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
     const WEIGHT_CUSTOM_VALUE           = 1;
     const WEIGHT_CUSTOM_ATTRIBUTE       = 2;
 
-    const HANDLING_NONE             = 0;
-    const HANDLING_CUSTOM_VALUE     = 1;
-    const HANDLING_CUSTOM_ATTRIBUTE = 2;
-
     // ########################################
 
     /**
@@ -106,11 +102,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
         return (int)$this->getData('measurement_system');
     }
 
-    public function getOriginatingPostalCode()
-    {
-        return $this->getData('originating_postal_code');
-    }
-
     //-----------------------------------------
 
     public function isMeasurementSystemMetric()
@@ -156,8 +147,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
             'width_value'  => $this->getData('dimension_width_value'),
             'width_attribute'  => $this->getData('dimension_width_attribute'),
 
-            'height_value' => $this->getData('dimension_height_value'),
-            'height_attribute' => $this->getData('dimension_height_attribute'),
+            'length_value' => $this->getData('dimension_length_value'),
+            'length_attribute' => $this->getData('dimension_length_attribute'),
 
             'depth_value'  => $this->getData('dimension_depth_value'),
             'depth_attribute'  => $this->getData('dimension_depth_attribute')
@@ -171,7 +162,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
 
         if ($src['mode'] == self::DIMENSION_CUSTOM_ATTRIBUTE) {
             $attributes[] = $src['width_attribute'];
-            $attributes[] = $src['height_attribute'];
+            $attributes[] = $src['length_attribute'];
             $attributes[] = $src['depth_attribute'];
         }
 
@@ -204,52 +195,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
 
     // #######################################
 
-    public function getLocalHandlingCostSource()
-    {
-        return array(
-            'mode'      => (int)$this->getData('local_handling_cost_mode'),
-            'value'     => $this->getData('local_handling_cost_value'),
-            'attribute' => $this->getData('local_handling_cost_attribute')
-        );
-    }
-
-    public function getLocalHandlingCostAttributes()
-    {
-        $attributes = array();
-        $src = $this->getLocalHandlingCostSource();
-
-        if ($src['mode'] == self::HANDLING_CUSTOM_ATTRIBUTE) {
-            $attributes[] = $src['attribute'];
-        }
-
-        return $attributes;
-    }
-
-    //----------------------------------------
-
-    public function getInternationalHandlingCostSource()
-    {
-        return array(
-            'mode'      => (int)$this->getData('international_handling_cost_mode'),
-            'value'     => $this->getData('international_handling_cost_value'),
-            'attribute' => $this->getData('international_handling_cost_attribute')
-        );
-    }
-
-    public function getInternationalHandlingCostAttributes()
-    {
-        $attributes = array();
-        $src = $this->getInternationalHandlingCostSource();
-
-        if ($src['mode'] == self::HANDLING_CUSTOM_ATTRIBUTE) {
-            $attributes[] = $src['attribute'];
-        }
-
-        return $attributes;
-    }
-
-    // #######################################
-
     public function getPackageSize()
     {
         $src = $this->getPackageSizeSource();
@@ -270,16 +215,21 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
         }
 
         if ($src['mode'] == self::DIMENSION_CUSTOM_ATTRIBUTE) {
+
+            $widthValue = str_replace(',', '.', $this->getMagentoProduct()->getAttributeValue($src['width_attribute']));
+            $lengthValue = str_replace(',', '.', $this->getMagentoProduct()->getAttributeValue($src['length_attribute']));
+            $depthValue = str_replace(',', '.', $this->getMagentoProduct()->getAttributeValue($src['depth_attribute']));
+
             return array(
-                'width' => $this->getMagentoProduct()->getAttributeValue($src['width_attribute']),
-                'height' => $this->getMagentoProduct()->getAttributeValue($src['height_attribute']),
-                'depth' => $this->getMagentoProduct()->getAttributeValue($src['depth_attribute'])
+                'width' => $widthValue,
+                'length' => $lengthValue,
+                'depth' => $depthValue
             );
         }
 
         return array(
             'width' => $src['width_value'],
-            'height' => $src['height_value'],
+            'length' => $src['length_value'],
             'depth' => $src['depth_value']
         );
     }
@@ -342,34 +292,14 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
 
     // #######################################
 
-    public function getLocalHandling()
+    public function getLocalHandlingCost()
     {
-        $src = $this->getLocalHandlingCostSource();
-
-        if ($src['mode'] == self::HANDLING_NONE) {
-            return 0;
-        }
-
-        if ($src['mode'] == self::HANDLING_CUSTOM_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
+        return (float)$this->getData('local_handling_cost');
     }
 
-    public function getInternationalHandling()
+    public function getInternationalHandlingCost()
     {
-        $src = $this->getInternationalHandlingCostSource();
-
-        if ($src['mode'] == self::HANDLING_NONE) {
-            return 0;
-        }
-
-        if ($src['mode'] == self::HANDLING_CUSTOM_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
+        return (float)$this->getData('international_handling_cost');
     }
 
     // #######################################
@@ -384,9 +314,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
         return array_unique(array_merge(
             $this->getPackageSizeAttributes(),
             $this->getDimensionAttributes(),
-            $this->getWeightAttributes(),
-            $this->getLocalHandlingCostAttributes(),
-            $this->getInternationalHandlingCostAttributes()
+            $this->getWeightAttributes()
         ));
     }
 

@@ -1,22 +1,21 @@
 <div class="content-header" style="border: none;">
     <table cellspacing="0">
         <tr>
-            <td><h3><?php echo Mage::helper('M2ePro')->__('Rules of auto adding and deletion products from current listing.'); ?></h3></td>
+            <td><h3><?php echo Mage::helper('M2ePro')->__('Choose the level at which products should be automatically added or deleted'); ?></h3></td>
         </tr>
     </table>
 </div>
 
-<div id="block_notice_ebay_listing_auto_action_mode" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Auto Actions'); ?>">
-    <?php
-        echo Mage::helper('M2ePro')->__('Depending on products scope level (Global, Website, Category) you can set the rules of adding / deletion Magento products from the current listing.');
-    ?>
+<div id="block_notice_ebay_listing_auto_action_mode" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Automatic Actions'); ?>">
+    <?php echo Mage::helper('M2ePro')->__(
+        'Choose the level at which products should be automatically added or deleted.<br/><br/>
+        <b>Global</b> will check for products being added or deleted anywhere in the Magento catalog.<br/>
+        <b>Website</b> will check for products being added or deleted anywhere in a Magento website.<br/>
+        <b>Category</b> will check for products being added or deleted in a category.'
+    ); ?>
 </div>
 
 <div>
-
-    <div style="text-decoration;">
-        <?php echo Mage::helper('M2ePro')->__('Select the scope level of products to which you want to apply the rule:');?>
-    </div>
 
     <div style="margin: 15px 0 0 10px;">
 
@@ -24,7 +23,7 @@
         <label style="font-weight: bold;" for="global"><?php echo Mage::helper('M2ePro')->__('Global (all products)'); ?></label>
 
         <div style="margin: 10px 22px;">
-            <?php echo Mage::helper('M2ePro')->__('Means that when a product is added or deleted from Magento catalog the rule is applied.'); ?>
+            <?php echo Mage::helper('M2ePro')->__('Acts when a product is added or deleted from Magento catalog.'); ?>
         </div>
 
         <?php if (!$this->isAdminStore()): ?>
@@ -40,7 +39,7 @@
         <label style="font-weight: bold;" for="category"><?php echo Mage::helper('M2ePro')->__('Category'); ?></label>
 
         <div style="margin: 10px 22px;">
-            <?php echo Mage::helper('M2ePro')->__('Means that when a product is added or deleted from Magento category, specified in the rule settings, the rule is applied.'); ?>
+            <?php echo Mage::helper('M2ePro')->__('Acts when a product is added or deleted from the Magento category specified in the M2E Pro listing rule settings.'); ?>
         </div>
 
     </div>

@@ -37,8 +37,6 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler,{
 
     //----------------------------------
 
-    // todo next (temp solution)
-
     options: {},
 
     setOptions: function(options)
@@ -301,7 +299,7 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler,{
         var partExecuteString = part.length;
         partExecuteString += '';
 
-        ListingProgressBarObj.setStatus(str_replace('%s', partExecuteString, self.options.text.sending_data_message));
+        ListingProgressBarObj.setStatus(str_replace('%product_title%', partExecuteString, self.options.text.sending_data_message));
 
         new Ajax.Request(self.options.url.searchAsinAuto, {
             method: 'post',

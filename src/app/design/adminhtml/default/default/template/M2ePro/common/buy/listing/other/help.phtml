@@ -2,10 +2,10 @@
     <?php
     $menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
     echo Mage::helper('M2ePro')->__(
-'This section contains Rakuten.com Listings, which belong to registered Rakuten.com Accounts (%1$s > Configuration > Rakuten.com Accounts) and were listed not by M2E Pro extension.<br/>
+'This section contains Rakuten.com Listings, which belong to registered Rakuten.com Accounts (%menu_label% > Configuration > Rakuten.com Accounts) and were listed not by M2E Pro extension.<br/>
 You can map these Listings to existing products in Magento and move them to another M2E Listings for further management. For that use single actions on appropriate Listing record or use mass Actions in the top right corner.<br/><br/>
 <b>Note:</b> To import Rakuten.com 3rd Party Listings the 3rd Party Listings Import must be enabled in account\'s settings
-(%1$s > Configuration > Rakuten.com Accounts > General tab) and the 3rd Party Listings Synchronization must be enabled in %1$s > Configuration > Synchronization.',
+(%menu_label% > Configuration > Rakuten.com Accounts > General tab) and the 3rd Party Listings Synchronization must be enabled in %menu_label% > Configuration > Synchronization.',
     $menuLabel);
     ?>
 </div>

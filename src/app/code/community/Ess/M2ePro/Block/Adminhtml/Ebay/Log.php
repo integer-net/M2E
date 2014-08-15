@@ -17,7 +17,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log extends Mage_Adminhtml_Block_Widget_Co
 
         // Set header text
         //------------------------------
-        $this->_headerText = 'Logs';
+        $this->_headerText = Mage::helper('M2ePro')->__('Logs');
         //------------------------------
 
         // Set buttons actions

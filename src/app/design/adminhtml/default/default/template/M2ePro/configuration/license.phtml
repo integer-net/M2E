@@ -66,21 +66,21 @@
         if ($betaComponentsCount > 1) $componentString = ' ' . Mage::helper('M2ePro')->__('components');
 
         $betaText = Mage::helper('M2ePro')->__(
-            'Current %s %s are in <span style="text-decoration: underline;">Beta</span> state and are provided free of charge. However, please be advised that upon the live version of the product release some monthly subscription fee will be introduced.</br>',
+            'Current %component_name% %version_title% are in <span style="text-decoration: underline;">Beta</span> state and are provided free of charge. However, please be advised that upon the live version of the product release some monthly subscription fee will be introduced.</br>',
             $betaComponentsString, $componentString
         );
     }
 
-    $tempString = Mage::helper('M2ePro')->__('<br/><b>Note:</b> M2E Pro v.6.x.x consists of %s.<br/>
-    %s
-    %s
+    $tempString = Mage::helper('M2ePro')->__('<br/><b>Note:</b> M2E Pro v.6.x.x consists of %component_name%.<br/>
+    %ebay_text%
+    %beta_text%
     <br/>
     <hr style="color:#D6D6D6"/><br/>
     M2E Pro extension requires activation for its work.<br/><br/>
     To get the License Key click the <span style="text-decoration: underline;">Manage License</span> link and follow the instructions.<br/>
     When you receive your License Key, press the Enter button, enter your License Key in appeared text field and press Confirm.
     <br/><br/>
-    <b>Note:</b> If you have not received the License Key, please contact us %s.',
+    <b>Note:</b> If you have not received the License Key, please contact us %email%.',
     $componentsString, $ebayText, $betaText, $email);
     echo $tempString;
     ?>
@@ -101,7 +101,7 @@
     ))?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'You must get valid Trial or Live license key.' => $this->__('You must get valid Trial or Live license key.')
+        'You must get valid Trial or Live license key.' => Mage::helper('M2ePro')->__('You must get valid Trial or Live license key.')
     )); ?>);
 
     Event.observe(window, 'load', function() {

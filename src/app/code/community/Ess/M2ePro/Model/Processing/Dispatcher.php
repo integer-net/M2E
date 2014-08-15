@@ -135,15 +135,11 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
 
     private function clearOldProcessingRequests()
     {
-        $currentDateTime = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-        $maxLifeTimeInterval = Ess_M2ePro_Model_Processing_Request::MAX_LIFE_TIME_INTERVAL;
-
-        $minCreateTimeStamp = $currentDateTime - $maxLifeTimeInterval;
-        $minCreateDateTime = Mage::helper('M2ePro')->getDate($minCreateTimeStamp);
+        $currentDateTime = Mage::helper('M2ePro')->getCurrentGmtDate();
 
         /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::getModel('M2ePro/Processing_Request')->getCollection();
-        $collection->getSelect()->where('create_date < \''.$minCreateDateTime.'\'');
+        $collection->getSelect()->where("expiration_date < '{$currentDateTime}'");
 
         $this->executeFailedProcessingRequests($collection->getItems());
     }

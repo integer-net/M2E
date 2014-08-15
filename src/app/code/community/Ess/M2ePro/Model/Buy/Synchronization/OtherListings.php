@@ -135,8 +135,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_OtherListings
     private function processAccountInventory(Ess_M2ePro_Model_Account $account)
     {
         $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
-        // ->__('The "3rd Party Listings" action for Rakuten.com account: "%s" is started. Please wait...')
-        $status = 'The "3rd Party Listings" action for Rakuten.com account: "%s" is started. Please wait...';
+        // M2ePro_TRANSLATIONS
+        // The "3rd Party Listings" action for Rakuten.com account: "%account_title%" is started. Please wait...
+        $status = 'The "3rd Party Listings" action for Rakuten.com account: "%account_title%" is started.';
+        $status .= ' Please wait...';
         $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
         if (!$this->isLockedAccount($account)) {
@@ -154,8 +156,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_OtherListings
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
         }
 
-        // ->__('The "3rd Party Listings" action for Rakuten.com account: "%s" is finished. Please wait...')
-        $status = 'The "3rd Party Listings" action for Rakuten.com account: "%s" is finished. Please wait...';
+        // M2ePro_TRANSLATIONS
+        // The "3rd Party Listings" action for Rakuten.com account: "%account_title%" is finished. Please wait...
+        $status = 'The "3rd Party Listings" action for Rakuten.com account: "%account_title%" is finished.';
+        $status .= ' Please wait...';
         $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
     }
 

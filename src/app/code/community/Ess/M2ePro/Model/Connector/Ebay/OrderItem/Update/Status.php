@@ -7,10 +7,11 @@
 class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Update_Status
     extends Ess_M2ePro_Model_Connector_Ebay_Abstract
 {
-    // ->__('Shipping status was not updated (Item: %item_id%, Transaction: %trn_id%). Reason: %msg%')
-    // ->__('Shipping status was not updated (Item: %item_id%, Transaction: %trn_id%). Reason: eBay Failure.')
-    // ->__('Tracking number "%num%" for "%code%" has been sent to eBay (Item: %item_id%, Transaction: %trn_id%).')
-    // ->__('Order item has been marked as shipped (Item: %item_id%, Transaction: %trn_id%).')
+    // M2ePro_TRANSLATIONS
+    // Shipping status was not updated (Item: %item_id%, Transaction: %trn_id%). Reason: %msg%
+    // Shipping status was not updated (Item: %item_id%, Transaction: %trn_id%). Reason: eBay Failure.
+    // Tracking number "%num%" for "%code%" has been sent to eBay (Item: %item_id%, Transaction: %trn_id%).
+    // Order item has been marked as shipped (Item: %item_id%, Transaction: %trn_id%).
 
     /** @var $orderItem Ess_M2ePro_Model_Order_Item */
     private $orderItem;

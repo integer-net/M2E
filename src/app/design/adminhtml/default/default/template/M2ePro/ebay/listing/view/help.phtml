@@ -1,24 +1,31 @@
 <div id="block_notice_ebay_listings_view_grid" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Listing Items'); ?>">
     <p>
         <?php echo Mage::helper('M2ePro')->__(
-            'This page contains products you have added to the Listing. You can review them and perform necessary actions.
-            <br/>You can also add a new M2E Pro Listing or navigate to other Listing directly from this page. Click the icon next to your Listing Title and a drop down menu appears.'
+            'This page shows the products you\'ve added to the current M2E Pro listing.<br/><br/>
+            Use the filters to find the product you want to manage. If an eBay Item ID is available, clicking it will take you to the listing on eBay.
+            Click the <b>Add Products</b> button to add new products to the M2E Pro listing.<br/><br/>
+            Click <b>Edit Listing Settings</b> to adjust the settings for this listing.<br/><br/>
+            To add a new M2E Pro listing or switch edit a different M2E Pro listing, click the arrow icon to the right of the M2E Pro listing title above.'
         ); ?>
     </p>
 
     <?php if(Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) : ?>
         <div>
             <?php echo Mage::helper('M2ePro')->__(
-                'There are three <b>\'Views\'</b> available to you in Advanced mode:
+                'There are three <b>View Mode</b>s available to you in Advanced mode:
                 <ul class="list">
-                    <li><b>eBay</b> - displays product information related to eBay. In this mode, you can easily find products by eBay information, perform actions in bulk (i.e. List, Revise, Relist, Stop, etc);</li>
-                    <li><b>Magento</b> - displays products information  related to Magento Catalog. In this mode, you can easily find products using magento products information (i.e. Magento QTY, Stock Status, etc);</li>
-                    <li><b>Settings</b> - displays information about settings set for products (i.e. Selling settings, eBay categories, etc). In this mode, you can easily find products by settings they use, change the settings in bulk.</li>
+                    <li>
+                        <b>eBay</b> - displays product information related to eBay. In this mode, you can easily find products by eBay information, perform actions in bulk (i.e. List, Revise, Relist, Stop, etc);
+                    </li>
+                    <li>
+                        <b>Magento</b> - displays products information related to Magento Catalog. In this mode, you can easily find products using magento products information (i.e. Magento QTY, Stock Status, etc);
+                    </li>
+                    <li>
+                        <b>Settings</b> - displays information about settings set for products (i.e. Selling settings, eBay categories, etc). In this mode, you can easily find products by settings they use, change the settings in bulk.
+                    </li>
                 </ul>
-                You can switch between modes using dropdown at the top of the product grid.
-                <br/>
-                <br/><b>Note:</b> If you need to search by magento product attributes which is not presented in the filters of the grid, you can use <b>\'Show Advanced Filter\'</b> option.
-                It\'s at the top of the page on the right hand side.'
+                You can switch between modes using dropdown at the top of the product grid.<br/><br/>
+                <b>Note:</b> If you need to search by Magento product attributes not shown in the filters of the grid, click <b>Show Advanced Filter</b> above the table on the right.'
             ); ?>
         </div>
     <?php endif; ?>

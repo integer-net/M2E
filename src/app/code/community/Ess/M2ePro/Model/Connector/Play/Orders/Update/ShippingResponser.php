@@ -7,9 +7,12 @@
 class Ess_M2ePro_Model_Connector_Play_Orders_Update_ShippingResponser
     extends Ess_M2ePro_Model_Connector_Play_Responser
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Play.com Order status was not updated. Reason: %msg%');
-    // Parser hack -> Mage::helper('M2ePro')->__('Play.com Order status was updated to Shipped.');
-    // Parser hack -> Mage::helper('M2ePro')->__('Tracking number "%num%" for "%code%" has been sent to Play.com.');
+    // M2ePro_TRANSLATIONS
+    // Play.com Order status was not updated. Reason: %msg%
+    // M2ePro_TRANSLATIONS
+    // Play.com Order status was updated to Shipped.
+    // M2ePro_TRANSLATIONS
+    // Tracking number "%num%" for "%code%" has been sent to Play.com.
 
     // ########################################
 

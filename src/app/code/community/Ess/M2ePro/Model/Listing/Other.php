@@ -111,8 +111,8 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
         }
 
         return $this->magentoProductModel = Mage::getModel('M2ePro/Magento_Product_Cache')
-                ->setStoreId($this->getChildObject()->getRelatedStoreId())
-                ->setProductId($this->getProductId());
+                                                    ->setStoreId($this->getChildObject()->getRelatedStoreId())
+                                                    ->setProductId($this->getProductId());
     }
 
     /**
@@ -247,105 +247,6 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
 
     // ########################################
 
-    public function getUsingMarketplacesIds()
-    {
-        $tableName = Mage::getResourceModel('M2ePro/Listing_Other')->getMainTable();
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        $dbSelect = $connRead->select()
-                             ->from($tableName,new Zend_Db_Expr('DISTINCT `marketplace_id`'));
-
-        return array_values($connRead->fetchCol($dbSelect));
-    }
-
-    public function getChangedItems(array $attributes,
-                                    $componentMode = NULL,
-                                    $withStoreFilter = false)
-    {
-        if (count($attributes) <= 0) {
-            return array();
-        }
-
-        $productsChangesTable = Mage::getResourceModel('M2ePro/ProductChange')->getMainTable();
-        $listingsOthersTable = Mage::getResourceModel('M2ePro/Listing_Other')->getMainTable();
-
-        $fields = array(
-            'changed_attribute'=>'attribute',
-            'changed_to_value'=>'value_new',
-        );
-
-        $limit = Mage::helper('M2ePro/Module')->getSynchronizationConfig()->getGroupValue(
-            '/settings/product_change/', 'max_count_per_one_time'
-        );
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from($productsChangesTable,'*')
-                             ->order(array('id ASC'))
-                             ->limit($limit);
-
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from(array('pc' => $dbSelect),$fields)
-                             ->join(array('lo' => $listingsOthersTable),'`pc`.`product_id` = `lo`.`product_id`','id')
-                             ->where('`pc`.`action` = ?',(string)Ess_M2ePro_Model_ProductChange::ACTION_UPDATE)
-                             ->where("`pc`.`attribute` IN ('".implode("','",$attributes)."')");
-
-        if ($withStoreFilter) {
-
-            $whereStatement = '';
-
-            if (!is_null($componentMode)) {
-                $components = array($componentMode);
-            } else {
-                $components = Mage::helper('M2ePro/Component')->getActiveComponents();
-            }
-
-            foreach ($components as $component) {
-
-                $accounts = Mage::helper('M2ePro/Component')
-                                    ->getComponentCollection($component,'Account')
-                                    ->getItems();
-                $marketplaces = Mage::helper('M2ePro/Component')
-                                        ->getComponentCollection($component,'Marketplace')
-                                        ->getItems();
-
-                foreach ($accounts as $account) {
-                    foreach ($marketplaces as $marketplace) {
-
-                        $whereStatement != '' && $whereStatement .= ' OR ';
-                        $whereStatement .= ' ( `lo`.`account_id` = '.(int)$account->getId().' ';
-                        $whereStatement .= ' AND `lo`.`marketplace_id` = '.(int)$marketplace->getId().' ';
-                        $whereStatement .= ' AND `lo`.`component_mode` = \''.$component.'\' ';
-                        $whereStatement .= ' AND `pc`.`store_id` = '.
-                                        (int)$account->getChildObject()
-                                            ->getRelatedStoreId($marketplace->getId()).' ) ';
-                    }
-                }
-            }
-
-            $whereStatement != '' && $dbSelect->where($whereStatement);
-        }
-
-        !is_null($componentMode) && $dbSelect->where("`lo`.`component_mode` = ?",(string)$componentMode);
-
-        $tempResult = Mage::getResourceModel('core/config')
-                                ->getReadConnection()
-                                ->fetchAll($dbSelect);
-
-        $finalResults = array();
-        foreach ($tempResult as $item) {
-            if (isset($finalResults[$item['id'].'_'.$item['changed_attribute']])) {
-                continue;
-            }
-            $finalResults[$item['id'].'_'.$item['changed_attribute']] = $item;
-        }
-
-        return array_values($finalResults);
-    }
-
-    // ########################################
-
     public function unmapDeletedProduct($product)
     {
         $productId = $product instanceof Mage_Catalog_Model_Product ?
@@ -374,7 +275,8 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
             $logsInitiator,
             NULL,
             Ess_M2ePro_Model_Listing_Other_Log::ACTION_MAP_LISTING,
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully mapped');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully mapped
             'Item was successfully mapped',
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
@@ -391,7 +293,8 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
             $logsInitiator,
             NULL,
             Ess_M2ePro_Model_Listing_Other_Log::ACTION_UNMAP_LISTING,
-            // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully unmapped');
+            // M2ePro_TRANSLATIONS
+            // Item was successfully unmapped
             'Item was successfully unmapped',
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);

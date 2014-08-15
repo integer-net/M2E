@@ -44,6 +44,30 @@ CommonHandler.prototype = {
 
             return hidden ? true : !!value;
         });
+
+        Validation.add('M2ePro-validation-float', M2ePro.translator.translate('Invalid input data. Decimal value required. Example 12.05'), function(value, element) {
+            if (!element.visible()) {
+                return true;
+            }
+
+            if (element.parentNode && !element.parentNode.visible()) {
+                return true;
+            }
+
+            if (element.up('tr') && !element.up('tr').visible()) {
+                return true;
+            }
+
+            if (element.up('.entry-edit') && !element.up('.entry-edit').visible()) {
+                return true;
+            }
+
+            if (value == '') {
+                return true;
+            }
+
+            return value.match(/^\d+[.]?\d*?$/g);
+        });
     },
 
     //----------------------------------

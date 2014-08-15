@@ -33,7 +33,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Revise_Single
         if (!$this->otherListing->isRevisable()) {
 
             $message = array(
-                // ->__('The item either is not listed or not available');
+                // M2ePro_TRANSLATIONS
+                // The item either is not listed or not available
                 parent::MESSAGE_TEXT_KEY => 'The item either is not listed or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
@@ -68,7 +69,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Revise_Single
             $this->getResponseObject()->processAlreadyStopped($response);
 
             $message = array(
-                // Parser hack -> Mage::helper('M2ePro')->__('Item was already stopped on eBay');
+                // M2ePro_TRANSLATIONS
+                // Item was already stopped on eBay
                 parent::MESSAGE_TEXT_KEY => 'Item was already stopped on eBay',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
@@ -78,7 +80,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Revise_Single
             $this->getResponseObject()->processSuccess($response);
 
             $message = array(
-                // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully revised');
+                // M2ePro_TRANSLATIONS
+                // Item was successfully revised
                 parent::MESSAGE_TEXT_KEY => $this->getResponseObject()->getSuccessfulMessage(),
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
             );

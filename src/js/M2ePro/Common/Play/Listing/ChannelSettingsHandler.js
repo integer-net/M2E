@@ -18,19 +18,12 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
             if (!el.up('tr').visible()) {
                 return true;
             }
-
-            var pattern = /[^\d.]+/;
-            if (pattern.exec(value) != null) {
-                return false;
+            var floatValidator = Validation.get('M2ePro-validation-float');
+            if (!floatValidator.test($F(el), el)) {
+                return true;
             }
 
-            if (isNaN(parseFloat(value)) ||
-                substr_count(value,'.') > 1 ||
-                value.substr(-1) == '.') {
-                return false;
-            }
-
-            if (value.indexOf('.') != -1 && (value.substring(value.indexOf('.')+1)).length > 2) {
+            if(value.indexOf('.') != -1 && (value.substring(value.indexOf('.')+1)).length > 2) {
                 return false;
             }
 

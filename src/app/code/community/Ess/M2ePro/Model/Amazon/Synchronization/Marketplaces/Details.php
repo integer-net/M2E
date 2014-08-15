@@ -89,7 +89,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
 
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        // ->__('The "Details" action for Amazon Marketplace: "%mrk%" has been successfully completed.');
+        // M2ePro_TRANSLATIONS
+        // The "Details" action for Amazon Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Details" action for Amazon Marketplace: "%mrk%" has been successfully completed.',

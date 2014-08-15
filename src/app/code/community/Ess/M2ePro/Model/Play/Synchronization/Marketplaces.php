@@ -94,8 +94,8 @@ final class Ess_M2ePro_Model_Play_Synchronization_Marketplaces
         $marketplace = Mage::helper('M2ePro/Component_Play')->getCachedObject(
             'Marketplace', (int)$params['marketplace_id']
         );
-
-        // ->__('The "Categories" action for Play Marketplace: "%mrk%" has been successfully completed.');
+        // M2ePro_TRANSLATIONS
+        // The "Categories" action for Play Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Categories" action for Play Marketplace: "%mrk%" has been successfully completed.',

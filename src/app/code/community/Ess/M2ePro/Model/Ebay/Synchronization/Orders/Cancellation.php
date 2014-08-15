@@ -66,16 +66,18 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Cancellation
             // ----------------------------------------------------------
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
 
-            // ->__('The "Cancellation" action for eBay account: "%s" is started. Please wait...')
-            $status = 'The "Cancellation" action for eBay account: "%s" is started. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Cancellation" action for eBay account: "%account_title%" is started. Please wait...
+            $status = 'The "Cancellation" action for eBay account: "%account_title%" is started. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 
             $this->processAccount($account);
 
             // ----------------------------------------------------------
-            // ->__('The "Cancellation" action for eBay account: "%s" is finished. Please wait...')
-            $status = 'The "Cancellation" action for eBay account: "%s" is finished. Please wait...';
+            // M2ePro_TRANSLATIONS
+            // The "Cancellation" action for eBay account: "%account_title%" is finished. Please wait...
+            $status = 'The "Cancellation" action for eBay account: "%account_title%" is finished. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
             $this->getActualLockItem()->activate();

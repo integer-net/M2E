@@ -12,11 +12,21 @@ class Ess_M2ePro_Model_Magento_Order
     /** @var $order Mage_Sales_Model_Order */
     private $order = NULL;
 
+    private $additionalData = array();
+
     // ########################################
 
     public function __construct(Mage_Sales_Model_Quote $quote)
     {
         $this->quote = $quote;
+    }
+
+    // ########################################
+
+    public function setAdditionalData($additionalData)
+    {
+        $this->additionalData = $additionalData;
+        return $this;
     }
 
     // ########################################
@@ -56,6 +66,7 @@ class Ess_M2ePro_Model_Magento_Order
         if (version_compare(Mage::helper('M2ePro/Magento')->getVersion(false), '1.4.1', '>=')) {
             /** @var $service Mage_Sales_Model_Service_Quote */
             $service = Mage::getModel('sales/service_quote', $this->quote);
+            $service->setOrderData($this->additionalData);
             $service->submitAll();
 
             return $service->getOrder();
@@ -83,6 +94,8 @@ class Ess_M2ePro_Model_Magento_Order
             }
             $orderObj->addItem($orderItem);
         }
+
+        $orderObj->addData($this->additionalData);
 
         $orderObj->setCanShipPartiallyItem(false);
         $orderObj->place();

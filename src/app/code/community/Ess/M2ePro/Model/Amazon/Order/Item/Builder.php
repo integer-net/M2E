@@ -27,10 +27,10 @@ class Ess_M2ePro_Model_Amazon_Order_Item_Builder extends Mage_Core_Model_Abstrac
         $this->setData('price', (float)$data['price']);
         $this->setData('gift_price', (float)$data['gift_price']);
         $this->setData('currency', trim($data['currency']));
-        $this->setData('tax_amount', (float)$data['tax_amount']);
-        $this->setData('discount_amount', (float)$data['discount_amount']);
+        $this->setData('discount_details', json_encode($data['discount_details']));
         $this->setData('qty_purchased', (int)$data['qty_purchased']);
         $this->setData('qty_shipped', (int)$data['qty_shipped']);
+        $this->setData('tax_details', json_encode($data['tax_details']));
         // ------------------
     }
 

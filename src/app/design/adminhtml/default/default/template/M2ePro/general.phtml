@@ -26,25 +26,27 @@
 
     M2ePro.translator.add(<?php echo Zend_Json::encode(array(
 
-        'Are you sure?' => $this->__('Are you sure?'),
-        'Help'          => $this->__('Help'),
-        'Hide Block'    => $this->__('Hide Block'),
-        'Show Tips'     => $this->__('Show Tips'),
-        'Hide Tips'     => $this->__('Hide Tips'),
-        'Notice'        => $this->__('Notice'),
-        'Error'         => $this->__('Error'),
-        'Close'         => $this->__('Close'),
-        'Success'       => $this->__('Success'),
-        'Warning'       => $this->__('Warning'),
-        'None'          => $this->__('None'),
-        'Cancel'        => $this->__('Cancel'),
+        'Are you sure?' => Mage::helper('M2ePro')->__('Are you sure?'),
+        'Help'          => Mage::helper('M2ePro')->__('Help'),
+        'Hide Block'    => Mage::helper('M2ePro')->__('Hide Block'),
+        'Show Tips'     => Mage::helper('M2ePro')->__('Show Tips'),
+        'Hide Tips'     => Mage::helper('M2ePro')->__('Hide Tips'),
+        'Notice'        => Mage::helper('M2ePro')->__('Notice'),
+        'Error'         => Mage::helper('M2ePro')->__('Error'),
+        'Close'         => Mage::helper('M2ePro')->__('Close'),
+        'Success'       => Mage::helper('M2ePro')->__('Success'),
+        'Warning'       => Mage::helper('M2ePro')->__('Warning'),
+        'None'          => Mage::helper('M2ePro')->__('None'),
+        'Cancel'        => Mage::helper('M2ePro')->__('Cancel'),
 
-        'Please select items.' => $this->__('Please select items.'),
-        'Please select action.' => $this->__('Please select action.'),
-        'View All Product Log' => $this->__('View All Product Log'),
-        'This is a required field.' => $this->__('This is a required field.'),
+        'Please select the products you want to perform the action on.' => Mage::helper('M2ePro')->__('Please select the products you want to perform the action on.'),
+        'Please select items.'  => Mage::helper('M2ePro')->__('Please select items.'),
+        'Please select action.' => Mage::helper('M2ePro')->__('Please select action.'),
+        'View All Product Log' => Mage::helper('M2ePro')->__('View All Product Log'),
+        'This is a required field.' => Mage::helper('M2ePro')->__('This is a required field.'),
+        'Invalid input data. Decimal value required. Example 12.05' => Mage::helper('M2ePro')->__('Invalid input data. Decimal value required. Example 12.05'),
 
-        'You should select Attribute Set first.' => $this->__('You should select Attribute Set first.'),
+        'You should select Attribute Set first.' => Mage::helper('M2ePro')->__('You should select Attribute Set first.'),
 
     )); ?>);
 

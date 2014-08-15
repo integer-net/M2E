@@ -60,7 +60,7 @@ abstract class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Abs
 
         $this->cache['listings_other_products_by_params'][$cacheKey] = array();
 
-        $changedListingOtherProducts = Mage::getModel('M2ePro/Listing_Other')->getChangedItems(
+        $changedListingOtherProducts = Mage::getResourceModel('M2ePro/Listing_Other')->getChangedItems(
             $attributes,
             Ess_M2ePro_Helper_Component_Ebay::NICK,
             $withStoreFilter

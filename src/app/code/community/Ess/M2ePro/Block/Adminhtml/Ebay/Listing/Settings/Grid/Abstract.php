@@ -605,11 +605,11 @@ HTML;
             'adminhtml_ebay_template/saveListingProduct' => $this->getUrl('*/adminhtml_ebay_template/saveListingProduct'),
         ));
         $translations = json_encode(array(
-            'Edit Payment and Shipping Settings' => $this->__('Edit Payment and Shipping Settings'),
-            'Edit Selling Settings' => $this->__('Edit Selling Settings'),
-            'Edit Synchronization Settings' => $this->__('Edit Synchronization Settings'),
-            'Edit Settings' => $this->__('Edit Settings'),
-            'for' => $this->__('for')
+            'Edit Payment and Shipping Settings' => Mage::helper('M2ePro')->__('Edit Payment and Shipping Settings'),
+            'Edit Selling Settings' => Mage::helper('M2ePro')->__('Edit Selling Settings'),
+            'Edit Synchronization Settings' => Mage::helper('M2ePro')->__('Edit Synchronization Settings'),
+            'Edit Settings' => Mage::helper('M2ePro')->__('Edit Settings'),
+            'for' => Mage::helper('M2ePro')->__('for')
         ));
 
         $commonJs = <<<HTML

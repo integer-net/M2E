@@ -196,24 +196,34 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         $product = $this->getMagentoProduct()->getProduct();
 
         $attributeCode = $descriptionTemplate->getVariationConfigurableImages();
-        $attributeData = $product->getResource()->getAttribute($attributeCode);
 
-        if (!$attributeData) {
+        /** @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
+        $attribute = $product->getResource()->getAttribute($attributeCode);
+
+        if (!$attribute) {
             return array();
         }
 
+        $attribute->setStoreId($product->getStoreId());
+
         $attributeLabels = array();
 
-        $configurableAttributes = $this->getMagentoProduct()->getTypeInstance()
-                                       ->getConfigurableAttributesAsArray($product);
+        /** @var $productTypeInstance Mage_Catalog_Model_Product_Type_Configurable */
+        $productTypeInstance = $this->getMagentoProduct()->getTypeInstance();
 
-        foreach ($configurableAttributes as $configurableAttribute) {
-            if ((int)$attributeData['attribute_id'] == (int)$configurableAttribute['attribute_id']) {
-                $attributeLabels = array(
-                    $configurableAttribute['label'],
-                    $configurableAttribute['frontend_label'],
-                    $configurableAttribute['store_label']
-                );
+        foreach ($productTypeInstance->getConfigurableAttributes() as $configurableAttribute) {
+
+            /** @var $configurableAttribute Mage_Catalog_Model_Product_Type_Configurable_Attribute */
+            $configurableAttribute->setStoteId($product->getStoreId());
+
+            if ((int)$attribute->getAttributeId() == (int)$configurableAttribute->getAttributeId()) {
+
+                $attributeLabels = array_values($attribute->getStoreLabels());
+                $attributeLabels[] = $configurableAttribute->getData('label');
+                $attributeLabels[] = $attribute->getFrontendLabel();
+
+                $attributeLabels = array_filter($attributeLabels);
+
                 break;
             }
         }

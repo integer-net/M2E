@@ -244,6 +244,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Edit_Form_Data exte
 
         return false;
     }
+
     // ####################################
 
     public  function isShowMultiCurrencyNotification()

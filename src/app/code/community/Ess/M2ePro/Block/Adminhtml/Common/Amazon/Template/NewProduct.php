@@ -22,8 +22,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_NewProduct extends Mage_
         // Set header text
         //------------------------------
         $marketplaceInstance = Mage::helper('M2ePro/Component_Amazon')->getCachedObject('Marketplace',$marketplace_id);
-        $this->_headerText = Mage::helper('M2ePro')->__('New ASIN Templates For "%s" Marketplace (Beta)',
-                                                        $marketplaceInstance->getCode());
+        $this->_headerText = Mage::helper('M2ePro')->__(
+            'New ASIN Templates For "%marketplace_code%" Marketplace (Beta)',
+            $marketplaceInstance->getCode()
+        );
         //------------------------------
 
         // Set buttons actions

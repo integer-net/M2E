@@ -50,8 +50,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
             $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
             $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$account->getId(),'Get orders from eBay');
 
-            // ->__('The "Receive" action for eBay account "%s" is in data receiving state...')
-            $status = 'The "Receive" action for eBay account "%s" is in data receiving state...';
+            // M2ePro_TRANSLATIONS
+            // The "Receive" action for eBay account "%account_title%" is in data receiving state...
+            $status = 'The "Receive" action for eBay account "%account_title%" is in data receiving state...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 
@@ -66,8 +67,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
                 'Create magento orders'
             );
 
-            // ->__('The "Receive" action for eBay account "%s" is in order creation state...')
-            $status = 'The "Receive" action for eBay account "%s" is in order creation state...';
+            // M2ePro_TRANSLATIONS
+            // The "Receive" action for eBay account "%account_title%" is in order creation state...
+            $status = 'The "Receive" action for eBay account "%account_title%" is in order creation state...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 
@@ -183,9 +185,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
 
         if (is_null($lastSynchronizationDate)) {
             $sinceTime = new DateTime('now', new DateTimeZone('UTC'));
-            $sinceTime->modify('-10 days');
-
             $sinceTime = Ess_M2ePro_Model_Connector_Ebay_Abstract::ebayTimeToString($sinceTime);
+
             $this->saveLastUpdateTime($account, $sinceTime);
 
             return $sinceTime;

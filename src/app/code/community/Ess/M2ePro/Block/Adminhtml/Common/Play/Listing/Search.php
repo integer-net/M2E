@@ -22,12 +22,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search extends Mage_Adminht
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $headerText = Mage::helper('M2ePro')->__("Search %component_name% Listings Items", $componentName);
         } else {
-            $componentName = '';
+             $headerText = Mage::helper('M2ePro')->__("Search Listings Items");
         }
 
-        $this->_headerText = Mage::helper('M2ePro')->__("Search%s Listings Items", $componentName);
+        $this->_headerText = $headerText;
         //------------------------------
 
         // Set buttons actions

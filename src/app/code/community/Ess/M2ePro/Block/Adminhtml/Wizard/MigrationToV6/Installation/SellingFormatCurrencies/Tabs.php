@@ -35,8 +35,8 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Installation_SellingFormat
             }
 
             $this->addTab($component, array(
-                'label' => $this->__($componentTitles[$component]),
-                'title' => $this->__($componentTitles[$component]),
+                'label' => Mage::helper('M2ePro')->__($componentTitles[$component]),
+                'title' => Mage::helper('M2ePro')->__($componentTitles[$component]),
                 'content' => $this->getLayout()->createBlock(
                     $tabsBlockPath . $component, '', array('migration_data' => $migrationData)
                 )->toHtml(),

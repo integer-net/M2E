@@ -22,19 +22,22 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_SellingFormat_Edit
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = ' ' . Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
+            $componentName = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
+            $headerTextEdit = Mage::helper('M2ePro')->__("Edit %component_name% Selling Format Template", $componentName);
+            $headerTextAdd = Mage::helper('M2ePro')->__("Add %component_name% Selling Format Template", $componentName);
         } else {
-            $componentName = '';
+            $headerTextEdit = Mage::helper('M2ePro')->__("Edit %component_name% Selling Format Template");
+            $headerTextAdd = Mage::helper('M2ePro')->__("Add %component_name% Selling Format Template" );
         }
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data')
             && Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getId()
         ) {
-            $this->_headerText = Mage::helper('M2ePro')->__("Edit%s Selling Format Template", $componentName);
+            $this->_headerText = $headerTextEdit;
             $this->_headerText .= ' "'.$this->escapeHtml(
                 Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getTitle()).'"';
         } else {
-            $this->_headerText = Mage::helper('M2ePro')->__("Add%s Selling Format Template", $componentName);
+            $this->_headerText = $headerTextAdd;
         }
         //------------------------------
 

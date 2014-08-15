@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @copyright  Copyright (c) 2014 by  ESS-UA.
  */
 
 class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
@@ -168,7 +168,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         if (!empty($productAddIds)) {
 
             $this->_getSession()->addNotice(Mage::helper('M2ePro')->__(
-                'Adding New Products action was not completed. Please, complete it.'
+                'Please make sure you finish adding new products before moving to the next step.'
             ));
 
             return $this->_redirect('*/adminhtml_ebay_listing_productAdd',array('listing_id' => $id, 'step' => 2));
@@ -261,10 +261,10 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             }
         }
 
-        $tempString = Mage::helper('M2ePro')->__('%s listing(s) were successfully deleted', $deleted);
+        $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) were successfully deleted', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
-        $tempString = Mage::helper('M2ePro')->__('%s listing(s) have listed items and can not be deleted', $locked);
+        $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) have listed items and can not be deleted', $locked);
         $locked && $this->_getSession()->addError($tempString);
 
         $this->_redirect('*/adminhtml_ebay_listing/index');

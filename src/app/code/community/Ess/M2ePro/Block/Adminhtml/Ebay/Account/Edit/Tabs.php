@@ -22,8 +22,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs extends Mage_Adminhtml_B
     protected function _beforeToHtml()
     {
         $this->addTab('general', array(
-            'label'   => Mage::helper('M2ePro')->__('General'),
-            'title'   => Mage::helper('M2ePro')->__('General'),
+            'label'   => Mage::helper('M2ePro')->__('Account Details'),
+            'title'   => Mage::helper('M2ePro')->__('Account Details'),
             'content' => $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_account_edit_tabs_general')->toHtml(),
         ));
 

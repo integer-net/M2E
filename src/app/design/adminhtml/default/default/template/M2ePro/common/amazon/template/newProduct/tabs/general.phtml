@@ -45,8 +45,6 @@ $formData['category']['identifiers'] = Mage::helper('M2ePro')->escapeHtml($formD
             return true;
         }
 
-        value = str_replace(',','.',value);
-
         var numValue = parseNumber(value);
         if (isNaN(numValue)) {
             return false;
@@ -69,32 +67,32 @@ $formData['category']['identifiers'] = Mage::helper('M2ePro')->escapeHtml($formD
     M2ePro.url.helpIcon = '<?php echo $this->getSkinUrl('images').'/fam_help.gif'; ?>';
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'This category is not supported at the moment, as it contains variational items only. Please select another category.' => $this->__('This category is not supported at the moment, as it contains variational items only. Please select another category.'),
+        'This category is not supported at the moment, as it contains variational items only. Please select another category.' => Mage::helper('M2ePro')->__('This category is not supported at the moment, as it contains variational items only. Please select another category.'),
+        'Search For Category' => Mage::helper('M2ePro')->__('Search For Category'),
+        'Browse Category' => Mage::helper('M2ePro')->__('Browse For Category'),
+        'You should select Category first' => Mage::helper('M2ePro')->__('You should select Category first'),
+        'This is a required field. Please press Choose button.' => Mage::helper('M2ePro')->__('This is a required field. Please press Choose button.'),
+        'The specified title is already used for another New ASIN Template.' => Mage::helper('M2ePro')->__('The specified title is already used for another New ASIN Template.'),
+        'Please enter at least 3 letters.' => Mage::helper('M2ePro')->__('Please enter at least 3 letters.'),
+        'Internal Error. Please try again later.' => Mage::helper('M2ePro')->__('Internal Error. Please try again later.'),
+        'Incorrect data.' => Mage::helper('M2ePro')->__('Incorrect data.'),
 
-        'Search For Category' => $this->__('Search For Category'),
-        'You should select Category first' => $this->__('You should select Category first'),
-        'This is a required field. Please press Choose button.' => $this->__('This is a required field. Please press Choose button.'),
-        'The specified title is already used for another New ASIN Template.' => $this->__('The specified title is already used for another New ASIN Template.'),
-        'Please enter at least 3 letters.' => $this->__('Please enter at least 3 letters.'),
-        'Internal Error. Please try again later.' => $this->__('Internal Error. Please try again later.'),
-        'Incorrect data.' => $this->__('Incorrect data.'),
+        'Add'       => Mage::helper('M2ePro')->__('Add'),
+        'Duplicate' => Mage::helper('M2ePro')->__('Duplicate'),
+        'Delete'    => Mage::helper('M2ePro')->__('Delete'),
+        'Choose'    => Mage::helper('M2ePro')->__('Choose'),
 
-        'Add'       => $this->__('Add'),
-        'Duplicate' => $this->__('Duplicate'),
-        'Delete'    => $this->__('Delete'),
-        'Choose'    => $this->__('Choose'),
+        'Optional Specifics' => Mage::helper('M2ePro')->__('Optional Specifics'),
+        'Recommended Values' => Mage::helper('M2ePro')->__('Recommended Values'),
+        'Allowed Values'     => Mage::helper('M2ePro')->__('Allowed Values'),
+        'Custom Attribute'   => Mage::helper('M2ePro')->__('Custom Attribute'),
+        'Custom Value'       => Mage::helper('M2ePro')->__('Custom Value'),
 
-        'Optional Specifics' => $this->__('Optional Specifics'),
-        'Recommended Values' => $this->__('Recommended Values'),
-        'Allowed Values'     => $this->__('Allowed Values'),
-        'Custom Attribute'   => $this->__('Custom Attribute'),
-        'Custom Value'       => $this->__('Custom Value'),
-
-        'Definition:'    => $this->__('Definition:'),
-        'Tips:'          => $this->__('Tips:'),
-        'Examples:'      => $this->__('Examples:'),
-        'Helpful Info:'  => $this->__('Helpful Info:'),
-        'Desired'        => $this->__('Desired')
+        'Definition:'    => Mage::helper('M2ePro')->__('Definition:'),
+        'Tips:'          => Mage::helper('M2ePro')->__('Tips:'),
+        'Examples:'      => Mage::helper('M2ePro')->__('Examples:'),
+        'Helpful Info:'  => Mage::helper('M2ePro')->__('Helpful Info:'),
+        'Desired'        => Mage::helper('M2ePro')->__('Desired')
     )); ?>);
 
     M2ePro.formData = <?php echo json_encode($formData); ?>;

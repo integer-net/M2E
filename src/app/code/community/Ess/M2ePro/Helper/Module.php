@@ -66,7 +66,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '6425';
+        $revision = '6732';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -173,7 +173,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         $requirements = array (
 
             'php_version' => array(
-                'title' => $this->__('PHP Version'),
+                'title' => Mage::helper('M2ePro')->__('PHP Version'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => '5.3.0'
@@ -185,7 +185,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             ),
 
             'memory_limit' => array(
-                'title' => $this->__('Memory Limit'),
+                'title' => Mage::helper('M2ePro')->__('Memory Limit'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => '256 MB'
@@ -197,7 +197,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             ),
 
             'magento_version' => array(
-                'title' => $this->__('Magento Version'),
+                'title' => Mage::helper('M2ePro')->__('Magento Version'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => (Mage::helper('M2ePro/Magento')->isGoEdition()           ? '1.9.0.0' :
@@ -211,7 +211,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             ),
 
             'max_execution_time' => array(
-                'title' => $this->__('Max Execution Time'),
+                'title' => Mage::helper('M2ePro')->__('Max Execution Time'),
                 'condition' => array(
                     'sign' => '>=',
                     'value' => '360 sec'
@@ -223,7 +223,13 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             )
         );
 
-        foreach ($requirements as &$requirement) {
+        foreach ($requirements as $key => &$requirement) {
+
+            // max execution time is unlimited
+            if ($key == 'max_execution_time' && $clientPhpData['max_execution_time'] == 0) {
+                continue;
+            }
+
             $requirement['current']['status'] = version_compare(
                 $requirement['current']['value'],
                 $requirement['condition']['value'],

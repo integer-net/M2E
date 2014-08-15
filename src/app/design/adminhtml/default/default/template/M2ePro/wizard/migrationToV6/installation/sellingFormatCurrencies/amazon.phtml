@@ -30,7 +30,7 @@
                 </td>
                 <td>
                     <?php foreach ($row['currencies'] as $currency): ?>
-                        <?php echo Mage::helper('M2ePro')->__('Store Currency (%s)', $currency['store']); ?> -> <?php echo Mage::helper('M2ePro')->__('Marketplace Currency (%s)', $currency['marketplace']); ?><br />
+                        <?php echo Mage::helper('M2ePro')->__('Store Currency (%currency_code%)', $currency['store']); ?> -> <?php echo Mage::helper('M2ePro')->__('Marketplace Currency (%currency_code%)', $currency['marketplace']); ?><br />
 
                         <?php if ($currency['rate'] <= 0): ?>
                             <span style="color: green; font-style: italic; font-size: 12px;">&nbsp;&nbsp;&nbsp;

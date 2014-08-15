@@ -78,10 +78,10 @@ class Ess_M2ePro_Adminhtml_Common_Template_SynchronizationController
             }
         }
 
-        $tempString = Mage::helper('M2ePro')->__('%s record(s) were successfully deleted.', $deleted);
+        $tempString = Mage::helper('M2ePro')->__('%amount% record(s) were successfully deleted.', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
-        $tempString  = Mage::helper('M2ePro')->__('%s record(s) are used in Listing(s).', $locked) . ' ';
+        $tempString  = Mage::helper('M2ePro')->__('%amount% record(s) are used in Listing(s).', $locked) . ' ';
         $tempString .= Mage::helper('M2ePro')->__('Template must not be in use to be deleted.');
         $locked && $this->_getSession()->addError($tempString);
 

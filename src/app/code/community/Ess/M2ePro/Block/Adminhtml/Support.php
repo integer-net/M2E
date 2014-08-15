@@ -19,17 +19,17 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
         $this->setId('supportContainer');
         $this->_blockGroup = 'M2ePro';
         $this->_controller = 'adminhtml';
+
         $this->_mode = 'support';
         $this->referrer = $this->getRequest()->getParam('referrer');
         //------------------------------
 
         // Set header text
         //------------------------------
-        $m2eProVersion = '(M2E Pro ver. ' . Mage::helper('M2ePro/Module')->getVersion() . ')';
         $m2eProVersion = '<span style="color: #777; font-size: small; font-weight: normal">' .
-                            $m2eProVersion .
+                            '(M2E Pro ver. '.Mage::helper('M2ePro/Module')->getVersion().')' .
                          '</span>';
-        $this->_headerText = Mage::helper('M2ePro')->__("Support {$m2eProVersion}");
+        $this->_headerText = Mage::helper('M2ePro')->__('Support') . " {$m2eProVersion}";
         //------------------------------
 
         // Set buttons actions
@@ -72,21 +72,22 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
 
         //------------------------------
         if (is_null($this->referrer)) {
+
             $this->_addButton('goto_docs', array(
                 'label' => Mage::helper('M2ePro')->__('Documentation'),
                 'class' => 'button_link drop_down button_documentation'
             ));
 
-            //------------------------------
-
             $this->_addButton('goto_video_tutorials', array(
                 'label' => Mage::helper('M2ePro')->__('Video Tutorials'),
                 'class' => 'button_link drop_down button_video_tutorial'
             ));
+
         } else {
+
             $url = ($this->referrer == Ess_M2ePro_Helper_View_Ebay::NICK)
-                        ? Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl()
-                            : Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
+                ? Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl()
+                : Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
 
             $this->_addButton('goto_docs', array(
                 'label'     => Mage::helper('M2ePro')->__('Documentation'),
@@ -97,8 +98,8 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
             //------------------------------
 
             $url = ($this->referrer == Ess_M2ePro_Helper_View_Ebay::NICK)
-                        ? Mage::helper('M2ePro/View_Ebay')->getVideoTutorialsUrl()
-                            : Mage::helper('M2ePro/View_Common')->getVideoTutorialsUrl();
+                ? Mage::helper('M2ePro/View_Ebay')->getVideoTutorialsUrl()
+                : Mage::helper('M2ePro/View_Common')->getVideoTutorialsUrl();
 
             $this->_addButton('goto_video_tutorials', array(
                 'label'     => Mage::helper('M2ePro')->__('Video Tutorials'),
@@ -121,29 +122,27 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
 
     public function getHeaderHtml()
     {
-        if (is_null($this->referrer)) {
-            $data = array(
-                'target_css_class' => 'button_documentation',
-                'style' => 'max-height: 120px; overflow: auto; width: 150px;',
-                'items' => $this->getDocumentationDropDownItems()
-            );
-
-            $dropDownBlockDocumentation = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
-
-            $data = array(
-                'target_css_class' => 'button_video_tutorial',
-                'style' => 'max-height: 120px; overflow: auto; width: 150px;',
-                'items' => $this->getVideoTutorialDropDownItems()
-            );
-
-            $dropDownBlockVideoTutorial = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
-
-            return parent::getHeaderHtml()
-            . $dropDownBlockDocumentation->toHtml()
-            . $dropDownBlockVideoTutorial->toHtml();
+        if (!is_null($this->referrer)) {
+            return parent::getHeaderHtml();
         }
 
-        return parent::getHeaderHtml();
+        $data = array(
+            'target_css_class' => 'button_documentation',
+            'style' => 'max-height: 120px; overflow: auto; width: 150px;',
+            'items' => $this->getDocumentationDropDownItems()
+        );
+        $dropDownBlockDocumentation = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+
+        $data = array(
+            'target_css_class' => 'button_video_tutorial',
+            'style' => 'max-height: 120px; overflow: auto; width: 150px;',
+            'items' => $this->getVideoTutorialDropDownItems()
+        );
+        $dropDownBlockVideoTutorial = $this->getLayout()->createBlock('M2ePro/adminhtml_widget_button_dropDown', '', $data);
+
+        return parent::getHeaderHtml()
+            .$dropDownBlockDocumentation->toHtml()
+            .$dropDownBlockVideoTutorial->toHtml();
     }
 
     // ----------------------------------------
@@ -153,19 +152,17 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
         $items = array();
 
         //------------------------------
-        $url = Mage::helper('M2ePro/View_Ebay')->getVideoTutorialsUrl();
         $items[] = array(
-            'url' => $url,
-            'label' => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+            'url'    => Mage::helper('M2ePro/View_Ebay')->getVideoTutorialsUrl(),
+            'label'  => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
             'target' => '_blank'
         );
         //------------------------------
 
         //------------------------------
-        $url = Mage::helper('M2ePro/View_Common')->getVideoTutorialsUrl();
         $items[] = array(
-            'url' => $url,
-            'label' => Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel(),
+            'url'    => Mage::helper('M2ePro/View_Common')->getVideoTutorialsUrl(),
+            'label'  => Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel(),
             'target' =>'_blank'
         );
         //------------------------------
@@ -173,26 +170,22 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
         return $items;
     }
 
-    // ----------------------------------------
-
     private function getDocumentationDropDownItems()
     {
         $items = array();
 
         //------------------------------
-        $url = Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl();
         $items[] = array(
-            'url' => $url,
-            'label' => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+            'url'    => Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl(),
+            'label'  => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
             'target' => '_blank'
         );
         //------------------------------
 
         //------------------------------
-        $url = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
         $items[] = array(
-            'url' => $url,
-            'label' => Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel(),
+            'url'    => Mage::helper('M2ePro/View_Common')->getDocumentationUrl(),
+            'label'  => Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel(),
             'target' =>'_blank'
         );
         //------------------------------

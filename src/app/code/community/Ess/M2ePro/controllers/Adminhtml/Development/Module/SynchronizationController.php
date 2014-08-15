@@ -87,7 +87,8 @@ class Ess_M2ePro_Adminhtml_Development_Module_SynchronizationController
     /**
      * @title "Marketplaces"
      * @description "Run only marketplaces synchronization as developer mode"
-     * @confirm "Please enter Marketplace id."
+     * @prompt "Please enter Marketplace ID."
+     * @prompt_var "marketplace_id"
      * @components
      */
     public function synchMarketplacesAction()

@@ -21,6 +21,15 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
 
     },
 
+    massActionSubmitClick : function($super)
+    {
+        if (this.getSelectedProductsString() == '' || this.getSelectedProductsArray().length == 0) {
+            alert(M2ePro.translator.translate('Please select the products you want to perform the action on.'));
+            return;
+        }
+        $super();
+    },
+
     //----------------------------------
 
     editCategorySettings: function(id)

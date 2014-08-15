@@ -13,7 +13,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
     public function __construct($resourceName)
     {
         // Get needed mysql tables
-        $tempTables = Mage::helper('M2ePro/Module_Database')->getMySqlTables();
+        $tempTables = Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables();
         $tempTables = array_merge($this->getMySqlTablesV3(),$tempTables);
         $tempTables = array_merge($this->getMySqlTablesV4(),$tempTables);
         $tempTables = array_merge($this->getMySqlTablesV5(),$tempTables);

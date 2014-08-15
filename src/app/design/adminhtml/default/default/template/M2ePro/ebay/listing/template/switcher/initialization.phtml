@@ -23,16 +23,15 @@
     );
 
     M2ePro.url.add(<?php echo $urls ?>);
-    // todo temp solution
     M2ePro.url.templateCheckMessages = '<?php echo $this->getUrl('*/adminhtml_template/checkMessages', array('component_mode' => Ess_M2ePro_Helper_Component_Ebay::NICK)); ?>';
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Customized' => $this->__('Customized'),
-        'M2E Pro Policies' => $this->__('M2E Pro Policies'),
-        'Policy with the same title already exists.' => $this->__('Policy with the same title already exists.'),
-        'Please specify policy title' => $this->__('Please specify policy title'),
-        'Save New Policy' => $this->__('Save New Policy'),
-        'Save as New Policy' => $this->__('Save as New Policy'),
+        'Customized' => Mage::helper('M2ePro')->__('Customized'),
+        'M2E Pro Policies' => Mage::helper('M2ePro')->__('M2E Pro Policies'),
+        'Policy with the same title already exists.' => Mage::helper('M2ePro')->__('Policy with the same title already exists.'),
+        'Please specify policy title' => Mage::helper('M2ePro')->__('Please specify policy title'),
+        'Save New Policy' => Mage::helper('M2ePro')->__('Save New Policy'),
+        'Save as New Policy' => Mage::helper('M2ePro')->__('Save as New Policy'),
     )) ?>);
 </script>
 <script type="text/javascript">

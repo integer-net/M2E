@@ -41,7 +41,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
                 if (!isset($this->params['remove']) || !(bool)$this->params['remove']) {
 
                     $message = array(
-                        // Parser hack -> Mage::helper('M2ePro')->__('Item is not listed or not available');
+                        // M2ePro_TRANSLATIONS
+                        // Item is not listed or not available
                         parent::MESSAGE_TEXT_KEY => 'Item is not listed or not available',
                         parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
                     );
@@ -116,7 +117,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
             if ($listingsProductResult['already_stop']) {
 
                 $message = array(
-                    // Parser hack -> Mage::helper('M2ePro')->__('Item was already stopped on eBay');
+                    // M2ePro_TRANSLATIONS
+                    // Item was already stopped on eBay
                     parent::MESSAGE_TEXT_KEY => 'Item was already stopped on eBay',
                     parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
                 );
@@ -124,7 +126,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
             } else {
 
                 $message = array(
-                    // Parser hack -> Mage::helper('M2ePro')->__('Item was successfully stopped');
+                    // M2ePro_TRANSLATIONS
+                    // Item was successfully stopped
                     parent::MESSAGE_TEXT_KEY => 'Item was successfully stopped',
                     parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
                 );

@@ -49,18 +49,12 @@
 </script>
 
 <div id="block_notice_ebay_accounts_other_listings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('3rd Party Listings'); ?>">
-    <?php
-        $menuLabel = Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
-
-        echo Mage::helper('M2ePro')->__('
-        The 3rd Party Listings are the items, which were listed on eBay without using M2E Pro extension.
-        <br><br>
-        Set \'Yes\' in Import 3rd Party Listings to allow importing for the current eBay Account. Imported listings you can find in Sell on eBay -> Listings -> 3rd Party.
-        <br>
-        Use \'Product Mapping\' settings to connect eBay listings to Magento products.
-        <br><br>
-        <b>Note:</b> The 3rd Party Listings Synchronization must be enabled in %1$s > Configuration > Synchronization.
-        ', $menuLabel); ?></div>
+    <?php echo Mage::helper('M2ePro')->__(
+        'Edit the import, mapping and synchronization settings for <b>3rd Party Listings</b> here.<br/>
+        3rd Party Listings are items that have been listed on eBay either directly or with a tool other than M2E Pro.<br/><br/>
+        <b>Note:</b> Settings made here only take effect if <b>3rd Party Listings Synchronization</b> is enabled in %root_node_label% > Configuration > Synchronization.',
+    Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()); ?>
+</div>
 
 <div class="entry-edit" id="magento_block_ebay_accounts_other_listings_synchronization">
 
@@ -83,7 +77,10 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_NO; ?>" <?php if ($formData['other_listings_synchronization'] == Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_NO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Allows importing 3rd Party Listings.<br><b>Note:</b> Only active eBay Listings created less than 2 years before will be imported.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose whether to import eBay listings that have been listed on eBay either directly or using a tool other than M2E Pro.
+                                 Only active eBay listings created within the last 2 years will be imported.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -98,7 +95,9 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_MODE_NO ?>" <?php if ($formData['other_listings_mapping_mode'] == Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Maps eBay product with Magento product.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose whether imported eBay listings should automatically map to a product in your Magento inventory.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -218,8 +217,12 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPED_SYNCHRONIZATION_NO; ?>" <?php if ($formData['other_listings_synchronization_mapped_items_mode'] == Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPED_SYNCHRONIZATION_NO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Enables / Disables synchronization of Mapped 3rd Party<br/>Listings for the current account. Click \'Synchronization Settings\' button to configure settings.
-                            <br><b>Note:</b> The first 3rd Party Listings Synchronization launches the first product automapping. After that you can launch it manually in Sell on eBay > Listings > 3rd Party.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose whether the details for 3rd Party Listings mapped to a product in your Magento inventory should change on eBay when the details have been changed in Magento.
+                                Click <b>Synchronization Settings</b> to specify which details should change.<br/><br/>
+                                <b>Note:</b> The first product auto-mapping runs when 3rd Party Listings Synchronization happens for the first time.
+                                To run auto-mapping manually after that, go to Sell on eBay > Listings > 3rd Party.'
+                            ); ?></span>
                         </p>
                     </td>
                     <td class="value" id="settings_button" style="width: auto;">

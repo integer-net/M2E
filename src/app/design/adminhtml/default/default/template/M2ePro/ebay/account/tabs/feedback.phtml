@@ -1,10 +1,9 @@
 <div id="block_notice_ebay_accounts_feedbacks" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Feedback'); ?>">
-    <?php
-        $menuLabel = Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
-        echo Mage::helper('M2ePro')->__('
-        M2E allows you to receive feedback from your buyers and respond them according to the settings below.
-<br/><br/><b>Note:</b> The Feedback Synchronization must be enabled in %s > Configuration > Synchronization.', $menuLabel);
-    ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        'Choose how you want to deal with feedback from eBay buyers.<br/><br/>
+        If you choose to import feedback from buyers, you can also choose whether to set up automatic responses.<br/><br/>
+        <b>Note:</b> Settings made here only take effect if <b>Feedback Synchronization</b> is enabled in %root_node_label% > Configuration > Synchronization.',
+    Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()); ?>
 </div>
 
 <?php
@@ -39,7 +38,7 @@
 <div class="entry-edit" id="magento_block_ebay_accounts_feedbacks_receive">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Buyers Feedback'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Buyer Feedback'); ?></h4>
     </div>
 
     <div class="fieldset">
@@ -57,7 +56,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_YES; ?>" <?php if ($formData['feedbacks_receive'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose to import feedback from eBay buyers into Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose whether to import feedback from eBay buyers into Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -72,16 +71,18 @@
 <div class="entry-edit" id="magento_block_ebay_accounts_feedbacks_response" <?php if($formData['feedbacks_receive'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_RECEIVE_NO): ?>style="display: none;"<?php endif; ?>>
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Seller Response'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Automatic Response'); ?></h4>
     </div>
 
     <div class="fieldset">
         <div class="hor-scroll">
 
-            <div id="block_notice_ebay_accounts_feedbacks_auto" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Auto Response'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('There are two ways to set up your auto response to buyer feedback:
+            <div id="block_notice_ebay_accounts_feedbacks_auto" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Auto-response'); ?>">
+                <?php echo Mage::helper('M2ePro')->__(
+                    'There are two ways to set up your auto response to buyer feedback:
                     <br/><b>Cycle Mode</b> - the system chooses an existing response template according to the sales order and sends it to the buyer.
-                    <br/><b>Random Mode</b> - the system randomly chooses an existing response template and sends it out.'); ?>
+                    <br/><b>Random Mode</b> - the system randomly chooses an existing response template and sends it out.'
+                ); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -97,7 +98,11 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_RANDOM; ?>" <?php if ($formData['feedbacks_auto_response'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_RANDOM) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Random Mode'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose between Cycle Mode, Random Mode, or to disable it completely.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                '<b>Cycle Mode</b> cycles through the template responses you set up below in turn.<br/>
+                                <b>Random Mode</b> uses a random template response<br/>
+                                <b>Disabled</b> means no automatic responses to feedback will be made.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -112,7 +117,9 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES; ?>" <?php if ($formData['feedbacks_auto_response_only_positive'] == Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_ONLY_POSITIVE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Positive'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Responses to All feedbacks or Positive only.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'Choose whether to respond to <b>All</b> feedback (positive, neutral or negative) or <b>Positive</b> feedback only.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>

@@ -36,13 +36,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit extends Mage_Adminhtml_Block
         // Set header text
         //------------------------------
         if ($template->getId()) {
-            $this->_headerText = sprintf(
-                Mage::helper('M2ePro')->__('Edit "%s" %s Policy'),
+            $this->_headerText =
+                Mage::helper('M2ePro')->__('Edit "%template_title%" %template_name% Policy',
                 $this->escapeHtml($template->getTitle()),
                 $this->getTemplateName()
             );
         } else {
-            $this->_headerText = sprintf(Mage::helper('M2ePro')->__('Add %s Policy'), $this->getTemplateName());
+            $this->_headerText = Mage::helper('M2ePro')->__('Add %template_name% Policy',
+                $this->getTemplateName());
         }
         //------------------------------
 
@@ -70,7 +71,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit extends Mage_Adminhtml_Block
         //------------------------------
         if ($template->getId() && !(bool)$this->getRequest()->getParam('wizard',false)) {
             $duplicateHeaderText = Mage::helper('M2ePro')->escapeJs(
-                sprintf(Mage::helper('M2ePro')->__('Add %s Policy'), $this->getTemplateName())
+                Mage::helper('M2ePro')->__('Add %template_name% Policy', $this->getTemplateName())
             );
 
             $onclickHandler = $nick == Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION

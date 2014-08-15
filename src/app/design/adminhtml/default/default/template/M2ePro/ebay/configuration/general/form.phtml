@@ -84,7 +84,7 @@
                                 <option value="1" <?php if ($this->view_ebay_feedbacks_notification_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Notifies when a new negative feedback was received.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Show a notification in Magento when you receive negative feedback on eBay.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -119,13 +119,14 @@
                         <td class="value">
                             <select name="use_last_specifics_mode">
                                 <option value="0" <?php if (!$this->use_last_specifics_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Show'); ?></option>
-                                <option value="1" <?php if ($this->use_last_specifics_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Not Show'); ?></option>
+                                <option value="1" <?php if ($this->use_last_specifics_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Do Not Show'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('If you do not need to change Item Specifics details every time you add products, you can skip this step (set \'Not Show\').
-                                <br>
-                                <b>Note:</b> Predefined item specifics you can view and change in Sell On eBay -> Configuration -> Categories In Use.
-                                '); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__(
+                                    'Choose <b>Do Not Show</b> if you don\'t need to edit item specifics details every time you add products.<br/>
+                                    You can view and change predefined item specifics in %root_node_label% > Configuration > Categories in Use.',
+                                    Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()
+                                ); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -135,7 +136,7 @@
                             <?php $currency = explode(',', $data['currency']);?>
                             <tr>
                                 <td class="label">
-                                    <label><?php echo $marketplace . ' ' . Mage::helper('M2ePro')->__('Currency')?>: </label>
+                                    <label><?php echo Mage::helper('M2ePro')->__($marketplace) . ' ' . Mage::helper('M2ePro')->__('Currency')?>: </label>
                                 </td>
 
                                 <td class="value">
@@ -165,9 +166,11 @@
                                 <option value="1" <?php if ($this->check_the_same_product_already_listed_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Does not list a Magento product if it was listed from another M2E listing.
-                                <br>
-                                <b>Note:</b> This mechanism only works for auto listing and in Live eBay environment.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__(
+                                    'Choose \'Yes\' to prevent M2E Pro listing a product if it has already been added by another M2E Pro listing.<br/><br/>
+                                     This function is useful if you have automatic rules set up that list products automatically as it will ensure a product is listed only once.<br/><br/>
+                                     <b>Note:</b> Applies only to products listed automatically on live eBay sites (ie not using a Sandbox account).'
+                                ); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -185,12 +188,15 @@
         <div class="entry-edit" id="magento_block_ebay_configuration_general_motors">
 
             <div id="block_notice_ebay_category_specific_motors_specifics" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Compatibility'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing. You can create one listing describing a single part and add a complete list of compatible vehicles.
-                <br/><br/>To use this feature you have to:
-                 <ul class="list">
-                    <li>In the section below choose the attribute, which will be used for saving ePIDs (Product Reference IDs) of compatible vehicles.</li>
-                    <li>In created M2E listing on the \'View Listing\' (Settings view mode) page use the Add Compatible Vehicles tool to find necessary compatible items.</li>
-                </ul>'); ?>
+                <?php echo Mage::helper('M2ePro')->__(
+                    'Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing.
+                    You can create one listing describing a single part and add a complete list of compatible vehicles.<br/><br/>
+                    To use this feature you need to:<br/>
+                    <ul>
+                        <li>1. Choose the attribute below that contains the Product Reference IDs (ePIDs) of compatible vehicles for the part.</li>
+                        <li>2. In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible items.</li>
+                    </ul>'
+                ); ?>
             </div>
 
             <div class="entry-edit-head">

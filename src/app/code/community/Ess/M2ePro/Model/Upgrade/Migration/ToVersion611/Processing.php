@@ -188,6 +188,11 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion611_Processing
         $connection->update(
             $tempTable, array('responser_model' => new Zend_Db_Expr("REPLACE(`responser_model`,'_Tasks','')"))
         );
+
+        $connection->update(
+            $tempTable,
+            array('responser_model' => 'M2ePro/Amazon_Synchronization_Orders_Receive_Responser'),
+            array("responser_model = 'M2ePro/Amazon_Synchronization_Orders_Responser'"));
     }
 
     //####################################

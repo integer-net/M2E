@@ -69,8 +69,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
     {
         $template = Mage::helper('M2ePro/Data_Global')->getValue('ebay_template_shipping');
 
-        $localDiscount = $template->getData('local_shipping_combined_discount_profile_id');
-        $internationalDiscount = $template->getData('international_shipping_combined_discount_profile_id');
+        $localDiscount = $template->getData('local_shipping_discount_profile_id');
+        $internationalDiscount = $template->getData('international_shipping_discount_profile_id');
 
         !is_null($localDiscount) && $localDiscount = json_decode($localDiscount, true);
         !is_null($internationalDiscount) && $internationalDiscount = json_decode($internationalDiscount, true);
@@ -316,21 +316,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
 
         $attributes = array();
 
-        // m2epro_ebay_template_shipping
-        //------------------------------
-        $code = 'dispatch_time_attribute';
-        if (!$this->isExistInAttributesArray($formData[$code])) {
-            $label = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($formData[$code]);
-            $attributes[$code] = $label;
-        }
-
-        $code = 'local_shipping_cash_on_delivery_cost_attribute';
-        if (!$this->isExistInAttributesArray($formData[$code])) {
-            $label = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($formData[$code]);
-            $attributes[$code] = $label;
-        }
-        //------------------------------
-
         // m2epro_ebay_template_shipping_service
         //------------------------------
         $attributes['services'] = array();
@@ -373,7 +358,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
                 $attributes['calculated'][$code] = $label;
             }
 
-            $code = 'dimension_height_attribute';
+            $code = 'dimension_length_attribute';
             if (!$this->isExistInAttributesArray($formData['calculated'][$code])) {
                 $label = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($formData['calculated'][$code]);
                 $attributes['calculated'][$code] = $label;
@@ -386,18 +371,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
             }
 
             $code = 'weight_attribute';
-            if (!$this->isExistInAttributesArray($formData['calculated'][$code])) {
-                $label = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($formData['calculated'][$code]);
-                $attributes['calculated'][$code] = $label;
-            }
-
-            $code = 'local_handling_cost_attribute';
-            if (!$this->isExistInAttributesArray($formData['calculated'][$code])) {
-                $label = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($formData['calculated'][$code]);
-                $attributes['calculated'][$code] = $label;
-            }
-
-            $code = 'international_handling_cost_attribute';
             if (!$this->isExistInAttributesArray($formData['calculated'][$code])) {
                 $label = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($formData['calculated'][$code]);
                 $attributes['calculated'][$code] = $label;
@@ -463,7 +436,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
         return $this->getMarketplace()->getChildObject()->isInternationalShippingRateTableEnabled();
     }
 
-    public function canDisplayCashOnDelivery()
+    public function canDisplayCashOnDeliveryCost()
     {
         return $this->getMarketplace()->getChildObject()->isCashOnDeliveryEnabled();
     }

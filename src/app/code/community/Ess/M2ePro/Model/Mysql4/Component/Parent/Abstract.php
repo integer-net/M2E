@@ -87,8 +87,10 @@ abstract class Ess_M2ePro_Model_Mysql4_Component_Parent_Abstract
 
     protected function _afterLoad(Mage_Core_Model_Abstract $object)
     {
+        $result = parent::_afterLoad($object);
+
         if (is_null($this->childMode)) {
-            return $this;
+            return $result;
         }
 
         $object->setChildMode($this->childMode);
@@ -102,13 +104,15 @@ abstract class Ess_M2ePro_Model_Mysql4_Component_Parent_Abstract
 
         $object->setChildObject($childObject);
 
-        return $this;
+        return $result;
     }
 
     protected function _afterSave(Mage_Core_Model_Abstract $object)
     {
+        $result = parent::_afterSave($object);
+
         if (is_null($this->childMode)) {
-            return $this;
+            return $result;
         }
 
         $childData = $object->getData();
@@ -119,7 +123,7 @@ abstract class Ess_M2ePro_Model_Mysql4_Component_Parent_Abstract
                 ->addData($childData)
                 ->save();
 
-        return $this;
+        return $result;
     }
 
     // ########################################

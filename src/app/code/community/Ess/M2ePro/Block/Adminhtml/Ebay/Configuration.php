@@ -17,7 +17,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration extends Mage_Adminhtml_Block
 
         // Set header text
         //------------------------------
-        $this->_headerText = 'Configuration';
+        $this->_headerText = Mage::helper('M2ePro')->__('Configuration');
         //------------------------------
 
         // Set buttons actions

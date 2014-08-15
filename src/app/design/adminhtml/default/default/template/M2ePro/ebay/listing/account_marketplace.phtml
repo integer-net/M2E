@@ -34,7 +34,9 @@
     <div id="content_container">
 
         <div id="block_notice_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General Settings'); ?>">
-            <?php echo Mage::helper('M2ePro')->__('Select the desired eBay account to use. Next, choose your preferred eBay site. Finally, the Magento Store View you would like eBay to use.'); ?>
+            <?php echo Mage::helper('M2ePro')->__(
+                'This page sets the eBay details and Magento store view you want to use for this M2E Pro listing.'
+            ); ?>
         </div>
 
         <div class="entry-edit" id="magento_block_general">
@@ -54,7 +56,10 @@
                                 <td class="value">
                                     <input id="title" type="text" class="input-text required-entry M2ePro-listing-title" name="title" value="<?php echo Mage::helper('M2ePro')->escapeHtml($this->getData('title')); ?>">
                                     <p class="note">
-                                        <span><?php echo Mage::helper('M2ePro')->__('Create a title that\'s meaningful to you. Your Listing Title will not be displayed publicly.'); ?></span>
+                                        <span><?php echo Mage::helper('M2ePro')->__(
+                                            'Create a descriptive and meaningful title for your M2E Pro listing.
+                                            This is used for reference within M2E Pro and will not appear on your eBay listings.'
+                                        ); ?></span>
                                     </p>
                                 </td>
                             </tr>
@@ -106,7 +111,9 @@
                                     <?php } ?>
                                 </select>
                                 <p class="note">
-                                    <span><?php echo Mage::helper('M2ePro')->__('This is the site where your item will be listed. Choose from the dropdown list. Your currency will be automatically selected based on your eBay Site choice.'); ?></span>
+                                    <span><?php echo Mage::helper('M2ePro')->__(
+                                        'Choose the eBay site you want to list on using this M2E Pro listing. Currency will be set automatically based on the eBay site you choose.'
+                                    ); ?></span>
                                 </p>
 
                             </td>
@@ -143,7 +150,7 @@
                         <td class="value" style="vertical-align: middle">
                             <?php echo $this->getChildHtml('store_switcher'); ?>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('This is the store information that will be used on M2E Pro.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento store view you want to use for this M2E Pro listing.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -247,9 +254,9 @@
         );
 
         M2ePro.translator.add(<?php echo json_encode(array(
-            'Another Synchronization Is Already Running.' => $this->__('Another Synchronization Is Already Running.'),
-            'Getting information. Please wait ...' => $this->__('Getting information. Please wait ...'),
-            'Preparing to start. Please wait ...' => $this->__('Preparing to start. Please wait ...'),
+            'Another Synchronization Is Already Running.' => Mage::helper('M2ePro')->__('Another Synchronization Is Already Running.'),
+            'Getting information. Please wait ...' => Mage::helper('M2ePro')->__('Getting information. Please wait ...'),
+            'Preparing to start. Please wait ...' => Mage::helper('M2ePro')->__('Preparing to start. Please wait ...'),
         )); ?>);
 
         var marketplaceSynchProgressHandlerObj = new EbayListingMarketplaceSynchProgressHandler(

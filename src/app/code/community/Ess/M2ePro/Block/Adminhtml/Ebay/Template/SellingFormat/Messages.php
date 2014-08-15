@@ -22,13 +22,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Messages
 
         $docUrl = 'http://www.magentocommerce.com/wiki/modules_reference/English/Mage_Adminhtml/system_currency/index';
 
-        $helpText = sprintf(
-            Mage::helper('M2ePro')->__(
-                'Please find more about currency rate set up in'
-                . ' <a href="%s" target="_blank">magento documentation</a>.'
-            ),
-            $docUrl
-        );
+        // M2ePro_TRANSLATIONS
+        // More about currency rate set-up can be found in the <a href="%url%" target="_blank">Magento documentation</a>
+        $helpText = 'More about currency rate set-up can be found in the ';
+        $helpText .= '<a href="%url%" target="_blank">Magento documentation</a>';
+        $helpText = Mage::helper('M2ePro')->__($helpText, $docUrl);
 
         return <<<HTML
 {$messageText}

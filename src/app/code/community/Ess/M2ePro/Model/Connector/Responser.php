@@ -124,8 +124,10 @@ abstract class Ess_M2ePro_Model_Connector_Responser
         }
 
         if ($internalServerErrorMessage != '') {
-            // Parser hack -> Mage::helper('M2ePro')->__('Internal server error(s) [%errors%]');
-            throw new Exception("Internal server error(s) [{$internalServerErrorMessage}]");
+            throw new Exception(Mage::helper('M2ePro')->__(
+                "Internal server error(s) [%error_message%]",
+                $internalServerErrorMessage
+            ));
         }
     }
 

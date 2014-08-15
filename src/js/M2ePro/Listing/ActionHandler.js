@@ -6,8 +6,6 @@ ListingActionHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    // todo next (temp solution)
-
     options: {},
 
     setOptions: function(options)
@@ -90,8 +88,8 @@ ListingActionHandler = Class.create(ActionHandler, {
                         if (combineResult == 'error') {
 
                             var message = self.options.text.task_completed_error_message;
-                            message = message.replace('%s', ListingProgressBarObj.getTitle());
-                            message = message.replace('%s', self.options.url.logViewUrl);
+                            message = message.replace('%task_title%', ListingProgressBarObj.getTitle());
+                            message = message.replace('%url%', self.options.url.logViewUrl);
 
                             MagentoMessageObj.addError(message);
 
@@ -115,13 +113,13 @@ ListingActionHandler = Class.create(ActionHandler, {
 
                         } else if (combineResult == 'warning') {
                             var message = self.options.text.task_completed_warning_message;
-                            message = message.replace('%s', ListingProgressBarObj.getTitle());
-                            message = message.replace('%s', self.options.url.logViewUrl);
+                            message = message.replace('%task_title%', ListingProgressBarObj.getTitle());
+                            message = message.replace('%url%', self.options.url.logViewUrl);
 
                             MagentoMessageObj.addWarning(message);
                         } else {
                             var message = self.options.text.task_completed_success_message;
-                            message = str_replace('%s', ListingProgressBarObj.getTitle(), message);
+                            message = message.replace('%task_title%', ListingProgressBarObj.getTitle());
 
                             MagentoMessageObj.addSuccess(message);
                         }
@@ -173,7 +171,7 @@ ListingActionHandler = Class.create(ActionHandler, {
 
         partExecuteString += '';
 
-        ListingProgressBarObj.setStatus(str_replace('%s', partExecuteString, self.options.text.sending_data_message));
+        ListingProgressBarObj.setStatus(str_replace('%product_title%', partExecuteString, self.options.text.sending_data_message));
 
         new Ajax.Request( url + 'id/' + self.gridHandler.listingId,
             {

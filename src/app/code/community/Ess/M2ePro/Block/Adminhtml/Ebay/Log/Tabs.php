@@ -44,8 +44,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs extends Mage_Adminhtml_Block_Widg
     protected function prepareTabListing()
     {
         $tab = array(
-            'label' => $this->__('Listings'),
-            'title' => $this->__('Listings')
+            'label' => Mage::helper('M2ePro')->__('Listings'),
+            'title' => Mage::helper('M2ePro')->__('Listings')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_LISTING) {
@@ -61,8 +61,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs extends Mage_Adminhtml_Block_Widg
     protected function prepareTabListingOther()
     {
         $tab = array(
-            'label' => $this->__('3rd Party Listings'),
-            'title' => $this->__('3rd Party Listings')
+            'label' => Mage::helper('M2ePro')->__('3rd Party Listings'),
+            'title' => Mage::helper('M2ePro')->__('3rd Party Listings')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_LISTING_OTHER) {
@@ -78,8 +78,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs extends Mage_Adminhtml_Block_Widg
     protected function prepareTabSynchronization()
     {
         $tab = array(
-            'label' => $this->__('Synchronization'),
-            'title' => $this->__('Synchronization')
+            'label' => Mage::helper('M2ePro')->__('Synchronization'),
+            'title' => Mage::helper('M2ePro')->__('Synchronization')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_SYNCHRONIZATION) {
@@ -95,8 +95,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs extends Mage_Adminhtml_Block_Widg
     protected function prepareTabOrder()
     {
         $tab = array(
-            'label' => $this->__('Orders'),
-            'title' => $this->__('Orders')
+            'label' => Mage::helper('M2ePro')->__('Orders'),
+            'title' => Mage::helper('M2ePro')->__('Orders')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_ORDER) {

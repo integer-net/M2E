@@ -10,10 +10,10 @@ class Ess_M2ePro_Adminhtml_Development_Tools_MagentoController
     //#############################################
 
     /**
-     * @title "Show Overwriten Models"
-     * @description "Show Overwriten Models"
+     * @title "Show Overwritten Models"
+     * @description "Show Overwritten Models"
      */
-    public function showOverwritenModelsAction()
+    public function showOverwrittenModelsAction()
     {
         $overwrittenModels = Mage::helper('M2ePro/Magento')->getRewrites();
 
@@ -91,6 +91,69 @@ HTML;
     }
 
     /**
+     * @title "Show Event Observers"
+     * @description "Show Event Observers"
+     * @new_line
+     */
+    public function showEventObserversAction()
+    {
+        $eventObservers = Mage::helper('M2ePro/Magento')->getAllEventObservers();
+
+        $html = $this->getStyleHtml();
+
+        $html .= <<<HTML
+
+<h2 style="margin: 20px 0 0 10px">Event Observers</h2>
+<br>
+
+<table class="grid" cellpadding="0" cellspacing="0">
+    <tr>
+        <th style="width: 50px">Area</th>
+        <th style="width: 500px">Event</th>
+        <th style="width: 500px">Observer</th>
+    </tr>
+
+HTML;
+
+        foreach ($eventObservers as $area => $areaEvents) {
+            if (empty($areaEvents)) {
+                continue;
+            }
+
+            $areaRowSpan = count($areaEvents, COUNT_RECURSIVE) - count($areaEvents);
+
+            $html .= '<tr>';
+            $html .= '<td valign="top" rowspan="'.$areaRowSpan.'">'.$area.'</td>';
+
+            foreach ($areaEvents as $eventName => $eventData) {
+                if (empty($eventData)) {
+                    continue;
+                }
+
+                $eventRowSpan = count($eventData);
+
+                $html .= '<td rowspan="'.$eventRowSpan.'">'.$eventName.'</td>';
+
+                $isFirstObserver = true;
+                foreach ($eventData as $observer) {
+                    if (!$isFirstObserver) {
+                        $html .= '<tr>';
+                    }
+
+                    $html .= '<td>'.$observer.'</td>';
+                    $html .= '</tr>';
+
+                    $isFirstObserver = false;
+                }
+            }
+        }
+
+        $html .= '</table>';
+
+        print $html;
+    }
+
+    /**
      * @title "Show Installed Modules"
      * @description "Show Installed Modules"
      * @new_line
@@ -122,9 +185,12 @@ HTML;
 HTML;
         foreach ($installedModules as $module => $data) {
 
-            $status = $data['active'] ? 'Enabled' : 'Disabled';
-            $codePool = $data['codePool'];
-            $version = $data['version'] != '' ? $data['version'] : '&nbsp;';
+            $status = $data['active'] === 'true'
+                ? '<span style="color: forestgreen">Enabled</span>'
+                : '<span style="color: orangered">Disabled</span>';
+
+            $codePool = !empty($data['codePool']) ? $data['codePool'] : '&nbsp;';
+            $version  = !empty($data['version']) ? $data['version'] : '&nbsp;';
 
             $html .= <<<HTML
 <tr>

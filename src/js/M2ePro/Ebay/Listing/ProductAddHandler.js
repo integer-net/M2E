@@ -21,7 +21,7 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
         this.options.get_selected_products((function(selectedProducts) {
 
             if (!selectedProducts) {
-                return alert(M2ePro.translator.translate('Please select items.'));
+                return alert(M2ePro.translator.translate('Please select the products you want to perform the action on.'));
             }
 
             if (this.options.show_autoaction_popup) {
@@ -192,8 +192,6 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
 
         this.settingsPopup.options.destroyOnClose = false;
         $('modal_dialog_message').insert($('settings_popup_content').show());
-
-        this.options.show_settings_popup = false;
     },
 
     //----------------------------------
@@ -204,6 +202,8 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
             true,
             this.continue.bind(this)
         );
+
+        this.options.show_settings_popup = false;
     },
 
     settingsPopupNoClick: function()
@@ -212,6 +212,8 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
             false,
             this.continue.bind(this)
         );
+
+        this.options.show_settings_popup = false;
     },
 
     setShowSettingsStep: function(showSettingsStep,callback)

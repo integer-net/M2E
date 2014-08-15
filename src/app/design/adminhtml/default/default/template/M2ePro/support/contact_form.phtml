@@ -53,14 +53,14 @@
 </style>
 
 <div id="block_notice_support_contact_form" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Contact Support'); ?>">
-    <?php
-        echo Mage::helper('M2ePro')->__('Please take a look at <a href="%s" onclick="%s">Documentation</a> and <a href="%s" onclick="%s">Knowledge Base</a>.
-                Most probably it has the answer to your question(s).<br/>
-                If you still have any questions, fill in the form below to contact our Customer Support. <br/><br/>
-                <b>Note:</b> We provide support during our working hours: 10 a.m. - 6 p.m. (GMT+2), mon - fri.',
-            'javascript:void(0)', 'SupportHandlerObj.setTabActive(\'support_documentation\')',
-            'javascript:void(0)', 'SupportHandlerObj.setTabActive(\'support_articles\')');
-    ?>
+    <?php echo Mage::helper('M2ePro')->__(
+        'Immediate help can be obtained from <a href="%url_1%" onclick="%script_code_1%">Documentation</a> and <a href="%url_2%" onclick="%script_code_2%">Knowledge Base</a>.
+        <br/><br/>
+        If you can\'t find the answer to your question, use the form below to contact us for help and we\'ll get back to you as soon as we can.
+        Our customer support team\'s hours of operation are Monday to Friday, 8am–4pm (UK time).',
+        'javascript:void(0)', 'SupportHandlerObj.setTabActive(\'support_documentation\')',
+        'javascript:void(0)', 'SupportHandlerObj.setTabActive(\'support_articles\')'
+    ); ?>
 </div>
 
 <form id="<?php echo $this->getForm()->getId(); ?>" method="post" action="<?php echo $this->getForm()->getData('action'); ?>" enctype="multipart/form-data">
@@ -72,6 +72,13 @@
         <input type="text" id="subject" name="subject" class="required-entry" placeholder="<?php echo Mage::helper('M2ePro')->__('Subject'); ?>" /><br />
         <input type="text" id="contact_name" name="contact_name" class="required-entry" placeholder="<?php echo Mage::helper('M2ePro')->__('Contact Name'); ?>" /><br />
         <input type="text" id="contact_mail" name="contact_mail" class="required-entry validate-email" placeholder="<?php echo Mage::helper('M2ePro')->__('Contact Email'); ?>" /><br />
+        <?php if (Mage::helper('M2ePro/Module_Support')->isTypePremium()) : ?>
+            <select id="severity" name="severity">
+                <option value="minor"><?php echo Mage::helper('M2ePro')->__('Minor'); ?></option>
+                <option value="important"><?php echo Mage::helper('M2ePro')->__('Important'); ?></option>
+                <option value="critical"><?php echo Mage::helper('M2ePro')->__('Critical'); ?></option>
+            </select>
+        <?php endif; ?>
 
         <select id="component" name="component" <?php if ($this->getRequest()->getParam('referrer') == Ess_M2ePro_Helper_View_Ebay::NICK) echo 'style="display: none"'?>>
             <option selected value="none"><?php echo Mage::helper('M2ePro')->__('General Problem'); ?></option>

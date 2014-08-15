@@ -19,6 +19,8 @@ abstract class Ess_M2ePro_Model_Mysql4_Abstract
 
         $object->setData('update_date',Mage::helper('M2ePro')->getCurrentGmtDate());
 
+        $result = parent::_beforeSave($object);
+
         // fix for \Varien_Db_Adapter_Pdo_Mysql::prepareColumnValue
         // an empty string cannot be saved -> NULL is saved instead
         // for Magento version > 1.6.x.x
@@ -26,13 +28,11 @@ abstract class Ess_M2ePro_Model_Mysql4_Abstract
             $value === '' && $object->setData($key,new Zend_Db_Expr("''"));
         }
 
-        return $this;
+        return $result;
     }
 
     protected function _afterSave(Mage_Core_Model_Abstract $object)
     {
-        $result = parent::_afterSave($object);
-
         // fix for \Varien_Db_Adapter_Pdo_Mysql::prepareColumnValue
         // an empty string cannot be saved -> NULL is saved instead
         // for Magento version > 1.6.x.x
@@ -42,7 +42,7 @@ abstract class Ess_M2ePro_Model_Mysql4_Abstract
             }
         }
 
-        return $result;
+        return parent::_afterSave($object);
     }
 
     // ########################################

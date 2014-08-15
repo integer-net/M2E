@@ -33,29 +33,26 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
 
     private function addCronNotificationMessage(Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        $url = 'http://support.m2epro.com/knowledgebase/articles/';
-        $url .= '334421-why-automatic-synchronization-is-needed-for-ebay-i';
+        $url = 'http://support.m2epro.com/knowledgebase/articles/42054-how-to-set-up-cron-job-for-m2e-pro';
 
-        $startLinkArticle = '<a href="'.$url.'" target="_blank">';
-        $endLink = '</a>';
+        // M2ePro_TRANSLATIONS
+        // Attention! Last eBay AUTOMATIC synchronization was performed by cron more than 1 hour ago. You should set up cron job, otherwise no automatic synchronization will be performed.<br/>You can check this <a href="%url%" target="_blank">article</a> to get how to set cron job.
+        $message = 'Attention! Last eBay AUTOMATIC synchronization was performed by cron ';
+        $message .= 'more than 1 hour ago. You should set up cron job, otherwise no automatic synchronization ';
+        $message .= 'will be performed.<br/>You can check this <a href="%url%" target="_blank">article</a> '.
+                    'to get how to set cron job.';
 
-        $message = 'Attention! AUTOMATIC synchronization is not running at the moment.';
-        $message .= '<br/>Please check this %sarticle%s to learn why it is required.';
-        $message = $this->__(
-            $message, $startLinkArticle, $endLink
-        );
-
-        $controller->getSession()->addNotice($message);
+        $controller->getSession()->addNotice(Mage::helper('M2ePro')->__($message, $url));
     }
 
     private function addFeedbackNotificationMessage(Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        $startLink = '<a href="'.$controller->getUrl('*/adminhtml_ebay_feedback/index').'" target="_blank">';
-        $endLink = '</a>';
+        $url = $controller->getUrl('*/adminhtml_ebay_feedback/index');
 
-        // ->__('New buyer negative feedback was received. Go to the %sfeedback page%s.')
-        $message = 'New buyer negative feedback was received. Go to the %sfeedback page%s.';
-        $message = $this->__($message, $startLink, $endLink);
+        // M2ePro_TRANSLATIONS
+        // New buyer negative feedback was received. Go to the <a href="%url%" target="blank">feedback page</a>.
+        $message = 'New buyer negative feedback was received. Go to the <a href="%url%" target="blank">feedback page</a>.';
+        $message = Mage::helper('M2ePro')->__($message, $url);
 
         $controller->getSession()->addNotice($message);
     }
@@ -86,15 +83,24 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
             foreach ($tempCollection->getData() as $accountData) {
 
                 $tokenExpirationTimeStamp = strtotime($accountData['token_expired_date']);
+// M2ePro_TRANSLATIONS
+/*
+The token for "%account_title%" eBay Account has been expired.<br>
+Please, go to %menu_label% > Configuration > eBay Account >
+<a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.
+(You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.
+Do not forget to press Save button after returning back to Magento
+ */
+                $textToTranslate =
+                    'The token for "%account_title%" eBay Account has been expired.<br>'.
+                    'Please, go to %menu_label% > Configuration > eBay Account >'.
+                    '<a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.'.
+                    '(You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.'.
+                    'Do not forget to press Save button after returning back to Magento';
 
                 if ($tokenExpirationTimeStamp < $currentTimeStamp) {
-                    $tempMessage = $this->__(
-                        'The token for "%s" eBay Account has been expired.
-                        <br>
-                        Please, go to %s > Configuration > eBay Account > <a href="%s" target="_blank">General TAB</a>,
-                        click on the Get Token button. (You will be redirected to the eBay website.)
-                        Sign-in and press I Agree on eBay page.
-                        Do not forget to press Save button after returning back to Magento',
+                    $tempMessage = Mage::helper('M2ePro')->__(
+                        trim($textToTranslate),
                         Mage::helper('M2ePro')->escapeHtml($accountData['title']),
                         Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
                         $controller->getUrl('*/adminhtml_ebay_account/edit', array('id' => $accountData['id']))
@@ -106,20 +112,31 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
 
                     continue;
                 }
+// M2ePro_TRANSLATIONS
+/*
+Attention! The token for "%account_title%" eBay Account will be expired soon ( %date% ).
+<br>Please, go to %menu_label% > Configuration > eBay Account >
+<a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.
+(You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.
+Do not forget to press Save button after returning back to Magento
+ */
+                $textToTranslate =
+                   'Attention! The token for "%account_title%" eBay Account will be expired soon ( %date% ).'.
+                    '<br>Please, go to %menu_label% > Configuration > eBay Account >'.
+                    '<a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.'.
+                    '(You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.'.
+                    'Do not forget to press Save button after returning back to Magento';
 
                 if (($currentTimeStamp + 60*60*24*10) >= $tokenExpirationTimeStamp) {
-                    $tempMessage = $this->__(
-                    'Attention! The token for "%s" eBay Account will be expired soon ( %s ).
-                    <br>
-                    Please, go to %s > Configuration > eBay Account > <a href="%s" target="_blank">General TAB</a>,
-                    click on the Get Token button. (You will be redirected to the eBay website.)
-                    Sign-in and press I Agree on eBay page.
-                    Do not forget to press Save button after returning back to Magento',
-                    Mage::helper('M2ePro')->escapeHtml($accountData['title']),
-                    Mage::app()->getLocale()->date(strtotime($accountData['token_expired_date']))->toString($format),
-                    Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
-                    $controller->getUrl('*/adminhtml_ebay_account/edit', array('id' => $accountData['id']))
-                    );
+
+                    $tempMessage = Mage::helper('M2ePro')->__(
+                        trim($textToTranslate),
+                        Mage::helper('M2ePro')->escapeHtml($accountData['title']),
+                        Mage::app()->getLocale()->date(strtotime($accountData['token_expired_date']))
+                                                ->toString($format),
+                        Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+                            $controller->getUrl('*/adminhtml_ebay_account/edit', array('id' => $accountData['id']))
+                        );
 
                     $tokenExpirationMessages[] = array(
                         'type' => 'notice',
@@ -181,11 +198,14 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
             return;
         }
 
-        $message = '%s data was changed on eBay. You need to synchronize it the extension works properly.
-                    Please, go to %s > Configuration >
-                    <a href="%s" target="_blank">eBay Sites</a> and click the Save And Update button.';
+// M2ePro_TRANSLATIONS
+// %marketplace_title% data was changed on eBay. You need to synchronize it the extension works properly. Please, go to %menu_label% > Configuration > <a href="%url%" target="_blank">eBay Sites</a> and click the Save And Update button.
 
-        $controller->getSession()->addNotice($this->__(
+        $message = '%marketplace_title% data was changed on eBay. You need to synchronize it'.
+            ' the extension works properly. Please, go to %menu_label% > Configuration > '.
+            '<a href="%url%" target="_blank">eBay Sites</a> and click the Save And Update button.';
+
+        $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
             $message,
             implode(', ',$outdatedMarketplaces),
             Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
@@ -196,7 +216,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
         ));
     }
 
-    //#############################################
+    // #############################################
 
     private function haveNewNegativeFeedbacks()
     {

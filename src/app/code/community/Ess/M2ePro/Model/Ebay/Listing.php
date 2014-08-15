@@ -726,9 +726,7 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
     {
         $ids = $this->getData('product_add_ids');
         $ids = array_filter((array)json_decode($ids, true));
-        $ids = array_values(array_unique($ids));
-
-        return $ids;
+        return array_values(array_unique($ids));
     }
 
     // ########################################
@@ -740,178 +738,36 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
     // ########################################
 
-    public function getAffectedListingProducts($templates = array(
-                                                   Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT,
-                                                   Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING,
-                                                   Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN,
-                                                   Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
-                                                   Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION,
-                                               ), $asObjects = false, $key = NULL)
+    public function getAffectedListingsProductsByTemplate($template, $asObjects = false)
     {
-        if (empty($templates)) {
-            return array();
-        }
-
-        if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
-        }
-
-        !is_array($templates) && $templates = array($templates);
+        $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
+        $templateManager->setTemplate($template);
 
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $collection->addFieldToFilter('listing_id', $this->getId());
+        $collection->addFieldToFilter($templateManager->getModeColumnName(),
+                                      Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT);
 
-        if (!is_null($key)) {
-            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($key);
-        }
-
-        $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
-
-        $where = '';
-        foreach ($templates as $template) {
-            $templateManager->setTemplate($template);
-
-            $where && $where .= ' OR ';
-            $where .= "{$templateManager->getModeColumnName()} = ".Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT;
-        }
-
-        $collection->getSelect()->where($where);
-
-        $listingProducts = $asObjects ? $collection->getItems() : $collection->getData();
-
-        if (is_null($key)) {
-            return $listingProducts;
-        }
-
-        $return = array();
-        foreach ($listingProducts as $listingProduct) {
-            isset($listingProduct[$key]) && $return[] = $listingProduct[$key];
-        }
-
-        return $return;
+        return $asObjects ? (array)$collection->getItems() : (array)$collection->getData();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $this->setSynchStatusNeedByTemplates($newData,$oldData);
-        $this->setSynchStatusNeedBySynchronizationTemplate($newData,$oldData);
-    }
-
-    // ----------------------------------------
-
-    private function setSynchStatusNeedByTemplates($newData,$oldData)
-    {
-        $templates = array(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
-                           Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION);
-
         $templateManager = Mage::getSingleton('M2ePro/Ebay_Template_Manager');
 
-        $newTemplates = $templateManager->getTemplatesFromData($newData,$templates);
-        $oldTemplates = $templateManager->getTemplatesFromData($oldData,$templates);
+        $newTemplates = $templateManager->getTemplatesFromData($newData);
+        $oldTemplates = $templateManager->getTemplatesFromData($oldData);
 
-        $changedTemplates = array();
-        foreach ($templates as $templateNick) {
+        foreach ($templateManager->getAllTemplates() as $template) {
 
-            $templateManager->setTemplate($templateNick);
+            $templateManager->setTemplate($template);
 
-            $isDifferent = $newTemplates[$templateNick]->getResource()->isDifferent(
-                $newTemplates[$templateNick]->getDataSnapshot(),
-                $oldTemplates[$templateNick]->getDataSnapshot()
+            $templateManager->getTemplateModel(true)->getResource()->setSynchStatusNeed(
+                $newTemplates[$template]->getDataSnapshot(),
+                $oldTemplates[$template]->getDataSnapshot(),
+                $this->getAffectedListingsProductsByTemplate($template,false)
             );
-
-            $isDifferent && $changedTemplates[] = $templateNick;
         }
-
-        if (!$changedTemplates) {
-            return;
-        }
-
-        $ids = $this->getAffectedListingProducts($changedTemplates,false,'id');
-
-        if (empty($ids)) {
-            return;
-        }
-
-        foreach ($changedTemplates as &$template) {
-            if ($template == Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT) {
-                $template = 'sellingFormatTemplate';
-            } else {
-                $template .= 'Template';
-            }
-        }
-        unset($template);
-
-        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
-            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
-            array(
-                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
-                'synch_reasons' => new Zend_Db_Expr(
-                    "IF(synch_reasons IS NULL,
-                        '".implode(',',$changedTemplates)."',
-                        CONCAT(synch_reasons,'".','.implode(',',$changedTemplates)."')
-                    )"
-                )
-            ),
-            array('id IN ('.implode(',', $ids).')')
-        );
-    }
-
-    private function setSynchStatusNeedBySynchronizationTemplate($newData,$oldData)
-    {
-        $template = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
-
-        $templateManager = Mage::getSingleton('M2ePro/Ebay_Template_Manager');
-
-        $newSynchTemplate = $templateManager->getTemplatesFromData($newData,array($template));
-        $newSynchTemplate = reset($newSynchTemplate);
-
-        $oldSynchTemplate = $templateManager->getTemplatesFromData($oldData,array($template));
-        $oldSynchTemplate = reset($oldSynchTemplate);
-
-        $newSynchTemplateSnapshot = $newSynchTemplate->getDataSnapshot();
-        $oldSynchTemplateSnapshot = $oldSynchTemplate->getDataSnapshot();
-
-        $settings = $newSynchTemplate->getFullReviseSettingWhichWereEnabled(
-            $newSynchTemplateSnapshot, $oldSynchTemplateSnapshot
-        );
-
-        if (!$settings) {
-            return;
-        }
-
-        $listingProducts = $this->getAffectedListingProducts($template);
-
-        $idsByReasonDictionary = array();
-        foreach ($listingProducts as $listingProduct) {
-
-            if ($listingProduct['synch_status'] != Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP) {
-                continue;
-            }
-
-            $listingProductSynchReasons = array_unique(array_filter(explode(',',$listingProduct['synch_reasons'])));
-            foreach ($listingProductSynchReasons as $reason) {
-                $idsByReasonDictionary[$reason][] = $listingProduct['id'];
-            }
-        }
-
-        $idsForUpdate = array();
-        foreach ($settings as $reason => $setting) {
-
-            if (!isset($idsByReasonDictionary[$reason])) {
-                continue;
-            }
-
-            $idsForUpdate = array_merge($idsForUpdate, $idsByReasonDictionary[$reason]);
-        }
-
-        Mage::getSingleton('core/resource')->getConnection('core_write')->update(
-            Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable(),
-            array('synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED),
-            array('id IN (?)' => array_unique($idsForUpdate))
-        );
     }
 
     // ########################################

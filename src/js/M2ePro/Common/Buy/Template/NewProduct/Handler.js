@@ -71,33 +71,21 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             self.showSpanWithCategoryPath(M2ePro.formData.category.category_path);
         }
 
-        Validation.add('M2ePro-validation-float', M2ePro.translator.translate('Invalid input data. Decimal value required. Example 12.05'), function(value, element) {
-            if (!element.up('tr').visible()) {
-                return true;
+        $('window_browse_category_close').observe(
+            'click',
+            function()
+            {
+                self.closeBrowseCategoryPopup();
             }
-            return self['floatTypeValidator'](value,element);
-        });
-    },
+        );
 
-    //----------------------------------
-
-    floatTypeValidator: function(value, element) {
-        var pattern = /[^\d.]+/;
-        if (pattern.exec(value) != null) {
-            return false;
-        }
-
-        if (isNaN(parseFloat(value)) ||
-            substr_count(value,'.') > 1 ||
-            value.substr(-1) == '.') {
-            return false;
-        }
-
-        if (value.indexOf('.') != -1 && (value.substring(value.indexOf('.')+1)).length > 2) {
-            return false;
-        }
-
-        return true;
+        $('window_search_category_close').observe(
+            'click',
+            function()
+            {
+                self.closeSearchCategoryPopup();
+            }
+        );
     },
 
     //----------------------------------
@@ -482,6 +470,20 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
                 this.value = 0;
             }
         }
+    },
+
+    closeBrowseCategoryPopup: function()
+    {
+        this.browse_category.close();
+        this.categoriesTr.hide();
+        this.nodeTitleEl.value = '';
+        this.confirmButton.hide();
+    },
+
+    closeSearchCategoryPopup: function()
+    {
+        this.search_category.close();
+        this.resetSearchClick();
     },
 
     main_image_mode_change: function()

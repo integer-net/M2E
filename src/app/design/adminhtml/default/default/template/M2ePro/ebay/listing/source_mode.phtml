@@ -1,12 +1,6 @@
 <?php echo $this->getParentBlock()->getChildHtml('view_header'); ?>
 
-<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Select appropriate product view.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
-
-    <div style="padding: 2px"></div>
-
-    <span>
-        <?php echo Mage::helper('M2ePro')->__('There are two ways to select your products :');?>
-    </span>
+<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Choose how you want to display products for selection.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
     <form id="<?php echo $this->getForm()->getId(); ?>" method="post" action="<?php echo $this->getUrl('*/*/*',array('_current' => true)); ?>">
 
@@ -18,14 +12,14 @@
             <label style="font-weight: bold" for="products"><?php echo Mage::helper('M2ePro')->__('Products List'); ?></label>
 
             <div style="margin: 10px 22px">
-                <?php echo Mage::helper('M2ePro')->__('Products are displayed altogether.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('Products displayed as a list without any grouping.'); ?>
             </div>
 
             <input id="categories" name="source" type="radio" value="categories">&nbsp;&nbsp;
             <label style="font-weight: bold" for="categories"><?php echo Mage::helper('M2ePro')->__('Category'); ?></label>
 
             <div style="margin: 10px 22px">
-                <?php echo Mage::helper('M2ePro')->__('Products grouped by Magento categories.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('Products grouped by Magento category.'); ?>
             </div>
 
         </div>

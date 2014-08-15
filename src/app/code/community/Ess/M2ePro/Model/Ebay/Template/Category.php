@@ -220,60 +220,22 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
 
     // #######################################
 
-    public function getAffectedListingProducts($asObjects = false, $key = NULL)
+    public function getAffectedListingsProducts($asObjects = false)
     {
-        if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
-        }
-
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $collection->addFieldToFilter('template_category_id', $this->getId());
-
-        if (!is_null($key)) {
-            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($key);
-        }
-
-        $listingProducts = $asObjects ? $collection->getItems() : $collection->getData();
-
-        if (is_null($key)) {
-            return $listingProducts;
-        }
-
-        $return = array();
-        foreach ($listingProducts as $listingProduct) {
-            isset($listingProduct[$key]) && $return[] = $listingProduct[$key];
-        }
-
-        return $return;
+        return $asObjects ? (array)$collection->getItems() : (array)$collection->getData();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        if (!$this->getResource()->isDifferent($newData,$oldData)) {
+        $listingsProducts = $this->getAffectedListingsProducts(false);
+
+        if (!$listingsProducts) {
             return;
         }
 
-        $ids = $this->getAffectedListingProducts(false,'id');
-
-        if (empty($ids)) {
-            return;
-        }
-
-        $templates = array('categoryTemplate');
-
-        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
-            Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
-            array(
-                'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,
-                'synch_reasons' => new Zend_Db_Expr(
-                    "IF(synch_reasons IS NULL,
-                        '".implode(',',$templates)."',
-                        CONCAT(synch_reasons,'".','.implode(',',$templates)."')
-                    )"
-                )
-            ),
-            array('id IN ('.implode(',', $ids).')')
-        );
+        $this->getResource()->setSynchStatusNeed($newData,$oldData,$listingsProducts);
     }
 
     // #######################################

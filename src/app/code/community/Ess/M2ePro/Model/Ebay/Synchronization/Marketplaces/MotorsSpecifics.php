@@ -60,9 +60,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
         $marketplace = Mage::helper('M2ePro/Component_Ebay')
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
-        $partNumber = (int)$this->getConfigValue($this->getFullSettingsPath(), 'part_next');
-        $partNumber <= 0 && $partNumber = 1;
-
+        $partNumber = 1;
         $this->deleteAllSpecificsForMarketplace($marketplace);
 
         while (true) {
@@ -91,7 +89,6 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
             $this->getActualLockItem()->activate();
 
             $partNumber = $response['next'];
-            $this->setConfigValue($this->getFullSettingsPath(), 'part_next', $partNumber);
 
             if (is_null($partNumber)) {
                 break;
@@ -174,7 +171,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
 
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        // ->__('The "Parts Compatibility" action for eBay Site: "%mrk%" has been successfully completed.');
+        // M2ePro_TRANSLATIONS
+        // The "Parts Compatibility" action for eBay Site: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Parts Compatibility" action for eBay Site: "%mrk%" has been successfully completed.',

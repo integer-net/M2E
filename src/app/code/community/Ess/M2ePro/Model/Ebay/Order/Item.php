@@ -19,9 +19,10 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
     // ##########################################################
 
-    // ->__('Product import is disabled in eBay Account settings.');
-    // ->__('Data obtaining for eBay Item failed. Please try again later.');
-    // ->__('Product for eBay Item #%id% was created in Magento catalog.');
+    // M2ePro_TRANSLATIONS
+    // Product import is disabled in eBay Account settings.
+    // Data obtaining for eBay Item failed. Please try again later.
+    // Product for eBay Item #%id% was created in Magento catalog.
 
     // ########################################
 
@@ -304,6 +305,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
         // Try to find exist product with sku from eBay
         // ----------------
         $product = Mage::getModel('catalog/product')
+            ->setStoreId($this->getEbayOrder()->getAssociatedStoreId())
             ->getCollection()
                 ->addAttributeToSelect('sku')
                 ->addAttributeToFilter('sku', $productData['sku'])

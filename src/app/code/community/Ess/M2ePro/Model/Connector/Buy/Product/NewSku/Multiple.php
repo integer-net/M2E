@@ -43,7 +43,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_NewSku_Multiple
 
             if (!$listingProduct->isNotListed()) {
 
-                // Parser hack -> Mage::helper('M2ePro')->__('Item is already on Rakuten.com, or not available.');
+                // M2ePro_TRANSLATIONS
+                // Item is already on Rakuten.com, or not available.
                 $this->addListingsProductsLogsMessage($listingProduct,
                                                       'Item is already on Rakuten.com, or not available.',
                                                       Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -55,8 +56,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_NewSku_Multiple
             $templateNewProductId = $listingProduct->getChildObject()->getTemplateNewProductId();
 
             if (empty($templateNewProductId)) {
-
-                // ->__('New SKU template is required.');
+                // M2ePro_TRANSLATIONS
+                // New SKU template is required.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
                     'New SKU template is required.',

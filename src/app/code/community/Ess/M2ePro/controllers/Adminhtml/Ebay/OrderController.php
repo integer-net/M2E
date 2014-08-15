@@ -210,11 +210,13 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         $order = Mage::helper('M2ePro/Component_Ebay')->getObject('Order', (int)$id);
 
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
-            $message = 'Magento Order is already created for this %s Order. ' .
+            // M2ePro_TRANSLATIONS
+            // Magento Order is already created for this %component_name% Order. Press Create Order button to create new one.
+            $message = 'Magento Order is already created for this %component_name% Order. ' .
                        'Press Create Order button to create new one.';
 
             $this->_getSession()->addWarning(
-                sprintf(Mage::helper('M2ePro')->__($message), Ess_M2ePro_Helper_Component_Ebay::TITLE)
+                Mage::helper('M2ePro')->__($message, Ess_M2ePro_Helper_Component_Ebay::TITLE)
             );
             $this->_redirect('*/*/view', array('id' => $id));
             return;
@@ -227,8 +229,9 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
             $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Magento Order was created.'));
         } catch (Exception $e) {
             $message = Mage::helper('M2ePro')->__(
-                'Magento Order was not created. Reason: %s',
-                Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage())
+                'Magento Order was not created. Reason: %error_message%',
+                 Mage::helper('M2ePro')->
+                     __(Mage::getSingleton('M2ePro/Log_Abstract')->decodeDescription($e->getMessage()))
             );
             $this->_getSession()->addError($message);
         }

@@ -6,7 +6,8 @@
 
 class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
 {
-    // Parser hack -> Mage::helper('M2ePro')->__('Sell On Multi-Channels');
+    // M2ePro_TRANSLATIONS
+    // Sell On Multi-Channels
 
     const NICK  = 'common';
     const TITLE = 'Sell On Multi-Channels';
@@ -21,19 +22,19 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         $componentsLabels = array();
 
         if (Mage::helper('M2ePro/Component_Amazon')->isActive()) {
-            $componentsLabels[] = $this->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
+            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
         }
 
         if (Mage::helper('M2ePro/Component_Buy')->isActive()) {
-            $componentsLabels[] = $this->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
         }
 
         if (Mage::helper('M2ePro/Component_Play')->isActive()) {
-            $componentsLabels[] = $this->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
         }
 
         if (count($componentsLabels) <= 0 || count($componentsLabels) > 2) {
-            return $this->__(self::TITLE);
+            return Mage::helper('M2ePro')->__(self::TITLE);
         }
 
         return implode(' / ', $componentsLabels);

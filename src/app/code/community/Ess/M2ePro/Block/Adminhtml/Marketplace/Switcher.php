@@ -12,7 +12,7 @@ class Ess_M2ePro_Block_Adminhtml_Marketplace_Switcher extends Ess_M2ePro_Block_A
 
     public function getLabel()
     {
-        return Mage::helper('M2ePro')->__($this->getComponentLabel('Choose %component% Marketplace'));
+        return Mage::helper('M2ePro')->__($this->getComponentLabel('%component% Marketplace'));
     }
 
     public function getItems()

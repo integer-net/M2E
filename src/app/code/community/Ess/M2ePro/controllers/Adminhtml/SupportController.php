@@ -121,11 +121,14 @@ class Ess_M2ePro_Adminhtml_SupportController
             $data[$key] = $post[$key];
         }
 
+        $severity = isset($post['severity']) ? $post['severity'] : null;
+
         Mage::helper('M2ePro/Module_Support_Form')->send($data['component'],
                                                          $data['contact_mail'],
                                                          $data['contact_name'],
                                                          $data['subject'],
-                                                         $data['description']);
+                                                         $data['description'],
+                                                         $severity);
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Your message has been successfully sent.'));
         $this->_redirect('*/*/index');

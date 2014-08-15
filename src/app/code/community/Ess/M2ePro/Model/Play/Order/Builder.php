@@ -12,7 +12,8 @@ class Ess_M2ePro_Model_Play_Order_Builder extends Varien_Object
 
     const UPDATE_STATUS = 0;
 
-    // Parser hack -> Mage::helper('M2ePro')->__('Duplicated Play.com orders with ID #%id%.');
+    // M2ePro_TRANSLATIONS
+    // Duplicated Play.com orders with ID #%id%.
 
     // ########################################
 
@@ -88,17 +89,37 @@ class Ess_M2ePro_Model_Play_Order_Builder extends Varien_Object
 
         $existOrders = Mage::helper('M2ePro/Component_Play')
             ->getCollection('Order')
-                ->addFieldToFilter('account_id', $this->account->getId())
-                ->addFieldToFilter('play_order_id', $this->getData('play_order_id'))
-                ->getItems();
+            ->addFieldToFilter('account_id', $this->account->getId())
+            ->addFieldToFilter('play_order_id', $this->getData('play_order_id'))
+            ->setOrder('id', Varien_Data_Collection_Db::SORT_ORDER_DESC)
+            ->getItems();
         $existOrdersNumber = count($existOrders);
 
+        // duplicated M2ePro orders. remove m2e order without magento order id or newest order
+        // --------------------
         if ($existOrdersNumber > 1) {
-            $message = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Duplicated Play.com orders with ID #%id%.', array('!id' => $this->getData('play_order_id'))
-            );
-            throw new Exception($message);
+            $isDeleted = false;
+
+            foreach ($existOrders as $key => $order) {
+                /** @var Ess_M2ePro_Model_Order $order */
+
+                $magentoOrderId = $order->getData('magento_order_id');
+                if (!empty($magentoOrderId)) {
+                    continue;
+                }
+
+                $order->deleteInstance();
+                unset($existOrders[$key]);
+                $isDeleted = true;
+                break;
+            }
+
+            if (!$isDeleted) {
+                $orderForRemove = reset($existOrders);
+                $orderForRemove->deleteInstance();
+            }
         }
+        // --------------------
 
         // New order
         // --------------------

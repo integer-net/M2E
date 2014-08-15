@@ -25,11 +25,11 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Header extends Mage_Adminhtml_Bloc
         return $this->cutLongLines($this->getListing()->getMarketplace()->getTitle());
     }
 
-    public function getStoreViewBreadcrumb()
+    public function getStoreViewBreadcrumb($cutLongValues = true)
     {
         $breadcrumb = Mage::helper('M2ePro/Magento_Store')->getStorePath($this->getListing()->getStoreId());
 
-        return $this->cutLongLines($breadcrumb);
+        return $cutLongValues ? $this->cutLongLines($breadcrumb) : $breadcrumb;
     }
 
     // ########################################

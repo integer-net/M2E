@@ -164,7 +164,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_ListingController
             Ess_M2ePro_Helper_Data::INITIATOR_USER,
             NULL,
             Ess_M2ePro_Model_Listing_Log::ACTION_ADD_LISTING,
-            // Parser hack -> Mage::helper('M2ePro')->__('Listing was successfully added');
+
+            // M2ePro_TRANSLATIONS
+            // Listing was successfully added
             'Listing was successfully added',
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
@@ -883,10 +885,10 @@ class Ess_M2ePro_Adminhtml_Common_Play_ListingController
             }
         }
 
-        $tempString = Mage::helper('M2ePro')->__('%s listing(s) were successfully deleted', $deleted);
+        $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) were successfully deleted', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
-        $tempString = Mage::helper('M2ePro')->__('%s listing(s) have listed items and can not be deleted', $locked);
+        $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) have listed items and can not be deleted', $locked);
         $locked && $this->_getSession()->addError($tempString);
 
         $this->_redirect('*/adminhtml_common_listing/index');

@@ -36,7 +36,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
     }
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @return Ess_M2ePro_Model_Magento_Product_Cache
      */
     public function getMagentoProduct()
     {

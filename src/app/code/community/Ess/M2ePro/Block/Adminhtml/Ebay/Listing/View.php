@@ -256,11 +256,11 @@ HTML;
 
         //------------------------------
         $translations = json_encode(array(
-            'Automatic Actions' => $this->__('Automatic Actions'),
-            'Based on Magento Categories' => $this->__('Based on Magento Categories'),
-            'You must select at least 1 category.' => $this->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => $this->__('Rule with the same title already exists.'),
-            'Compatibility Attribute' => $this->__('Compatibility Attribute'),
+            'Automatic Actions' => Mage::helper('M2ePro')->__('Automatic Actions'),
+            'Based on Magento Categories' => Mage::helper('M2ePro')->__('Based on Magento Categories'),
+            'You must select at least 1 category.' => Mage::helper('M2ePro')->__('You must select at least 1 category.'),
+            'Rule with the same title already exists.' => Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
+            'Compatibility Attribute' => Mage::helper('M2ePro')->__('Compatibility Attribute'),
         ));
         //------------------------------
 

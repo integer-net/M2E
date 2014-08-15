@@ -104,7 +104,9 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         } catch (Exception $e) {
             $this->_getSession()->addError(
-                Mage::helper('M2ePro')->__('QTY for selected Order(s) was not reserved. Reason: %s', $e->getMessage())
+                Mage::helper('M2ePro')->__(
+                    'QTY for selected Order(s) was not reserved. Reason: %error_message%',
+                    $e->getMessage())
             );
         }
 
@@ -149,7 +151,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         } catch (Exception $e) {
             $this->_getSession()->addError(
                 Mage::helper('M2ePro')->__(
-                    'QTY reserve for selected Order(s) was not canceled. Reason: %s', $e->getMessage()
+                    'QTY reserve for selected Order(s) was not canceled. Reason: %error_message%', $e->getMessage()
                 )
             );
         }
@@ -183,7 +185,7 @@ class Ess_M2ePro_Adminhtml_OrderController
             $block = $this->getLayout()->createBlock('M2ePro/adminhtml_order_item_product_mapping');
 
             $this->getResponse()->setBody(json_encode(array(
-                'title' => Mage::helper('M2ePro')->__('Mapping Product "%s"', $item->getChildObject()->getTitle()),
+                'title' => Mage::helper('M2ePro')->__('Mapping Product "%title%"', $item->getChildObject()->getTitle()),
                 'html' => $block->toHtml(),
                 'pop_up_config' => array(
                     'height' => 500,
@@ -258,10 +260,6 @@ class Ess_M2ePro_Adminhtml_OrderController
         }
 
         $orderItem->assignProduct($productData['entity_id']);
-
-        if (!$orderItem->getMagentoProduct()->hasRequiredOptions()) {
-            $orderItem->setActionRequired(false)->save();
-        }
 
         $orderItem->getOrder()->addSuccessLog('Order item "%title%" was successfully mapped.', array(
             'title' => $orderItem->getChildObject()->getTitle()
@@ -365,8 +363,10 @@ class Ess_M2ePro_Adminhtml_OrderController
             return;
         }
 
-        if ($orderItem->hasRepairInput()) {
-            $hash = Ess_M2ePro_Model_Order_Repair::generateHash($orderItem->getChildObject()->getRepairInput());
+        $repairInput = $orderItem->getChildObject()->getRepairInput();
+
+        if (!empty($repairInput)) {
+            $hash = Ess_M2ePro_Model_Order_Repair::generateHash($repairInput);
 
             /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
             $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');

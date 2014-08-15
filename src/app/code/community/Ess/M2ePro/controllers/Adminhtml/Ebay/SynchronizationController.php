@@ -204,10 +204,12 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
             ->addFieldToFilter('nick', array('like' => 'synchronization_ebay_other_listings%'))
             ->getSize();
 
+        // M2ePro_TRANSLATIONS
+        // eBay 3rd Party Listings are being downloaded now. They will be available soon in %menu_label% > Listings > 3rd Party. You can continue working with M2E Pro.
         if ($synchronizationEbayOtherListingsProcessing > 0) {
             $warningMessages[] = Mage::helper('M2ePro')->__(
                 'eBay 3rd Party Listings are being downloaded now. ' .
-                'They will be available soon in %s > Listings > 3rd Party. ' .
+                'They will be available soon in %menu_label% > Listings > 3rd Party. ' .
                 'You can continue working with M2E Pro.',
                 Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()
             );
