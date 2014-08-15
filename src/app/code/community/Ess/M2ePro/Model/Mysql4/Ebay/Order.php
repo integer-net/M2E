@@ -29,8 +29,8 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Order
 
         $whereSql = array();
         foreach ($items as $orderItem) {
-            $itemIdSql = $readConnection->quoteInto('?', $orderItem->getData('item_id'));
-            $transactionIdSql = $readConnection->quoteInto('?', $orderItem->getData('transaction_id'));
+            $itemIdSql = $readConnection->quoteInto('?', $orderItem['item_id']);
+            $transactionIdSql = $readConnection->quoteInto('?', $orderItem['transaction_id']);
 
             $whereSql[] = "(item_id = {$itemIdSql} AND transaction_id = {$transactionIdSql})";
         }

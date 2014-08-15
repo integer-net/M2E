@@ -228,14 +228,14 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
 
     public function getTableInfo($tableName)
     {
-        $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
-
         if (!in_array($tableName, $this->getMySqlTables())) {
             return false;
         }
 
+        $moduleTableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+
         $stmtQuery = Mage::getResourceModel('core/config')->getReadConnection()->query(
-            "SHOW COLUMNS FROM {$tableName}"
+            "SHOW COLUMNS FROM {$moduleTableName}"
         );
 
         $result = array();
@@ -310,7 +310,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
         $result = array();
 
         $simpleColumns = array('store_id', 'related_store_id');
-        $jsonColumns = array('magento_orders_settings', 'marketplaces_data');
+        $jsonColumns   = array('magento_orders_settings', 'marketplaces_data');
 
         foreach ($this->getTablesInfo() as $tableName => $tableInfo) {
             foreach ($tableInfo as $columnName => $columnInfo) {

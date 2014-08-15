@@ -116,7 +116,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     {
         $data = array();
 
-        foreach (array('isbn','epid','upc','ean') as $tempType) {
+        foreach (array('isbn','epid','upc','ean','gtin','brand','mpn') as $tempType) {
 
             $this->searchNotFoundAttributes();
             $tempValue = $this->getDescriptionTemplate()->getProductDetail($tempType);
@@ -131,6 +131,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
 
             $data[$tempType] = $tempValue;
         }
+
+        if (empty($data)) {
+            return $data;
+        }
+
+        $data['include_description'] = $this->getDescriptionTemplate()->isProductDetailsIncludeDescription();
+        $data['include_image'] = $this->getDescriptionTemplate()->isProductDetailsIncludeImage();
+
+        $data['list_if_no_product'] = $this->getDescriptionTemplate()->isProductDetailsListIfNoProduct();
 
         return $data;
     }

@@ -159,7 +159,7 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
         $sku = $this->getSku();
         if ($sku != '' && strlen($sku) <= 64) {
             $product = Mage::getModel('catalog/product')
-                ->setStoreId($this->getEbayOrder()->getAssociatedStoreId())
+                ->setStoreId($this->getPlayOrder()->getAssociatedStoreId())
                 ->getCollection()
                     ->addAttributeToSelect('sku')
                     ->addAttributeToFilter('sku', $sku)

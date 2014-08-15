@@ -277,6 +277,38 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
+    product_details_specification_visibility_change: function()
+    {
+        if ($('product_details_ean').value == ''
+            && $('product_details_upc').value == ''
+            && $('product_details_gtin').value == ''
+            && $('product_details_epid').value == ''
+            && $('product_details_isbn').value == ''
+            && $('product_details_brand').value == ''
+        ) {
+            $$('.product-details-specification').each(function (element) {
+                element.hide();
+                element.down('.value').down().selectedIndex = 1;
+            });
+        } else {
+            $$('.product-details-specification').invoke('show');
+        }
+    },
+
+    product_details_brand_change: function()
+    {
+        var self = EbayTemplateDescriptionHandlerObj;
+
+        if (this.value != '') {
+            $('product_details_mpn_tr').show();
+        } else {
+            $('product_details_mpn_tr').hide();
+            $('product_details_mpn').selectedIndex = 0;
+        }
+
+        self.product_details_specification_visibility_change();
+    },
+
     insertGallery: function()
     {
         var template = '#' + $('select_attributes_image').value;

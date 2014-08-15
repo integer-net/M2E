@@ -153,6 +153,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
                     'make'           => $item['Make'],
                     'model'          => $item['Model'],
                     'year'           => $item['Year'],
+                    'trim'           => (isset($item['Trim']) ? $item['Trim'] : NULL),
                     'engine'         => (isset($item['Engine']) ? $item['Engine'] : NULL),
                     'submodel'       => (isset($item['Submodel']) ? $item['Submodel'] : NULL)
                 );

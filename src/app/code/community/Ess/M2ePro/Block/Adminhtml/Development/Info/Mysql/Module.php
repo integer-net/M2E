@@ -38,14 +38,15 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Mysql_Module extends Mage_Admi
         foreach ($tablesData as $category => $tables) {
             foreach ($tables as $table) {
 
-                if(!in_array($table, $existTables)) {
+                $moduleTable = Mage::getSingleton('core/resource')->getTableName($table);
+
+                if(!in_array($moduleTable, $existTables)) {
                     $tablesInfo[$category][$table] = array(
                         'count' => 0, 'url'   => '#'
                     );
                     continue;
                 }
 
-                $moduleTable = Mage::getSingleton('core/resource')->getTableName($table);
                 $dbSelect = $connRead->select()->from($moduleTable, new Zend_Db_Expr('COUNT(*)'));
 
                 $tablesInfo[$category][$table]['count'] = $connRead->fetchOne($dbSelect);

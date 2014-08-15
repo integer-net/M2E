@@ -1,3 +1,13 @@
+* 6.1.8 (r6757) (01/08/2014)
+
+* Added: [eBay] ability to use GTIN and Brand/MPN as eBay Catalog Identifiers in description policy
+* Added: [eBay] ability to set partial data import from eBay catalog (description and photo)
+* Added: [eBay] ability to not list product if product not found in eBay Catalog
+* Fix: [eBay] trim column was empty already in eBay parts compatibility grid (ePIDs list)
+* Fix: [eBay] automatic relist action is not performed when "Out Of Stock Control" option is enabled
+* Fix: [eBay] fatal error "call getData() of non object" during order synchronization
+* Fix: [Amazon] fatal error "call undefined function getEbayOrder()" during order creation
+
 * 6.1.7 (r6732) (29/07/2014)
 
 * Added: ability to set percent of qty to sell on channel in selling format template

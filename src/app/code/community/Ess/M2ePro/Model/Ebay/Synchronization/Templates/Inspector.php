@@ -191,7 +191,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($ebaySynchronizationTemplate->isRelistFilterUserLock() &&
+        if ($listingProduct->isStopped() &&
+            $ebaySynchronizationTemplate->isRelistFilterUserLock() &&
             $listingProduct->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
             return false;
         }

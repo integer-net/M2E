@@ -363,7 +363,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     public function getProductDetailAttribute($type)
     {
-        if (!in_array($type, array('isbn', 'epid', 'upc', 'ean'))) {
+        if (!in_array($type, array('isbn', 'epid', 'upc', 'ean', 'gtin', 'brand', 'mpn'))) {
             throw new InvalidArgumentException('Unknown product details name');
         }
 
@@ -373,7 +373,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             return NULL;
         }
 
-        $tempProductsDetails = json_decode($this->getData('product_details'),true);
+        $tempProductsDetails = $this->getProductDetails();
 
         if (!isset($tempProductsDetails[$type])) {
             return NULL;
@@ -396,6 +396,15 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         $temp && $attributes[] = $temp;
 
         $temp = $this->getProductDetailAttribute('ean');
+        $temp && $attributes[] = $temp;
+
+        $temp = $this->getProductDetailAttribute('gtin');
+        $temp && $attributes[] = $temp;
+
+        $temp = $this->getProductDetailAttribute('brand');
+        $temp && $attributes[] = $temp;
+
+        $temp = $this->getProductDetailAttribute('mpn');
         $temp && $attributes[] = $temp;
 
         return $attributes;
@@ -971,6 +980,11 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     // #######################################
 
+    public function getProductDetails()
+    {
+        return $this->getSettings('product_details');
+    }
+
     public function getProductDetail($type)
     {
         $attribute = $this->getProductDetailAttribute($type);
@@ -980,6 +994,24 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         }
 
         return $this->getMagentoProduct()->getAttributeValue($attribute);
+    }
+
+    public function isProductDetailsIncludeDescription()
+    {
+        $productDetails = $this->getProductDetails();
+        return isset($productDetails['include_description']) ? (bool)$productDetails['include_description'] : false;
+    }
+
+    public function isProductDetailsIncludeImage()
+    {
+        $productDetails = $this->getProductDetails();
+        return isset($productDetails['include_image']) ? (bool)$productDetails['include_image'] : false;
+    }
+
+    public function isProductDetailsListIfNoProduct()
+    {
+        $productDetails = $this->getProductDetails();
+        return isset($productDetails['list_if_no_product']) ? (bool)$productDetails['list_if_no_product'] : false;
     }
 
     // #######################################
@@ -1117,10 +1149,16 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             'condition_note_template' => '',
 
             'product_details' => json_encode(array(
-                'isbn' => '',
-                'epid' => '',
-                'upc'  => '',
-                'ean'  => ''
+                'isbn'  => '',
+                'epid'  => '',
+                'upc'   => '',
+                'ean'   => '',
+                'gtin'  => '',
+                'brand' => '',
+                'mpn'   => '',
+                'include_description' => 1,
+                'include_image'       => 1,
+                'list_if_no_product'  => 1,
             )),
 
             'editor_type' => self::EDITOR_TYPE_SIMPLE,

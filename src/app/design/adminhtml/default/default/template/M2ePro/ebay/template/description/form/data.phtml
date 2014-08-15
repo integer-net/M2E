@@ -102,6 +102,20 @@
             .observe('change', EbayTemplateDescriptionHandlerObj.gallery_images_change)
             .simulate('change');
 
+        $('product_details_ean',
+          'product_details_upc',
+          'product_details_gtin',
+          'product_details_epid',
+          'product_details_isbn'
+        ).each(function(element) {
+                element.observe('change', EbayTemplateDescriptionHandlerObj.product_details_specification_visibility_change)
+                    .simulate('change');
+        });
+
+        $('product_details_brand')
+            .observe('change', EbayTemplateDescriptionHandlerObj.product_details_brand_change)
+            .simulate('change');
+
         <?php if (!$showAdvancedMode) : ?>
             EbayTemplateDescriptionHandlerObj.simple_mode_disallowed_hide();
         <?php endif; ?>
@@ -1071,6 +1085,134 @@
                                     'Choose the Magento attribute that contains the ISBN for a product.<br/><br/>
                                     The ISBN or International Standard Book Number is a unique identifier for a book.'
                                 ); ?>
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="product_details_gtin_tr">
+                    <td class="label">
+                        <label for="product_details_gtin"><?php echo Mage::helper('M2ePro')->__('GTIN'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="product_details_gtin" name="description[product_details][gtin]">
+                            <option value=""><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <optgroup label="Magento Attributes">
+                                <?php foreach($attributesByInputTypes['text'] as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['gtin'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose the Magento attribute that contains the GTIN for a product.<br/><br/>
+                                    GTIN is a unique 8, 12, 13, or 14-digit identifier that some catalogs use instead of ISBN, UPC, EAN, or other values.'
+                                ); ?>
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="product_details_brand_tr">
+                    <td class="label">
+                        <label for="product_details_brand"><?php echo Mage::helper('M2ePro')->__('Brand'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="product_details_brand" name="description[product_details][brand]">
+                            <option value=""><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <optgroup label="Magento Attributes">
+                                <?php foreach($attributesByInputTypes['text'] as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['brand'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose the Magento attribute that contains the Brand of the product.'
+                                ); ?>
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="product_details_mpn_tr"<?php if (empty($formData['product_details']['brand'])): ?> style="display: none"<?php endif; ?>>
+                    <td class="label">
+                        <label for="product_details_mpn"><?php echo Mage::helper('M2ePro')->__('MPN'); ?>:<span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="product_details_mpn" name="description[product_details][mpn]" class="M2ePro-required-when-visible">
+                            <option value=""></option>
+                            <optgroup label="Magento Attributes">
+                                <?php foreach($attributesByInputTypes['text'] as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['mpn'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose the Magento attribute that contains the MPN of the product.<br/><br/>
+                                    The MPN or Manufacturer Part Number is a identifier specified by the manufacturer.'
+                                ); ?>
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr class="product-details-specification">
+                    <td class="value" colspan="2" style="width: auto;">
+                        <hr style="border: 1px solid silver; border-bottom: none;"/>
+                    </td>
+                </tr>
+
+                <tr id="product_details_include_description_tr" class="product-details-specification">
+                    <td class="label">
+                        <label for="product_details_include_description"><?php echo Mage::helper('M2ePro')->__('Use Description'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="product_details_include_description" name="description[product_details][include_description]">
+                            <option value="0"<?php if ($formData['product_details']['include_description'] == 0): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="1"<?php if ($formData['product_details']['include_description'] == 1): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__('If true, specifies that the listing should include additional information about the product, <br />such as a publisher\'s description or film credits'); ?>
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="product_details_include_image_tr" class="product-details-specification">
+                    <td class="label">
+                        <label for="product_details_include_image"><?php echo Mage::helper('M2ePro')->__('Use Image'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="product_details_include_image" name="description[product_details][include_image]">
+                            <option value="0"<?php if ($formData['product_details']['include_image'] == 0): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="1"<?php if ($formData['product_details']['include_image'] == 1): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__('If true, indicates that the item listing includes the stock photo.'); ?>
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="product_details_list_if_no_product_tr" class="product-details-specification">
+                    <td class="label">
+                        <label for="product_details_list_if_no_product"><?php echo Mage::helper('M2ePro')->__('List If Product Not Found'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="product_details_list_if_no_product" name="description[product_details][list_if_no_product]">
+                            <option value="0"<?php if ($formData['product_details']['list_if_no_product'] == 0): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="1"<?php if ($formData['product_details']['list_if_no_product'] == 1): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__('Indicates what eBay should do if no product match has been found.'); ?>
                             </span>
                         </p>
                     </td>
