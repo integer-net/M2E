@@ -219,8 +219,35 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
             'packages' => $this->getMarketplace()->getChildObject()->getPackageInfo(),
             'dispatch' => $this->getSortedDispatchInfo(),
             'locations' => $this->getMarketplace()->getChildObject()->getShippingLocationInfo(),
-            'locations_exclude' => $this->getSortedLocationExcludeInfo()
+            'locations_exclude' => $this->getSortedLocationExcludeInfo(),
+            'origin_country' => $this->getMarketplace()->getChildObject()->getOriginCountry(),
         );
+
+        $policyLocalization = $this->getData('policy_localization');
+
+        if(!empty($policyLocalization)) {
+            /** @var Ess_M2ePro_Model_Magento_Translate $translator */
+            $translator = Mage::getModel('M2ePro/Magento_Translate');
+            $translator->setLocale($policyLocalization);
+            $translator->init();
+
+            foreach ($data['services'] as $serviceKey => $service) {
+                $data['services'][$serviceKey]['title'] = $translator->__($service['title']);
+                foreach ($service['methods'] as $methodKey => $method) {
+                    $data['services'][$serviceKey]['methods'][$methodKey]['title'] = $translator->__($method['title']);
+                }
+            }
+
+            foreach ($data['locations'] as $key => $item) {
+                $data['locations'][$key]['title'] =  $translator->__($item['title']);
+            }
+
+            foreach ($data['locations_exclude'] as $regionKey => $region) {
+                foreach ($region as $locationKey => $location) {
+                    $data['locations_exclude'][$regionKey][$locationKey] = $translator->__($location);
+                }
+            }
+        }
 
         return $data;
     }

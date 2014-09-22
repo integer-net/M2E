@@ -17,6 +17,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Log_Grid extends Ess_M2ePro_Block_
             Ess_M2ePro_Model_Listing_Log::ACTION_NEW_SKU_PRODUCT_ON_COMPONENT => '',
         );
 
+        if (!Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
+            $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT] = '';
+        }
+
         return array_diff_key($allActions, $excludeActions);
     }
 

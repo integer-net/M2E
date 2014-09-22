@@ -66,7 +66,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '6919';
+        $revision = '7197';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');

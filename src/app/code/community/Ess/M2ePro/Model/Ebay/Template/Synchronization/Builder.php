@@ -83,16 +83,28 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_Builder
             $prepared['list_is_in_stock'] = (int)$data['list_is_in_stock'];
         }
 
-        if (isset($data['list_qty'])) {
-            $prepared['list_qty'] = (int)$data['list_qty'];
+        if (isset($data['list_qty_magento'])) {
+            $prepared['list_qty_magento'] = (int)$data['list_qty_magento'];
         }
 
-        if (isset($data['list_qty_value'])) {
-            $prepared['list_qty_value'] = (int)$data['list_qty_value'];
+        if (isset($data['list_qty_magento_value'])) {
+            $prepared['list_qty_magento_value'] = (int)$data['list_qty_magento_value'];
         }
 
-        if (isset($data['list_qty_value_max'])) {
-            $prepared['list_qty_value_max'] = (int)$data['list_qty_value_max'];
+        if (isset($data['list_qty_magento_value_max'])) {
+            $prepared['list_qty_magento_value_max'] = (int)$data['list_qty_magento_value_max'];
+        }
+
+        if (isset($data['list_qty_calculated'])) {
+            $prepared['list_qty_calculated'] = (int)$data['list_qty_calculated'];
+        }
+
+        if (isset($data['list_qty_calculated_value'])) {
+            $prepared['list_qty_calculated_value'] = (int)$data['list_qty_calculated_value'];
+        }
+
+        if (isset($data['list_qty_calculated_value_max'])) {
+            $prepared['list_qty_calculated_value_max'] = (int)$data['list_qty_calculated_value_max'];
         }
 
         return $prepared;
@@ -188,16 +200,28 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_Builder
             $prepared['relist_is_in_stock'] = (int)$data['relist_is_in_stock'];
         }
 
-        if (isset($data['relist_qty'])) {
-            $prepared['relist_qty'] = (int)$data['relist_qty'];
+        if (isset($data['relist_qty_magento'])) {
+            $prepared['relist_qty_magento'] = (int)$data['relist_qty_magento'];
         }
 
-        if (isset($data['relist_qty_value'])) {
-            $prepared['relist_qty_value'] = (int)$data['relist_qty_value'];
+        if (isset($data['relist_qty_magento_value'])) {
+            $prepared['relist_qty_magento_value'] = (int)$data['relist_qty_magento_value'];
         }
 
-        if (isset($data['relist_qty_value_max'])) {
-            $prepared['relist_qty_value_max'] = (int)$data['relist_qty_value_max'];
+        if (isset($data['relist_qty_magento_value_max'])) {
+            $prepared['relist_qty_magento_value_max'] = (int)$data['relist_qty_magento_value_max'];
+        }
+
+        if (isset($data['relist_qty_calculated'])) {
+            $prepared['relist_qty_calculated'] = (int)$data['relist_qty_calculated'];
+        }
+
+        if (isset($data['relist_qty_calculated_value'])) {
+            $prepared['relist_qty_calculated_value'] = (int)$data['relist_qty_calculated_value'];
+        }
+
+        if (isset($data['relist_qty_calculated_value_max'])) {
+            $prepared['relist_qty_calculated_value_max'] = (int)$data['relist_qty_calculated_value_max'];
         }
 
         return $prepared;
@@ -215,16 +239,28 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization_Builder
             $prepared['stop_out_off_stock'] = (int)$data['stop_out_off_stock'];
         }
 
-        if (isset($data['stop_qty'])) {
-            $prepared['stop_qty'] = (int)$data['stop_qty'];
+        if (isset($data['stop_qty_magento'])) {
+            $prepared['stop_qty_magento'] = (int)$data['stop_qty_magento'];
         }
 
-        if (isset($data['stop_qty_value'])) {
-            $prepared['stop_qty_value'] = (int)$data['stop_qty_value'];
+        if (isset($data['stop_qty_magento_value'])) {
+            $prepared['stop_qty_magento_value'] = (int)$data['stop_qty_magento_value'];
         }
 
-        if (isset($data['stop_qty_value_max'])) {
-            $prepared['stop_qty_value_max'] = (int)$data['stop_qty_value_max'];
+        if (isset($data['stop_qty_magento_value_max'])) {
+            $prepared['stop_qty_magento_value_max'] = (int)$data['stop_qty_magento_value_max'];
+        }
+
+        if (isset($data['stop_qty_calculated'])) {
+            $prepared['stop_qty_calculated'] = (int)$data['stop_qty_calculated'];
+        }
+
+        if (isset($data['stop_qty_calculated_value'])) {
+            $prepared['stop_qty_calculated_value'] = (int)$data['stop_qty_calculated_value'];
+        }
+
+        if (isset($data['stop_qty_calculated_value_max'])) {
+            $prepared['stop_qty_calculated_value_max'] = (int)$data['stop_qty_calculated_value_max'];
         }
 
         return $prepared;

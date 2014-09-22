@@ -6,9 +6,10 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
-    const VIEW_MODE_EBAY     = 'ebay';
-    const VIEW_MODE_MAGENTO  = 'magento';
-    const VIEW_MODE_SETTINGS = 'settings';
+    const VIEW_MODE_EBAY        = 'ebay';
+    const VIEW_MODE_MAGENTO     = 'magento';
+    const VIEW_MODE_SETTINGS    = 'settings';
+    const VIEW_MODE_TRANSLATION = 'translation';
 
     const DEFAULT_VIEW_MODE = self::VIEW_MODE_EBAY;
 
@@ -83,7 +84,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View extends Mage_Adminhtml_Block_
             return self::VIEW_MODE_EBAY;
         }
 
-        $allowedModes = array(self::VIEW_MODE_EBAY, self::VIEW_MODE_MAGENTO, self::VIEW_MODE_SETTINGS);
+        $allowedModes = array(
+            self::VIEW_MODE_EBAY,
+            self::VIEW_MODE_MAGENTO,
+            self::VIEW_MODE_SETTINGS,
+            self::VIEW_MODE_TRANSLATION,
+        );
         $mode = $this->getParam('view_mode', self::DEFAULT_VIEW_MODE);
 
         if (in_array($mode, $allowedModes)) {
@@ -244,26 +250,71 @@ HTML;
         $addProductsDropDownBlock->setData($data);
         //------------------------------
 
+        /** @var $helper Ess_M2ePro_Helper_Data */
+        $helper = Mage::helper('M2ePro');
+
         //------------------------------
         $urls = json_encode(array_merge(
-            Mage::helper('M2ePro')->getControllerActions(
+            $helper->getControllerActions(
                 'adminhtml_ebay_listing', array('_current' => true)
             ),
-            Mage::helper('M2ePro')->getControllerActions(
+            $helper->getControllerActions(
                 'adminhtml_ebay_listing_autoAction', array('listing_id' => $this->getRequest()->getParam('id'))
-            )
+            ),
+            $helper->getControllerActions(
+                'adminhtml_ebay_listing_transferring', array('listing_id' => $this->getRequest()->getParam('id'))
+            ),
+            $helper->getControllerActions('adminhtml_ebay_account'),
+            $helper->getControllerActions('adminhtml_ebay_listing_categorySettings'),
+            $helper->getControllerActions('adminhtml_ebay_marketplace'),
+            array('adminhtml_system_store/index' =>
+                Mage::helper('adminhtml')->getUrl('adminhtml/system_store/')),
+            array('logViewUrl' =>
+                $this->getUrl('M2ePro/adminhtml_common_log/synchronization',
+                    array('back'=>$helper->makeBackUrlParam('*/adminhtml_common_synchronization/index')))),
+            array('runSynchNow' =>
+                $this->getUrl('M2ePro/adminhtml_common_marketplace/runSynchNow')),
+            array('synchCheckProcessingNow' =>
+                $this->getUrl('M2ePro/adminhtml_common_synchronization/synchCheckProcessingNow'))
         ));
         //------------------------------
 
         //------------------------------
         $translations = json_encode(array(
-            'Automatic Actions' => Mage::helper('M2ePro')->__('Automatic Actions'),
-            'Based on Magento Categories' => Mage::helper('M2ePro')->__('Based on Magento Categories'),
-            'You must select at least 1 category.' =>
-                Mage::helper('M2ePro')->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' =>
-                Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
-            'Compatibility Attribute' => Mage::helper('M2ePro')->__('Compatibility Attribute'),
+            'Automatic Actions' => $helper->__('Automatic Actions'),
+            'Based on Magento Categories' => $helper->__('Based on Magento Categories'),
+            'You must select at least 1 category.' => $helper->__('You must select at least 1 category.'),
+            'Rule with the same title already exists.' => $helper->__('Rule with the same title already exists.'),
+            'Compatibility Attribute' => $helper->__('Compatibility Attribute'),
+            'Sell on Another eBay Site' => $helper->__('Sell on Another eBay Site'),
+            'Translation Service' => $helper->__('Translation Service'),
+            'You must select at least 1 listing.' => $helper->__('You must select at least 1 listing.'),
+            'Data migration.' => $helper->__('Data migration...'),
+            'Creating templates in process. Please wait...' =>
+                $helper->__('Creating policies in process. Please wait...'),
+            'Creating translation account in process. Please wait...' =>
+                $helper->__('Creating translation account in process. Please wait...'),
+            'Creating listing in process. Please wait...' =>
+                $helper->__('Creating listing in process. Please wait...'),
+            'Adding products in process. Please wait...' =>
+                $helper->__('Adding products in process. Please wait...'),
+            'Products failed to add' => $helper->__('Failed products'),
+            'Migration success.' => $helper->__('The products have been successfully added into Destination listing.'),
+            'Migration error.' => $helper->__('The products have not been added into Destination listing'
+                                           .' because products with the same Magento Product IDs already exist there.'),
+            'Some products categories settings are not set or attributes for title or description are empty.' =>
+                $helper->__('Some products Categories settings are not set'
+                           .' or attributes for Title or Description are empty.'),
+            'Another Synchronization Is Already Running.' => $helper->__('Another Synchronization Is Already Running.'),
+            'Getting information. Please wait ...' => $helper->__('Getting information. Please wait ...'),
+            'Preparing to start. Please wait ...' => $helper->__('Preparing to start. Please wait ...'),
+            'Synchronization has successfully ended.' => $helper->__('Synchronization has successfully ended.'),
+            'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.' =>
+                $helper->__(
+                    'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.'),
+            'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' =>
+                $helper->__(
+                    'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
         ));
         //------------------------------
 

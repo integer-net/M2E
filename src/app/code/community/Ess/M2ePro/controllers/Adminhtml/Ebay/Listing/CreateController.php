@@ -113,6 +113,10 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
             return;
         }
         //------------------------------
+        $listingOnlyMode = Ess_M2ePro_Helper_Component_Ebay::LISTING_CREATION_MODE_LISTING_ONLY;
+        if($this->getRequest()->getParam('creation_mode') == $listingOnlyMode) {
+            $this->setSessionValue('creation_mode', $listingOnlyMode);
+        }
 
         Mage::helper('M2ePro/Data_Global')->setValue('ebay_listing_title', $this->getSessionValue('listing_title'));
         Mage::helper('M2ePro/Data_Global')->setValue('ebay_account_id', $this->getSessionValue('account_id'));
@@ -282,6 +286,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
 
             //------------------------------
             $listing = $this->createListing();
+
+            if($this->isCreationModeListingOnly()) {
+                // closing window for 3rd party products moving in new listing creation
+                echo "<script>window.close();</script>";
+                return;
+            }
+
             $this->clearSession();
             //------------------------------
 
@@ -461,4 +472,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
     }
 
     //#############################################
+
+    private function isCreationModeListingOnly()
+    {
+        return $this->getSessionValue('creation_mode') ===
+            Ess_M2ePro_Helper_Component_Ebay::LISTING_CREATION_MODE_LISTING_ONLY;
+    }
+
+    //#############################################
+
 }

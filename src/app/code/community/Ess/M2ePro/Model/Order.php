@@ -499,6 +499,12 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
             $this->magentoOrder = $magentoOrderBuilder->getOrder();
 
+            $magentoOrderId = $this->getMagentoOrderId();
+            if (empty($magentoOrderId)) {
+                $this->setData('magento_order_id', $this->magentoOrder->getId());
+                $this->save();
+            }
+
             unset($magentoQuoteBuilder);
             unset($magentoOrderBuilder);
             // ---------------

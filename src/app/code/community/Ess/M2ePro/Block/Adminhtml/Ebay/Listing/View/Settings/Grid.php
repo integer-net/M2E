@@ -272,6 +272,20 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
                 'url'   => ''
             ));
         }
+
+        $this->getMassactionBlock()->addItem('moving', array(
+            'label'    => Mage::helper('M2ePro')->__('Move Item(s) to Another Listing'),
+            'url'      => '',
+            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
+        ));
+
+        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
+            $this->getMassactionBlock()->addItem('transferring', array(
+                'label'    => Mage::helper('M2ePro')->__('Sell on Another eBay Site'),
+                'url'      => '',
+            ));
+        }
+
         //------------------------------
 
         return $this;
@@ -527,8 +541,11 @@ HTML;
 
     protected function _toHtml()
     {
+        /** @var $helper Ess_M2ePro_Helper_Data */
+        $helper = Mage::helper('M2ePro');
+
         //------------------------------
-        $urls = Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_listing',array('_current' => true));
+        $urls = $helper->getControllerActions('adminhtml_ebay_listing',array('_current' => true));
 
         $path = 'adminhtml_ebay_listing/getCategoryChooserHtml';
         $urls[$path] = $this->getUrl('*/' . $path, array(
@@ -545,26 +562,177 @@ HTML;
             'listing_id' => $this->getListing()->getId()
         ));
 
+        $path = 'adminhtml_ebay_listing/runTransferring';
+        $urls[$path] = $this->getUrl('*/' . $path, array(
+            'listing_id' => $this->getListing()->getId()
+        ));
+
+        $path = 'adminhtml_ebay_log/listing';
+        $urls[$path] = $this->getUrl('*/adminhtml_ebay_log/listing', array(
+            'id' => $this->getListing()->getId()
+        ));
+
+        $path = 'adminhtml_ebay_listing/getEstimatedFees';
+        $urls[$path] = $this->getUrl('*/' . $path, array(
+                'listing_id' => $this->getListing()->getId()
+            ));
+
+        $urls['adminhtml_ebay_listing/getTransferringUrl'] = $this->getUrl('*/adminhtml_ebay_listing/view');
+
         $urls = json_encode($urls);
         //------------------------------
 
         //------------------------------
         $translations = json_encode(array(
-            'eBay Categories' => Mage::helper('M2ePro')->__('eBay Categories'),
-            'Specifics' => Mage::helper('M2ePro')->__('Specifics'),
-            'Compatibility Attribute ePIDs' => Mage::helper('M2ePro')->__('Compatibility Attribute ePIDs')
+            'eBay Categories' => $helper->__('eBay Categories'),
+            'Specifics' => $helper->__('Specifics'),
+            'Compatibility Attribute ePIDs' => $helper->__('Compatibility Attribute ePIDs'),
+            'Payment for Translation Service' => $helper->__('Payment for Translation Service'),
+            'Payment for Translation Service. Help' => $helper->__('Payment for Translation Service'),
+            'Specify a sum to be credited to an account.' =>
+                $helper->__('Specify a sum to be credited to an Account.'
+                           .' If you are planning to order more items for translation in future,'
+                           .' you can credit the sum greater than the one needed for current translation.'
+                           .' Click <a href="%url%" target="_blank">here</a> to find out more.',
+                    'http://docs.m2epro.com/display/eBayMagentoV6/Translation#Translation-Account.1'),
+            'Amount to Pay.' => $helper->__('Amount to Pay'),
+            'Insert amount to be credited to an account' => $helper->__('Insert amount to be credited to an account.'),
+            'Confirm' => $helper->__('Confirm'),
         ));
         //------------------------------
 
         //------------------------------
-        $constants = Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Ebay_Category');
+        $constants = $helper->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Ebay_Category');
         //------------------------------
+
+        // todo next (change)
+        $component = Ess_M2ePro_Helper_Component_Ebay::NICK;
+
+        $temp = Mage::helper('M2ePro/Data_Session')->getValue('products_ids_for_list',true);
+        $productsIdsForList = empty($temp) ? '' : $temp;
+
+        $gridId = $component . 'ListingViewGrid' . $this->getListing()->getId();
+        $ignoreListings = json_encode(array($this->getListing()->getId()));
+
+        $logViewUrl = $this->getUrl('*/adminhtml_ebay_log/listing',array(
+            'id'=>$this->getListing()->getId(),
+            'back'=>$helper->makeBackUrlParam('*/adminhtml_ebay_listing/view',array('id'=>$this->getListing()->getId()))
+        ));
+        $checkLockListing = $this->getUrl('*/adminhtml_listing/checkLockListing',array('component'=>$component));
+        $lockListingNow = $this->getUrl('*/adminhtml_listing/lockListingNow',array('component'=>$component));
+        $unlockListingNow = $this->getUrl('*/adminhtml_listing/unlockListingNow',array('component'=>$component));
+        $getErrorsSummary = $this->getUrl('*/adminhtml_listing/getErrorsSummary');
+
+        $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
+        $taskCompletedSuccessMessage = $helper->escapeJs(
+            $helper->__('"%task_title%" task has successfully completed.'));
+
+        // M2ePro_TRANSLATIONS
+        // %task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
+        $tempString = '"%task_title%" task has completed with warnings.'
+                     .' <a target="_blank" href="%url%">View log</a> for details.';
+        $taskCompletedWarningMessage = $helper->escapeJs($helper->__($tempString));
+
+        // M2ePro_TRANSLATIONS
+        // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
+        $tempString = '"%task_title%" task has completed with errors. '
+                     .' <a target="_blank" href="%url%">View log</a> for details.';
+        $taskCompletedErrorMessage = $helper->escapeJs($helper->__($tempString));
+
+        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on eBay.'));
+        $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
+
+        $listingLockedMessage = $helper->escapeJs(
+            $helper->__('The listing was locked by another process. Please try again later.')
+        );
+        $listingEmptyMessage = $helper->escapeJs(
+            $helper->__('Listing is empty.')
+        );
+
+        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+
+        $successWord = $helper->escapeJs($helper->__('Success'));
+        $noticeWord = $helper->escapeJs($helper->__('Notice'));
+        $warningWord = $helper->escapeJs($helper->__('Warning'));
+        $errorWord = $helper->escapeJs($helper->__('Error'));
+        $closeWord = $helper->escapeJs($helper->__('Close'));
+
+        $prepareData = $this->getUrl('*/adminhtml_listing_moving/prepareMoveToListing');
+        $getMoveToListingGridHtml = $this->getUrl('*/adminhtml_ebay_listing_settings_moving/moveToListingGrid');
+        $getFailedProductsGridHtml = $this->getUrl('*/adminhtml_listing_moving/getFailedProductsGrid');
+        $tryToMoveToListing = $this->getUrl('*/adminhtml_listing_moving/tryToMoveToListing');
+        $moveToListing = $this->getUrl('*/adminhtml_listing_moving/moveToListing');
+
+        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
+        $productsWereNotMovedMessage = $helper->escapeJs(
+            $helper->__('Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+        );
+        $someProductsWereNotMovedMessage = $helper->escapeJs(
+            $helper->__('Some product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+        );
+
+        $popupTitle = $helper->escapeJs($helper->__('Moving eBay Items.'));
+        $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
+
         $html = <<<HTML
 <script type="text/javascript">
 
     M2ePro.url.add({$urls});
     M2ePro.translator.add({$translations});
     M2ePro.php.setConstants({$constants},'Ess_M2ePro_Helper_Component_Ebay_Category');
+
+    M2ePro.productsIdsForList = '{$productsIdsForList}';
+
+    M2ePro.url.logViewUrl = '{$logViewUrl}';
+    M2ePro.url.checkLockListing = '{$checkLockListing}';
+    M2ePro.url.lockListingNow = '{$lockListingNow}';
+    M2ePro.url.unlockListingNow = '{$unlockListingNow}';
+    M2ePro.url.getErrorsSummary = '{$getErrorsSummary}';
+
+    M2ePro.url.prepareData = '{$prepareData}';
+    M2ePro.url.getGridHtml = '{$getMoveToListingGridHtml}';
+    M2ePro.url.getFailedProductsGridHtml = '{$getFailedProductsGridHtml}';
+    M2ePro.url.tryToMoveToListing = '{$tryToMoveToListing}';
+    M2ePro.url.moveToListing = '{$moveToListing}';
+
+    M2ePro.text.popup_title = '{$popupTitle}';
+    M2ePro.text.failed_products_popup_title = '{$failedProductsPopupTitle}';
+
+    M2ePro.text.task_completed_message = '{$taskCompletedMessage}';
+    M2ePro.text.task_completed_success_message = '{$taskCompletedSuccessMessage}';
+    M2ePro.text.task_completed_warning_message = '{$taskCompletedWarningMessage}';
+    M2ePro.text.task_completed_error_message = '{$taskCompletedErrorMessage}';
+
+    M2ePro.text.sending_data_message = '{$sendingDataToEbayMessage}';
+    M2ePro.text.view_all_product_log_message = '{$viewAllProductLogMessage}';
+
+    M2ePro.text.listing_locked_message = '{$listingLockedMessage}';
+    M2ePro.text.listing_empty_message = '{$listingEmptyMessage}';
+
+    M2ePro.text.select_items_message = '{$selectItemsMessage}';
+    M2ePro.text.select_action_message = '{$selectActionMessage}';
+
+    M2ePro.text.success_word = '{$successWord}';
+    M2ePro.text.notice_word = '{$noticeWord}';
+    M2ePro.text.warning_word = '{$warningWord}';
+    M2ePro.text.error_word = '{$errorWord}';
+    M2ePro.text.close_word = '{$closeWord}';
+
+    M2ePro.text.successfully_moved = '{$successfullyMovedMessage}';
+    M2ePro.text.products_were_not_moved = '{$productsWereNotMovedMessage}';
+    M2ePro.text.some_products_were_not_moved = '{$someProductsWereNotMovedMessage}';
+
+    M2ePro.customData.componentMode = '{$component}';
+    M2ePro.customData.gridId = '{$gridId}';
+    M2ePro.customData.ignoreListings = '{$ignoreListings}';
+
+    Event.observe(window, 'load', function() {
+        EbayListingTransferringHandlerObj = new EbayListingTransferringHandler();
+        EbayListingSettingsGridHandlerObj.movingHandler.setOptions(M2ePro);
+
+        EbayListingTransferringPaymentHandlerObj = new EbayListingTransferringPaymentHandler();
+    });
 
 </script>
 HTML;

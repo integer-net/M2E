@@ -21,6 +21,9 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 
     const MAX_LENGTH_FOR_OPTION_VALUE = 50;
 
+    const LISTING_CREATION_MODE_FULL = 0;
+    const LISTING_CREATION_MODE_LISTING_ONLY = 1;
+
     // ########################################
 
     public function isEnabled()
@@ -231,6 +234,30 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
         }
 
         return $options;
+    }
+
+    // ########################################
+
+    public function getTranslationServices()
+    {
+        $helper = Mage::helper('M2ePro');
+
+        return array(
+            'silver'   => $helper->__('Silver Product Translation'),
+            'gold'     => $helper->__('Gold Product Translation'),
+            'platinum' => $helper->__('Platinum Product Translation'),
+        );
+    }
+
+    public function getDefaultTranslationService()
+    {
+        return 'gold';
+    }
+
+    public function isAllowedTranslationService($service)
+    {
+        $translationServices = $this->getTranslationServices();
+        return isset($translationServices[$service]);
     }
 
     // ########################################

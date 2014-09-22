@@ -205,8 +205,23 @@ ListingMovingHandler = Class.create(ActionHandler, {
                 callback.call(this);
             }).bind(this)
         });
-    }
+    },
 
     //----------------------------------
+
+    startEbayListingCreation: function(url, response){
+        var self = this;
+        var win = window.open(url);
+
+        var intervalId = setInterval(function(){
+            if (!win.closed) {
+                return;
+            }
+
+            clearInterval(intervalId);
+
+            listingMovingGridJsObject.reload();
+        }, 1000);
+    }
 
 });

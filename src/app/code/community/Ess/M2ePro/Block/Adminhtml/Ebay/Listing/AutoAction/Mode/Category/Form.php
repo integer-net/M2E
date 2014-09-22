@@ -110,6 +110,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AutoAction_Mode_Category_Form exte
             $selectedCategories = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category')
                 ->getCollection()
                     ->addFieldToFilter('group_id', $this->getRequest()->getParam('group_id'))
+                    ->addFieldToFilter('category_id', array('neq' => 0))
                     ->getColumnValues('category_id');
         }
 

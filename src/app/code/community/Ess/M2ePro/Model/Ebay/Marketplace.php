@@ -9,6 +9,11 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
     const IS_MULTIVARIATION_NO  = 0;
     const IS_MULTIVARIATION_YES = 1;
 
+    const TRANSLATION_SERVICE_NO       = 0;
+    const TRANSLATION_SERVICE_YES_TO   = 1;
+    const TRANSLATION_SERVICE_YES_FROM = 2;
+    const TRANSLATION_SERVICE_YES_BOTH = 3;
+
     private $info = NULL;
 
     // ########################################
@@ -92,6 +97,41 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
         }
 
         return array_shift($currency);
+    }
+
+    public function getOriginCountry()
+    {
+        return $this->getData('origin_country');
+    }
+
+    public function getLanguageCode()
+    {
+        return $this->getData('language_code');
+    }
+
+    public function getTranslationServiceMode()
+    {
+        return (int)$this->getData('translation_service_mode');
+    }
+
+    public function isTranslationServiceMode()
+    {
+        return $this->getTranslationServiceMode() != self::TRANSLATION_SERVICE_NO;
+    }
+
+    public function isTranslationServiceModeTo()
+    {
+        return $this->getTranslationServiceMode() == self::TRANSLATION_SERVICE_YES_TO;
+    }
+
+    public function isTranslationServiceModeFrom()
+    {
+        return $this->getTranslationServiceMode() == self::TRANSLATION_SERVICE_YES_FROM;
+    }
+
+    public function isTranslationServiceModeBoth()
+    {
+        return $this->getTranslationServiceMode() == self::TRANSLATION_SERVICE_YES_BOTH;
     }
 
     public function isMultiCurrencyEnabled()

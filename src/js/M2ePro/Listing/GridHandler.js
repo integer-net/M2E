@@ -23,7 +23,7 @@ ListingGridHandler = Class.create(GridHandler, {
 
     //----------------------------------
 
-    getSelectedItemsParts : function()
+    getSelectedItemsParts : function(maxProductsInPart)
     {
         var selectedProductsArray = this.getSelectedProductsArray();
 
@@ -31,7 +31,7 @@ ListingGridHandler = Class.create(GridHandler, {
             return [];
         }
 
-        var maxProductsInPart = this.getMaxProductsInPart();
+        var maxProductsInPart = maxProductsInPart || this.getMaxProductsInPart();
 
         var result = [];
         for (var i=0;i<selectedProductsArray.length;i++) {
@@ -62,7 +62,9 @@ ListingGridHandler = Class.create(GridHandler, {
             relistAction: this.actionHandler.relistAction.bind(this.actionHandler),
             reviseAction: this.actionHandler.reviseAction.bind(this.actionHandler),
             stopAction: this.actionHandler.stopAction.bind(this.actionHandler),
-            stopAndRemoveAction: this.actionHandler.stopAndRemoveAction.bind(this.actionHandler)
+            stopAndRemoveAction: this.actionHandler.stopAndRemoveAction.bind(this.actionHandler),
+            startTranslateAction: this.actionHandler.startTranslateAction.bind(this.actionHandler),
+            stopTranslateAction: this.actionHandler.stopTranslateAction.bind(this.actionHandler)
         };
     }
 

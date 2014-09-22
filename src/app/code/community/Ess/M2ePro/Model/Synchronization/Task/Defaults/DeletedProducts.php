@@ -63,13 +63,14 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_DeletedProducts
             array('cpe'=>$entityTableName), '(cpe.entity_id = `main_table`.product_id)',array('entity_id')
         );
 
+        $collection->getSelect()->where('cpe.entity_id IS NULL');
+
         $tempProductsIds = array();
         $rows = $collection->toArray();
 
         foreach ($rows['items'] as $row) {
 
-            if (in_array((int)$row['product_id'],$tempProductsIds) ||
-                !is_null($row['entity_id'])) {
+            if (in_array((int)$row['product_id'],$tempProductsIds)) {
                 continue;
             }
 
@@ -95,13 +96,14 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_DeletedProducts
             array('cpe'=>$entityTableName), '(cpe.entity_id = `main_table`.product_id)',array('entity_id')
         );
 
+        $collection->getSelect()->where('cpe.entity_id IS NULL');
+
         $tempProductsIds = array();
         $rows = $collection->toArray();
 
         foreach ($rows['items'] as $row) {
 
-            if (in_array((int)$row['product_id'],$tempProductsIds) ||
-                !is_null($row['entity_id'])) {
+            if (in_array((int)$row['product_id'],$tempProductsIds)) {
                 continue;
             }
 
@@ -136,13 +138,14 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_DeletedProducts
                 array('cpe'=>$entityTableName), '(cpe.entity_id = `main_table`.product_id)', array('entity_id')
             );
 
+            $collection->getSelect()->where('cpe.entity_id IS NULL');
+
             $tempProductsIds = array();
             $rows = $collection->toArray();
 
             foreach ($rows['items'] as $row) {
 
-                if (in_array((int)$row['product_id'],$tempProductsIds) ||
-                    !is_null($row['entity_id'])) {
+                if (in_array((int)$row['product_id'],$tempProductsIds)) {
                     continue;
                 }
 

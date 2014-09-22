@@ -102,6 +102,19 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Payment_Edit_Form_Data extends Ma
             'services' => $marketplace->getChildObject()->getPaymentInfo()
         );
 
+        $policyLocalization = $this->getData('policy_localization');
+
+        if(!empty($policyLocalization)) {
+            /** @var Ess_M2ePro_Model_Magento_Translate $translator */
+            $translator = Mage::getModel('M2ePro/Magento_Translate');
+            $translator->setLocale($policyLocalization);
+            $translator->init();
+
+            foreach ($data['services'] as $key => $item) {
+                $data['services'][$key]['title'] = $translator->__($item['title']);
+            }
+        }
+
         return $data;
     }
 

@@ -82,9 +82,12 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SynchronizationController
             'list_mode',
             'list_status_enabled',
             'list_is_in_stock',
-            'list_qty',
-            'list_qty_value',
-            'list_qty_value_max',
+            'list_qty_magento',
+            'list_qty_magento_value',
+            'list_qty_magento_value_max',
+            'list_qty_calculated',
+            'list_qty_calculated_value',
+            'list_qty_calculated_value_max',
         );
         foreach ($keys as $key) {
             if (isset($post[$key])) {
@@ -119,9 +122,12 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SynchronizationController
             'relist_filter_user_lock',
             'relist_status_enabled',
             'relist_is_in_stock',
-            'relist_qty',
-            'relist_qty_value',
-            'relist_qty_value_max'
+            'relist_qty_magento',
+            'relist_qty_magento_value',
+            'relist_qty_magento_value_max',
+            'relist_qty_calculated',
+            'relist_qty_calculated_value',
+            'relist_qty_calculated_value_max'
         );
         foreach ($keys as $key) {
             if (isset($post[$key])) {
@@ -135,9 +141,12 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SynchronizationController
         $keys = array(
             'stop_status_disabled',
             'stop_out_off_stock',
-            'stop_qty',
-            'stop_qty_value',
-            'stop_qty_value_max'
+            'stop_qty_magento',
+            'stop_qty_magento_value',
+            'stop_qty_magento_value_max',
+            'stop_qty_calculated',
+            'stop_qty_calculated_value',
+            'stop_qty_calculated_value_max'
         );
         foreach ($keys as $key) {
             if (isset($post[$key])) {

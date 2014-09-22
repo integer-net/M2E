@@ -78,4 +78,64 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
     }
 
     // ########################################
+
+    public function prepareMenu(array $menuArray)
+    {
+        if (!Mage::getSingleton('admin/session')->isAllowed(self::MENU_ROOT_NODE_NICK)) {
+            return $menuArray;
+        }
+
+        if (count(Mage::helper('M2ePro/View_Common_Component')->getActiveComponents()) <= 0) {
+            unset($menuArray[self::MENU_ROOT_NODE_NICK]);
+            return $menuArray;
+        }
+
+        $tempTitle = $this->getMenuRootNodeLabel();
+        !empty($tempTitle) && $menuArray[self::MENU_ROOT_NODE_NICK]['label'] = $tempTitle;
+
+        // Add wizard menu item
+        //---------------------------------
+        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
+        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
+
+        $activeBlocker = $wizardHelper->getActiveBlockerWizard(Ess_M2ePro_Helper_View_Common::NICK);
+
+        if ($activeBlocker) {
+
+            unset($menuArray[self::MENU_ROOT_NODE_NICK]['children']);
+            unset($menuArray[self::MENU_ROOT_NODE_NICK]['click']);
+
+            $menuArray[self::MENU_ROOT_NODE_NICK]['url'] = Mage::helper('adminhtml')->getUrl(
+                'M2ePro/adminhtml_wizard_'.$wizardHelper->getNick($activeBlocker).'/index'
+            );
+            $menuArray[self::MENU_ROOT_NODE_NICK]['last'] = true;
+
+            return $menuArray;
+        }
+        //---------------------------------
+
+        // Set documentation redirect url
+        //---------------------------------
+        if (isset($menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['doc'])) {
+            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['doc']['click'] =
+                "window.open(this.href, '_blank'); return false;";
+            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['doc']['url'] =
+                $this->getDocumentationUrl();
+        }
+        //---------------------------------
+
+        // Set video tutorials redirect url
+        //---------------------------------
+        if (isset($menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['tutorial'])) {
+            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['tutorial']['click'] =
+                "window.open(this.href, '_blank'); return false;";
+            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['tutorial']['url'] =
+                $this->getVideoTutorialsUrl();
+        }
+        //---------------------------------
+
+        return $menuArray;
+    }
+
+    // ########################################
 }

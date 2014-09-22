@@ -146,9 +146,14 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
 
     private function processProcessingRequests()
     {
-        $components = Mage::helper('M2ePro/Component')->getComponents();
+        $collection = Mage::getModel('M2ePro/Processing_Request')->getCollection();
+        $collection->addFieldToSelect('component');
+        $collection->getSelect()->distinct();
+        $collection->load();
 
-        foreach ($components as $component) {
+        foreach ($collection->getItems() as $component) {
+
+            $component = $component->getData('component');
 
             /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
             $collection = Mage::getModel('M2ePro/Processing_Request')->getCollection();

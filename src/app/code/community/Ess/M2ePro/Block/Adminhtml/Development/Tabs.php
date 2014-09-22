@@ -89,7 +89,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs extends Mage_Adminhtml_Block_W
         $block = 'M2ePro/adminhtml_development_tabs_build';
         $blockClassName = Mage::getConfig()->getBlockClassName($block);
 
-        if (class_exists($blockClassName, false) || mageFindClassFile($blockClassName)) {
+        if (class_exists($blockClassName, false) || @mageFindClassFile($blockClassName)) {
             $this->addTab(Ess_M2ePro_Helper_View_Development::TAB_BUILD, array(
                 'label'     => Mage::helper('M2ePro')->__('Build'),
                 'content'   => $this->getLayout()->createBlock($block)->toHtml(),

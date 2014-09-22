@@ -313,8 +313,8 @@ HTML;
         );
 
         if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-            unset($actions['auto_actions']);
-            unset($actions['edit_synchronization']);
+            unset($actions['autoActions']);
+            unset($actions['editSynchronization']);
         }
 
         return $actions;

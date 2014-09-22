@@ -342,12 +342,12 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Source
 
             $src = $this->coreTemplate->getFeaturesSource();
             foreach ($src['template'] as $feature) {
-                $features[] = trim(strip_tags(
-                    Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
-                        $feature,
-                        $this->listingProduct->getActualMagentoProduct()
-                    )
+
+                $parsedFeature = trim(Mage::helper('M2ePro/Module_Renderer_Description')->parseTemplate(
+                    $feature, $this->listingProduct->getActualMagentoProduct()
                 ));
+
+                $parsedFeature && $features[] = strip_tags($parsedFeature);
             }
 
             $features = implode('|',$features);

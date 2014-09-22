@@ -6,10 +6,7 @@ ControlPanelHandler.prototype = Object.extend(new CommonHandler(), {
     initialize: function()
     {
         var cmdKeys = [67, 77, 68];
-        var developmentKeys = [68, 69, 86];
-
         var cmdPressedKeys = [];
-        var developmentPressedKeys = [];
 
         document.observe('keyup', function (event) {
 
@@ -20,18 +17,11 @@ ControlPanelHandler.prototype = Object.extend(new CommonHandler(), {
                     cmdPressedKeys = [];
                 }
             }
-            if (developmentPressedKeys.length < developmentKeys.length) {
-                if (developmentKeys[developmentPressedKeys.length] == event.keyCode) {
-                    developmentPressedKeys.push(event.keyCode);
-                } else {
-                    developmentPressedKeys = [];
-                }
-            }
 
-            if (cmdPressedKeys.length == cmdKeys.length ||
-                developmentPressedKeys.length == developmentKeys.length) {
+            if (cmdPressedKeys.length == cmdKeys.length) {
 
                 var queryInput = $('query');
+
                 if (queryInput !== null) {
                     queryInput.value = '';
                     queryInput.focus();
@@ -40,15 +30,10 @@ ControlPanelHandler.prototype = Object.extend(new CommonHandler(), {
                 }
 
                 $$('.development')[0].show();
-
-                if (cmdPressedKeys.length == cmdKeys.length) {
-                    $$('.development')[0].simulate('click');
-                }
+                $$('.development')[0].simulate('click');
 
                 cmdPressedKeys = [];
-                developmentPressedKeys = [];
             }
-
         });
     }
 

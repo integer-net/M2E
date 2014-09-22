@@ -151,26 +151,47 @@ HTML;
     /**
      * @title "Reset eBay Images Hashes"
      * @description "Clear eBay images hashes for listing product"
-     * @prompt "Please enter Listing Product ID."
+     * @prompt "Please enter Listing Product ID or `all` code for reset all products."
      * @prompt_var "listing_product_id"
      */
     public function resetEbayImagesHashesAction()
     {
-        $listingProductId = (int)$this->getRequest()->getParam('listing_product_id');
+        $listingProductId = $this->getRequest()->getParam('listing_product_id');
 
-        if (!$listingProduct = Mage::getModel('M2ePro/Listing_Product')->load($listingProductId)) {
-            $this->_getSession()->addError('Failed to load by ID.');
+        $listingProducts = array();
+        if (strtolower($listingProductId) == 'all') {
+
+            $listingProducts = Mage::getModel('M2ePro/Listing_Product')->getCollection()
+                ->addFieldToFilter('component_mode', 'ebay');
+        } else {
+
+            $listingProduct = Mage::getModel('M2ePro/Listing_Product')->load((int)$listingProductId);
+            $listingProduct && $listingProducts[] = $listingProduct;
+        }
+
+        if (empty($listingProducts)) {
+            $this->_getSession()->addError('Failed to load listing product.');
             return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
         }
 
-        $additionalData = $listingProduct->getAdditionalData();
-        unset($additionalData['ebay_product_images_hash'], $additionalData['ebay_product_variation_images_hash']);
+        foreach ($listingProducts as $listingProduct) {
 
-        $listingProduct->setData('additional_data', json_encode($additionalData))
-                       ->save();
+            $additionalData = $listingProduct->getAdditionalData();
+
+            if (!isset($additionalData['ebay_product_images_hash']) &&
+                !isset($additionalData['ebay_product_variation_images_hash'])) {
+                continue;
+            }
+
+            unset($additionalData['ebay_product_images_hash'],
+                  $additionalData['ebay_product_variation_images_hash']);
+
+            $listingProduct->setData('additional_data', json_encode($additionalData))
+                           ->save();
+        }
 
         $this->_getSession()->addSuccess('Successfully removed.');
-        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
+        return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 
     //#############################################

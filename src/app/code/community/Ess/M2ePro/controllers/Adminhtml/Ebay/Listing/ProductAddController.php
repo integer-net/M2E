@@ -29,6 +29,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
 
             ->addJs('M2ePro/ActionHandler.js')
             ->addJs('M2ePro/Listing/ActionHandler.js')
+            ->addJs('M2ePro/Listing/MovingHandler.js')
             ->addJs('M2ePro/GridHandler.js')
             ->addJs('M2ePro/Listing/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ViewGridHandler.js')

@@ -300,12 +300,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
 
-        $this->getMassactionBlock()->addItem('moving', array(
-            'label'    => Mage::helper('M2ePro')->__('Move Item(s) to Another Listing'),
-            'url'      => '',
-            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
-
         if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
             $this->getMassactionBlock()->addItem('editCategorySettings', array(
                 'label'    => Mage::helper('M2ePro')->__('Edit eBay Categories Settings'),
@@ -889,7 +883,7 @@ HTML;
 
         $showMotorNotification= json_encode((bool)$this->isShowMotorNotification());
 
-        // M2ePro_TRNSLATIONS
+        // M2ePro_TRANSLATIONS
         // Please check eBay Motors compatibility attribute.You can find it in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>.
         $motorNotification = $helper->escapeJs($helper->__(
             'Please check eBay Motors compatibility attribute.'.
@@ -973,7 +967,6 @@ HTML;
         EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
 
         EbayListingEbayGridHandlerObj.actionHandler.setOptions(M2ePro);
-        EbayListingEbayGridHandlerObj.movingHandler.setOptions(M2ePro);
 
         ListingProgressBarObj = new ProgressBar('listing_view_progress_bar');
         GridWrapperObj = new AreaWrapper('listing_view_content_container');

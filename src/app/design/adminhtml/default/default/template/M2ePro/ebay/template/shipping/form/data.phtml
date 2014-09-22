@@ -22,7 +22,7 @@
 
     // removing ignored options for mode checking
     $ignoredOptions = array('country', 'postal_code', 'address', 'local_shipping_mode',
-                            'dispatch_time', 'international_shipping_mode');
+                            'dispatch_time', 'international_shipping_mode', 'services');
 
     foreach($ignoredOptions as $val) {
         unset($defaultStrictSettingsForSimpleMode[$val]);
@@ -39,9 +39,16 @@
 
     $showBlockedAdvancedMode = false;
     if(Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
-        $showBlockedAdvancedMode =  !in_array($formData['local_shipping_mode'], $showSimpleModeSettings) &&
+        $showBlockedAdvancedMode = !in_array($formData['local_shipping_mode'], $showSimpleModeSettings) &&
             (!!count(array_intersect_assoc($formData, $settingsOnlyForAdvancedMode)) ||
-            !!count(array_diff_assoc($defaultStrictSettingsForSimpleMode, $formData))) ;
+            !!count(array_diff_assoc($defaultStrictSettingsForSimpleMode, $formData)));
+        if(!$showBlockedAdvancedMode) {
+            foreach($formData['services'] as $service) {
+                if(!empty($service['cost_surcharge_value'])) {
+                    $showBlockedAdvancedMode = true;
+                }
+            }
+        }
     }
 
     $showAdvancedMode = (!Mage::helper('M2ePro/View_Ebay')->isSimpleMode() || (Mage::helper('M2ePro/View_Ebay')->isSimpleMode() && $showBlockedAdvancedMode));
@@ -107,6 +114,7 @@
         EbayTemplateShippingHandlerObj.shippingLocations = <?php echo json_encode($marketplaceData['locations']) ?>;
         EbayTemplateShippingHandlerObj.discountProfiles = <?php echo json_encode($this->getDiscountProfiles()) ?>;
         EbayTemplateShippingHandlerObj.isSimpleViewMode = <?php echo json_encode(!$showAdvancedMode); ?>;
+        EbayTemplateShippingHandlerObj.originCountry = "<?php echo $marketplaceData['origin_country']; ?>";
 
         if (EbayTemplateShippingHandlerObj.isSimpleViewMode) {
             $$('.local-shipping-tr').each(function(element) {
@@ -121,6 +129,8 @@
             });
             EbayTemplateShippingHandlerObj.simple_mode_disallowed_hide();
         }
+
+        $('country').observe('change', EbayTemplateShippingHandlerObj.countryChange);
 
         $('local_shipping_mode')
             .observe('change', EbayTemplateShippingHandlerObj.localShippingModeChange)

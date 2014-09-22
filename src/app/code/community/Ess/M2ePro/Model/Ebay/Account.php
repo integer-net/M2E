@@ -163,6 +163,11 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
         return $this->getData('server_hash');
     }
 
+    public function getTranslationHash()
+    {
+        return $this->getData('translation_hash');
+    }
+
     public function isModeProduction()
     {
         return $this->getMode() == self::MODE_PRODUCTION;

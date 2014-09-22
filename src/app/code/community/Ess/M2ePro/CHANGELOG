@@ -1,3 +1,21 @@
+* 6.2.0 (r7197) (15/09/2014)
+
+* Added: [eBay] Global Shipping Program functionality for UK eBay site
+* Added: [eBay] "Sell On Another eBay Site" feature for selling existing items on another eBay Site
+* Added: [eBay] Ability to translate products information for selling on another eBay Site
+* Improvement: [eBay] Attempt to reduce the length of eBay variation options values if they are too long
+* Fix: synchronization stuck if a multiple buffering was enabled (ob_get_level() > 1)
+* Fix: Notice: ob_end_flush(): failed to delete buffer zlib output compression
+* Fix: wrong mapping of 3rd Party products even if Mapping Option is disabled
+* Fix: [eBay] State was always required during editing shipping address on M2ePro order page
+* Fix: [eBay] javascript errors on the edit page of shipping policy, on Prototype lib version < 1.7
+
+* 6.1.9.1 (r6933) (15/08/2014) [Custom Release]
+
+* Added: Ability to set QTY rules in Synchronization template based on calculated value by Selling Format Template
+* Fix: synchronization failed during cron working (Deleted Products)
+* Fix: [eBay] incorrect variations list order for configurable magento product on eBay item page
+
 * 6.1.9 (r6919) (14/08/2014)
 
 * Added: Ability to click on the URLs in logs texts

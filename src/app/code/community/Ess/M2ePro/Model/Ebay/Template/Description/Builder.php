@@ -179,7 +179,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
         if (isset($data['watermark_settings']['position'])) {
             $watermarkSettings['position'] = (int)$data['watermark_settings']['position'];
 
-            if ($data['watermark_settings']['position'] != $data['old_watermark_settings']['position']) {
+            if (isset($data['old_watermark_settings']) &&
+                $data['watermark_settings']['position'] != $data['old_watermark_settings']['position']) {
                 $hashChange = true;
             }
         }
@@ -187,7 +188,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
         if (isset($data['watermark_settings']['scale'])) {
             $watermarkSettings['scale'] = (int)$data['watermark_settings']['scale'];
 
-            if ($data['watermark_settings']['scale'] != $data['old_watermark_settings']['scale']) {
+            if (isset($data['old_watermark_settings']) &&
+                $data['watermark_settings']['scale'] != $data['old_watermark_settings']['scale']) {
                 $hashChange = true;
             }
         }
@@ -195,7 +197,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
         if (isset($data['watermark_settings']['transparent'])) {
             $watermarkSettings['transparent'] = (int)$data['watermark_settings']['transparent'];
 
-            if ($data['watermark_settings']['transparent'] != $data['old_watermark_settings']['transparent']) {
+            if (isset($data['old_watermark_settings']) &&
+                $data['watermark_settings']['transparent'] != $data['old_watermark_settings']['transparent']) {
                 $hashChange = true;
             }
         }

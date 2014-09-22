@@ -34,6 +34,10 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             ->addJs('M2ePro/Ebay/Listing/ViewGridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Ebay/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Settings/GridHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Translation/GridHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Transferring/PaymentHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Transferring/TranslateHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Transferring/InfoHandler.js')
             ->addJs('M2ePro/Ebay/Motor/CompatibilityHandler.js')
         ;
 
@@ -213,6 +217,13 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             ->addJs('M2ePro/Ebay/Template/SellingFormatHandler.js')
             ->addJs('M2ePro/Ebay/Template/DescriptionHandler.js')
             ->addJs('M2ePro/Ebay/Template/SynchronizationHandler.js')
+            ->addJs('M2ePro/VideoTutorialHandler.js')
+            ->addJs('M2ePro/SynchProgressHandler.js')
+            ->addJs('M2ePro/MarketplaceHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/TransferringHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Transferring/ActionHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/Transferring/BreadcrumbHandler.js')
+
         ;
 
         if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()) {
@@ -274,7 +285,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         $deleted && $this->_getSession()->addSuccess($tempString);
 
         $tempString = Mage::helper('M2ePro')->__(
-            '%amount% listing(s) have listed items and can not be deleted', $locked
+            '%amount% listing(s) cannot be deleted because they have items with status "In Progress".', $locked
         );
         $locked && $this->_getSession()->addError($tempString);
 
@@ -610,6 +621,37 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
 
     //#############################################
 
+    public function getTranslationHtmlAction()
+    {
+        $productsIds = $this->getRequest()->getParam('products_ids');
+        $productsIds = explode(',', $productsIds);
+        $productsIds = array_filter($productsIds);
+
+        $listingProducts = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product')
+            ->addFieldToFilter('id', array('in' => ($productsIds)))
+            ->addFieldToFilter('translation_status', array('in' => array(
+                Ess_M2ePro_Model_Ebay_Listing_Product::TRANSLATION_STATUS_PENDING,
+                Ess_M2ePro_Model_Ebay_Listing_Product::TRANSLATION_STATUS_PENDING_PAYMENT_REQUIRED)));
+
+        if (!(int)$listingProducts->getSize()) {
+            return $this->getResponse()->setBody(json_encode(array(
+                'result'  => 'error',
+                'message' => Mage::helper('M2ePro')->__('Item is already being translated.'),
+            )));
+        }
+
+        $translateBlock = $this->getLayout()
+            ->createBlock('M2ePro/adminhtml_ebay_listing_transferring_translate')
+            ->setData('listing_id', (int)$this->getRequest()->getParam('listing_id'))
+            ->setData('products_ids', $this->getRequest()->getParam('products_ids'));
+        $this->getResponse()->setBody(json_encode(array(
+            'result'  => 'success',
+            'content' => $translateBlock->toHtml(),
+        )));
+    }
+
+    //#############################################
+
     public function getCategoryChooserHtmlAction()
     {
         //------------------------------
@@ -844,6 +886,103 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         return $this->getResponse()->setBody($this->processConnector(
             Ess_M2ePro_Model_Listing_Product::ACTION_STOP, array('remove' => true)
         ));
+    }
+
+    public function runStartTranslateProductsAction()
+    {
+        if (!$listingsProductsIds = $this->getRequest()->getParam('selected_products')) {
+            return 'You should select products';
+        }
+
+        $params = array('status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER);
+
+        $listingsProductsIds = explode(',', $listingsProductsIds);
+
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Translation_Product_Add_Dispatcher');
+        $result = (int)$dispatcherObject->process($listingsProductsIds, $params);
+        $actionId = (int)$dispatcherObject->getLogsActionId();
+
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_ERROR) {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'error','action_id'=>$actionId)));
+        }
+
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_WARNING) {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'warning','action_id'=>$actionId)));
+        }
+
+        if ($result == Ess_M2ePro_Helper_Data::STATUS_SUCCESS) {
+            return $this->getResponse()->setBody(json_encode(array('result'=>'success','action_id'=>$actionId)));
+        }
+
+        return $this->getResponse()->setBody(json_encode(array('result'=>'error','action_id'=>$actionId)));
+    }
+
+    public function runStopTranslateProductsAction()
+    {
+        if (!$listingsProductsIds = $this->getRequest()->getParam('selected_products')) {
+            return 'You should select products';
+        }
+
+        $listingProductsForStopping = array();
+
+        $stoppingErrors = 0;
+
+        $logModel = Mage::getModel('M2ePro/Listing_Log');
+        $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
+        $logActionId = $logModel->getNextActionId();
+
+        $listingsProductsIds = explode(',', $listingsProductsIds);
+        foreach ($listingsProductsIds as $product) {
+            $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getObject('Listing_Product',(int)$product);
+
+            if (!$listingProduct->getChildObject()->isTranslationStatusInProgress()) {
+
+                // Set message to log
+                //---------------
+                $logModel->addProductMessage(
+                    $listingProduct->getListingId(),
+                    $listingProduct->getProductId(),
+                    $listingProduct->getId(),
+                    Ess_M2ePro_Helper_Data::INITIATOR_USER,
+                    $logActionId,
+                    Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
+                    // M2ePro_TRANSLATIONS
+                    // You cannot stop translation for items not being translated.
+                    'You cannot stop translation for items not being translated.',
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
+
+                $stoppingErrors++;
+                continue;
+            }
+            $listingProductsForStopping[] = $listingProduct;
+        }
+
+        //is need for correct logging stopping translation
+        foreach ($listingProductsForStopping as $listingProduct) {
+            $listingProduct->deleteProcessingRequests();
+
+            // Set message to log
+            //---------------
+            $logModel->addProductMessage(
+                $listingProduct->getListingId(),
+                $listingProduct->getProductId(),
+                $listingProduct->getId(),
+                Ess_M2ePro_Helper_Data::INITIATOR_USER,
+                $logActionId,
+                Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
+                // M2ePro_TRANSLATIONS
+                // Translation has been successfully stopped
+                'Translation successfully stopped',
+                Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
+        }
+
+        return $stoppingErrors
+            ? $this->getResponse()->setBody(json_encode(array('result'=>'error',  'action_id' => $logActionId)))
+            : $this->getResponse()->setBody(json_encode(array('result'=>'success','action_id' => $logActionId)));
     }
 
     //#############################################

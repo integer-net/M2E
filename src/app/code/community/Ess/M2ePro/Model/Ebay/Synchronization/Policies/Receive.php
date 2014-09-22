@@ -93,7 +93,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Policies_Receive
 
                 /** @var $account Ess_M2ePro_Model_Account **/
 
-                //M2ePro_TRANSLATIONS
+                // M2ePro_TRANSLATIONS
                 // The "Business Policies Receive" action for eBay Site: "%marketplace%" and Account: "%account_title%" is finished. Please wait...
                 $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
                 $status = 'The "Business Policies Receive" action for eBay Site: "%marketplace%" and Account: ';

@@ -515,9 +515,8 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             examplesContainer   = $(this.id.replace('coefficient_mode','') + 'example_container');
 
         //-----------------------------
-        coefficientInputDiv.show();
 
-        console.log(examplesContainer);
+        coefficientInputDiv.show();
         examplesContainer.show();
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_NONE')) {

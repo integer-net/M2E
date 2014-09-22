@@ -193,6 +193,20 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
         }
 
         $sinceTime = new DateTime($lastSynchronizationDate, new DateTimeZone('UTC'));
+
+        // Get min date for synch
+        //------------------------
+        $minDate = new DateTime('now',new DateTimeZone('UTC'));
+        $minDate->modify('-90 days');
+        //------------------------
+
+        // Prepare last date
+        //------------------------
+        if ((int)$sinceTime->format('U') < (int)$minDate->format('U')) {
+            $sinceTime = $minDate;
+        }
+        //------------------------
+
         return Ess_M2ePro_Model_Connector_Ebay_Abstract::ebayTimeToString($sinceTime);
     }
 

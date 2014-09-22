@@ -182,7 +182,10 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             '/Aitoc_/i' => 'Stock management conflicts.',
 
             '/Eternalsoft_Ajaxcart/i' => 'Broke some ajax responses.',
-            '/Amasty_Shiprestriction/i' => '"Please specify a shipping method" error for some orders.'
+            '/Amasty_Shiprestriction/i' => '"Please specify a shipping method" error for some orders.',
+            '/RicoNeitzel_PaymentFilter/i' => '"The requested payment method is not available" error',
+            '/Mxperts_NoRegion/i' => 'Error about empty billing address information',
+            '/MageWorx_DeliveryZone/i' => 'Shipping price is 0 in magento order',
         );
 
         $result = array();

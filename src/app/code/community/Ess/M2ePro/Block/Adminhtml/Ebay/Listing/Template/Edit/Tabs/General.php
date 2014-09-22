@@ -30,31 +30,34 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Edit_Tabs_General extends
         //------------------------------
 
         //------------------------------
-        $data = array(
+        $parameters = array(
             'template_nick' => Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT,
+            'policy_localization' => $this->getData('policy_localization')
         );
-        $switcherBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_template_switcher');
-        $switcherBlock->setData($data);
+        $switcherBlock = $this->getLayout()
+                              ->createBlock('M2ePro/adminhtml_ebay_listing_template_switcher','',$parameters);
 
         $this->setChild('payment', $switcherBlock);
         //------------------------------
 
         //------------------------------
-        $data = array(
+        $parameters = array(
             'template_nick' => Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING,
+            'policy_localization' => $this->getData('policy_localization')
         );
-        $switcherBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_template_switcher');
-        $switcherBlock->setData($data);
+        $switcherBlock = $this->getLayout()
+                              ->createBlock('M2ePro/adminhtml_ebay_listing_template_switcher','',$parameters);
 
         $this->setChild('shipping', $switcherBlock);
         //------------------------------
 
         //------------------------------
-        $data = array(
+        $parameters = array(
             'template_nick' => Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN,
+            'policy_localization' => $this->getData('policy_localization')
         );
-        $switcherBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_template_switcher');
-        $switcherBlock->setData($data);
+        $switcherBlock = $this->getLayout()
+                              ->createBlock('M2ePro/adminhtml_ebay_listing_template_switcher','',$parameters);
 
         $this->setChild('return', $switcherBlock);
         //------------------------------

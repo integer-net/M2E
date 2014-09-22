@@ -40,6 +40,31 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
 
     // --------------------------------
 
+    public function getByCode($code, $returnType = self::RETURN_TYPE_ARRAYS)
+    {
+        $attributeCollection = Mage::getResourceModel('catalog/product_attribute_collection')
+            ->addVisibleFilter()
+            ->setCodeFilter($code)
+            ->setOrder('frontend_label', Varien_Data_Collection_Db::SORT_ORDER_ASC);
+
+        $attributes = $this->_convertCollectionToReturnType($attributeCollection, $returnType);
+        if ($returnType != self::RETURN_TYPE_ARRAYS) {
+            return $attributes;
+        }
+
+        $resultAttributes = array();
+        foreach ($attributeCollection->getItems() as $attribute) {
+            $resultAttributes[] = array(
+                'code' => $attribute['attribute_code'],
+                'label' => $attribute['frontend_label']
+            );
+        }
+
+        return $resultAttributes;
+    }
+
+    // --------------------------------
+
     public function getByAttributeSet($attributeSet, $returnType = self::RETURN_TYPE_ARRAYS)
     {
         $attributeSetId = $this->_getIdFromInput($attributeSet);
@@ -351,6 +376,76 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
         }
 
         return array_unique($missingAttributesSets);
+    }
+
+    // ################################
+
+    public function create($attributeCode,
+                           array $frontendLabel,
+                           $frontendInput = 'text',
+                           $isGlobal = 1,
+                           array $additionalParams = array())
+    {
+        $validatorAttrCode = new Zend_Validate_Regex(array('pattern' => '/^[a-z][a-z_0-9]{1,254}$/'));
+        if (!$validatorAttrCode->isValid($attributeCode)) {
+            return false;
+        }
+
+        if (empty($frontendLabel)) {
+            return false;
+        }
+
+        //@todo Now we can only handle type "text"
+        if ($frontendInput != 'text') {
+            return false;
+        }
+
+        /** @var $validatorInputType Mage_Eav_Model_Adminhtml_System_Config_Source_Inputtype_Validator */
+        // doesn't exist in magento <= 1.4.1.1
+//        $validatorInputType = Mage::getModel('eav/adminhtml_system_config_source_inputtype_validator');
+//        if (!$validatorInputType->isValid($frontendInput)) {
+//            return false;
+//        }
+
+        $data = $additionalParams;
+        $data['attribute_code'] = $attributeCode;
+        $data['frontend_input'] = $frontendInput;
+        $data['frontend_label'] = $frontendLabel;
+        $data['is_global']      = (int)$isGlobal;
+
+        $data['source_model']   = Mage::helper('catalog/product')->getAttributeSourceModelByInputType($frontendInput);
+        $data['backend_model']  = Mage::helper('catalog/product')->getAttributeBackendModelByInputType($frontendInput);
+
+        !isset($data['is_configurable'])         && $data['is_configurable'] = 0;
+        !isset($data['is_filterable'])           && $data['is_filterable'] = 0;
+        !isset($data['is_filterable_in_search']) && $data['is_filterable_in_search'] = 0;
+
+        /* @var $model Mage_Catalog_Model_Entity_Attribute */
+        $model = Mage::getModel('catalog/resource_eav_attribute');
+
+        if (is_null($model->getIsUserDefined()) || $model->getIsUserDefined() != 0) {
+            $data['backend_type'] = $model->getBackendTypeByInput($frontendInput);
+        }
+
+        $defaultValueField = $model->getDefaultValueByInput($frontendInput);
+        if ($defaultValueField && isset($data[$defaultValueField])) {
+            $data['default_value'] = $data[$defaultValueField];
+        }
+
+        !isset($data['apply_to']) && $data['apply_to'] = array();
+
+        $model->addData($data);
+
+        $model->setEntityTypeId(Mage::getModel('catalog/product')->getResource()->getTypeId());
+        $model->setIsUserDefined(1);
+
+        try {
+            $model->save();
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return (int)$model->getId();
     }
 
     // ################################

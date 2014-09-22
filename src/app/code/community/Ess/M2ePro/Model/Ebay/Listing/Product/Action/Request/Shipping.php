@@ -217,7 +217,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
                 $tempDataMethod['cost'] = $service->getCost();
                 $tempDataMethod['cost_additional'] = $service->getCostAdditional();
 
-                if (in_array($this->getShippingTemplate()->getMarketplaceId(), array(
+                if (!$this->getShippingTemplate()->isLocalShippingRateTableEnabled() &&
+                    in_array($this->getShippingTemplate()->getMarketplaceId(), array(
                         Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_US,
                         Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_MOTORS,
                     )) && preg_match('/(FedEx|UPS)/', $service->getShippingValue())) {

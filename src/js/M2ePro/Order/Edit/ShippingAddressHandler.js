@@ -37,11 +37,11 @@ OrderEditShippingAddressHandler.prototype = Object.extend(new CommonHandler(), {
             html = '';
 
         if (data.length == 0) {
-            html = '<input type="text" name="%name%" class="input-text required-entry" value="%value%" />'
+            html = '<input type="text" name="%name%" class="input-text" value="%value%" />'
                 .replace(/%name%/, self.regionElementName)
                 .replace(/%value%/, M2ePro.formData.region);
         } else {
-            html += '<select name="'+self.regionElementName+'" class="required-entry">';
+            html += '<select name="'+self.regionElementName+'">';
             data.each(function(item) {
                 var selected = (item.value == M2ePro.formData.region) ? 'selected="selected"' : '';
                 html += '<option value="'+item.value+'" '+selected+'>'+item.label+'</option>';

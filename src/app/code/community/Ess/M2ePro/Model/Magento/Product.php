@@ -67,9 +67,15 @@ class Ess_M2ePro_Model_Magento_Product
             throw new Exception('The Product ID is not set.');
         }
 
-        $this->_productModel = Mage::getModel('catalog/product')
-                                         ->setStoreId($storeId)
-                                         ->load($productId);
+        try {
+
+            $this->_productModel = Mage::getModel('catalog/product')
+                 ->setStoreId($storeId)
+                 ->load($productId);
+
+        } catch(Mage_Core_Model_Store_Exception $e) {
+            throw new Exception(Mage::helper('M2ePro')->__("Store ID '%store_id%' doesn't exist.", $storeId));
+        }
 
         $this->setProductId($productId);
         $this->setStoreId($storeId);
@@ -866,6 +872,20 @@ class Ess_M2ePro_Model_Magento_Product
         return is_string($value) ? $value : '';
     }
 
+    public function setAttributeValue($attributeCode, $value)
+    {
+        //supports only string values
+        if (is_string($value)) {
+            $productObject = $this->getProduct();
+
+            $productObject->setData($attributeCode, $value)
+                ->getResource()
+                ->saveAttribute($productObject, $attributeCode);
+        }
+
+        return $this;
+    }
+
     // ########################################
 
     public function getThumbnailImageLink()
@@ -1327,7 +1347,8 @@ class Ess_M2ePro_Model_Magento_Product
                     'product_id' => $childProduct->getId(),
                     'product_type' => self::TYPE_CONFIGURABLE,
                     'attribute' => $attributeLabel,
-                    'option' => $attributeValue
+                    'attribute_code' => $attributeCode,
+                    'option' => $attributeValue,
                 );
             }
 
@@ -1340,17 +1361,49 @@ class Ess_M2ePro_Model_Magento_Product
 
         foreach ($variations as $variation) {
             foreach ($variation as $option) {
-                $set[$option['attribute']][] = $option['option'];
+                if (empty($set[$option['attribute_code']])) {
+                    $set[$option['attribute_code']] = array(
+                        'label' => $option['attribute'],
+                        'options' => array(),
+                    );
+                }
+
+                $set[$option['attribute_code']]['options'][] = $option['option'];
             }
         }
-        foreach ($set as &$options) {
-            $options = array_values(array_unique($options));
+
+        $resultSet = array();
+        foreach ($set as $code => $data) {
+            $options = $this->sortAttributeOptions($code, array_values(array_unique($data['options'])));
+            $resultSet[$data['label']] = $options;
         }
 
         return array(
-            'set' => $set,
+            'set'        => $resultSet,
             'variations' => $variations
         );
+    }
+
+    protected function sortAttributeOptions($attributeCode, $options)
+    {
+        $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
+
+        /** @var Mage_Eav_Model_Resource_Entity_Attribute_Option_Collection $optionCollection */
+        $optionCollection = Mage::getModel('eav/entity_attribute_option')->getCollection();
+        $optionCollection->setAttributeFilter($attribute->getId());
+        $optionCollection->setPositionOrder();
+        $optionCollection->setStoreFilter($this->getStoreId());
+
+        $sortedOptions = array();
+        foreach ($optionCollection as $option) {
+            if (!in_array($option->getValue(), $options)) {
+                continue;
+            }
+
+            $sortedOptions[] = $option->getValue();
+        }
+
+        return $sortedOptions;
     }
 
     //-----------------------------------------

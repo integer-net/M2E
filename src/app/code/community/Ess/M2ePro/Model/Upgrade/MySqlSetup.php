@@ -63,6 +63,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
     {
         parent::_upgradeResourceDb($oldVersion, $newVersion);
         $this->updateInstallationVersionHistory($oldVersion, $newVersion);
+        $this->updateCompilation();
     }
 
     //####################################
@@ -477,6 +478,11 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
         );
 
         $connection->insertArray($tableName, $mysqlColumns, array($mysqlData));
+    }
+
+    private function updateCompilation()
+    {
+        defined('COMPILER_INCLUDE_PATH') && Mage::getModel('compiler/process')->run();
     }
 
     public function generateHash()

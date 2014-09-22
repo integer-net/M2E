@@ -37,6 +37,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher extends Mage_Adm
                 array(
                     'value' => 'magento',
                     'label' => Mage::helper('M2ePro')->__('Magento')
+                ),
+                array(
+                    'value' => 'translation',
+                    'label' => Mage::helper('M2ePro')->__('Translation')
                 )
             )
         );

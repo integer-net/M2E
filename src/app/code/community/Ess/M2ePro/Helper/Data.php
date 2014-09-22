@@ -197,37 +197,35 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function reduceWordsInString($string, $neededLength, $longWord = 6)
+    public function reduceWordsInString($string, $neededLength, $longWord = 6, $minWordLen = 2, $atEndOfWord = '.')
     {
-        // todo for the next version
-        return $string;
-
         if (strlen($string) <= $neededLength) {
             return $string;
         }
 
         $longWords = array();
-        $countOfLetters = 0;
-
         foreach (explode(' ', $string) as $word) {
-            if (strlen($word) >= $longWord && !preg_match('/\.|[0-9]/', $word)) {
-                $longWords[] = $word;
-                $countOfLetters += strlen($word);
+            if (strlen($word) >= $longWord && !preg_match('/[0-9]/', $word)) {
+                $longWords[$word] = strlen($word) - $minWordLen;
             }
         }
 
-        if (empty($longWords)) {
+        $canBeReduced = 0;
+        foreach ($longWords as $canBeReducedForWord) {
+            $canBeReduced += $canBeReducedForWord;
+        }
+
+        $needToBeReduced = strlen($string) - $neededLength + (count($longWords) * strlen($atEndOfWord));
+
+        if ($canBeReduced < $needToBeReduced) {
             return $string;
         }
 
-        $reduce = strlen($string) - $neededLength;
-        // count($longWords) means count of dots
-        $reduceForOneLetterOfWord = ($reduce + count($longWords)) / $countOfLetters;
+        $weightOfOneLetter = $needToBeReduced / $canBeReduced;
+        foreach($longWords as $word => $canBeReducedForWord) {
 
-        foreach($longWords as $word) {
-
-            $reducedWordLen = strlen($word) - ceil($reduceForOneLetterOfWord * strlen($word));
-            $reducedWord = substr($word, 0, $reducedWordLen).'.';
+            $willReduced = ceil($weightOfOneLetter * $canBeReducedForWord);
+            $reducedWord = substr($word, 0, strlen($word) - $willReduced) . $atEndOfWord;
 
             $string = str_replace($word, $reducedWord, $string);
 

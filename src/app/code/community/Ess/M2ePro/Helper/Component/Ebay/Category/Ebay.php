@@ -32,6 +32,12 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
         return implode($delimiter, $pathData);
     }
 
+    public function getTopLevel($categoryId, $marketplaceId, $dataField = 'category_id')
+    {
+        $pathCategoriesIds = $this->getPathData($categoryId, $marketplaceId, $dataField);
+        return array_shift($pathCategoriesIds);
+    }
+
     // ----------------------------------------
 
     public function isVariationEnabled($categoryId, $marketplaceId)

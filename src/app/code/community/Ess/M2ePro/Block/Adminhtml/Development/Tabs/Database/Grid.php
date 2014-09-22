@@ -46,8 +46,8 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
                 'table_name' => $moduleTable,
                 'component'  => 'general',
                 'group'      => $group,
-                'is_exist'   => $helper->isTableExists($moduleTable),
-                'is_crashed' => !$helper->isTableStatusOk($moduleTable),
+                'is_exist'   => $isExists = $helper->isTableExists($moduleTable),
+                'is_crashed' => $isExists ? !$helper->isTableStatusOk($moduleTable) : false,
                 'records'    => 0,
                 'size'       => 0,
                 'model'      => $helper->getTableModel($moduleTable)

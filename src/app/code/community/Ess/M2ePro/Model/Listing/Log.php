@@ -73,6 +73,9 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
     const ACTION_INVENTORY_SYNCHRONIZATION = 26;
     const _ACTION_INVENTORY_SYNCHRONIZATION = 'Inventory synchronization';
 
+    const ACTION_TRANSLATE_PRODUCT = 28;
+    const _ACTION_TRANSLATE_PRODUCT = 'Translation';
+
     //####################################
 
     public function _construct()

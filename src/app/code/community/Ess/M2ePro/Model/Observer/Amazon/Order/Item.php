@@ -27,6 +27,12 @@ class Ess_M2ePro_Model_Observer_Amazon_Order_Item
 
                 /** @var $productOtherInstance Ess_M2ePro_Model_Listing_Other */
                 $productOtherInstance = $collection->getFirstItem();
+
+                if (!$productOtherInstance->getAccount()->getChildObject()->isOtherListingsSynchronizationEnabled() ||
+                    !$productOtherInstance->getAccount()->getChildObject()->isOtherListingsMappingEnabled()) {
+                    return;
+                }
+
                 $productOtherInstance->mapProduct($productId, Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
             }
 

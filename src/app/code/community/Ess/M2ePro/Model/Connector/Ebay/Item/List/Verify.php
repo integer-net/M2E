@@ -71,6 +71,23 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Verify
             return false;
         }
 
+        if ($this->listingProduct->isLockedObject(NULL) ||
+            $this->listingProduct->isLockedObject('in_action')) {
+
+            $message = array(
+                // M2ePro_TRANSLATIONS
+                // Another action is being processed. Try again when the action is completed.
+                parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
+                                           .'Try again when the action is completed.',
+                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
+            );
+
+            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
+                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+
+            return false;
+        }
+
         if(!$this->listingProduct->getChildObject()->isSetCategoryTemplate()) {
 
             $message = array(

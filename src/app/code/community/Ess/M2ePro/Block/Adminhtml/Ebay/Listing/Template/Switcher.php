@@ -234,12 +234,12 @@ HTML;
             );
         }
 
-        $data = array(
+        $parameters = array(
             'is_custom' => $this->isTemplateModeCustom(),
-            'custom_title' => Mage::helper('M2ePro/Data_Global')->getValue('ebay_custom_template_title')
+            'custom_title' => Mage::helper('M2ePro/Data_Global')->getValue('ebay_custom_template_title'),
+            'policy_localization' => $this->getData('policy_localization')
         );
-        $block = $this->getLayout()->createBlock($blockName);
-        $block->setData($data);
+        $block = $this->getLayout()->createBlock($blockName,'',$parameters);
 
         return $block;
     }

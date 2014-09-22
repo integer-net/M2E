@@ -53,7 +53,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Edit_Tabs extends Mage_Ad
     {
         //------------------------------
         if ($this->isTabAllowed('general')) {
-            $block = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_template_edit_tabs_general');
+            $block = $this->getLayout()
+                          ->createBlock('M2ePro/adminhtml_ebay_listing_template_edit_tabs_general','',
+                                        array('policy_localization' => $this->getData('policy_localization')));
             $this->addTab(
                 'general',
                 array(

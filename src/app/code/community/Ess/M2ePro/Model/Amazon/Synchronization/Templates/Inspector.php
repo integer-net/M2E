@@ -113,14 +113,43 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             }
         }
 
-        if($amazonSynchronizationTemplate->isListWhenQtyHasValue()) {
+        if($amazonSynchronizationTemplate->isListWhenQtyMagentoHasValue()) {
 
             $result = false;
             $productQty = (int)$listingProduct->getChildObject()->getQty(true);
 
-            $typeQty = (int)$amazonSynchronizationTemplate->getListWhenQtyHasValueType();
-            $minQty = (int)$amazonSynchronizationTemplate->getListWhenQtyHasValueMin();
-            $maxQty = (int)$amazonSynchronizationTemplate->getListWhenQtyHasValueMax();
+            $typeQty = (int)$amazonSynchronizationTemplate->getListWhenQtyMagentoHasValueType();
+            $minQty = (int)$amazonSynchronizationTemplate->getListWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$amazonSynchronizationTemplate->getListWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_LESS &&
+                $productQty <= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_MORE &&
+                $productQty >= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                $result = true;
+            }
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        if($amazonSynchronizationTemplate->isListWhenQtyCalculatedHasValue()) {
+
+            $result = false;
+            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+
+            $typeQty = (int)$amazonSynchronizationTemplate->getListWhenQtyCalculatedHasValueType();
+            $minQty = (int)$amazonSynchronizationTemplate->getListWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$amazonSynchronizationTemplate->getListWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_LESS &&
                 $productQty <= $minQty) {
@@ -238,14 +267,43 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             }
         }
 
-        if($amazonSynchronizationTemplate->isRelistWhenQtyHasValue()) {
+        if($amazonSynchronizationTemplate->isRelistWhenQtyMagentoHasValue()) {
 
             $result = false;
             $productQty = (int)$listingProduct->getChildObject()->getQty(true);
 
-            $typeQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyHasValueType();
-            $minQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyHasValueMin();
-            $maxQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyHasValueMax();
+            $typeQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyMagentoHasValueType();
+            $minQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_QTY_LESS &&
+                $productQty <= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_QTY_MORE &&
+                $productQty >= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                $result = true;
+            }
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        if($amazonSynchronizationTemplate->isRelistWhenQtyCalculatedHasValue()) {
+
+            $result = false;
+            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+
+            $typeQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueType();
+            $minQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_QTY_LESS &&
                 $productQty <= $minQty) {
@@ -354,13 +412,37 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             }
         }
 
-        if ($amazonSynchronizationTemplate->isStopWhenQtyHasValue()) {
+        if ($amazonSynchronizationTemplate->isStopWhenQtyMagentoHasValue()) {
 
             $productQty = (int)$listingProduct->getChildObject()->getQty(true);
 
-            $typeQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyHasValueType();
-            $minQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyHasValueMin();
-            $maxQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyHasValueMax();
+            $typeQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyMagentoHasValueType();
+            $minQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_LESS &&
+                $productQty <= $minQty) {
+                return true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_MORE &&
+                $productQty >= $minQty) {
+                return true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                return true;
+            }
+        }
+
+        if ($amazonSynchronizationTemplate->isStopWhenQtyCalculatedHasValue()) {
+
+            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+
+            $typeQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyCalculatedHasValueType();
+            $minQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_QTY_LESS &&
                 $productQty <= $minQty) {

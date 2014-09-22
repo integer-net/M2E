@@ -128,6 +128,79 @@ class Ess_M2ePro_Helper_Magento_AttributeSet extends Ess_M2ePro_Helper_Magento_A
 
     // ################################
 
+    public function create($attributeSetName, $sourceAttributeSetId = NULL)
+    {
+        empty($sourceAttributeSetId) &&
+            $sourceAttributeSetId = Mage::getModel('catalog/product')->getDefaultAttributeSetId();
+
+        if (!Mage::getModel('eav/entity_attribute_set')->load($sourceAttributeSetId)->getId()){
+            return false;
+        }
+
+        $entityTypeId = Mage::getModel('catalog/product')->getResource()->getTypeId();
+
+        /** @var $attributeSet Mage_Eav_Model_Entity_Attribute_Set */
+        $attributeSet = Mage::getModel('eav/entity_attribute_set')
+            ->setEntityTypeId($entityTypeId)
+            ->setAttributeSetName($attributeSetName);
+
+        try {
+            // check if name is valid
+            $attributeSet->validate();
+            // copy parameters to new set from source set
+            $attributeSet->save();
+            $attributeSet->initFromSkeleton($sourceAttributeSetId)->save();
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return (int)$attributeSet->getId();
+    }
+
+    // ################################
+
+    public function attributeAdd($attributeId, $attributeSetId, $attributeGroupId = NULL, $sortOrder = '0')
+    {
+        /** @var $attribute Mage_Eav_Model_Entity_Attribute */
+        $attribute = Mage::getModel('eav/entity_attribute')->load($attributeId);
+        if (!$attribute->getId()) {
+            return false;
+        }
+
+        /** @var $attributeSet Mage_Eav_Model_Entity_Attribute_Set */
+        $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
+        if (!$attributeSet->getId()) {
+            return false;
+        }
+
+        if (!empty($attributeGroupId)) {
+            if (!Mage::getModel('eav/entity_attribute_group')->load($attributeGroupId)->getId()) {
+                return false;
+            }
+        } else {
+            $attributeGroupId = $attributeSet->getDefaultGroupId();
+        }
+
+        $attribute->setAttributeSetId($attributeSet->getId())->loadEntityAttributeIdBySet();
+        if ($attribute->getEntityAttributeId()) {
+            return false;
+        }
+
+        try {
+            $attribute->setEntityTypeId($attributeSet->getEntityTypeId())
+                ->setAttributeSetId($attributeSetId)
+                ->setAttributeGroupId($attributeGroupId)
+                ->setSortOrder($sortOrder)
+                ->save();
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // ################################
+
     protected function _getContainsAttributeIds(array $attributeIds,
                                                              $returnType = self::RETURN_TYPE_ARRAYS,
                                                              $isFully = false)

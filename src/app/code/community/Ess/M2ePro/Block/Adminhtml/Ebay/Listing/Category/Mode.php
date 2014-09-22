@@ -43,11 +43,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Mode extends Mage_Adminht
                 $url = $this->getUrl('*/adminhtml_ebay_listing_productAdd/deleteAll',array('_current' => true));
         }
 
-        $this->_addButton('back', array(
-            'label'     => Mage::helper('M2ePro')->__('Back'),
-            'class'     => 'back',
-            'onclick'   => 'setLocation(\''.$url.'\');'
-        ));
+        if (!$this->getRequest()->getParam('without_back')) {
+            $this->_addButton('back', array(
+                'label'     => Mage::helper('M2ePro')->__('Back'),
+                'class'     => 'back',
+                'onclick'   => 'setLocation(\''.$url.'\');'
+            ));
+        }
 
         $this->_addButton('next', array(
             'label'     => Mage::helper('M2ePro')->__('Continue'),

@@ -6,6 +6,8 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
     {
         $super();
 
+        this.movingHandler = new ListingMovingHandler(this);
+
         this.actions = Object.extend(this.actions,{
 
             editPrimaryCategorySettingsAction: function(id) {
@@ -30,6 +32,12 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
             editPartsCompatibilityAction: function(id) {
                 EbayMotorCompatibilityHandlerObj.setMode('add');
                 this.openPartsCompatibilityPopup(id);
+            }.bind(this),
+
+            movingAction: this.movingHandler.run.bind(this.movingHandler),
+
+            transferringAction: function(id) {
+                this.transferring(id);
             }.bind(this)
 
         });
@@ -176,6 +184,16 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
         title += '.';
 
         return title;
+    },
+
+    //----------------------------------
+
+    transferring: function(id)
+    {
+        this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
+        if (this.selectedProductsIds.length) {
+            EbayListingTransferringHandlerObj.loadActionHtml(this.selectedProductsIds);
+        }
     },
 
     //----------------------------------

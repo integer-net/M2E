@@ -113,14 +113,43 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
             }
         }
 
-        if($playSynchronizationTemplate->isListWhenQtyHasValue()) {
+        if($playSynchronizationTemplate->isListWhenQtyMagentoHasValue()) {
 
             $result = false;
             $productQty = (int)$listingProduct->getChildObject()->getQty(true);
 
-            $typeQty = (int)$playSynchronizationTemplate->getListWhenQtyHasValueType();
-            $minQty = (int)$playSynchronizationTemplate->getListWhenQtyHasValueMin();
-            $maxQty = (int)$playSynchronizationTemplate->getListWhenQtyHasValueMax();
+            $typeQty = (int)$playSynchronizationTemplate->getListWhenQtyMagentoHasValueType();
+            $minQty = (int)$playSynchronizationTemplate->getListWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$playSynchronizationTemplate->getListWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS &&
+                $productQty <= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_MORE &&
+                $productQty >= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                $result = true;
+            }
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        if($playSynchronizationTemplate->isListWhenQtyCalculatedHasValue()) {
+
+            $result = false;
+            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+
+            $typeQty = (int)$playSynchronizationTemplate->getListWhenQtyCalculatedHasValueType();
+            $minQty = (int)$playSynchronizationTemplate->getListWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$playSynchronizationTemplate->getListWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS &&
                 $productQty <= $minQty) {
@@ -238,14 +267,43 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
             }
         }
 
-        if($playSynchronizationTemplate->isRelistWhenQtyHasValue()) {
+        if($playSynchronizationTemplate->isRelistWhenQtyMagentoHasValue()) {
 
             $result = false;
             $productQty = (int)$listingProduct->getChildObject()->getQty(true);
 
-            $typeQty = (int)$playSynchronizationTemplate->getRelistWhenQtyHasValueType();
-            $minQty = (int)$playSynchronizationTemplate->getRelistWhenQtyHasValueMin();
-            $maxQty = (int)$playSynchronizationTemplate->getRelistWhenQtyHasValueMax();
+            $typeQty = (int)$playSynchronizationTemplate->getRelistWhenQtyMagentoHasValueType();
+            $minQty = (int)$playSynchronizationTemplate->getRelistWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$playSynchronizationTemplate->getRelistWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_LESS &&
+                $productQty <= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_MORE &&
+                $productQty >= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                $result = true;
+            }
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        if($playSynchronizationTemplate->isRelistWhenQtyCalculatedHasValue()) {
+
+            $result = false;
+            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+
+            $typeQty = (int)$playSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueType();
+            $minQty = (int)$playSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$playSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_LESS &&
                 $productQty <= $minQty) {
@@ -354,13 +412,37 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
             }
         }
 
-        if ($playSynchronizationTemplate->isStopWhenQtyHasValue()) {
+        if ($playSynchronizationTemplate->isStopWhenQtyMagentoHasValue()) {
 
             $productQty = (int)$listingProduct->getChildObject()->getQty(true);
 
-            $typeQty = (int)$playSynchronizationTemplate->getStopWhenQtyHasValueType();
-            $minQty = (int)$playSynchronizationTemplate->getStopWhenQtyHasValueMin();
-            $maxQty = (int)$playSynchronizationTemplate->getStopWhenQtyHasValueMax();
+            $typeQty = (int)$playSynchronizationTemplate->getStopWhenQtyMagentoHasValueType();
+            $minQty = (int)$playSynchronizationTemplate->getStopWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$playSynchronizationTemplate->getStopWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_LESS &&
+                $productQty <= $minQty) {
+                return true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_MORE &&
+                $productQty >= $minQty) {
+                return true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                return true;
+            }
+        }
+
+        if ($playSynchronizationTemplate->isStopWhenQtyCalculatedHasValue()) {
+
+            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+
+            $typeQty = (int)$playSynchronizationTemplate->getStopWhenQtyCalculatedHasValueType();
+            $minQty = (int)$playSynchronizationTemplate->getStopWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$playSynchronizationTemplate->getStopWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_LESS &&
                 $productQty <= $minQty) {

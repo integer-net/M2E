@@ -9,10 +9,19 @@ class Ess_M2ePro_Adminhtml_Ebay_GeneralController
 {
     //#############################################
 
-    public function isMarketplaceSynchronizedAction()
+    public function isMarketplaceEnabledAndSynchronizedAction()
     {
         $marketplaceId = $this->getRequest()->getParam('marketplace_id');
+        $marketplaceObj = Mage::helper('M2ePro/Component')->getUnknownObject('Marketplace',(int)$marketplaceId);
 
+        $this->loadLayout();
+        $this->getResponse()->setBody(json_encode(
+            $marketplaceObj->isStatusEnabled() && $this->isMarketplaceSynchronized($marketplaceId)
+        ));
+    }
+
+    private function isMarketplaceSynchronized($marketplaceId)
+    {
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $tableDictMarketplace = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_marketplace');
@@ -21,10 +30,7 @@ class Ess_M2ePro_Adminhtml_Ebay_GeneralController
                              ->from($tableDictMarketplace,'COUNT(*)')
                              ->where('`marketplace_id` = ?',(int)$marketplaceId);
 
-        $this->loadLayout();
-        $this->getResponse()->setBody(json_encode(
-            $connRead->fetchOne($dbSelect) == 1
-        ));
+        return ($connRead->fetchOne($dbSelect) == 1);
     }
 
     //#############################################

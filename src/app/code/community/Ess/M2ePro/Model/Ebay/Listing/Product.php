@@ -11,6 +11,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
 {
     // ########################################
 
+    const TRANSLATION_STATUS_NONE                     = 0;
+    const TRANSLATION_STATUS_PENDING                  = 1;
+    const TRANSLATION_STATUS_PENDING_PAYMENT_REQUIRED = 2;
+    const TRANSLATION_STATUS_IN_PROGRESS              = 3;
+    const TRANSLATION_STATUS_TRANSLATED               = 4;
+
+    // ########################################
+
     /**
      * @var Ess_M2ePro_Model_Ebay_Item
      */
@@ -527,6 +535,53 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
     }
 
     //-----------------------------------------
+
+    public function getTranslationStatus()
+    {
+        return (int)$this->getData('translation_status');
+    }
+
+    public function isTranslationStatusNone()
+    {
+        return $this->getTranslationStatus() == self::TRANSLATION_STATUS_NONE;
+    }
+
+    public function isTranslationStatusPending()
+    {
+        return $this->getTranslationStatus() == self::TRANSLATION_STATUS_PENDING;
+    }
+
+    public function isTranslationStatusPendingPaymentRequired()
+    {
+        return $this->getTranslationStatus() == self::TRANSLATION_STATUS_PENDING_PAYMENT_REQUIRED;
+    }
+
+    public function isTranslationStatusInProgress()
+    {
+        return $this->getTranslationStatus() == self::TRANSLATION_STATUS_IN_PROGRESS;
+    }
+
+    public function isTranslationStatusTranslated()
+    {
+        return $this->getTranslationStatus() == self::TRANSLATION_STATUS_TRANSLATED;
+    }
+
+    public function isTranslatable()
+    {
+        return $this->isTranslationStatusPending() || $this->isTranslationStatusPendingPaymentRequired();
+    }
+
+    public function getTranslationService()
+    {
+        return $this->getData('translation_service');
+    }
+
+    public function getTranslatedDate()
+    {
+        return $this->getData('translated_date');
+    }
+
+    //----------------------------------------
 
     public function getStartDate()
     {

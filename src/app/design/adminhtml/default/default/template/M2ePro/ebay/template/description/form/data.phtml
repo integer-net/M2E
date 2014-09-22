@@ -1183,7 +1183,7 @@
 
                 <tr id="product_details_include_description_tr" class="product-details-specification">
                     <td class="label">
-                        <label for="product_details_include_description"><?php echo Mage::helper('M2ePro')->__('Use Description'); ?>:</label>
+                        <label for="product_details_include_description"><?php echo Mage::helper('M2ePro')->__('Use Description From eBay Catalog'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="product_details_include_description" name="description[product_details][include_description]">
@@ -1200,7 +1200,7 @@
 
                 <tr id="product_details_include_image_tr" class="product-details-specification">
                     <td class="label">
-                        <label for="product_details_include_image"><?php echo Mage::helper('M2ePro')->__('Use Image'); ?>:</label>
+                        <label for="product_details_include_image"><?php echo Mage::helper('M2ePro')->__('Use Image From eBay Catalog'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="product_details_include_image" name="description[product_details][include_image]">
@@ -1273,7 +1273,7 @@
                             <input name="description[enhancement][]" value="BoldTitle" type="checkbox" <?php if (in_array('BoldTitle', $formData['enhancement'])): echo ' checked="checked"'; endif; ?> /> <?php echo Mage::helper('M2ePro')->__('Bold listing title'); ?><br />
                         </label>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Find out about <a href="http://sellercentre.ebay.co.uk/fees-optional-listing-features" target="_blank">eBay optional listing features</a>'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Find out about <a href="http://pages.ebay.com/help/sell/fees.html#optional" target="_blank">eBay optional listing features</a>'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -1303,7 +1303,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_TYPE_FEATURED; ?>" <?php if ($formData['gallery_type'] == Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_TYPE_FEATURED): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Gallery Featured'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Find out about <a href="http://sellercentre.ebay.co.uk/fees-optional-listing-features" target="_blank">eBay optional listing features</a>'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Find out about <a href="http://pages.ebay.com/help/sell/fees.html#optional" target="_blank">eBay optional listing features</a>'); ?></span>
                         </p>
                     </td>
                 </tr>

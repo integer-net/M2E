@@ -80,22 +80,24 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
             var stopMaxQty = 0,
                 relistMinQty = 0;
 
-            switch (parseInt($('stop_qty').value)) {
+            var qtyType = el.getAttribute('qty_type');
+
+            switch (parseInt($('stop_qty_' + qtyType).value)) {
 
                 case M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_NONE'):
                     return true;
                     break;
 
                 case M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_LESS'):
-                    stopMaxQty = parseInt($('stop_qty_value').value);
+                    stopMaxQty = parseInt($('stop_qty_' + qtyType + '_value').value);
                     break;
 
                 case M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN'):
-                    stopMaxQty = parseInt($('stop_qty_value_max').value);
+                    stopMaxQty = parseInt($('stop_qty_' + qtyType + '_value_max').value);
                     break;
             }
 
-            switch (parseInt($('relist_qty').value)) {
+            switch (parseInt($('relist_qty_' + qtyType).value)) {
 
                 case M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_NONE'):
                     return false;
@@ -103,7 +105,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
 
                 case M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_MORE'):
                 case M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_BETWEEN'):
-                    relistMinQty = parseInt($('relist_qty_value').value);
+                    relistMinQty = parseInt($('relist_qty_' + qtyType + '_value').value);
                     break;
             }
 
@@ -139,27 +141,28 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
 
     stopQty_change : function()
     {
-        if ($('stop_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_NONE')) {
-            $('stop_qty_value_container').hide();
-            $('stop_qty_value_max_container').hide();
-        } else if ($('stop_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_LESS')) {
-            $('stop_qty_item_min').hide();
-            $('stop_qty_item').show();
-            $('stop_qty_value_container').show();
-            $('stop_qty_value_max_container').hide();
-        } else if ($('stop_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN')) {
-            $('stop_qty_item_min').show();
-            $('stop_qty_item').hide();
-            $('stop_qty_value_container').show();
-            $('stop_qty_value_max_container').show();
-        } else if ($('stop_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_MORE')) {
-            $('stop_qty_item_min').hide();
-            $('stop_qty_item').show();
-            $('stop_qty_value_container').show();
-            $('stop_qty_value_max_container').hide();
-        } else {
-            $('stop_qty_value_container').hide();
-            $('stop_qty_value_max_container').hide();
+        var qtyType = this.getAttribute('qty_type');
+
+        var valueContainer    = $('stop_qty_' + qtyType + '_value_container'),
+            valueMaxContainer = $('stop_qty_' + qtyType + '_value_max_container'),
+            itemMin           = $('stop_qty_' + qtyType + '_item_min'),
+            item              = $('stop_qty_' + qtyType + '_item');
+
+        valueContainer.hide();
+        valueMaxContainer.hide();
+        itemMin.hide();
+        item.hide();
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_LESS') ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_MORE')) {
+            item.show();
+            valueContainer.show();
+        }
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN')) {
+            itemMin.show();
+            valueContainer.show();
+            valueMaxContainer.show();
         }
     },
 
@@ -176,27 +179,28 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
 
     listQty_change : function()
     {
-        if ($('list_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE')) {
-            $('list_qty_value_container').hide();
-            $('list_qty_value_max_container').hide();
-        } else if ($('list_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS')) {
-            $('list_qty_item_min').hide();
-            $('list_qty_item').show();
-            $('list_qty_value_container').show();
-            $('list_qty_value_max_container').hide();
-        } else if ($('list_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN')) {
-            $('list_qty_item_min').show();
-            $('list_qty_item').hide();
-            $('list_qty_value_container').show();
-            $('list_qty_value_max_container').show();
-        } else if ($('list_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_MORE')) {
-            $('list_qty_item_min').hide();
-            $('list_qty_item').show();
-            $('list_qty_value_container').show();
-            $('list_qty_value_max_container').hide();
-        } else {
-            $('list_qty_value_container').hide();
-            $('list_qty_value_max_container').hide();
+        var qtyType = this.getAttribute('qty_type');
+
+        var valueContainer    = $('list_qty_' + qtyType + '_value_container'),
+            valueMaxContainer = $('list_qty_' + qtyType + '_value_max_container'),
+            itemMin           = $('list_qty_' + qtyType + '_item_min'),
+            item              = $('list_qty_' + qtyType + '_item');
+
+        valueContainer.hide();
+        valueMaxContainer.hide();
+        itemMin.hide();
+        item.hide();
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS') ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_MORE')) {
+            item.show();
+            valueContainer.show();
+        }
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN')) {
+            itemMin.show();
+            valueContainer.show();
+            valueMaxContainer.show();
         }
     },
 
@@ -216,27 +220,28 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
 
     relistQty_change : function()
     {
-        if ($('relist_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_NONE')) {
-            $('relist_qty_value_container').hide();
-            $('relist_qty_value_max_container').hide();
-        } else if ($('relist_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_LESS')) {
-            $('relist_qty_item_min').hide();
-            $('relist_qty_item').show();
-            $('relist_qty_value_container').show();
-            $('relist_qty_value_max_container').hide();
-        } else if ($('relist_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_BETWEEN')) {
-            $('relist_qty_item_min').show();
-            $('relist_qty_item').hide();
-            $('relist_qty_value_container').show();
-            $('relist_qty_value_max_container').show();
-        } else if ($('relist_qty').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_MORE')) {
-            $('relist_qty_item_min').hide();
-            $('relist_qty_item').show();
-            $('relist_qty_value_container').show();
-            $('relist_qty_value_max_container').hide();
-        } else {
-            $('relist_qty_value_container').hide();
-            $('relist_qty_value_max_container').hide();
+        var qtyType = this.getAttribute('qty_type');
+
+        var valueContainer    = $('relist_qty_' + qtyType + '_value_container'),
+            valueMaxContainer = $('relist_qty_' + qtyType + '_value_max_container'),
+            itemMin           = $('relist_qty_' + qtyType + '_item_min'),
+            item              = $('relist_qty_' + qtyType + '_item');
+
+        valueContainer.hide();
+        valueMaxContainer.hide();
+        itemMin.hide();
+        item.hide();
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_LESS') ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_MORE')) {
+            item.show();
+            valueContainer.show();
+        }
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_QTY_BETWEEN')) {
+            itemMin.show();
+            valueContainer.show();
+            valueMaxContainer.show();
         }
     },
 

@@ -82,6 +82,11 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_DatabaseBrokenTables
 
         $crashedTables = array();
         foreach ($helper->getMySqlTables() as $tableName) {
+
+            if (!$helper->isTableExists($tableName)) {
+                continue;
+            }
+
             !$helper->isTableStatusOk($tableName) && $crashedTables[] = $tableName;
         }
 

@@ -4,17 +4,13 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_CronController extends Mage_Core_Controller_Front_Action
+class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
 {
     //#############################################
 
     public function indexAction()
     {
-        header('Connection: Close');
-        header('Content-Length: 13');
-        echo 'processing...';
-        ob_get_level() && ob_end_flush();
-        flush();
+        $this->closeConnection();
 
         Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
 
@@ -59,6 +55,20 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Front_Action
     }
 
     //#############################################
+
+    private function closeConnection()
+    {
+        header('Connection: Close');
+        header('Content-Length: 13');
+        echo 'processing...';
+
+        while(ob_get_level()) {
+            if (!$result = @ob_end_flush()) {
+                break;
+            }
+        }
+        flush();
+    }
 
     private function getConnectionsReports($connectionIds)
     {

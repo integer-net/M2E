@@ -1,6 +1,6 @@
 <?php
-    $lastUpgradeDate = $this->installationVersionHistory[0]['value'];
-    $lastUpgradeVersion = $this->installationVersionHistory[0]['key'];
+    $lastUpgradeDate = isset($this->installationVersionHistory[0]['value']) ? $this->installationVersionHistory[0]['value'] : 'no data';
+    $lastUpgradeVersion = isset($this->installationVersionHistory[0]['key']) ? $this->installationVersionHistory[0]['key'] : 'no data';
 ?>
 
 <table class="form-list" cellspacing="0" cellpadding="0">

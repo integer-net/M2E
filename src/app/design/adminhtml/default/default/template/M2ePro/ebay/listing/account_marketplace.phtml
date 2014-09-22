@@ -84,12 +84,22 @@
                             </td>
                             <td class="value" style="min-width: 280px;">
                                 <span id="account_label"></span>
-                                <select id="account_id" name="account_id" class="required-entry" style="display: none"></select>
+                                <?php
+                                $accountSelectionDisabled = true;
+                                $accountId = $this->getRequest()->getParam('account_id');
+                                if($accountId) {
+                                    echo '<input type="hidden" name="account_id" value="'.$accountId.'" />';
+                                } else {
+                                    $accountId = $this->getData('account_id');
+                                    $accountSelectionDisabled = false;
+                                }
+                                ?>
+                                <select <?php if($accountSelectionDisabled) echo 'disabled="disabled"' ?> id="account_id" name="account_id" class="required-entry" style="display: none"></select>
                                 <p class="note">
                                     <span><?php echo Mage::helper('M2ePro')->__('This is the user name of your eBay account.'); ?></span>
                                 </p>
                             </td>
-                            <td class="value">
+                            <td class="value" <?php if($accountSelectionDisabled) echo 'style="visibility: hidden;"'?>>
                                 <?php echo $this->getChildHtml('add_account_button'); ?>
                             </td>
                         </tr>
@@ -103,11 +113,20 @@
                             </td>
 
                             <td class="value">
-
-                                <select class="required-entry" id="marketplace_id" name="marketplace_id">
+                                <?php
+                                    $marketplaceSelectionDisabled = true;
+                                    $marketplaceId = $this->getRequest()->getParam('marketplace_id');
+                                    if($marketplaceId) {
+                                        echo '<input type="hidden" name="marketplace_id" value="'.$marketplaceId.'" />';
+                                    } else {
+                                        $marketplaceId = $this->getData('marketplace_id');
+                                        $marketplaceSelectionDisabled = false;
+                                    }
+                                ?>
+                                <select <?php if($marketplaceSelectionDisabled) echo 'disabled="disabled"' ?> class="required-entry" id="marketplace_id" name="marketplace_id">
                                     <option style="display: none"></option>
                                     <?php foreach($this->getData('marketplaces') as $marketplace) { ?>
-                                        <option <?php  if ($this->getData('marketplace_id') == $marketplace['id']) echo 'selected'; ?> value="<?php echo (int)$marketplace['id']; ?>"><?php echo Mage::helper('M2ePro')->escapeHtml($marketplace['title']); ?></option>
+                                        <option <?php  if ($marketplaceId == $marketplace['id']) echo 'selected'; ?> value="<?php echo (int)$marketplace['id']; ?>"><?php echo Mage::helper('M2ePro')->escapeHtml($marketplace['title']); ?></option>
                                     <?php } ?>
                                 </select>
                                 <p class="note">
@@ -222,8 +241,8 @@
         };
 
         renderAccounts(function() {
-            <?php if ($this->getData('account_id')) {?>
-                $('account_id').setValue(<?php echo $this->getData('account_id'); ?>);
+            <?php if ($accountId) {?>
+                $('account_id').setValue(<?php echo $accountId; ?>);
             <?php } ?>
         });
 
@@ -266,7 +285,7 @@
 
         var synchronizeMarketplace = function(marketplaceId) {
 
-            new Ajax.Request('<?php echo $this->getUrl('*/adminhtml_ebay_general/isMarketplaceSynchronized'); ?>', {
+            new Ajax.Request('<?php echo $this->getUrl('*/adminhtml_ebay_general/isMarketplaceEnabledAndSynchronized'); ?>', {
                 method: 'get',
                 parameters: { marketplace_id: marketplaceId },
                 onSuccess: function(transport) {

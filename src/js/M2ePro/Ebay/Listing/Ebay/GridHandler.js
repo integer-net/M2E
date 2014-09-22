@@ -44,19 +44,6 @@ EbayListingEbayGridHandler = Class.create(EbayListingViewGridHandler, {
 
     //----------------------------------
 
-    prepareActions: function($super)
-    {
-        $super();
-        this.movingHandler = new ListingMovingHandler(this);
-
-        this.actions = Object.extend(this.actions,{
-            movingAction: this.movingHandler.run.bind(this.movingHandler)
-        });
-
-    },
-
-    //----------------------------------
-
     getLogViewUrl: function(rowId)
     {
         var temp = this.getProductIdByRowId(rowId);

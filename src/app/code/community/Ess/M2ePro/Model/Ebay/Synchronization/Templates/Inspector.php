@@ -55,6 +55,11 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
         ) {
             return false;
         }
+
+        if ($listingProduct->isLockedObject(NULL) ||
+            $listingProduct->isLockedObject('in_action')) {
+            return false;
+        }
         //--------------------
 
         /* @var $ebaySynchronizationTemplate Ess_M2ePro_Model_Ebay_Template_Synchronization */
@@ -116,14 +121,43 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
             }
         }
 
-        if($ebaySynchronizationTemplate->isListWhenQtyHasValue()) {
+        if($ebaySynchronizationTemplate->isListWhenQtyMagentoHasValue()) {
 
             $result = false;
             $productQty = (int)$listingProduct->getMagentoProduct()->getQty(true);
 
-            $typeQty = (int)$ebaySynchronizationTemplate->getListWhenQtyHasValueType();
-            $minQty = (int)$ebaySynchronizationTemplate->getListWhenQtyHasValueMin();
-            $maxQty = (int)$ebaySynchronizationTemplate->getListWhenQtyHasValueMax();
+            $typeQty = (int)$ebaySynchronizationTemplate->getListWhenQtyMagentoHasValueType();
+            $minQty = (int)$ebaySynchronizationTemplate->getListWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$ebaySynchronizationTemplate->getListWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_QTY_LESS &&
+                $productQty <= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_QTY_MORE &&
+                $productQty >= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                $result = true;
+            }
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        if($ebaySynchronizationTemplate->isListWhenQtyCalculatedHasValue()) {
+
+            $result = false;
+            $productQty = (int)$listingProduct->getChildObject()->getQtyTotal();
+
+            $typeQty = (int)$ebaySynchronizationTemplate->getListWhenQtyCalculatedHasValueType();
+            $minQty = (int)$ebaySynchronizationTemplate->getListWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$ebaySynchronizationTemplate->getListWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::LIST_QTY_LESS &&
                 $productQty <= $minQty) {
@@ -178,6 +212,11 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                         $tempActionAndParams['action'],
                         $listingProduct->isHidden() ? $tempActionAndParams['params'] : array())
         ) {
+            return false;
+        }
+
+        if ($listingProduct->isLockedObject(NULL) ||
+            $listingProduct->isLockedObject('in_action')) {
             return false;
         }
         //--------------------
@@ -247,14 +286,43 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
             }
         }
 
-        if($ebaySynchronizationTemplate->isRelistWhenQtyHasValue()) {
+        if($ebaySynchronizationTemplate->isRelistWhenQtyMagentoHasValue()) {
 
             $result = false;
             $productQty = (int)$listingProduct->getMagentoProduct()->getQty(true);
 
-            $typeQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyHasValueType();
-            $minQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyHasValueMin();
-            $maxQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyHasValueMax();
+            $typeQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyMagentoHasValueType();
+            $minQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::RELIST_QTY_LESS &&
+                $productQty <= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::RELIST_QTY_MORE &&
+                $productQty >= $minQty) {
+                $result = true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::RELIST_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                $result = true;
+            }
+
+            if (!$result) {
+                return false;
+            }
+        }
+
+        if($ebaySynchronizationTemplate->isRelistWhenQtyCalculatedHasValue()) {
+
+            $result = false;
+            $productQty = (int)$listingProduct->getChildObject()->getQtyTotal();
+
+            $typeQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyCalculatedHasValueType();
+            $minQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$ebaySynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::RELIST_QTY_LESS &&
                 $productQty <= $minQty) {
@@ -311,6 +379,11 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
         ) {
             return false;
         }
+
+        if ($listingProduct->isLockedObject(NULL) ||
+            $listingProduct->isLockedObject('in_action')) {
+            return false;
+        }
         //--------------------
 
         /* @var $ebaySynchronizationTemplate Ess_M2ePro_Model_Ebay_Template_Synchronization */
@@ -361,13 +434,37 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
             }
         }
 
-        if ($ebaySynchronizationTemplate->isStopWhenQtyHasValue()) {
+        if ($ebaySynchronizationTemplate->isStopWhenQtyMagentoHasValue()) {
 
             $productQty = (int)$listingProduct->getMagentoProduct()->getQty(true);
 
-            $typeQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyHasValueType();
-            $minQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyHasValueMin();
-            $maxQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyHasValueMax();
+            $typeQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyMagentoHasValueType();
+            $minQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyMagentoHasValueMin();
+            $maxQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyMagentoHasValueMax();
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_LESS &&
+                $productQty <= $minQty) {
+                return true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_MORE &&
+                $productQty >= $minQty) {
+                return true;
+            }
+
+            if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN &&
+                $productQty >= $minQty && $productQty <= $maxQty) {
+                return true;
+            }
+        }
+
+        if ($ebaySynchronizationTemplate->isStopWhenQtyCalculatedHasValue()) {
+
+            $productQty = (int)$listingProduct->getChildObject()->getQtyTotal();
+
+            $typeQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyCalculatedHasValueType();
+            $minQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyCalculatedHasValueMin();
+            $maxQty = (int)$ebaySynchronizationTemplate->getStopWhenQtyCalculatedHasValueMax();
 
             if ($typeQty == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_LESS &&
                 $productQty <= $minQty) {
@@ -422,6 +519,11 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
             Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
             $actionParams)
         ) {
+            return false;
+        }
+
+        if ($listingProduct->isLockedObject(NULL) ||
+            $listingProduct->isLockedObject('in_action')) {
             return false;
         }
         //--------------------
@@ -536,6 +638,11 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
             Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
             $actionParams)
         ) {
+            return false;
+        }
+
+        if ($listingProduct->isLockedObject(NULL) ||
+            $listingProduct->isLockedObject('in_action')) {
             return false;
         }
         //--------------------

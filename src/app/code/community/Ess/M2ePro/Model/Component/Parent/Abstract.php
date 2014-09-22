@@ -71,6 +71,10 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
             $tempMode = $this->getComponentMode();
         }
 
+        if (!$tempMode) {
+            throw new LogicException('Component mode is not defined.');
+        }
+
         $modelName = str_replace('M2ePro/',ucwords($tempMode).'_',$this->_resourceName);
         $this->childObject = Mage::helper('M2ePro')->getModel($modelName);
 
