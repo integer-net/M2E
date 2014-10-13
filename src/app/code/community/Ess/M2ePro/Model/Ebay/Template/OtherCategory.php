@@ -4,6 +4,9 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * @method Ess_M2ePro_Model_Mysql4_Ebay_Template_OtherCategory getResource()
+ */
 class Ess_M2ePro_Model_Ebay_Template_OtherCategory extends Ess_M2ePro_Model_Component_Abstract
 {
     // ########################################
@@ -248,16 +251,31 @@ class Ess_M2ePro_Model_Ebay_Template_OtherCategory extends Ess_M2ePro_Model_Comp
 
     // #######################################
 
-    public function getAffectedListingsProducts($asObjects = false)
+    /**
+     * @param bool|array $asArrays
+     * @return array
+     */
+    public function getAffectedListingsProducts($asArrays = true)
     {
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $collection->addFieldToFilter('template_other_category_id', $this->getId());
-        return $asObjects ? (array)$collection->getItems() : (array)$collection->getData();
+
+        if ($asArrays === false) {
+            return (array)$collection->getItems();
+        }
+
+        if (is_array($asArrays) && !empty($asArrays)) {
+            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+            $collection->getSelect()->columns($asArrays);
+        }
+
+        return (array)$collection->getData();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getAffectedListingsProducts(false);
+        $neededColumns = array('id');
+        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
 
         if (!$listingsProducts) {
             return;

@@ -8,6 +8,14 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
 {
     //#############################################
 
+    public function preDispatch()
+    {
+        $this->getLayout()->setArea('frontend');
+        parent::preDispatch();
+    }
+
+    //#############################################
+
     public function indexAction()
     {
         $this->closeConnection();

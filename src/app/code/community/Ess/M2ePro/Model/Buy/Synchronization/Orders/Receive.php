@@ -62,7 +62,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive
         }
 
         $iteration = 0;
-        $percentsForOneStep = $this->getPercentsInterval() / count($permittedAccounts);
+        $percentsForOneAccount = $this->getPercentsInterval() / count($permittedAccounts);
 
         foreach ($permittedAccounts as $account) {
 
@@ -97,7 +97,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive
             // The "Receive" action for Rakuten.com account: "%account_title%" is finished. Please wait...
             $status = 'The "Receive" action for Rakuten.com account: "%account_title%" is finished. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
-            $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
+            $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneAccount);
             $this->getActualLockItem()->activate();
             // ----------------------------------------------------------
 

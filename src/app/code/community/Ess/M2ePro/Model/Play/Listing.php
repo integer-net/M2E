@@ -6,6 +6,7 @@
 
 /**
  * @method Ess_M2ePro_Model_Listing getParentObject()
+ * @method Ess_M2ePro_Model_Mysql4_Play_Listing getResource()
  */
 class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Play_Abstract
 {
@@ -622,9 +623,31 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
 
     // ########################################
 
+    /**
+     * @param bool|array $asArrays
+     * @return array
+     */
+    public function getAffectedListingsProducts($asArrays = true)
+    {
+        $listingProductCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('listing_id', $this->getId());
+
+        if ($asArrays === false) {
+            return (array)$listingProductCollection->getItems();
+        }
+
+        if (is_array($asArrays) && !empty($asArrays)) {
+            $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+            $listingProductCollection->getSelect()->columns($asArrays);
+        }
+
+        return (array)$listingProductCollection->getData();
+    }
+
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getProducts(false);
+        $neededColumns = array('id', 'synch_status', 'synch_reasons');
+        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
 
         if (!$listingsProducts) {
             return;

@@ -54,7 +54,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_BaseController
                 exit($exception->getMessage());
             } else {
 
-                if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+                if (Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
                     throw $exception;
                 } else {
 

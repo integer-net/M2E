@@ -146,6 +146,18 @@
                 .observe('change', EbayTemplateShippingHandlerObj.rateTableModeChange);
         }
 
+        EbayTemplateShippingHandlerObj.prepareMeasurementObservers('local');
+
+        $('dispatch_time')
+            .observe('change', EbayTemplateShippingHandlerObj.dispatchTimeChange)
+            .simulate('change');
+
+        if ($('click_and_collect_mode')) {
+            $('click_and_collect_mode')
+                .observe('change', EbayTemplateShippingHandlerObj.clickAndCollectModeChange)
+                .simulate('change');
+        }
+
         if ($('cross_border_trade')) {
             $('cross_border_trade')
                 .observe('change', EbayTemplateShippingHandlerObj.crossBorderTradeChange)
@@ -512,6 +524,28 @@
                         </p>
                     </td>
                 </tr>
+
+                <?php if ($showAdvancedMode && $this->canDisplayClickAndCollectOption()): ?>
+                    <tr id="click_and_collect_mode_tr" class="local-shipping-tr">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Click And Collect'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="click_and_collect_mode" name="shipping[click_and_collect_mode]">
+                                <option value="0" <?php if (!$formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1" <?php if ($formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span>
+                                    <?php echo Mage::helper('M2ePro')->__(
+                                        'Click & Collect at Argos enables your buyers to collect items at a time that suits them from over 650 Argos stores across the UK.
+                                         <br/>For more details please read <a href="http://pages.ebay.co.uk/clickandcollect/" target="_blank">this documentation</a>.'
+                                    ) ;?>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
 
                 <tr id="local_handling_cost_cv_tr" class="local-shipping-tr">
                     <td class="label">
@@ -978,7 +1012,7 @@
                     <input type="hidden" id="package_size_value" name="shipping[package_size_value]" value="<?php echo $formData['package_size_value']; ?>">
                     <input type="hidden" id="package_size_attribute" name="shipping[package_size_attribute]" value="<?php echo $formData['package_size_attribute']; ?>">
 
-                    <tr class="visible-for-calculated-by-default">
+                    <tr id="package_size_tr" class="visible-for-calculated-by-default">
                         <td class="label">
                             <label for="package_size"><?php echo Mage::helper('M2ePro')->__('Package Size Source'); ?>:</label>
                         </td>
@@ -1007,13 +1041,13 @@
                         </td>
                     </tr>
 
-                    <tr id="dimensions_tr" class="visible-for-calculated-by-default">
+                    <tr id="dimensions_tr" class="visible-for-calculated-by-default visible-for-flat-by-default">
                         <td class="label">
                             <label for="dimension_mode"><?php echo Mage::helper('M2ePro')->__('Dimension Source'); ?>:</label>
                         </td>
                         <td class="value">
                             <select id="dimension_mode" name="shipping[dimension_mode]" class="select">
-                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::DIMENSION_NONE; ?>"
+                                <option id="dimension_mode_none" value="<?php echo Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::DIMENSION_NONE; ?>"
                                         <?php if ($formData['dimension_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::DIMENSION_NONE): ?>selected="selected"<?php endif; ?> >
                                     <?php echo Mage::helper('M2ePro')->__('None'); ?>
                                 </option>

@@ -371,7 +371,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
         $result = array();
         foreach ($collection['items'] as $item) {
 
-            $codeHash = "{$item['group']}#{$item['key']}";
+            $codeHash = strtolower($item['group']).'#'.strtolower($item['key']);
             $result[$codeHash] = array(
                 'group'  => $item['group'],
                 'key'    => $item['key'],

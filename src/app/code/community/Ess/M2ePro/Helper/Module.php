@@ -16,6 +16,8 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     const WIZARD_MIGRATION_NICK = 'migrationToV6';
 
+    const DEVELOPMENT_MODE_COOKIE_KEY = 'm2epro_development_mode';
+
     // ########################################
 
     /**
@@ -66,7 +68,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '7197';
+        $revision = '7322';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -278,6 +280,36 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         }
 
         return $directories;
+    }
+
+    // ########################################
+
+    public function isDevelopmentMode()
+    {
+        return Mage::app()->getCookie()->get(self::DEVELOPMENT_MODE_COOKIE_KEY);
+    }
+
+    public function isProductionMode()
+    {
+        return !$this->isDevelopmentMode();
+    }
+
+    public function setDevelopmentModeMode($value)
+    {
+        $value ? Mage::app()->getCookie()->set(self::DEVELOPMENT_MODE_COOKIE_KEY, 'true', 60*60*24*31)
+               : Mage::app()->getCookie()->set(self::DEVELOPMENT_MODE_COOKIE_KEY, '', 0);
+    }
+
+    // ----------------------------------------
+
+    public function isDevelopmentEnvironment()
+    {
+        return (bool)getenv('DEVELOPMENT_ENV');
+    }
+
+    public function isProductionEnvironment()
+    {
+        return !$this->isDevelopmentEnvironment();
     }
 
     // ########################################

@@ -307,6 +307,20 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
             ->setData($warehouseAddress);
     }
 
+    public function isUseClickAndCollect()
+    {
+        $clickEndCollectDetails = $this->getClickAndCollectDetails();
+        return !empty($clickEndCollectDetails);
+    }
+
+    public function getClickAndCollectDetails()
+    {
+        $shippingDetails = $this->getShippingDetails();
+
+        return isset($shippingDetails['click_and_collect_details'])
+            ? $shippingDetails['click_and_collect_details'] : array();
+    }
+
     // ----------------------------------------------------------
 
     public function getPaymentDetails()
@@ -728,6 +742,11 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     public function canUpdatePaymentStatus()
     {
+        // ebay restriction
+        if (stripos($this->getPaymentMethod(), 'paisa') !== false) {
+            return false;
+        }
+
         return !$this->isPaymentCompleted() && !$this->isPaymentStatusUnknown();
     }
 
@@ -744,6 +763,11 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
     public function canUpdateShippingStatus(array $trackingDetails = array())
     {
         if (!$this->isPaymentCompleted() || $this->isShippingStatusUnknown()) {
+            return false;
+        }
+
+        // ebay restriction
+        if (stripos($this->getPaymentMethod(), 'paisa') !== false) {
             return false;
         }
 
@@ -768,6 +792,9 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
             $params['carrier_code'] = Mage::helper('M2ePro/Component_Ebay')->getCarrierTitle(
                 $trackingDetails['carrier_code'], $trackingDetails['carrier_title']
             );
+
+            // remove unsupported by eBay symbols
+            $params['carrier_code'] = str_replace(array('\'', '"', '+', '(', ')'), array(), $params['carrier_code']);
             // -------------
         }
 

@@ -103,9 +103,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
             return array();
         }
 
-        return array(
+        $data = array(
             'qty' => $this->getEbayListingProduct()->getQty()
         );
+
+        return $data;
     }
 
     public function getPriceData()

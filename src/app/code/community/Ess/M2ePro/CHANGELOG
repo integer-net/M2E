@@ -1,20 +1,38 @@
+* 6.2.1 (r7322) (11/10/2014)
+
+* Added: [eBay] Ability to use Strike-Through Pricing for eBay Motors site
+* Added: [eBay] Ability to use Click And Collect shipping feature for UK site
+* Added: [eBay] Ability to use Extended Holiday Returns for US, CA, UK, DE and AU sites
+* Improvement: Performance was increased for Magento Product saving / Import tools (if there are many variation products)
+* Improvement: [eBay] View Mode "Translation" is not shown if there were no any translations of products data
+* Improvement: [eBay] Warning message if selected store view is not eligible for using Translation service
+* Improvement: [Amazon / Rakuten.com / Play.com] Account can not be changed in Edit Listing Settings
+* Fix: Trying to get property of non-object in app/code/core/Mage/Core/Model/Config.php (null Area)
+* Fix: "Track Direct Database Changes" feature did not work properly if there were many changes at the same time
+* Fix: Memory leak if Listing (with big amount of products) or Policy/Template (many usages) settings are saved
+* Fix: [eBay] Orders were not downloaded if the last downloading was more than 30 days back
+* Fix: [eBay] Shipping services were not added in shipping policy if Prototype library version < 1.7
+* Fix: [Amazon] EAN was not recognized as valid identifier if it starts from "978"
+* Fix: [Amazon] Wrong URL of ASIN link in search items grid (amazon.com link instead of correct marketplace link)
+* Removed: [eBay] Updating of shipping and payment statuses for orders with "Paisa Pay" payment method (eBay restriction)
+
 * 6.2.0 (r7197) (15/09/2014)
 
 * Added: [eBay] Global Shipping Program functionality for UK eBay site
 * Added: [eBay] "Sell On Another eBay Site" feature for selling existing items on another eBay Site
 * Added: [eBay] Ability to translate products information for selling on another eBay Site
 * Improvement: [eBay] Attempt to reduce the length of eBay variation options values if they are too long
-* Fix: synchronization stuck if a multiple buffering was enabled (ob_get_level() > 1)
+* Fix: Synchronization stuck if a multiple buffering was enabled (ob_get_level() > 1)
 * Fix: Notice: ob_end_flush(): failed to delete buffer zlib output compression
-* Fix: wrong mapping of 3rd Party products even if Mapping Option is disabled
+* Fix: Wrong mapping of 3rd Party products even if Mapping Option is disabled
 * Fix: [eBay] State was always required during editing shipping address on M2ePro order page
-* Fix: [eBay] javascript errors on the edit page of shipping policy, on Prototype lib version < 1.7
+* Fix: [eBay] Javascript errors on the edit page of shipping policy, on Prototype lib version < 1.7
 
 * 6.1.9.1 (r6933) (15/08/2014) [Custom Release]
 
 * Added: Ability to set QTY rules in Synchronization template based on calculated value by Selling Format Template
-* Fix: synchronization failed during cron working (Deleted Products)
-* Fix: [eBay] incorrect variations list order for configurable magento product on eBay item page
+* Fix: Synchronization failed during cron working (Deleted Products)
+* Fix: [eBay] Incorrect variations list order for configurable magento product on eBay item page
 
 * 6.1.9 (r6919) (14/08/2014)
 
@@ -28,23 +46,23 @@
 * Improvement: [eBay] Allow to remove sandbox account with active listings and products
 * Improvement: [Amazon] Marketplace cannot be changed for existing accounts
 * Fix: Use Admin (Default) Store View when cron service is working
-* Fix: big amount of wrong messages in Listings and 3rd Party Listings logs
+* Fix: Big amount of wrong messages in Listings and 3rd Party Listings logs
 * Fix: Full revise of product data was performed sometimes instead of revise only one certain criteria
-* Fix: [eBay] wrong calculating of configurable variations (incorrect set of options)
+* Fix: [eBay] Wrong calculating of configurable variations (incorrect set of options)
 * Fix: [eBay] The value <%value%> of type <EAN>/<UPC>/etc. does not exist in our Catalogue.
-* Fix: [Amazon / Rakuten.com / Play.com] it was not possible to move the 3rd party items into M2ePro listings manually
+* Fix: [Amazon / Rakuten.com / Play.com] It was not possible to move the 3rd party items into M2ePro listings manually
 * Fix: [Rakuten.com] Notice 'Undefined index: next_part' in some cases during 3rd party items synchronization
 * Removed: [Amazon / Rakuten.com / Play.com] Wrong types of log records in the grid filters
 
 * 6.1.8 (r6757) (01/08/2014)
 
-* Added: [eBay] ability to use GTIN and Brand/MPN as eBay Catalog Identifiers in description policy
-* Added: [eBay] ability to set partial data import from eBay catalog (description and photo)
-* Added: [eBay] ability to not list product if product not found in eBay Catalog
-* Fix: [eBay] trim column was empty already in eBay parts compatibility grid (ePIDs list)
-* Fix: [eBay] automatic relist action is not performed when "Out Of Stock Control" option is enabled
-* Fix: [eBay] fatal error "call getData() of non object" during order synchronization
-* Fix: [Amazon] fatal error "call undefined function getEbayOrder()" during order creation
+* Added: [eBay] Ability to use GTIN and Brand/MPN as eBay Catalog Identifiers in description policy
+* Added: [eBay] Ability to set partial data import from eBay catalog (description and photo)
+* Added: [eBay] Ability to not list product if product not found in eBay Catalog
+* Fix: [eBay] Trim column was empty already in eBay parts compatibility grid (ePIDs list)
+* Fix: [eBay] Automatic relist action is not performed when "Out Of Stock Control" option is enabled
+* Fix: [eBay] Fatal error "call getData() of non object" during order synchronization
+* Fix: [Amazon] Fatal error "call undefined function getEbayOrder()" during order creation
 
 * 6.1.7 (r6732) (29/07/2014)
 

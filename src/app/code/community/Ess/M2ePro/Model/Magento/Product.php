@@ -610,7 +610,7 @@ class Ess_M2ePro_Model_Magento_Product
             '/product/force_qty/','mode'
         );
 
-        if($forceQtyMode == 0){
+        if ($forceQtyMode == 0) {
             return $qty;
         }
 
@@ -619,13 +619,13 @@ class Ess_M2ePro_Model_Magento_Product
         );
 
         $manageStockGlobal = Mage::getStoreConfigFlag('cataloginventory/item_options/manage_stock');
-        if(($useConfigManageStock && !$manageStockGlobal) || (!$useConfigManageStock && !$manageStock)){
+        if (($useConfigManageStock && !$manageStockGlobal) || (!$useConfigManageStock && !$manageStock)) {
             return $forceQtyValue;
         }
 
         $backOrdersGlobal = Mage::getStoreConfig('cataloginventory/item_options/backorders');
-        if(($useConfigBackorders && $backOrdersGlobal != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO) ||
-           (!$useConfigBackorders && $backorders != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO)){
+        if (($useConfigBackorders && $backOrdersGlobal != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO) ||
+           (!$useConfigBackorders && $backorders != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO)) {
             if($forceQtyValue > $qty){
                 return $forceQtyValue;
             }

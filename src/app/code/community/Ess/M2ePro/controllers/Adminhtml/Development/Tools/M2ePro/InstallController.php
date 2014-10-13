@@ -288,21 +288,20 @@ HTML;
                 );
 
                 $diffData = isset($resultRow['info']['diff_data']) ? $resultRow['info']['diff_data'] : array();
-                $confirmFunc = "return confirm('Be attentive. The data will not migrated.');";
 
                 if (empty($resultRow['info']['current_data']) ||
                     (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
 
                     $urlParams['mode'] = 'properties';
                     $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                    $actionsHtml .= "<a onclick=\"{$confirmFunc}\" href=\"{$url}\">Fix Properties</a>";
+                    $actionsHtml .= "<a href=\"{$url}\">Fix Properties</a>";
                 }
 
                 if (isset($resultRow['info']['diff_data']) && isset($diffData['key'])) {
 
                     $urlParams['mode'] = 'index';
                     $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                    $actionsHtml .= "<a onclick=\"{$confirmFunc}\" href=\"{$url}\">Fix Index</a>";
+                    $actionsHtml .= "<a href=\"{$url}\">Fix Index</a>";
                 }
 
                 $html .= <<<HTML

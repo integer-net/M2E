@@ -236,6 +236,13 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
         return $options;
     }
 
+    // ----------------------------------------
+
+    public function getImagesHash(array $images)
+    {
+        return sha1(json_encode($images)).'#'.date('dmY');
+    }
+
     // ########################################
 
     public function getTranslationServices()

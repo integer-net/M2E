@@ -57,7 +57,7 @@ final class Ess_M2ePro_Model_Cron_Type_Magento extends Ess_M2ePro_Model_Cron_Typ
 
     private function distributeLoadIfNeed()
     {
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             return;
         }
 

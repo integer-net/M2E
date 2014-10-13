@@ -67,7 +67,7 @@ class Ess_M2ePro_Helper_Module_Wizard extends Mage_Core_Helper_Abstract
 
     private function getConfigValue($nick, $key)
     {
-        Mage::helper('M2ePro/Magento')->isDeveloper() && $this->loadCache();
+        Mage::helper('M2ePro/Module')->isDevelopmentEnvironment() && $this->loadCache();
 
         if (!is_null($this->cache)) {
             return $this->cache[$nick][$key];
@@ -85,7 +85,7 @@ class Ess_M2ePro_Helper_Module_Wizard extends Mage_Core_Helper_Abstract
 
     private function setConfigValue($nick, $key, $value)
     {
-        (is_null($this->cache) || Mage::helper('M2ePro/Magento')->isDeveloper()) && $this->loadCache();
+        (is_null($this->cache) || Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) && $this->loadCache();
 
         $this->cache[$nick][$key] = $value;
 
@@ -168,7 +168,7 @@ class Ess_M2ePro_Helper_Module_Wizard extends Mage_Core_Helper_Abstract
 
     private function getAllWizards($view)
     {
-        (is_null($this->cache) || Mage::helper('M2ePro/Magento')->isDeveloper()) && $this->loadCache();
+        (is_null($this->cache) || Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) && $this->loadCache();
 
         $wizards = array();
         foreach ($this->cache as $nick => $wizard) {

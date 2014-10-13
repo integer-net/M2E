@@ -150,6 +150,8 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
                 self.selectedProductsIds = [];
                 self.selectedCategoriesData = {};
 
+                $('excludeListPopup') && Windows.getWindow('excludeListPopup').destroy();
+
                 self.getGridObj().reload();
 
                 return true;

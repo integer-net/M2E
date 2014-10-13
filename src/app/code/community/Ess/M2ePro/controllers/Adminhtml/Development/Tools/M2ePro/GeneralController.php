@@ -326,6 +326,54 @@ HTML;
         $this->_redirect('*/*/showRemovedMagentoStores');
     }
 
+    // ----------------------------------------
+
+    /**
+     * @title "Repair Listing Product Structure"
+     * @description "Listing -> Listing Product -> Option -> Variation"
+     */
+    public function repairListingProductStructureAction()
+    {
+        ini_set('display_errors', 1);
+
+        foreach (array('Ebay', 'Amazon', 'Buy', 'Play') as $component) {
+
+            $collection = Mage::helper("M2ePro/Component_{$component}")
+                    ->getCollection('Listing_Product_Variation_Option');
+
+            $deletedOptions = $deletedVariations = $deletedProducts = 0;
+
+            /* @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
+            while($option = $collection->fetchItem()) {
+
+                try {
+                    $variation = $option->getListingProductVariation();
+                } catch (LogicException $e) {
+                    $option->deleteInstance() && $deletedOptions++;
+                    continue;
+                }
+
+                try {
+                    $listingProduct = $variation->getListingProduct();
+                } catch (LogicException $e) {
+                    $variation->deleteInstance() && $deletedVariations++;
+                    continue;
+                }
+
+                try {
+                    $listing = $listingProduct->getListing();
+                } catch (LogicException $e) {
+                    $listingProduct->deleteInstance() && $deletedProducts++;
+                    continue;
+                }
+            }
+
+            printf('Deleted options on %s count = %d <br>', $component, $deletedOptions);
+            printf('Deleted variations on %s count = %d <br>', $component, $deletedVariations);
+            printf('Deleted products on %s count = %d <br>', $component, $deletedProducts);
+        }
+    }
+
     //#############################################
 
     /**

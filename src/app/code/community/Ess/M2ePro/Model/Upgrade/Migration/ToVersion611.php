@@ -49,6 +49,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion611
             $this->processOrdersData();
 
         } catch (Exception $e) {
+            echo $e->getMessage();
             die;
         }
     }

@@ -80,13 +80,13 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
         }
 
         $actions[] = array(
-            'title' => Mage::helper('M2ePro')->__('Stop And Remove'),
+            'title' => Mage::helper('M2ePro')->__('Stop & Remove'),
             'handler' => $this->getColumn()->getData('js_handler').'.actionHandler.stopAndRemoveAction();'
         );
 
         if ($row->getData('component_mode') == Ess_M2ePro_Helper_Component_Amazon::NICK) {
             $actions[] = array(
-                'title' => Mage::helper('M2ePro')->__('Delete And Remove'),
+                'title' => Mage::helper('M2ePro')->__('Delete & Remove'),
                 'handler' => $this->getColumn()->getData('js_handler').'.actionHandler.deleteAndRemoveAction();'
             );
         }
@@ -103,8 +103,24 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
             $html .= '<a href="javascript: void(0);" onclick="'.$onclick.'">'.$action['title'].'</a>';
         }
 
-        $html .= '<br>' . $row->getData($this->getColumn()->getGrid()->getMassactionIdField());
+        // --------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_development_database/manageTable', array(
+                 'table' => Mage::getSingleton('core/resource')->getTableName('m2epro_listing_product'),
+                 'filter'=> base64_encode("id[from]={$id}&id[to]={$id}"))
+        );
+        $html .= '<br><a href="'.$url.'" target="_blank" style="color: green;">Parent Product</a>';
 
+        $componentMode = $row->getData('component_mode');
+        $url = $this->getUrl(
+            '*/adminhtml_development_database/manageTable', array(
+                'table' => Mage::getSingleton('core/resource')->getTableName("m2epro_{$componentMode}_listing_product"),
+                'filter'=> base64_encode("listing_product_id[from]={$id}&listing_product_id[to]={$id}"))
+        );
+        $html .= '<br><a href="'.$url.'" target="_blank" style="color: green;">Child Product</a>';
+        // --------------------------
+
+        $html .= "<br>{$id}";
         return $html;
     }
 }

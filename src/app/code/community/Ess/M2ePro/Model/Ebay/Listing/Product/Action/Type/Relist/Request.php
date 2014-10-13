@@ -71,13 +71,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Relist_Request
 
         $key = 'ebay_product_images_hash';
         if (!empty($additionalData[$key]) && isset($data['images']['images']) &&
-            $additionalData[$key] == sha1(json_encode($data['images']['images']))) {
+            $additionalData[$key] == Mage::helper('M2ePro/Component_Ebay')->getImagesHash($data['images']['images'])) {
             unset($data['images']['images']);
         }
 
         $key = 'ebay_product_variation_images_hash';
         if (!empty($additionalData[$key]) && isset($data['variation_image']) &&
-            $additionalData[$key] == sha1(json_encode($data['variation_image']))) {
+            $additionalData[$key] == Mage::helper('M2ePro/Component_Ebay')->getImagesHash($data['variation_image'])) {
             unset($data['variation_image']);
         }
 

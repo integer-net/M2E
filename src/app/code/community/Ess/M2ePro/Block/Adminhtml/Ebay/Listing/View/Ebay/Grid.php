@@ -98,6 +98,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             array(
                 'id' => 'id',
                 'status' => 'status',
+                'component_mode' => 'component_mode',
                 'additional_data' => 'additional_data'
             ),
             '{{table}}.listing_id='.(int)$listingData['id']
@@ -238,11 +239,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
 ////            'frame_callback' => array($this, 'callbackColumnAdviser')
 //        ));
 
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
             $this->addColumn('developer_action', array(
                 'header'    => Mage::helper('M2ePro')->__('Actions'),
                 'align'     => 'left',
-                'width'     => '100px',
+                'width'     => '150px',
                 'type'      => 'text',
                 'renderer'  => 'M2ePro/adminhtml_listing_view_grid_column_renderer_developerAction',
                 'index'     => 'value',
