@@ -18,6 +18,31 @@ class Ess_M2ePro_Model_Magento_Product
 
     const TAX_CLASS_ID_NONE = 0;
 
+    const FORCING_QTY_TYPE_MANAGE_STOCK_NO = 1;
+    const FORCING_QTY_TYPE_BACKORDERS = 2;
+
+    /**
+     *  $statistics = array(
+     *      'id' => array(
+     *         'store_id' => array(
+     *              'product_id' => array(
+     *                  'qty' => array(
+     *                      '1' => $qty,
+     *                      '2' => $qty,
+     *                  ),
+     *              ),
+     *              ...
+     *          ),
+     *          ...
+     *      ),
+     *      ...
+     *  )
+     */
+
+    public static $statistics = array();
+
+    private $statisticId;
+
     // ########################################
 
     private $_productId = 0;
@@ -620,6 +645,11 @@ class Ess_M2ePro_Model_Magento_Product
 
         $manageStockGlobal = Mage::getStoreConfigFlag('cataloginventory/item_options/manage_stock');
         if (($useConfigManageStock && !$manageStockGlobal) || (!$useConfigManageStock && !$manageStock)) {
+            self::$statistics[$this->getStatisticId()]
+                             [$this->getProductId()]
+                             [$this->getStoreId()]
+                             ['qty']
+                             [self::FORCING_QTY_TYPE_MANAGE_STOCK_NO] = $forceQtyValue;
             return $forceQtyValue;
         }
 
@@ -627,6 +657,11 @@ class Ess_M2ePro_Model_Magento_Product
         if (($useConfigBackorders && $backOrdersGlobal != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO) ||
            (!$useConfigBackorders && $backorders != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO)) {
             if($forceQtyValue > $qty){
+                self::$statistics[$this->getStatisticId()]
+                                 [$this->getProductId()]
+                                 [$this->getStoreId()]
+                                 ['qty']
+                                 [self::FORCING_QTY_TYPE_BACKORDERS] = $forceQtyValue;
                 return $forceQtyValue;
             }
         }
@@ -768,6 +803,19 @@ class Ess_M2ePro_Model_Magento_Product
         }
 
         return $minQty;
+    }
+
+    //-----------------------------------------
+
+    public function setStatisticId($id)
+    {
+        $this->statisticId = $id;
+        return $this;
+    }
+
+    public function getStatisticId()
+    {
+        return $this->statisticId;
     }
 
     // ########################################

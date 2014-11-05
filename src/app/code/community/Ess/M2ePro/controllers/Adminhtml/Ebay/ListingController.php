@@ -187,18 +187,6 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             return $this->_redirect('*/adminhtml_ebay_listing_productAdd',array('listing_id' => $id, 'step' => 2));
         }
 
-        // Check listing lock item
-        //----------------------------
-        $lockItem = Mage::getModel(
-            'M2ePro/Listing_LockItem', array('id' => $id, 'component' => Ess_M2ePro_Helper_Component_Ebay::NICK)
-        );
-        if ($lockItem->isExist()) {
-            $this->_getSession()->addWarning(
-                Mage::helper('M2ePro')->__('The listing is locked by another process. Please try again later.')
-            );
-        }
-        //----------------------------
-
         $this->_initAction();
 
         //------------------------------
@@ -529,51 +517,6 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         ));
     }
 
-    public function changeCompatibilityNoteAction()
-    {
-        $listingProductId = (int)$this->getRequest()->getPost('listing_product_id');
-        $identifier = $this->getRequest()->getPost('id');
-        $compatibilityType = $this->getRequest()->getPost('compatibility_type');
-        $note = $this->getRequest()->getPost('note');
-
-        /** @var Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility $compatibilityHelper */
-        $compatibilityHelper = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility');
-
-        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
-        $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getObject(
-            'Listing_Product', $listingProductId
-        );
-
-        /** @var Ess_M2ePro_Model_Magento_Product $magentoProduct */
-        $magentoProduct = $listingProduct->getMagentoProduct();
-
-        $compatibilityAttribute = $compatibilityHelper->getAttribute($compatibilityType);
-        $attributeValue = $magentoProduct->getAttributeValue($compatibilityAttribute);
-
-        $compatibilityData = $compatibilityHelper->parseAttributeValue($attributeValue);
-        if (empty($compatibilityData[$identifier])) {
-            return;
-        }
-
-        $compatibilityData[$identifier]['note'] = $note;
-
-        $resultAttributeValue = '';
-        foreach ($compatibilityData as $identifierData) {
-            $resultAttributeValue .= $identifierData['id'];
-
-            if (!empty($identifierData['note'])) {
-                $resultAttributeValue .= '|"' . $identifierData['note'] . '"';
-            }
-
-            $resultAttributeValue .= ',';
-        }
-
-        Mage::getResourceModel('M2ePro/Ebay_Listing')->updatePartsCompatibilityAttributesData(
-            $listingProduct->getListingId(), array($listingProductId),
-            $compatibilityAttribute, trim($resultAttributeValue, ','), true
-        );
-    }
-
     public function deleteIdsFromCompatibilityListAction()
     {
         $listingProductId = (int)$this->getRequest()->getPost('listing_product_id');
@@ -598,24 +541,56 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
 
         $idsForDelete = explode(',', $ids);
 
-        $resultAttributeValue = '';
         foreach ($compatibilityData as $identifierData) {
-            if (in_array($identifierData['id'], $idsForDelete)) {
+            if (!in_array($identifierData['id'], $idsForDelete)) {
                 continue;
             }
 
-            $resultAttributeValue .= $identifierData['id'];
-
-            if (!empty($identifierData['note'])) {
-                $resultAttributeValue .= '|"' . $identifierData['note'] . '"';
-            }
-
-            $resultAttributeValue .= ',';
+            unset($compatibilityData[$identifierData['id']]);
         }
 
         Mage::getResourceModel('M2ePro/Ebay_Listing')->updatePartsCompatibilityAttributesData(
             $listingProduct->getListingId(), array($listingProductId),
-            $compatibilityAttribute, trim($resultAttributeValue, ','), true
+            $compatibilityAttribute, $compatibilityHelper->buildAttributeValue($compatibilityData), true
+        );
+    }
+
+    public function setNoteToCompatibilityListAction()
+    {
+        $listingProductId = (int)$this->getRequest()->getPost('listing_product_id');
+        $ids = $this->getRequest()->getPost('ids');
+        $compatibilityType = $this->getRequest()->getPost('compatibility_type');
+        $note = $this->getRequest()->getPost('note');
+
+        /** @var Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility $compatibilityHelper */
+        $compatibilityHelper = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility');
+
+        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+        $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getObject(
+            'Listing_Product', $listingProductId
+        );
+
+        /** @var Ess_M2ePro_Model_Magento_Product $magentoProduct */
+        $magentoProduct = $listingProduct->getMagentoProduct();
+
+        $compatibilityAttribute = $compatibilityHelper->getAttribute($compatibilityType);
+        $attributeValue = $magentoProduct->getAttributeValue($compatibilityAttribute);
+
+        $compatibilityData = $compatibilityHelper->parseAttributeValue($attributeValue);
+
+        $idsForAdding = explode(',', $ids);
+
+        foreach ($compatibilityData as &$identifierData) {
+            if (!in_array($identifierData['id'], $idsForAdding)) {
+                continue;
+            }
+
+            $identifierData['note'] = $note;
+        }
+
+        Mage::getResourceModel('M2ePro/Ebay_Listing')->updatePartsCompatibilityAttributesData(
+            $listingProduct->getListingId(), array($listingProductId),
+            $compatibilityAttribute, $compatibilityHelper->buildAttributeValue($compatibilityData), true
         );
     }
 

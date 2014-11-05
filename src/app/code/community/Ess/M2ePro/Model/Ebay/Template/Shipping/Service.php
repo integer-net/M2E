@@ -224,6 +224,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
                 break;
         }
 
+        is_string($result) && $result = str_replace(',','.',$result);
+
         return round((float)$result,2);
     }
 
@@ -243,6 +245,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
                 break;
         }
 
+        is_string($result) && $result = str_replace(',','.',$result);
+
         return round((float)$result,2);
     }
 
@@ -261,6 +265,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
                 $result = $this->getMagentoProduct()->getAttributeValue($this->getCostSurchargeValue());
                 break;
         }
+
+        is_string($result) && $result = str_replace(',','.',$result);
 
         return round((float)$result,2);
     }

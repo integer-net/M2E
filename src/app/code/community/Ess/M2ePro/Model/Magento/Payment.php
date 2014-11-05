@@ -25,7 +25,8 @@ class Ess_M2ePro_Model_Magento_Payment extends Mage_Payment_Model_Method_Abstrac
             'payment_method'    => $data['payment_method'],
             'channel_order_id'  => $data['channel_order_id'],
             'channel_final_fee' => $data['channel_final_fee'],
-            'transactions'      => $data['transactions']
+            'transactions'      => $data['transactions'],
+            'tax_id'            => $data['tax_id'],
         );
 
         $this->getInfoInstance()->setAdditionalData(serialize($details));

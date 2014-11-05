@@ -282,26 +282,29 @@ HTML;
                 }
 
                 $actionsHtml = '';
-                $urlParams = array(
-                    'table_name'  => $tableName,
-                    'column_info' => json_encode($resultRow['info']['original_data'])
-                );
+                if (isset($resultRow['info'])) {
 
-                $diffData = isset($resultRow['info']['diff_data']) ? $resultRow['info']['diff_data'] : array();
+                    $urlParams = array(
+                        'table_name'  => $tableName,
+                        'column_info' => json_encode($resultRow['info']['original_data'])
+                    );
 
-                if (empty($resultRow['info']['current_data']) ||
-                    (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
+                    $diffData = isset($resultRow['info']['diff_data']) ? $resultRow['info']['diff_data'] : array();
 
-                    $urlParams['mode'] = 'properties';
-                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                    $actionsHtml .= "<a href=\"{$url}\">Fix Properties</a>";
-                }
+                    if (empty($resultRow['info']['current_data']) ||
+                        (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
 
-                if (isset($resultRow['info']['diff_data']) && isset($diffData['key'])) {
+                        $urlParams['mode'] = 'properties';
+                        $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                        $actionsHtml .= "<a href=\"{$url}\">Fix Properties</a>";
+                    }
 
-                    $urlParams['mode'] = 'index';
-                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                    $actionsHtml .= "<a href=\"{$url}\">Fix Index</a>";
+                    if (isset($resultRow['info']['diff_data']) && isset($diffData['key'])) {
+
+                        $urlParams['mode'] = 'index';
+                        $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                        $actionsHtml .= "<a href=\"{$url}\">Fix Index</a>";
+                    }
                 }
 
                 $html .= <<<HTML

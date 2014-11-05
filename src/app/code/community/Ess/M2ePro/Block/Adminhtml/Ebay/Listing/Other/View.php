@@ -136,9 +136,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
 
         $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
 
-        $checkLockListing = $this->getUrl('*/adminhtml_listing_other/checkLockListing', array('component'=>$component));
-        $lockListingNow = $this->getUrl('*/adminhtml_listing_other/lockListingNow', array('component'=>$component));
-        $unlockListingNow = $this->getUrl('*/adminhtml_listing_other/unlockListingNow', array('component'=>$component));
         $getErrorsSummary = $this->getUrl('*/adminhtml_listing_other/getErrorsSummary');
 
         $runReviseProducts = $this->getUrl('*/adminhtml_ebay_listing_other/runReviseProducts');
@@ -218,9 +215,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
     M2eProEbay.text = {};
 
     M2eProEbay.url.logViewUrl = '{$logViewUrl}';
-    M2eProEbay.url.checkLockListing = '{$checkLockListing}';
-    M2eProEbay.url.lockListingNow = '{$lockListingNow}';
-    M2eProEbay.url.unlockListingNow = '{$unlockListingNow}';
     M2eProEbay.url.getErrorsSummary = '{$getErrorsSummary}';
 
     M2eProEbay.url.runReviseProducts = '{$runReviseProducts}';

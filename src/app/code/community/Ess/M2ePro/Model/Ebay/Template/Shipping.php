@@ -513,7 +513,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
             'local_shipping_discount_mode' => 0,
             'local_shipping_discount_profile_id' => json_encode(array()),
             'local_shipping_rate_table_mode' => 0,
-            'click_and_collect_mode' => 0,
+            'click_and_collect_mode' => 1,
 
             'international_shipping_mode' => self::SHIPPING_TYPE_NO_INTERNATIONAL,
             'international_shipping_discount_mode' => 0,

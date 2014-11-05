@@ -207,4 +207,35 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_RequestData extends Ess_M2ePr
     }
 
     // ########################################
+
+    public function getImagesCount()
+    {
+        if (!$this->hasImagesData()) {
+            return 0;
+        }
+
+        $images = $this->getImagesData();
+        $images = isset($images['images']) ? $images['images'] : array();
+
+        return count($images);
+    }
+
+    public function getVariationsImagesCount()
+    {
+        if (!$this->hasVariationsImagesData()) {
+            return 0;
+        }
+
+        $images = $this->getVariationsImagesData();
+        $images = isset($images['images']) ? $images['images'] : array();
+
+        return count($images);
+    }
+
+    public function getTotalImagesCount()
+    {
+        return $this->getImagesCount() + $this->getVariationsImagesCount();
+    }
+
+    // ########################################
 }

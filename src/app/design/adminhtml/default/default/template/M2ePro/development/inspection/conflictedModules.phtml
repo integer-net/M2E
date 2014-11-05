@@ -34,10 +34,10 @@
                 <?php } ?>
             </td>
             <td class="value">
-                <?php echo $data['codePool']; ?>
+                <?php echo isset($data['codePool']) ? $data['codePool'] : '-'; ?>
             </td>
             <td class="value">
-                <?php echo $data['version']; ?>
+                <?php echo isset($data['version']) ? $data['version'] : '-'; ?>
             </td>
         </tr>
 

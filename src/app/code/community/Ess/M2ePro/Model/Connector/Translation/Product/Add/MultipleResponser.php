@@ -60,23 +60,15 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
 
         if ($fail) {
 
-            $tempListings = array();
             foreach ($this->listingsProducts as $listingProduct) {
 
                 $listingProduct->getChildObject()->setData(
                     'translation_status', Ess_M2ePro_Model_Ebay_Listing_Product::TRANSLATION_STATUS_PENDING
                 )->save();
 
-                /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-                if (isset($tempListings[$listingProduct->getListingId()])) {
-                    continue;
-                }
-
-                $this->addListingsLogsMessage($listingProduct,$message,
-                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
-
-                $tempListings[$listingProduct->getListingId()] = true;
+                $this->addListingsProductsLogsMessage($listingProduct,$message,
+                                                      Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
             }
         }
     }
@@ -87,21 +79,8 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
                                                       $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                                       $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
     {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,false);
-    }
+        $action = Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT;
 
-    protected function addListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                              $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                              $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
-    {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,true);
-    }
-
-    protected function addBaseListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                                  $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                                  $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM,
-                                                  $isListingMode = true)
-    {
         if ($this->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
             $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
         } else if ($this->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
@@ -113,19 +92,12 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
         $logModel = Mage::getModel('M2ePro/Listing_Log');
         $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
-        if ($isListingMode) {
-            $logModel->addListingMessage($listingProduct->getListingId() ,
-                $initiator ,
-                $this->getLogsActionId() ,
-                Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT , $text, $type , $priority);
-        } else {
-            $logModel->addProductMessage($listingProduct->getListingId() ,
-                $listingProduct->getProductId() ,
-                $listingProduct->getId() ,
-                $initiator ,
-                $this->getLogsActionId() ,
-                Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT , $text, $type , $priority);
-        }
+        $logModel->addProductMessage($listingProduct->getListingId() ,
+                                     $listingProduct->getProductId() ,
+                                     $listingProduct->getId() ,
+                                     $initiator ,
+                                     $this->getLogsActionId() ,
+                                     $action , $text, $type , $priority);
     }
 
     // ########################################
@@ -219,10 +191,13 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
             trim($descriptionTemplate->getData('description_template')) != '#ebay_translated_description#')) {
 
             $this->checkAndCreateMagentoAttributes(array(
-                'ebay_translated_title'       => 'Ebay Translated Title',
-                'ebay_translated_subtitle'    => 'Ebay Translated Subtitle',
+                'ebay_translated_title'    => 'Ebay Translated Title',
+                'ebay_translated_subtitle' => 'Ebay Translated Subtitle',
+            ), 'text');
+
+            $this->checkAndCreateMagentoAttributes(array(
                 'ebay_translated_description' => 'Ebay Translated Description',
-            ));
+            ), 'textarea');
 
             $this->checkAndCreateMagentoProductAttributes($listingProduct->getMagentoProduct(), array(
                 'ebay_translated_title',
@@ -379,11 +354,11 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
 
     // ########################################
 
-    private function checkAndCreateMagentoAttributes($attributes)
+    private function checkAndCreateMagentoAttributes($attributes, $frontendInput = 'text')
     {
         foreach ($attributes as $code => $label) {
             if (!Mage::helper('M2ePro/Magento_Attribute')->getByCode($code)) {
-                Mage::helper('M2ePro/Magento_Attribute')->create($code, array($label), 'text', 0);
+                Mage::helper('M2ePro/Magento_Attribute')->create($code, array($label), $frontendInput, 0);
             }
         }
         return true;

@@ -9,61 +9,6 @@ class Ess_M2ePro_Adminhtml_ListingController
 {
     //#############################################
 
-    public function checkLockListingAction()
-    {
-        $listingId = (int)$this->getRequest()->getParam('id');
-        $component = $this->getRequest()->getParam('component');
-
-        $lockItemParams = array(
-            'id' => $listingId,
-            'component' => $component
-        );
-
-        $lockItem = Mage::getModel('M2ePro/Listing_LockItem',$lockItemParams);
-
-        if ($lockItem->isExist()) {
-            return $this->getResponse()->setBody('locked');
-        }
-
-        return $this->getResponse()->setBody('unlocked');
-    }
-
-    public function lockListingNowAction()
-    {
-        $listingId = (int)$this->getRequest()->getParam('id');
-        $component = $this->getRequest()->getParam('component');
-
-        $lockItemParams = array(
-            'id' => $listingId,
-            'component' => $component
-        );
-
-        $lockItem = Mage::getModel('M2ePro/Listing_LockItem',$lockItemParams);
-
-        if (!$lockItem->isExist()) {
-            $lockItem->create();
-        }
-    }
-
-    public function unlockListingNowAction()
-    {
-        $listingId = (int)$this->getRequest()->getParam('id');
-        $component = $this->getRequest()->getParam('component');
-
-        $lockItemParams = array(
-            'id' => $listingId,
-            'component' => $component
-        );
-
-        $lockItem = Mage::getModel('M2ePro/Listing_LockItem',$lockItemParams);
-
-        if ($lockItem->isExist()) {
-            $lockItem->remove();
-        }
-    }
-
-    //#############################################
-
     public function clearLogAction()
     {
         $ids = $this->getRequestIds();

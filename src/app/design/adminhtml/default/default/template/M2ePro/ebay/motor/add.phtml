@@ -14,6 +14,8 @@
         $this->getUrl('*/adminhtml_ebay_configuration')
     );
 
+    $translations['Set Note'] = Mage::helper('M2ePro')->__('Set Note');
+
     // ->__('Please edit categories settings for selected products and select the compatibility attribute.')
     $text = 'Please edit categories settings for selected products and select the compatibility attribute.';
     $translations[$text] = Mage::helper('M2ePro')->__($text);
@@ -132,7 +134,7 @@
                         <label><?php echo Mage::helper('M2ePro')->__('Selected %identifier_title%', $idTitle) ?>:</label>
                     </td>
                     <td class="value" style="width: 100%; padding-right: 10px;">
-                        <input class="left-col-block input-text" style="width: 100%;" name="attribute_content" id="attribute_content">
+                        <input class="left-col-block input-text" style="width: 100%;" name="attribute_content" id="attribute_content" readonly>
                     </td>
                 </tr>
             </tbody>

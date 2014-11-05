@@ -307,7 +307,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
 
     public function getTableInfo($tableName)
     {
-        if (!in_array($tableName, $this->getMySqlTables())) {
+        if (!$this->isTableExists($tableName)) {
             return false;
         }
 

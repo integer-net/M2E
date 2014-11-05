@@ -102,7 +102,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             'international_shipping_mode',
             'international_shipping_discount_mode',
             'cross_border_trade',
-            'click_and_collect_mode',
         );
 
         foreach ($keys as $key) {
@@ -123,6 +122,10 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             $prepared['excluded_locations'] = $data['excluded_locations'];
         }
 
+        if (isset($data['click_and_collect_mode'])) {
+            $prepared['click_and_collect_mode'] = (int)$data['click_and_collect_mode'];
+        }
+
         $key = 'cash_on_delivery_cost';
         $prepared[$key] = (isset($data[$key]) && $data[$key] != '') ? $data[$key] : NULL;
 
@@ -134,7 +137,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             'international_shipping_mode',
             'international_shipping_discount_mode',
             'cross_border_trade',
-            'click_and_collect_mode',
         );
 
         foreach ($modes as $mode) {

@@ -68,7 +68,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '7322';
+        $revision = '7435';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -154,8 +154,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             'app/code/community/Ess/',
             'app/code/community/Ess/M2ePro/*',
 
-            // todo uncomment when translations will be available
-            //'app/locale/*/Ess_M2ePro.csv',
+            'app/locale/*/Ess_M2ePro.csv',
             'app/etc/modules/Ess_M2ePro.xml',
             'app/design/adminhtml/default/default/layout/M2ePro.xml',
 

@@ -84,7 +84,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
                 if (!is_null($listingProduct)) {
                     $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
                     'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                    'Reason: number of values for each option more than 30.'
+                    'Reason: number of values for each option more than 60.'
                     );
                 }
 

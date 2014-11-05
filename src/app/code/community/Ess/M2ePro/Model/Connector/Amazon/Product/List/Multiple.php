@@ -91,7 +91,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
             $listingProduct->setData('sku',$addingSku);
         }
 
-        $this->checkSkuExistance($listingProducts);
+        $this->checkSkuExistence($listingProducts);
 
         foreach ($listingProducts as $key => $listingProduct) {
 
@@ -174,6 +174,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
             $requestData['items'][] = $sendedData;
         }
+
+        $this->checkQtyWarnings();
 
         $this->addSkusToQueue($tempSkus);
 
@@ -523,7 +525,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
     // ########################################
 
-    private function checkSkuExistance($listingProducts)
+    private function checkSkuExistence($listingProducts)
     {
         $listingProductsPacks = array_chunk($listingProducts,20,true);
 

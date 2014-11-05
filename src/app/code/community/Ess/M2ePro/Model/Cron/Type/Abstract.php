@@ -21,7 +21,7 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
         $this->updateLastAccess();
 
         if (!$this->isPossibleToRun()) {
-            return false;
+            return true;
         }
 
         $this->updateLastRun();

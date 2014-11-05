@@ -789,9 +789,6 @@ HTML;
             'id'=>$listingData['id'],
             'back'=>$helper->makeBackUrlParam('*/adminhtml_ebay_listing/view',array('id'=>$listingData['id']))
         ));
-        $checkLockListing = $this->getUrl('*/adminhtml_listing/checkLockListing',array('component'=>$component));
-        $lockListingNow = $this->getUrl('*/adminhtml_listing/lockListingNow',array('component'=>$component));
-        $unlockListingNow = $this->getUrl('*/adminhtml_listing/unlockListingNow',array('component'=>$component));
         $getErrorsSummary = $this->getUrl('*/adminhtml_listing/getErrorsSummary');
 
         $runListProducts = $this->getUrl('*/adminhtml_ebay_listing/runListProducts');
@@ -903,9 +900,6 @@ HTML;
     M2ePro.productsIdsForList = '{$productsIdsForList}';
 
     M2ePro.url.logViewUrl = '{$logViewUrl}';
-    M2ePro.url.checkLockListing = '{$checkLockListing}';
-    M2ePro.url.lockListingNow = '{$lockListingNow}';
-    M2ePro.url.unlockListingNow = '{$unlockListingNow}';
     M2ePro.url.getErrorsSummary = '{$getErrorsSummary}';
 
     M2ePro.url.runListProducts = '{$runListProducts}';

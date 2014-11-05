@@ -107,6 +107,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
             'qty' => $this->getEbayListingProduct()->getQty()
         );
 
+        $this->checkQtyWarnings();
+
         return $data;
     }
 
@@ -233,4 +235,42 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
     }
 
     // ########################################
+
+    public function checkQtyWarnings()
+    {
+        $qtyMode = $this->getEbaySellingFormatTemplate()->getQtyMode();
+        if ($qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+            $qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) {
+
+            $listingProductId = $this->getListingProduct()->getId();
+            $productId = $this->getListingProduct()->getProductId();
+            $storeId = $this->getListingProduct()->getListing()->getStoreId();
+
+            if(!empty(Ess_M2ePro_Model_Magento_Product::$statistics[$listingProductId][$productId][$storeId]['qty'])) {
+
+                $qtys = Ess_M2ePro_Model_Magento_Product::$statistics[$listingProductId][$productId][$storeId]['qty'];
+                foreach ($qtys as $type => $override) {
+                    $this->addQtyWarnings($type);
+                }
+            }
+        }
+    }
+
+    public function addQtyWarnings($type)
+    {
+        if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_MANAGE_STOCK_NO) {
+        // M2ePro_TRANSLATIONS
+        // During the quantity calculation the settings in the "Manage Stock No" field were taken into consideration.
+            $this->addWarningMessage('During the quantity calculation the settings in the "Manage Stock No" '.
+                                     'field were taken into consideration.');
+        }
+
+        if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_BACKORDERS) {
+            // M2ePro_TRANSLATIONS
+            // During the quantity calculation the settings in the "Backorders" field were taken into consideration.
+            $this->addWarningMessage('During the quantity calculation the settings in the "Backorders" '.
+                                     'field were taken into consideration.');
+        }
+    }
+
 }

@@ -22,30 +22,13 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
         $('listing_container_errors_summary').hide();
 
         var self = this;
-        new Ajax.Request(M2ePro.url.get('adminhtml_listing_other/checkLock',{component: 'ebay'}),
-        {
-            method:'get',
-            onSuccess: function(transport)
-            {
-                if (transport.responseText == 'locked') {
-                    MagentoMessageObj.addError(self.options.text.listing_locked_message);
-                } else {
-                    new Ajax.Request(M2ePro.url.get('adminhtml_listing_other/lockNow',{component: 'ebay'}),
-                    {
-                        method:'get',
-                        onSuccess: function(transport)
-                        {
-                            ListingProgressBarObj.reset();
-                            ListingProgressBarObj.show(title);
-                            GridWrapperObj.lock();
-                            $('loading-mask').setStyle({visibility: 'hidden'});
 
-                            self.sendPartsOfProducts(selectedProductsParts,selectedProductsParts.length,url);
-                        }
-                    });
-                }
-            }
-        });
+        ListingProgressBarObj.reset();
+        ListingProgressBarObj.show(title);
+        GridWrapperObj.lock();
+        $('loading-mask').setStyle({visibility: 'hidden'});
+
+        self.sendPartsOfProducts(selectedProductsParts,selectedProductsParts.length,url);
     },
 
     sendPartsOfProducts : function(parts,totalPartsCount,url)
@@ -61,71 +44,64 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
             ListingProgressBarObj.setPercents(100,0);
             ListingProgressBarObj.setStatus(self.options.text.task_completed_message);
 
-            new Ajax.Request(M2ePro.url.get('adminhtml_listing_other/unlockNow',{component: 'ebay'}),
-            {
-                method:'get',
-                onSuccess: function(transport)
-                {
-                    var combineResult = 'success';
-                    for (var i=0;i<self.sendPartsResponses.length;i++) {
-                        if (self.sendPartsResponses[i].result != 'success' && self.sendPartsResponses[i].result != 'warning') {
-                            combineResult = 'error';
-                            break;
-                        }
-                        if (self.sendPartsResponses[i].result == 'warning') {
-                            combineResult = 'warning';
-                        }
-                    }
-
-                    if (combineResult == 'error') {
-
-                        var message = self.options.text.task_completed_error_message;
-                        message = message.replace("%task_title%", ListingProgressBarObj.getTitle());
-                        message = message.replace('%url%', self.options.url.logViewUrl);
-
-                        MagentoMessageObj.addError(message);
-
-                        var actionIds = '';
-                        for (var i=0;i<self.sendPartsResponses.length;i++) {
-                            if (actionIds != '') {
-                                actionIds += ',';
-                            }
-                            actionIds += self.sendPartsResponses[i].action_id;
-                        }
-
-                        new Ajax.Request( self.options.url.getErrorsSummary + 'action_ids/' + actionIds + '/' ,
-                        {
-                            method:'get',
-                            onSuccess: function(transportSummary)
-                            {
-                                $('listing_container_errors_summary').innerHTML = transportSummary.responseText;
-                                $('listing_container_errors_summary').show();
-                            }
-                        });
-
-                    } else if (combineResult == 'warning') {
-                        var message = self.options.text.task_completed_warning_message;
-                        message = message.replace('%task_title%', ListingProgressBarObj.getTitle());
-                        message = message.replace('%url%', self.options.url.logViewUrl);
-
-                        MagentoMessageObj.addWarning(message);
-                    } else {
-                        var message = self.options.text.task_completed_success_message;
-                        message = message.replace('%task_title%', ListingProgressBarObj.getTitle());
-
-                        MagentoMessageObj.addSuccess(message);
-                    }
-
-                    ListingProgressBarObj.hide();
-                    ListingProgressBarObj.reset();
-                    GridWrapperObj.unlock();
-                    $('loading-mask').setStyle({visibility: 'visible'});
-
-                    self.sendPartsResponses = new Array();
-
-                    self.gridHandler.unselectAllAndReload();
+            var combineResult = 'success';
+            for (var i=0;i<self.sendPartsResponses.length;i++) {
+                if (self.sendPartsResponses[i].result != 'success' && self.sendPartsResponses[i].result != 'warning') {
+                    combineResult = 'error';
+                    break;
                 }
-            });
+                if (self.sendPartsResponses[i].result == 'warning') {
+                    combineResult = 'warning';
+                }
+            }
+
+            if (combineResult == 'error') {
+
+                var message = self.options.text.task_completed_error_message;
+                message = message.replace("%task_title%", ListingProgressBarObj.getTitle());
+                message = message.replace('%url%', self.options.url.logViewUrl);
+
+                MagentoMessageObj.addError(message);
+
+                var actionIds = '';
+                for (var i=0;i<self.sendPartsResponses.length;i++) {
+                    if (actionIds != '') {
+                        actionIds += ',';
+                    }
+                    actionIds += self.sendPartsResponses[i].action_id;
+                }
+
+                new Ajax.Request( self.options.url.getErrorsSummary + 'action_ids/' + actionIds + '/' ,
+                    {
+                        method:'get',
+                        onSuccess: function(transportSummary)
+                        {
+                            $('listing_container_errors_summary').innerHTML = transportSummary.responseText;
+                            $('listing_container_errors_summary').show();
+                        }
+                    });
+
+            } else if (combineResult == 'warning') {
+                var message = self.options.text.task_completed_warning_message;
+                message = message.replace('%task_title%', ListingProgressBarObj.getTitle());
+                message = message.replace('%url%', self.options.url.logViewUrl);
+
+                MagentoMessageObj.addWarning(message);
+            } else {
+                var message = self.options.text.task_completed_success_message;
+                message = message.replace('%task_title%', ListingProgressBarObj.getTitle());
+
+                MagentoMessageObj.addSuccess(message);
+            }
+
+            ListingProgressBarObj.hide();
+            ListingProgressBarObj.reset();
+            GridWrapperObj.unlock();
+            $('loading-mask').setStyle({visibility: 'visible'});
+
+            self.sendPartsResponses = new Array();
+
+            self.gridHandler.unselectAllAndReload();
 
             return;
         }

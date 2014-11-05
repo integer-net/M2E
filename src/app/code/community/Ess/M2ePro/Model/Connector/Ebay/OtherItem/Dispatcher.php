@@ -69,31 +69,12 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
     {
         $results = array();
 
-        if (count($products) == 0) {
+        if (empty($products)) {
             return Mage::helper('M2ePro')->getMainStatus($results);
         }
 
         if (!class_exists($connectorNameSingle)) {
             return Mage::helper('M2ePro')->getMainStatus($results);
-        }
-
-        $needRemoveLockItem = false;
-
-        $lockItemParams = array('component' => Ess_M2ePro_Helper_Component_Ebay::NICK);
-        $lockItem = Mage::getModel('M2ePro/Listing_Other_LockItem',$lockItemParams);
-
-        if ($lockItem->isExist()) {
-            if (!isset($params['status_changer']) ||
-                $params['status_changer'] != Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
-                // M2ePro_TRANSLATIONS
-                // Other listings locked by other process.
-                throw new LogicException("Other listings locked by other process.");
-            }
-            $lockItem->activate();
-        } else {
-            $lockItem->create();
-            $lockItem->makeShutdownFunction();
-            $needRemoveLockItem = true;
         }
 
         try {
@@ -122,8 +103,6 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
 
             $results[] = Ess_M2ePro_Helper_Data::STATUS_ERROR;
         }
-
-        $needRemoveLockItem && $lockItem->isExist() && $lockItem->remove();
 
         return Mage::helper('M2ePro')->getMainStatus($results);
     }

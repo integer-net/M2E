@@ -22,7 +22,7 @@
 
     // removing ignored options for mode checking
     $ignoredOptions = array('country', 'postal_code', 'address', 'local_shipping_mode',
-                            'dispatch_time', 'international_shipping_mode', 'services');
+                            'dispatch_time', 'international_shipping_mode', 'services', 'excluded_locations');
 
     foreach($ignoredOptions as $val) {
         unset($defaultStrictSettingsForSimpleMode[$val]);
@@ -47,6 +47,9 @@
                 if(!empty($service['cost_surcharge_value'])) {
                     $showBlockedAdvancedMode = true;
                 }
+            }
+            if (!empty($formData['excluded_locations'])) {
+                $showBlockedAdvancedMode = true;
             }
         }
     }
@@ -528,18 +531,18 @@
                 <?php if ($showAdvancedMode && $this->canDisplayClickAndCollectOption()): ?>
                     <tr id="click_and_collect_mode_tr" class="local-shipping-tr">
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Click And Collect'); ?>:</label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Click And Collect Opt-out'); ?>:</label>
                         </td>
                         <td class="value" style="width: auto;">
                             <select id="click_and_collect_mode" name="shipping[click_and_collect_mode]">
-                                <option value="0" <?php if (!$formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
-                                <option value="1" <?php if ($formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                                <option value="0" <?php if (!$formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                                <option value="1" <?php if ($formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                             </select>
                             <p class="note">
                                 <span>
                                     <?php echo Mage::helper('M2ePro')->__(
                                         'Click & Collect at Argos enables your buyers to collect items at a time that suits them from over 650 Argos stores across the UK.
-                                         <br/>For more details please read <a href="http://pages.ebay.co.uk/clickandcollect/" target="_blank">this documentation</a>.'
+                                         <br/>For more details please read <a href="http://sellercentre.ebay.co.uk/click-and-collect" target="_blank">this documentation</a>.'
                                     ) ;?>
                                 </span>
                             </p>
@@ -1069,7 +1072,7 @@
                         </td>
                         <td class="value">
                                 <span id="dimension_width_attribute_span">
-                                    <select name="shipping[dimension_width_attribute]" id="dimension_width_attribute">
+                                    <select name="shipping[dimension_width_attribute]" id="dimension_width_attribute" class="M2ePro-required-when-visible">
                                         <option value="" class="empty-option"></option>
                                         <?php $attributeCode = 'dimension_width_attribute'; ?>
                                         <?php if (isset($missingAttributes[$attributeCode])): ?>
@@ -1084,7 +1087,7 @@
                                 </span>
                             x
                                 <span id="dimension_length_attribute_span">
-                                    <select name="shipping[dimension_length_attribute]" id="dimension_length_attribute">
+                                    <select name="shipping[dimension_length_attribute]" id="dimension_length_attribute" class="M2ePro-required-when-visible">
                                         <option value="" class="empty-option"></option>
                                         <?php $attributeCode = 'dimension_length_attribute'; ?>
                                         <?php if (isset($missingAttributes[$attributeCode])): ?>
@@ -1099,7 +1102,7 @@
                                 </span>
                             x
                                 <span id="dimension_depth_attribute_span">
-                                    <select name="shipping[dimension_depth_attribute]" id="dimension_depth_attribute">
+                                    <select name="shipping[dimension_depth_attribute]" id="dimension_depth_attribute" class="M2ePro-required-when-visible">
                                         <option value="" class="empty-option"></option>
                                         <?php $attributeCode = 'dimension_depth_attribute'; ?>
                                         <?php if (isset($missingAttributes[$attributeCode])): ?>

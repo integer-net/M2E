@@ -6,18 +6,18 @@
 
 class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker extends Ess_M2ePro_Model_Ebay_Listing_Action_Locker
 {
-    private $listingId = NULL;
+    private $listingProductId = NULL;
 
     // ########################################
 
-    public function setListingId($id)
+    public function setListingProductId($id)
     {
-        $this->listingId = (int)$id;
+        $this->listingProductId = (int)$id;
     }
 
-    public function getListingId()
+    public function getListingProductId()
     {
-        return $this->listingId;
+        return $this->listingProductId;
     }
 
     // ########################################
@@ -27,15 +27,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker extends Ess_M2ePro_Mod
      */
     protected function getLockItem()
     {
-        if (is_null($this->listingId)) {
-            throw new Exception('Listing ID must be specified.');
+        if (is_null($this->listingProductId)) {
+            throw new Exception('Listing product ID must be specified.');
         }
 
         if (is_null($this->lockItem)) {
-            $this->lockItem = Mage::getModel('M2ePro/Listing_LockItem', array(
-                'component' => Ess_M2ePro_Helper_Component_Ebay::NICK,
-                'id' => $this->listingId
-            ));
+            $this->lockItem = Mage::getModel('M2ePro/LockItem');
+            $this->lockItem->setNick(
+                Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$this->listingProductId
+            );
         }
 
         return $this->lockItem;

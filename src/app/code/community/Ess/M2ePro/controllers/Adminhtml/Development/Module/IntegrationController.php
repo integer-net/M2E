@@ -150,10 +150,9 @@ HTML;
 
     /**
      * @title "Reset eBay Images Hashes"
-     * @description "Clear eBay images hashes for listing product"
+     * @description "Clear eBay images hashes for listing products"
      * @prompt "Please enter Listing Product ID or `all` code for reset all products."
      * @prompt_var "listing_product_id"
-     * @new_line
      */
     public function resetEbayImagesHashesAction()
     {
@@ -175,6 +174,7 @@ HTML;
             return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
         }
 
+        $affected = 0;
         foreach ($listingProducts as $listingProduct) {
 
             $additionalData = $listingProduct->getAdditionalData();
@@ -187,11 +187,60 @@ HTML;
             unset($additionalData['ebay_product_images_hash'],
                   $additionalData['ebay_product_variation_images_hash']);
 
+            $affected++;
             $listingProduct->setData('additional_data', json_encode($additionalData))
                            ->save();
         }
 
-        $this->_getSession()->addSuccess('Successfully removed.');
+        $this->_getSession()->addSuccess("Successfully removed for {$affected} products.");
+        return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
+    }
+
+    /**
+     * @title "Set EPS Images Mode"
+     * @description "Set EPS Images Mode = true for listing products"
+     * @prompt "Please enter Listing Product ID or `all` code for all products."
+     * @prompt_var "listing_product_id"
+     * @new_line
+     */
+    public function setEpsImagesModeAction()
+    {
+        $listingProductId = $this->getRequest()->getParam('listing_product_id');
+
+        $listingProducts = array();
+        if (strtolower($listingProductId) == 'all') {
+
+            $listingProducts = Mage::getModel('M2ePro/Listing_Product')->getCollection()
+                ->addFieldToFilter('component_mode', 'ebay');
+        } else {
+
+            $listingProduct = Mage::getModel('M2ePro/Listing_Product')->load((int)$listingProductId);
+            $listingProduct && $listingProducts[] = $listingProduct;
+        }
+
+        if (empty($listingProducts)) {
+            $this->_getSession()->addError('Failed to load listing product.');
+            return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
+        }
+
+        $affected = 0;
+        foreach ($listingProducts as $listingProduct) {
+
+            $additionalData = $listingProduct->getAdditionalData();
+
+            if (!isset($additionalData['is_eps_ebay_images_mode']) ||
+                $additionalData['is_eps_ebay_images_mode'] == true) {
+                continue;
+            }
+
+            $additionalData['is_eps_ebay_images_mode'] = true;
+            $affected++;
+
+            $listingProduct->setData('additional_data', json_encode($additionalData))
+                           ->save();
+        }
+
+        $this->_getSession()->addSuccess("Successfully set for {$affected} products.");
         return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 

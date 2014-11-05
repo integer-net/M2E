@@ -175,7 +175,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
             $warningMessageReasons[] = Mage::helper('M2ePro')->__('Title');
             unset($data['title']);
         }
-        if (isset($data['subtitle']) && ($deleteByAuctionFlag || $deleteByFixedFlag)) {
+        if (isset($data['subtitle']) && $deleteByAuctionFlag) {
             $warningMessageReasons[] = Mage::helper('M2ePro')->__('Subtitle');
             unset($data['subtitle']);
         }
