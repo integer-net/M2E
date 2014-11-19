@@ -1,0 +1,13 @@
+<div id="<?php echo $this->getContainerId(); ?>" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Orders'); ?>">
+    <?php echo Mage::helper('M2ePro')->__(
+        'This page shows orders imported from eBay.<br/><br/>
+        Click the line with the order in the table below to <b>View Order Details</b> such as the eBay transaction details, buyer information, payment details and the order log.<br/><br/>
+        Filters are available to show orders for a specifc <b>eBay Marketplace</b> or <b>eBay Account</b> only.
+        You can also filter to <b>Show eBay orders without Magento orders</b>.
+        This is useful to show which eBay orders need further action from you.<br/><br>
+        <b>Note:</b> Magento Orders, Invoices, and Shipments are created automatically according to the eBay Accounts settings
+        for your eBay accounts found in %menu_label% > Configuration > Account Settings > [eBay account] > Configuration > Orders.',
+
+        Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()
+    ); ?>
+</div>

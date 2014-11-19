@@ -1,0 +1,317 @@
+<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Please ensure your personal information is correct'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+
+    <div class="clear" style="margin-bottom: 15px;"></div>
+
+    <div style="border: 1px solid #CCCCCC; float: left; padding: 10px 25px 10px 25px; font-size: 13px">
+
+        <table id="license_table" class="form-list" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr>
+                    <td class="label" style="width: 150px">
+                        <?php echo Mage::helper('M2ePro')->__('Email') ?>:
+                    </td>
+                    <td id="email" class="value" style="width: 200px">
+                        <?php echo Mage::helper('M2ePro')->__($this->getData('email')); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label" style="width: 150px">
+                        <?php echo Mage::helper('M2ePro')->__('First Name') ?>:
+                    </td>
+                    <td id="firstname" class="value" style="width: 200px">
+                        <?php echo Mage::helper('M2ePro')->__($this->getData('firstname')); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label" style="width: 150px">
+                        <?php echo Mage::helper('M2ePro')->__('Last Name') ?>:
+                    </td>
+                    <td id="lastname" class="value" style="width: 200px">
+                        <?php echo Mage::helper('M2ePro')->__($this->getData('lastname')); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+
+                <tr>
+                    <td class="label" style="width: 150px">
+                        <?php echo Mage::helper('M2ePro')->__('Country') ?>:
+                    </td>
+                    <td id="country" class="value" style="width: 200px">
+                        <?php echo Mage::helper('M2ePro')->__($this->getCountryLabelByCode($this->getData('country'))); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label" style="width: 150px">
+                        <?php echo Mage::helper('M2ePro')->__('City') ?>:
+                    </td>
+                    <td id="city" class="value" style="width: 200px">
+                        <?php echo Mage::helper('M2ePro')->__($this->getData('city')); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label" style="width: 150px">
+                        <?php echo Mage::helper('M2ePro')->__('Postal Code') ?>:
+                    </td>
+                    <td id="postal_code" class="value" style="width: 200px">
+                        <?php echo Mage::helper('M2ePro')->__($this->getData('postal_code')); ?>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+        <div class="right">
+            <a id="edit_license" href="javascript:"><?php echo Mage::helper('M2ePro')->__('Edit'); ?></a>
+        </div>
+
+    </div>
+
+    <div style="padding: 20px 25px 20px 35px; height: 100px; width: 450px; margin-left: 50px; float: left; background: url('<?php echo $this->getSkinUrl('M2ePro').'/images/note_background.png'; ?>') no-repeat;">
+        <?php echo Mage::helper('M2ePro')->__(
+            'This information will be sent to M2E Pro for approval.
+            <br/>Read more in our <a href="http://www.m2epro.com/privacy" target="_blank">Privacy Policy</a>.'
+        ); ?>
+    </div>
+
+    <div class="clear"></div>
+
+    <div style="margin-top: 40px">
+        <h4>
+            <?php echo Mage::helper('M2ePro')->__('Please sign into eBay to link M2E to your eBay account and proceed to the next step.'); ?>
+        </h4>
+
+        <div style="margin-top: 15px">
+            <?php echo $this->getChildHtml('sign_into_ebay_button'); ?>
+            &nbsp;
+            <?php echo Mage::helper('M2ePro')->__('or'); ?>&nbsp;
+            <a id="sign_into_ebay_sandbox" href="javascript:"><?php echo Mage::helper('M2ePro')->__('Sign into eBay Sandbox'); ?></a>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px">
+        <h4>
+            <?php echo Mage::helper('M2ePro')->__('If you don\'t have an eBay account, please create one. It\'s easy, fast and free.'); ?>
+        </h4>
+
+        <div style="margin-top: 15px">
+            <?php echo $this->getChildHtml('register_on_ebay_button'); ?>
+        </div>
+    </div>
+
+</div>
+
+<div id="license_popup_content" style="display: none;">
+    <div style="padding: 10px; height: 335px">
+        <div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Please verify the below information is valid before we register you with M2E.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes"></div>
+
+        <form id="license_form">
+            <div class="fieldset">
+                <div class="hor-scroll">
+                    <table class="form-list" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <td class="label">
+                                    <?php echo Mage::helper('M2ePro')->__('Email') ?>: <span class="required">*</span>
+                                </td>
+                                <td class="value">
+                                    <input type="text" name="email" class="input-text required-entry validate-email" value="" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <?php echo Mage::helper('M2ePro')->__('First Name') ?>: <span class="required">*</span>
+                                </td>
+                                <td class="value">
+                                    <input type="text" name="firstname" class="input-text required-entry" value="" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <?php echo Mage::helper('M2ePro')->__('Last Name') ?>: <span class="required">*</span>
+                                </td>
+                                <td class="value">
+                                    <input type="text" name="lastname" class="input-text required-entry" value="" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <?php echo Mage::helper('M2ePro')->__('Country') ?>: <span class="required">*</span>
+                                </td>
+                                <td class="value">
+                                    <select name="country" class="required-entry">
+                                    <?php foreach($this->getData('countries') as $country) {?>
+                                        <option value="<?php echo $country['label']; ?>"><?php echo Mage::helper('M2ePro')->escapeHtml($country['label']); ?></option>
+                                    <?php } ?>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <?php echo Mage::helper('M2ePro')->__('City') ?>: <span class="required">*</span>
+                                </td>
+                                <td class="value">
+                                    <input type="text" name="city" class="input-text required-entry" value="" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="label">
+                                    <?php echo Mage::helper('M2ePro')->__('Postal Code') ?>: <span class="required">*</span>
+                                </td>
+                                <td class="value">
+                                    <input type="text" name="postal_code" class="input-text required-entry" value="" />
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </form>
+    </div>
+    <div style="padding-right: 5px">
+        <div class="clear"></div>
+        <div class="right">
+            <a id="license_popup_cancel_link" href="javascript:void(0);" onclick=""><?php echo Mage::helper('M2ePro')->__('Cancel'); ?></a>
+            &nbsp;
+            <?php echo $this->getChildHtml('license_popup_confirm_button'); ?>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    var licenseForm;
+
+    var licenseInit = function() {
+
+        var licensePopUp;
+        licenseForm = new varienForm('license_form');
+
+        $('edit_license').observe('click', function() {
+
+            licensePopUp = Dialog.info(null, {
+                draggable: true,
+                resizable: true,
+                closable: true,
+                className: "magento",
+                windowClassName: "popup-window",
+                title: '<?php echo Mage::helper('M2ePro')->__('Register Your Free M2E Extension'); ?>',
+                width: 640,
+                height: 400,
+                zIndex: 100,
+                recenterAuto: false,
+                hideEffect: Element.hide,
+                showEffect: Element.show
+            });
+
+            licensePopUp.options.destroyOnClose = false;
+            $('modal_dialog_message').insert($('license_popup_content').show());
+
+            Form.getElements($(licenseForm.formId)).each(function(element) {
+                element.setValue($(element.name).innerHTML.trim())
+            });
+        });
+
+        $('license_popup_cancel_link').observe('click',function() {
+            licensePopUp.close();
+        });
+        $('license_popup_confirm_button').observe('click',function() {
+
+            if (!licenseForm.validate()) {
+                return;
+            }
+
+            Form.getElements($(licenseForm.formId)).each(function(element) {
+                $(element.readAttribute('name')).update(element.value);
+            });
+
+            licensePopUp.close();
+        });
+
+    };
+
+    var accountInit = function() {
+
+        var getToken = function(mode) {
+
+            if (!checkRequiredFields()) {
+                return;
+            }
+
+            MagentoMessageObj.clearAll();
+
+            var formData = {};
+
+            Form.getElements($('license_form')).each(function(element) {
+                var attribute = element.readAttribute('name');
+                element.value && (formData[attribute] = element.value);
+            });
+
+            var parameters = Object.extend(
+                {account_mode: mode},
+                formData
+            );
+
+            new Ajax.Request('<?php echo $this->getUrl('*/*/beforeToken'); ?>',
+            {
+                method: 'post',
+                asynchronous: true,
+                parameters: parameters,
+                onSuccess: function(transport) {
+                    var url = transport.responseText.evalJSON().url;
+                    if (!url) {
+                        MagentoMessageObj.addError('<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The eBay token obtaining is currently unavailable. Please try again later.')); ?>');
+                        return CommonHandlerObj.scroll_page_to_top();
+                    }
+                    return setLocation(url);
+                }
+            });
+        };
+
+        $('sign_into_ebay_button').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_PRODUCTION; ?>') });
+        $('sign_into_ebay_sandbox').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_SANDBOX; ?>') });
+    };
+
+    var checkRequiredFields = function()
+    {
+        Form.getElements($(licenseForm.formId)).each(function(element) {
+            element.setValue($(element.name).innerHTML.trim())
+        });
+
+        if (licenseForm.validate()) {
+            return true;
+        }
+
+        $('edit_license').simulate('click');
+        $('license_popup_confirm_button').click();
+
+        return false;
+    };
+
+    var init = function() {
+
+        licenseInit();
+        accountInit();
+        checkRequiredFields();
+    };
+
+    Event.observe(window, 'load', init);
+
+</script>

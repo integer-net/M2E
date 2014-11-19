@@ -1,0 +1,152 @@
+<?php
+
+    /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add $this */
+
+    $compatibleAttribute = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility')->getAttribute($this->getCompatibilityType());
+
+    $translations = array();
+    // M2ePro_TRANSLATIONS
+    // Please specify eBay motors compatibility attribute in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>
+    $text = 'Please specify eBay motors compatibility attribute in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>';
+    $translations[$text] = Mage::helper('M2ePro')->__(
+        $text,
+        Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+        $this->getUrl('*/adminhtml_ebay_configuration')
+    );
+
+    // ->__('Please edit categories settings for selected products and select the compatibility attribute.')
+    $text = 'Please edit categories settings for selected products and select the compatibility attribute.';
+    $translations[$text] = Mage::helper('M2ePro')->__($text);
+
+    $translations = json_encode($translations);
+?>
+
+<style type="text/css">
+    #compatibility_grid_container table td, #compatibility_grid_container table th {
+        padding: 5px;
+    }
+
+    #generate_attribute_content_container td.label {
+        width: 100px;
+    }
+
+    #generate_attribute_content_container label {
+        width: 100px;
+    }
+</style>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.customData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Ebay_Template_Category'); ?>, 'Ess_M2ePro_Model_Ebay_Template_Category');
+    M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility'); ?>, 'Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility');
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'adminhtml_ebay_listing/motorSpecificGrid' => $this->getUrl('*/adminhtml_ebay_listing/motorSpecificGrid'),
+        'adminhtml_ebay_listing/motorKtypeGrid' => $this->getUrl('*/adminhtml_ebay_listing/motorKtypeGrid'),
+        'adminhtml_ebay_listing/updateMotorsCompatibilityAttributes' => $this->getUrl('*/adminhtml_ebay_listing/updateMotorsCompatibilityAttributes'),
+    )) ?>);
+
+    M2ePro.translator.add(<?php echo $translations ?>);
+
+    var init = function() {
+
+        EbayMotorCompatibilityHandlerObj = new EbayMotorCompatibilityHandler(
+            <?php echo (int)$this->getRequest()->getParam('id') ?>,
+            '<?php echo Mage::helper('M2ePro')->escapeJs($this->getCompatibilityType()) ?>',
+            '<?php echo Mage::helper('M2ePro')->escapeJs($this->getCompatibilityGridId()) ?>',
+            '<?php echo Mage::helper('M2ePro')->escapeJs($this->getProductGridId()) ?>',
+            <?php echo json_encode(empty($compatibleAttribute)); ?>
+        );
+
+        EbayMotorCompatibilityHandlerObj.initPopUp('<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Add Compatible Vehicles')); ?>', 'pop_up_content');
+    };
+
+    <?php if ($this->getRequest()->isXmlHttpRequest()): ?>
+        init();
+    <?php else: ?>
+        Event.observe(window, 'load', init);
+    <?php endif; ?>
+
+</script>
+
+<?php if (!$this->getRequest()->isXmlHttpRequest()): ?>
+<div id="pop_up_content" style="display: none;">
+
+    <div class="content-header skip-header">
+        <table cellspacing="0">
+            <tbody>
+            <tr>
+                <td style="width: 50%;">
+                    <h3 class="icon-head head-adminhtml-ebay-template-general-motor-compatibility">
+                        <?php echo Mage::helper('M2ePro')->__('Add Vehicles') ?>
+                    </h3>
+                </td>
+                <td class="form-buttons"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="block_notice_motors_compatibility_generate_attribute_value" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Add Compatible Vehicles'); ?>" style="margin-top: 15px;">
+
+        <?php
+            if ($this->getCompatibilityType() == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC) {
+                $idTitle = 'ePIDs';
+            } else {
+                $idTitle = 'KTypes';
+            }
+        ?>
+
+        <?php echo Mage::helper('M2ePro')->__(
+'Select the items, compatible with your part and choose one of three actions in the Actions dropdown:
+<ul class=list>
+    <li><b>Overwrite %identifier_title% in Compatibility Attribute</b> - replaces items %identifier_title% in the Compatibility Attribute chosen in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a> with selected ones.</li>
+    <li><b>Add %identifier_title% to Compatibility Attribute</b> - adds selected items %identifier_title% to existing ones in Compatibility Attribute chosen in the General settings.</li>
+</ul>
+<b>Note:</b> Compatibility items can not be replaced or removed from eBay.',
+            array(
+                'menu_label' => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+                'url' => $this->getUrl('*/adminhtml_ebay_configuration'),
+                'identifier_title' => $idTitle,
+            )
+        ); ?>
+
+    </div>
+
+    <div id="generate_attribute_content_container" class="<?php echo Mage::helper('M2ePro/Magento')->isGoEdition() ? '' : 'switcher'; ?>" style="display: none; margin-top: 15px;">
+
+        <table cellspacing="0" class="form-list">
+            <tbody>
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Selected %identifier_title%', $idTitle) ?>:</label>
+                    </td>
+                    <td class="value" style="width: 100%; padding-right: 10px;">
+                        <input class="left-col-block input-text" style="width: 100%;" name="attribute_content" id="attribute_content">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="hor-scroll">
+
+        <div id="compatibility">
+            <div id="compatibility_grid_container"></div>
+        </div>
+
+    </div>
+
+</div>
+<?php endif; ?>

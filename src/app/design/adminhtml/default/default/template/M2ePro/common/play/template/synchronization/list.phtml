@@ -1,0 +1,273 @@
+<div id="block_notice_play_template_synchronization_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('Synchronization Template includes rules and conditions which determine Listing behavior on Play.com.<br/>
+    List, Revise, Relist and Stop Rules have to be specified in this template.<br/><br/>
+    <b>List Action</b> - at first this action to be executed for each item in M2E Listings, which has <i>Not Listed</i> status and its settings meet the List Condition. If an item was not listed for some reason, autosynchronization will attempt
+    to list it again only if Product Status, Stock Availability or Quantity is changed.
+    <br/><br/>
+    <b>Note:</b> Inventory Synchronization setting must be enabled in Synchronization (Configuration > Synchronization).
+    Otherwise, Synchronization Template Rules will not take effect.'); ?>
+</div>
+
+<?php
+$formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
+$defaults = array(
+    'title' => '',
+    'list_mode' => Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_YES,
+    'list_status_enabled' => Ess_M2ePro_Model_Play_Template_Synchronization::LIST_STATUS_ENABLED_YES,
+    'list_is_in_stock' => Ess_M2ePro_Model_Play_Template_Synchronization::LIST_IS_IN_STOCK_YES,
+
+    'list_qty_magento'           => Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE,
+    'list_qty_magento_value'     => '1',
+    'list_qty_magento_value_max' => '10',
+
+    'list_qty_calculated'           => Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE,
+    'list_qty_calculated_value'     => '1',
+    'list_qty_calculated_value_max' => '10'
+);
+$formData = array_merge($defaults, $formData);
+
+$isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // General for all tabs
+    //-----------------------------
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Play_Template_Synchronization'); ?>,
+        'Ess_M2ePro_Model_Play_Template_Synchronization'
+    );
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Play'); ?>,
+        'Ess_M2ePro_Helper_Component_Play'
+    );
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'formSubmit'    => $this->getUrl('M2ePro/adminhtml_common_play_template_synchronization/save', array('id' => $this->getRequest()->getParam('id'))),
+        'formSubmitNew' => $this->getUrl('M2ePro/adminhtml_common_play_template_synchronization/save'),
+        'deleteAction'  => $this->getUrl('M2ePro/adminhtml_common_template_synchronization/delete', array('id' => $this->getRequest()->getParam('id')))
+    )); ?>);
+
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'Add Synchronization Template.' => Mage::helper('M2ePro')->__('Add Synchronization Template.'),
+        'Wrong time format string.' => Mage::helper('M2ePro')->__('Wrong time format string.'),
+
+        'Must be greater than "Min".' => Mage::helper('M2ePro')->__('Must be greater than "Min".'),
+        'Inconsistent settings in Revise and Stop rules.' => Mage::helper('M2ePro')->__('Inconsistent settings in Revise and Stop rules.')
+    )); ?>);
+
+    M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
+
+    Event.observe(window, 'load', function() {
+        PlayTemplateSynchronizationHandlerObj = new CommonPlayTemplateSynchronizationHandler();
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+    });
+    //-----------------------------
+
+</script>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'The specified title is already used for other template. Template title must be unique.' => Mage::helper('M2ePro')->__('The specified title is already used for other template. Template title must be unique.')
+    )); ?>);
+
+    M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';
+
+    Event.observe(window, 'load', function() {
+        $('list_mode').observe('change', PlayTemplateSynchronizationHandlerObj.listMode_change);
+        $('list_qty_magento').observe('change', PlayTemplateSynchronizationHandlerObj.listQty_change);
+        $('list_qty_calculated').observe('change', PlayTemplateSynchronizationHandlerObj.listQty_change);
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_play_template_synchronization_general_general">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="title"><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="title" name="title" value="<?php echo $this->escapeHtml($formData['title']); ?>" type="text" class="input-text required-entry M2ePro-synchronization-tpl-title" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful template title for your internal use.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_template_synchronization_general_list_action">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('List Action'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('List Action'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="list_mode" name="list_mode" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_NONE; ?>" <?php if ($formData['list_mode'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_YES; ?>" <?php if ($formData['list_mode'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Enables / disables automatic listing of <i>Not Listed</i> items, when they meet the List Conditions.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_template_synchronization_list_rules" <?php if ($formData['list_mode'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_NONE): echo ' style="display:none;"'; endif; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('List Conditions'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Product Status'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="list_status_enabled" name="list_status_enabled" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_STATUS_ENABLED_NONE; ?>" <?php if ($formData['list_status_enabled'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_STATUS_ENABLED_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Any'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_STATUS_ENABLED_YES; ?>" <?php if ($formData['list_status_enabled'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_STATUS_ENABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Product Status at which the item(s) have to be listed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Stock Availability'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="list_is_in_stock" name="list_is_in_stock" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_IS_IN_STOCK_NONE; ?>" <?php if ($formData['list_is_in_stock'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_IS_IN_STOCK_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Any'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_IS_IN_STOCK_YES; ?>" <?php if ($formData['list_is_in_stock'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_IS_IN_STOCK_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('In Stock'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Stock Availability at which the item(s) have to be listed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Magento QTY'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="list_qty_magento" name="list_qty_magento" class="required-entry" qty_type="magento">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE; ?>" <?php if ($formData['list_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Any'); ?></option>
+                            <!-- <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS; ?>" <?php if ($formData['list_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Less'); ?></option> -->
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_MORE; ?>" <?php if ($formData['list_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_MORE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('More or Equal'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN; ?>" <?php if ($formData['list_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Magento product(s) quantity at which the item(s) have to be listed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="list_qty_magento_value_container" <?php if ($formData['list_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE) echo ' style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="list_qty_magento_value">
+                            <span id="list_qty_magento_item" <?php if ($formData['list_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="list_qty_magento_item_min" <?php if ($formData['list_qty_magento'] != Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Quantity'); ?>: <span class="required">*</span></span>
+                        </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="list_qty_magento_value" name="list_qty_magento_value" value="<?php echo $this->escapeHtml($formData['list_qty_magento_value']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits" />
+                    </td>
+                </tr>
+
+                <tr id="list_qty_magento_value_max_container" <?php if ($formData['list_qty_magento'] != Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="list_qty_magento_value_max"><?php echo Mage::helper('M2ePro')->__('Max Quantity'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="list_qty_magento_value_max" name="list_qty_magento_value_max" value="<?php echo $this->escapeHtml($formData['list_qty_magento_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits M2ePro-validate-conditions-between" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Calculated QTY'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="list_qty_calculated" name="list_qty_calculated" class="required-entry" qty_type="calculated">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE; ?>" <?php if ($formData['list_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Any'); ?></option>
+                            <!-- <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS; ?>" <?php if ($formData['list_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_LESS): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Less'); ?></option> -->
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_MORE; ?>" <?php if ($formData['list_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_MORE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('More or Equal'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN; ?>" <?php if ($formData['list_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Calculated quantity according to the selling format template at which the item(s) have to be listed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="list_qty_calculated_value_container" <?php if ($formData['list_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_NONE) echo ' style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="list_qty_calculated_value">
+                            <span id="list_qty_calculated_item" <?php if ($formData['list_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: <span class="required">*</span></span>
+                            <span id="list_qty_calculated_item_min" <?php if ($formData['list_qty_calculated'] != Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('Min Quantity'); ?>: <span class="required">*</span></span>
+                        </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="list_qty_calculated_value" name="list_qty_calculated_value" value="<?php echo $this->escapeHtml($formData['list_qty_calculated_value']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits" />
+                    </td>
+                </tr>
+
+                <tr id="list_qty_calculated_value_max_container" <?php if ($formData['list_qty_calculated'] != Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN) echo ' style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="list_qty_calculated_value_max"><?php echo Mage::helper('M2ePro')->__('Max Quantity'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="list_qty_calculated_value_max" name="list_qty_calculated_value_max" value="<?php echo $this->escapeHtml($formData['list_qty_calculated_value_max']); ?>" type="text" class="M2ePro-required-when-visible input-text validate-digits M2ePro-validate-conditions-between" />
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>

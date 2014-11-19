@@ -1,0 +1,39 @@
+<?php
+
+/*
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
+ */
+
+class Ess_M2ePro_Model_Mysql4_Play_Order
+    extends Ess_M2ePro_Model_Mysql4_Component_Child_Abstract
+{
+    // ########################################
+
+    protected $_isPkAutoIncrement = false;
+
+    // ########################################
+
+    public function _construct()
+    {
+        $this->_init('M2ePro/Play_Order', 'order_id');
+        $this->_isPkAutoIncrement = false;
+    }
+
+    // ########################################
+
+    public function getItemsTotal($orderId)
+    {
+        /** @var $collection Ess_M2ePro_Model_Mysql4_Play_Order_Collection */
+        $collection = Mage::helper('M2ePro/Component_Play')->getCollection('Order_Item');
+        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+        $collection->addFieldToFilter('order_id', (int)$orderId);
+        $collection->getSelect()->columns(array(
+            'items_total' => new Zend_Db_Expr('SUM((`price`)*`qty`)')
+        ));
+        $collection->getSelect()->group('order_id');
+
+        return round($collection->getFirstItem()->getData('items_total'), 2);
+    }
+
+    // ########################################
+}

@@ -1,0 +1,55 @@
+<style>
+
+    #block_notice_development_tab_debug_development,
+    #block_notice_development_tab_debug_maintenance{
+        style: margin-top: 8px;
+        width: 500px;
+    }
+
+</style>
+
+<div id="magento_block_development_debug_commands">
+
+    <?php foreach($this->commands as $command) : ?>
+
+        <table class="simple_commands_list">
+
+            <tr>
+                <td>
+
+                    <a href="<?php echo $command['url']; ?>" <?php if ($command['confirm'] != ''): ?>onclick="return confirm('<?php echo $command['confirm']; ?>');"<?php endif; ?> <?php if ($command['new_window']): ?>target="_blank"<?php endif; ?> title="<?php echo $command['description']; ?>" alt="<?php echo $command['description']; ?>"><?php echo $command['title']; ?></a>
+                    <p><?php echo $command['description']; ?></p>
+
+                </td>
+            </tr>
+
+        </table>
+
+    <?php endforeach; ?>
+
+</div>
+
+<div id="block_notice_development_tab_debug_development" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+    <?php
+    $developmentHtml = '<span style="color:green;">Disabled</span>';
+    if ($this->isDevelopmentModeEnabled) {
+        $developmentHtml = '<span style="color:red;">Enabled</span>';
+    }
+    echo Mage::helper('M2ePro')->__('<b>Magento development mode is '.$developmentHtml.' now.</b>'); ?>
+</div>
+
+<div id="block_notice_development_tab_debug_maintenance" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+    <?php
+    $maintenanceHtml = '<span style="color:green;">Disabled</span>';
+    $buttonHtml = $this->getChildHtml('enable_maintenance');
+
+    if ($this->isMaintenanceEnabled) {
+        $maintenanceHtml = '<span style="color:red;">Enabled</span>';
+        $buttonHtml = $this->getChildHtml('disable_maintenance');
+    }
+
+    $buttonHtml = '<div style="float: right;">'.
+        $buttonHtml.
+        '</div>';
+    echo Mage::helper('M2ePro')->__('<b>Maintenance mode is '.$maintenanceHtml.' now.</b>'.$buttonHtml); ?>
+</div>

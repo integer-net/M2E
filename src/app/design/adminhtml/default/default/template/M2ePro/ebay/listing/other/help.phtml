@@ -1,0 +1,10 @@
+<div id="<?php echo $this->getContainerId(); ?>" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('3rd Party Listings'); ?>">
+    <?php echo Mage::helper('M2ePro')->__(
+        'This page shows eBay accounts and sites that have 3rd party listings associated with them. (3rd party listings are eBay listings that haven\'t been added by M2E Pro.)<br/><br/>
+        Filter by eBay user ID and eBay Site and click a line to see the listings.<br/><br/>
+        To import 3rd Party Listings, <b>Import 3rd Party Listings Import</b> must be enabled for an eBay account
+        in %menu_root_node% > Configuration > Accounts Settings > 3rd Party Listings and <b>3rd Party Listings Synchronization</b>
+        must be enabled in %menu_root_node% > Configuration > Synchronization.',
+        Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()
+    ); ?>
+</div>

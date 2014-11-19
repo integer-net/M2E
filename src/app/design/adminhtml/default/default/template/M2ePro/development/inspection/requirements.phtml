@@ -1,0 +1,44 @@
+<style type="text/css">
+    .column_condition {
+        color: gray;
+    }
+    .column_value_fail {
+        color: red;
+    }
+    .column_value_success {
+        color: green;
+    }
+</style>
+
+<table class="form-list" cellspacing="0" cellpadding="0">
+
+    <tr>
+        <td class="label" style="width:200px;">
+            <strong><?php echo Mage::helper('M2ePro')->__('Properties'); ?></strong>
+        </td>
+        <td class="value" style="width:200px;">
+            <strong><?php echo Mage::helper('M2ePro')->__('Recommended Value'); ?></strong>
+        </td>
+        <td class="value" style="width:200px;">
+            <strong><?php echo Mage::helper('M2ePro')->__('Current Value'); ?></strong>
+        </td>
+    </tr>
+
+    <?php foreach($this->requirements as $key => $requirement) { ?>
+
+        <tr>
+            <td class="label">
+                <label><?php echo $requirement['title']; ?></label>
+            </td>
+            <td class="value column_condition">
+                <?php echo $requirement['condition']['sign'] ?>
+                <?php echo $requirement['condition']['value'] ?>
+            </td>
+            <td class="value <?php echo $requirement['current']['status'] ? 'column_value_success' : 'column_value_fail'; ?>">
+                <?php echo $requirement['current']['value']; ?>
+            </td>
+        </tr>
+
+    <?php } ?>
+
+</table>

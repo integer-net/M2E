@@ -1,0 +1,99 @@
+<script type="text/javascript">
+
+    var BLOCK_NOTICES_SHOW = <?php echo $this->block_notices_show ? 'true' : 'false'; ?>;
+    var BLOCK_NOTICES_DISABLE_COLLAPSE = <?php echo json_encode((bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/ebay/notice/', 'disable_collapse')); ?>;
+
+    var IS_VIEW_EBAY = <?php echo json_encode(Mage::helper('M2ePro/View')->isCurrentViewEbay()); ?>;
+    var IS_VIEW_COMMON = <?php echo json_encode(Mage::helper('M2ePro/View')->isCurrentViewCommon()); ?>;
+    var IS_VIEW_CONFIGURATION = <?php echo json_encode(Mage::helper('M2ePro/View')->isCurrentViewConfiguration()); ?>;
+
+    var M2ePro = {};
+
+    M2ePro.url        = new UrlHandler();
+    M2ePro.php        = new PhpHandler();
+    M2ePro.translator = new TranslatorHandler();
+    M2ePro.info = <?php echo Zend_Json::encode($this->m2epro_info); ?>;
+
+    // backward compatibility
+    M2ePro.text       = {};
+    M2ePro.formData   = {};
+    M2ePro.customData = {};
+
+    M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_general')) ?>);
+    M2ePro.url.add(<?php echo json_encode(array(
+        'm2epro_skin_url' => $this->getSkinUrl('M2ePro')
+    )); ?>);
+
+    M2ePro.translator.add(<?php echo Zend_Json::encode(array(
+
+        'Are you sure?' => Mage::helper('M2ePro')->__('Are you sure?'),
+        'Help'          => Mage::helper('M2ePro')->__('Help'),
+        'Hide Block'    => Mage::helper('M2ePro')->__('Hide Block'),
+        'Show Tips'     => Mage::helper('M2ePro')->__('Show Tips'),
+        'Hide Tips'     => Mage::helper('M2ePro')->__('Hide Tips'),
+        'Notice'        => Mage::helper('M2ePro')->__('Notice'),
+        'Error'         => Mage::helper('M2ePro')->__('Error'),
+        'Close'         => Mage::helper('M2ePro')->__('Close'),
+        'Success'       => Mage::helper('M2ePro')->__('Success'),
+        'Warning'       => Mage::helper('M2ePro')->__('Warning'),
+        'None'          => Mage::helper('M2ePro')->__('None'),
+        'Cancel'        => Mage::helper('M2ePro')->__('Cancel'),
+
+        'Please select the products you want to perform the action on.' => Mage::helper('M2ePro')->__('Please select the products you want to perform the action on.'),
+        'Please select items.'  => Mage::helper('M2ePro')->__('Please select items.'),
+        'Please select action.' => Mage::helper('M2ePro')->__('Please select action.'),
+        'View All Product Log' => Mage::helper('M2ePro')->__('View All Product Log'),
+        'This is a required field.' => Mage::helper('M2ePro')->__('This is a required field.'),
+        'Invalid input data. Decimal value required. Example 12.05' => Mage::helper('M2ePro')->__('Invalid input data. Decimal value required. Example 12.05'),
+
+        'You should select Attribute Set first.' => Mage::helper('M2ePro')->__('You should select Attribute Set first.'),
+
+    )); ?>);
+
+</script>
+
+<?php if ($this->analytic['mode']) { ?>
+
+    <script type="text/javascript" src="<?php echo $this->analytic['url']; ?>public/analytic_v1.js"></script>
+
+    <script type="text/javascript">
+
+        var analyticDispatcher = new AnalyticDispatcher('<?php echo $this->analytic['url']; ?>');
+
+        analyticDispatcher
+
+            .setInfoParams({
+                ip: M2ePro.info.location.ip,
+                dom: M2ePro.info.location.domain,
+                pt: M2ePro.info.platform.name,
+                pv: M2ePro.info.platform.version,
+                pr: M2ePro.info.platform.revision,
+                mt: M2ePro.info.module.name,
+                mv: M2ePro.info.module.version,
+                mr: M2ePro.info.module.revision,
+                loc: M2ePro.info.locale
+            })
+
+            .setNavigationParams({
+                nid: '<?php echo $this->analytic['data']['identifier']; ?>',
+                nsi: '<?php echo $this->analytic['data']['session_id']; ?>',
+                nct: '<?php echo $this->analytic['data']['controller']; ?>',
+                nac: '<?php echo $this->analytic['data']['action']; ?>',
+                nmp: '<?php echo $this->analytic['data']['mage_params']; ?>'
+            })
+
+            <?php if (isset($this->analytic['additional_data'])) { ?>
+                .setNavigationAdditionalParams({
+                    ngp: '<?php echo $this->analytic['additional_data']['get_params']; ?>',
+                    npp: '<?php echo $this->analytic['additional_data']['post_params']; ?>'
+                })
+            <?php } ?>
+
+            .setActionMode('<?php echo $this->analytic['action_mode']; ?>')
+            .setNavigationMode('<?php echo $this->analytic['navigation_mode'] != Ess_M2ePro_Helper_Module_Analytic::NAVIGATION_MODE_DISABLED; ?>')
+
+            .process();
+
+    </script>
+
+<?php } ?>

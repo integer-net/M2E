@@ -1,0 +1,19 @@
+<div id="next_step_warning_popup_content" style="display: none">
+
+    <div style="margin: 10px; height: 155px">
+        <?php echo Mage::helper('M2ePro')->__(
+            '<b>Warning:</b> There are <span id="failed_count"></span> product(s) of <span id=total_count"></span> which have no primary eBay category specified.<br/><br/>
+            To add primary eBay categories now, click <b>Cancel</b> then choose the Edit Category action for the products which need them.<br/><br/>
+            If you\'re not ready to add primary eBay categories yet or are not sure which category to choose, click <b>Continue</b>.
+            You will have a chance to add categories later in the M2E Pro listing settings.'
+        ); ?>
+    </div>
+
+    <div style="text-align: right">
+        <a href="javascript:"
+            onclick="EbayListingCategoryProductGridHandlerObj.nextStepWarningPopup.hide();"><?php echo Mage::helper('M2ePro')->__('Cancel') ?></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <?php echo $this->getChildHtml('continue_button'); ?>
+    </div>
+
+</div>

@@ -1,0 +1,25 @@
+<div id="block_notice_wizard_installation_step_license" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('License Set Up'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes" style="display:none;">
+    <div>
+        <div class="step_container_description">
+            <?php echo Mage::helper('M2ePro')->__('You need to specify the License Key. <br/>
+            <strong>Note:</strong> M2E Pro does not work without activation.'); ?>
+        </div>
+        <div class="step_container_completed">
+            <span class="step_completed" style="display:none;"><?php echo Mage::helper('M2ePro')->__('Completed'); ?></span>
+        </div>
+        <div class="step_container_incomplete">
+            <span class="step_incomplete" style="display:none;"><?php echo Mage::helper('M2ePro')->__('Incomplete'); ?></span>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <div class="step_container_buttons">
+        <span class="step_skip" style="display:none;"></span>
+        <span class="step_process" style="display:none;"><?php echo $this->getChildHtml('process_license_button'); ?></span>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    WizardHandlerObj.addStep('license', 'block_notice_wizard_installation_step_license');
+
+</script>

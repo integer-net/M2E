@@ -1,0 +1,1020 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Ess_M2ePro>
+            <version>6.2.0</version>
+        </Ess_M2ePro>
+    </modules>
+    <default>
+        <carriers>
+            <m2eproshipping>
+                <active>1</active>
+                <allowed_methods>m2eproshipping</allowed_methods>
+                <methods>m2eproshipping</methods>
+                <sallowspecific>0</sallowspecific>
+                <model>Ess_M2ePro_Model_Magento_Shipping</model>
+                <name>M2E Pro Shipping</name>
+                <title>M2E Pro Shipping</title>
+                <handling_type>F</handling_type>
+            </m2eproshipping>
+        </carriers>
+        <payment>
+            <m2epropayment>
+                <active>1</active>
+                <model>Ess_M2ePro_Model_Magento_Payment</model>
+                <order_status>pending</order_status>
+                <title>M2E Pro Payment</title>
+                <allowspecific>0</allowspecific>
+                <group>offline</group>
+            </m2epropayment>
+        </payment>
+    </default>
+    <frontend>
+        <routers>
+            <M2ePro>
+                <use>m2epro_custom</use>
+                <args>
+                    <module>Ess_M2ePro</module>
+                    <frontName>M2ePro</frontName>
+                </args>
+            </M2ePro>
+        </routers>
+    </frontend>
+    <admin>
+        <routers>
+            <M2ePro>
+                <use>admin</use>
+                <args>
+                    <module>Ess_M2ePro</module>
+                    <frontName>M2ePro</frontName>
+                </args>
+            </M2ePro>
+        </routers>
+    </admin>
+    <adminhtml>
+        <translate>
+            <modules>
+                <Ess_M2ePro>
+                    <files>
+                        <default>Ess_M2ePro.csv</default>
+                    </files>
+                </Ess_M2ePro>
+            </modules>
+        </translate>
+        <menu>
+
+            <m2epro_ebay module="M2ePro">
+                <title>Sell On eBay</title>
+                <sort_order>71</sort_order>
+                <children>
+
+                    <listings module="M2ePro">
+                        <title>Listings</title>
+                        <sort_order>1</sort_order>
+                        <action>M2ePro/adminhtml_ebay_listing/index</action>
+                    </listings>
+
+                    <orders module="M2ePro">
+                        <title>Sales</title>
+                        <sort_order>2</sort_order>
+                        <action>M2ePro/adminhtml_ebay_order/index</action>
+                    </orders>
+
+                    <logs module="M2ePro">
+                        <title>Logs</title>
+                        <sort_order>3</sort_order>
+                        <action>M2ePro/adminhtml_ebay_log/listing</action>
+                    </logs>
+
+                    <configuration module="M2ePro">
+                        <title>Configuration</title>
+                        <sort_order>4</sort_order>
+                        <action>M2ePro/adminhtml_ebay_synchronization/index</action>
+                    </configuration>
+
+                    <help module="M2ePro">
+                        <title>Help</title>
+                        <sort_order>5</sort_order>
+                        <action>M2ePro/adminhtml_support/index/referrer/ebay</action>
+                    </help>
+
+                </children>
+            </m2epro_ebay>
+
+            <m2epro_common module="M2ePro">
+                <title>Sell On Multi-Channels</title>
+                <sort_order>72</sort_order>
+                <children>
+
+                    <listings module="M2ePro">
+                        <title>Manage Listings</title>
+                        <sort_order>1</sort_order>
+                        <children>
+                            <listing module="M2ePro">
+                                <title>Listings</title>
+                                <sort_order>1</sort_order>
+                                <action>M2ePro/adminhtml_common_listing/index</action>
+                            </listing>
+                            <listing_other module="M2ePro">
+                                <title>3rd Party Listings</title>
+                                <sort_order>2</sort_order>
+                                <action>M2ePro/adminhtml_common_listing_other/index</action>
+                            </listing_other>
+                        </children>
+                    </listings>
+
+                    <orders module="M2ePro">
+                        <title>Sales</title>
+                        <sort_order>2</sort_order>
+                        <action>M2ePro/adminhtml_common_order/index</action>
+                    </orders>
+
+                    <templates module="M2ePro">
+                        <title>Templates</title>
+                        <sort_order>3</sort_order>
+                        <children>
+                            <selling_format module="M2ePro">
+                                <title>Selling Format Templates</title>
+                                <sort_order>1</sort_order>
+                                <action>M2ePro/adminhtml_common_template_sellingFormat/index</action>
+                            </selling_format>
+                            <synchronization module="M2ePro">
+                                <title>Synchronization Templates</title>
+                                <sort_order>2</sort_order>
+                                <action>M2ePro/adminhtml_common_template_synchronization/index</action>
+                            </synchronization>
+                        </children>
+                    </templates>
+
+                    <logs module="M2ePro">
+                        <title>Activity Logs</title>
+                        <sort_order>4</sort_order>
+                        <children>
+                            <listing module="M2ePro">
+                                <title>Listings Log</title>
+                                <sort_order>1</sort_order>
+                                <action>M2ePro/adminhtml_common_log/listing</action>
+                            </listing>
+                            <listing_other module="M2ePro">
+                                <title>3rd Party Listings Log</title>
+                                <sort_order>2</sort_order>
+                                <action>M2ePro/adminhtml_common_log/listingOther</action>
+                            </listing_other>
+                            <synchronization module="M2ePro">
+                                <title>Synchronization Log</title>
+                                <sort_order>3</sort_order>
+                                <action>M2ePro/adminhtml_common_log/synchronization</action>
+                            </synchronization>
+                            <order module="M2ePro">
+                                <title>Orders Log</title>
+                                <sort_order>4</sort_order>
+                                <action>M2ePro/adminhtml_common_log/order</action>
+                            </order>
+                        </children>
+                    </logs>
+
+                    <configuration module="M2ePro">
+                        <title>Configuration</title>
+                        <sort_order>5</sort_order>
+                        <children>
+                            <account module="M2ePro">
+                                <title>Account Settings</title>
+                                <sort_order>1</sort_order>
+                                <action>M2ePro/adminhtml_common_account/index</action>
+                            </account>
+                            <marketplace module="M2ePro">
+                                <title>Marketplaces</title>
+                                <sort_order>2</sort_order>
+                                <action>M2ePro/adminhtml_common_marketplace/index</action>
+                            </marketplace>
+                            <synchronization module="M2ePro">
+                                <title>Synchronization</title>
+                                <sort_order>3</sort_order>
+                                <action>M2ePro/adminhtml_common_synchronization/index</action>
+                            </synchronization>
+                            <global module="M2ePro">
+                                <title>Global Settings</title>
+                                <sort_order>4</sort_order>
+                                <action>M2ePro/adminhtml_common_configuration/index</action>
+                            </global>
+                        </children>
+                    </configuration>
+
+                    <help module="M2ePro">
+                        <title>Help</title>
+                        <sort_order>6</sort_order>
+                        <children>
+                            <doc module="M2ePro">
+                                <title>Documentation</title>
+                                <sort_order>1</sort_order>
+                                <action>M2ePro/adminhtml_support/index</action>
+                            </doc>
+                            <tutorial module="M2ePro">
+                                <title>Video Tutorials</title>
+                                <sort_order>2</sort_order>
+                                <action>M2ePro/adminhtml_support/index</action>
+                            </tutorial>
+                            <support module="M2ePro">
+                                <title>Support</title>
+                                <sort_order>3</sort_order>
+                                <action>M2ePro/adminhtml_support/index/referrer/common</action>
+                            </support>
+                        </children>
+                    </help>
+
+                </children>
+            </m2epro_common>
+
+        </menu>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+
+                        <m2epro_ebay>
+                            <title>Sell On eBay</title>
+                            <sort_order>71</sort_order>
+                            <children>
+
+                                <listings>
+                                    <title>Listings</title>
+                                    <sort_order>1</sort_order>
+                                </listings>
+
+                                <orders>
+                                    <title>Sales</title>
+                                    <sort_order>2</sort_order>
+                                </orders>
+
+                                <logs>
+                                    <title>Logs</title>
+                                    <sort_order>3</sort_order>
+                                </logs>
+
+                                <configuration>
+                                    <title>Configuration</title>
+                                    <sort_order>4</sort_order>
+                                </configuration>
+
+                                <help>
+                                    <title>Help</title>
+                                    <sort_order>5</sort_order>
+                                </help>
+
+                            </children>
+                        </m2epro_ebay>
+
+                        <m2epro_common>
+                            <title>Sell On Multi-Channels</title>
+                            <sort_order>72</sort_order>
+                            <children>
+
+                                <listings>
+                                    <title>Manage Listings</title>
+                                    <sort_order>1</sort_order>
+                                    <children>
+                                        <listing>
+                                            <title>Listings</title>
+                                            <sort_order>1</sort_order>
+                                        </listing>
+                                        <listing_other>
+                                            <title>3rd Party Listings</title>
+                                            <sort_order>2</sort_order>
+                                        </listing_other>
+                                    </children>
+                                </listings>
+
+                                <orders>
+                                    <title>Sales</title>
+                                    <sort_order>2</sort_order>
+                                </orders>
+
+                                <templates>
+                                    <title>Templates</title>
+                                    <sort_order>3</sort_order>
+                                    <children>
+                                        <selling_format>
+                                            <title>Selling Format Templates</title>
+                                            <sort_order>1</sort_order>
+                                        </selling_format>
+                                        <synchronization>
+                                            <title>Synchronization Templates</title>
+                                            <sort_order>2</sort_order>
+                                        </synchronization>
+                                    </children>
+                                </templates>
+
+                                <logs>
+                                    <title>Activity Logs</title>
+                                    <sort_order>4</sort_order>
+                                    <children>
+                                        <listing>
+                                            <title>Listings Log</title>
+                                            <sort_order>1</sort_order>
+                                        </listing>
+                                        <listing_other>
+                                            <title>3rd Party Listings Log</title>
+                                            <sort_order>2</sort_order>
+                                        </listing_other>
+                                        <synchronization>
+                                            <title>Synchronization Log</title>
+                                            <sort_order>3</sort_order>
+                                        </synchronization>
+                                        <order>
+                                            <title>Orders Log</title>
+                                            <sort_order>4</sort_order>
+                                        </order>
+                                    </children>
+                                </logs>
+
+                                <configuration>
+                                    <title>Configuration</title>
+                                    <sort_order>5</sort_order>
+                                    <children>
+                                        <account>
+                                            <title>Account Settings</title>
+                                            <sort_order>1</sort_order>
+                                        </account>
+                                        <marketplace>
+                                            <title>Marketplaces</title>
+                                            <sort_order>2</sort_order>
+                                        </marketplace>
+                                        <synchronization>
+                                            <title>Synchronization</title>
+                                            <sort_order>3</sort_order>
+                                        </synchronization>
+                                        <global>
+                                            <title>Global Settings</title>
+                                            <sort_order>4</sort_order>
+                                        </global>
+                                    </children>
+                                </configuration>
+
+                                <help>
+                                    <title>Help</title>
+                                    <sort_order>6</sort_order>
+                                    <children>
+                                        <doc>
+                                            <title>Documentation</title>
+                                            <sort_order>1</sort_order>
+                                        </doc>
+                                        <tutorial>
+                                            <title>Video Tutorials</title>
+                                            <sort_order>2</sort_order>
+                                        </tutorial>
+                                        <support>
+                                            <title>Support</title>
+                                            <sort_order>3</sort_order>
+                                        </support>
+                                    </children>
+                                </help>
+
+                            </children>
+                        </m2epro_common>
+
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <m2epro_components>
+                                            <title>Channels</title>
+                                            <sort_order>1</sort_order>
+                                        </m2epro_components>
+                                        <m2epro_settings>
+                                            <title>General</title>
+                                            <sort_order>2</sort_order>
+                                        </m2epro_settings>
+                                        <m2epro_logs_cleaning>
+                                            <title>Logs Clearing</title>
+                                            <sort_order>3</sort_order>
+                                        </m2epro_logs_cleaning>
+                                        <m2epro_license>
+                                            <title>License</title>
+                                            <sort_order>4</sort_order>
+                                        </m2epro_license>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+        <layout>
+            <updates>
+                <M2ePro>
+                    <file>M2ePro.xml</file>
+                </M2ePro>
+            </updates>
+        </layout>
+    </adminhtml>
+    <global>
+
+        <ignore_user_agents>
+            <m2ePro>M2E Pro Cron Service/1.0</m2ePro>
+        </ignore_user_agents>
+
+        <events>
+
+            <controller_action_predispatch_adminhtml_system_config_save>
+                <observers>
+                    <ess_M2ePro_observer_config>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Magento_Configuration</class>
+                        <method>systemConfigSaveAction</method>
+                    </ess_M2ePro_observer_config>
+                </observers>
+            </controller_action_predispatch_adminhtml_system_config_save>
+            <catalog_product_save_before>
+                <observers>
+                    <ess_M2ePro_observer_product>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Product</class>
+                        <method>catalogProductSaveBefore</method>
+                    </ess_M2ePro_observer_product>
+                </observers>
+            </catalog_product_save_before>
+            <catalog_product_save_after>
+                <observers>
+                    <ess_M2ePro_observer_product>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Product</class>
+                        <method>catalogProductSaveAfter</method>
+                    </ess_M2ePro_observer_product>
+                </observers>
+            </catalog_product_save_after>
+
+            <catalog_product_delete_before>
+                <observers>
+                    <ess_M2ePro_observer_product>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Product</class>
+                        <method>catalogProductDeleteBefore</method>
+                    </ess_M2ePro_observer_product>
+                </observers>
+            </catalog_product_delete_before>
+            <catalog_category_change_products>
+                <observers>
+                    <ess_M2ePro_observer_category>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Category</class>
+                        <method>catalogCategoryChangeProducts</method>
+                    </ess_M2ePro_observer_category>
+                </observers>
+            </catalog_category_change_products>
+            <cataloginventory_stock_item_save_after>
+                <observers>
+                    <ess_M2ePro_observer_stock_item>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_StockItem</class>
+                        <method>catalogInventoryStockItemSaveAfter</method>
+                    </ess_M2ePro_observer_stock_item>
+                </observers>
+            </cataloginventory_stock_item_save_after>
+
+            <sales_order_save_after>
+                <observers>
+                    <ess_M2ePro_observer_order>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Order</class>
+                        <method>salesOrderSaveAfter</method>
+                    </ess_M2ePro_observer_order>
+                </observers>
+            </sales_order_save_after>
+
+            <sales_order_invoice_pay>
+                <observers>
+                    <ess_M2ePro_observer_invoice>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Invoice</class>
+                        <method>salesOrderInvoicePay</method>
+                    </ess_M2ePro_observer_invoice>
+                </observers>
+            </sales_order_invoice_pay>
+            <sales_order_shipment_save_after>
+                <observers>
+                    <ess_M2ePro_observer_shipment>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Shipment</class>
+                        <method>salesOrderShipmentSaveAfter</method>
+                    </ess_M2ePro_observer_shipment>
+                </observers>
+            </sales_order_shipment_save_after>
+            <sales_convert_quote_item_to_order_item>
+                <observers>
+                    <ess_M2ePro_observer_order>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Order</class>
+                        <method>salesConvertQuoteItemToOrderItem</method>
+                    </ess_M2ePro_observer_order>
+                </observers>
+            </sales_convert_quote_item_to_order_item>
+
+            <m2epro_associate_ebay_order_item_to_product>
+                <observers>
+                    <ess_M2ePro_observer_ebay_order_product>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Ebay_Order_Item</class>
+                        <method>associateItemWithProduct</method>
+                    </ess_M2ePro_observer_ebay_order_product>
+                </observers>
+            </m2epro_associate_ebay_order_item_to_product>
+            <m2epro_associate_amazon_order_item_to_product>
+                <observers>
+                    <ess_M2ePro_observer_amazon_order_product>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Amazon_Order_Item</class>
+                        <method>associateItemWithProduct</method>
+                    </ess_M2ePro_observer_amazon_order_product>
+                </observers>
+            </m2epro_associate_amazon_order_item_to_product>
+            <m2epro_associate_buy_order_item_to_product>
+                <observers>
+                    <ess_M2ePro_observer_buy_order_product>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Buy_Order_Item</class>
+                        <method>associateItemWithProduct</method>
+                    </ess_M2ePro_observer_buy_order_product>
+                </observers>
+            </m2epro_associate_buy_order_item_to_product>
+            <m2epro_associate_play_order_item_to_product>
+                <observers>
+                    <ess_M2ePro_observer_play_order_product>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Play_Order_Item</class>
+                        <method>associateItemWithProduct</method>
+                    </ess_M2ePro_observer_play_order_product>
+                </observers>
+            </m2epro_associate_play_order_item_to_product>
+            <m2epro_amazon_fba_magento_order_place_after>
+                <observers>
+                    <revert_ordered_qty>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Amazon_Order</class>
+                        <method>revertOrderedQty</method>
+                    </revert_ordered_qty>
+                </observers>
+            </m2epro_amazon_fba_magento_order_place_after>
+
+            <m2epro_synchronization_before_start>
+                <observers>
+                    <disable_stock_item_automatic_reindex>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_StockItem</class>
+                        <method>disableAutomaticReindex</method>
+                    </disable_stock_item_automatic_reindex>
+                </observers>
+            </m2epro_synchronization_before_start>
+            <m2epro_synchronization_after_end>
+                <observers>
+                    <enable_stock_item_automatic_reindex>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_StockItem</class>
+                        <method>enableAutomaticReindex</method>
+                    </enable_stock_item_automatic_reindex>
+                </observers>
+            </m2epro_synchronization_after_end>
+
+        </events>
+        <models>
+            <M2ePro>
+                <class>Ess_M2ePro_Model</class>
+                <resourceModel>M2ePro_mysql4</resourceModel>
+            </M2ePro>
+            <M2ePro_mysql4>
+                <class>Ess_M2ePro_Model_Mysql4</class>
+                <entities>
+
+                    <!-- GENERAL -->
+
+                    <Config_Primary>
+                        <table>m2epro_primary_config</table>
+                    </Config_Primary>
+                    <Config_Module>
+                        <table>m2epro_config</table>
+                    </Config_Module>
+                    <Config_Cache>
+                        <table>m2epro_cache_config</table>
+                    </Config_Cache>
+                    <Config_Synchronization>
+                        <table>m2epro_synchronization_config</table>
+                    </Config_Synchronization>
+
+                    <LockItem>
+                        <table>m2epro_lock_item</table>
+                    </LockItem>
+                    <LockedObject>
+                        <table>m2epro_locked_object</table>
+                    </LockedObject>
+                    <ProductChange>
+                        <table>m2epro_product_change</table>
+                    </ProductChange>
+                    <OperationHistory>
+                        <table>m2epro_operation_history</table>
+                    </OperationHistory>
+                    <Processing_Request>
+                        <table>m2epro_processing_request</table>
+                    </Processing_Request>
+                    <Synchronization_Log>
+                        <table>m2epro_synchronization_log</table>
+                    </Synchronization_Log>
+
+                    <AttributeSet>
+                        <table>m2epro_attribute_set</table>
+                    </AttributeSet>
+                    <StopQueue>
+                        <table>m2epro_stop_queue</table>
+                    </StopQueue>
+                    <Wizard>
+                        <table>m2epro_wizard</table>
+                    </Wizard>
+
+                    <!-- ACCOUNTS AND MARKETPLACES -->
+
+                    <Account>
+                        <table>m2epro_account</table>
+                    </Account>
+                    <Ebay_Account>
+                        <table>m2epro_ebay_account</table>
+                    </Ebay_Account>
+                    <Ebay_Account_Policy>
+                        <table>m2epro_ebay_account_policy</table>
+                    </Ebay_Account_Policy>
+                    <Amazon_Account>
+                        <table>m2epro_amazon_account</table>
+                    </Amazon_Account>
+                    <Buy_Account>
+                        <table>m2epro_buy_account</table>
+                    </Buy_Account>
+                    <Play_Account>
+                        <table>m2epro_play_account</table>
+                    </Play_Account>
+
+                    <Marketplace>
+                        <table>m2epro_marketplace</table>
+                    </Marketplace>
+                    <Ebay_Marketplace>
+                        <table>m2epro_ebay_marketplace</table>
+                    </Ebay_Marketplace>
+                    <Amazon_Marketplace>
+                        <table>m2epro_amazon_marketplace</table>
+                    </Amazon_Marketplace>
+                    <Buy_Marketplace>
+                        <table>m2epro_buy_marketplace</table>
+                    </Buy_Marketplace>
+                    <Play_Marketplace>
+                        <table>m2epro_play_marketplace</table>
+                    </Play_Marketplace>
+
+                    <!-- TEMPLATES -->
+
+                    <Template_SellingFormat>
+                        <table>m2epro_template_selling_format</table>
+                    </Template_SellingFormat>
+                    <Ebay_Template_SellingFormat>
+                        <table>m2epro_ebay_template_selling_format</table>
+                    </Ebay_Template_SellingFormat>
+                    <Amazon_Template_SellingFormat>
+                        <table>m2epro_amazon_template_selling_format</table>
+                    </Amazon_Template_SellingFormat>
+                    <Buy_Template_SellingFormat>
+                        <table>m2epro_buy_template_selling_format</table>
+                    </Buy_Template_SellingFormat>
+                    <Play_Template_SellingFormat>
+                        <table>m2epro_play_template_selling_format</table>
+                    </Play_Template_SellingFormat>
+
+                    <Template_Synchronization>
+                        <table>m2epro_template_synchronization</table>
+                    </Template_Synchronization>
+                    <Ebay_Template_Synchronization>
+                        <table>m2epro_ebay_template_synchronization</table>
+                    </Ebay_Template_Synchronization>
+                    <Amazon_Template_Synchronization>
+                        <table>m2epro_amazon_template_synchronization</table>
+                    </Amazon_Template_Synchronization>
+                    <Buy_Template_Synchronization>
+                        <table>m2epro_buy_template_synchronization</table>
+                    </Buy_Template_Synchronization>
+                    <Play_Template_Synchronization>
+                        <table>m2epro_play_template_synchronization</table>
+                    </Play_Template_Synchronization>
+
+                    <!-- LISTINGS -->
+
+                    <Listing_Category>
+                        <table>m2epro_listing_category</table>
+                    </Listing_Category>
+
+                    <Listing_Log>
+                        <table>m2epro_listing_log</table>
+                    </Listing_Log>
+                    <Listing_Other_Log>
+                        <table>m2epro_listing_other_log</table>
+                    </Listing_Other_Log>
+
+                    <Listing_Other>
+                        <table>m2epro_listing_other</table>
+                    </Listing_Other>
+                    <Ebay_Listing_Other>
+                        <table>m2epro_ebay_listing_other</table>
+                    </Ebay_Listing_Other>
+                    <Amazon_Listing_Other>
+                        <table>m2epro_amazon_listing_other</table>
+                    </Amazon_Listing_Other>
+                    <Buy_Listing_Other>
+                        <table>m2epro_buy_listing_other</table>
+                    </Buy_Listing_Other>
+                    <Play_Listing_Other>
+                        <table>m2epro_play_listing_other</table>
+                    </Play_Listing_Other>
+
+                    <Listing>
+                        <table>m2epro_listing</table>
+                    </Listing>
+                    <Ebay_Listing>
+                        <table>m2epro_ebay_listing</table>
+                    </Ebay_Listing>
+                    <Amazon_Listing>
+                        <table>m2epro_amazon_listing</table>
+                    </Amazon_Listing>
+                    <Buy_Listing>
+                        <table>m2epro_buy_listing</table>
+                    </Buy_Listing>
+                    <Play_Listing>
+                        <table>m2epro_play_listing</table>
+                    </Play_Listing>
+
+                    <Listing_Product>
+                        <table>m2epro_listing_product</table>
+                    </Listing_Product>
+                    <Ebay_Listing_Product>
+                        <table>m2epro_ebay_listing_product</table>
+                    </Ebay_Listing_Product>
+                    <Amazon_Listing_Product>
+                        <table>m2epro_amazon_listing_product</table>
+                    </Amazon_Listing_Product>
+                    <Buy_Listing_Product>
+                        <table>m2epro_buy_listing_product</table>
+                    </Buy_Listing_Product>
+                    <Play_Listing_Product>
+                        <table>m2epro_play_listing_product</table>
+                    </Play_Listing_Product>
+
+                    <Listing_Product_Variation>
+                        <table>m2epro_listing_product_variation</table>
+                    </Listing_Product_Variation>
+                    <Ebay_Listing_Product_Variation>
+                        <table>m2epro_ebay_listing_product_variation</table>
+                    </Ebay_Listing_Product_Variation>
+                    <Amazon_Listing_Product_Variation>
+                        <table>m2epro_amazon_listing_product_variation</table>
+                    </Amazon_Listing_Product_Variation>
+                    <Buy_Listing_Product_Variation>
+                        <table>m2epro_buy_listing_product_variation</table>
+                    </Buy_Listing_Product_Variation>
+                    <Play_Listing_Product_Variation>
+                        <table>m2epro_play_listing_product_variation</table>
+                    </Play_Listing_Product_Variation>
+
+                    <Listing_Product_Variation_Option>
+                        <table>m2epro_listing_product_variation_option</table>
+                    </Listing_Product_Variation_Option>
+                    <Ebay_Listing_Product_Variation_Option>
+                        <table>m2epro_ebay_listing_product_variation_option</table>
+                    </Ebay_Listing_Product_Variation_Option>
+                    <Amazon_Listing_Product_Variation_Option>
+                        <table>m2epro_amazon_listing_product_variation_option</table>
+                    </Amazon_Listing_Product_Variation_Option>
+                    <Buy_Listing_Product_Variation_Option>
+                        <table>m2epro_buy_listing_product_variation_option</table>
+                    </Buy_Listing_Product_Variation_Option>
+                    <Play_Listing_Product_Variation_Option>
+                        <table>m2epro_play_listing_product_variation_option</table>
+                    </Play_Listing_Product_Variation_Option>
+
+                    <!-- ORDERS -->
+
+                    <Order_Log>
+                        <table>m2epro_order_log</table>
+                    </Order_Log>
+                    <Order_Change>
+                        <table>m2epro_order_change</table>
+                    </Order_Change>
+                    <Order_Repair>
+                        <table>m2epro_order_repair</table>
+                    </Order_Repair>
+
+                    <Order>
+                        <table>m2epro_order</table>
+                    </Order>
+                    <Ebay_Order>
+                        <table>m2epro_ebay_order</table>
+                    </Ebay_Order>
+                    <Amazon_Order>
+                        <table>m2epro_amazon_order</table>
+                    </Amazon_Order>
+                    <Buy_Order>
+                        <table>m2epro_buy_order</table>
+                    </Buy_Order>
+                    <Play_Order>
+                        <table>m2epro_play_order</table>
+                    </Play_Order>
+
+                    <Order_Item>
+                        <table>m2epro_order_item</table>
+                    </Order_Item>
+                    <Ebay_Order_Item>
+                        <table>m2epro_ebay_order_item</table>
+                    </Ebay_Order_Item>
+                    <Amazon_Order_Item>
+                        <table>m2epro_amazon_order_item</table>
+                    </Amazon_Order_Item>
+                    <Buy_Order_Item>
+                        <table>m2epro_buy_order_item</table>
+                    </Buy_Order_Item>
+                    <Play_Order_Item>
+                        <table>m2epro_play_order_item</table>
+                    </Play_Order_Item>
+
+                    <!-- EBAY -->
+
+                    <Ebay_Item>
+                        <table>m2epro_ebay_item</table>
+                    </Ebay_Item>
+
+                    <Ebay_Feedback>
+                        <table>m2epro_ebay_feedback</table>
+                    </Ebay_Feedback>
+                    <Ebay_Feedback_Template>
+                        <table>m2epro_ebay_feedback_template</table>
+                    </Ebay_Feedback_Template>
+
+                    <Ebay_Order_ExternalTransaction>
+                        <table>m2epro_ebay_order_external_transaction</table>
+                    </Ebay_Order_ExternalTransaction>
+
+                    <Ebay_Listing_Auto_Category>
+                        <table>m2epro_ebay_listing_auto_category</table>
+                    </Ebay_Listing_Auto_Category>
+                    <Ebay_Listing_Auto_Category_Group>
+                        <table>m2epro_ebay_listing_auto_category_group</table>
+                    </Ebay_Listing_Auto_Category_Group>
+
+                    <Ebay_Template_Payment>
+                        <table>m2epro_ebay_template_payment</table>
+                    </Ebay_Template_Payment>
+                    <Ebay_Template_Payment_Service>
+                        <table>m2epro_ebay_template_payment_service</table>
+                    </Ebay_Template_Payment_Service>
+                    <Ebay_Template_Shipping>
+                        <table>m2epro_ebay_template_shipping</table>
+                    </Ebay_Template_Shipping>
+                    <Ebay_Template_Shipping_Service>
+                        <table>m2epro_ebay_template_shipping_service</table>
+                    </Ebay_Template_Shipping_Service>
+                    <Ebay_Template_Shipping_Calculated>
+                        <table>m2epro_ebay_template_shipping_calculated</table>
+                    </Ebay_Template_Shipping_Calculated>
+                    <Ebay_Template_Return>
+                        <table>m2epro_ebay_template_return</table>
+                    </Ebay_Template_Return>
+                    <Ebay_Template_Description>
+                        <table>m2epro_ebay_template_description</table>
+                    </Ebay_Template_Description>
+                    <Ebay_Template_Policy>
+                        <table>m2epro_ebay_template_policy</table>
+                    </Ebay_Template_Policy>
+                    <Ebay_Template_Category>
+                        <table>m2epro_ebay_template_category</table>
+                    </Ebay_Template_Category>
+                    <Ebay_Template_Category_Specific>
+                        <table>m2epro_ebay_template_category_specific</table>
+                    </Ebay_Template_Category_Specific>
+                    <Ebay_Template_OtherCategory>
+                        <table>m2epro_ebay_template_other_category</table>
+                    </Ebay_Template_OtherCategory>
+
+                    <!-- AMAZON -->
+
+                    <Amazon_Item>
+                        <table>m2epro_amazon_item</table>
+                    </Amazon_Item>
+
+                    <Amazon_Template_NewProduct>
+                        <table>m2epro_amazon_template_new_product</table>
+                    </Amazon_Template_NewProduct>
+                    <Amazon_Template_NewProduct_Specific>
+                        <table>m2epro_amazon_template_new_product_specific</table>
+                    </Amazon_Template_NewProduct_Specific>
+                    <Amazon_Template_NewProduct_Description>
+                        <table>m2epro_amazon_template_new_product_description</table>
+                    </Amazon_Template_NewProduct_Description>
+
+                    <!-- BUY -->
+
+                    <Buy_Item>
+                        <table>m2epro_buy_item</table>
+                    </Buy_Item>
+                    <Buy_Template_NewProduct>
+                        <table>m2epro_buy_template_new_product</table>
+                    </Buy_Template_NewProduct>
+
+                    <Buy_Template_NewProduct_Core>
+                        <table>m2epro_buy_template_new_product_core</table>
+                    </Buy_Template_NewProduct_Core>
+
+                    <Buy_Template_NewProduct_Attribute>
+                        <table>m2epro_buy_template_new_product_attribute</table>
+                    </Buy_Template_NewProduct_Attribute>
+
+                    <!-- PLAY -->
+
+                    <Play_Item>
+                        <table>m2epro_play_item</table>
+                    </Play_Item>
+
+                </entities>
+            </M2ePro_mysql4>
+        </models>
+        <resources>
+            <M2ePro_setup>
+                <setup>
+                    <module>Ess_M2ePro</module>
+                    <class>Ess_M2ePro_Model_Upgrade_MySqlSetup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </M2ePro_setup>
+            <M2ePro_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </M2ePro_write>
+            <M2ePro_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </M2ePro_read>
+        </resources>
+        <blocks>
+            <M2ePro>
+                <class>Ess_M2ePro_Block</class>
+            </M2ePro>
+            <adminhtml>
+                <rewrite>
+                    <page_menu>Ess_M2ePro_Block_Adminhtml_Magento_Menu</page_menu>
+                </rewrite>
+            </adminhtml>
+        </blocks>
+        <helpers>
+            <M2ePro>
+                <class>Ess_M2ePro_Helper</class>
+            </M2ePro>
+        </helpers>
+    </global>
+    <crontab>
+        <jobs>
+            <M2ePro_cron>
+                <schedule>
+                    <cron_expr>*/1 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>M2ePro/Cron_Type_Magento::process</model>
+                </run>
+            </M2ePro_cron>
+        </jobs>
+        <events>
+            <sales_convert_quote_item_to_order_item>
+                <observers>
+                    <m2epro_cron_giftmessage>
+                        <type>model</type>
+                        <class>giftmessage/observer</class>
+                        <method>salesEventConvertQuoteItemToOrderItem</method>
+                    </m2epro_cron_giftmessage>
+                </observers>
+            </sales_convert_quote_item_to_order_item>
+            <sales_order_item_save_commit_after>
+                <observers>
+                    <m2epro_cron_downloadable_observer>
+                        <class>downloadable/observer</class>
+                        <method>saveDownloadableOrderItem</method>
+                    </m2epro_cron_downloadable_observer>
+                </observers>
+            </sales_order_item_save_commit_after>
+            <sales_order_save_commit_after>
+                <observers>
+                    <m2epro_cron_downloadable_observer>
+                        <class>downloadable/observer</class>
+                        <method>setLinkStatus</method>
+                    </m2epro_cron_downloadable_observer>
+                </observers>
+            </sales_order_save_commit_after>
+        </events>
+    </crontab>
+</config>

@@ -1,0 +1,292 @@
+<script type="text/javascript">
+
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_View_Ebay'); ?>,
+        'Ess_M2ePro_Helper_View_Ebay'
+    );
+
+    Event.observe(window, 'load', function() {
+
+        EbayConfigurationGeneralHandlerObj = new EbayConfigurationHandler();
+
+        $('view_ebay_mode').observe('change', EbayConfigurationGeneralHandlerObj.viewModeChange)
+                           .simulate('change');
+
+        editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+
+    });
+
+    M2ePro.formData.multiCurrencyCount = <?php echo count($multiCurrency = $this->getMultiCurrency()); ?>;
+
+</script>
+
+<form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
+
+    <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
+
+    <div class="entry-edit" id="magento_block_ebay_configuration_general_general">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tbody>
+
+                        <tr id="view_ebay_mode_tr">
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Mode'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <select id="view_ebay_mode" name="view_ebay_mode">
+                                    <option value="<?php echo Ess_M2ePro_Helper_View_Ebay::MODE_SIMPLE; ?>" <?php if ($this->view_ebay_mode == Ess_M2ePro_Helper_View_Ebay::MODE_SIMPLE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Simple'); ?></option>
+                                    <option value="<?php echo Ess_M2ePro_Helper_View_Ebay::MODE_ADVANCED; ?>" <?php if ($this->view_ebay_mode == Ess_M2ePro_Helper_View_Ebay::MODE_ADVANCED): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Advanced'); ?></option>
+                                </select>
+                                <p class="note">
+                                    <span><?php echo Mage::helper('M2ePro')->__('There are two modes. Simple is suitable for new users and for those with a limited inventory. Advanced is suitable for the more experienced user.'); ?></span>
+                                </p>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_configuration_general_notification">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Notifications'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tbody>
+
+                    <tr id="negative_feedbacks_row">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Negative Feedback'); ?>: </label>
+                        </td>
+                        <td class="value">
+                            <select name="view_ebay_feedbacks_notification_mode">
+                                <option value="0" <?php if (!$this->view_ebay_feedbacks_notification_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1" <?php if ($this->view_ebay_feedbacks_notification_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Show a notification in Magento when you receive negative feedback on eBay.'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="entry-edit" id="magento_block_ebay_configuration_general_selling">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Selling'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tbody>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Item Specifics Step')?>: </label>
+                        </td>
+
+                        <td class="value">
+                            <select name="use_last_specifics_mode">
+                                <option value="0" <?php if (!$this->use_last_specifics_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Show'); ?></option>
+                                <option value="1" <?php if ($this->use_last_specifics_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Do Not Show'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__(
+                                    'Choose <b>Do Not Show</b> if you don\'t need to edit item specifics details every time you add products.<br/>
+                                    You can view and change predefined item specifics in %root_node_label% > Configuration > Categories in Use.',
+                                    Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()
+                                ); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <?php if (!empty($multiCurrency)) :?>
+                        <?php foreach ($multiCurrency as $marketplace=>$data) :?>
+                            <?php $currency = explode(',', $data['currency']);?>
+                            <tr>
+                                <td class="label">
+                                    <label><?php echo Mage::helper('M2ePro')->__($marketplace) . ' ' . Mage::helper('M2ePro')->__('Currency')?>: </label>
+                                </td>
+
+                                <td class="value">
+
+                                    <select name="selling_currency[<?php echo $data['code']?>]">
+                                        <?php foreach ($currency as $cur) :?>
+                                            <option value="<?php echo $cur?>" <?php echo ($this->isCurrencyForCode($data['code'], $cur)) ? 'selected = selected' : ''?>><?php echo $cur; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+
+                                    <p class="note">
+                                        <span><?php echo Mage::helper('M2ePro')->__('Choose the currency you want to sell for.'); ?></span>
+                                    </p>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Prevent eBay Item Duplicates')?>: </label>
+                        </td>
+
+                        <td class="value">
+                            <select name="check_the_same_product_already_listed_mode">
+                                <option value="0" <?php if (!$this->check_the_same_product_already_listed_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1" <?php if ($this->check_the_same_product_already_listed_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__(
+                                    'Choose \'Yes\' to prevent M2E Pro listing a product if it has already been added by another M2E Pro listing.<br/><br/>
+                                     This function is useful if you have automatic rules set up that list products automatically as it will ensure a product is listed only once.<br/><br/>
+                                     <b>Note:</b> Applies only to products listed automatically on live eBay sites (ie not using a Sandbox account).'
+                                ); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <?php if ($this->is_motors_specifics_marketplace_enabled || $this->is_motors_ktypes_marketplace_enabled): ?>
+        <div class="entry-edit" id="magento_block_ebay_configuration_general_parts_compatibility">
+
+            <div id="block_notice_ebay_category_parts_compatibility" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Compatibility'); ?>">
+                <?php echo Mage::helper('M2ePro')->__(
+                    'Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing.<br />
+                    You can create one listing describing a single part and add a complete list of compatible vehicles'
+                ); ?>
+            </div>
+
+            <div class="entry-edit-head">
+                <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Parts Compatibility'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+                <div class="hor-scroll">
+
+                    <table class="form-list" cellspacing="0" cellpadding="0">
+
+                        <tbody>
+
+                        <?php if ($this->is_motors_specifics_marketplace_enabled): ?>
+
+                            <tr>
+                                <td class="label">
+                                    <label for="motors_specifics_attribute"><?php echo Mage::helper('M2ePro')->__('ePIDs Attribute'); ?>:</label>
+                                </td>
+
+                                <?php if (count($this->attributes_for_parts_compatibility) != 0): ?>
+                                    <td class="value">
+                                        <select id="motors_specifics_attribute" name="motors_specifics_attribute" class="select">
+                                            <option value="">-- <?php echo Mage::helper('M2ePro')->__('Select Attribute'); ?> --</option>
+                                            <?php foreach ($this->attributes_for_parts_compatibility as $attribute): ?>
+                                                <option value="<?php echo $attribute['attribute_code']; ?>"<?php if ($attribute['attribute_code'] == $this->motors_specifics_attribute): ?> selected="selected"<?php endif; ?>><?php echo $attribute['frontend_label']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </td>
+                                    <td id="motors_specifics_attribute_td_note">
+                                        <p class="note">
+                                            <span><?php echo Mage::helper('M2ePro')->__(
+                                                    'Choose the attribute below that contains the Product Reference IDs (ePIDs) of compatible vehicles for the part.<br />
+                                                     In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible items.
+                                                     <br /><br />
+                                                     Only textarea attributes are shown.'
+                                                ); ?></span>
+                                        </p>
+                                    </td>
+                                <?php else: ?>
+                                    <td class="value">
+                                        <div id="block_notice_ebay_configuration_motors_specifics_attribute" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+                                            <?php echo Mage::helper('M2ePro')->__('You do not have textarea attributes.'); ?>
+                                        </div>
+                                    </td>
+                                <?php endif; ?>
+                            </tr>
+
+                        <?php endif; ?>
+
+                        <?php if ($this->is_motors_ktypes_marketplace_enabled): ?>
+
+                            <tr>
+                                <td class="label">
+                                    <label for="motors_ktypes_attribute"><?php echo Mage::helper('M2ePro')->__('KTypes Attribute'); ?>:</label>
+                                </td>
+
+                                <?php if (count($this->attributes_for_parts_compatibility) != 0): ?>
+                                    <td class="value">
+                                        <select id="motors_ktypes_attribute" name="motors_ktypes_attribute" class="select">
+                                            <option value="">-- <?php echo Mage::helper('M2ePro')->__('Select Attribute'); ?> --</option>
+                                            <?php foreach ($this->attributes_for_parts_compatibility as $attribute): ?>
+                                                <option value="<?php echo $attribute['attribute_code']; ?>"<?php if ($attribute['attribute_code'] == $this->motors_ktypes_attribute): ?> selected="selected"<?php endif; ?>><?php echo $attribute['frontend_label']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </td>
+                                    <td id="motors_ktypes_attribute_td_note">
+                                        <p class="note">
+                                            <span><?php echo Mage::helper('M2ePro')->__(
+                                                    'Choose the attribute below that contains the KTypes of compatible vehicles for the part.<br />
+                                                     In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible items.
+                                                     <br /><br />
+                                                     Only textarea attributes are shown.'
+                                                ); ?></span>
+                                        </p>
+                                    </td>
+                                <?php else: ?>
+                                    <td class="value">
+                                        <div id="block_notice_ebay_configuration_motors_ktypes_attribute" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+                                            <?php echo Mage::helper('M2ePro')->__('You do not have textarea attributes.'); ?>
+                                        </div>
+                                    </td>
+                                <?php endif; ?>
+                            </tr>
+
+                        <?php endif; ?>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+    <?php endif; ?>
+
+</form>

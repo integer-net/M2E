@@ -1,0 +1,652 @@
+<div id="block_notice_play_accounts_orders" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Orders'); ?>">
+    <?php
+    $menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
+    echo Mage::helper('M2ePro')->__('This tab contains settings of Play.com Orders, Play.com Customers import; Magento Orders and Products creation.<br/>
+If you set Import Play.com Orders to <i>Yes</i>, a new Play.com order will be imported to the system and can be found in %menu_label% > Sales > Orders.<br/><br/>
+It is possible to allow auto creation of Magento Orders based on imported Play.com Orders for products listed by Other Software.<br/><br/>
+<b>Note:</b> The Product Stock QTY only reduces after Magento Order is created.<br/>
+These type of orders can be managed as typical Magento Orders in Magento > Sales > Orders.<br/><br/>
+<b>Note:</b> To receive orders from Play.com, Order Synchronization must be enabled in %menu_label% > Configuration > Synchronization.', $menuLabel);
+    ?>
+</div>
+
+<?php
+$formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
+$formData['magento_orders_settings'] = !empty($formData['magento_orders_settings']) ? json_decode($formData['magento_orders_settings'], true) : array();
+
+$defaults = array(
+    'orders_mode' => Ess_M2ePro_Model_Play_Account::ORDERS_MODE_YES,
+
+    'magento_orders_settings' => array(
+        'listing' => array(
+            'mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES,
+            'store_mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT,
+            'store_id' => NULL
+        ),
+        'listing_other' => array(
+            'mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES,
+            'product_mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT,
+            'product_tax_class_id' => Ess_M2ePro_Model_Magento_Product::TAX_CLASS_ID_NONE,
+            'store_id' => NULL,
+        ),
+        'number' => array(
+            'source' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_SOURCE_MAGENTO,
+            'prefix' => array(
+                'mode'   => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_NO,
+                'prefix' => '',
+            ),
+        ),
+        'tax' => array(
+            'mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_MIXED
+        ),
+        'customer' => array(
+            'mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_GUEST,
+            'id' => NULL,
+            'website_id' => NULL,
+            'group_id' => NULL,
+            'subscription_mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_NEW_SUBSCRIPTION_MODE_NO,
+            'notifications' => array(
+                'customer_created' => false,
+                'invoice_created' => false,
+                'order_created' => false
+            )
+        ),
+        'status_mapping' => array(
+            'mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT,
+            'processing' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_PROCESSING,
+            'shipped' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_SHIPPED,
+        ),
+        'qty_reservation' => array(
+            'days' => 0
+        ),
+        'invoice_mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_INVOICE_MODE_YES,
+        'shipment_mode' => Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_SHIPMENT_MODE_YES
+    )
+);
+
+$formData = Mage::helper('M2ePro')->arrayReplaceRecursive($defaults, $formData);
+
+$isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'No Customer entry is found for specified ID.' => Mage::helper('M2ePro')->__('No Customer entry is found for specified ID.'),
+        'Prefix length should not be greater than 5 characters.' => Mage::helper('M2ePro')->__('Prefix length should not be greater than 5 characters.')
+    )); ?>);
+
+    M2ePro.formData.orders_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['orders_mode']); ?>';
+
+    M2ePro.formData.magento_orders_listings_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing']['mode']); ?>';
+    M2ePro.formData.magento_orders_listings_store_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing']['store_mode']); ?>';
+    M2ePro.formData.magento_orders_listings_store_id = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing']['store_id']); ?>';
+
+    M2ePro.formData.magento_orders_listings_other_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing_other']['mode']); ?>';
+    M2ePro.formData.magento_orders_listings_other_store_id = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing_other']['store_id']); ?>';
+    M2ePro.formData.magento_orders_listings_other_product_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing_other']['product_mode']); ?>';
+
+    M2ePro.formData.magento_orders_customer_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['customer']['mode']); ?>';
+    M2ePro.formData.magento_orders_customer_id = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['customer']['id']); ?>';
+    M2ePro.formData.magento_orders_customer_new_website_id = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['customer']['website_id']); ?>';
+    M2ePro.formData.magento_orders_customer_new_group_id = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['customer']['group_id']); ?>';
+<!--    M2ePro.formData.magento_orders_customer_new_newsletter_mode = '--><?php //echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['customer']['subscription_mode']); ?><!--';-->
+
+    Event.observe(window, 'load', function() {
+        setTimeout(function() {
+            $('orders_mode').observe('change', PlayAccountHandlerObj.ordersModeChange);
+
+            $('magento_orders_listings_mode').observe('change', PlayAccountHandlerObj.magentoOrdersListingsModeChange);
+            $('magento_orders_listings_store_mode').observe('change', PlayAccountHandlerObj.magentoOrdersListingsStoreModeChange);
+
+            $('magento_orders_listings_other_mode').observe('change', PlayAccountHandlerObj.magentoOrdersListingsOtherModeChange);
+            $('magento_orders_listings_other_product_mode').observe('change', PlayAccountHandlerObj.magentoOrdersListingsOtherProductModeChange);
+
+            $('magento_orders_number_source').observe('change', PlayAccountHandlerObj.magentoOrdersNumberSourceChange);
+            $('magento_orders_number_prefix_mode').observe('change', PlayAccountHandlerObj.magentoOrdersNumberPrefixModeChange);
+            $('magento_orders_number_prefix_prefix').observe('keyup', PlayAccountHandlerObj.magentoOrdersNumberPrefixPrefixChange);
+            PlayAccountHandlerObj.renderOrderNumberExample();
+
+            $('magento_orders_customer_mode').observe('change', PlayAccountHandlerObj.magentoOrdersCustomerModeChange);
+            $('magento_orders_status_mapping_mode').observe('change', PlayAccountHandlerObj.magentoOrdersStatusMappingModeChange);
+        }, 350);
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_play_accounts_orders_mode">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="orders_mode"><?php echo Mage::helper('M2ePro')->__('Import Play.com Orders'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="orders_mode" name="orders_mode" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO; ?>" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::ORDERS_MODE_YES; ?>" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Allows importing orders from Play.com to M2E Pro.'); ?></span>
+                        </p>
+
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_accounts_magento_orders_listings" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Product Is Listed By M2E Pro'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="magento_orders_listings_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="magento_orders_listings_mode" name="magento_orders_settings[listing][mode]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO; ?>" <?php if ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES; ?>" <?php if ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Whether an order has to be created in Magento if a sold product belongs to M2E Pro Listings.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_listings_store_mode_container" <?php if($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="magento_orders_listings_store_mode"><?php echo Mage::helper('M2ePro')->__('Store View Source'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="magento_orders_listings_store_mode" name="magento_orders_settings[listing][store_mode]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT; ?>" <?php if ($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Use Store View from Listing'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM; ?>" <?php if ($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Choose Store View Manually'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('If Store View has to be automatically taken from the listing or manually chosen from available Store View values.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_listings_store_id_container" <?php if($formData['magento_orders_settings']['listing']['store_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_DEFAULT) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Store View'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <?php echo $this->getChildHtml('magento_orders_listings_store_id'); ?>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Store in which orders will be placed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_accounts_magento_orders_listings_other" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Product Is Listed By Any Other Software'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="magento_orders_listings_other_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="magento_orders_listings_other_mode" name="magento_orders_settings[listing_other][mode]" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Whether an order has to be created in Magento if a sold product does not belong to M2E Pro Listings.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_listings_other_store_id_container" <?php if($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Store View'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <?php echo $this->getChildHtml('magento_orders_listings_other_store_id'); ?>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Store in which orders will be placed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_listings_other_product_mode_container" <?php if($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="magento_orders_listings_other_product_mode"><?php echo Mage::helper('M2ePro')->__('Product Not Found'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="magento_orders_listings_other_product_mode" name="magento_orders_settings[listing_other][product_mode]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Do Not Create Order'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT; ?>" <?php if ($formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT) echo ' selected="selected"';?>><?php echo Mage::helper('M2ePro')->__('Create Product and Order'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('What has to be done if a listed product does not exist in Magento.'); ?></span><br />
+                            <span id="magento_orders_listings_other_product_mode_note" <?php if ($formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE) echo 'style="display: none;"'; ?>><?php echo Mage::helper('M2ePro')->__('<b>Note:</b> Only simple products without variations can be created in Magento. If there is a product with variations on Play.com, M2E Pro creates different simple products for each variation.') ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <?php $canShowBlock = $formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT; ?>
+                <tr id="magento_orders_listings_other_product_tax_class_id_container" <?php if (!$canShowBlock): ?>style="display: none;"<?php endif; ?>>
+                    <td class="label">
+                        <label for="magento_orders_listings_other_product_tax_class_id"><?php echo Mage::helper('M2ePro')->__('Product Tax Class') ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select id="magento_orders_listings_other_product_tax_class_id" name="magento_orders_settings[listing_other][product_tax_class_id]" class="M2ePro-required-when-visible">
+                            <?php foreach ($this->productTaxClasses as $taxClass): ?>
+                                <option value="<?php echo (int)$taxClass['value'] ?>" <?php if ($formData['magento_orders_settings']['listing_other']['product_tax_class_id'] == $taxClass['value']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($taxClass['label']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="note">
+                            <?php echo Mage::helper('M2ePro')->__('Tax Class which will be used for products created by M2E Pro.'); ?>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_accounts_magento_orders_number" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Magento Order Number'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <div id="block_notice_play_accounts_orders_number" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Number Prefix'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('Sets Magento order number basing on the settings below.'); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="magento_orders_number_source"><?php echo Mage::helper('M2ePro')->__('Source'); ?>: </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_number_source" name="magento_orders_settings[number][source]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_SOURCE_MAGENTO; ?>" <?php if ($formData['magento_orders_settings']['number']['source'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_SOURCE_MAGENTO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Magento'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_SOURCE_CHANNEL; ?>" <?php if ($formData['magento_orders_settings']['number']['source'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_SOURCE_CHANNEL) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Play.com'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('If source is set to Magento, Magento order numbers are created basing on your Magento settings. <br>If source is set to Play.com, Magento order numbers are the same as Play.com order numbers.</br>'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="magento_orders_number_prefix_mode"><?php echo Mage::helper('M2ePro')->__('Use Prefix'); ?>: </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_number_prefix_mode" name="magento_orders_settings[number][prefix][mode]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_NO; ?>" <?php if ($formData['magento_orders_settings']['number']['prefix']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_YES; ?>" <?php if ($formData['magento_orders_settings']['number']['prefix']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose to set the prefix before Magento order number.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_number_prefix_container" <?php if($formData['magento_orders_settings']['number']['prefix']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_PREFIX_MODE_NO) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="magento_orders_customer_id"><?php echo Mage::helper('M2ePro')->__('Prefix'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="magento_orders_number_prefix_prefix" maxlength="5" name="magento_orders_settings[number][prefix][prefix]" value="<?php echo $this->escapeHtml($formData['magento_orders_settings']['number']['prefix']['prefix']); ?>" type="text" class="M2ePro-required-when-visible M2ePro-account-order-number-prefix input-text" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Enter the prefix to be set before Magento order number.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input type="hidden" id="sample_magento_order_id" value="<?php echo Mage::helper('M2ePro/Magento')->getNextMagentoOrderId(); ?>" />
+                        <input type="hidden" id="sample_play_order_id" value="456395693" />
+
+                        <p class="note note-no-tool-tip">
+                            <?php echo Mage::helper('M2ePro')->__('e.g.'); ?> <strong><span id="order_number_example_container"></span></strong>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_accounts_magento_orders_rules" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('QTY Reservation'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+            <div id="block_notice_play_accounts_magento_orders_rules" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('QTY Reservation'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('Use the Reserve QTY option to prevent the item being sold, before Magento Order created (as the Product Stock QTY only reduces after Magento Order creation). It removes items from Magento Stock at once Play.com Order comes from Play.com.
+                Reserve qty will be used when Magento Order is created or released when the term of qty reservation has expired.
+                '); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr id="magento_orders_qty_reservation_days_container">
+                    <td class="label">
+                        <label for="magento_orders_qty_reservation_days"><?php echo Mage::helper('M2ePro')->__('Reserve QTY') ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select name="magento_orders_settings[qty_reservation][days]" id="magento_orders_qty_reservation_days">
+                            <option value="0" <?php if ($formData['magento_orders_settings']['qty_reservation']['days'] == 0): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Never') ?></option>
+                            <?php for ($day = 1; $day <= 14; $day++): ?>
+                                <option value="<?php echo (int)$day ?>" <?php if ($formData['magento_orders_settings']['qty_reservation']['days'] == $day): ?>selected="selected"<?php endif; ?>>
+                                    <?php if ($day == 1): ?>
+                                        <?php echo Mage::helper('M2ePro')->__('For %number% day', $day) ?>
+                                    <?php else: ?>
+                                        <?php echo Mage::helper('M2ePro')->__('For %amount% days', $day) ?>
+                                    <?php endif; ?>
+                                </option>
+                            <?php endfor; ?>
+                        </select>
+                            <p class="note">
+                                <?php echo Mage::helper('M2ePro')->__('For how many days reserve qty has to be kept while Magento Order is not created.') ?>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_accounts_magento_orders_customer" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Customer Settings'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <div id="block_notice_play_accounts_orders_customers" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Customers'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('There are several ways to specify a customer for which Magento Orders will be created:
+                <ul class="list">
+                    <li><b>Guest Account</b> - the system does not require a customer account to be created. Default Guest Account will be defined as a customer. <br/>
+                    <b>Note:</b> The Guest Checkout option must be enabled in Magento. (<i>Yes</i> must be chosen in the Allow Guest Checkout option in Magento > System > Configuration > Sales > Checkout tab). </li>
+                    <li><b>Predefined Customer</b> - the system uses one predefined customer for all Play.com orders related to this account. You will be required
+                    to provide an ID of the existing Customer, which you can find in Magento > Customers > Manage Customers table.</li>
+                    <li><b>Create New</b> - a new customer will be created in Magento, using Play.com customer data of Play.com Order.
+                    <br/><b>Note:</b> A unique customer identifier is his e-mail address. If the one already exists among Magento customers e-mails,
+                    the system uses this customer as owner of order and links order to him. A new customer will not be created.</li>
+                </ul>'); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="magento_orders_customer_mode"><?php echo Mage::helper('M2ePro')->__('Customer'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_customer_mode" name="magento_orders_settings[customer][mode]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_GUEST; ?>" <?php if ($formData['magento_orders_settings']['customer']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_GUEST) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Guest Account'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_PREDEFINED; ?>" <?php if ($formData['magento_orders_settings']['customer']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_PREDEFINED) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Predefined Customer'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW; ?>" <?php if ($formData['magento_orders_settings']['customer']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Create New'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Customer for which Magento Orders will be created.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_customer_id_container" <?php if($formData['magento_orders_settings']['customer']['mode'] != Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_PREDEFINED) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="magento_orders_customer_id"><?php echo Mage::helper('M2ePro')->__('Customer ID'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input id="magento_orders_customer_id" name="magento_orders_settings[customer][id]" value="<?php echo $this->escapeHtml($formData['magento_orders_settings']['customer']['id']); ?>" type="text" class="M2ePro-required-when-visible validate-digits M2ePro-account-customer-id input-text" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Enter Magento customer ID.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_customer_new_website_id_container" <?php if($formData['magento_orders_settings']['customer']['mode'] != Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="magento_orders_customer_new_website_id"><?php echo Mage::helper('M2ePro')->__('Associate to Website'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_customer_new_website_id" name="magento_orders_settings[customer][website_id]" class="M2ePro-required-when-visible">
+                            <option value="" <?php if ($formData['magento_orders_settings']['customer']['website_id'] == '') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('-- Please Select --'); ?></option>
+                            <?php foreach($this->websites as $website) { ?>
+                                <option value="<?php echo $website['website_id']; ?>" <?php if ($formData['magento_orders_settings']['customer']['website_id'] == $website['website_id']) echo ' selected="selected"'; ?>><?php echo $website['name']; ?></option>
+                            <?php } ?>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Website in which a customer account will be created.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_customer_new_group_id_container" <?php if($formData['magento_orders_settings']['customer']['mode'] != Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="magento_orders_customer_new_group_id"><?php echo Mage::helper('M2ePro')->__('Customer Group'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_customer_new_group_id" name="magento_orders_settings[customer][group_id]" class="M2ePro-required-when-visible">
+                            <option value="" <?php if ($formData['magento_orders_settings']['customer']['group_id'] == '') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('-- Please Select --'); ?></option>
+                            <?php foreach($this->groups as $group) { ?>
+                                <option value="<?php echo $group['customer_group_id']; ?>" <?php if ($formData['magento_orders_settings']['customer']['group_id'] == $group['customer_group_id']) echo ' selected="selected"'; ?>><?php echo $group['customer_group_code']; ?></option>
+                            <?php } ?>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Customer Group to which a customer will be assigned.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_customer_new_notifications_container" <?php if($formData['magento_orders_settings']['customer']['mode'] != Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_CUSTOMER_MODE_NEW) echo 'style="display: none;"'; ?>>
+                    <td class="label">
+                        <label for="magento_orders_customer_new_notifications"><?php echo Mage::helper('M2ePro')->__('Send Emails When The Following Is Created'); ?>: </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_customer_new_notifications" name="magento_orders_settings[customer][notifications][]" multiple="multiple" class="M2ePro-required-when-visible" >
+<!--                            <option value="customer_created" --><?php //if ($formData['magento_orders_settings']['customer']['notifications']['customer_created']) echo ' selected="selected"'; ?><!-->--><?php //echo Mage::helper('M2ePro')->__('Customer Account'); ?><!--</option>-->
+                            <option value="order_created" <?php if ($formData['magento_orders_settings']['customer']['notifications']['order_created']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Magento Order'); ?></option>
+                            <option value="invoice_created" <?php if ($formData['magento_orders_settings']['customer']['notifications']['invoice_created']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Invoice'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Necessary emails will be sent according to Magento settings in Magento > System > Configuration > Sales Emails.<br/>
+                                                                         Hold Ctrl button, to choose more, than one option.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_accounts_magento_orders_tax" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Order Tax Settings'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+            <div id="block_notice_play_accounts_magento_orders_tax" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Order Tax Settings'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('This section allows you to choose tax settings for Magento Order:
+                    <ul class="list">
+                        <li><b>Play.com</b> - Magento Order(s) uses tax settings from Play.com Listing(s).</li>
+                        <li><b>Magento</b> - Magento Order(s) uses Magento tax settings.</li>
+                        <li><b>Play.com & Magento</b> - if there are tax settings in Play.com Order, they are used in Magento Order(s), otherwise, Magento tax settings are used.</li>
+                        <li><b>None</b> - Play.com and Magento tax settings are ignored.</li>
+                    </ul>'); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="magento_orders_tax_mode"><?php echo Mage::helper('M2ePro')->__('Tax Source'); ?>: <span class="required">*</span></label>
+                    </td>
+
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_tax_mode" name="magento_orders_settings[tax][mode]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_NONE; ?>"<?php if ($formData['magento_orders_settings']['tax']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_NONE) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_CHANNEL; ?>"<?php if ($formData['magento_orders_settings']['tax']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_CHANNEL) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Play.com'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_MAGENTO; ?>"<?php if ($formData['magento_orders_settings']['tax']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_MAGENTO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Magento'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_MIXED; ?>"<?php if ($formData['magento_orders_settings']['tax']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_TAX_MODE_MIXED) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Play.com & Magento'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<?php $statusList = $this->getMagentoOrderStatusList(); ?>
+
+<div class="entry-edit" id="magento_block_play_accounts_magento_orders_status_mapping" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Play_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Order Status Mapping'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <div id="block_notice_play_accounts_orders_status" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Order Status Mapping'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('In this block you can configure mapping between Play.com Order state and Magento Order statuses.
+                Depending on the state of Play.com Order you can manually determine certain statuses for Magento Order and enable automatic Shipment and Invoice
+                creation by selecting appropriate check-boxes, or use predefined default settings. (i.e. Play.com: Order is Shipped -> Magento Order is Completed).<br/> '); ?>
+            </div>
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="magento_orders_status_mapping_mode"><?php echo Mage::helper('M2ePro')->__('Status Mapping'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_status_mapping_mode" name="magento_orders_settings[status_mapping][mode]" class="M2ePro-required-when-visible">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT; ?>" <?php if ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT) echo "selected='selected'"; ?>><?php echo Mage::helper('M2ePro')->__('Default Order Statuses'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_CUSTOM; ?>" <?php if ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_CUSTOM) echo "selected='selected'"; ?>><?php echo Mage::helper('M2ePro')->__('Custom Order Statuses'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <?php $isDisabledStatusStyle = ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT) ? "disabled='disabled'" : ''; ?>
+                <?php
+                if ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT) {
+                    $formData['magento_orders_settings']['status_mapping']['new'] = Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_NEW;
+                    $formData['magento_orders_settings']['status_mapping']['processing'] = Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_PROCESSING;
+                    $formData['magento_orders_settings']['status_mapping']['shipped'] = Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_SHIPPED;
+
+                    $formData['magento_orders_settings']['invoice_mode'] = Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_INVOICE_MODE_YES;
+                    $formData['magento_orders_settings']['shipment_mode'] = Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_SHIPMENT_MODE_YES;
+                }
+                ?>
+
+                <tr id="magento_orders_status_mapping_processing_container">
+                    <td class="label">
+                        <label for="magento_orders_status_mapping_processing"><?php echo Mage::helper('M2ePro')->__('Order Status is Sold'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_status_mapping_processing" name="magento_orders_settings[status_mapping][processing]" class="M2ePro-required-when-visible" <?php echo $isDisabledStatusStyle; ?>>
+                            <?php foreach ($statusList as $statusKey => $statusValue) { ?>
+                                <option value="<?php echo $statusKey; ?>" <?php if ($formData['magento_orders_settings']['status_mapping']['processing'] == $statusKey) echo 'selected="selected"'; ?>><?php echo $statusValue; ?></option>
+                            <?php } ?>
+                        </select>
+                    </td>
+                    <td class="value">
+                        <input id="magento_orders_invoice_mode" name="magento_orders_settings[invoice_mode]" type="checkbox" <?php if ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT || $formData['magento_orders_settings']['invoice_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_INVOICE_MODE_YES) echo 'checked="checked"'; ?> <?php echo $isDisabledStatusStyle; ?>>
+                        <label for="magento_orders_invoice_mode"><?php echo Mage::helper('M2ePro')->__('Automatic Invoice Creation'); ?></label>
+                    </td>
+                </tr>
+
+                <tr id="magento_orders_status_mapping_shipped_container" <?php echo $isDisabledStatusStyle; ?>>
+                    <td class="label">
+                        <label for="magento_orders_status_mapping_shipped"><?php echo Mage::helper('M2ePro')->__('Order Status is Posted'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="magento_orders_status_mapping_shipped" name="magento_orders_settings[status_mapping][shipped]" class="M2ePro-required-when-visible" <?php echo $isDisabledStatusStyle; ?>>
+                            <?php foreach ($statusList as $statusKey => $statusValue) { ?>
+                                <option value="<?php echo $statusKey; ?>" <?php if ($formData['magento_orders_settings']['status_mapping']['shipped'] == $statusKey) echo 'selected="selected"'; ?>><?php echo $statusValue; ?></option>
+                            <?php } ?>
+                        </select>
+                    </td>
+                    <td class="value">
+                        <input id="magento_orders_shipment_mode" name="magento_orders_settings[shipment_mode]" type="checkbox" <?php if ($formData['magento_orders_settings']['status_mapping']['mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_MODE_DEFAULT || $formData['magento_orders_settings']['shipment_mode'] == Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_SHIPMENT_MODE_YES) echo 'checked="checked"'; ?> <?php echo $isDisabledStatusStyle; ?>>
+                        <label for="magento_orders_shipment_mode"><?php echo Mage::helper('M2ePro')->__('Automatic Shipment Creation');?></label>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>

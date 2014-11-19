@@ -1,0 +1,55 @@
+<?php
+    $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
+
+    $suffix = isset($listingData['listing_id']) ? $listingData['listing_id'] : '';
+    $gridJsObjectName = $this->getGridJsObjectName();
+
+    $prefix = Mage::helper('M2ePro/Data_Global')->getValue('hide_products_others_listings_prefix');
+    $hideParam = Mage::helper('M2ePro/Data_Session')->getValue($prefix);
+    is_null($hideParam) && $hideParam = true;
+?>
+
+<div class="entry-edit" id="listing_product_rules" style="display: none;" collapseable="no">
+
+    <div class="entry-edit-head" style="height: 20px">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Advanced Filter'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <form id="<?php echo $this->getForm()->getId(); ?>" method="post" onsubmit="<?php echo $gridJsObjectName ?>.doFilter(event)">
+                <div style="float: left">
+                    <?php echo $this->getChildHtml('rule_block') ?>
+                </div>
+                <?php if ($this->isShowHideProductsOption()): ?>
+                    <div style="float: right; width: 315px">
+                        <table>
+                            <tr>
+                                <td>
+                                    <label for="hide_products_others_listings"><?php echo Mage::helper('M2ePro')->__('Products already in M2E Pro listings'); ?>:&nbsp;</label>
+                                </td>
+                                <td>
+                                    <select id="hide_products_others_listings" name="hide_products_others_listings" style="width: 80px">
+                                        <option value="0" <?php if ($hideParam == 0): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Show');  ?></option>
+                                        <option value="1" <?php if ($hideParam == 1): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Hide'); ?></option>
+                                    </select>
+                                    <?php if (Mage::helper('M2ePro/View')->isCurrentViewEbay()) : ?>
+                                        <p class="note show-left">
+                                            <?php echo Mage::helper('M2ePro')->__(
+                                                '<b>Show</b> - show all products<br/>
+                                                <b>Hide</b> - show only products that have not already been added to an M2E Pro listing'
+                                            ); ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </form>
+
+        </div>
+    </div>
+
+</div>

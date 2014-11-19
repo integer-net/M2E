@@ -1,0 +1,84 @@
+<?php
+    $selectedCategories = Mage::helper('M2ePro/Data_Global')->getValue('temp_listing_categories');
+?>
+
+<script type="text/javascript">
+
+    if (typeof M2ePro == 'undefined') {
+        M2ePro = {};
+        M2ePro.url = {};
+        M2ePro.formData = {};
+        M2ePro.customData = {};
+        M2ePro.text = {};
+    }
+
+    M2ePro.text.select_items_message = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Please select categories.')); ?>';
+
+    ListingCategoryTreeHandlerObj = new ListingCategoryTreeHandler();
+
+</script>
+
+<div class="categories-side-col">
+    <div class="tree-holder">
+        <div id="tree-div" style="width: 100%; overflow: auto;"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var categories_selected_items = new Array();
+    var initTreeSelectedNodes = new Array();
+
+    <?php foreach ($selectedCategories as $category) { ?>
+        categories_selected_items.push('<?php echo $category; ?>');
+        initTreeSelectedNodes[initTreeSelectedNodes.length] = new Array();
+        initTreeSelectedNodes[initTreeSelectedNodes.length-1][0] = '<?php echo $category; ?>';
+        initTreeSelectedNodes[initTreeSelectedNodes.length-1][1] = null;
+    <?php } ?>
+
+    Ext.EventManager.onDocumentReady(function() {
+
+        var tree = new Ext.tree.TreePanel('tree-div', {
+            animate: true,
+            enableDD: false,
+            containerScroll: true,
+            rootUIProvider: Ext.tree.CheckboxNodeUI,
+            selModel: new Ext.tree.CheckNodeMultiSelectionModel(),
+            rootVisible: false
+        });
+
+        tree.on('check', function(node) {
+            if (node.attributes.checked) {
+                ListingCategoryTreeHandlerObj.tree_categoryAdd(node.id, node);
+            } else {
+                ListingCategoryTreeHandlerObj.tree_categoryRemove(node.id, node);
+            }
+        }, tree);
+
+        var root = new Ext.tree.TreeNode({
+            text: 'root',
+            draggable: false,
+            checked: 'false',
+            id: '__root__',
+            uiProvider: Ext.tree.CheckboxNodeUI
+        });
+
+        tree.setRootNode(root);
+        ListingCategoryTreeHandlerObj.tree_buildCategory(root, <?php echo $this->getTreeJson(); ?>);
+
+        tree.render();
+        root.expand();
+
+        var tempTree;
+        for (var j=0;j<initTreeSelectedNodes.length;j++) {
+            tempTree = initTreeSelectedNodes[j][1];
+            while (tempTree.parentNode != null && tempTree.parentNode.id != '__root__') {
+                tempTree.parentNode.render();
+                tempTree.parentNode.expand();
+
+                tempTree = tempTree.parentNode;
+            }
+        }
+    });
+
+</script>
