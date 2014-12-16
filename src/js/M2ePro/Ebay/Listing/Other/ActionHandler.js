@@ -178,10 +178,6 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
 
                     self.sendPartsResponses = new Array();
 
-                    new Ajax.Request(M2ePro.url.get('adminhtml_listing_other/unlockNow',{component: 'ebay'}),{
-                        method: 'get'
-                    });
-
                     alert(response.message);
 
                     return;

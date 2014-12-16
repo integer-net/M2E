@@ -28,7 +28,7 @@
         MarketplaceWrapperObj = new AreaWrapper('marketplaces_content_container');
 
         MarketplaceProgressHandlerObj = new SynchProgressHandler(MarketplaceProgressBarObj, MarketplaceWrapperObj );
-        MarketplaceHandlerObj = new MarketplaceHandler(MarketplaceProgressHandlerObj);
+        MarketplaceHandlerObj = new MarketplaceHandler(MarketplaceProgressHandlerObj, storedStatuses);
         MarketplaceProgressHandlerObj.initPageCheckState();
 
         <?php if (!is_null($this->getChildBlockId())) { ?>

@@ -1266,17 +1266,19 @@ class Ess_M2ePro_Model_Magento_Product
                 continue;
             }
 
+            $optionTitle = $singleOption->getTitle();
+            $optionTitle == '' && $optionTitle = $singleOption->getDefaultTitle();
+
+            if (isset($variationOptionsTitle[$optionTitle])) {
+                continue;
+            }
+
             $optionCombinationTitle = array();
             $possibleVariationProductOptions = array();
 
             $selectionsCollectionItems = $productInstance->getSelectionsCollection(
                 array(0 => $singleOption->getId()), $product
             )->getItems();
-
-            $optionTitle = $singleOption->getTitle();
-            if ($optionTitle == '') {
-                $optionTitle = $singleOption->getDefaultTitle();
-            }
 
             foreach ($selectionsCollectionItems as $item) {
                 $optionCombinationTitle[] = $item->getName();
@@ -1444,7 +1446,8 @@ class Ess_M2ePro_Model_Magento_Product
 
         $sortedOptions = array();
         foreach ($optionCollection as $option) {
-            if (!in_array($option->getValue(), $options)) {
+            if (!in_array($option->getValue(), $options) ||
+                in_array($option->getValue(), $sortedOptions)) {
                 continue;
             }
 

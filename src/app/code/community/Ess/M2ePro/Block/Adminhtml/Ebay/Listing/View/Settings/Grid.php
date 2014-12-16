@@ -478,8 +478,8 @@ HTML;
 
         if ($mode == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
 
-            $category = $helper->__('Magento Attribute'). ': ';
-            $category.= $helper->escapeHtml(
+            $category = $helper->__('Magento Attribute'). ' -> ';
+            $category .= $helper->escapeHtml(
                 Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $row->getData('store_'.$modeNick.'_attribute'),
                     $this->getListing()->getStoreId()

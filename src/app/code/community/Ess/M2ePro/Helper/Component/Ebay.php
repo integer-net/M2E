@@ -258,7 +258,7 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 
     public function getDefaultTranslationService()
     {
-        return 'gold';
+        return 'silver';
     }
 
     public function isAllowedTranslationService($service)

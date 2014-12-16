@@ -61,7 +61,7 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
 
     public function __destruct()
     {
-        $this->checkUnlockListings();
+        $this->checkUnlockListingProducts();
     }
 
     // ########################################
@@ -86,7 +86,7 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
             $this->setStatus(Ess_M2ePro_Helper_Data::STATUS_ERROR);
         }
 
-        $this->checkUnlockListings();
+        $this->checkUnlockListingProducts();
     }
 
     protected function getResponserParams()
@@ -183,7 +183,7 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
         }
     }
 
-    protected function checkUnlockListings()
+    protected function checkUnlockListingProducts()
     {
         foreach ($this->neededRemoveLocks as $lockItem) {
             $lockItem->isExist() && $lockItem->remove();

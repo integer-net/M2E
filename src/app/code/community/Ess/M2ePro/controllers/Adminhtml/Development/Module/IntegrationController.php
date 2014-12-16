@@ -192,7 +192,7 @@ HTML;
                            ->save();
         }
 
-        $this->_getSession()->addSuccess("Successfully removed for {$affected} products.");
+        $this->_getSession()->addSuccess("Successfully removed for {$affected} affected products.");
         return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 
@@ -240,7 +240,7 @@ HTML;
                            ->save();
         }
 
-        $this->_getSession()->addSuccess("Successfully set for {$affected} products.");
+        $this->_getSession()->addSuccess("Successfully set for {$affected} affected products.");
         return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 

@@ -1140,7 +1140,7 @@
                     <input type="hidden" id="weight_mode" name="shipping[weight_mode]" value="<?php echo $formData['weight_mode']; ?>">
                     <input type="hidden" id="weight_attribute" name="shipping[weight_attribute]" value="<?php echo $formData['weight_attribute']; ?>">
 
-                    <tr class="visible-for-flat-by-default visible-for-calculated-by-default">
+                    <tr id="weight_tr" class="visible-for-flat-by-default visible-for-calculated-by-default">
                         <td class="label">
                             <label for="weight"><?php echo Mage::helper('M2ePro')->__('Weight Source'); ?>:</label>
                         </td>

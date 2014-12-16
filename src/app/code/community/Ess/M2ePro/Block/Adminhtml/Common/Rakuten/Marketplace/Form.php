@@ -37,6 +37,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Rakuten_Marketplace_Form extends Mage_Ad
         }
 
         $groups = array();
+        $storedStatuses = array();
         $previewGroup = '';
         $idGroup = 1;
 
@@ -52,6 +53,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Rakuten_Marketplace_Form extends Mage_Ad
                 $idGroup++;
             }
 
+            $storedStatuses[] = array(
+                'marketplace_id' => $marketplace->getId(),
+                'status' => $marketplace->getStatus()
+            );
+
             $marketplace = array(
                 'instance' => $marketplace,
                 'params'   => array('locked'=>$marketplace->isLocked())
@@ -61,12 +67,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Rakuten_Marketplace_Form extends Mage_Ad
         }
 
         $this->groups = $groups;
+        $this->storedStatuses = $storedStatuses;
         //----------------------------
 
         //------------------------------
         $data = array(
             'label'   => Mage::helper('M2ePro')->__('Update Now'),
-            'onclick' => 'MarketplaceHandlerObj.runSingleMarketplaceSynchronization(this)',
+            'onclick' => 'MarketplaceHandlerObj.runSingleSynchronization(this)',
             'class'   => 'run_single_button'
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);

@@ -1,3 +1,22 @@
+* 6.2.3 (r7568) (05/12/2014)
+
+* Added: [eBay] Strike Through Prices for Spain, France, Italy marketplaces
+* Added: [eBay] Restricted To Business option into Selling Policy
+* Added: [eBay] Freight domestic shipping for Canada Site
+* Improvement: Some changes of marketplace saving behaviour for all integrations
+* Improvement: Some improvements of the cron service working (reduced amount of the calls, store troubles)
+* Improvement: IP of the last connection was added to the IP validation fail message
+* Improvement: [eBay] Added ability to use of translation credits for Translation Tool
+* Fix: Some sort of troubles if Bundle Product has several attributes with identical labels
+* Fix: [eBay] Empty value in Combined Shipping Profile field when Shipping Type has been changed
+* Fix: [eBay] Start Date and End Date were not moved from 3rd Party Listings to M2E Pro Listings
+* Fix: [eBay] Getting SKU for 3rd party items stops if one of the eBay items was removed
+* Fix: [eBay] Wrong values of "Total Items", "Active Items", "Inactive Items", "Sold QTY" in 3rd Party Listings grid
+* Fix: [eBay] An unexpected error during list/relist/revise: "The product was listed as a simple product as it has limitation for multi-variation items. Reason: number of values for each option more than 60."
+* Fix: [eBay] An unexpected warning during list/relist/revise action: "Not eligible for "Click And Collect"
+* Fix: [eBay] Multiple error messages about failed updating shipping status for order
+* Fix: [Amazon / Rakuten.com / Play.com] Fatal error: "Call to a member function isExist() on a non-object" on 3rd Party Listings
+
 * 6.2.2 (r7435) (31/10/2014)
 
 * Added: [eBay] Ability to use Extended Holiday Returns for eBay Motors marketplace

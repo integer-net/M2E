@@ -205,6 +205,10 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
             $prepared['price_discount_map_exposure_type'] = (int)$data['price_discount_map_exposure_type'];
         }
 
+        if (isset($data['restricted_to_business'])) {
+            $prepared['restricted_to_business'] = (int)$data['restricted_to_business'];
+        }
+
         //------------------------------
 
         if (isset($data['best_offer_mode'])) {

@@ -523,6 +523,19 @@ EbayListingTransferringActionHandler.prototype = {
 
     // --------------------------------
 
+    getCurTranslationType: function(el)
+    {
+        return el.options[el.selectedIndex].value;
+    },
+
+    getTotalCredits: function()
+    {
+        if (!$('translation_account_ebay_total_credit_value'))
+            return 0;
+        var totalCreditsElem = $('translation_account_ebay_total_credit_value');
+        return isNaN(parseInt(totalCreditsElem.innerHTML)) ? 0 : parseInt(totalCreditsElem.innerHTML);
+    },
+
     getRemainingAmount: function(el)
     {
         var prepaid = $('translation_account_balance') && parseFloat($('translation_account_balance').innerHTML);
@@ -535,8 +548,16 @@ EbayListingTransferringActionHandler.prototype = {
     {
         var selectedIndex = el.selectedIndex;
         var avgCost = el.options[selectedIndex].getAttribute('data');
+        var productsAmount = this.getProductsIds().length;
 
-        return (parseFloat(avgCost) * this.getProductsIds().length).toFixed(2);
+        if (this.getCurTranslationType(el) === 'silver') {
+            productsAmount -= this.getTotalCredits();
+        }
+
+        if (productsAmount <= 0)
+            return 0;
+
+        return (parseFloat(avgCost) * productsAmount).toFixed(2);
     },
 
     isShowPaymentWarningMessage: function(el)
@@ -697,6 +718,12 @@ EbayListingTransferringActionHandler.prototype = {
 
                     if ($('translation_account_balance')) {
                         $('translation_account_balance').innerHTML = parseFloat(response['info']['credit']['prepaid']).toFixed(2);
+                    }
+
+                    if ($('translation_account_ebay_total_credit_value')) {
+                        $('translation_account_ebay_total_credit_value').innerHTML =
+                        parseInt(response['info']['credit']['translation']) -
+                        parseInt(response['info']['credit']['used']);
                     }
 
                     if ($('translation_account_currency')) {

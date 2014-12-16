@@ -386,7 +386,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             $dbSelect = $connRead->select()
                 ->from($tableAccountStoreCategories,'*')
                 ->where('`account_id` = ?',(int)$accountId)
-                ->where('`parent_id` = ?', (int)$parentCategoryId)
+                ->where('`parent_id` = ?', $parentCategoryId)
                 ->order(array('sorder ASC'));
 
             $data = $connRead->fetchAll($dbSelect);

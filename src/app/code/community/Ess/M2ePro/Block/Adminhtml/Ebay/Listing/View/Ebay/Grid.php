@@ -665,6 +665,9 @@ HTML;
             case Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL:
                 $string = Mage::helper('M2ePro')->__('Status Change');
                 break;
+            case Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT:
+                $string = Mage::helper('M2ePro')->__('Translation');
+                break;
         }
 
         return $string;

@@ -39,6 +39,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Update
 
     protected function performActions()
     {
+        $this->deleteNotActualChanges();
+
         $permittedAccounts = $this->getPermittedAccounts();
 
         if (count($permittedAccounts) <= 0) {
@@ -148,6 +150,16 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Update
                 $order->getId() && $order->getChildObject()->updateShippingStatus($params);
             }
         }
+    }
+
+    // ##########################################################
+
+    private function deleteNotActualChanges()
+    {
+        Mage::getResourceModel('M2ePro/Order_Change')->deleteByProcessingAttemptCount(
+            Ess_M2ePro_Model_Order_Change::MAX_ALLOWED_PROCESSING_ATTEMPTS,
+            Ess_M2ePro_Helper_Component_Ebay::NICK
+        );
     }
 
     // ##########################################################

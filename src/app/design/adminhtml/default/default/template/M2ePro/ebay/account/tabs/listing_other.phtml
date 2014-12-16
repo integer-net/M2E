@@ -237,6 +237,8 @@
 
 </div>
 
+<?php if (!empty($this->marketplaces)) { ?>
+
 <div class="entry-edit" id="magento_block_ebay_accounts_other_listings_related_store_views" <?php if ($formData['other_listings_synchronization'] == Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_NO || count($this->marketplaces) == 0) echo 'style="display:none"'; ?>>
 
     <div class="entry-edit-head">
@@ -283,3 +285,5 @@
     </div>
 
 </div>
+
+<?php } ?>

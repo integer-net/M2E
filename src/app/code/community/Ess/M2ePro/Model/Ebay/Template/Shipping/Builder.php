@@ -111,11 +111,15 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
         if (isset($data['local_shipping_discount_profile_id'])) {
             $prepared['local_shipping_discount_profile_id'] =
                 json_encode(array_diff($data['local_shipping_discount_profile_id'], array('')));
+        } else {
+            $prepared['local_shipping_discount_profile_id'] = json_encode(array());
         }
 
         if (isset($data['international_shipping_discount_profile_id'])) {
             $prepared['international_shipping_discount_profile_id'] =
                 json_encode(array_diff($data['international_shipping_discount_profile_id'], array('')));
+        } else {
+            $prepared['international_shipping_discount_profile_id'] = json_encode(array());
         }
 
         if (isset($data['excluded_locations'])) {

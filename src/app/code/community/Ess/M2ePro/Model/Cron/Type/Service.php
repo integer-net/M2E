@@ -67,13 +67,18 @@ final class Ess_M2ePro_Model_Cron_Type_Service extends Ess_M2ePro_Model_Cron_Typ
 
             if (!$helper->isTypeService()) {
                 $helper->setType(Ess_M2ePro_Helper_Module_Cron::TYPE_SERVICE);
+                $helper->setLastTypeChange(Mage::helper('M2ePro')->getCurrentGmtDate());
             }
 
             $this->resetTasksStartFrom();
         }
 
         if (is_null($this->getAuthKey())) {
-            Mage::getModel('M2ePro/Servicing_Dispatcher')->processTask(
+
+            $servicingDispatcher = Mage::getModel('M2ePro/Servicing_Dispatcher');
+            $servicingDispatcher->setForceTasksRunning(true);
+
+            $servicingDispatcher->processTask(
                 Mage::getModel('M2ePro/Servicing_Task_Cron')->getPublicNick()
             );
         }

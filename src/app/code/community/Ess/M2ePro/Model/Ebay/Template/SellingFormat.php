@@ -69,6 +69,9 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const BEST_OFFER_REJECT_MODE_PERCENTAGE  = 1;
     const BEST_OFFER_REJECT_MODE_ATTRIBUTE   = 2;
 
+    const RESTRICTED_TO_BUSINESS_DISABLED = 0;
+    const RESTRICTED_TO_BUSINESS_ENABLED = 1;
+
     // ########################################
 
     /**
@@ -344,6 +347,11 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'value'     => $this->getData('tax_category_value'),
             'attribute' => $this->getData('tax_category_attribute')
         );
+    }
+
+    public function isRestrictedToBusinessEnabled()
+    {
+        return (bool)$this->getData('restricted_to_business');
     }
 
     //-------------------------
@@ -905,6 +913,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
             'vat_percent'    => 0,
             'tax_table_mode' => 0,
+
+            'restricted_to_business' => self::RESTRICTED_TO_BUSINESS_DISABLED,
 
             'tax_category_mode'      => 0,
             'tax_category_value'     => '',

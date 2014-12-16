@@ -30,6 +30,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
             $data = array_merge(
                 $this->getGeneralData(),
                 $this->getVatTaxData(),
+                $this->getRestrictedToBusinessData(),
                 $this->getCharityData()
             );
         }
@@ -75,6 +76,18 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
 
         if ($this->getEbayMarketplace()->isTaxTableEnabled()) {
             $data['use_tax_table'] = $this->getEbaySellingFormatTemplate()->isTaxTableEnabled();
+        }
+
+        return $data;
+    }
+
+    public function getRestrictedToBusinessData()
+    {
+        $data = array();
+
+        if ($this->getEbaySellingFormatTemplate()->isRestrictedToBusinessEnabled()) {
+            $data['restricted_to_business'] = $this->getEbaySellingFormatTemplate()
+                                                   ->isRestrictedToBusinessEnabled();
         }
 
         return $data;

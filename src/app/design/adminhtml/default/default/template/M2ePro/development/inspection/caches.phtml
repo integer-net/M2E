@@ -57,7 +57,7 @@
         </td>
         <td class="value">
             <?php if (defined('COMPILER_INCLUDE_PATH')) { ?>
-                <span style="color: red">Enabled [<?php echo Mage::getModel('compiler/process')->getCompiledFilesCount(); ?>]</span>
+                <span style="color: red">Enabled [<?php echo Mage::getModel('compiler/process')->getCollectedFilesCount(); ?>]</span>
             <?php } else { ?>
                 <span>Disabled</span>
             <?php } ?>

@@ -446,11 +446,12 @@ HTML;
      */
     public function filesDiffAction()
     {
-        $filePath = base64_decode($this->getRequest()->getParam('filePath'));
+        $filePath     = base64_decode($this->getRequest()->getParam('filePath'));
+        $originalPath = base64_decode($this->getRequest()->getParam('originalPath'));
 
         $params = array(
             'content' => file_get_contents(Mage::getBaseDir() . '/' . $filePath),
-            'path' => $filePath
+            'path'    => $originalPath ? $originalPath : $filePath
         );
 
         $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')

@@ -637,8 +637,8 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
             'online_qty' => $listingOtherProduct->getChildObject()->getOnlineQty(),
             'online_qty_sold' => $listingOtherProduct->getChildObject()->getOnlineQtySold(),
             'online_bids' => $listingOtherProduct->getChildObject()->getOnlineBids(),
-            'online_start_date' => $listingOtherProduct->getChildObject()->getStartDate(),
-            'online_end_date' => $listingOtherProduct->getChildObject()->getEndDate(),
+            'start_date' => $listingOtherProduct->getChildObject()->getStartDate(),
+            'end_date' => $listingOtherProduct->getChildObject()->getEndDate(),
             'status' => $listingOtherProduct->getStatus(),
             'status_changer' => $listingOtherProduct->getStatusChanger()
         );

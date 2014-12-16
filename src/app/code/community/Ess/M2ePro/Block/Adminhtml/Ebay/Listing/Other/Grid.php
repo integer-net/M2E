@@ -218,6 +218,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Grid extends Mage_Adminhtml_
 
     private function prepareCacheData()
     {
+        $this->cacheData = array();
+
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Other');
         $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
         $collection->getSelect()->columns(
