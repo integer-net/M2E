@@ -103,8 +103,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Transferring_Step_Translation exte
 
                 $translationInfo = json_decode($account->getTranslationInfo(), true);
                 isset($translationInfo['currency']) && $info['translation_currency'] = $translationInfo['currency'];
-                isset($translationInfo['credit'])   && isset($translationInfo['credit']['prepaid']) &&
+                isset($translationInfo['credit']['prepaid']) &&
                     $info['translation_balance'] = $translationInfo['credit']['prepaid'];
+                isset($translationInfo['credit']['translation']) && isset($translationInfo['credit']['used']) &&
+                    $info['translation_total_credits'] =
+                    $translationInfo['credit']['translation']- $translationInfo['credit']['used'];
             }
 
             $userId = Mage::getSingleton('admin/session')->getUser()->getId();

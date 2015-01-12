@@ -152,6 +152,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_Multiple
             $requestData['items'][] = $sendedData;
         }
 
+        $this->checkQtyWarnings();
+
         $this->addSkusToQueue($tempSkus);
 
         return $requestData;
@@ -334,11 +336,14 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_Multiple
 
                 Mage::helper('M2ePro/Module_Exception')->process($exception);
 
-                $this->addListingsLogsMessage(
-                    reset($listingProductsPack), Mage::helper('M2ePro')->__($exception->getMessage()),
-                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
-                );
+                foreach ($listingProductsPack as $listingProduct) {
+
+                    $this->addListingsProductsLogsMessage(
+                        $listingProduct, Mage::helper('M2ePro')->__($exception->getMessage()),
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                    );
+                }
 
                 continue;
             }

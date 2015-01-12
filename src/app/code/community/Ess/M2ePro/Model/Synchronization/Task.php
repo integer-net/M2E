@@ -35,7 +35,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
         $this->initialize();
 
         if (!$this->isPossibleToRun()) {
-            return false;
+            return true;
         }
 
         $this->beforeStart();

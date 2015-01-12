@@ -6,6 +6,7 @@
 
 /**
  * @method Ess_M2ePro_Model_Template_SellingFormat getParentObject()
+ * @method Ess_M2ePro_Model_Mysql4_Ebay_Template_SellingFormat getResource()
  */
 class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
@@ -67,6 +68,9 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const BEST_OFFER_REJECT_MODE_NO          = 0;
     const BEST_OFFER_REJECT_MODE_PERCENTAGE  = 1;
     const BEST_OFFER_REJECT_MODE_ATTRIBUTE   = 2;
+
+    const RESTRICTED_TO_BUSINESS_DISABLED = 0;
+    const RESTRICTED_TO_BUSINESS_ENABLED = 1;
 
     // ########################################
 
@@ -343,6 +347,11 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'value'     => $this->getData('tax_category_value'),
             'attribute' => $this->getData('tax_category_attribute')
         );
+    }
+
+    public function isRestrictedToBusinessEnabled()
+    {
+        return (bool)$this->getData('restricted_to_business');
     }
 
     //-------------------------
@@ -905,6 +914,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'vat_percent'    => 0,
             'tax_table_mode' => 0,
 
+            'restricted_to_business' => self::RESTRICTED_TO_BUSINESS_DISABLED,
+
             'tax_category_mode'      => 0,
             'tax_category_value'     => '',
             'tax_category_attribute' => '',
@@ -958,17 +969,21 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     // #######################################
 
-    public function getAffectedListingsProducts($asObjects = false)
+    /**
+     * @param bool|array $asArrays
+     * @return array
+     */
+    public function getAffectedListingsProducts($asArrays = true)
     {
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
         $templateManager->setTemplate(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT);
 
         $listingsProducts = $templateManager->getAffectedOwnerObjects(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asObjects
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asArrays
         );
 
         $listings = $templateManager->getAffectedOwnerObjects(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING, $this->getId(), true
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING, $this->getId(), false
         );
 
         foreach ($listings as $listing) {
@@ -976,7 +991,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             $tempListingsProducts = $listing->getChildObject()
                                             ->getAffectedListingsProductsByTemplate(
                                                 Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
-                                                $asObjects
+                                                $asArrays
                                             );
 
             foreach ($tempListingsProducts as $listingProduct) {
@@ -991,7 +1006,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getAffectedListingsProducts(false);
+        $neededColumns = array('id');
+        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
 
         if (!$listingsProducts) {
             return;

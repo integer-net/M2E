@@ -61,7 +61,7 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
 
     public function __destruct()
     {
-        $this->checkUnlockListings();
+        $this->checkUnlockListingProducts();
     }
 
     // ########################################
@@ -77,7 +77,7 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
 
         $this->setIsProcessingItems(true);
 
-        $this->updateOrLockListings();
+        $this->updateOrLockListingProducts();
         parent::process();
 
         // When all items are failed in response
@@ -86,7 +86,7 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
             $this->setStatus(Ess_M2ePro_Helper_Data::STATUS_ERROR);
         }
 
-        $this->checkUnlockListings();
+        $this->checkUnlockListingProducts();
     }
 
     protected function getResponserParams()
@@ -164,34 +164,26 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
 
     // ########################################
 
-    protected function updateOrLockListings()
+    protected function updateOrLockListingProducts()
     {
         foreach ($this->listingsProducts as $product) {
 
             /** @var $product Ess_M2ePro_Model_Listing_Product */
 
-            if (isset($this->neededRemoveLocks[$product->getListingId()])) {
-                continue;
-            }
-
-            $lockItemParams = array(
-                'component' => Ess_M2ePro_Helper_Component_Play::NICK,
-                'id' => $product->getListingId()
-            );
-
-            $lockItem = Mage::getModel('M2ePro/Listing_LockItem',$lockItemParams);
+            $lockItem = Mage::getModel('M2ePro/LockItem');
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Play::NICK.'_listing_product_'.$product->getId());
 
             if (!$lockItem->isExist()) {
                 $lockItem->create();
                 $lockItem->makeShutdownFunction();
-                $this->neededRemoveLocks[$product->getListingId()] = $lockItem;
+                $this->neededRemoveLocks[$product->getId()] = $lockItem;
             }
 
             $lockItem->activate();
         }
     }
 
-    protected function checkUnlockListings()
+    protected function checkUnlockListingProducts()
     {
         foreach ($this->neededRemoveLocks as $lockItem) {
             $lockItem->isExist() && $lockItem->remove();
@@ -204,21 +196,6 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
     protected function addListingsProductsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
                                                       $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                                       $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
-    {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,false);
-    }
-
-    protected function addListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                              $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                              $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
-    {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,true);
-    }
-
-    protected function addBaseListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                                  $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                                  $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM,
-                                                  $isListingMode = true)
     {
         $action = $this->getListingsLogsCurrentAction();
         is_null($action) && $action = Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN;
@@ -251,19 +228,12 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
         $logModel = Mage::getModel('M2ePro/Listing_Log');
         $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Play::NICK);
 
-        if ($isListingMode) {
-            $logModel->addListingMessage($listingProduct->getListingId() ,
-                                         $initiator ,
-                                         $this->logsActionId ,
-                                         $action , $text, $type , $priority);
-        } else {
-            $logModel->addProductMessage($listingProduct->getListingId() ,
-                                         $listingProduct->getProductId() ,
-                                         $listingProduct->getId() ,
-                                         $initiator ,
-                                         $this->logsActionId ,
-                                         $action , $text, $type , $priority);
-        }
+        $logModel->addProductMessage($listingProduct->getListingId() ,
+                                     $listingProduct->getProductId() ,
+                                     $listingProduct->getId() ,
+                                     $initiator ,
+                                     $this->logsActionId ,
+                                     $action , $text, $type , $priority);
     }
 
     // ########################################
@@ -363,6 +333,86 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Requester
         }
 
         return $listingsProducts;
+    }
+
+    // ########################################
+
+    public function checkQtyWarnings()
+    {
+        foreach ($this->listingsProducts as $listingProduct) {
+            /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+
+            $productsIds = array();
+
+            if ($listingProduct->getChildObject()->isVariationProduct()) {
+                $variations = $listingProduct->getVariations(true);
+
+                foreach ($variations as $variation) {
+                    $options = $variation->getOptions();
+                    foreach ($options as $option) {
+                        $productsIds[] = $option['product_id'];
+                    }
+                }
+            } else {
+                $productsIds[] = $listingProduct->getProductId();
+            }
+
+            $qtyMode = $listingProduct->getChildObject()->getPlaySellingFormatTemplate()->getQtyMode();
+            if ($qtyMode == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+                $qtyMode == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT) {
+
+                $productsIds = array_unique($productsIds);
+                $qtyWarnings = array();
+
+                $listingProductId = $listingProduct->getId();
+                $storeId = $listingProduct->getListing()->getStoreId();
+
+                foreach ($productsIds as $productId) {
+                    if (!empty(Ess_M2ePro_Model_Magento_Product::$statistics
+                    [$listingProductId][$productId][$storeId]['qty'])) {
+
+                        $qtys = Ess_M2ePro_Model_Magento_Product::$statistics
+                        [$listingProductId][$productId][$storeId]['qty'];
+                        $qtyWarnings = array_unique(array_merge($qtyWarnings, array_keys($qtys)));
+                    }
+
+                    if (count($qtyWarnings) === 2) {
+                        break;
+                    }
+                }
+
+                foreach ($qtyWarnings as $qtyWarningType) {
+                    $this->addQtyWarnings($qtyWarningType, $listingProduct);
+                }
+            }
+        }
+    }
+
+    public function addQtyWarnings($type, $listingProduct)
+    {
+        if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_MANAGE_STOCK_NO) {
+        // M2ePro_TRANSLATIONS
+        // During the quantity calculation the settings in the "Manage Stock No" field were taken into consideration.
+            $this->addListingsProductsLogsMessage(
+                $listingProduct,
+                'During the quantity calculation the settings in the "Manage Stock No" '.
+                'field were taken into consideration.',
+                Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
+        }
+
+        if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_BACKORDERS) {
+            // M2ePro_TRANSLATIONS
+            // During the quantity calculation the settings in the "Backorders" field were taken into consideration.
+            $this->addListingsProductsLogsMessage(
+                $listingProduct,
+                'During the quantity calculation the settings in the "Backorders" '.
+                'field were taken into consideration.',
+                Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
+        }
     }
 
     // ########################################

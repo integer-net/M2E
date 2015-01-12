@@ -6,6 +6,7 @@
 
 /**
  * @method Ess_M2ePro_Model_Template_Synchronization getParentObject()
+ * @method Ess_M2ePro_Model_Mysql4_Amazon_Template_Synchronization getResource()
  */
 class Ess_M2ePro_Model_Amazon_Template_Synchronization extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
@@ -321,7 +322,11 @@ class Ess_M2ePro_Model_Amazon_Template_Synchronization extends Ess_M2ePro_Model_
 
     // #######################################
 
-    public function getAffectedListingsProducts($asObjects = false)
+    /**
+     * @param bool|array $asArrays
+     * @return array
+     */
+    public function getAffectedListingsProducts($asArrays = true)
     {
         $listingCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing');
         $listingCollection->addFieldToFilter('template_synchronization_id', $this->getId());
@@ -331,12 +336,22 @@ class Ess_M2ePro_Model_Amazon_Template_Synchronization extends Ess_M2ePro_Model_
         $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id',array('in' => $listingCollection->getSelect()));
 
-        return $asObjects ? (array)$listingProductCollection->getItems() : (array)$listingProductCollection->getData();
+        if ($asArrays === false) {
+            return (array)$listingProductCollection->getItems();
+        }
+
+        if (is_array($asArrays) && !empty($asArrays)) {
+            $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+            $listingProductCollection->getSelect()->columns($asArrays);
+        }
+
+        return (array)$listingProductCollection->getData();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getAffectedListingsProducts(false);
+        $neededColumns = array('id', 'synch_status', 'synch_reasons');
+        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
 
         if (!$listingsProducts) {
             return;

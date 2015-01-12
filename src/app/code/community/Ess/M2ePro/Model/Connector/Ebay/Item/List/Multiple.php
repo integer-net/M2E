@@ -26,6 +26,27 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
         return Ess_M2ePro_Model_Listing_Product::ACTION_LIST;
     }
 
+    // ----------------------------------------
+
+    protected function getRequestTimeout()
+    {
+        $imagesTimeout = 0;
+
+        foreach ($this->listingsProducts as $listingProduct) {
+
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
+            if (in_array($listingProduct->getId(),$this->failedListingProductIds)) {
+                continue;
+            }
+
+            $requestDataObject = $this->getRequestDataObject($listingProduct);
+            $imagesTimeout += self::TIMEOUT_INCREMENT_FOR_ONE_IMAGE * $requestDataObject->getTotalImagesCount();
+        }
+
+        return parent::getRequestTimeout() + $imagesTimeout;
+    }
+
     // ########################################
 
     protected function isNeedSendRequest()

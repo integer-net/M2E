@@ -69,21 +69,18 @@ class Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility extends Mage_Core_Hel
             return array();
         }
 
-        $value = (array)explode(',', $value);
-        if (empty($value)) {
-            return array();
-        }
+        $value = trim($value, ',') . ',';
+
+        preg_match_all('/("?(\d+?)"?\|"(.+?)",)|("?(\d+)"?,)/', $value, $matches);
+
+        $identifiersWithNotes = array_combine($matches[2], $matches[3]);
+        $identifiersWithoutNotes = $matches[5];
 
         $parsedData = array();
-        foreach ($value as $identifierData) {
-            $identifier = $identifierData;
-            $note = '';
 
-            if (strpos($identifierData, '|') !== false) {
-                $identifierData = explode('|', $identifierData);
-
-                $identifier = $identifierData[0];
-                $note = trim($identifierData[1], '"');
+        foreach ($identifiersWithNotes as $identifier => $note) {
+            if (empty($identifier) || empty($note)) {
+                continue;
             }
 
             $parsedData[$identifier] = array(
@@ -92,7 +89,44 @@ class Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility extends Mage_Core_Hel
             );
         }
 
+        foreach ($identifiersWithoutNotes as $identifier) {
+            if (empty($identifier) || isset($parsedData[$identifier])) {
+                continue;
+            }
+
+            $parsedData[$identifier] = array(
+                'id'   => $identifier,
+                'note' => '',
+            );
+        }
+
         return $parsedData;
+    }
+
+    public function buildAttributeValue(array $data)
+    {
+        if (empty($data)) {
+            return '';
+        }
+
+        $value = '';
+        foreach ($data as $item) {
+            if (empty($item) || empty($item['id'])) {
+                continue;
+            }
+
+            $value .= '"' . $item['id'] . '"';
+
+            $note = trim($item['note']);
+
+            if (!empty($note)) {
+                $value .= '|"' . $note . '"';
+            }
+
+            $value .= ',';
+        }
+
+        return $value;
     }
 
     // ##########################################################

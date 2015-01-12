@@ -190,7 +190,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             return;
         }
 
-        $sinceTime = $listingOtherCollection->getFirstItem()->getData('start_date');
+        $firstItem = $listingOtherCollection->getFirstItem();
+
+        $sinceTime = $firstItem->getData('start_date');
         $items = $this->receiveSkusFromEbay($account, $sinceTime);
 
         if (count($items) <= 0) {
@@ -199,6 +201,16 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             }
             return;
         }
+
+        //-- removed eBay item ID can lead to the issue and getting SKU process freezes
+        $isItemIdReturned = false;
+        foreach ($items as $item) {
+            if ($item['id'] == $firstItem->getData('item_id')) {
+                $isItemIdReturned = true;
+                break;
+            }
+        }
+        !$isItemIdReturned && $firstItem->getChildObject()->setData('sku','')->save();
 
         $this->updateSkusByReceivedItems($account, $listingOtherCollection, $items);
     }

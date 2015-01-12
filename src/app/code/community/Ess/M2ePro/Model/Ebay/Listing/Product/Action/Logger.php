@@ -8,49 +8,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger extends Ess_M2ePro_Mod
 {
     protected $action = Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN;
 
-    private $listingId = NULL;
-
     /**
      * @var Ess_M2ePro_Model_Listing_Log
      */
     private $listingLog = NULL;
 
     // ########################################
-
-    public function setListingId($id)
-    {
-        $this->listingId = (int)$id;
-    }
-
-    public function getListingId()
-    {
-        return $this->listingId;
-    }
-
-    // ########################################
-
-    public function logListingMessage(array $messageData,
-                                      $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
-    {
-        if ($this->storeMode) {
-
-            $this->storedMessages[] = array(
-                'type' => $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
-                'text' => $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]
-            );
-
-            return;
-        }
-
-        $this->getListingLog()
-            ->addListingMessage($this->listingId,
-                                $this->initiator,
-                                $this->actionId,
-                                $this->action,
-                                $messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY],
-                                $this->initLogType($messageData[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_KEY]),
-                                $priority);
-    }
 
     public function logListingProductMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
                                              array $messageData,
@@ -67,7 +30,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger extends Ess_M2ePro_Mod
         }
 
         $this->getListingLog()
-            ->addProductMessage($this->listingId ,
+            ->addProductMessage($listingProduct->getListingId() ,
                                 $listingProduct->getProductId() ,
                                 $listingProduct->getId() ,
                                 $this->initiator ,

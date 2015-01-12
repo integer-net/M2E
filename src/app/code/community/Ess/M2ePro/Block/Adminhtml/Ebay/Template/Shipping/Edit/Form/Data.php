@@ -436,6 +436,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
         return $this->getMarketplace()->getChildObject()->isLocalShippingRateTableEnabled();
     }
 
+    public function canDisplayClickAndCollectOption()
+    {
+        return $this->getMarketplace()->getId() == Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_UK;
+    }
+
     public function canDisplayFreightShippingType()
     {
         return $this->getMarketplace()->getChildObject()->isFreightShippingEnabled();

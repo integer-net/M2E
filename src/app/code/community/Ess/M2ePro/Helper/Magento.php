@@ -186,6 +186,8 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             '/RicoNeitzel_PaymentFilter/i' => '"The requested payment method is not available" error',
             '/Mxperts_NoRegion/i' => 'Error about empty billing address information',
             '/MageWorx_DeliveryZone/i' => 'Shipping price is 0 in magento order',
+
+            '/Netzarbeiter_Cache/i' => 'Adding product step by circle.'
         );
 
         $result = array();
@@ -355,19 +357,17 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
         );
 
         foreach ($paths as &$patch) {
-            $patch = Mage::getBaseDir() . DS . $patch;
+            $patch = Mage::getBaseDir() . '/' . $patch;
         }
 
         $overwrites = array();
         foreach ($paths as $path) {
-            $overwrites = array_merge($overwrites,
-                $this->getLocalPoolOverwritesRec($path)
-            );
+            $overwrites = array_merge($overwrites, $this->getLocalPoolOverwritesRec($path));
         }
 
         $result = array();
         foreach ($overwrites as $item) {
-            $this->isOriginalFileExists($item) && $result[] = str_replace(Mage::getBaseDir().DS,'',$item);
+            $this->isOriginalFileExists($item) && $result[] = str_replace(Mage::getBaseDir().DS, '', $item);
         }
 
         return $result;
@@ -382,13 +382,14 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
         $overrides = array();
         foreach (scandir($path) as $folderItem) {
 
-            is_file($path . DS . $folderItem) && $overrides[] = $path . DS . $folderItem;
+            $tempPath = $path . '/' . $folderItem;
+            is_file($tempPath) && $overrides[] = $tempPath;
 
-            if ($folderItem != '.' && $folderItem != '..' && is_dir($path . DS . $folderItem)) {
-                $overrides = array_merge($overrides,
-                    $this->getLocalPoolOverwritesRec($path . DS . $folderItem)
-                );
+            if ($folderItem == '.' || $folderItem == '..' || !is_dir($tempPath)) {
+                continue;
             }
+
+            $overrides = array_merge($overrides, $this->getLocalPoolOverwritesRec($tempPath));
         }
 
         return $overrides;
@@ -396,9 +397,9 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
 
     private function isOriginalFileExists($overwritedFilename)
     {
-        $isOriginalCoreFileExist = is_file(str_replace('/local/', '/core/', $overwritedFilename));
+        $isOriginalCoreFileExist      = is_file(str_replace('/local/', '/core/', $overwritedFilename));
         $isOriginalCommunityFileExist = is_file(str_replace('/local/', '/community/', $overwritedFilename));
-        $isOriginalLibFileExist = is_file(str_replace('app/code/local/', 'lib/', $overwritedFilename));
+        $isOriginalLibFileExist       = is_file(str_replace('app/code/local/', 'lib/', $overwritedFilename));
 
         return $isOriginalCoreFileExist || $isOriginalCommunityFileExist || $isOriginalLibFileExist;
     }

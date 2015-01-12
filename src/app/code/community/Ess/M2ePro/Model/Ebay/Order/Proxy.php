@@ -103,12 +103,15 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 
     public function getAddressData()
     {
-        if (!$this->order->isUseGlobalShippingProgram()) {
+        if (!$this->order->isUseGlobalShippingProgram() && !$this->order->isUseClickAndCollect()) {
             return parent::getAddressData();
         }
 
-        $rawAddressData = $this->order->getGlobalShippingWarehouseAddress()->getRawData();
-        $globalShippingDetails = $this->order->getGlobalShippingDetails();
+        if ($this->order->isUseGlobalShippingProgram()) {
+            $rawAddressData = $this->order->getGlobalShippingWarehouseAddress()->getRawData();
+        } else {
+            $rawAddressData = $this->order->getShippingAddress()->getRawData();
+        }
 
         $addressData = array();
 
@@ -129,10 +132,17 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         $addressData['telephone']  = $rawAddressData['telephone'];
         $addressData['company']    = !empty($rawAddressData['company']) ? $rawAddressData['company'] : '';
 
-        // Adding reference id for global shipping into street array
+        // Adding reference id into street array
         // ----------------------------------------------
+        if ($this->order->isUseGlobalShippingProgram()) {
+            $globalShippingDetails = $this->order->getGlobalShippingDetails();
+            $referenceId = 'Ref #'.$globalShippingDetails['warehouse_address']['reference_id'];
+        } else {
+            $clickAndCollectDetails = $this->order->getClickAndCollectDetails();
+            $referenceId = 'Ref #'.$clickAndCollectDetails['reference_id'];
+        }
+
         $streetParts = !empty($rawAddressData['street']) ? $rawAddressData['street'] : array();
-        $referenceId = 'Ref #'.$globalShippingDetails['warehouse_address']['reference_id'];
 
         $addressData['street'] = array();
         if (count($streetParts) >= 2) {

@@ -206,7 +206,7 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Multiple
 
         $this->setIsProcessingItems(true);
 
-        $this->updateOrLockListings();
+        $this->updateOrLockListingProducts();
         parent::process();
 
         // When all items are failed in response
@@ -270,27 +270,19 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Multiple
 
     // ########################################
 
-    protected function updateOrLockListings()
+    protected function updateOrLockListingProducts()
     {
         foreach ($this->listingsProducts as $product) {
 
             /** @var $product Ess_M2ePro_Model_Listing_Product */
 
-            if (isset($this->neededRemoveLocks[$product->getListingId()])) {
-                continue;
-            }
-
-            $lockItemParams = array(
-                'component' => Ess_M2ePro_Helper_Component_Ebay::NICK,
-                'id' => $product->getListingId()
-            );
-
-            $lockItem = Mage::getModel('M2ePro/Listing_LockItem',$lockItemParams);
+            $lockItem = Mage::getModel('M2ePro/LockItem');
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$product->getId());
 
             if (!$lockItem->isExist()) {
                 $lockItem->create();
                 $lockItem->makeShutdownFunction();
-                $this->neededRemoveLocks[$product->getListingId()] = $lockItem;
+                $this->neededRemoveLocks[$product->getId()] = $lockItem;
             }
 
             $lockItem->activate();
@@ -311,21 +303,17 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Multiple
                                                       $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                                       $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
     {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,false);
-    }
+        $action = Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT;
 
-    protected function addListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                              $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                              $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
-    {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,true);
-    }
+        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+        if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+        } else if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
+        } else {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
+        }
 
-    protected function addBaseListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                                  $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                                  $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM,
-                                                  $isListingMode = true)
-    {
         switch ($type) {
             case Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR:
                 $this->setStatus(Ess_M2ePro_Helper_Data::STATUS_ERROR);
@@ -342,30 +330,15 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Multiple
                 break;
         }
 
-        if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
-            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
-        } else if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
-            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
-        } else {
-            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
-        }
-
         $logModel = Mage::getModel('M2ePro/Listing_Log');
         $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
-        if ($isListingMode) {
-            $logModel->addListingMessage($listingProduct->getListingId() ,
-                $initiator ,
-                $this->logsActionId ,
-                Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT , $text, $type , $priority);
-        } else {
-            $logModel->addProductMessage($listingProduct->getListingId() ,
-                $listingProduct->getProductId() ,
-                $listingProduct->getId() ,
-                $initiator ,
-                $this->logsActionId ,
-                Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT , $text, $type , $priority);
-        }
+        $logModel->addProductMessage($listingProduct->getListingId() ,
+                                     $listingProduct->getProductId() ,
+                                     $listingProduct->getId() ,
+                                     $initiator ,
+                                     $this->logsActionId ,
+                                     $action , $text, $type , $priority);
     }
 
     // ########################################

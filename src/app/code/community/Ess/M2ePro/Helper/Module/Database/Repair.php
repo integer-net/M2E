@@ -181,7 +181,7 @@ class Ess_M2ePro_Helper_Module_Database_Repair extends Mage_Core_Helper_Abstract
 
         $definition = "{$columnInfo['type']} ";
         $columnInfo['null'] == 'no' && $definition .= 'NOT NULL ';
-        $columnInfo['default'] != '' && $definition .= "DEFAULT {$columnInfo['default']} ";
+        $columnInfo['default'] != '' && $definition .= "DEFAULT '{$columnInfo['default']}' ";
         ($columnInfo['null'] == 'yes' && $columnInfo['default'] == '') && $definition .= 'DEFAULT NULL ';
         !empty($columnInfo['after']) && $definition .= "AFTER `{$columnInfo['after']}`";
 

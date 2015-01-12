@@ -89,7 +89,19 @@ EbayListingTransferringTranslateHandler = Class.create(CommonHandler, {
         var estimatedAmountElement = $('translation_estimated_amount');
 
         if (estimatedAmountElement) {
-            estimatedAmountElement.innerHTML = this.actionHandler.getEstimatedAmount(el);
+            estimatedAmount = this.actionHandler.getEstimatedAmount(el);
+            if (estimatedAmount) {
+                $('translation_estimated_row') && $('translation_estimated_row').show();
+            } else {
+                $('translation_estimated_row') && $('translation_estimated_row').hide();
+            }
+            estimatedAmountElement.innerHTML = estimatedAmount;
+        }
+
+        if (this.actionHandler.getCurTranslationType(el) === 'silver' && this.actionHandler.getTotalCredits() > 0) {
+            $('translation_total_credit_row') && $('translation_total_credit_row').show();
+        } else {
+            $('translation_total_credit_row') && $('translation_total_credit_row').hide();
         }
 
         if (this.actionHandler.isShowPaymentWarningMessage(el)) {

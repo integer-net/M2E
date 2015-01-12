@@ -35,28 +35,6 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
                 continue;
             }
 
-            $needRemoveLockItem = false;
-
-            $lockItemParams = array(
-                'component' => Ess_M2ePro_Helper_Component_Ebay::NICK,
-                'id' => (int)$listingId
-            );
-            $lockItem = Mage::getModel('M2ePro/Listing_LockItem',$lockItemParams);
-
-            if ($lockItem->isExist()) {
-                if (!isset($params['status_changer']) ||
-                    $params['status_changer'] != Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
-                    // M2ePro_TRANSLATIONS
-                    // Listing "%listing_id%" locked by other process.
-                    throw new LogicException("Listing \"{$listingId}\" locked by other process.");
-                }
-                $lockItem->activate();
-            } else {
-                $lockItem->create();
-                $lockItem->makeShutdownFunction();
-                $needRemoveLockItem = true;
-            }
-
             $params['source_language'] = $chunk['language']['source'];
             $params['target_language'] = $chunk['language']['target'];
             $params['service']      = $chunk['service'];
@@ -65,8 +43,6 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
                 $productsForRequest = array_slice($products,$i,100);
                 $results[] = $this->processProducts($listingId, $productsForRequest, $params);
             }
-
-            $needRemoveLockItem && $lockItem->isExist() && $lockItem->remove();
         }
 
         return Mage::helper('M2ePro')->getMainStatus($results);
@@ -111,15 +87,24 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
             $logModel = Mage::getModel('M2ePro/Listing_Log');
             $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
-            $logModel->addListingMessage(
-                $listingId,
-                Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
-                $this->logsActionId,
-                Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
-                $exception->getMessage(),
-                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
-            );
+            $initiator = $this->recognizeInitiatorForLogging($params);
+
+            foreach ($products as $product) {
+
+                /** @var Ess_M2ePro_Model_Listing_Product $product */
+
+                $logModel->addProductMessage(
+                    $product->getListingId(),
+                    $product->getProductId(),
+                    $product->getId(),
+                    $initiator,
+                    $this->logsActionId,
+                    Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
+                    $exception->getMessage(),
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+                );
+            }
 
             return Ess_M2ePro_Helper_Data::STATUS_ERROR;
         }
@@ -186,6 +171,26 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
         }
 
         return array_values($sortedProducts);
+    }
+
+    // ----------------------------------------
+
+    protected function recognizeInitiatorForLogging(array $params)
+    {
+        $statusChanger = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN;
+        isset($params['status_changer']) && $statusChanger = $params['status_changer'];
+
+        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+
+        if ($statusChanger == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+        } else if ($statusChanger == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
+        } else {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
+        }
+
+        return $initiator;
     }
 
     // ########################################

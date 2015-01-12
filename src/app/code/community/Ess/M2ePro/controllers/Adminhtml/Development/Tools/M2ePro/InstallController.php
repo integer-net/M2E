@@ -282,27 +282,29 @@ HTML;
                 }
 
                 $actionsHtml = '';
-                $urlParams = array(
-                    'table_name'  => $tableName,
-                    'column_info' => json_encode($resultRow['info']['original_data'])
-                );
+                if (isset($resultRow['info'])) {
 
-                $diffData = isset($resultRow['info']['diff_data']) ? $resultRow['info']['diff_data'] : array();
-                $confirmFunc = "return confirm('Be attentive. The data will not migrated.');";
+                    $urlParams = array(
+                        'table_name'  => $tableName,
+                        'column_info' => json_encode($resultRow['info']['original_data'])
+                    );
 
-                if (empty($resultRow['info']['current_data']) ||
-                    (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
+                    $diffData = isset($resultRow['info']['diff_data']) ? $resultRow['info']['diff_data'] : array();
 
-                    $urlParams['mode'] = 'properties';
-                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                    $actionsHtml .= "<a onclick=\"{$confirmFunc}\" href=\"{$url}\">Fix Properties</a>";
-                }
+                    if (empty($resultRow['info']['current_data']) ||
+                        (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
 
-                if (isset($resultRow['info']['diff_data']) && isset($diffData['key'])) {
+                        $urlParams['mode'] = 'properties';
+                        $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                        $actionsHtml .= "<a href=\"{$url}\">Fix Properties</a>";
+                    }
 
-                    $urlParams['mode'] = 'index';
-                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                    $actionsHtml .= "<a onclick=\"{$confirmFunc}\" href=\"{$url}\">Fix Index</a>";
+                    if (isset($resultRow['info']['diff_data']) && isset($diffData['key'])) {
+
+                        $urlParams['mode'] = 'index';
+                        $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                        $actionsHtml .= "<a href=\"{$url}\">Fix Index</a>";
+                    }
                 }
 
                 $html .= <<<HTML
@@ -444,11 +446,12 @@ HTML;
      */
     public function filesDiffAction()
     {
-        $filePath = base64_decode($this->getRequest()->getParam('filePath'));
+        $filePath     = base64_decode($this->getRequest()->getParam('filePath'));
+        $originalPath = base64_decode($this->getRequest()->getParam('originalPath'));
 
         $params = array(
             'content' => file_get_contents(Mage::getBaseDir() . '/' . $filePath),
-            'path' => $filePath
+            'path'    => $originalPath ? $originalPath : $filePath
         );
 
         $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')

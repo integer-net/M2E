@@ -22,7 +22,7 @@
 
     // removing ignored options for mode checking
     $ignoredOptions = array('country', 'postal_code', 'address', 'local_shipping_mode',
-                            'dispatch_time', 'international_shipping_mode', 'services');
+                            'dispatch_time', 'international_shipping_mode', 'services', 'excluded_locations');
 
     foreach($ignoredOptions as $val) {
         unset($defaultStrictSettingsForSimpleMode[$val]);
@@ -47,6 +47,9 @@
                 if(!empty($service['cost_surcharge_value'])) {
                     $showBlockedAdvancedMode = true;
                 }
+            }
+            if (!empty($formData['excluded_locations'])) {
+                $showBlockedAdvancedMode = true;
             }
         }
     }
@@ -144,6 +147,18 @@
         if ($('international_shipping_rate_table_mode')) {
             $('international_shipping_rate_table_mode')
                 .observe('change', EbayTemplateShippingHandlerObj.rateTableModeChange);
+        }
+
+        EbayTemplateShippingHandlerObj.prepareMeasurementObservers('local');
+
+        $('dispatch_time')
+            .observe('change', EbayTemplateShippingHandlerObj.dispatchTimeChange)
+            .simulate('change');
+
+        if ($('click_and_collect_mode')) {
+            $('click_and_collect_mode')
+                .observe('change', EbayTemplateShippingHandlerObj.clickAndCollectModeChange)
+                .simulate('change');
         }
 
         if ($('cross_border_trade')) {
@@ -512,6 +527,28 @@
                         </p>
                     </td>
                 </tr>
+
+                <?php if ($showAdvancedMode && $this->canDisplayClickAndCollectOption()): ?>
+                    <tr id="click_and_collect_mode_tr" class="local-shipping-tr">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Click And Collect Opt-out'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="click_and_collect_mode" name="shipping[click_and_collect_mode]">
+                                <option value="0" <?php if (!$formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                                <option value="1" <?php if ($formData['click_and_collect_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span>
+                                    <?php echo Mage::helper('M2ePro')->__(
+                                        'Click & Collect at Argos enables your buyers to collect items at a time that suits them from over 650 Argos stores across the UK.
+                                         <br/>For more details please read <a href="http://sellercentre.ebay.co.uk/click-and-collect" target="_blank">this documentation</a>.'
+                                    ) ;?>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
 
                 <tr id="local_handling_cost_cv_tr" class="local-shipping-tr">
                     <td class="label">
@@ -978,7 +1015,7 @@
                     <input type="hidden" id="package_size_value" name="shipping[package_size_value]" value="<?php echo $formData['package_size_value']; ?>">
                     <input type="hidden" id="package_size_attribute" name="shipping[package_size_attribute]" value="<?php echo $formData['package_size_attribute']; ?>">
 
-                    <tr class="visible-for-calculated-by-default">
+                    <tr id="package_size_tr" class="visible-for-calculated-by-default">
                         <td class="label">
                             <label for="package_size"><?php echo Mage::helper('M2ePro')->__('Package Size Source'); ?>:</label>
                         </td>
@@ -1007,13 +1044,13 @@
                         </td>
                     </tr>
 
-                    <tr id="dimensions_tr" class="visible-for-calculated-by-default">
+                    <tr id="dimensions_tr" class="visible-for-calculated-by-default visible-for-flat-by-default">
                         <td class="label">
                             <label for="dimension_mode"><?php echo Mage::helper('M2ePro')->__('Dimension Source'); ?>:</label>
                         </td>
                         <td class="value">
                             <select id="dimension_mode" name="shipping[dimension_mode]" class="select">
-                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::DIMENSION_NONE; ?>"
+                                <option id="dimension_mode_none" value="<?php echo Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::DIMENSION_NONE; ?>"
                                         <?php if ($formData['dimension_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::DIMENSION_NONE): ?>selected="selected"<?php endif; ?> >
                                     <?php echo Mage::helper('M2ePro')->__('None'); ?>
                                 </option>
@@ -1035,7 +1072,7 @@
                         </td>
                         <td class="value">
                                 <span id="dimension_width_attribute_span">
-                                    <select name="shipping[dimension_width_attribute]" id="dimension_width_attribute">
+                                    <select name="shipping[dimension_width_attribute]" id="dimension_width_attribute" class="M2ePro-required-when-visible">
                                         <option value="" class="empty-option"></option>
                                         <?php $attributeCode = 'dimension_width_attribute'; ?>
                                         <?php if (isset($missingAttributes[$attributeCode])): ?>
@@ -1050,7 +1087,7 @@
                                 </span>
                             x
                                 <span id="dimension_length_attribute_span">
-                                    <select name="shipping[dimension_length_attribute]" id="dimension_length_attribute">
+                                    <select name="shipping[dimension_length_attribute]" id="dimension_length_attribute" class="M2ePro-required-when-visible">
                                         <option value="" class="empty-option"></option>
                                         <?php $attributeCode = 'dimension_length_attribute'; ?>
                                         <?php if (isset($missingAttributes[$attributeCode])): ?>
@@ -1065,7 +1102,7 @@
                                 </span>
                             x
                                 <span id="dimension_depth_attribute_span">
-                                    <select name="shipping[dimension_depth_attribute]" id="dimension_depth_attribute">
+                                    <select name="shipping[dimension_depth_attribute]" id="dimension_depth_attribute" class="M2ePro-required-when-visible">
                                         <option value="" class="empty-option"></option>
                                         <?php $attributeCode = 'dimension_depth_attribute'; ?>
                                         <?php if (isset($missingAttributes[$attributeCode])): ?>
@@ -1103,7 +1140,7 @@
                     <input type="hidden" id="weight_mode" name="shipping[weight_mode]" value="<?php echo $formData['weight_mode']; ?>">
                     <input type="hidden" id="weight_attribute" name="shipping[weight_attribute]" value="<?php echo $formData['weight_attribute']; ?>">
 
-                    <tr class="visible-for-flat-by-default visible-for-calculated-by-default">
+                    <tr id="weight_tr" class="visible-for-flat-by-default visible-for-calculated-by-default">
                         <td class="label">
                             <label for="weight"><?php echo Mage::helper('M2ePro')->__('Weight Source'); ?>:</label>
                         </td>

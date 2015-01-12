@@ -8,6 +8,8 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
 {
     const MAX_MEMORY_LIMIT = 1024;
 
+    private $previousStoreId = NULL;
+
     private $lockItem = NULL;
     private $operationHistory = NULL;
 
@@ -21,7 +23,8 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
         $this->updateLastAccess();
 
         if (!$this->isPossibleToRun()) {
-            return false;
+            $this->deInitialize();
+            return true;
         }
 
         $this->updateLastRun();
@@ -54,6 +57,7 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
         }
 
         $this->afterEnd();
+        $this->deInitialize();
 
         return $result;
     }
@@ -95,9 +99,22 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
 
     protected function initialize()
     {
+        $this->previousStoreId = Mage::app()->getStore()->getId();
+        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+
         Mage::helper('M2ePro/Client')->setMemoryLimit(self::MAX_MEMORY_LIMIT);
         Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
     }
+
+    protected function deInitialize()
+    {
+        if (!is_null($this->previousStoreId)) {
+            Mage::app()->setCurrentStore($this->previousStoreId);
+            $this->previousStoreId = NULL;
+        }
+    }
+
+    //####################################
 
     protected function updateLastAccess()
     {

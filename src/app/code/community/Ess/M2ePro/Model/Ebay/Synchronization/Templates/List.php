@@ -136,7 +136,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
                 }
 
                 if (is_null($affectedListingsProducts)) {
-                    $affectedListingsProducts = $ebaySynchTemplate->getAffectedListingsProducts(false);
+                    $affectedListingsProducts = $ebaySynchTemplate->getAffectedListingsProducts(true);
                 }
 
                 if (count($affectedListingsProducts) <= 0) {

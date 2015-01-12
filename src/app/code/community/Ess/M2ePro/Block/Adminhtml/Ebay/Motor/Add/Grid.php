@@ -74,6 +74,11 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Grid extends Mage_Admin
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
         ));
+
+        $this->getMassactionBlock()->addItem('add_note', array(
+            'label'   => Mage::helper('M2ePro')->__('Set Note'),
+            'url'     => '',
+        ));
         //--------------------------------
 
         return parent::_prepareMassaction();
@@ -110,29 +115,27 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Grid extends Mage_Admin
 <br />
 <div id="note_{$row[$idKey]}">
     <span id="note_view_{$row[$idKey]}"></span>
-    <textarea id="note_edit_{$row[$idKey]}" style="display: none"></textarea>
-    <br />
+    <div id="note_edit_{$row[$idKey]}_container" style="display: none">
+        <textarea id="note_edit_{$row[$idKey]}"></textarea>
+        <br />
+    </div>
     <span id="note_edit_link_{$row[$idKey]}" style="display: none;">
-        <a href="javascript:void(0)" onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row[$idKey]}')">
-            {$editLabel}
-        </a>
+        <br />
+        <a href="javascript:void(0)"
+           onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row[$idKey]}')">{$editLabel}</a>
     </span>
     <span id="note_add_link_{$row[$idKey]}">
-        <a href="javascript:void(0)" onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row[$idKey]}')">
-            {$addLabel}
-        </a>
+        <a href="javascript:void(0)"
+           onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row[$idKey]}')">{$addLabel}</a>
     </span>
     <span id="note_save_link_{$row[$idKey]}" style="display: none">
-        <a href="javascript:void(0)" onclick="EbayMotorCompatibilityHandlerObj.saveNote('{$row[$idKey]}')">
-            {$saveLabel}
-        </a>
+        <a href="javascript:void(0)"
+           onclick="EbayMotorCompatibilityHandlerObj.saveNote('{$row[$idKey]}')">{$saveLabel}</a>
     </span>
     &nbsp;&nbsp;&nbsp;
     <span id="note_cancel_link_{$row[$idKey]}" style="display: none">
         <a href="javascript:void(0)"
-           onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row[$idKey]}', true)">
-            {$cancelLabel}
-        </a>
+           onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row[$idKey]}', true)">{$cancelLabel}</a>
     </span>
 </div>
 

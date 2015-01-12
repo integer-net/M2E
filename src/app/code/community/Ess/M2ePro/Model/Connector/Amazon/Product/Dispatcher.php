@@ -106,34 +106,6 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
                 continue;
             }
 
-            $needRemoveLockItems = array();
-            foreach ($products as $product) {
-
-                /** @var $product Ess_M2ePro_Model_Listing_Product */
-                if (isset($needRemoveLockItems[$product->getListingId()])) {
-                    continue;
-                }
-                $lockItemParams = array(
-                    'component' => Ess_M2ePro_Helper_Component_Amazon::NICK,
-                    'id' => $product->getListingId()
-                );
-                $lockItem = Mage::getModel('M2ePro/Listing_LockItem',$lockItemParams);
-                if ($lockItem->isExist()) {
-                    if (!isset($params['status_changer']) ||
-                        $params['status_changer'] != Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER
-                    ) {
-                        // M2ePro_TRANSLATIONS
-                        // Listing "%listing_id%" locked by other process.
-                        throw new LogicException('Listing "'.$product->getListingId().'" locked by other process.');
-                    }
-                    $lockItem->activate();
-                } else {
-                    $lockItem->create();
-                    $lockItem->makeShutdownFunction();
-                    $needRemoveLockItems[$product->getListingId()] = $lockItem;
-                }
-            }
-
             if (is_null($maxProductsForOneRequest)) {
                 $results[] = $this->processProducts($products, $connectorName, $params);
             } else {
@@ -141,10 +113,6 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
                     $productsForRequest = array_slice($products,$i,$maxProductsForOneRequest);
                     $results[] = $this->processProducts($productsForRequest, $connectorName, $params);
                 }
-            }
-
-            foreach ($needRemoveLockItems as $lockItem) {
-                $lockItem->isExist() && $lockItem->remove();
             }
         }
 
@@ -175,22 +143,24 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
             $logModel = Mage::getModel('M2ePro/Listing_Log');
             $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Amazon::NICK);
 
-            $tempListings = array();
+            $action = $this->recognizeActionForLogging($connectorName,$params);
+            $initiator = $this->recognizeInitiatorForLogging($params);
+
             foreach ($products as $product) {
-                /** @var $product Ess_M2ePro_Model_Listing_Product */
-                if (isset($tempListings[$product->getListingId()])) {
-                    continue;
-                }
-                $logModel->addListingMessage(
+
+                /** @var Ess_M2ePro_Model_Listing_Product $product */
+
+                $logModel->addProductMessage(
                     $product->getListingId(),
-                    Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
+                    $product->getProductId(),
+                    $product->getId(),
+                    $initiator,
                     $this->logsActionId,
-                    Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN,
+                    $action,
                     $exception->getMessage(),
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
                 );
-                $tempListings[$product->getListingId()] = true;
             }
 
             return Ess_M2ePro_Helper_Data::STATUS_ERROR;
@@ -239,6 +209,60 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
         }
 
         return array_values($sortedProducts);
+    }
+
+    // ----------------------------------------
+
+    protected function recognizeInitiatorForLogging(array $params)
+    {
+        $statusChanger = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN;
+        isset($params['status_changer']) && $statusChanger = $params['status_changer'];
+
+        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+
+        if ($statusChanger == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+        } else if ($statusChanger == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
+        } else {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
+        }
+
+        return $initiator;
+    }
+
+    protected function recognizeActionForLogging($connectorName, array $params)
+    {
+        $action = Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN;
+
+        switch ($connectorName)
+        {
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Delete_Multiple':
+                if (isset($params['remove']) && (bool)$params['remove']) {
+                    $action = Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_AND_REMOVE_PRODUCT;
+                } else {
+                    $action = Ess_M2ePro_Model_Listing_Log::_ACTION_DELETE_PRODUCT_FROM_COMPONENT;
+                }
+                break;
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple':
+                $action = Ess_M2ePro_Model_Listing_Log::ACTION_LIST_PRODUCT_ON_COMPONENT;
+                break;
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Relist_Multiple':
+                $action = Ess_M2ePro_Model_Listing_Log::ACTION_RELIST_PRODUCT_ON_COMPONENT;
+                break;
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Revise_Multiple':
+                $action = Ess_M2ePro_Model_Listing_Log::ACTION_REVISE_PRODUCT_ON_COMPONENT;
+                break;
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Stop_Multiple':
+                if (isset($params['remove']) && (bool)$params['remove']) {
+                    $action = Ess_M2ePro_Model_Listing_Log::ACTION_STOP_AND_REMOVE_PRODUCT;
+                } else {
+                    $action = Ess_M2ePro_Model_Listing_Log::ACTION_STOP_PRODUCT_ON_COMPONENT;
+                }
+                break;
+        }
+
+        return $action;
     }
 
     // ########################################

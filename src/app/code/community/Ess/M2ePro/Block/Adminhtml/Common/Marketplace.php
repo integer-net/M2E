@@ -53,7 +53,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
             //------------------------------
             $this->_addButton('close', array(
                 'label'     => Mage::helper('M2ePro')->__('Save And Complete This Step'),
-                'onclick'   => 'MarketplaceHandlerObj.completeStep();',
+                'onclick'   => 'MarketplaceHandlerObj.completeStepAction();',
                 'class'     => 'close'
             ));
             //------------------------------
@@ -67,9 +67,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
             //------------------------------
 
             //------------------------------
+            $this->addButton('run_update_all', array(
+                'label' => Mage::helper('M2ePro')->__('Update All Now'),
+                'onclick' => 'MarketplaceHandlerObj.updateAction()',
+                'class' => 'save update_all_marketplace'
+            ));
+            //------------------------------
+
+            //------------------------------
             $this->_addButton('run_synch_now', array(
-                'label'     => Mage::helper('M2ePro')->__('Save And Update'),
-                'onclick'   => 'MarketplaceHandlerObj.saveSettings(\'runSynchNow\');',
+                'label'     => Mage::helper('M2ePro')->__('Save'),
+                'onclick'   => 'MarketplaceHandlerObj.saveAction();',
                 'class'     => 'save save_and_update_marketplaces'
             ));
             //------------------------------

@@ -32,7 +32,7 @@ abstract class Ess_M2ePro_Model_Connector_Command extends Ess_M2ePro_Model_Conne
 
         $parsedResponseData = $this->prepareResponseData($responseData);
 
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             $this->parsedResponseData = $parsedResponseData;
         }
 
@@ -49,7 +49,7 @@ abstract class Ess_M2ePro_Model_Connector_Command extends Ess_M2ePro_Model_Conne
 
     public function printDebugData()
     {
-        if (!Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isProductionEnvironment()) {
             return;
         }
 

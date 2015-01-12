@@ -87,7 +87,7 @@
                                             <select class="required-entry" id="transferring_marketplace_id" name="transferring_marketplace_id">
                                                 <option value="" selected="selected"></option>
                                                 <?php if ($this->getData('count_available_translation_marketplaces')) : ?>
-                                                    <optgroup label="<?php echo Mage::helper('M2ePro')->__('Translation Available'); ?>">
+                                                    <optgroup data="1" label="<?php echo Mage::helper('M2ePro')->__('Translation Available'); ?>">
                                                         <?php foreach($marketplaces as $marketplace) : ?>
                                                             <?php if ($marketplace['translation_available']) : ?>
                                                                 <option data="<?php echo $marketplace['status']; ?>" value="<?php echo (int)$marketplace['id']; ?>"><?php echo Mage::helper('M2ePro')->escapeHtml($marketplace['title']); ?></option>
@@ -96,7 +96,7 @@
                                                     </optgroup>
                                                 <?php endif; ?>
                                                 <?php if ($this->getData('count_not_available_translation_marketplaces')) : ?>
-                                                    <optgroup label="<?php echo Mage::helper('M2ePro')->__('Translation Not Available'); ?>">
+                                                    <optgroup data="0" label="<?php echo Mage::helper('M2ePro')->__('Translation Not Available'); ?>">
                                                         <?php foreach($marketplaces as $marketplace) : ?>
                                                             <?php if (!$marketplace['translation_available']) : ?>
                                                                 <option data="<?php echo $marketplace['status']; ?>" value="<?php echo (int)$marketplace['id']; ?>"><?php echo Mage::helper('M2ePro')->escapeHtml($marketplace['title']); ?></option>
@@ -161,6 +161,17 @@
                                         </td>
                                         <td class="value" style="vertical-align: middle">
                                             or&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" id="transferring_add_store"><?php echo Mage::helper('M2ePro')->__('Create New') ?></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="value">
+                                            <p class="note note-no-tool-tip" id="transferring_store_note" style="display: none; margin-top: -10px;"><?php echo Mage::helper('M2ePro')->__('You should select store view different from "Admin (Default Values)" one to use Translation service.') ?></p>
+                                        </td>
+                                        <td class="value">
+                                            &nbsp;
+                                        </td>
+                                        <td class="value">
+                                            &nbsp;
                                         </td>
                                     </tr>
                                 </table>

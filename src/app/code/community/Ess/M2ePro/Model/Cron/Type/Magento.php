@@ -29,6 +29,7 @@ final class Ess_M2ePro_Model_Cron_Type_Magento extends Ess_M2ePro_Model_Cron_Typ
 
         if (!$helper->isTypeMagento() && $helper->isLastRunMoreThan($maxServiceInactiveTime)) {
             $helper->setType(Ess_M2ePro_Helper_Module_Cron::TYPE_MAGENTO);
+            $helper->setLastTypeChange(Mage::helper('M2ePro')->getCurrentGmtDate());
         }
     }
 
@@ -57,7 +58,7 @@ final class Ess_M2ePro_Model_Cron_Type_Magento extends Ess_M2ePro_Model_Cron_Typ
 
     private function distributeLoadIfNeed()
     {
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             return;
         }
 

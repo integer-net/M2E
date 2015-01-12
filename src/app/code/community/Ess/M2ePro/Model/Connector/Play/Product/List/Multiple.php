@@ -90,7 +90,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             $listingProduct->setData('sku',$addingSku);
         }
 
-        $this->checkSkuExistance($listingProducts);
+        $this->checkSkuExistence($listingProducts);
 
         foreach ($listingProducts as $key => $listingProduct) {
 
@@ -144,6 +144,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
             $requestData['items'][] = $sendedData;
         }
+
+        $this->checkQtyWarnings();
 
         $this->addSkusToQueue($tempSkus);
 
@@ -351,7 +353,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
     // ########################################
 
-    private function checkSkuExistance($listingProducts)
+    private function checkSkuExistence($listingProducts)
     {
         $listingProductsPacks = array_chunk($listingProducts,5,true);
 
@@ -379,11 +381,14 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
                 Mage::helper('M2ePro/Module_Exception')->process($exception);
 
-                $this->addListingsLogsMessage(
-                    reset($listingProductsPack), Mage::helper('M2ePro')->__($exception->getMessage()),
-                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
-                );
+                foreach ($listingProductsPack as $listingProduct) {
+
+                    $this->addListingsProductsLogsMessage(
+                        $listingProduct, Mage::helper('M2ePro')->__($exception->getMessage()),
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                    );
+                }
 
                 continue;
             }

@@ -52,6 +52,14 @@
                                     </span><span id="translation_account_ebay_id"><?php echo Mage::helper('M2ePro')->__($this->getData('ebay_user_id')); ?></span>
                                 </td>
                             </tr>
+                            <tr id="translation_total_credit_row">
+                                <td class="label" style="...">
+                                    <span id="translation_account_ebay_total_credit_label"><?php echo Mage::helper('M2ePro')->__('Total Credits'); ?>:</span>
+                                </td>
+                                <td class="value">
+                                    <span id="translation_account_ebay_total_credit_value"><?php echo $this->getData('translation_total_credits'); ?></span>
+                                </td>
+                            </tr>
                             <tr>
                                 <td class="label" style="min-width:350px;">
                                     <span><?php echo Mage::helper('M2ePro')->__('Balance'); ?>:
@@ -64,7 +72,7 @@
                                 </td>
                                 <td class="value" style="min-width: 21px !important;">&nbsp;</td>
                             </tr>
-                            <tr>
+                            <tr id="translation_estimated_row">
                                 <td class="label" style="min-width:350px;">
                                     <span><?php echo Mage::helper('M2ePro')->__('Estimated Amount'); ?>:
                                 </td>

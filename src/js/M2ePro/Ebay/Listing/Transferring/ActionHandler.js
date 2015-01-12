@@ -137,7 +137,7 @@ EbayListingTransferringActionHandler.prototype = {
                 method: 'post',
                 asynchronous : true,
                 parameters : {},
-                onSuccess: function (transport){callback && callback();}.bind(this)
+                onSuccess: function(transport){callback && callback();}.bind(this)
             });
     },
 
@@ -226,7 +226,7 @@ EbayListingTransferringActionHandler.prototype = {
                     marketplace_id : marketplaceId,
                     store_id       : storeId
                 },
-                onSuccess: function (transport)
+                onSuccess: function(transport)
                 {
                     var result = transport.responseText.evalJSON();
 
@@ -333,7 +333,7 @@ EbayListingTransferringActionHandler.prototype = {
                         store_id       : storeId,
                         products_ids   : [productsIds]
                     },
-                    onSuccess: function (transport)
+                    onSuccess: function(transport)
                     {
                         this.loadedData.policy[accountId+'_'+marketplaceId+'_'+storeId] = transport.responseText;
                         callback && callback();
@@ -372,7 +372,7 @@ EbayListingTransferringActionHandler.prototype = {
                     parameters : {
                         account_id : accountId
                     },
-                    onSuccess: function (transport)
+                    onSuccess: function(transport)
                     {
                         this.loadedData.translation[accountId] = transport.responseText;
                         callback && callback();
@@ -523,6 +523,19 @@ EbayListingTransferringActionHandler.prototype = {
 
     // --------------------------------
 
+    getCurTranslationType: function(el)
+    {
+        return el.options[el.selectedIndex].value;
+    },
+
+    getTotalCredits: function()
+    {
+        if (!$('translation_account_ebay_total_credit_value'))
+            return 0;
+        var totalCreditsElem = $('translation_account_ebay_total_credit_value');
+        return isNaN(parseInt(totalCreditsElem.innerHTML)) ? 0 : parseInt(totalCreditsElem.innerHTML);
+    },
+
     getRemainingAmount: function(el)
     {
         var prepaid = $('translation_account_balance') && parseFloat($('translation_account_balance').innerHTML);
@@ -535,11 +548,19 @@ EbayListingTransferringActionHandler.prototype = {
     {
         var selectedIndex = el.selectedIndex;
         var avgCost = el.options[selectedIndex].getAttribute('data');
+        var productsAmount = this.getProductsIds().length;
 
-        return (parseFloat(avgCost) * this.getProductsIds().length).toFixed(2);
+        if (this.getCurTranslationType(el) === 'silver') {
+            productsAmount -= this.getTotalCredits();
+        }
+
+        if (productsAmount <= 0)
+            return 0;
+
+        return (parseFloat(avgCost) * productsAmount).toFixed(2);
     },
 
-    isShowPaymentWarningMessage: function (el)
+    isShowPaymentWarningMessage: function(el)
     {
         return (this.getRemainingAmount(el) > 0);
     },
@@ -603,7 +624,7 @@ EbayListingTransferringActionHandler.prototype = {
                 method: 'post',
                 asynchronous : true,
                 parameters : parameters,
-                onSuccess: function (transport)
+                onSuccess: function(transport)
                 {
                     var response = transport.responseText.evalJSON();
                     if (response['result'] == 'success' && response['listing_id']) {
@@ -640,7 +661,7 @@ EbayListingTransferringActionHandler.prototype = {
                     company    : $('transferring_company')   && $('transferring_company').value,
                     country    : $('transferring_country')   && $('transferring_country').value
                 },
-                onSuccess: function (transport)
+                onSuccess: function(transport)
                 {
                     var response = transport.responseText.evalJSON();
                     if (response['result'] != 'success') {
@@ -688,7 +709,7 @@ EbayListingTransferringActionHandler.prototype = {
                 parameters : {
                     account_id : accountId
                 },
-                onSuccess: function (transport)
+                onSuccess: function(transport)
                 {
                     var response = transport.responseText.evalJSON();
                     if (response['result'] != 'success') {
@@ -697,6 +718,12 @@ EbayListingTransferringActionHandler.prototype = {
 
                     if ($('translation_account_balance')) {
                         $('translation_account_balance').innerHTML = parseFloat(response['info']['credit']['prepaid']).toFixed(2);
+                    }
+
+                    if ($('translation_account_ebay_total_credit_value')) {
+                        $('translation_account_ebay_total_credit_value').innerHTML =
+                        parseInt(response['info']['credit']['translation']) -
+                        parseInt(response['info']['credit']['used']);
                     }
 
                     if ($('translation_account_currency')) {

@@ -220,6 +220,11 @@
                                             <?php echo $this->licenseData['domain']; ?>
                                         </span>
 
+                                        <?php if (!$this->licenseData['valid']['domain'] &&
+                                                  !is_null($this->licenseData['connection']['domain'])): ?>
+                                            <span> (<?php echo Mage::helper('M2ePro')->__('Your Domain') . ': ' . Mage::helper('M2ePro')->escapeHtml($this->licenseData['connection']['domain']);?>)</span>
+                                        <?php endif;?>
+
                                         <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
                                             </span>
                                         <?php } ?>
@@ -243,6 +248,11 @@
                                             <?php echo $this->licenseData['ip']; ?>
                                         </span>
 
+                                        <?php if (!$this->licenseData['valid']['ip'] &&
+                                            !is_null($this->licenseData['connection']['ip'])): ?>
+                                            <span> (<?php echo Mage::helper('M2ePro')->__('Your IP') . ': ' . Mage::helper('M2ePro')->escapeHtml($this->licenseData['connection']['ip']);?>)</span>
+                                        <?php endif;?>
+
                                         <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
                                             </span>
                                         <?php } ?>
@@ -265,6 +275,11 @@
                                         <span <?php echo $this->licenseData['valid']['directory'] ? '' : 'style="color: red;"'?>>
                                             <?php echo $this->licenseData['directory']; ?>
                                         </span>
+
+                                        <?php if (!$this->licenseData['valid']['directory'] &&
+                                            !is_null($this->licenseData['connection']['directory'])): ?>
+                                            <span> (<?php echo Mage::helper('M2ePro')->__('Your Directory') . ': ' . Mage::helper('M2ePro')->escapeHtml($this->licenseData['connection']['directory']);?>)</span>
+                                        <?php endif;?>
 
                                         <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>
                                             </span>

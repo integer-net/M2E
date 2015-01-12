@@ -45,34 +45,12 @@ button.next > span {
     background-image: url("../images/next.gif") !important;
 }
 
-/*
-For Magento GO
-
-button.next span span span {
-    background-position: 100% 50%;
-    background-repeat: no-repeat !important;
-    padding-right: 20px !important;
-    padding-left: 0 !important;
-    background-image: url("../images/next.gif") !important;
-}*/
-
 button.search > span {
     background-position: 0% 50%;
     padding-left: 18px !important;
     padding-right: 0 !important;
     background-image: url("../images/search.gif") !important;
 }
-
-/*
-For Magento GO
-
-button.search span span span {
-    background-position: 0% 50% !important;
-    background-repeat: no-repeat !important;
-    padding-left: 18px !important;
-    padding-right: 0 !important;
-    background-image: url("../images/search.gif") !important;
-}*/
 
 select.locked_selected {
     color: gray !important;
@@ -275,6 +253,7 @@ td.help_line .hl_footer {
 
 /* Wizard Notification */
 /* ================================================ */
+
 .wizard-note {
     background: url(../images/wizard-note.png) 48px 38px #E7FFE5 no-repeat;
     border: dashed 1px #04DD04;
@@ -305,6 +284,7 @@ a.wizard-close:hover {
 
 /* Tool tip */
 /* ================================================ */
+
 .tool-tip-image {
     cursor: help;
 }
@@ -355,9 +335,12 @@ a.wizard-close:hover {
     margin-left: -25px;
     float: left;
 }
+
 /* ================================================ */
 
 /* Description preview */
+/* ================================================ */
+
 .description-preview-watermark-info {
     position: relative;
     display: inline;
@@ -371,6 +354,31 @@ a.wizard-close:hover {
     left: 0px;
     font-size: 10px;
     font-weight: bold;
+}
+
+/* ================================================ */
+
+/* Marketplaces */
+/* ================================================ */
+
+td.changed {
+    display: none;
+    vertical-align: top;
+}
+
+td.changed::after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+td.changed span {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin-top: 5px;
+    margin-left: 5px;
+    background-image: url('../../images/fam_bullet_disk.gif');
 }
 
 /* ================================================ */

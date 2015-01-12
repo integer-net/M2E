@@ -31,23 +31,31 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Marketplace_Edit_Form extends Mage_Adminht
             ->getItems();
 
         $marketplaces = array();
+        $storedStatuses = array();
 
         foreach($tempMarketplaces as $tempMarketplace) {
 
+            /* @var $tempMarketplace Ess_M2ePro_Model_Marketplace */
             $marketplaces[] = array(
                 'instance' => $tempMarketplace,
                 'params'   => array('locked'=>$tempMarketplace->isLocked())
             );
+
+            $storedStatuses[] = array(
+                'marketplace_id' => $tempMarketplace->getMarketplaceId(),
+                'status' => $tempMarketplace->getStatus()
+            );
         }
 
         $this->marketplaces = $marketplaces;
+        $this->storedStatuses = $storedStatuses;
         //----------------------------
 
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label'   => Mage::helper('M2ePro')->__('Update Now'),
-                'onclick' => 'MarketplaceHandlerObj.runSingleMarketplaceSynchronization(this)',
+                'onclick' => 'MarketplaceHandlerObj.runSingleSynchronization(this)',
                 'class' => 'run_single_button'
             ) );
 

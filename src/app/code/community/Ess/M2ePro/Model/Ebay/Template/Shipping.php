@@ -4,6 +4,9 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * @method Ess_M2ePro_Model_Mysql4_Ebay_Template_Shipping getResource()
+ */
 class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component_Abstract
 {
     const SHIPPING_TYPE_FLAT                = 0;
@@ -301,6 +304,13 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
         return !isset($data[$accountId]) ? NULL : $data[$accountId];
     }
 
+    //---------------------------------------
+
+    public function isClickAndCollectEnabled()
+    {
+        return (bool)$this->getData('click_and_collect_mode');
+    }
+
     // #######################################
 
     public function isInternationalShippingNoInternationalEnabled()
@@ -503,6 +513,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
             'local_shipping_discount_mode' => 0,
             'local_shipping_discount_profile_id' => json_encode(array()),
             'local_shipping_rate_table_mode' => 0,
+            'click_and_collect_mode' => 1,
 
             'international_shipping_mode' => self::SHIPPING_TYPE_NO_INTERNATIONAL,
             'international_shipping_discount_mode' => 0,
@@ -542,17 +553,21 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
     // #######################################
 
-    public function getAffectedListingsProducts($asObjects = false)
+    /**
+     * @param bool|array $asArrays
+     * @return array
+     */
+    public function getAffectedListingsProducts($asArrays = true)
     {
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
         $templateManager->setTemplate(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING);
 
         $listingsProducts = $templateManager->getAffectedOwnerObjects(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asObjects
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asArrays
         );
 
         $listings = $templateManager->getAffectedOwnerObjects(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING, $this->getId(), true
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING, $this->getId(), false
         );
 
         foreach ($listings as $listing) {
@@ -560,7 +575,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
             $tempListingsProducts = $listing->getChildObject()
                                             ->getAffectedListingsProductsByTemplate(
                                                 Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING,
-                                                $asObjects
+                                                $asArrays
                                             );
 
             foreach ($tempListingsProducts as $listingProduct) {
@@ -575,7 +590,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getAffectedListingsProducts(false);
+        $neededColumns = array('id');
+        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
 
         if (!$listingsProducts) {
             return;

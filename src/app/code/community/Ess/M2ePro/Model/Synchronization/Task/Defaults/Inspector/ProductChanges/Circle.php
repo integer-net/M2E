@@ -36,26 +36,23 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_ProductChan
     protected function performActions()
     {
         $this->prepareBaseValues();
-
         $listingsProducts = $this->getNextListingsProducts();
+
+        if ($listingsProducts === false) {
+            return;
+        }
 
         if (count($listingsProducts) <= 0) {
 
             $lastTime = strtotime($this->getLastTimeStartCircle());
             $interval = $this->getMinIntervalBetweenCircles();
 
-            if ($lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true)) {
-                return;
+            if ($lastTime + $interval < Mage::helper('M2ePro')->getCurrentGmtDate(true)) {
+                $this->setLastListingProductId(0);
+                $this->resetLastTimeStartCircle();
             }
 
-            $this->setLastListingProductId(0);
-            $this->resetLastTimeStartCircle();
-
-            $listingsProducts = $this->getNextListingsProducts();
-
-            if (count($listingsProducts) <= 0) {
-                return;
-            }
+            return;
         }
 
         $tempIndex = 0;
@@ -161,11 +158,14 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_ProductChan
     {
         $countOfProductChanges = Mage::getModel('M2ePro/ProductChange')->getCollection()->getSize();
         $productChangeMaxPerOneTime = $this->getConfigValue('/settings/product_change/', 'max_count_per_one_time');
-        $limit = min(array($this->getCountItemsPerOneTime(),$productChangeMaxPerOneTime)) - $countOfProductChanges;
+
+        $limit = $productChangeMaxPerOneTime - $countOfProductChanges;
 
         if ($limit <= 0) {
-            return array();
+            return false;
         }
+
+        $limit > $this->getCountItemsPerOneTime() && $limit = $this->getCountItemsPerOneTime();
 
         $collection = Mage::getModel('M2ePro/Listing_Product')->getCollection();
         $collection->getSelect()

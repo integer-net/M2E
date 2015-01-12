@@ -9,6 +9,33 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
     const DEFAULT_INTERVAL = 3600;
     const MAX_MEMORY_LIMIT = 256;
 
+    private $params = array();
+    private $forceTasksRunning = false;
+
+    // ########################################
+
+    public function getForceTasksRunning()
+    {
+        return $this->forceTasksRunning;
+    }
+
+    public function setForceTasksRunning($value)
+    {
+        $this->forceTasksRunning = (bool)$value;
+    }
+
+    // ----------------------------------------
+
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    public function setParams(array $params = array())
+    {
+        $this->params = $params;
+    }
+
     // ########################################
 
     public function process($minInterval = NULL)
@@ -23,6 +50,8 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
         $this->setLastUpdateDateTime();
         return $this->processTasks($this->getRegisteredTasks());
     }
+
+    // ----------------------------------------
 
     public function processTask($allowedTask)
     {
@@ -61,6 +90,11 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
 
             /** @var $taskModel Ess_M2ePro_Model_Servicing_Task */
             $taskModel = Mage::getModel('M2ePro/Servicing_Task_'.ucfirst($taskName));
+            $taskModel->setParams($this->getParams());
+
+            if (!$this->getForceTasksRunning() && !$taskModel->isAllowed()) {
+                continue;
+            }
 
             $requestData[$taskModel->getPublicNick()] = $taskModel->getRequestData();
         }
@@ -78,6 +112,7 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
 
             /** @var $taskModel Ess_M2ePro_Model_Servicing_Task */
             $taskModel = Mage::getModel('M2ePro/Servicing_Task_'.ucfirst($taskName));
+            $taskModel->setParams($this->getParams());
 
             if (!isset($responseData[$taskModel->getPublicNick()]) ||
                 !is_array($responseData[$taskModel->getPublicNick()])) {

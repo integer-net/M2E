@@ -683,7 +683,7 @@ class Ess_M2ePro_Helper_Component extends Mage_Core_Helper_Abstract
 
     public function getCachedComponentObject($mode, $modelName, $value, $field = NULL, array $tags = array())
     {
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             return $this->getComponentObject($mode,$modelName,$value,$field);
         }
 

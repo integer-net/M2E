@@ -41,15 +41,22 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
             }
         }
 
-        $tempListing = $listingsProducts[0]->getListing();
+        $tempAccount = $listingsProducts[0]->getAccount();
+        $tempMarketplace = $listingsProducts[0]->getMarketplace();
+
         foreach($listingsProducts as $listingProduct) {
-            if ($tempListing->getId() != $listingProduct->getListing()->getId()) {
-                throw new Exception('Multiple Item Connector has received products from different listings');
+
+            if ($tempAccount->getId() != $listingProduct->getAccount()->getId()) {
+                throw new Exception('Multiple Item Connector has received products from different accounts');
+            }
+
+            if ($tempMarketplace->getId() != $listingProduct->getMarketplace()->getId()) {
+                throw new Exception('Multiple Item Connector has received products from different marketplaces');
             }
         }
 
         $this->listingsProducts = $listingsProducts;
-        parent::__construct($params,$tempListing);
+        parent::__construct($params,$tempMarketplace,$tempAccount);
     }
 
     // ########################################
@@ -66,7 +73,9 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
                 $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH;
             }
 
-            $this->getLogger()->logListingMessage($message, $priority);
+            foreach ($this->listingsProducts as $product) {
+                $this->getLogger()->logListingProductMessage($product, $message, $priority);
+            }
         }
 
         if (!isset($result['result'])) {
@@ -113,6 +122,22 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
             }
 
             throw $exception;
+        }
+    }
+
+    // ########################################
+
+    protected function eventBeforeProcess()
+    {
+        foreach ($this->listingsProducts as $listingProduct) {
+            $this->getLocker($listingProduct->getId())->update();
+        }
+    }
+
+    protected function eventAfterProcess()
+    {
+        foreach ($this->listingsProducts as $listingProduct) {
+            $this->getLocker($listingProduct->getId())->remove();
         }
     }
 

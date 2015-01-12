@@ -143,6 +143,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Relist_Multiple
             $requestData['items'][] = $sendedData;
         }
 
+        $this->checkQtyWarnings();
+
         return $requestData;
     }
 

@@ -68,7 +68,7 @@ class Ess_M2ePro_Model_Magento_Product_Index
     public function requireReindex($code)
     {
         /** @var $process Mage_Index_Model_Process */
-        $process = $this->indexer->getProcessByCode($code);
+        $process = $this->getIndexer()->getProcessByCode($code);
 
         if ($process === false) {
             return false;
@@ -84,7 +84,7 @@ class Ess_M2ePro_Model_Magento_Product_Index
     public function executeReindex($code)
     {
         /** @var $process Mage_Index_Model_Process */
-        $process = $this->indexer->getProcessByCode($code);
+        $process = $this->getIndexer()->getProcessByCode($code);
 
         if ($process === false || $process->getStatus() == Mage_Index_Model_Process::STATUS_RUNNING) {
             return false;

@@ -645,18 +645,6 @@ class Ess_M2ePro_Adminhtml_Common_Play_ListingController
         $id = $this->getRequest()->getParam('id');
         $model = Mage::helper('M2ePro/Component_Play')->getCachedObject('Listing',$id);
 
-        // Check listing lock item
-        //----------------------------
-        $lockItem = Mage::getModel(
-            'M2ePro/Listing_LockItem',array('id' => $id, 'component' => Ess_M2ePro_Helper_Component_Play::NICK)
-        );
-        if ($lockItem->isExist()) {
-            $this->_getSession()->addWarning(
-                Mage::helper('M2ePro')->__('The listing is locked by another process. Please try again later.')
-            );
-        }
-        //----------------------------
-
         // Check listing lock object
         //----------------------------
         if ($model->isLockedObject('products_in_action')) {

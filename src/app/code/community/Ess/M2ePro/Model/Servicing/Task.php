@@ -4,27 +4,47 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-interface Ess_M2ePro_Model_Servicing_Task
+abstract class Ess_M2ePro_Model_Servicing_Task
 {
+    private $params = array();
+
     // ########################################
 
     /**
      * @return string
      */
-    public function getPublicNick();
+    abstract public function getPublicNick();
 
     // ########################################
 
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    public function setParams(array $params = array())
+    {
+        $this->params = $params;
+    }
+
+    // ########################################
+
+    public function isAllowed()
+    {
+        return true;
+    }
+
+    // ----------------------------------------
     /**
      * @return array
      */
-    public function getRequestData();
+    abstract public function getRequestData();
 
     /**
      * @param array $data
      * @return null
      */
-    public function processResponseData(array $data);
+    abstract public function processResponseData(array $data);
 
     // ########################################
 }

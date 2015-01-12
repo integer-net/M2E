@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Servicing_Task_Backups implements Ess_M2ePro_Model_Servicing_Task
+class Ess_M2ePro_Model_Servicing_Task_Backups extends Ess_M2ePro_Model_Servicing_Task
 {
     const MAX_ALLOWED_ITEMS_PER_REQUEST = 10000;
 

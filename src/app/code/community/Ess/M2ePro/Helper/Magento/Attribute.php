@@ -395,8 +395,8 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
             return false;
         }
 
-        //@todo Now we can only handle type "text"
-        if ($frontendInput != 'text') {
+        //@todo Now we can only handle type "text" or "textarea"
+        if ($frontendInput != 'text' && $frontendInput != 'textarea') {
             return false;
         }
 

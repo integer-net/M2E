@@ -173,6 +173,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
     {
         if (is_null($this->locker)) {
             $this->locker = Mage::getModel('M2ePro/Ebay_Listing_Other_Action_Locker');
+            $this->locker->setListingOtherId($this->otherListing->getId());
         }
 
         return $this->locker;
