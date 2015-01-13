@@ -8,11 +8,17 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
 {
     //#############################################
 
+    public function preDispatch()
+    {
+        $this->getLayout()->setArea('frontend');
+        parent::preDispatch();
+    }
+
+    //#############################################
+
     public function indexAction()
     {
         $this->closeConnection();
-
-        Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
 
         $cron = Mage::getModel('M2ePro/Cron_Type_Service');
         $cron->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
@@ -67,6 +73,7 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
                 break;
             }
         }
+
         flush();
     }
 

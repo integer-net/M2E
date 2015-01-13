@@ -10,10 +10,12 @@ class Ess_M2ePro_Helper_View_Common_Controller extends Mage_Core_Helper_Abstract
 
     public function addMessages(Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        !Mage::helper('M2ePro/Module_Cron')->isReadyToRun() ||
-        !Mage::helper('M2ePro/Module_Cron')->isLastRunMoreThan(1,true) ||
-        Mage::helper('M2ePro/Magento')->isDeveloper() ||
-        $this->addCronErrorMessage($controller);
+        if (Mage::helper('M2ePro/Module_Cron')->isReadyToRun() &&
+            Mage::helper('M2ePro/Module_Cron')->isLastRunMoreThan(1,true) &&
+            Mage::helper('M2ePro/Module')->isProductionEnvironment()) {
+
+            $this->addCronErrorMessage($controller);
+        }
     }
 
     // ########################################

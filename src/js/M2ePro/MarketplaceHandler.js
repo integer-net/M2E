@@ -3,16 +3,51 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    initialize: function(synchProgressObj)
+    initialize: function(synchProgressObj, storedStatuses)
     {
         this.synchProgressObj = synchProgressObj;
 
         this.marketplacesForUpdate = new Array();
         this.marketplacesForUpdateCurrentIndex = 0;
+        this.storedStatuses = storedStatuses || [];
 
         this.synchErrors = 0;
         this.synchWarnings = 0;
         this.synchSuccess = 0;
+    },
+
+    //----------------------------------
+
+    getStoredStatuses: function()
+    {
+        return this.storedStatuses;
+    },
+
+    getStoredStatusByMarketplaceId: function(marketplaceId)
+    {
+        if (marketplaceId == '') {
+            return;
+        }
+
+        for (var i = 0; i < this.storedStatuses.length; i++) {
+            if (this.storedStatuses[i].marketplace_id == marketplaceId) {
+                return this.storedStatuses[i].status;
+            }
+        }
+    },
+
+    getCurrentStatuses: function()
+    {
+        var allStatuses = [];
+        $$('select.marketplace_status_select').each(function(element) {
+            var elementId = element.getAttribute('marketplace_id');
+            allStatuses.push({
+                marketplace_id: elementId,
+                status: parseInt(element.value)
+            });
+        });
+
+        return allStatuses;
     },
 
     //----------------------------------
@@ -24,48 +59,41 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
         }
 
         $(destinationBlockId).appendChild($(childBlockId));
+        return true;
     },
 
     //----------------------------------
 
-    saveSettings : function(runSynch)
+    saveAction: function()
     {
         MagentoMessageObj.clearAll();
-        runSynch = runSynch || '';
-
         CommonHandlerObj.scroll_page_to_top();
 
-        var self = this;
-        new Ajax.Request( M2ePro.url.get('formSubmit', $('edit_form').serialize(true)) ,
-        {
-            method: 'get',
-            asynchronous: true,
-            onSuccess: function(transport)
-            {
-                MagentoMessageObj.addSuccess(M2ePro.translator.translate('Marketplaces settings have been saved.'));
-                if (runSynch != '') {
-                    eval('self.'+runSynch+'();');
-                }
-            }
-        });
+        var changedStatuses = this.runEnabledSynchronization();
+        this.saveSettings();
+
+        for (var i = 0; i < changedStatuses.length; i++) {
+            $('changed_' + changedStatuses[i].marketplace_id).style.display = 'none';
+            this.changeStatus($('status_' + changedStatuses[i].marketplace_id));
+        }
+
+        MagentoMessageObj.addSuccess(M2ePro.translator.translate('Marketplaces settings have been saved.'));
     },
 
-    //----------------------------------
+    updateAction: function()
+    {
+        MagentoMessageObj.clearAll();
+        CommonHandlerObj.scroll_page_to_top();
+        this.runAllSynchronization();
+    },
 
-    completeStep : function()
+    completeStepAction: function()
     {
         var self = this;
-        var isMarketplaceSelected = false;
 
-        $$('.marketplace_status_select').each(function(obj) {
-            if (obj.value == 1) {
-                isMarketplaceSelected = true;
-            }
-        });
+        if (self.runAllSynchronization(self.getCurrentStatuses())) {
 
-        if (isMarketplaceSelected) {
-
-            self.saveSettings('runSynchNow');
+            self.saveSettings();
 
             var intervalId = setInterval(function(){
                 if (typeof self.marketplacesUpdateFinished != 'undefined' && self.marketplacesUpdateFinished) {
@@ -74,6 +102,7 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
                     window.close();
                 }
             }, 1000);
+
         } else {
             MagentoMessageObj.addError(M2ePro.translator.translate('You must select at least one marketplace you will work with.'));
         }
@@ -81,37 +110,27 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    runSynchNow : function()
+    saveSettings : function()
     {
-        var self = this;
-
-        self.marketplacesForUpdate = new Array();
-        self.marketplacesForUpdateCurrentIndex = 0;
-
-        $$('select.marketplace_status_select').each(function(marketplaceObj) {
-            var marketplaceId = marketplaceObj.readAttribute('marketplace_id');
-            var marketplaceState = marketplaceObj.value;
-
-            if (!marketplaceId) {
-                return;
-            }
-
-            if (marketplaceState == 1) {
-                $('synch_info_wait_'+marketplaceId).show();
-                $('synch_info_process_'+marketplaceId).hide();
-                $('synch_info_complete_'+marketplaceId).hide();
-                self.marketplacesForUpdate[self.marketplacesForUpdate.length] = marketplaceId;
-            } else {
-                $('synch_info_wait_'+marketplaceId).hide();
-                $('synch_info_process_'+marketplaceId).hide();
-                $('synch_info_complete_'+marketplaceId).hide();
-            }
+        new Ajax.Request( M2ePro.url.get('formSubmit', $('edit_form').serialize(true)) ,
+        {
+            method: 'get',
+            asynchronous: true,
+            onSuccess: function(transport) {}
         });
+    },
 
-        if (self.marketplacesForUpdate.length == 0) {
-            return;
-        }
+    //----------------------------------
 
+    runSingleSynchronization: function(runNowButton)
+    {
+        MagentoMessageObj.clearAll();
+        CommonHandlerObj.scroll_page_to_top();
+
+        var self = this;
+        var marketplaceStatusSelect = $(runNowButton).up('tr').select('.marketplace_status_select')[0];
+
+        self.marketplacesForUpdate = [marketplaceStatusSelect.readAttribute('marketplace_id')];
         self.marketplacesForUpdateCurrentIndex = 0;
 
         self.synchErrors = 0;
@@ -119,9 +138,84 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
         self.synchSuccess = 0;
 
         self.runNextMarketplaceNow();
+        return true;
     },
 
-    runNextMarketplaceNow : function()
+    runEnabledSynchronization: function()
+    {
+        var currentStatuses = this.getCurrentStatuses();
+        var storedStatuses = this.getStoredStatuses();
+        var changedStatuses = new Array();
+        this.marketplacesForUpdate = new Array();
+
+        for (var i =0; i < storedStatuses.length; i++) {
+
+            if ((storedStatuses[i].marketplace_id == currentStatuses[i].marketplace_id)
+                && (storedStatuses[i].status != currentStatuses[i].status)) {
+
+                this.storedStatuses[i].status = currentStatuses[i].status;
+                changedStatuses.push({
+                    marketplace_id: currentStatuses[i].marketplace_id,
+                    status: currentStatuses[i].status
+                });
+
+                this.changeStatusInfo(currentStatuses[i].marketplace_id, currentStatuses[i].status);
+
+                if (currentStatuses[i].status) {
+                    this.marketplacesForUpdate[this.marketplacesForUpdate.length] = currentStatuses[i].marketplace_id;
+                }
+            }
+        }
+        this.marketplacesForUpdateCurrentIndex = 0;
+
+        this.synchErrors = 0;
+        this.synchWarnings = 0;
+        this.synchSuccess = 0;
+
+        this.runNextMarketplaceNow();
+        return changedStatuses;
+    },
+
+    runAllSynchronization : function(statuses)
+    {
+        var statusesForSynch = statuses || this.getStoredStatuses();
+
+        this.marketplacesForUpdate = new Array();
+        this.marketplacesForUpdateCurrentIndex = 0;
+
+        for (var i = 0; i < statusesForSynch.length; i++ ) {
+
+            var marketplaceId = statusesForSynch[i].marketplace_id;
+            var marketplaceState = statusesForSynch[i].status;
+
+            if (!marketplaceId) {
+                return false;
+            }
+
+            this.changeStatusInfo(marketplaceId, marketplaceState);
+
+            if (marketplaceState == 1) {
+                this.marketplacesForUpdate[this.marketplacesForUpdate.length] = marketplaceId;
+            }
+        }
+
+        if (this.marketplacesForUpdate.length == 0) {
+            return false;
+        }
+
+        this.marketplacesForUpdateCurrentIndex = 0;
+
+        this.synchErrors = 0;
+        this.synchWarnings = 0;
+        this.synchSuccess = 0;
+
+        this.runNextMarketplaceNow();
+        return true;
+    },
+
+    //----------------------------------
+
+    runNextMarketplaceNow: function()
     {
         var self = this;
 
@@ -195,41 +289,57 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
             M2ePro.url.get('runSynchNow', {'marketplace_id': marketplaceId}),
             '', 'MarketplaceHandlerObj.runNextMarketplaceNow();'
         );
-    },
 
-    runSingleMarketplaceSynchronization: function(runNowButton)
-    {
-        var self = this;
-        var marketplaceStatusSelect = $(runNowButton).up('tr').select('.marketplace_status_select')[0];
-
-        self.saveSettings();
-
-        self.marketplacesForUpdate = [marketplaceStatusSelect.readAttribute('marketplace_id')];
-        self.marketplacesForUpdateCurrentIndex = 0;
-
-        self.synchErrors = 0;
-        self.synchWarnings = 0;
-        self.synchSuccess = 0;
-
-        self.runNextMarketplaceNow();
+        return true;
     },
 
     //----------------------------------
 
-    changeStatus : function(element, marketplaceId)
+    changeStatus: function(element)
     {
         var marketplaceId = element.readAttribute('marketplace_id');
         var runSingleButton = $('run_single_button_' + marketplaceId);
 
+        this.markChangedStatus(marketplaceId, element.value);
+
         if (element.value == '1') {
             element.removeClassName('lacklustre_selected');
             element.addClassName('hightlight_selected');
-            runSingleButton && runSingleButton.show();
+
+            if (this.getStoredStatusByMarketplaceId(marketplaceId) == element.value) {
+                runSingleButton && runSingleButton.show();
+            }
+
         } else {
             element.removeClassName('hightlight_selected');
             element.addClassName('lacklustre_selected');
             $('synch_info_complete_'+marketplaceId).hide();
             runSingleButton && runSingleButton.hide();
+        }
+    },
+
+    markChangedStatus: function(marketplaceId, status)
+    {
+        var storedStatus = this.getStoredStatusByMarketplaceId(marketplaceId);
+        var changedStatus = $('changed_' + marketplaceId);
+
+        if (storedStatus != status) {
+            changedStatus.style.display = 'table-cell';
+        } else {
+            changedStatus.style.display = 'none';
+        }
+    },
+
+    changeStatusInfo: function(marketplaceId, status)
+    {
+        if (status == 1) {
+            $('synch_info_wait_'+marketplaceId).show();
+            $('synch_info_process_'+marketplaceId).hide();
+            $('synch_info_complete_'+marketplaceId).hide();
+        } else {
+            $('synch_info_wait_'+marketplaceId).hide();
+            $('synch_info_process_'+marketplaceId).hide();
+            $('synch_info_complete_'+marketplaceId).hide();
         }
     }
 

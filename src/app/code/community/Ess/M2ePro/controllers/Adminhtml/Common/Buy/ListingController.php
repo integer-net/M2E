@@ -650,18 +650,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             return $this->_redirect('*/adminhtml_common_listing/index');
         }
 
-        // Check listing lock item
-        //----------------------------
-        $lockItem = Mage::getModel(
-            'M2ePro/Listing_LockItem',array('id' => $id, 'component' => Ess_M2ePro_Helper_Component_Buy::NICK)
-        );
-        if ($lockItem->isExist()) {
-            $this->_getSession()->addWarning(
-                Mage::helper('M2ePro')->__('The listing is locked by another process. Please try again later.')
-            );
-        }
-        //----------------------------
-
         // Check listing lock object
         //----------------------------
         if ($model->isLockedObject('products_in_action')) {

@@ -27,4 +27,20 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Motor_Ktypes_Collection
     }
 
     // ########################################
+
+    public function getAllIds()
+    {
+        $idsSelect = clone $this->getSelect();
+        $idsSelect->reset(Zend_Db_Select::ORDER);
+        $idsSelect->reset(Zend_Db_Select::LIMIT_COUNT);
+        $idsSelect->reset(Zend_Db_Select::LIMIT_OFFSET);
+        $idsSelect->reset(Zend_Db_Select::COLUMNS);
+
+        $idsSelect->columns($this->_idFieldName, 'main_table');
+        $idsSelect->limit(1000);
+
+        return $this->getConnection()->fetchCol($idsSelect);
+    }
+
+    // ########################################
 }

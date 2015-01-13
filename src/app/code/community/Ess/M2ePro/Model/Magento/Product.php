@@ -18,6 +18,31 @@ class Ess_M2ePro_Model_Magento_Product
 
     const TAX_CLASS_ID_NONE = 0;
 
+    const FORCING_QTY_TYPE_MANAGE_STOCK_NO = 1;
+    const FORCING_QTY_TYPE_BACKORDERS = 2;
+
+    /**
+     *  $statistics = array(
+     *      'id' => array(
+     *         'store_id' => array(
+     *              'product_id' => array(
+     *                  'qty' => array(
+     *                      '1' => $qty,
+     *                      '2' => $qty,
+     *                  ),
+     *              ),
+     *              ...
+     *          ),
+     *          ...
+     *      ),
+     *      ...
+     *  )
+     */
+
+    public static $statistics = array();
+
+    private $statisticId;
+
     // ########################################
 
     private $_productId = 0;
@@ -610,7 +635,7 @@ class Ess_M2ePro_Model_Magento_Product
             '/product/force_qty/','mode'
         );
 
-        if($forceQtyMode == 0){
+        if ($forceQtyMode == 0) {
             return $qty;
         }
 
@@ -619,14 +644,24 @@ class Ess_M2ePro_Model_Magento_Product
         );
 
         $manageStockGlobal = Mage::getStoreConfigFlag('cataloginventory/item_options/manage_stock');
-        if(($useConfigManageStock && !$manageStockGlobal) || (!$useConfigManageStock && !$manageStock)){
+        if (($useConfigManageStock && !$manageStockGlobal) || (!$useConfigManageStock && !$manageStock)) {
+            self::$statistics[$this->getStatisticId()]
+                             [$this->getProductId()]
+                             [$this->getStoreId()]
+                             ['qty']
+                             [self::FORCING_QTY_TYPE_MANAGE_STOCK_NO] = $forceQtyValue;
             return $forceQtyValue;
         }
 
         $backOrdersGlobal = Mage::getStoreConfig('cataloginventory/item_options/backorders');
-        if(($useConfigBackorders && $backOrdersGlobal != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO) ||
-           (!$useConfigBackorders && $backorders != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO)){
+        if (($useConfigBackorders && $backOrdersGlobal != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO) ||
+           (!$useConfigBackorders && $backorders != Mage_CatalogInventory_Model_Stock::BACKORDERS_NO)) {
             if($forceQtyValue > $qty){
+                self::$statistics[$this->getStatisticId()]
+                                 [$this->getProductId()]
+                                 [$this->getStoreId()]
+                                 ['qty']
+                                 [self::FORCING_QTY_TYPE_BACKORDERS] = $forceQtyValue;
                 return $forceQtyValue;
             }
         }
@@ -768,6 +803,19 @@ class Ess_M2ePro_Model_Magento_Product
         }
 
         return $minQty;
+    }
+
+    //-----------------------------------------
+
+    public function setStatisticId($id)
+    {
+        $this->statisticId = $id;
+        return $this;
+    }
+
+    public function getStatisticId()
+    {
+        return $this->statisticId;
     }
 
     // ########################################
@@ -1218,17 +1266,19 @@ class Ess_M2ePro_Model_Magento_Product
                 continue;
             }
 
+            $optionTitle = $singleOption->getTitle();
+            $optionTitle == '' && $optionTitle = $singleOption->getDefaultTitle();
+
+            if (isset($variationOptionsTitle[$optionTitle])) {
+                continue;
+            }
+
             $optionCombinationTitle = array();
             $possibleVariationProductOptions = array();
 
             $selectionsCollectionItems = $productInstance->getSelectionsCollection(
                 array(0 => $singleOption->getId()), $product
             )->getItems();
-
-            $optionTitle = $singleOption->getTitle();
-            if ($optionTitle == '') {
-                $optionTitle = $singleOption->getDefaultTitle();
-            }
 
             foreach ($selectionsCollectionItems as $item) {
                 $optionCombinationTitle[] = $item->getName();
@@ -1396,7 +1446,8 @@ class Ess_M2ePro_Model_Magento_Product
 
         $sortedOptions = array();
         foreach ($optionCollection as $option) {
-            if (!in_array($option->getValue(), $options)) {
+            if (!in_array($option->getValue(), $options) ||
+                in_array($option->getValue(), $sortedOptions)) {
                 continue;
             }
 

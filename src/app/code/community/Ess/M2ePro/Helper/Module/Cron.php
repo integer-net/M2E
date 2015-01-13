@@ -55,6 +55,39 @@ class Ess_M2ePro_Helper_Module_Cron extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function getLastTypeChange()
+    {
+        return $this->getConfigValue('last_type_change');
+    }
+
+    public function setLastTypeChange($value)
+    {
+        $this->setConfigValue('last_type_change', $value);
+    }
+
+    // ----------------------------------------
+
+    public function isLastTypeChangeMoreThan($interval, $isHours = false)
+    {
+        $isHours && $interval *= 3600;
+        $lastTypeChange = $this->getLastTypeChange();
+
+        if (is_null($lastTypeChange)) {
+
+            $tempTimeCacheKey = 'cron_start_time_of_checking_last_type_change';
+            $lastTypeChange = Mage::helper('M2ePro/Data_Cache')->getValue($tempTimeCacheKey);
+
+            if (empty($lastTypeChange)) {
+                $lastTypeChange = Mage::helper('M2ePro')->getCurrentGmtDate();
+                Mage::helper('M2ePro/Data_Cache')->setValue($tempTimeCacheKey,$lastTypeChange,array('cron'));
+            }
+        }
+
+        return Mage::helper('M2ePro')->getCurrentGmtDate(true) > strtotime($lastTypeChange) + $interval;
+    }
+
+    // ########################################
+
     public function getLastAccess()
     {
         return $this->getConfigValue('last_access');

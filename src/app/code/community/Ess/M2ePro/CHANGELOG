@@ -1,20 +1,71 @@
+* 6.2.3 (r7568) (05/12/2014)
+
+* Added: [eBay] Strike Through Prices for Spain, France, Italy marketplaces
+* Added: [eBay] Restricted To Business option into Selling Policy
+* Added: [eBay] Freight domestic shipping for Canada Site
+* Improvement: Some changes of marketplace saving behaviour for all integrations
+* Improvement: Some improvements of the cron service working (reduced amount of the calls, store troubles)
+* Improvement: IP of the last connection was added to the IP validation fail message
+* Improvement: [eBay] Added ability to use of translation credits for Translation Tool
+* Fix: Some sort of troubles if Bundle Product has several attributes with identical labels
+* Fix: [eBay] Empty value in Combined Shipping Profile field when Shipping Type has been changed
+* Fix: [eBay] Start Date and End Date were not moved from 3rd Party Listings to M2E Pro Listings
+* Fix: [eBay] Getting SKU for 3rd party items stops if one of the eBay items was removed
+* Fix: [eBay] Wrong values of "Total Items", "Active Items", "Inactive Items", "Sold QTY" in 3rd Party Listings grid
+* Fix: [eBay] An unexpected error during list/relist/revise: "The product was listed as a simple product as it has limitation for multi-variation items. Reason: number of values for each option more than 60."
+* Fix: [eBay] An unexpected warning during list/relist/revise action: "Not eligible for "Click And Collect"
+* Fix: [eBay] Multiple error messages about failed updating shipping status for order
+* Fix: [Amazon / Rakuten.com / Play.com] Fatal error: "Call to a member function isExist() on a non-object" on 3rd Party Listings
+
+* 6.2.2 (r7435) (31/10/2014)
+
+* Added: [eBay] Ability to use Extended Holiday Returns for eBay Motors marketplace
+* Added: [eBay] Ability to set note through mass action for eBay Motors parts compatibilities (ePIDs / K-Types)
+* Improvement: Warning message if M2E Pro "backorder / manage stock no" features affect qty of the item
+* Improvement: [eBay] Click And Collect option in shipping policy enabled by default and package details are not required
+* Improvement: [eBay] Performance of list/relist/revise/stop actions was increased (grouping by account/marketplace)
+* Fix: [eBay] Support of the comma in prices for cost and additional cost fields in shipping policy
+* Fix: [eBay] Ability to revise subtitle of the fixed price listing even if the listing has a sale
+* Fix: [eBay] Translated text was reduced because "ebay_translated_description" attribute type 'text' (instead of textarea)
+* Fix: [eBay] Showing Buyer Tax ID (Codice Fiscale) in magento order
+* Fix: [eBay] The items were duplicated if many products were listed at the same time (connection timeout was increased)
+* Fix: [eBay] Ability to select up to 1000 items (ePIDs or KTypes) in compatibility list using "Select All" option
+
+* 6.2.1 (r7322) (11/10/2014)
+
+* Added: [eBay] Ability to use Strike-Through Pricing for eBay Motors site
+* Added: [eBay] Ability to use Click And Collect shipping feature for UK site
+* Added: [eBay] Ability to use Extended Holiday Returns for US, CA, UK, DE and AU sites
+* Improvement: Performance was increased for Magento Product saving / Import tools (if there are many variation products)
+* Improvement: [eBay] View Mode "Translation" is not shown if there were no any translations of products data
+* Improvement: [eBay] Warning message if selected store view is not eligible for using Translation service
+* Improvement: [Amazon / Rakuten.com / Play.com] Account can not be changed in Edit Listing Settings
+* Fix: Trying to get property of non-object in app/code/core/Mage/Core/Model/Config.php (null Area)
+* Fix: "Track Direct Database Changes" feature did not work properly if there were many changes at the same time
+* Fix: Memory leak if Listing (with big amount of products) or Policy/Template (many usages) settings are saved
+* Fix: [eBay] Orders were not downloaded if the last downloading was more than 30 days back
+* Fix: [eBay] Shipping services were not added in shipping policy if Prototype library version < 1.7
+* Fix: [Amazon] EAN was not recognized as valid identifier if it starts from "978"
+* Fix: [Amazon] Wrong URL of ASIN link in search items grid (amazon.com link instead of correct marketplace link)
+* Removed: [eBay] Updating of shipping and payment statuses for orders with "Paisa Pay" payment method (eBay restriction)
+
 * 6.2.0 (r7197) (15/09/2014)
 
 * Added: [eBay] Global Shipping Program functionality for UK eBay site
 * Added: [eBay] "Sell On Another eBay Site" feature for selling existing items on another eBay Site
 * Added: [eBay] Ability to translate products information for selling on another eBay Site
 * Improvement: [eBay] Attempt to reduce the length of eBay variation options values if they are too long
-* Fix: synchronization stuck if a multiple buffering was enabled (ob_get_level() > 1)
+* Fix: Synchronization stuck if a multiple buffering was enabled (ob_get_level() > 1)
 * Fix: Notice: ob_end_flush(): failed to delete buffer zlib output compression
-* Fix: wrong mapping of 3rd Party products even if Mapping Option is disabled
+* Fix: Wrong mapping of 3rd Party products even if Mapping Option is disabled
 * Fix: [eBay] State was always required during editing shipping address on M2ePro order page
-* Fix: [eBay] javascript errors on the edit page of shipping policy, on Prototype lib version < 1.7
+* Fix: [eBay] Javascript errors on the edit page of shipping policy, on Prototype lib version < 1.7
 
 * 6.1.9.1 (r6933) (15/08/2014) [Custom Release]
 
 * Added: Ability to set QTY rules in Synchronization template based on calculated value by Selling Format Template
-* Fix: synchronization failed during cron working (Deleted Products)
-* Fix: [eBay] incorrect variations list order for configurable magento product on eBay item page
+* Fix: Synchronization failed during cron working (Deleted Products)
+* Fix: [eBay] Incorrect variations list order for configurable magento product on eBay item page
 
 * 6.1.9 (r6919) (14/08/2014)
 
@@ -28,23 +79,23 @@
 * Improvement: [eBay] Allow to remove sandbox account with active listings and products
 * Improvement: [Amazon] Marketplace cannot be changed for existing accounts
 * Fix: Use Admin (Default) Store View when cron service is working
-* Fix: big amount of wrong messages in Listings and 3rd Party Listings logs
+* Fix: Big amount of wrong messages in Listings and 3rd Party Listings logs
 * Fix: Full revise of product data was performed sometimes instead of revise only one certain criteria
-* Fix: [eBay] wrong calculating of configurable variations (incorrect set of options)
+* Fix: [eBay] Wrong calculating of configurable variations (incorrect set of options)
 * Fix: [eBay] The value <%value%> of type <EAN>/<UPC>/etc. does not exist in our Catalogue.
-* Fix: [Amazon / Rakuten.com / Play.com] it was not possible to move the 3rd party items into M2ePro listings manually
+* Fix: [Amazon / Rakuten.com / Play.com] It was not possible to move the 3rd party items into M2ePro listings manually
 * Fix: [Rakuten.com] Notice 'Undefined index: next_part' in some cases during 3rd party items synchronization
 * Removed: [Amazon / Rakuten.com / Play.com] Wrong types of log records in the grid filters
 
 * 6.1.8 (r6757) (01/08/2014)
 
-* Added: [eBay] ability to use GTIN and Brand/MPN as eBay Catalog Identifiers in description policy
-* Added: [eBay] ability to set partial data import from eBay catalog (description and photo)
-* Added: [eBay] ability to not list product if product not found in eBay Catalog
-* Fix: [eBay] trim column was empty already in eBay parts compatibility grid (ePIDs list)
-* Fix: [eBay] automatic relist action is not performed when "Out Of Stock Control" option is enabled
-* Fix: [eBay] fatal error "call getData() of non object" during order synchronization
-* Fix: [Amazon] fatal error "call undefined function getEbayOrder()" during order creation
+* Added: [eBay] Ability to use GTIN and Brand/MPN as eBay Catalog Identifiers in description policy
+* Added: [eBay] Ability to set partial data import from eBay catalog (description and photo)
+* Added: [eBay] Ability to not list product if product not found in eBay Catalog
+* Fix: [eBay] Trim column was empty already in eBay parts compatibility grid (ePIDs list)
+* Fix: [eBay] Automatic relist action is not performed when "Out Of Stock Control" option is enabled
+* Fix: [eBay] Fatal error "call getData() of non object" during order synchronization
+* Fix: [Amazon] Fatal error "call undefined function getEbayOrder()" during order creation
 
 * 6.1.7 (r6732) (29/07/2014)
 
@@ -52,8 +103,6 @@
 * Added: managing of magento order number created by module (new settings block in account settings)
 * Improvement: major translations improvements (development part / locale files)
 * Improvement: [eBay] variation will not be sold if it has status disabled or out of stock
-* Removed: [eBay] Sweden marketplace was removed because it is not supported already by eBay
-* Removed: [eBay] possibility to use values from magento attributes for fields: "Handling cost", "Dispatch Time", "Cash On Delivery"
 * Fix: duplicates of Magento orders in some cases
 * Fix: cron service didn't work sometimes if eBay Sweden marketplace was enabled
 * Fix: cron service didn't work properly if web server is LiteSpeed v 6.3
@@ -74,12 +123,13 @@
 * Fix: [eBay] wrong transaction amount in payment information block in order, when eBay and store currencies are different
 * Fix: [Amazon] fatal error: Class 'Ess_M2ePro_Model_Amazon_Synchronization_Orders_Responser' not found
 * Fix: [Amazon / Rakuten.com / Play.com] 3rd party listings was not mapped and moved manually in some cases
+* Removed: [eBay] Sweden marketplace was removed because it is not supported already by eBay
+* Removed: [eBay] possibility to use values from magento attributes for fields: "Handling cost", "Dispatch Time", "Cash On Delivery"
 
 * 6.1.6 (r6425) (19/05/2014)
 
 * Added: [eBay] support of multi-variations products for ebay.nl marketplace
 * Improvement: major translations improvements (development part / locale files)
-* Removed: [eBay] "Get It Fast" option in shipping policy (eBay no longer supports this feature)
 * Fix: major trouble with cache clearing by tag(s) (TwoLevel cache)
 * Fix: cron service doesn't work properly if web server is LiteSpeed
 * Fix: big size of m2epro_operation_history table was reduced
@@ -90,6 +140,7 @@
 * Fix: [eBay] reserved qty did not release during combine orders
 * Fix: [eBay] count of rows for Listing Other Grid was increased to 100 (from 20)
 * Fix: [Rakuten.com] update shipping status for orders did not work
+* Removed: [eBay] "Get It Fast" option in shipping policy (eBay no longer supports this feature)
 
 * 6.1.5 (r6329) (29/04/2014)
 
@@ -606,7 +657,6 @@
 * Improvement: [eBay] receiving sku for the 3rd party listings
 * Improvement: [eBay] sending tracking details separately for each item in the order
 * Improvement: 3rd Party listings log improvements
-* Removed: ability to select admin store in account's orders settings
 * Fix: [Amazon] automatic moving 3rd party listings critical issue
 * Fix: [Amazon] wrong totals in magento order for orders which have tax information and tax source set to amazon
 * Fix: [eBay] "Invalid <WeightMinor>. Enter a value between 0 and 15 for <WeightMinor>."
@@ -620,6 +670,7 @@
 * Fix: perform automatically listing categories actions when new product has been added
 * Fix: SQLSTATE[42000]: Syntax error or access violation: 1142 UPDATE command denied to user 'user'@'host'
 * Fix: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'undefined' in 'where clause'
+* Removed: ability to select admin store in account's orders settings
 
 * 4.2.4 (r2619)
 
@@ -788,13 +839,13 @@
 * Added: [Amazon] ASIN/ISBN search tool for listings items
 * Added: [Amazon] support handling time option
 * Added: [Amazon] 3rd party products have repeated automatic mapping
-* Removed: [Amazon] "Synch. template" -> "Full Revise" -> "Description Template"
 * Fix: [Amazon] account adding is failed when several marketplaces are selected
 * Fix: [eBay] Item specifics of some eBay categories were not shown
 * Fix: [eBay] vat percent can be a float number
 * Fix: filters by account and marketplace did not work correctly on 3rd Party Listings page
 * Fix: [Amazon] wrong magento order prices for items with qty more than 1
 * Fix: [Amazon] Unknown column in where clause in order grid
+* Removed: [Amazon] "Synch. template" -> "Full Revise" -> "Description Template"
 
 * 4.0.2 (r1750) [Beta]
 

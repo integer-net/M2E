@@ -170,7 +170,7 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
 
     public function appendLinksToLogMessage($logMessage)
     {
-        preg_match_all('/(http|https)\:\/\/[a-z0-9\-\._\/+\?\&\%=]+/i', $logMessage, $matches);
+        preg_match_all('/(http|https)\:\/\/[a-z0-9\-\._\/+\?\&\%=;]+/i', $logMessage, $matches);
         $matches = array_unique($matches[0]);
 
         foreach ($matches as $url) {

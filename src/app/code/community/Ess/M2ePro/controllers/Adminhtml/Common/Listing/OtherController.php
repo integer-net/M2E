@@ -51,29 +51,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_OtherController
 
     public function indexAction()
     {
-        // Check 3rd listing lock items
-        //----------------------------
-        $lockItemAmazon = Mage::getModel(
-            'M2ePro/Listing_Other_LockItem',
-            array('component'=>Ess_M2ePro_Helper_Component_Amazon::NICK)
-        );
-        $lockItemBuy = Mage::getModel(
-            'M2ePro/Listing_Other_LockItem',
-            array('component'=>Ess_M2ePro_Helper_Component_Buy::NICK)
-        );
-        $lockItemPlay = Mage::getModel(
-            'M2ePro/Listing_Other_LockItem',
-            array('component'=>Ess_M2ePro_Helper_Component_Play::NICK)
-        );
-
-        if ($lockItemAmazon->isExist() ||
-            $lockItemBuy->isExist() || $lockItemPlay->isExist()) {
-            $warning  = Mage::helper('M2ePro')->__('The 3rd party listings are locked by another process. ');
-            $warning .= Mage::helper('M2ePro')->__('Please try again later.');
-            $this->_getSession()->addWarning($warning);
-        }
-        //----------------------------
-
         $this->_initAction()
              ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_other'))
              ->renderLayout();

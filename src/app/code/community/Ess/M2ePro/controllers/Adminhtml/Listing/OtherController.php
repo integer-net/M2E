@@ -31,43 +31,6 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
 
     //#############################################
 
-    public function checkLockAction()
-    {
-        $component = $this->getRequest()->getParam('component');
-
-        $lockItem = Mage::getModel('M2ePro/Listing_Other_LockItem',array('component' => $component));
-
-        if ($lockItem->isExist()) {
-            return $this->getResponse()->setBody('locked');
-        }
-
-        return $this->getResponse()->setBody('unlocked');
-    }
-
-    public function lockNowAction()
-    {
-        $component = $this->getRequest()->getParam('component');
-
-        $lockItem = Mage::getModel('M2ePro/Listing_Other_LockItem',array('component' => $component));
-
-        if (!$lockItem->isExist()) {
-            $lockItem->create();
-        }
-    }
-
-    public function unlockNowAction()
-    {
-        $component = $this->getRequest()->getParam('component');
-
-        $lockItem = Mage::getModel('M2ePro/Listing_Other_LockItem',array('component' => $component));
-
-        if ($lockItem->isExist()) {
-            $lockItem->remove();
-        }
-    }
-
-    //---------------------------------------------
-
     public function getErrorsSummaryAction()
     {
         $blockParams = array(

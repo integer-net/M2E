@@ -229,7 +229,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Other_Grid extends Mage_Admi
                          .');">'
                          .Mage::helper('M2ePro')->__('Map').'</a>';
 
-            if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+            if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
                 $htmlValue .= '<br>' . $row->getId();
             }
 
@@ -250,7 +250,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Other_Grid extends Mage_Admi
             .Mage::helper('M2ePro')->__('Move')
             .'</a>';
 
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
             $htmlValue .= '<br>' . $row->getId();
         }
 

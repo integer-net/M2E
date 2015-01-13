@@ -7,15 +7,12 @@
 abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
     extends Ess_M2ePro_Model_Connector_Ebay_Abstract
 {
-    /**
-     * @var Ess_M2ePro_Model_Listing
-     */
-    protected $listing = NULL;
+    const TIMEOUT_INCREMENT_FOR_ONE_IMAGE = 20; // seconds
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker
+     * @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker[]
      */
-    protected $locker = NULL;
+    protected $lockers = array();
 
     /**
      * @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger
@@ -29,17 +26,17 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
     // ########################################
 
-    public function __construct(array $params = array(), Ess_M2ePro_Model_Listing $listing)
+    public function __construct(array $params = array(),
+                                Ess_M2ePro_Model_Marketplace $marketplace,
+                                Ess_M2ePro_Model_Account $account)
     {
         $defaultParams = array(
             'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
         );
         $params = array_merge($defaultParams, $params);
 
-        $this->listing = $listing;
-
-        parent::__construct($params,$this->listing->getMarketplace(),
-                            $this->listing->getAccount(),NULL);
+        parent::__construct($params,$marketplace,
+                            $account,NULL);
     }
 
     // ########################################
@@ -75,15 +72,9 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
     // ----------------------------------------
 
-    protected function eventBeforeProcess()
-    {
-        $this->getLocker()->update();
-    }
+    abstract protected function eventBeforeProcess();
 
-    protected function eventAfterProcess()
-    {
-        $this->getLocker()->remove();
-    }
+    abstract protected function eventAfterProcess();
 
     // ########################################
 
@@ -115,21 +106,22 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
     // ########################################
 
     /**
+     * @param int $listingProductId
      * @return Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker
      */
-    protected function getLocker()
+    protected function getLocker($listingProductId)
     {
-        if (is_null($this->locker)) {
+        if (empty($this->lockers[$listingProductId])) {
 
             /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker $locker */
 
             $locker = Mage::getModel('M2ePro/Ebay_Listing_Product_Action_Locker');
-            $locker->setListingId($this->listing->getId());
+            $locker->setListingProductId($listingProductId);
 
-            $this->locker = $locker;
+            $this->lockers[$listingProductId] = $locker;
         }
 
-        return $this->locker;
+        return $this->lockers[$listingProductId];
     }
 
     /**
@@ -166,7 +158,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
             }
 
             $logger->setInitiator($initiator);
-            $logger->setListingId($this->listing->getId());
 
             $this->logger = $logger;
         }

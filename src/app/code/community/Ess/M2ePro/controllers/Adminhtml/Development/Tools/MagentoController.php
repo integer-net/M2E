@@ -75,13 +75,27 @@ HTML;
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
         <th style="width: 800px">Path</th>
+        <th style="width: 40px"></th>
     </tr>
 HTML;
         foreach ($localPoolOverwrites as $item) {
 
+            $diffHtml = '';
+            if (strpos(strtolower($item), 'm2epro') !== false) {
+
+                $originalPath = str_replace('local', 'community', $item);
+                $url = Mage::helper('adminhtml')->getUrl(
+                    '*/adminhtml_development_tools_m2ePro_install/filesDiff',
+                    array('filePath' => base64_encode($item), 'originalPath' => base64_encode($originalPath))
+                );
+
+                $diffHtml = '<a href="'.$url.'" target="_blank">Diff</a>';
+            }
+
             $html .= <<<HTML
 <tr>
     <td>{$item}</td>
+    <td>{$diffHtml}</td>
 </tr>
 HTML;
         }
@@ -185,7 +199,7 @@ HTML;
 HTML;
         foreach ($installedModules as $module => $data) {
 
-            $status = $data['active'] === 'true'
+            $status = isset($data['active']) && $data['active'] === 'true'
                 ? '<span style="color: forestgreen">Enabled</span>'
                 : '<span style="color: orangered">Disabled</span>';
 

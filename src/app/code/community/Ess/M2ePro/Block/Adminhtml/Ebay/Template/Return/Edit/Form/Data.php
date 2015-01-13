@@ -106,4 +106,17 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Return_Edit_Form_Data extends Mag
     }
 
     // ####################################
+
+    public function canShowHolidayReturnOption()
+    {
+        $marketplace = Mage::helper('M2ePro/Data_Global')->getValue('ebay_marketplace');
+
+        if (!$marketplace instanceof Ess_M2ePro_Model_Marketplace) {
+            throw new LogicException('Marketplace is required for editing return template.');
+        }
+
+        return $marketplace->getChildObject()->isHolidayReturnEnabled();
+    }
+
+    // ####################################
 }

@@ -65,7 +65,7 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getCachedObject($modelName, $value, $field = NULL, array $tags = array())
     {
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             return $this->getObject($modelName,$value,$field);
         }
 
@@ -555,10 +555,6 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function isEAN($ean)
     {
-        if (substr($ean,0,3) == '978') {
-            return false;
-        }
-
         return $this->isWorldWideId($ean,'EAN');
     }
 

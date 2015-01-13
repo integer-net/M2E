@@ -37,7 +37,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         $collection->getSelect()
                    ->join(array('l'=>Mage::getResourceModel('M2ePro/Listing')->getMainTable()),
                                 '(`l`.`id` = `main_table`.`listing_id`)',
-                                array('listing_title'=>'title','store_id'))
+                                array('listing_title'=>'title','store_id','marketplace_id'))
                    ->join(array('al'=>Mage::getResourceModel('M2ePro/Amazon_Listing')->getMainTable()),
                                 '(`al`.`listing_id` = `l`.`id`)',
                                 array('template_selling_format_id'));

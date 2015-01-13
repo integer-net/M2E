@@ -62,19 +62,11 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Responser
 
         if ($fail) {
 
-            $tempListings = array();
             foreach ($this->listingsProducts as $listingProduct) {
 
-                /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-                if (isset($tempListings[$listingProduct->getListingId()])) {
-                    continue;
-                }
-
-                $this->addListingsLogsMessage($listingProduct,$message,
-                                              Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                              Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
-
-                $tempListings[$listingProduct->getListingId()] = true;
+                $this->addListingsProductsLogsMessage($listingProduct,$message,
+                                                      Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
             }
         }
 
@@ -94,21 +86,6 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Responser
                                                       $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                                       $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
     {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,false);
-    }
-
-    protected function addListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                              $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                              $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM)
-    {
-        $this->addBaseListingsLogsMessage($listingProduct,$text,$type,$priority,true);
-    }
-
-    protected function addBaseListingsLogsMessage(Ess_M2ePro_Model_Listing_Product $listingProduct,
-                                                  $text, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
-                                                  $priority = Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM,
-                                                  $isListingMode = true)
-    {
         $action = $this->getListingsLogsCurrentAction();
         is_null($action) && $action = Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN;
 
@@ -124,19 +101,12 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Responser
         $logModel = Mage::getModel('M2ePro/Listing_Log');
         $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Buy::NICK);
 
-        if ($isListingMode) {
-            $logModel->addListingMessage($listingProduct->getListingId() ,
-                                         $initiator ,
-                                         $this->getLogsActionId() ,
-                                         $action , $text, $type , $priority);
-        } else {
-            $logModel->addProductMessage($listingProduct->getListingId() ,
-                                         $listingProduct->getProductId() ,
-                                         $listingProduct->getId() ,
-                                         $initiator ,
-                                         $this->getLogsActionId() ,
-                                         $action , $text, $type , $priority);
-        }
+        $logModel->addProductMessage($listingProduct->getListingId() ,
+                                     $listingProduct->getProductId() ,
+                                     $listingProduct->getId() ,
+                                     $initiator ,
+                                     $this->getLogsActionId() ,
+                                     $action , $text, $type , $priority);
     }
 
     // ########################################

@@ -37,13 +37,22 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher extends Mage_Adm
                 array(
                     'value' => 'magento',
                     'label' => Mage::helper('M2ePro')->__('Magento')
-                ),
-                array(
-                    'value' => 'translation',
-                    'label' => Mage::helper('M2ePro')->__('Translation')
                 )
             )
         );
+
+        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+        $collection->addFieldToFilter('translation_status', array('neq' =>
+            Ess_M2ePro_Model_Ebay_Listing_Product::TRANSLATION_STATUS_NONE
+        ));
+
+        if ($collection->getSize()) {
+            $data['items'][] = array(
+                'value' => 'translation',
+                'label' => Mage::helper('M2ePro')->__('Translation')
+            );
+        }
+
         $modeChangeBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_listing_view_modeSwitcher');
         $modeChangeBlock->setData($data);
         $modeChangeLabel = Mage::helper('M2ePro')->__('View Mode');

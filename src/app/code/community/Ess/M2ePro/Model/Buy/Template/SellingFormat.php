@@ -6,6 +6,7 @@
 
 /**
  * @method Ess_M2ePro_Model_Template_SellingFormat getParentObject()
+ * @method Ess_M2ePro_Model_Mysql4_Buy_Template_SellingFormat getResource()
  */
 class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Component_Child_Buy_Abstract
 {
@@ -253,7 +254,11 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
 
     // ########################################
 
-    public function getAffectedListingsProducts($asObjects = false)
+    /**
+     * @param bool|array $asArrays
+     * @return array
+     */
+    public function getAffectedListingsProducts($asArrays = true)
     {
         $listingCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing');
         $listingCollection->addFieldToFilter('template_selling_format_id', $this->getId());
@@ -263,12 +268,22 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
         $listingProductCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id',array('in' => $listingCollection->getSelect()));
 
-        return $asObjects ? (array)$listingProductCollection->getItems() : (array)$listingProductCollection->getData();
+        if ($asArrays === false) {
+            return (array)$listingProductCollection->getItems();
+        }
+
+        if (is_array($asArrays) && !empty($asArrays)) {
+            $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+            $listingProductCollection->getSelect()->columns($asArrays);
+        }
+
+        return (array)$listingProductCollection->getData();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getAffectedListingsProducts(false);
+        $neededColumns = array('id');
+        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
 
         if (!$listingsProducts) {
             return;

@@ -30,39 +30,58 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
 
     public function getItemsByProductId($productId)
     {
-        $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
+        $listingTable   = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
         $variationTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation')->getMainTable();
-        $optionTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')->getMainTable();
+        $optionTable    = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')->getMainTable();
 
-        $select = $this->_getReadAdapter()
-                       ->select()
-                       ->from(
-                           array('l' => $listingTable),
-                           new Zend_Db_Expr('DISTINCT `lp`.`id`,
-                                                      `l`.`store_id`,
-                                                      `lp`.`component_mode`')
-                       )
-                       ->join(
-                           array('lp' => $this->getMainTable()),
-                           '`l`.`id` = `lp`.`listing_id`',
-                           array()
-                       )
-                       ->joinLeft(
-                           array('lpv' => $variationTable),
-                           '`lp`.`id` = `lpv`.`listing_product_id`',
-                           array()
-                       )
-                       ->joinLeft(
-                           array('lpvo' => $optionTable),
-                           '`lpv`.`id` = `lpvo`.`listing_product_variation_id`',
-                           array()
-                       )
-                       ->where("`lp`.`product_id` = ?",(int)$productId)
-                       ->orWhere("`lpvo`.`product_id` IS NOT NULL AND `lpvo`.`product_id` = ?",(int)$productId);
+        $simpleProductsSelect = $this->_getReadAdapter()
+            ->select()
+            ->from(
+                array('l' => $listingTable),
+                       array('lp.id',
+                             'l.store_id',
+                             'lp.component_mode')
+            )
+            ->join(
+                array('lp' => $this->getMainTable()),
+                '`l`.`id` = `lp`.`listing_id`',
+                array()
+            )
+            ->where("`lp`.`product_id` = ?",(int)$productId);
+
+        $variationsProductsSelect = $this->_getReadAdapter()
+            ->select()
+            ->from(
+                array('l' => $listingTable),
+                array('lp.id',
+                      'l.store_id',
+                      'lp.component_mode')
+            )
+            ->join(
+                array('lp' => $this->getMainTable()),
+                '`l`.`id` = `lp`.`listing_id`',
+                array()
+            )
+            ->join(
+                array('lpv' => $variationTable),
+                '`lp`.`id` = `lpv`.`listing_product_id`',
+                array()
+            )
+            ->join(
+                array('lpvo' => $optionTable),
+                '`lpv`.`id` = `lpvo`.`listing_product_variation_id`',
+                array()
+            )
+            ->where("`lpvo`.`product_id` = ?",(int)$productId);
+
+        $unionSelect = $this->_getReadAdapter()->select()->union(array(
+            $simpleProductsSelect,
+            $variationsProductsSelect
+        ));
 
         $result = array();
 
-        foreach ($select->query()->fetchAll() as $item) {
+        foreach ($unionSelect->query()->fetchAll() as $item) {
 
             $item['id'] = (int)$item['id'];
             $item['store_id'] = (int)$item['store_id'];

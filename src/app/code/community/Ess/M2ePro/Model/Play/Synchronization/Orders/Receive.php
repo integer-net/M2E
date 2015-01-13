@@ -61,7 +61,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Orders_Receive extends Ess_M2ePro_Mo
         }
 
         $iteration = 0;
-        $percentsForOneStep = $this->getPercentsInterval() / count($permittedAccounts);
+        $percentsForOneAccount = $this->getPercentsInterval() / count($permittedAccounts);
 
         foreach ($permittedAccounts as $account) {
 
@@ -96,7 +96,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Orders_Receive extends Ess_M2ePro_Mo
             // The "Receive" action for Play.com account: "%account_title%" is finished. Please wait...
             $status = 'The "Receive" action for Play.com account: "%account_title%" is finished. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
-            $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
+            $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneAccount);
             $this->getActualLockItem()->activate();
             // ----------------------------------------------------------
 

@@ -32,7 +32,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
     public function __construct(array $params = array(), Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         $this->listingProduct = $listingProduct;
-        parent::__construct($params,$this->listingProduct->getListing());
+        parent::__construct($params,$this->listingProduct->getMarketplace(),$this->listingProduct->getAccount());
     }
 
     // ########################################
@@ -71,6 +71,18 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
 
             throw $exception;
         }
+    }
+
+    // ########################################
+
+    protected function eventBeforeProcess()
+    {
+        $this->getLocker($this->listingProduct->getId())->update();
+    }
+
+    protected function eventAfterProcess()
+    {
+        $this->getLocker($this->listingProduct->getId())->remove();
     }
 
     // ########################################

@@ -111,6 +111,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Revise_Multiple
             $requestData['items'][] = $sendedData;
         }
 
+        $this->checkQtyWarnings();
+
         return $requestData;
     }
 

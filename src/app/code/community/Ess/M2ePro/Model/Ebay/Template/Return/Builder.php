@@ -75,6 +75,10 @@ class Ess_M2ePro_Model_Ebay_Template_Return_Builder
             $prepared['within'] = $data['within'];
         }
 
+        if (isset($data['holiday_mode'])) {
+            $prepared['holiday_mode'] = $data['holiday_mode'];
+        }
+
         if (isset($data['shipping_cost'])) {
             $prepared['shipping_cost'] = $data['shipping_cost'];
         }
@@ -87,6 +91,10 @@ class Ess_M2ePro_Model_Ebay_Template_Return_Builder
             $prepared['description'] = $data['description'];
         }
         //------------------------------
+
+        if ($prepared['accepted'] != 'ReturnsAccepted') {
+            $prepared['holiday_mode'] = 0;
+        }
 
         return $prepared;
     }

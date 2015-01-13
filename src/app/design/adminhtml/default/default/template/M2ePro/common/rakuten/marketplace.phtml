@@ -1,5 +1,11 @@
 <div id="<?php echo $this->getContainerId(); ?>">
-
+    <script>
+        if (typeof storedStatuses !== 'undefined') {
+            storedStatuses = storedStatuses.concat(<?php echo json_encode($this->storedStatuses)?>);
+        } else {
+            storedStatuses = <?php echo json_encode($this->storedStatuses)?>;
+        }
+    </script>
     <?php foreach($this->groups as $group) { ?>
 
     <div class="entry-edit" id="magento_block_rakuten_marketplaces_group_<?php echo $group['id']; ?>">

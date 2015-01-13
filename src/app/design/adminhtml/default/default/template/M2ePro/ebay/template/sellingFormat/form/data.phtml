@@ -18,11 +18,24 @@
     $defaultStrictSettingsForSimpleMode = $default;
 
     // removing ignored options for mode checking
-    $ignoredOptions = array('duration_mode', 'out_of_stock_control', 'qty_custom_value',
-                            'buyitnow_price_mode', 'buyitnow_price_coefficient', 'buyitnow_price_custom_attribute',
-                            'best_offer_accept_mode', 'best_offer_accept_value', 'best_offer_accept_attribute',
-                            'best_offer_reject_mode', 'best_offer_reject_value', 'best_offer_reject_attribute',
-                            'price_discount_map_exposure_type');
+    $ignoredOptions = array(
+        'duration_mode',
+        'out_of_stock_control',
+        'qty_custom_value',
+
+        'buyitnow_price_mode',
+        'buyitnow_price_coefficient',
+        'buyitnow_price_custom_attribute',
+
+        'best_offer_accept_mode',
+        'best_offer_accept_value',
+        'best_offer_accept_attribute',
+        'best_offer_reject_mode',
+        'best_offer_reject_value',
+        'best_offer_reject_attribute',
+
+        'price_discount_map_exposure_type'
+    );
 
     foreach($ignoredOptions as $val) {
         unset($defaultStrictSettingsForSimpleMode[$val]);
@@ -320,6 +333,25 @@
                                 This can be useful in cases where you or the buyer might want to be discreet about the item and/or the final price - such as the sale of high-priced items or approved pharmaceutical products.
                                 You should only make your listing private for a specific reason.'
                             ); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('For Business Users Only'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="restricted_to_business" name="selling_format[restricted_to_business]">
+                            <option value="0" <?php if (!$formData['restricted_to_business']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
+                            <option value="1" <?php if ($formData['restricted_to_business']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'If Yes, this indicates that you elect to offer the item exclusively to business users. If No, this indicates that you elect to offer the item to all users. Applicable only to business sellers residing in Germany, Austria, or Switzerland who are listing in a B2B VAT-enabled category on the eBay Germany (DE), Austria (AT), or Switzerland (CH) sites. If this argument is Yes, you must have a valid VAT-ID registered with eBay, and BusinessSeller must also be true.'
+                                ); ?>
+                            </span>
                         </p>
                     </td>
                 </tr>

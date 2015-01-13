@@ -247,7 +247,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_Grid extends Mage_A
                                         (int)$row->getId().
                                     ');">' . Mage::helper('M2ePro')->__('Map') . '</a>';
 
-            if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+            if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
                 $htmlValue .= '<br>' . $row->getId();
             }
             return $htmlValue;
@@ -267,7 +267,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_Grid extends Mage_A
                       .Mage::helper('M2ePro')->__('Move')
                       .'</a>';
 
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
             $htmlValue .= '<br>' . $row->getId();
         }
 

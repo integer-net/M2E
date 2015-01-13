@@ -99,6 +99,30 @@
                     </td>
                 </tr>
 
+                <?php if ($this->canShowHolidayReturnOption()): ?>
+                    <tr id="return_holiday_tr" class="return return-accepted">
+                        <td class="label">
+                            <label for="return_holiday_mode"><?php echo Mage::helper('M2ePro')->__('Extended Holiday Returns'); ?>:</label>
+                        </td>
+                        <td class="value">
+                            <select id="return_holiday_mode" name="return[holiday_mode]">
+                                <option value="0" <?php if (!$formData['holiday_mode']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('No') ?></option>
+                                <option value="1" <?php if ($formData['holiday_mode']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes') ?></option>
+                            </select>
+                            <p class="note">
+                                <span>
+                                    <?php echo Mage::helper('M2ePro')->__(
+                                        'You can specify Extended Holiday Returns (as well as their regular non-holiday returns period) for chosen listings at any time during the year. The Extended Holiday Returns offer is not visible in the listings until the current year\'s holiday returns period start date, at which point it overrides the non-holiday returns policy.
+                                         <br/><br/>Buyers will see and be subject to the Extended Holiday Returns offer in listings purchased through the purchase cutoff date, and will be able to return those purchases through the end date.
+                                         <br/><br/>After the purchase cutoff date, the Extended Holiday Returns offer automatically disappears from the listings, and non-holiday returns period reappears. Purchases made from that point on are subject to the non-holiday returns period, while purchases made before the cutoff date still have until the end date to be returned.
+                                         <br/><br/>For more details please read <a href="http://pages.ebay.com/sellerinformation/holiday2014/extholidayreturns.html" target="_blank">this documentation</a>.'
+                                    ) ;?>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+
                 <tr id="return_shipping_cost_tr" class="return return-accepted" <?php if (empty($marketplaceData['info']['shipping_cost_paid_by'])): echo 'style="display: none;"'; endif; ?>>
                     <td class="label">
                         <label for="return_shipping_cost"><?php echo Mage::helper('M2ePro')->__('Return Shipping Will Be Paid By'); ?>:</label>

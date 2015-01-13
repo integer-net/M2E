@@ -29,7 +29,7 @@ final class Ess_M2ePro_Model_Synchronization_Dispatcher
         $this->updateLastAccess();
 
         if (!$this->isPossibleToRun()) {
-            return false;
+            return true;
         }
 
         $this->updateLastRun();

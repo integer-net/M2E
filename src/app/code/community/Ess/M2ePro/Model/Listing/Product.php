@@ -145,7 +145,8 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
         return $this->magentoProductModel = Mage::getModel('M2ePro/Magento_Product_Cache')
                                                     ->setStoreId($this->getListing()->getStoreId())
-                                                    ->setProductId($this->getData('product_id'));
+                                                    ->setProductId($this->getData('product_id'))
+                                                    ->setStatisticId($this->getId());
     }
 
     /**

@@ -98,6 +98,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             array(
                 'id' => 'id',
                 'status' => 'status',
+                'component_mode' => 'component_mode',
                 'additional_data' => 'additional_data'
             ),
             '{{table}}.listing_id='.(int)$listingData['id']
@@ -238,11 +239,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
 ////            'frame_callback' => array($this, 'callbackColumnAdviser')
 //        ));
 
-        if (Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
             $this->addColumn('developer_action', array(
                 'header'    => Mage::helper('M2ePro')->__('Actions'),
                 'align'     => 'left',
-                'width'     => '100px',
+                'width'     => '150px',
                 'type'      => 'text',
                 'renderer'  => 'M2ePro/adminhtml_listing_view_grid_column_renderer_developerAction',
                 'index'     => 'value',
@@ -664,6 +665,9 @@ HTML;
             case Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL:
                 $string = Mage::helper('M2ePro')->__('Status Change');
                 break;
+            case Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT:
+                $string = Mage::helper('M2ePro')->__('Translation');
+                break;
         }
 
         return $string;
@@ -788,9 +792,6 @@ HTML;
             'id'=>$listingData['id'],
             'back'=>$helper->makeBackUrlParam('*/adminhtml_ebay_listing/view',array('id'=>$listingData['id']))
         ));
-        $checkLockListing = $this->getUrl('*/adminhtml_listing/checkLockListing',array('component'=>$component));
-        $lockListingNow = $this->getUrl('*/adminhtml_listing/lockListingNow',array('component'=>$component));
-        $unlockListingNow = $this->getUrl('*/adminhtml_listing/unlockListingNow',array('component'=>$component));
         $getErrorsSummary = $this->getUrl('*/adminhtml_listing/getErrorsSummary');
 
         $runListProducts = $this->getUrl('*/adminhtml_ebay_listing/runListProducts');
@@ -902,9 +903,6 @@ HTML;
     M2ePro.productsIdsForList = '{$productsIdsForList}';
 
     M2ePro.url.logViewUrl = '{$logViewUrl}';
-    M2ePro.url.checkLockListing = '{$checkLockListing}';
-    M2ePro.url.lockListingNow = '{$lockListingNow}';
-    M2ePro.url.unlockListingNow = '{$unlockListingNow}';
     M2ePro.url.getErrorsSummary = '{$getErrorsSummary}';
 
     M2ePro.url.runListProducts = '{$runListProducts}';

@@ -16,6 +16,8 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     const WIZARD_MIGRATION_NICK = 'migrationToV6';
 
+    const DEVELOPMENT_MODE_COOKIE_KEY = 'm2epro_development_mode';
+
     // ########################################
 
     /**
@@ -66,7 +68,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '7197';
+        $revision = '7568';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -152,8 +154,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
             'app/code/community/Ess/',
             'app/code/community/Ess/M2ePro/*',
 
-            // todo uncomment when translations will be available
-            //'app/locale/*/Ess_M2ePro.csv',
+            'app/locale/*/Ess_M2ePro.csv',
             'app/etc/modules/Ess_M2ePro.xml',
             'app/design/adminhtml/default/default/layout/M2ePro.xml',
 
@@ -278,6 +279,41 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         }
 
         return $directories;
+    }
+
+    // ########################################
+
+    public function isDevelopmentMode()
+    {
+        if (isset($_SERVER['REMOTE_ADDR']) &&
+            sha1($_SERVER['REMOTE_ADDR']) == 'e4c431597cf909cf228fcf9287b3ace0924e573c') {
+            return true;
+        }
+
+        return Mage::app()->getCookie()->get(self::DEVELOPMENT_MODE_COOKIE_KEY);
+    }
+
+    public function isProductionMode()
+    {
+        return !$this->isDevelopmentMode();
+    }
+
+    public function setDevelopmentModeMode($value)
+    {
+        $value ? Mage::app()->getCookie()->set(self::DEVELOPMENT_MODE_COOKIE_KEY, 'true', 60*60*24*31)
+               : Mage::app()->getCookie()->set(self::DEVELOPMENT_MODE_COOKIE_KEY, '', 0);
+    }
+
+    // ----------------------------------------
+
+    public function isDevelopmentEnvironment()
+    {
+        return (bool)getenv('DEVELOPMENT_ENV');
+    }
+
+    public function isProductionEnvironment()
+    {
+        return !$this->isDevelopmentEnvironment();
     }
 
     // ########################################

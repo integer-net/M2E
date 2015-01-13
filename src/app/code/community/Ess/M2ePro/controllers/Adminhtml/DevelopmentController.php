@@ -102,5 +102,23 @@ class Ess_M2ePro_Adminhtml_DevelopmentController
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDebugTabUrl());
     }
 
+    // --------------------------------------------
+
+    public function enableDevelopmentModeAction()
+    {
+        Mage::helper('M2ePro/Module')->setDevelopmentModeMode(true);
+
+        $this->_getSession()->addSuccess('Development mode was activated.');
+        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDebugTabUrl());
+    }
+
+    public function disableDevelopmentModeAction()
+    {
+        Mage::helper('M2ePro/Module')->setDevelopmentModeMode(false);
+
+        $this->_getSession()->addSuccess('Development mode was activated.');
+        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDebugTabUrl());
+    }
+
     //#############################################
 }

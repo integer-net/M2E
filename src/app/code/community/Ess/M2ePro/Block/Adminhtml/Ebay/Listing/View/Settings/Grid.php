@@ -478,8 +478,8 @@ HTML;
 
         if ($mode == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
 
-            $category = $helper->__('Magento Attribute'). ': ';
-            $category.= $helper->escapeHtml(
+            $category = $helper->__('Magento Attribute'). ' -> ';
+            $category .= $helper->escapeHtml(
                 Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $row->getData('store_'.$modeNick.'_attribute'),
                     $this->getListing()->getStoreId()
@@ -618,9 +618,6 @@ HTML;
             'id'=>$this->getListing()->getId(),
             'back'=>$helper->makeBackUrlParam('*/adminhtml_ebay_listing/view',array('id'=>$this->getListing()->getId()))
         ));
-        $checkLockListing = $this->getUrl('*/adminhtml_listing/checkLockListing',array('component'=>$component));
-        $lockListingNow = $this->getUrl('*/adminhtml_listing/lockListingNow',array('component'=>$component));
-        $unlockListingNow = $this->getUrl('*/adminhtml_listing/unlockListingNow',array('component'=>$component));
         $getErrorsSummary = $this->getUrl('*/adminhtml_listing/getErrorsSummary');
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
@@ -685,9 +682,6 @@ HTML;
     M2ePro.productsIdsForList = '{$productsIdsForList}';
 
     M2ePro.url.logViewUrl = '{$logViewUrl}';
-    M2ePro.url.checkLockListing = '{$checkLockListing}';
-    M2ePro.url.lockListingNow = '{$lockListingNow}';
-    M2ePro.url.unlockListingNow = '{$unlockListingNow}';
     M2ePro.url.getErrorsSummary = '{$getErrorsSummary}';
 
     M2ePro.url.prepareData = '{$prepareData}';

@@ -130,8 +130,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid extends Mage_Adminhtml_Blo
 
         $this->addColumn('id', array(
             'header'    => $typeIdentifierTitle,
-            'align'     => 'center',
-            'width'     => '80px',
+            'align'     => 'left',
+            'width'     => '50px',
             'index'     => 'id',
             'type'      => 'text',
             'filter_index' => 'id',
@@ -141,7 +141,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid extends Mage_Adminhtml_Blo
         $this->addColumn('note', array(
             'header'    => Mage::helper('M2ePro')->__('Note'),
             'align'     => 'left',
-            'width'     => '200px',
+            'width'     => '250px',
             'index'     => 'note',
             'type'      => 'text',
             'filter_index' => 'note',
@@ -170,9 +170,12 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid extends Mage_Adminhtml_Blo
 
 <div id="note_{$row['id']}">
     <span id="note_view_{$row['id']}">{$value}</span>
-    <textarea id="note_edit_{$row['id']}" style="display: none"></textarea>
-    <br />
+    <div id="note_edit_{$row['id']}_container" style="display: none">
+        <textarea id="note_edit_{$row['id']}"></textarea>
+        <br />
+    </div>
     <span id="note_edit_link_{$row['id']}"{$editStyle}>
+        <br />
         <a href="javascript:void(0)"
            onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row['id']}')">{$editLabel}</a>
     </span>
@@ -187,9 +190,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid extends Mage_Adminhtml_Blo
     &nbsp;&nbsp;&nbsp;
     <span id="note_cancel_link_{$row['id']}" style="display: none">
         <a href="javascript:void(0)"
-           onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row['id']}', true)">
-            {$cancelLabel}
-        </a>
+           onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row['id']}', true)">{$cancelLabel}</a>
     </span>
 </div>
 
@@ -217,6 +218,11 @@ HTML;
             'label'    => Mage::helper('M2ePro')->__('Delete'),
             'url'      => '',
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
+        ));
+
+        $this->getMassactionBlock()->addItem('add_note', array(
+            'label' => Mage::helper('M2ePro')->__('Set Note'),
+            'url'   => '',
         ));
 
         return parent::_prepareMassaction();
@@ -376,15 +382,16 @@ CSS;
 HTML;
 
         $urls = json_encode(array(
-            'adminhtml_ebay_listing/changeCompatibilityNote' =>
-                $this->getUrl('*/adminhtml_ebay_listing/changeCompatibilityNote'),
+            'adminhtml_ebay_listing/setNoteToCompatibilityList' =>
+                $this->getUrl('*/adminhtml_ebay_listing/setNoteToCompatibilityList'),
             'adminhtml_ebay_listing/deleteIdsFromCompatibilityList' =>
-                $this->getUrl('*/adminhtml_ebay_listing/deleteIdsFromCompatibilityList')
+                $this->getUrl('*/adminhtml_ebay_listing/deleteIdsFromCompatibilityList'),
         ));
 
         $translations = json_encode(array(
             'Please select items you want to perform the action on.'
                 => Mage::helper('M2ePro')->__('Please select items you want to perform the action on.'),
+            'Set Note' => Mage::helper('M2ePro')->__('Set Note'),
         ));
 
         $additionalJs = <<<JAVASCRIPT
@@ -402,6 +409,7 @@ HTML;
 
     M2ePro.url.add({$urls});
     M2ePro.translator.add({$translations});
+    top.M2ePro.translator.add({$translations});
 
 </script>
 

@@ -38,6 +38,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_Other_MovingController
                 'moving_handler_js' => 'EbayListingOtherGridHandlerObj.movingHandler',
             )
         );
+        $block->setShowCreateListingBtn(true);
         $this->getResponse()->setBody($block->toHtml());
     }
 

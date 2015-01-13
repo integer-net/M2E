@@ -58,7 +58,9 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
         $track = $shipment->getTracksCollection()->getLastItem();
         $trackingDetails = array();
 
-        if ($track->getData('number') != '') {
+        $number = trim($track->getData('number'));
+
+        if (!empty($number)) {
             $carrierCode = trim($track->getData('carrier_code'));
 
             if (strtolower($carrierCode) == 'dhlint') {
@@ -68,7 +70,7 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
             $trackingDetails = array(
                 'carrier_title'   => trim($track->getData('title')),
                 'carrier_code'    => $carrierCode,
-                'tracking_number' => (string)$track->getData('number')
+                'tracking_number' => (string)$number
             );
         }
 

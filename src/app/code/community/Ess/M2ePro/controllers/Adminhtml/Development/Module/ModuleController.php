@@ -55,7 +55,10 @@ class Ess_M2ePro_Adminhtml_Development_Module_ModuleController
      */
     public function processServicingAction()
     {
-        Mage::getModel('M2ePro/Servicing_Dispatcher')->process()
+        $dispatcher = Mage::getModel('M2ePro/Servicing_Dispatcher');
+        $dispatcher->setForceTasksRunning(true);
+
+        $dispatcher->process()
             ? $this->_getSession()->addSuccess('Processing was successfully executed.')
             : $this->_getSession()->addError('Processing was executed with errors.');
 

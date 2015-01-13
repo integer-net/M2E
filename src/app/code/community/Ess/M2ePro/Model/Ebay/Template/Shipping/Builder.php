@@ -44,8 +44,10 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
 
         // create calculated
         //------------------------------
-        $calculatedData = $this->prepareCalculatedData($template->getId(), $data);
-        $this->createCalculated($template->getId(), $calculatedData);
+        if ($this->canSaveCalculatedData($data)) {
+            $calculatedData = $this->prepareCalculatedData($template->getId(), $data);
+            $this->createCalculated($template->getId(), $calculatedData);
+        }
         //------------------------------
 
         // create shipping methods
@@ -109,15 +111,23 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
         if (isset($data['local_shipping_discount_profile_id'])) {
             $prepared['local_shipping_discount_profile_id'] =
                 json_encode(array_diff($data['local_shipping_discount_profile_id'], array('')));
+        } else {
+            $prepared['local_shipping_discount_profile_id'] = json_encode(array());
         }
 
         if (isset($data['international_shipping_discount_profile_id'])) {
             $prepared['international_shipping_discount_profile_id'] =
                 json_encode(array_diff($data['international_shipping_discount_profile_id'], array('')));
+        } else {
+            $prepared['international_shipping_discount_profile_id'] = json_encode(array());
         }
 
         if (isset($data['excluded_locations'])) {
             $prepared['excluded_locations'] = $data['excluded_locations'];
+        }
+
+        if (isset($data['click_and_collect_mode'])) {
+            $prepared['click_and_collect_mode'] = (int)$data['click_and_collect_mode'];
         }
 
         $key = 'cash_on_delivery_cost';
@@ -130,7 +140,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             'local_shipping_discount_mode',
             'international_shipping_mode',
             'international_shipping_discount_mode',
-            'cross_border_trade'
+            'cross_border_trade',
         );
 
         foreach ($modes as $mode) {
@@ -145,17 +155,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
 
     private function prepareCalculatedData($templateShippingId, array $data)
     {
-        // flat local shipping with enabled rate table allows to send measurement & weight data to eBay
-        if ($data['local_shipping_mode'] != Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_CALCULATED
-            && $data['international_shipping_mode'] != Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_CALCULATED
-            && ($data['local_shipping_mode'] != Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_FLAT
-                ||
-                empty($data['local_shipping_rate_table_mode'])
-            )
-        ) {
-            return array();
-        }
-
         $prepared = array('template_shipping_id' => $templateShippingId);
 
         $keys = array(
@@ -193,6 +192,42 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
         }
 
         return $prepared;
+    }
+
+    private function canSaveCalculatedData(array $data)
+    {
+        if ($data['local_shipping_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_CALCULATED) {
+            return true;
+        }
+
+        if ($data['international_shipping_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_CALCULATED) {
+            return true;
+        }
+
+        $marketplace = Mage::helper('M2ePro/Component_Ebay')->getObject('Marketplace', $data['marketplace_id']);
+
+        $isLocalRateTableEnabled = $marketplace->getChildObject()->isLocalShippingRateTableEnabled();
+        $isInternationalRateTableEnabled = $marketplace->getChildObject()->isInternationalShippingRateTableEnabled();
+
+        if ($isLocalRateTableEnabled
+            && $data['local_shipping_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_FLAT
+            && !empty($data['local_shipping_rate_table_mode'])
+        ) {
+            return true;
+        }
+
+        if ($isInternationalRateTableEnabled
+            && $data['international_shipping_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_FLAT
+            && !empty($data['international_shipping_rate_table_mode'])
+        ) {
+            return true;
+        }
+
+        if ($marketplace->getId() == 3 && !empty($data['click_and_collect_mode'])) { // UK
+            return true;
+        }
+
+        return false;
     }
 
     private function createCalculated($templateShippingId, array $data)

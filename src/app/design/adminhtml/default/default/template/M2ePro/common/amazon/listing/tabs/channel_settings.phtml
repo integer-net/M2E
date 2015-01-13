@@ -157,11 +157,12 @@
                         <label for="account_id"><?php echo Mage::helper('M2ePro')->__('Amazon Account'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="account_id" name="account_id" class="required-entry">
+                        <select id="account_id" name="account_id" class="required-entry" <?php if ($isEdit): ?>disabled="disabled"<?php endif; ?>>
                             <?php if (!$isEdit): ?>
                                 <option class="empty"></option>
                             <?php endif ?>
                             <?php foreach ($this->getData('accounts') as $account): ?>
+                                <?php if ($isEdit && $formData['account_id'] != $account['id']){ continue; } ?>
                                 <option value="<?php echo $account['id']; ?>" <?php if ($formData['account_id'] == $account['id']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($account['title']); ?></option>
                             <?php endforeach ?>
                         </select>

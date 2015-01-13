@@ -361,7 +361,7 @@ class Ess_M2ePro_Model_Config_Abstract extends Ess_M2ePro_Model_Abstract
         $key = $this->_ormConfig.'_data';
         $this->_cacheData = Mage::helper('M2ePro/Data_Cache')->getValue($key);
 
-        if ($this->_cacheData === false || Mage::helper('M2ePro/Magento')->isDeveloper()) {
+        if ($this->_cacheData === false || Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             $this->_cacheData = $this->buildCacheData();
             $this->updatePermanentCacheData();
         }

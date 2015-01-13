@@ -637,8 +637,8 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
             'online_qty' => $listingOtherProduct->getChildObject()->getOnlineQty(),
             'online_qty_sold' => $listingOtherProduct->getChildObject()->getOnlineQtySold(),
             'online_bids' => $listingOtherProduct->getChildObject()->getOnlineBids(),
-            'online_start_date' => $listingOtherProduct->getChildObject()->getStartDate(),
-            'online_end_date' => $listingOtherProduct->getChildObject()->getEndDate(),
+            'start_date' => $listingOtherProduct->getChildObject()->getStartDate(),
+            'end_date' => $listingOtherProduct->getChildObject()->getEndDate(),
             'status' => $listingOtherProduct->getStatus(),
             'status_changer' => $listingOtherProduct->getStatusChanger()
         );
@@ -742,7 +742,12 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
     // ########################################
 
-    public function getAffectedListingsProductsByTemplate($template, $asObjects = false)
+    /**
+     * @param bool|array $asArrays
+     * @param string $template
+     * @return array
+     */
+    public function getAffectedListingsProductsByTemplate($template, $asArrays = true)
     {
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
         $templateManager->setTemplate($template);
@@ -752,7 +757,16 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
         $collection->addFieldToFilter($templateManager->getModeColumnName(),
                                       Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT);
 
-        return $asObjects ? (array)$collection->getItems() : (array)$collection->getData();
+        if ($asArrays === false) {
+            return (array)$collection->getItems();
+        }
+
+        if (is_array($asArrays) && !empty($asArrays)) {
+            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+            $collection->getSelect()->columns($asArrays);
+        }
+
+        return (array)$collection->getData();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
@@ -769,7 +783,11 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
             $templateManager->getTemplateModel(true)->getResource()->setSynchStatusNeed(
                 $newTemplates[$template]->getDataSnapshot(),
                 $oldTemplates[$template]->getDataSnapshot(),
-                $this->getAffectedListingsProductsByTemplate($template,false)
+                $this->getAffectedListingsProductsByTemplate(
+                    $template,
+                    $template == Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION ?
+                        array('id', 'synch_status', 'synch_reasons') : array('id')
+                )
             );
         }
     }

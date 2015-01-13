@@ -583,7 +583,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
         }
         //--------------------
 
-        /* @var $amazonSynchronizationTemplate Ess_M2ePro_Model_Buy_Template_Synchronization */
+        /* @var $buySynchronizationTemplate Ess_M2ePro_Model_Buy_Template_Synchronization */
         $buySynchronizationTemplate = $listingProduct->getChildObject()->getBuySynchronizationTemplate();
 
         // Correct synchronization
