@@ -13,11 +13,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
     protected $otherListing = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Listing_Other_Action_Locker
-     */
-    protected $locker = NULL;
-
-    /**
      * @var Ess_M2ePro_Model_Ebay_Listing_Other_Action_Logger
      */
     protected $logger = NULL;
@@ -46,13 +41,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
 
     public function __construct(array $params = array(), Ess_M2ePro_Model_Listing_Other $otherListing)
     {
-        $defaultParams = array(
-            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
-        );
-        $params = array_merge($defaultParams, $params);
-
         $this->otherListing = $otherListing;
-
         parent::__construct($params,$this->otherListing->getMarketplace(),
                             $this->otherListing->getAccount(),NULL);
     }
@@ -99,36 +88,55 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
         return $this->getLogger()->getStatus();
     }
 
-    // ----------------------------------------
+    // ########################################
 
-    protected function processResponseInfo($responseInfo)
+    protected function isNeedSendRequest()
     {
-        try {
-            parent::processResponseInfo($responseInfo);
-        } catch (Exception $exception) {
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_other_'.$this->otherListing->getId());
+
+        if ($this->otherListing->isLockedObject(NULL) ||
+            $this->otherListing->isLockedObject('in_action') ||
+            $lockItem->isExist()) {
 
             $message = array(
-                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR,
-                parent::MESSAGE_TEXT_KEY => $exception->getMessage()
+                // M2ePro_TRANSLATIONS
+                // Another action is being processed. Try again when the action is completed.
+                parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
+                                           .'Try again when the action is completed.',
+                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
-           $this->getLogger()->logListingOtherMessage($this->otherListing, $message,
-                                                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
+            $this->getLogger()->logListingOtherMessage($this->otherListing, $message,
+                                                       Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
-            throw $exception;
+            return false;
         }
+
+        return $this->filterManualListingOther();
     }
 
-    // ----------------------------------------
+    // -----------------------------------------
+
+    abstract protected function filterManualListingOther();
+
+    // ########################################
 
     protected function eventBeforeProcess()
     {
-        $this->getLocker()->update();
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_other_'.$this->otherListing->getId());
+
+        $lockItem->create();
+        $lockItem->makeShutdownFunction();
     }
 
     protected function eventAfterProcess()
     {
-        $this->getLocker()->remove();
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_other_'.$this->otherListing->getId());
+
+        $lockItem->remove();
     }
 
     // ########################################
@@ -136,10 +144,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
     abstract protected function getLogAction();
 
     abstract protected function getActionType();
-
-    // ----------------------------------------
-
-    abstract protected function isNeedSendRequest();
 
     // ########################################
 
@@ -167,19 +171,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
     // ########################################
 
     /**
-     * @return Ess_M2ePro_Model_Ebay_Listing_Other_Action_Locker
-     */
-    protected function getLocker()
-    {
-        if (is_null($this->locker)) {
-            $this->locker = Mage::getModel('M2ePro/Ebay_Listing_Other_Action_Locker');
-            $this->locker->setListingOtherId($this->otherListing->getId());
-        }
-
-        return $this->locker;
-    }
-
-    /**
      * @return Ess_M2ePro_Model_Ebay_Listing_Other_Action_Logger
      */
     protected function getLogger()
@@ -189,14 +180,11 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
             /** @var Ess_M2ePro_Model_Ebay_Listing_Other_Action_Logger $logger */
             $logger = Mage::getModel('M2ePro/Ebay_Listing_Other_Action_Logger');
 
-            if (isset($this->params['logs_action_id'])) {
-                $logger->setActionId((int)$this->params['logs_action_id']);
-            } else {
-                $logger->setActionId(
-                    Mage::getModel('M2ePro/Listing_Other_Log')->getNextActionId()
-                );
+            if (!isset($this->params['logs_action_id']) || !isset($this->params['status_changer'])) {
+                throw new Exception('Product connector has not received some params');
             }
 
+            $logger->setActionId((int)$this->params['logs_action_id']);
             $logger->setAction($this->getLogAction());
 
             switch ($this->params['status_changer']) {

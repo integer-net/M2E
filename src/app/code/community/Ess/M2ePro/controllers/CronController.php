@@ -75,6 +75,8 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
         }
 
         flush();
+
+        $this->getResponse()->headersSentThrowsException = false;
     }
 
     private function getConnectionsReports($connectionIds)

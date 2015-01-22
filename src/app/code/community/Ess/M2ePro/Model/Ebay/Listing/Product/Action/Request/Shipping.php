@@ -171,6 +171,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
                                             );
 
         if ($this->getShippingTemplate()->isLocalShippingFlatEnabled()) {
+
             // there are permissions by marketplace (interface management)
             $data['rate_table_enabled'] = $this->getShippingTemplate()->isLocalShippingRateTableEnabled();
 
@@ -321,7 +322,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
 
     private function isClickAndCollectAvailable()
     {
-        if ($this->getMarketplace()->getId() != Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_UK) {
+        if (!$this->getMarketplace()->getChildObject()->isClickAndCollectEnabled()) {
             return false;
         }
 

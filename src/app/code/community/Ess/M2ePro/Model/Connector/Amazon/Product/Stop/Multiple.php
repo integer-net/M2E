@@ -39,51 +39,49 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Stop_Multiple
 
     // ########################################
 
-    protected function prepareListingsProducts($listingsProducts)
+    protected function filterManualListingsProducts()
     {
-        $tempListingsProducts = array();
-
-        foreach ($listingsProducts as $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            if (!$listingProduct->isListed() && isset($this->params['remove']) && (bool)$this->params['remove']) {
-                $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
-                $listingProduct->deleteInstance();
-                continue;
-            }
-
-            if ($listingProduct->isBlocked()) {
+            if ($listingProduct->isBlocked() && !(isset($this->params['remove']) && (bool)$this->params['remove'])) {
 
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
-                        'The action can not be executed as the item was Closed, Incomplete or Blocked on Amazon.
-                         Please, go to Amazon seller central and Active the item.
-                         After the next synchronization the item will be available.',
+                    'The action can not be executed as the item was Closed, Incomplete or Blocked on Amazon.
+                     Please, go to Amazon seller central and Active the item.
+                     After the next synchronization the item will be available.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
 
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             if (!$listingProduct->isListed()) {
 
+                $this->removeAndUnlockListingProduct($listingProduct);
+
                 if (!isset($this->params['remove']) || !(bool)$this->params['remove']) {
+
                     // M2ePro_TRANSLATIONS
                     // Item is not listed or not available
-                    $this->addListingsProductsLogsMessage($listingProduct, 'Item is not listed or not available',
-                                                          Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                          Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-
-                    continue;
+                    $this->addListingsProductsLogsMessage(
+                        $listingProduct,
+                        'Item is not listed or not available',
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                    );
+                } else {
+                    $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
+                    $listingProduct->deleteInstance();
                 }
+
+                continue;
             }
-
-            $tempListingsProducts[] = $listingProduct;
         }
-
-        return $tempListingsProducts;
     }
 
     // ########################################

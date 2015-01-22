@@ -247,7 +247,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Edit_Form_Data exte
 
     // ####################################
 
-    public  function isShowMultiCurrencyNotification()
+    public function isShowMultiCurrencyNotification()
     {
         $marketplace = $this->getMarketplace();
 
@@ -274,6 +274,26 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Edit_Form_Data exte
         );
 
         return true;
+    }
+
+    // ####################################
+
+    public function getTaxCategoriesInfo()
+    {
+        $marketplacesCollection = Mage::helper('M2ePro/Component_Ebay')->getModel('Marketplace')
+            ->getCollection()
+            ->addFieldToFilter('status',Ess_M2ePro_Model_Marketplace::STATUS_ENABLE)
+            ->setOrder('sorder','ASC');
+
+        $marketplacesCollection->getSelect()->limit(1);
+
+        $marketplaces = $marketplacesCollection->getItems();
+
+        if (count($marketplaces) == 0) {
+            return array();
+        }
+
+        return array_shift($marketplaces)->getChildObject()->getTaxCategoryInfo();
     }
 
     // ####################################

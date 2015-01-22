@@ -105,17 +105,16 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
 
         // --------------------------
         $url = $this->getUrl(
-            '*/adminhtml_development_database/manageTable', array(
-                 'table' => Mage::getSingleton('core/resource')->getTableName('m2epro_listing_product'),
-                 'filter'=> base64_encode("id[from]={$id}&id[to]={$id}"))
+            '*/adminhtml_development_database/manageTable',
+            array('table' => 'm2epro_listing_product', 'filter'=> base64_encode("id[from]={$id}&id[to]={$id}"))
         );
         $html .= '<br><a href="'.$url.'" target="_blank" style="color: green;">Parent Product</a>';
 
         $componentMode = $row->getData('component_mode');
         $url = $this->getUrl(
-            '*/adminhtml_development_database/manageTable', array(
-                'table' => Mage::getSingleton('core/resource')->getTableName("m2epro_{$componentMode}_listing_product"),
-                'filter'=> base64_encode("listing_product_id[from]={$id}&listing_product_id[to]={$id}"))
+            '*/adminhtml_development_database/manageTable',
+            array('table' => "m2epro_{$componentMode}_listing_product",
+                  'filter'=> base64_encode("listing_product_id[from]={$id}&listing_product_id[to]={$id}"))
         );
         $html .= '<br><a href="'.$url.'" target="_blank" style="color: green;">Child Product</a>';
         // --------------------------

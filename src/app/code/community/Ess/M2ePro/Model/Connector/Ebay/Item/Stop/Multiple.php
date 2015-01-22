@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
     extends Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
 {
-    protected $failedListingProductIds = array();
-
     // ########################################
 
     protected function getCommand()
@@ -31,12 +29,15 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
 
     // ########################################
 
-    protected function isNeedSendRequest()
+    protected function filterManualListingsProducts()
     {
         foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
             if (!$listingProduct->isStoppable()) {
+
+                $this->removeAndUnlockListingProduct($listingProduct);
 
                 if (!isset($this->params['remove']) || !(bool)$this->params['remove']) {
 
@@ -49,65 +50,14 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
 
                     $this->getLogger()->logListingProductMessage($listingProduct, $message,
                                                                  Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-                } elseif ($listingProduct->isLockedObject(NULL) ||
-                          $listingProduct->isLockedObject('in_action')) {
-
-                    $message = array(
-                        // M2ePro_TRANSLATIONS
-                        // Another action is being processed. Try again when the action is completed.
-                        parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
-                                                   .'Try again when the action is completed.',
-                        parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
-                    );
-
-                    $this->getLogger()->logListingProductMessage($listingProduct, $message,
-                                                                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-                }
-
-                $this->failedListingProductIds[] = $listingProduct->getId();
-                continue;
-            }
-
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
-
-                $message = array(
-                    // M2ePro_TRANSLATIONS
-                    // Another action is being processed. Try again when the action is completed.
-                    parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
-                                               .'Try again when the action is completed.',
-                    parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
-                );
-
-                $this->getLogger()->logListingProductMessage($listingProduct, $message,
-                                                             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-
-                $this->failedListingProductIds[] = $listingProduct->getId();
-                continue;
-            }
-        }
-
-        if (count($this->listingsProducts) <= count($this->failedListingProductIds)) {
-
-            if (isset($this->params['remove']) && (bool)$this->params['remove']) {
-
-                foreach ($this->listingsProducts as $listingProduct) {
-
-                    if ($listingProduct->isLockedObject(NULL) ||
-                        $listingProduct->isLockedObject('in_action')) {
-                        continue;
-                    }
-
-                    /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+                } else {
                     $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
                     $listingProduct->deleteInstance();
                 }
+
+                continue;
             }
-
-            return false;
         }
-
-        return true;
     }
 
     protected function getRequestData()
@@ -119,10 +69,6 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Stop_Multiple
         foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-            if (in_array($listingProduct->getId(),$this->failedListingProductIds)) {
-                continue;
-            }
 
             $tempData = $this->getRequestObject($listingProduct)->getData();
             $this->logRequestMessages($listingProduct);

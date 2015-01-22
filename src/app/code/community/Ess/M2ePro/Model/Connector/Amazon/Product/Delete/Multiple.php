@@ -39,39 +39,34 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Delete_Multiple
 
     // ########################################
 
-    protected function prepareListingsProducts($listingsProducts)
+    protected function filterManualListingsProducts()
     {
-        $tempListingsProducts = array();
-
-        foreach ($listingsProducts as $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
             if ($listingProduct->isNotListed()) {
 
+                $this->removeAndUnlockListingProduct($listingProduct);
+
                 if (!isset($this->params['remove']) || !(bool)$this->params['remove']) {
+
                     // M2ePro_TRANSLATIONS
                     // Item is not listed or not available
-                    $this->addListingsProductsLogsMessage($listingProduct, 'Item is not listed or not available',
-                                                          Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                          Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-
-                    continue;
+                    $this->addListingsProductsLogsMessage(
+                        $listingProduct,
+                        'Item is not listed or not available',
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                    );
+                } else {
+                    $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
+                    $listingProduct->deleteInstance();
                 }
-            }
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-            if ($listingProduct->isNotListed() && isset($this->params['remove']) && (bool)$this->params['remove']) {
-                $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
-                $listingProduct->deleteInstance();
                 continue;
             }
-
-            $tempListingsProducts[] = $listingProduct;
         }
-
-        return $tempListingsProducts;
     }
 
     // ########################################

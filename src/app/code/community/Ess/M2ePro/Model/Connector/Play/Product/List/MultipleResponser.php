@@ -32,8 +32,18 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_MultipleResponser
 
     protected function unsetLocks($fail = false, $message = NULL)
     {
-        $this->removeFromQueueOfSKus();
-        parent::unsetLocks($fail,$message);
+        try {
+
+            $this->removeFromQueueOfSKus();
+            parent::unsetLocks($fail,$message);
+
+        } catch (Exception $e) {
+
+            $exception = new Exception('Failed to clear SKU queue. '.$e->getMessage());
+            Mage::helper('M2ePro/Module_Exception')->process($exception);
+
+            throw $e;
+        }
     }
 
     // ########################################

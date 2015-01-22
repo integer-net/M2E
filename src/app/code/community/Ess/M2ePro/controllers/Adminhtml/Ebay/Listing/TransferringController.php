@@ -840,7 +840,9 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
             'auto_website_adding_template_category_id' =>
                 $sourceEbayListing->getAutoWebsiteAddingTemplateCategoryId(),
             'auto_website_adding_template_other_category_id' =>
-                $sourceEbayListing->getAutoWebsiteAddingTemplateOtherCategoryId()
+                $sourceEbayListing->getAutoWebsiteAddingTemplateOtherCategoryId(),
+            'auto_website_deleting_mode' =>
+                $sourceEbayListing->getAutoWebsiteDeletingMode()
         );
 
         if ($isDifferentMarketplace) {
@@ -900,7 +902,6 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
 
             if ($isDifferentMarketplace && $autoCategoryObject->isAddingModeAddAndAssignCategory()) {
                 $autoCategoryData['adding_mode'] = Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_ADD;
-                $autoCategoryData['category_id']                       = NULL;
                 $autoCategoryData['adding_template_category_id']       = NULL;
                 $autoCategoryData['adding_template_other_category_id'] = NULL;
             }

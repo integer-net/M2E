@@ -352,6 +352,14 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             return true;
         }
 
+        if ($this->getData('checkout_status') == Ess_M2ePro_Model_Ebay_Order::CHECKOUT_STATUS_COMPLETED) {
+            return true;
+        }
+
+        if ($this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED) {
+            return false;
+        }
+
         if (count($this->relatedOrders) == 1) {
             /** @var Ess_M2ePro_Model_Order $relatedOrder */
             $relatedOrder = reset($this->relatedOrders);

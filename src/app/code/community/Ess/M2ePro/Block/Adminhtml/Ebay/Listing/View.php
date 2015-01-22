@@ -172,7 +172,7 @@ HTML;
 
     // ########################################
 
-    protected  function _toHtml()
+    protected function _toHtml()
     {
         return '<div id="listing_view_progress_bar"></div>'.
                '<div id="listing_container_errors_summary" class="errors_summary" style="display: none;"></div>'.

@@ -15,12 +15,14 @@ $connection = $installer->getConnection();
     ADD COLUMN `restricted_to_business` tinyint(2) UNSIGNED DEFAULT 0 AFTER `listing_is_private`;
 */
 
-$templateTable = $installer->getTable('m2epro_ebay_template_selling_format');
+//---------------------------------------------
+
+$tempTable = $installer->getTable('m2epro_ebay_template_selling_format');
 $columnName = 'restricted_to_business';
 
-if ($connection->tableColumnExists($templateTable, $columnName) === false) {
+if ($connection->tableColumnExists($tempTable, $columnName) === false) {
     $connection->addColumn(
-        $templateTable, $columnName, 'tinyint(2) UNSIGNED DEFAULT 0 AFTER `listing_is_private`'
+        $tempTable, $columnName, 'tinyint(2) UNSIGNED DEFAULT 0 AFTER `listing_is_private`'
     );
 }
 

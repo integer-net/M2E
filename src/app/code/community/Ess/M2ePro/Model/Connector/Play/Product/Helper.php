@@ -299,6 +299,20 @@ class Ess_M2ePro_Model_Connector_Play_Product_Helper
             'store_id' => (int)$listingProduct->getListing()->getStoreId()
         );
 
+        if ($listingProduct->getChildObject()->isVariationsReady()) {
+
+            $variations = $listingProduct->getVariations(true);
+            /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
+            $variation = reset($variations);
+            $options = $variation->getOptions();
+
+            $dataForAdd['variation_options'] = array();
+            foreach ($options as $optionData) {
+                $dataForAdd['variation_options'][$optionData['attribute']] = $optionData['option'];
+            }
+            $dataForAdd['variation_options'] = json_encode($dataForAdd['variation_options']);
+        }
+
         return Mage::getModel('M2ePro/Play_Item')->setData($dataForAdd)->save()->getId();
     }
 

@@ -183,16 +183,17 @@ class Ess_M2ePro_Model_Ebay_Template_Return extends Ess_M2ePro_Model_Component_A
     // #######################################
 
     /**
-     * @param bool|array $asArrays
+     * @param bool $asArrays
+     * @param string|array $columns
      * @return array
      */
-    public function getAffectedListingsProducts($asArrays = true)
+    public function getAffectedListingsProducts($asArrays = true, $columns = '*')
     {
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
         $templateManager->setTemplate(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN);
 
         $listingsProducts = $templateManager->getAffectedOwnerObjects(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asArrays
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asArrays, $columns
         );
 
         $listings = $templateManager->getAffectedOwnerObjects(
@@ -204,7 +205,7 @@ class Ess_M2ePro_Model_Ebay_Template_Return extends Ess_M2ePro_Model_Component_A
             $tempListingsProducts = $listing->getChildObject()
                                             ->getAffectedListingsProductsByTemplate(
                                                 Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN,
-                                                $asArrays
+                                                $asArrays, $columns
                                             );
 
             foreach ($tempListingsProducts as $listingProduct) {
@@ -219,10 +220,8 @@ class Ess_M2ePro_Model_Ebay_Template_Return extends Ess_M2ePro_Model_Component_A
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $neededColumns = array('id');
-        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
-
-        if (!$listingsProducts) {
+        $listingsProducts = $this->getAffectedListingsProducts(true, array('id'));
+        if (empty($listingsProducts)) {
             return;
         }
 

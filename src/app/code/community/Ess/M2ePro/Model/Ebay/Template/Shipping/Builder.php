@@ -223,7 +223,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             return true;
         }
 
-        if ($marketplace->getId() == 3 && !empty($data['click_and_collect_mode'])) { // UK
+        if ($marketplace->getChildObject()->isClickAndCollectEnabled() &&
+            !empty($data['click_and_collect_mode'])) {
             return true;
         }
 

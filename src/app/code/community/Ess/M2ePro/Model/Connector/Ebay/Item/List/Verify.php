@@ -46,15 +46,15 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Verify
         return $messages;
     }
 
-    //----------------------------------------
-
-    protected function eventBeforeProcess() {}
-
-    protected function eventAfterProcess() {}
-
     // ########################################
 
-    protected function isNeedSendRequest()
+    protected function lockListingProduct() {}
+
+    protected function unLockListingProduct() {}
+
+    //----------------------------------------
+
+    protected function filterManualListingProduct()
     {
         if (!$this->listingProduct->isListable()) {
 

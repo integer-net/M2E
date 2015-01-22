@@ -197,11 +197,10 @@ HTML;
     }
 
     /**
-     * @title "Set EPS Images Mode"
+     * @title "Set eBay EPS Images Mode"
      * @description "Set EPS Images Mode = true for listing products"
      * @prompt "Please enter Listing Product ID or `all` code for all products."
      * @prompt_var "listing_product_id"
-     * @new_line
      */
     public function setEpsImagesModeAction()
     {
@@ -242,6 +241,199 @@ HTML;
 
         $this->_getSession()->addSuccess("Successfully set for {$affected} affected products.");
         return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
+    }
+
+    //#############################################
+
+    /**
+     * @title "Show eBay Nonexistent Templates"
+     * @description "Show Nonexistent Templates [eBay]"
+     * @new_line
+     */
+    public function showNonexistentTemplatesAction()
+    {
+        $nonexistentTemplates = array();
+
+        $simpleTemplates = array('category', 'other_category');
+        foreach ($simpleTemplates as $templateName) {
+
+            $tempResult = $this->getNonexistentTemplatesBySimpleLogic($templateName);
+            !empty($tempResult) && $nonexistentTemplates[$templateName] = $tempResult;
+        }
+
+        $difficultTemplates = array(
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION,
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION,
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING,
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT,
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN,
+        );
+        foreach ($difficultTemplates as $templateName) {
+
+            $tempResult = $this->getNonexistentTemplatesByDifficultLogic($templateName);
+            !empty($tempResult) && $nonexistentTemplates[$templateName] = $tempResult;
+        }
+
+        if (count($nonexistentTemplates) <= 0) {
+            echo $this->getEmptyResultsHtml('There are no any nonexistent templates.');
+            return;
+        }
+
+        $tableContent = <<<HTML
+<tr>
+    <th>Template Code</th>
+    <th>Listing Product ID</th>
+    <th>Listing ID</th>
+    <th>Template ID</th>
+    <th>My Mode</th>
+    <th>Parent Mode</th>
+</tr>
+HTML;
+
+        foreach ($nonexistentTemplates as $templateName => $items) {
+
+            foreach ($items as $index => $itemInfo) {
+
+                $myMode = '';
+                if (isset($itemInfo['my_mode'])) {
+                    $myMode = 'parent';
+                    (int)$itemInfo['my_mode'] == 1 && $myMode = 'custom';
+                    (int)$itemInfo['my_mode'] == 2 && $myMode = 'template';
+                }
+
+                $parentMode = '';
+                if (isset($itemInfo['parent_mode']) && isset($itemInfo['my_mode']) && (int)$itemInfo['my_mode'] == 0) {
+                    $parentMode = (int)$itemInfo['parent_mode'] == 1 ? 'custom' : 'template';
+                }
+
+                $tableContent .= <<<HTML
+<tr>
+    <td>{$templateName}</td>
+    <td>{$itemInfo['my_id']}</td>
+    <td>{$itemInfo['listing_id']}</td>
+    <td>{$itemInfo['my_needed_id']}</td>
+    <td>{$myMode}</td>
+    <td>{$parentMode}</td>
+</tr>
+HTML;
+            }
+            $tableContent .= "</tr>";
+        }
+
+        echo $this->getStyleHtml() . <<<HTML
+<html>
+    <body>
+        <h2 style="margin: 20px 0 0 10px">Nonexistent templates
+            <span style="color: #808080; font-size: 15px;">( entries)</span>
+        </h2>
+        <br>
+        <table class="grid" cellpadding="0" cellspacing="0">
+            {$tableContent}
+        </table>
+    </body>
+</html>
+HTML;
+    }
+
+    //todo change when description will be horizontal
+    private function getNonexistentTemplatesByDifficultLogic($templateCode)
+    {
+        /** @var $resource Mage_Core_Model_Resource */
+        $resource = Mage::getSingleton('core/resource');
+        $connRead = $resource->getConnection('core_write');
+
+        $subSelect = $connRead->select()
+            ->from(
+                array('melp' => $resource->getTableName('m2epro_ebay_listing_product')),
+                array(
+                    'my_id'          => 'listing_product_id',
+                    'my_mode'        => "template_{$templateCode}_mode",
+                    'my_template_id' => "template_{$templateCode}_id",
+                    'my_custom_id'   => "template_{$templateCode}_custom_id",
+
+                    'my_needed_id'   => new Zend_Db_Expr(
+                    "CASE
+                        WHEN melp.template_{$templateCode}_mode = 2 THEN melp.template_{$templateCode}_id
+                        WHEN melp.template_{$templateCode}_mode = 1 THEN melp.template_{$templateCode}_custom_id
+                        WHEN melp.template_{$templateCode}_mode = 0 THEN IF(mel.template_{$templateCode}_mode = 1,
+                                                                            mel.template_{$templateCode}_custom_id,
+                                                                            mel.template_{$templateCode}_id)
+                    END"
+                    ))
+            )
+            ->joinLeft(
+                array('mlp' => $resource->getTableName('m2epro_listing_product')),
+                'melp.listing_product_id = mlp.id',
+                array('listing_id' => 'listing_id')
+            )
+            ->joinLeft(
+                array('mel' => $resource->getTableName('m2epro_ebay_listing')),
+                'mlp.listing_id = mel.listing_id',
+                array(
+                    'parent_mode'        => "template_{$templateCode}_mode",
+                    'parent_template_id' => "template_{$templateCode}_id",
+                    'parent_custom_id'   => "template_{$templateCode}_custom_id"
+                )
+            );
+
+        $templateIdName = 'id';
+        $horizontalTemplates = array(
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION,
+        );
+        in_array($templateCode, $horizontalTemplates) && $templateIdName = "template_{$templateCode}_id";
+
+        $result = $connRead->select()
+           ->from(
+               array('subselect' => new Zend_Db_Expr('('.$subSelect->__toString().')')),
+               array(
+                   'subselect.my_id',
+                   'subselect.listing_id',
+                   'subselect.my_mode',
+                   'subselect.parent_mode',
+                   'subselect.my_needed_id',
+               )
+           )
+           ->joinLeft(
+               array('template' => $resource->getTableName("m2epro_ebay_template_{$templateCode}")),
+               "subselect.my_needed_id = template.{$templateIdName}",
+               array()
+           )
+           ->where("template.{$templateIdName} IS NULL")
+           ->query()->fetchAll();
+
+        return $result;
+    }
+
+    private function getNonexistentTemplatesBySimpleLogic($templateCode)
+    {
+        /** @var $resource Mage_Core_Model_Resource */
+        $resource = Mage::getSingleton('core/resource');
+        $connRead = $resource->getConnection('core_write');
+
+        $select = $connRead->select()
+            ->from(
+                array('melp' => $resource->getTableName('m2epro_ebay_listing_product')),
+                array(
+                    'my_id'        => 'listing_product_id',
+                    'my_needed_id' => "template_{$templateCode}_id",
+                )
+            )
+            ->joinLeft(
+                array('mlp' => $resource->getTableName('m2epro_listing_product')),
+                'melp.listing_product_id = mlp.id',
+                array('listing_id' => 'listing_id')
+            )
+            ->joinLeft(
+                array('template' => $resource->getTableName("m2epro_ebay_template_{$templateCode}")),
+                "melp.template_{$templateCode}_id = template.id",
+                array()
+            )
+            ->where("melp.template_{$templateCode}_id IS NOT NULL")
+            ->where("template.id IS NULL");
+
+        return $select->query()->fetchAll();
     }
 
     //#############################################
@@ -342,6 +534,20 @@ HTML;
 
         $this->_getSession() ->addSuccess("Success '{$success}' products.");
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
+    }
+
+    //#############################################
+
+    private function getEmptyResultsHtml($messageText)
+    {
+        $backUrl = Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl();
+
+        return <<<HTML
+    <h2 style="margin: 20px 0 0 10px">
+        {$messageText} <span style="color: grey; font-size: 10px;">
+        <a href="{$backUrl}">[back]</a>
+    </h2>
+HTML;
     }
 
     //#############################################

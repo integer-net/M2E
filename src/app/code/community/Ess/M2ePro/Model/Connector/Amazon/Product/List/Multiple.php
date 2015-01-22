@@ -37,11 +37,11 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
     // ########################################
 
-    protected function prepareListingsProducts($listingProducts)
+    protected function filterManualListingsProducts()
     {
         $this->params['list_types'] = array();
 
-        foreach ($listingProducts as $key => $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
@@ -49,40 +49,64 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
                 // M2ePro_TRANSLATIONS
                 // Item is already on Amazon, or not available.
-                $this->addListingsProductsLogsMessage($listingProduct, 'Item is already on Amazon, or not available.',
-                                                      Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+                $this->addListingsProductsLogsMessage(
+                    $listingProduct,
+                    'Item is already on Amazon, or not available.',
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
 
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
-            $addingSku = $listingProduct->getChildObject()->getSku();
-            empty($addingSku) && $addingSku = $listingProduct->getChildObject()->getAddingSku();
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
+
+            if ($amazonListingProduct->isVariationProduct() && !$amazonListingProduct->isVariationMatched()) {
+
+                // M2ePro_TRANSLATIONS
+                // You have to select variation.
+                $this->addListingsProductsLogsMessage(
+                    $listingProduct,
+                    'You have to select variation.',
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
+
+                $this->removeAndUnlockListingProduct($listingProduct);
+                continue;
+            }
+
+            $addingSku = $amazonListingProduct->getSku();
+            empty($addingSku) && $addingSku = $amazonListingProduct->getAddingSku();
 
             if (!$this->validateSku($addingSku,$listingProduct)) {
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             if ($this->isSkuExistsInM2ePro($addingSku,$listingProduct)) {
 
-                if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
-                    unset($listingProducts[$key]);
+                if ($amazonListingProduct->getAmazonListing()->isGenerateSkuModeNo()) {
+                    $this->removeAndUnlockListingProduct($listingProduct);
                     continue;
                 }
 
                 $addingSku = $this->generateSku($listingProduct);
 
                 if ($addingSku === false) {
-                    // -> Mage::helper('M2ePro')->__('Can\'t generate SKU.');
+
+                    // M2ePro_TRANSLATIONS
+                    // Can't generate SKU.
                     $this->addListingsProductsLogsMessage(
-                        $listingProduct, 'Can\'t generate SKU.',
+                        $listingProduct,
+                        'Can\'t generate SKU.',
                         Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );
 
-                    unset($listingProducts[$key]);
+                    $this->removeAndUnlockListingProduct($listingProduct);
                     continue;
                 }
             }
@@ -91,19 +115,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
             $listingProduct->setData('sku',$addingSku);
         }
 
-        $this->checkSkuExistence($listingProducts);
+        $this->checkSkuExistence();
 
-        foreach ($listingProducts as $key => $listingProduct) {
+        foreach ($this->listingsProducts as $key => $listingProduct) {
 
             // exception happened
             if (is_null($listingProduct->getData('found_on_amazon'))) {
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             if ($listingProduct->getData('found_on_amazon')) {
                 $this->linkItem($listingProduct);
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
@@ -114,20 +138,21 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
             }
 
             if ($listType === false) {
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             if (!$this->validateConditions($listingProduct)) {
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
-            $price = $listingProduct->getChildObject()->getPrice();
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
 
-            if ($price <= 0) {
-
-            //->__('The price must be greater than 0. Please, check the Selling Format Template and Product settings.');
+            if ($amazonListingProduct->getPrice() <= 0) {
+            // M2ePro_TRANSLATIONS
+            // The price must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
                     'The price must be greater than 0. Please, check the Selling Format Template and Product settings.',
@@ -135,14 +160,12 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
 
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             $this->params['list_types'][$listingProduct->getId()] = $listType;
         }
-
-        return array_values($listingProducts);
     }
 
     // ########################################
@@ -176,7 +199,6 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
         }
 
         $this->checkQtyWarnings();
-
         $this->addSkusToQueue($tempSkus);
 
         return $requestData;
@@ -186,10 +208,15 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
     private function getListTypeChangerUser(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $generalId = $listingProduct->getChildObject()->getGeneralId();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        $generalId = $amazonListingProduct->getGeneralId();
 
         if (!empty($generalId)) {
+
             if (!$this->validateGeneralId($generalId)) {
+
                 // M2ePro_TRANSLATIONS
                 // ASIN/ISBN has a wrong format.
                 $this->addListingsProductsLogsMessage(
@@ -198,15 +225,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
+
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_GENERAL_ID;
         }
 
-        $worldWideId = $listingProduct->getChildObject()->getWorldWideId();
+        $worldWideId = $amazonListingProduct->getWorldWideId();
 
         if (!empty($worldWideId)) {
+
             if (!$this->validateWorldWideId($worldWideId)) {
+
                 // M2ePro_TRANSLATIONS
                 // UPC/EAN has a wrong format.
                 $this->addListingsProductsLogsMessage(
@@ -215,14 +246,17 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
+
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
         }
 
-        $templateNewProductId = $listingProduct->getChildObject()->getTemplateNewProductId();
+        $templateNewProductId = $amazonListingProduct->getTemplateNewProductId();
 
         if (empty($templateNewProductId)) {
+
             // M2ePro_TRANSLATIONS
             // ASIN/ISBN or New ASIN template is required.
             $this->addListingsProductsLogsMessage(
@@ -231,19 +265,21 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
+
             return false;
         }
 
-        $worldWideId = $listingProduct->getChildObject()->getTemplateNewProductSource()->getWorldWideId();
+        $worldWideId = $amazonListingProduct->getTemplateNewProductSource()->getWorldWideId();
         $isWorldWideIdValid = !empty($worldWideId) && $this->validateWorldWideId($worldWideId);
 
         if ($isWorldWideIdValid && $this->isWorldWideIdAlreadyExists($worldWideId,$listingProduct)) {
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT_WORLDWIDE_ID;
         }
 
-        $registeredParameter = $listingProduct->getChildObject()->getTemplateNewProduct()->getRegisteredParameter();
+        $registeredParameter = $amazonListingProduct->getTemplateNewProduct()->getRegisteredParameter();
 
         if (!$registeredParameter && !$isWorldWideIdValid) {
+
             // M2ePro_TRANSLATIONS
             // Valid EAN/UPC or Product ID Override is required for adding new ASIN. Please check Template Settings.
             $this->addListingsProductsLogsMessage(
@@ -252,10 +288,12 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
+
             return false;
         }
 
         if (!empty($worldWideId) && !$isWorldWideIdValid) {
+
             // M2ePro_TRANSLATIONS
             // UPC/EAN has a wrong format. Please check New ASIN Template Settings.
             $this->addListingsProductsLogsMessage(
@@ -264,6 +302,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
+
             return false;
         }
 
@@ -272,10 +311,15 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
     private function getListTypeChangerAutomatic(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $generalId = $listingProduct->getChildObject()->getGeneralId();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        $generalId = $amazonListingProduct->getGeneralId();
 
         if (!empty($generalId)) {
+
             if (!$this->validateGeneralId($generalId)) {
+
                 // M2ePro_TRANSLATIONS
                 // ASIN/ISBN has a wrong format.
                 $this->addListingsProductsLogsMessage(
@@ -284,15 +328,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
+
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_GENERAL_ID;
         }
 
-        $worldWideId = $listingProduct->getChildObject()->getWorldWideId();
+        $worldWideId = $amazonListingProduct->getWorldWideId();
 
         if (!empty($worldWideId)) {
+
             if (!$this->validateWorldWideId($worldWideId)) {
+
                 // M2ePro_TRANSLATIONS
                 // UPC/EAN has a wrong format.
                 $this->addListingsProductsLogsMessage(
@@ -301,25 +349,28 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
+
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
         }
 
-        $templateNewProductId = $listingProduct->getChildObject()->getTemplateNewProductId();
+        $templateNewProductId = $amazonListingProduct->getTemplateNewProductId();
 
         if (!empty($templateNewProductId)) {
 
-            $worldWideId = $listingProduct->getChildObject()->getTemplateNewProductSource()->getWorldWideId();
+            $worldWideId = $amazonListingProduct->getTemplateNewProductSource()->getWorldWideId();
             $isWorldWideIdValid = !empty($worldWideId) && $this->validateWorldWideId($worldWideId);
 
             if ($isWorldWideIdValid && $this->isWorldWideIdAlreadyExists($worldWideId,$listingProduct)) {
                 return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT_WORLDWIDE_ID;
             }
 
-            $registeredParameter = $listingProduct->getChildObject()->getTemplateNewProduct()->getRegisteredParameter();
+            $registeredParameter = $amazonListingProduct->getTemplateNewProduct()->getRegisteredParameter();
 
             if (!$registeredParameter && !$isWorldWideIdValid) {
+
                 // M2ePro_TRANSLATIONS
     // Valid EAN/UPC or Product ID Override is required for adding new ASIN. Please check Template Settings.
                 $this->addListingsProductsLogsMessage(
@@ -328,10 +379,12 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
 
             if (!empty($worldWideId) && !$isWorldWideIdValid) {
+
                 // M2ePro_TRANSLATIONS
                 // UPC/EAN has a wrong format. Please check New ASIN Template Settings.
                 $this->addListingsProductsLogsMessage(
@@ -340,16 +393,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
 
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_TEMPLATE_NEW_PRODUCT;
         }
 
-        $generalId = $listingProduct->getChildObject()->getAddingGeneralId();
+        $generalId = $amazonListingProduct->getAddingGeneralId();
 
         if (!empty($generalId)) {
+
             if (!$this->validateGeneralId($generalId)) {
+
         // M2ePro_TRANSLATIONS
         // ASIN/ISBN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.
                 $this->addListingsProductsLogsMessage(
@@ -358,15 +414,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
+
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_GENERAL_ID;
         }
 
-        $worldWideId = $listingProduct->getChildObject()->getAddingWorldWideId();
+        $worldWideId = $amazonListingProduct->getAddingWorldWideId();
 
         if (!empty($worldWideId)) {
+
             if (!$this->validateWorldWideId($worldWideId)) {
+
         // M2ePro_TRANSLATIONS
         // UPC/EAN has a wrong format. Please check Search Settings for ASIN / ISBN  in Listing -> Channel Settings.
                 $this->addListingsProductsLogsMessage(
@@ -375,8 +435,10 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+
                 return false;
             }
+
             return Ess_M2ePro_Model_Connector_Amazon_Product_Helper::LIST_TYPE_WORLDWIDE_ID;
         }
 
@@ -428,14 +490,18 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
     private function validateConditions(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $addingCondition = $listingProduct->getChildObject()->getCondition();
-        $validConditions = $listingProduct->getListing()->getChildObject()->getConditionValues();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        $addingCondition = $amazonListingProduct->getCondition();
+        $validConditions = $amazonListingProduct->getAmazonListing()->getConditionValues();
 
         if (empty($addingCondition) || !in_array($addingCondition,$validConditions)) {
             // M2ePro_TRANSLATIONS
             // Condition is invalid or missed. Please, check Listing Channel and product settings.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'Condition is invalid or missed. Please, check Listing Channel and product settings.',
+                $listingProduct,
+                'Condition is invalid or missed. Please, check Listing Channel and product settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -443,13 +509,14 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
             return false;
         }
 
-        $addingConditionNote = $listingProduct->getChildObject()->getConditionNote();
+        $addingConditionNote = $amazonListingProduct->getConditionNote();
 
         if (is_null($addingConditionNote)) {
             // M2ePro_TRANSLATIONS
             // Condition note is invalid or missed. Please, check Listing Channel and product settings.
             $this->addListingsProductsLogsMessage(
-            $listingProduct, 'Condition note is invalid or missed. Please, check Listing Channel and product settings.',
+                $listingProduct,
+                'Condition note is invalid or missed. Please, check Listing Channel and product settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -461,7 +528,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
             // M2ePro_TRANSLATIONS
             // The length of condition note must be less than 2000 characters.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'The length of condition note must be less than 2000 characters.',
+                $listingProduct,
+                'The length of condition note must be less than 2000 characters.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -525,9 +593,9 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
     // ########################################
 
-    private function checkSkuExistence($listingProducts)
+    private function checkSkuExistence()
     {
-        $listingProductsPacks = array_chunk($listingProducts,20,true);
+        $listingProductsPacks = array_chunk($this->listingsProducts,20,true);
 
         foreach ($listingProductsPacks as $listingProductsPack) {
 
@@ -568,7 +636,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                 foreach ($listingProductsPack as $listingProduct) {
 
                     $this->addListingsProductsLogsMessage(
-                        $listingProduct, Mage::helper('M2ePro')->__($exception->getMessage()),
+                        $listingProduct,
+                        Mage::helper('M2ePro')->__($exception->getMessage()),
                         Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );
@@ -586,14 +655,15 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
                 }
             }
         }
-
-        return $listingProducts;
     }
 
     // ----------------------------------------
 
     private function isSkuExistsInM2ePro($sku, Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
         // check in 3rd party by account
 
         $listingOtherCollection = Mage::helper('M2ePro/Component_Amazon')
@@ -603,7 +673,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
         if ($listingOtherCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
+            if ($amazonListingProduct->getAmazonListing()->isGenerateSkuModeNo()) {
 
                 $message = Mage::helper('M2ePro')->__('The same Merchant SKU was found among 3rd Party Listings. ');
                 $message.= Mage::helper('M2ePro')->__('Merchant SKU must be unique for each Amazon item.');
@@ -636,7 +706,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
         if ($listingProductCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
+            if ($amazonListingProduct->getAmazonListing()->isGenerateSkuModeNo()) {
 
                 $message = Mage::helper('M2ePro')->__('The same Merchant SKU was found among M2E Listings. ');
                 $message.= Mage::helper('M2ePro')->__('Merchant SKU must be unique for each Amazon item.');
@@ -657,12 +727,14 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
         $queue = $this->getQueueOfSkus();
         if (in_array($sku,$queue,true) || isset($this->skusToCheck[$sku])) {
 
-            if ($listingProduct->getChildObject()->getAmazonListing()->isGenerateSkuModeNo()) {
-                // M2ePro_TRANSLATIONS
-                // The product with the same Merchant SKU is being listed now. SKU must be unique for each Amazon item.
+            if ($amazonListingProduct->getAmazonListing()->isGenerateSkuModeNo()) {
+
+                $message = Mage::helper('M2ePro')->__('The same Merchant SKU is being listed now. ');
+                $message.= Mage::helper('M2ePro')->__('Merchant SKU must be unique for each Amazon item.');
+
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
-            'The product with the same Merchant SKU is being listed now. SKU must be unique for each Amazon item.',
+                    $message,
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -678,16 +750,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
 
     private function generateSku(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
         $countTriedTemp = 0;
         do {
-            $newSku  = $listingProduct->getChildObject()->getAddingSku();
+            $newSku  = $amazonListingProduct->getAddingSku();
             $newSku .= '_' . $listingProduct->getProductId() . '_' . $listingProduct->getId();
 
             if (strlen($newSku) >= (Ess_M2ePro_Model_Amazon_Listing_Product::SKU_MAX_LENGTH - 5)) {
                 $newSku = 'SKU_' .$listingProduct->getProductId() . '_' . $listingProduct->getId();
             }
 
-            $newSku = $listingProduct->getChildObject()->createRandomSku($newSku);
+            $newSku = $amazonListingProduct->createRandomSku($newSku);
 
         } while ($this->isSkuExistsInM2ePro($newSku,$listingProduct) && ++$countTriedTemp <= 5);
 
@@ -720,6 +795,20 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
             'product_id' => $listingProduct->getProductId(),
             'store_id' => $listingProduct->getListing()->getStoreId()
         );
+
+        if ($listingProduct->getChildObject()->isVariationsReady()) {
+
+            $variations = $listingProduct->getVariations(true);
+            /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
+            $variation = reset($variations);
+            $options = $variation->getOptions();
+
+            $dataForAdd['variation_options'] = array();
+            foreach ($options as $optionData) {
+                $dataForAdd['variation_options'][$optionData['attribute']] = $optionData['option'];
+            }
+            $dataForAdd['variation_options'] = json_encode($dataForAdd['variation_options']);
+        }
 
         Mage::getModel('M2ePro/Amazon_Item')->setData($dataForAdd)->save();
 

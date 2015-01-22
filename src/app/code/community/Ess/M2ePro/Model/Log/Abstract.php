@@ -101,12 +101,25 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
             throw new Exception('Wrong object class for getting action_id!');
         }
 
-        $groupConfig = '/logs/'.$groupConfig.'/';
-        $lastActionId = (int)Mage::helper('M2ePro/Module')->getConfig()
-                                ->getGroupValue($groupConfig, 'last_action_id');
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
 
-        Mage::helper('M2ePro/Module')->getConfig()
-                ->setGroupValue($groupConfig, 'last_action_id',$lastActionId+1);
+        $table = Mage::getSingleton('core/resource')->getTableName('m2epro_config');
+        $groupConfig = '/logs/'.$groupConfig.'/';
+
+        $lastActionId = (int)$connRead->select()
+                                      ->from($table,'value')
+                                      ->where('`group` = ?',$groupConfig)
+                                      ->where('`key` = ?','last_action_id')
+                                      ->query()->fetchColumn();
+
+        $connWrite->update(
+            $table,
+            array('value' => $lastActionId + 1),
+            array('`group` = ?' => $groupConfig, '`key` = ?' => 'last_action_id')
+        );
 
         return $lastActionId + 1;
     }

@@ -7,7 +7,7 @@
 abstract class Ess_M2ePro_Model_Connector_Amazon_Requester extends Ess_M2ePro_Model_Connector_Requester
 {
     const COMPONENT = 'Amazon';
-    const COMPONENT_VERSION = 3;
+    const COMPONENT_VERSION = 4;
 
     /**
      * @var Ess_M2ePro_Model_Account|null

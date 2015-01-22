@@ -12,7 +12,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
     {
         if (Mage::helper('M2ePro/Module_Cron')->isReadyToRun() &&
             Mage::helper('M2ePro/Module_Cron')->isLastRunMoreThan(1,true) &&
-            Mage::helper('M2ePro/Module')->isProductionEnvironment()) {
+            !Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             $this->addCronNotificationMessage($controller);
         }
 

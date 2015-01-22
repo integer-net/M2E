@@ -187,7 +187,10 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             '/Mxperts_NoRegion/i' => 'Error about empty billing address information',
             '/MageWorx_DeliveryZone/i' => 'Shipping price is 0 in magento order',
 
-            '/Netzarbeiter_Cache/i' => 'Adding product step by circle.'
+            '/Netzarbeiter_Cache/i' => 'Adding product step by circle.',
+
+            '/Netzarbeiter_LoginCatalog/i' => 'Cron problem. [Model_Observer->_redirectToLoginPage()]',
+            '/Elsner_Loginonly/i'          => 'Cron problem. [Model_Observer->_redirectToLoginPage()]'
         );
 
         $result = array();

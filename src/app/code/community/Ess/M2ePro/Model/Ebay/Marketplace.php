@@ -6,9 +6,6 @@
 
 class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
-    const IS_MULTIVARIATION_NO  = 0;
-    const IS_MULTIVARIATION_YES = 1;
-
     const TRANSLATION_SERVICE_NO       = 0;
     const TRANSLATION_SERVICE_YES_TO   = 1;
     const TRANSLATION_SERVICE_YES_FROM = 2;
@@ -22,26 +19,6 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
     {
         parent::_construct();
         $this->_init('M2ePro/Ebay_Marketplace');
-    }
-
-    // ########################################
-
-    public static function getTaxCategoriesInfo()
-    {
-        $marketplacesCollection = Mage::helper('M2ePro/Component_Ebay')->getModel('Marketplace')
-            ->getCollection()
-            ->addFieldToFilter('status',Ess_M2ePro_Model_Marketplace::STATUS_ENABLE)
-            ->setOrder('sorder','ASC');
-
-        $marketplacesCollection->getSelect()->limit(1);
-
-        $marketplaces = $marketplacesCollection->getItems();
-
-        if (count($marketplaces) == 0) {
-            return array();
-        }
-
-        return array_shift($marketplaces)->getChildObject()->getTaxCategoryInfo();
     }
 
     // ########################################
@@ -141,7 +118,7 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     public function isMultivariationEnabled()
     {
-        return (int)$this->getData('is_multivariation') == self::IS_MULTIVARIATION_YES;
+        return (bool)$this->getData('is_multivariation');
     }
 
     public function isTaxTableEnabled()
@@ -214,6 +191,11 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
         return (bool)(int)$this->getData('is_charity');
     }
 
+    public function isClickAndCollectEnabled()
+    {
+        return (bool)(int)$this->getData('is_click_and_collect');
+    }
+
     public function isHolidayReturnEnabled()
     {
         return (bool)(int)$this->getData('is_holiday_return');
@@ -258,25 +240,6 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     // ########################################
 
-    public function getMultivariationObjects()
-    {
-        $collection = Mage::getModel('M2ePro/Ebay_Marketplace')->getCollection();
-        $collection->addFieldToFilter('is_multivariation',self::IS_MULTIVARIATION_YES);
-        return $collection->getItems();
-    }
-
-    public function getMultivariationIds()
-    {
-        $result = array();
-        $tempMarketplaces = Mage::getModel('M2ePro/Ebay_Marketplace')->getMultivariationObjects();
-        foreach ($tempMarketplaces as $tempMarketplace) {
-            $result[] = (int)$tempMarketplace->getId();
-        }
-        return $result;
-    }
-
-    // ########################################
-
     public function getInfo()
     {
         if (!is_null($this->info)) {
@@ -287,52 +250,47 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
         $coreResource = Mage::getSingleton('core/resource');
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
-        //------------------------------
         $tableDictMarketplace = $coreResource->getTableName('m2epro_ebay_dictionary_marketplace');
         $tableDictShipping = $coreResource->getTableName('m2epro_ebay_dictionary_shipping');
         $tableDictShippingCategory = $coreResource->getTableName('m2epro_ebay_dictionary_shipping_category');
-        //------------------------------
 
         // table m2epro_ebay_dictionary_marketplace
         //------------------------------
-        $dbSelect = $connRead
-            ->select()
-                ->from($tableDictMarketplace,'*')
-                ->where('`marketplace_id` = ?',(int)$this->getId());
+        $dbSelect = $connRead->select()
+                             ->from($tableDictMarketplace,'*')
+                             ->where('`marketplace_id` = ?',(int)$this->getId());
         $data = $connRead->fetchRow($dbSelect);
         //------------------------------
 
         if (!$data) {
-            $this->info = array();
-
-            return $this->info;
+            return $this->info = array();
         }
 
         // table m2epro_ebay_dictionary_shipping
         //------------------------------
-        $dbSelect = $connRead
-            ->select()
-                ->from($tableDictShipping,'*')
-                ->where('`marketplace_id` = ?',(int)$this->getId())
-                ->order(array('title ASC'));
+        $dbSelect = $connRead->select()
+                             ->from($tableDictShipping,'*')
+                             ->where('`marketplace_id` = ?',(int)$this->getId())
+                             ->order(array('title ASC'));
         $shippingMethods = $connRead->fetchAll($dbSelect);
         //------------------------------
 
-        if ($shippingMethods == false) {
+        if (!$shippingMethods) {
             $shippingMethods = array();
         }
 
         // table m2epro_ebay_dictionary_shipping_category
         //------------------------------
-        $dbSelect = $connRead
-            ->select()
-                ->from($tableDictShippingCategory,'*')
-                ->where('`marketplace_id` = ?',(int)$this->getId())
-                ->order(array('title ASC'));
+        $dbSelect = $connRead->select()
+                             ->from($tableDictShippingCategory,'*')
+                             ->where('`marketplace_id` = ?',(int)$this->getId())
+                             ->order(array('title ASC'));
         $shippingCategories = $connRead->fetchAll($dbSelect);
 
         $categoryShippingMethods = array();
+
         if (is_array($shippingCategories)) {
+
             foreach ($shippingCategories as $category) {
                 $categoryShippingMethods[$category['ebay_id']] = array(
                     'title'   => $category['title'],
@@ -347,7 +305,7 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
         }
         //------------------------------
 
-        $this->info = array(
+        return $this->info = array(
             'dispatch'                   => json_decode($data['dispatch'], true),
             'packages'                   => json_decode($data['packages'], true),
             'return_policy'              => json_decode($data['return_policy'], true),
@@ -359,8 +317,6 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
             'shipping_locations_exclude' => json_decode($data['shipping_locations_exclude'], true),
             'tax_categories'             => json_decode($data['tax_categories'], true)
         );
-
-        return $this->info;
     }
 
     //-----------------------------------------

@@ -51,7 +51,7 @@
     $charitiesDict = $this->getData('charities');
     $charitySelf = json_decode($formData['charity'], true);
 
-    $taxCategories = Ess_M2ePro_Model_Ebay_Marketplace::getTaxCategoriesInfo();
+    $taxCategories = $this->getTaxCategoriesInfo();
 ?>
 
 <script type="text/javascript">

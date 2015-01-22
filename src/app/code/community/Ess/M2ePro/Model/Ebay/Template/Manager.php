@@ -528,10 +528,11 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
     /**
      * @param string $ownerObjectModel
      * @param int $templateId
-     * @param bool|array $asArrays
+     * @param bool $asArrays
+     * @param string|array $columns
      * @return array
      */
-    public function getAffectedOwnerObjects($ownerObjectModel, $templateId, $asArrays = true)
+    public function getAffectedOwnerObjects($ownerObjectModel, $templateId, $asArrays = true, $columns = '*')
     {
         /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection($ownerObjectModel);
@@ -546,16 +547,12 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
 
         $collection->getSelect()->where($where);
 
-        if ($asArrays === false) {
-            return (array)$collection->getItems();
-        }
-
-        if (is_array($asArrays) && !empty($asArrays)) {
+        if (is_array($columns) && !empty($columns)) {
             $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
-            $collection->getSelect()->columns($asArrays);
+            $collection->getSelect()->columns($columns);
         }
 
-        return (array)$collection->getData();
+        return $asArrays ? (array)$collection->getData() : (array)$collection->getItems();
     }
 
     public function getTemplatesFromData($data)

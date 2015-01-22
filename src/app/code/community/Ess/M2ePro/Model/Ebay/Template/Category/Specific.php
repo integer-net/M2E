@@ -252,6 +252,19 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
 
     // #######################################
 
+    public function getUsedAttributes()
+    {
+        $attributes = array();
+
+        if ($this->isCustomAttributeValueMode() || $this->isCustomLabelAttributeValueMode()) {
+            $attributes[] = $this->getData('value_custom_attribute');
+        }
+
+        return $attributes;
+    }
+
+    // #######################################
+
     private function getAttributeValue($attributeCode)
     {
         $attributeValue = $this->getMagentoProduct()->getAttributeValue($attributeCode);

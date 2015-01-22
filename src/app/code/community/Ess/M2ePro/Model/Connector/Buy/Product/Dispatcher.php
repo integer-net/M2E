@@ -7,7 +7,7 @@
 class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
 {
     private $logsActionId = NULL;
-    private $isProcessingItems = array();
+    private $isProcessingItems = false;
 
     // ########################################
 
@@ -19,6 +19,10 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
      */
     public function process($action, $products, array $params = array())
     {
+        $params = array_merge(array(
+            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
+        ), $params);
+
         $this->logsActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
         $params['logs_action_id'] = $this->logsActionId;
 
@@ -70,7 +74,6 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
             return Mage::helper('M2ePro')->getMainStatus($results);
         }
 
-        $result = Ess_M2ePro_Helper_Data::STATUS_ERROR;
         $sortedProductsData = $this->sortProductsByAccount($products);
 
         switch ($action) {
@@ -112,11 +115,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
 
     public function isProcessingItems()
     {
-        if (count($this->isProcessingItems) <= 0) {
-            return false;
-        }
-
-        return !(array_search(true,$this->isProcessingItems) === false);
+        return (bool)$this->isProcessingItems;
     }
 
     // ########################################
@@ -126,6 +125,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
      * @param int $maxProductsForOneRequest
      * @param string $connectorName
      * @param array $params
+     * @throws LogicException
      * @return int
      */
     protected function processGroupedProducts(array $sortedProductsData,
@@ -167,7 +167,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
             $connector = new $connectorName($params,$products);
             $connector->process();
 
-            $this->isProcessingItems[] = $connector->isProcessingItems();
+            $this->isProcessingItems = $connector->isProcessingItems();
 
             return $connector->getStatus();
 

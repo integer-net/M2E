@@ -18,7 +18,9 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher
      */
     public function process($action, $products, array $params = array())
     {
-        $result = Ess_M2ePro_Helper_Data::STATUS_ERROR;
+        $params = array_merge(array(
+            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
+        ), $params);
 
         $this->logsActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
         $params['logs_action_id'] = $this->logsActionId;

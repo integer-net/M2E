@@ -438,7 +438,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
 
     public function canDisplayClickAndCollectOption()
     {
-        return $this->getMarketplace()->getId() == Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_UK;
+        return $this->getMarketplace()->getChildObject()->isClickAndCollectEnabled();
     }
 
     public function canDisplayFreightShippingType()

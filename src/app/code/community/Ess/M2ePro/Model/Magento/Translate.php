@@ -29,7 +29,7 @@ class Ess_M2ePro_Model_Magento_Translate extends Mage_Core_Model_Translate
         return $this->mode;
     }
 
-    function __construct($mode = self::TRANSLATE_MODE_CUSTOM)
+    public function __construct($mode = self::TRANSLATE_MODE_CUSTOM)
     {
         $this->setMode($mode);
     }

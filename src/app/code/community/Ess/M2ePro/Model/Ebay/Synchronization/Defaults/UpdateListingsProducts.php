@@ -191,34 +191,45 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
     private function getChangesByAccount(Ess_M2ePro_Model_Account $account)
     {
-        $sinceTime = $this->getSinceTime();
+        $nextSinceTime = new DateTime($this->getSinceTime(), new DateTimeZone('UTC'));
 
-        $response = $this->receiveFromEbay($account, array('since_time'=>$sinceTime));
-
-        if ($response) {
-            $this->toTime = (string)$response['to_time'];
-            return (array)$response['items'];
-        }
-
-        $sinceTime = new DateTime('now', new DateTimeZone('UTC'));
-        $sinceTime->modify("-1 day");
-        $sinceTime = $sinceTime->format('Y-m-d H:i:s');
-
-        $response = $this->receiveFromEbay($account, array('since_time'=>$sinceTime));
+        // from stored value
+        $response = $this->receiveFromEbay($account, array('since_time' => $nextSinceTime->format('Y-m-d H:i:s')));
 
         if ($response) {
             $this->toTime = (string)$response['to_time'];
             return (array)$response['items'];
         }
 
-        $sinceTime = new DateTime('now', new DateTimeZone('UTC'));
-        $sinceTime = $sinceTime->format('Y-m-d H:i:s');
+        $previousSinceTime = $nextSinceTime;
 
-        $response = $this->receiveFromEbay($account, array('since_time'=>$sinceTime));
+        $nextSinceTime = new DateTime('now', new DateTimeZone('UTC'));
+        $nextSinceTime->modify("-1 day");
 
-        if ($response) {
-            $this->toTime = (string)$response['to_time'];
-            return (array)$response['items'];
+        if ($previousSinceTime->format('U') < $nextSinceTime->format('U')) {
+
+            // from day behind now
+            $response = $this->receiveFromEbay($account, array('since_time' => $nextSinceTime->format('Y-m-d H:i:s')));
+
+            if ($response) {
+                $this->toTime = (string)$response['to_time'];
+                return (array)$response['items'];
+            }
+
+            $previousSinceTime = $nextSinceTime;
+        }
+
+        $nextSinceTime = new DateTime('now', new DateTimeZone('UTC'));
+
+        if ($previousSinceTime->format('U') < $nextSinceTime->format('U')) {
+
+            // from now
+            $response = $this->receiveFromEbay($account, array('since_time' => $nextSinceTime->format('Y-m-d H:i:s')));
+
+            if ($response) {
+                $this->toTime = (string)$response['to_time'];
+                return (array)$response['items'];
+            }
         }
 
         return array();
@@ -247,7 +258,17 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
         $listingType = $this->getActualListingType($listingProduct, $change);
 
         if ($listingType == Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED) {
+
             $data['online_buyitnow_price'] = (float)$change['currentPrice'] < 0 ? 0 : (float)$change['currentPrice'];
+
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+            $ebayListingProduct = $listingProduct->getChildObject();
+
+            if ($ebayListingProduct->getOnlineBuyItNowPrice() != $data['online_buyitnow_price']) {
+                Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
+                    $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
+                );
+            }
         }
 
         if ($listingType == Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION) {

@@ -349,7 +349,11 @@ HTML;
                 try {
                     $variation = $option->getListingProductVariation();
                 } catch (LogicException $e) {
-                    $option->deleteInstance() && $deletedOptions++;
+
+                    $tempOption = Mage::getModel('M2ePro/Listing_Product_Variation_Option')->load($option->getId());
+                    if (!is_null($tempOption->getId())) {
+                        $option->deleteInstance() && $deletedOptions++;
+                    }
                     continue;
                 }
 
@@ -372,101 +376,6 @@ HTML;
             printf('Deleted variations on %s count = %d <br>', $component, $deletedVariations);
             printf('Deleted products on %s count = %d <br>', $component, $deletedProducts);
         }
-    }
-
-    /**
-     * @title "Check Nonexistent Templates [eBay]"
-     * @description "Check Nonexistent Templates [eBay]"
-     */
-    public function checkNonexistentTemplatesAction()
-    {
-        $nonexistentTemplates = array();
-
-        foreach (Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product') as $item) {
-
-            /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayLp */
-            $ebayLp = $item->getChildObject();
-
-            try {
-                $ebayLp->isSetCategoryTemplate() && $ebayLp->getCategoryTemplate()->getId();
-            } catch (LogicException $e) {
-
-                $templateColumnId = 'template_category_id';
-                $nonexistentTemplates[$ebayLp->getId()][$templateColumnId] = $ebayLp->getTemplateCategoryId();
-            }
-
-            try {
-                $ebayLp->isSetOtherCategoryTemplate() && $ebayLp->getOtherCategoryTemplate();
-            } catch (LogicException $e) {
-
-                $templateColumnId = 'template_other_category_id';
-                $nonexistentTemplates[$ebayLp->getId()][$templateColumnId] = $ebayLp->getTemplateOtherCategoryId();
-            }
-
-            foreach (Mage::getSingleton('M2ePro/Ebay_Template_Manager')->getAllTemplates() as $nick) {
-
-                $methodName = $nick == Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT
-                    ? 'getSellingFormatTemplate' : 'get' . ucfirst($nick) . 'Template';
-
-                try {
-
-                    $ebayLp->$methodName();
-
-                } catch (LogicException $e) {
-
-                    $manager = $ebayLp->getTemplateManager($nick);
-                    $templateIdColumnName = !$manager->isModeParent()
-                        ? $manager->getIdColumnNameByMode($manager->getModeValue()) : 'parent';
-
-                    $nonexistentTemplates[$ebayLp->getId()][$templateIdColumnName] = $manager->getIdColumnValue();
-                }
-            }
-        }
-
-        if (count($nonexistentTemplates) <= 0) {
-            echo $this->getEmptyResultsHtml('There are no any nonexistent templates.');
-            return;
-        }
-
-        $tableContent = '';
-        foreach ($nonexistentTemplates as $listingProductId => $templateInfo) {
-
-            $rowSpan = count($templateInfo);
-            $tableContent .= "<tr>";
-            $tableContent .= "<td rowspan=\"{$rowSpan}\">{$listingProductId}</td>";
-
-            $firstRow = true;
-            foreach ($templateInfo as $columnName => $columnValue) {
-
-                $firstRow && $tableContent .= "<td>{$columnName}</td>";
-                $firstRow && $tableContent .= "<td>{$columnValue}</td>";
-                $firstRow && $tableContent .= "</tr>";
-
-                !$firstRow && $tableContent .= <<<HTML
-<tr>
-    <td>{$columnName}</td>
-    <td>{$columnValue}</td>
-</tr>
-HTML;
-                $firstRow = false;
-            }
-        }
-
-        echo $this->getStyleHtml() . <<<HTML
-<html>
-    <body>
-        <h2 style="margin: 20px 0 0 10px">Nonexistent templates
-            <span style="color: #808080; font-size: 15px;">( entries)</span>
-        </h2>
-        <br>
-        <form method="GET" action="">
-            <table class="grid" cellpadding="0" cellspacing="0">
-                {$tableContent}
-            </table>
-        </form>
-    </body>
-</html>
-HTML;
     }
 
     //#############################################

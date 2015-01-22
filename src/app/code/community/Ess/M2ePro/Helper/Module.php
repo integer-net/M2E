@@ -16,6 +16,10 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     const WIZARD_MIGRATION_NICK = 'migrationToV6';
 
+    const ENVIRONMENT_PRODUCTION = 'production';
+    const ENVIRONMENT_DEVELOPMENT = 'development';
+    const ENVIRONMENT_TESTING = 'testing';
+
     const DEVELOPMENT_MODE_COOKIE_KEY = 'm2epro_development_mode';
 
     // ########################################
@@ -68,7 +72,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '7568';
+        $revision = '7742';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -285,11 +289,6 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function isDevelopmentMode()
     {
-        if (isset($_SERVER['REMOTE_ADDR']) &&
-            sha1($_SERVER['REMOTE_ADDR']) == 'e4c431597cf909cf228fcf9287b3ace0924e573c') {
-            return true;
-        }
-
         return Mage::app()->getCookie()->get(self::DEVELOPMENT_MODE_COOKIE_KEY);
     }
 
@@ -300,20 +299,26 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function setDevelopmentModeMode($value)
     {
-        $value ? Mage::app()->getCookie()->set(self::DEVELOPMENT_MODE_COOKIE_KEY, 'true', 60*60*24*31)
-               : Mage::app()->getCookie()->set(self::DEVELOPMENT_MODE_COOKIE_KEY, '', 0);
+        $value ? Mage::app()->getCookie()->set(self::DEVELOPMENT_MODE_COOKIE_KEY, 'true', 60*60*24*31*12)
+               : Mage::app()->getCookie()->delete(self::DEVELOPMENT_MODE_COOKIE_KEY);
     }
 
     // ----------------------------------------
 
-    public function isDevelopmentEnvironment()
-    {
-        return (bool)getenv('DEVELOPMENT_ENV');
-    }
-
     public function isProductionEnvironment()
     {
-        return !$this->isDevelopmentEnvironment();
+        return (string)getenv('M2EPRO_ENV') == self::ENVIRONMENT_PRODUCTION ||
+               (!$this->isDevelopmentEnvironment() && !$this->isTestingEnvironment());
+    }
+
+    public function isDevelopmentEnvironment()
+    {
+        return (string)getenv('M2EPRO_ENV') == self::ENVIRONMENT_DEVELOPMENT;
+    }
+
+    public function isTestingEnvironment()
+    {
+        return (string)getenv('M2EPRO_ENV') == self::ENVIRONMENT_TESTING;
     }
 
     // ########################################

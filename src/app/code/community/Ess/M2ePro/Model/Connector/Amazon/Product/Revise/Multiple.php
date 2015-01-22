@@ -33,11 +33,9 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Revise_Multiple
 
     // ########################################
 
-    protected function prepareListingsProducts($listingsProducts)
+    protected function filterManualListingsProducts()
     {
-        $tempListingsProducts = array();
-
-        foreach ($listingsProducts as $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
@@ -45,13 +43,14 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Revise_Multiple
 
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
-                        'The action can not be executed as the item was Closed, Incomplete or Blocked on Amazon.
-                         Please, go to Amazon seller central and Active the item.
-                         After the next synchronization the item will be available.',
+                    'The action can not be executed as the item was Closed, Incomplete or Blocked on Amazon.
+                     Please, go to Amazon seller central and Active the item.
+                     After the next synchronization the item will be available.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
 
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
@@ -59,17 +58,35 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Revise_Multiple
 
                 // M2ePro_TRANSLATIONS
                 // Item is not listed or not available
-                $this->addListingsProductsLogsMessage($listingProduct, 'Item is not listed or not available',
-                                                      Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+                $this->addListingsProductsLogsMessage(
+                    $listingProduct,
+                    'Item is not listed or not available',
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
 
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
-            $tempListingsProducts[] = $listingProduct;
-        }
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
 
-        return $tempListingsProducts;
+            if ($amazonListingProduct->isVariationProduct() && !$amazonListingProduct->isVariationMatched()) {
+
+                // M2ePro_TRANSLATIONS
+                // You have to select variation.
+                $this->addListingsProductsLogsMessage(
+                    $listingProduct,
+                    'You have to select variation.',
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
+
+                $this->removeAndUnlockListingProduct($listingProduct);
+                continue;
+            }
+        }
     }
 
     // ########################################
