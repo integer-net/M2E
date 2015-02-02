@@ -95,14 +95,13 @@ class Ess_M2ePro_Adminhtml_Common_Buy_OrderController
         $order = Mage::helper('M2ePro/Component_Buy')->getObject('Order', (int)$id);
 
     // M2ePro_TRANSLATIONS
-    // Magento Order is already created for this %component_name% Order. Press Create Order button to create new one.
+    // Magento Order is already created for this Rakuten.com Order. Press Create Order button to create new one.
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
-            $message = 'Magento Order is already created for this %component_name% Order. ' .
+            $message = 'Magento Order is already created for this Rakuten.com Order. ' .
                        'Press Create Order button to create new one.';
 
-            // todo replace hardcoded string with constant, when Buy will be stable (no "Beta" in component title)
             $this->_getSession()->addWarning(
-                Mage::helper('M2ePro')->__($message, 'Rakuten.com')
+                Mage::helper('M2ePro')->__($message)
             );
             $this->_redirect('*/*/view', array('id' => $id));
             return;

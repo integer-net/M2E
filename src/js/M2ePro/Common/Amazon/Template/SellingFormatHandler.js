@@ -109,7 +109,7 @@ CommonAmazonTemplateSellingFormatHandler.prototype = Object.extend(new CommonHan
 
     qty_mode_change: function()
     {
-        $('qty_custom_attribute_tr', 'qty_custom_value_tr', 'qty_percentage_tr', 'qty_max_posted_value_mode_tr').invoke('hide');
+        $('qty_custom_attribute_tr', 'qty_custom_value_tr', 'qty_percentage_tr', 'qty_modification_mode_tr').invoke('hide');
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_NUMBER')) {
             $('qty_custom_value_tr').show();
@@ -120,22 +120,22 @@ CommonAmazonTemplateSellingFormatHandler.prototype = Object.extend(new CommonHan
                 : $('qty_custom_attribute_tr').show();
         }
 
-        $('qty_max_posted_value_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MAX_POSTED_MODE_OFF');
+        $('qty_modification_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF');
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT') ||
             this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_ATTRIBUTE')) {
 
-            $('qty_max_posted_value_mode_tr').show();
+            $('qty_modification_mode_tr').show();
 
-            $('qty_max_posted_value_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON');
+            $('qty_modification_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODIFICATION_MODE_ON');
 
             if (M2ePro.formData.qty_mode == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT') ||
                 M2ePro.formData.qty_mode == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_ATTRIBUTE')) {
-                $('qty_max_posted_value_mode').value = M2ePro.formData.qty_max_posted_value_mode;
+                $('qty_modification_mode').value = M2ePro.formData.qty_modification_mode;
             }
         }
 
-        $('qty_max_posted_value_mode').simulate('change');
+        $('qty_modification_mode').simulate('change');
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT') ||
             this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_ATTRIBUTE')) {
@@ -144,11 +144,13 @@ CommonAmazonTemplateSellingFormatHandler.prototype = Object.extend(new CommonHan
         }
     },
 
-    qtyMaxPostedMode_change: function()
+    qtyPostedMode_change: function()
     {
+        $('qty_min_posted_value_tr').hide();
         $('qty_max_posted_value_tr').hide();
 
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON')) {
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODIFICATION_MODE_ON')) {
+            $('qty_min_posted_value_tr').show();
             $('qty_max_posted_value_tr').show();
         }
     },

@@ -375,8 +375,8 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             customValueTr      = $('qty_mode_cv_tr'),
             attributeElement   = $('qty_custom_attribute'),
 
-            maxPostedValueTr   = $('qty_max_posted_value_mode_tr'),
-            maxPostedValueMode = $('qty_max_posted_value_mode');
+            maxPostedValueTr   = $('qty_modification_mode_tr'),
+            maxPostedValueMode = $('qty_modification_mode');
 
         customValueTr.hide();
         attributeElement.value = '';
@@ -388,15 +388,15 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         }
 
         maxPostedValueTr.hide();
-        maxPostedValueMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_OFF');
+        maxPostedValueMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF');
 
         if (self.isMaxPostedQtyAvailable(this.value)) {
 
             maxPostedValueTr.show();
-            maxPostedValueMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON');
+            maxPostedValueMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODIFICATION_MODE_ON');
 
             if (self.isMaxPostedQtyAvailable(M2ePro.formData.qty_mode)) {
-                maxPostedValueMode.value = M2ePro.formData.qty_max_posted_value_mode;
+                maxPostedValueMode.value = M2ePro.formData.qty_modification_mode;
             }
         }
 
@@ -412,12 +412,16 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
                qtyMode == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED');
     },
 
-    qtyMaxPostedMode_change: function()
+    qtyPostedMode_change: function()
     {
-        var maxPosterValueTr = $('qty_max_posted_value_tr');
+        var minPosterValueTr = $('qty_min_posted_value_tr'),
+            maxPosterValueTr = $('qty_max_posted_value_tr');
 
+        minPosterValueTr.hide();
         maxPosterValueTr.hide();
-        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON')) {
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODIFICATION_MODE_ON')) {
+            minPosterValueTr.show();
             maxPosterValueTr.show();
         }
     },

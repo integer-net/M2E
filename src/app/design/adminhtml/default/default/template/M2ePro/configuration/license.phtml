@@ -124,6 +124,18 @@
 
     <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
 
+    <?php if ($this->key != '' && ($this->licenseData['domain'] == '' || $this->licenseData['ip'] == '' || $this->licenseData['directory'] == '')) : ?>
+        <ul style="margin-top: 5px;" class="messages">
+            <li class="error-msg">
+                <ul>
+                    <li>
+                        <?php echo Mage::helper('M2ePro')->__('You are trying to use invalid license key. TODO TEXT'); ?>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    <?php endif; ?>
+
     <div class="entry-edit" id="magento_block_configuration_license_data" collapseable="no">
 
         <div class="entry-edit-head">
@@ -300,7 +312,7 @@
 
     <?php } ?>
 
-    <?php if ($this->key != '') { ?>
+    <?php if ($this->key != '' && $this->licenseData['domain'] != '' && $this->licenseData['ip'] != '' && $this->licenseData['directory'] != '') { ?>
 
         <?php foreach ($this->components as $componentName => $componentData) { ?>
 

@@ -28,6 +28,8 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_Cron
         $this->cronLastRunTime = 'N/A';
         $this->cronIsNotWorking = false;
         $this->cronCurrentType = ucfirst(Mage::helper('M2ePro/Module_Cron')->getType());
+        $this->cronServiceAuthKey = Mage::helper('M2ePro/Module')->getConfig()
+                                                                 ->getGroupValue('/cron/service/', 'auth_key');
 
         $baseDir = Mage::helper('M2ePro/Client')->getBaseDirectory();
         $this->cronPhp = 'php -q '.$baseDir.DIRECTORY_SEPARATOR.'cron.php -mdefault 1';

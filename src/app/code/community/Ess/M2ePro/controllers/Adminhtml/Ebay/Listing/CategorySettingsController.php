@@ -200,6 +200,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $listingId);
 
             $this->addCategoriesPath($data,$listing);
+            $data['marketplace_id'] = $listing->getMarketplaceId();
 
             $templates = Mage::getModel('M2ePro/Ebay_Template_Category')->getCollection()->getItemsByPrimaryCategories(
                 array($data)
@@ -1231,6 +1232,9 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
     private function getTemplatesData()
     {
+        $listingId = $this->getRequest()->getParam('listing_id');
+        $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $listingId);
+
         $templatesData = array();
         foreach ($this->getSessionValue($this->getSessionDataKey()) as $templateData) {
 
@@ -1244,6 +1248,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
                 continue;
             }
 
+            $templateData['marketplace_id'] = $listing->getMarketplaceId();
             $templatesData[$id] = $templateData;
         }
 

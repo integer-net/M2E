@@ -1,3 +1,8 @@
+* 6.2.4.1 (r7782) (26/01/2015) [Custom Release]
+
+* Added: [eBay] Ability to set "Minimum QTY to be listed" into Selling Format Template
+* Fix: [eBay] "Notice: Undefined index: marketplace_id" during setup of categories
+
 * 6.2.4 (r7742) (18/01/2015)
 
 * Added: [eBay] Ability to use "Click And Collect" shipping feature for AU site

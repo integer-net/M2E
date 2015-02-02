@@ -485,7 +485,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
         $mysqlData = array(
             'group'       => '/installation/version/history/',
             'key'         => $newVersion,
-            'value'       => $currentGmtDate,
+            'value'       => $oldVersion,
             'update_date' => $currentGmtDate,
             'create_date' => $currentGmtDate
         );

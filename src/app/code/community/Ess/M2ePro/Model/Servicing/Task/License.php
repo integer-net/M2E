@@ -44,104 +44,85 @@ class Ess_M2ePro_Model_Servicing_Task_License extends Ess_M2ePro_Model_Servicing
 
     private function updateValidationMainData(array $validationData)
     {
-        if (isset($validationData['domain'])) {
-            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/','domain',(string)$validationData['domain']
-            );
+        $moduleName = Mage::helper('M2ePro/Module')->getName();
+        $primaryConfig = Mage::helper('M2ePro/Primary')->getConfig();
+
+        if (array_key_exists('domain', $validationData)) {
+            $primaryConfig->setGroupValue('/'.$moduleName.'/license/','domain', $validationData['domain']);
         }
 
-        if (isset($validationData['ip'])) {
-            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/','ip',(string)$validationData['ip']
-            );
+        if (array_key_exists('ip', $validationData)) {
+            $primaryConfig->setGroupValue('/'.$moduleName.'/license/','ip', $validationData['ip']);
         }
 
-        if (isset($validationData['directory'])) {
-            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/',
-                'directory',(string)$validationData['directory']
-            );
+        if (array_key_exists('directory', $validationData)) {
+            $primaryConfig->setGroupValue('/'.$moduleName.'/license/', 'directory', $validationData['directory']);
         }
     }
 
-    private function updateValidationValidData(array $validationValidData)
+    private function updateValidationValidData(array $isValidData)
     {
-        if (isset($validationValidData['domain'])) {
-            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/',
-                'domain',(int)$validationValidData['domain']
-            );
+        $moduleName = Mage::helper('M2ePro/Module')->getName();
+        $primaryConfig = Mage::helper('M2ePro/Primary')->getConfig();
+
+        if (array_key_exists('domain', $isValidData)) {
+            $primaryConfig->setGroupValue('/'.$moduleName.'/license/valid/','domain',(int)$isValidData['domain']);
         }
 
-        if (isset($validationValidData['ip'])) {
-            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/',
-                'ip',(int)$validationValidData['ip']
-            );
+        if (array_key_exists('ip', $isValidData)) {
+            $primaryConfig->setGroupValue('/'.$moduleName.'/license/valid/','ip',(int)$isValidData['ip']);
         }
 
-        if (isset($validationValidData['directory'])) {
-            Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                '/'.Mage::helper('M2ePro/Module')->getName().'/license/valid/',
-                'directory',(int)$validationValidData['directory']
-            );
+        if (array_key_exists('directory', $isValidData)) {
+            $primaryConfig->setGroupValue('/'.$moduleName.'/license/valid/','directory',(int)$isValidData['directory']);
         }
     }
 
     private function updateComponentsData(array $componentsData)
     {
+        $primaryConfig = Mage::helper('M2ePro/Primary')->getConfig();
+
         foreach (Mage::helper('M2ePro/Component')->getComponents() as $component) {
 
-            if (!isset($componentsData[$component]) ||
-                !is_array($componentsData[$component])) {
+            if (!isset($componentsData[$component]) || !is_array($componentsData[$component])) {
                 continue;
             }
 
-            $componentData = $componentsData[$component];
-            $componentConfigGroup = '/'.Mage::helper('M2ePro/Module')->getName().
-                                    '/license/'.strtolower($component).'/';
+            $componentData  = $componentsData[$component];
+            $componentGroup = '/'.Mage::helper('M2ePro/Module')->getName().'/license/'.strtolower($component).'/';
 
-            if (isset($componentData['mode'])) {
-                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                    $componentConfigGroup, 'mode', (int)$componentData['mode']
-                );
+            if (array_key_exists('mode', $componentData)) {
+                $primaryConfig->setGroupValue($componentGroup, 'mode', (int)$componentData['mode']);
             }
 
-            if (isset($componentData['status'])) {
-                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                    $componentConfigGroup, 'status', (int)$componentData['status']
-                );
+            if (array_key_exists('status', $componentData)) {
+                $primaryConfig->setGroupValue($componentGroup, 'status', (int)$componentData['status']);
             }
 
-            if (isset($componentData['expiration_date'])) {
-                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                    $componentConfigGroup, 'expiration_date', (string)$componentData['expiration_date']
-                );
+            if (array_key_exists('expiration_date', $componentData)) {
+                $primaryConfig->setGroupValue($componentGroup, 'expiration_date', $componentData['expiration_date']);
             }
 
-            if (isset($componentData['is_free'])) {
-                Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
-                    $componentConfigGroup, 'is_free', (int)$componentData['is_free']
-                );
+            if (array_key_exists('is_free', $componentData)) {
+                $primaryConfig->setGroupValue($componentGroup, 'is_free', (int)$componentData['is_free']);
             }
         }
     }
 
-    private function updateConnectionData($data)
+    private function updateConnectionData(array $data)
     {
-        if (isset($data['domain'])) {
-            Mage::helper('M2ePro/Module')->getCacheConfig()
-                ->setGroupValue('/license/connection/', 'domain', $data['domain']);
+        $cacheConfig = Mage::helper('M2ePro/Module')->getCacheConfig();
+
+        if (array_key_exists('domain', $data)) {
+            $cacheConfig->setGroupValue('/license/connection/', 'domain', $data['domain']);
         }
 
-        if (isset($data['ip'])) {
-            Mage::helper('M2ePro/Module')->getCacheConfig()
-                ->setGroupValue('/license/connection/', 'ip', $data['ip']);
+        if (array_key_exists('ip', $data)) {
+            $cacheConfig->setGroupValue('/license/connection/', 'ip', $data['ip']);
         }
 
-        if (isset($data['directory'])) {
-            Mage::helper('M2ePro/Module')->getCacheConfig()
-                ->setGroupValue('/license/connection/', 'directory', $data['directory']);
+        if (array_key_exists('directory', $data)) {
+            $cacheConfig->setGroupValue('/license/connection/', 'directory', $data['directory']);
         }
     }
 

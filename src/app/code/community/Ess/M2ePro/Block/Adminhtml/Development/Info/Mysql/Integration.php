@@ -68,6 +68,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Mysql_Integration extends Mage
     {
         return array(
             'Amazon' => array(
+                'm2epro_amazon_account',
                 'm2epro_amazon_item',
                 'm2epro_amazon_listing',
                 'm2epro_amazon_listing_product',
@@ -79,6 +80,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Mysql_Integration extends Mage
     {
         return array(
             'Ebay' => array(
+                'm2epro_ebay_account',
                 'm2epro_ebay_item',
                 'm2epro_ebay_listing',
                 'm2epro_ebay_listing_product',

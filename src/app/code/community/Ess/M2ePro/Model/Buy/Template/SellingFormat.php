@@ -16,9 +16,10 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
     const QTY_MODE_ATTRIBUTE     = 4;
     const QTY_MODE_PRODUCT_FIXED = 5;
 
-    const QTY_MAX_POSTED_MODE_OFF = 0;
-    const QTY_MAX_POSTED_MODE_ON = 1;
+    const QTY_MODIFICATION_MODE_OFF = 0;
+    const QTY_MODIFICATION_MODE_ON = 1;
 
+    const QTY_MIN_POSTED_DEFAULT_VALUE = 1;
     const QTY_MAX_POSTED_DEFAULT_VALUE = 10;
 
     const PRICE_NONE      = 0;
@@ -111,7 +112,8 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
             'mode'      => $this->getQtyMode(),
             'value'     => $this->getQtyNumber(),
             'attribute' => $this->getData('qty_custom_attribute'),
-            'qty_max_posted_value_mode' => $this->getQtyMaxPostedValueMode(),
+            'qty_modification_mode'     => $this->getQtyModificationMode(),
+            'qty_min_posted_value'      => $this->getQtyMinPostedValue(),
             'qty_max_posted_value'      => $this->getQtyMaxPostedValue(),
             'qty_percentage'            => $this->getQtyPercentage()
         );
@@ -138,19 +140,24 @@ class Ess_M2ePro_Model_Buy_Template_SellingFormat extends Ess_M2ePro_Model_Compo
 
     //-------------------------
 
-    public function getQtyMaxPostedValueMode()
+    public function getQtyModificationMode()
     {
-        return (int)$this->getData('qty_max_posted_value_mode');
+        return (int)$this->getData('qty_modification_mode');
     }
 
-    public function isQtyMaxPostedValueModeOn()
+    public function isQtyModificationModeOn()
     {
-        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_ON;
+        return $this->getQtyModificationMode() == self::QTY_MODIFICATION_MODE_ON;
     }
 
-    public function isQtyMaxPostedValueModeOff()
+    public function isQtyModificationModeOff()
     {
-        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_OFF;
+        return $this->getQtyModificationMode() == self::QTY_MODIFICATION_MODE_OFF;
+    }
+
+    public function getQtyMinPostedValue()
+    {
+        return (int)$this->getData('qty_min_posted_value');
     }
 
     public function getQtyMaxPostedValue()

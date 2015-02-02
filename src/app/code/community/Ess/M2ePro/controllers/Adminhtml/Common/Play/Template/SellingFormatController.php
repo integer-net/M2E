@@ -89,7 +89,8 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SellingFormatController
             'qty_custom_value',
             'qty_custom_attribute',
             'qty_percentage',
-            'qty_max_posted_value_mode',
+            'qty_modification_mode',
+            'qty_min_posted_value',
             'qty_max_posted_value',
 
             'price_gbr_mode',
