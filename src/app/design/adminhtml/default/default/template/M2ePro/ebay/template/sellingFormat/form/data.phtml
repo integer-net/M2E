@@ -51,7 +51,7 @@
     $charitiesDict = $this->getData('charities');
     $charitySelf = json_decode($formData['charity'], true);
 
-    $taxCategories = Ess_M2ePro_Model_Ebay_Marketplace::getTaxCategoriesInfo();
+    $taxCategories = $this->getTaxCategoriesInfo();
 ?>
 
 <script type="text/javascript">
@@ -114,7 +114,7 @@
     M2ePro.formData.outOfStockControl = <?php echo $formData['out_of_stock_control']; ?>;
     M2ePro.formData.duration_mode = <?php echo Mage::helper('M2ePro')->escapeJs($formData['duration_mode']); ?>;
     M2ePro.formData.qty_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_mode']); ?>';
-    M2ePro.formData.qty_max_posted_value_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_max_posted_value_mode']); ?>';
+    M2ePro.formData.qty_modification_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_modification_mode']); ?>';
 
     <?php if (!is_null($currency = $this->getCurrency())) : ?>
         M2ePro.formData.currency = '<?php echo Mage::app()->getLocale()->currency($currency)->getSymbol(); ?>';
@@ -136,8 +136,8 @@
             .observe('change', EbayTemplateSellingFormatHandlerObj.qty_mode_change)
             .simulate('change');
 
-        $('qty_max_posted_value_mode')
-            .observe('change', EbayTemplateSellingFormatHandlerObj.qtyMaxPostedMode_change)
+        $('qty_modification_mode')
+            .observe('change', EbayTemplateSellingFormatHandlerObj.qtyPostedMode_change)
             .simulate('change');
 
         if ($('tax_category_mode')) {
@@ -509,14 +509,14 @@
                 </tr>
 
                 <!-- Max Posted QTY-->
-                <tr id="qty_max_posted_value_mode_tr" class="simple_mode_disallowed" style="display: none;">
+                <tr id="qty_modification_mode_tr" class="simple_mode_disallowed" style="display: none;">
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Conditional Quantity'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="qty_max_posted_value_mode" name="selling_format[qty_max_posted_value_mode]" class="required-entry">
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_OFF; ?>" <?php if ($formData['qty_max_posted_value_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_OFF): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON; ?>" <?php if ($formData['qty_max_posted_value_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
+                        <select id="qty_modification_mode" name="selling_format[qty_modification_mode]" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF; ?>" <?php if ($formData['qty_modification_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODIFICATION_MODE_ON; ?>" <?php if ($formData['qty_modification_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODIFICATION_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
@@ -524,6 +524,20 @@
                                 If this setting is <b>Enabled</b> you can specify the maximum quantity to be listed.
                                 If this setting is <b>Disabled</b> all stock for the product will be listed as available on eBay.'
                             ); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="qty_min_posted_value_tr" class="simple_mode_disallowed" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Minimum Quantity to Be Listed'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td id="qty_min_posted_value_td" class="value" style="width: auto;">
+                        <input id="qty_min_posted_value" name="selling_format[qty_min_posted_value]" value="<?php echo $this->escapeHtml($formData['qty_min_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in stock but set a min qty to be listed of 5, item will not be listed on eBay.</br>
+Otherwise, the item will be listed with quantity according to the settings in the Price, Quantity and Format Policy'); ?>
+                            </span>
                         </p>
                     </td>
                 </tr>

@@ -396,7 +396,7 @@ HTML;
     {
         $value = $column->getFilter()->getValue();
 
-        if ($value == null) {
+        if (is_null($value)) {
             return;
         }
 
@@ -408,7 +408,7 @@ HTML;
             $attributeCode = $this->partsCompatibilityAttribute->getAttributeCode();
 
             $collection->addFieldToFilter($attributeCode,array('notnull'=>true));
-            $collection->addFieldToFilter($attributeCode,array('neq'=>'\'\''));
+            $collection->addFieldToFilter($attributeCode,array('neq'=>''));
             $collection->addFieldToFilter(
                 'is_parts_compatibility_attribute_in_product_attribute_set',array('notnull'=>true)
             );
@@ -416,9 +416,15 @@ HTML;
             $attributeId = $this->partsCompatibilityAttribute->getId();
             $storeId = $this->getListing()->getStoreId();
 
+            $joinCondition = 'eaa.entity_id = e.entity_id and eaa.attribute_id = '.$attributeId;
+            if (!$this->partsCompatibilityAttribute->isScopeGlobal()) {
+                $joinCondition .= ' and eaa.store_id = '.$storeId;
+            }
+
             $collection->getSelect()->joinLeft(
                 array('eaa' => Mage::getSingleton('core/resource')->getTableName('catalog_product_entity_text')),
-                'eaa.entity_id = e.entity_id and eaa.attribute_id = '.$attributeId.' and eaa.store_id = '.$storeId
+                $joinCondition,
+                array('value')
             );
 
             $collection->getSelect()->orWhere('eaa.value IS NULL');

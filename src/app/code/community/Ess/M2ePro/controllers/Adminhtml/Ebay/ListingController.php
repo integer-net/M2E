@@ -339,8 +339,13 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         $sourceProduct = NULL;
 
         foreach ($listingProductCollection as $product) {
+
             $fees = array();
-            $connector = new Ess_M2ePro_Model_Connector_Ebay_Item_List_Verify(array(), $product);
+
+            $connector = new Ess_M2ePro_Model_Connector_Ebay_Item_List_Verify(array(
+                'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN,
+                'logs_action_id' => Mage::getModel('M2ePro/Listing_Log')->getNextActionId()
+            ), $product);
 
             try {
                 $fees = $connector->process();
@@ -724,9 +729,10 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
 
         if ($categoryWasChanged) {
             $templateData = array(
-                'category_main_id' => 0,
-                'category_main_mode' => $categoryMode,
-                'category_main_attribute' => ''
+                'category_main_id'        => 0,
+                'category_main_mode'      => $categoryMode,
+                'category_main_attribute' => '',
+                'marketplace_id'          => $listing->getMarketplaceId()
             );
 
             if ($categoryMode == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {

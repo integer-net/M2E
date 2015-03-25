@@ -226,6 +226,28 @@ class Ess_M2ePro_Model_Ebay_Template_OtherCategory extends Ess_M2ePro_Model_Comp
         return array();
     }
 
+    public function getUsedAttributes()
+    {
+        $usedAttributes = array();
+
+        $src = $this->getCategorySecondarySource();
+        if ($src['mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
+            $usedAttributes[] = $src['attribute'];
+        }
+
+        $src = $this->getStoreCategorySecondarySource();
+        if ($src['mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
+            $usedAttributes[] = $src['attribute'];
+        }
+
+        $src = $this->getStoreCategoryMainSource();
+        if ($src['mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
+            $usedAttributes[] = $src['attribute'];
+        }
+
+        return array_values(array_unique($usedAttributes));
+    }
+
     // #######################################
 
     public function getDefaultSettings()
@@ -252,32 +274,28 @@ class Ess_M2ePro_Model_Ebay_Template_OtherCategory extends Ess_M2ePro_Model_Comp
     // #######################################
 
     /**
-     * @param bool|array $asArrays
+     * @param bool $asArrays
+     * @param string|array $columns
      * @return array
      */
-    public function getAffectedListingsProducts($asArrays = true)
+    public function getAffectedListingsProducts($asArrays = true, $columns = '*')
     {
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $collection */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $collection->addFieldToFilter('template_other_category_id', $this->getId());
 
-        if ($asArrays === false) {
-            return (array)$collection->getItems();
-        }
-
-        if (is_array($asArrays) && !empty($asArrays)) {
+        if (is_array($columns) && !empty($columns)) {
             $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
-            $collection->getSelect()->columns($asArrays);
+            $collection->getSelect()->columns($columns);
         }
 
-        return (array)$collection->getData();
+        return $asArrays ? (array)$collection->getData() : (array)$collection->getItems();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $neededColumns = array('id');
-        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
-
-        if (!$listingsProducts) {
+        $listingsProducts = $this->getAffectedListingsProducts(true, array('id'));
+        if (empty($listingsProducts)) {
             return;
         }
 

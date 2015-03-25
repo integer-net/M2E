@@ -49,7 +49,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table extends Mage_Ad
         $this->_addButton('delete_all', array(
             'label'     => Mage::helper('M2ePro')->__('Truncate Table'),
             'onclick'   => 'deleteConfirm(\'Are you sure?\', \''.$url.'\')',
-            'class'     => 'delete_all'
+            'class'     => 'delete_all delete'
         ));
         //------------------------------
 
@@ -57,7 +57,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table extends Mage_Ad
         $this->_addButton('add_row', array(
             'label'     => Mage::helper('M2ePro')->__('Append Row'),
             'onclick'   => 'DevelopmentDatabaseGridHandlerObj.openTableCellsPopup(\'add\')',
-            'class'     => 'delete_all'
+            'class'     => 'delete_all success'
         ));
         //------------------------------
 

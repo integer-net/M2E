@@ -211,12 +211,12 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
     // M2ePro_TRANSLATIONS
-    // Magento Order is already created for this %component_name% Order. Press Create Order button to create new one.
-            $message = 'Magento Order is already created for this %component_name% Order. ' .
+    // Magento Order is already created for this eBay Order. Press Create Order button to create new one.
+            $message = 'Magento Order is already created for this eBay Order. ' .
                        'Press Create Order button to create new one.';
 
             $this->_getSession()->addWarning(
-                Mage::helper('M2ePro')->__($message, Ess_M2ePro_Helper_Component_Ebay::TITLE)
+                Mage::helper('M2ePro')->__($message)
             );
             $this->_redirect('*/*/view', array('id' => $id));
             return;

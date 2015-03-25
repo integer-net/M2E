@@ -11,7 +11,7 @@
             <li>Select <i>\'I want to use an application to access my Amazon seller account with MWS.\'</i></li>
             <li>Fill in Application Name and Application\'s Developer Account Number, which you can find in the Marketplaces section on the current page.</li>
             <li>Accept the Amazon MWS License Agreement.</li>
-            <li>Copy generated Merchant ID and paste it in the corresponding fields of the current page.</li>
+            <li>Copy generated "Seller ID" / "MWS Auth Token" and paste it in the corresponding fields of the current page.</li>
         </ul>
         Continue working with 3rd Party Listings and Orders settings tabs.
     '); ?>
@@ -25,9 +25,10 @@
     }
 
     $defaults = array(
-        'title' => '',
+        'title'          => '',
         'marketplace_id' => 0,
-        'merchant_id' => ''
+        'merchant_id'    => '',
+        'token'          => ''
     );
 
     $formData = array_merge($defaults, $formData);
@@ -64,6 +65,10 @@
     Event.observe(window, 'load', function() {
         AmazonAccountHandlerObj = new CommonAmazonAccountHandler();
         editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
+
+        <?php if ($isEdit) { ?>
+            AmazonAccountHandlerObj.showGetAccessData(<?php echo $formData['marketplace_id']; ?>);
+        <?php } ?>
     });
     //-----------------------------
 
@@ -76,7 +81,7 @@
     M2ePro.translator.add(<?php echo json_encode(array(
         'The specified title is already used for other account. Account title must be unique.' => Mage::helper('M2ePro')->__('The specified title is already used for other account. Account title must be unique.'),
         'You must choose marketplace first.' => Mage::helper('M2ePro')->__('You must choose marketplace first.'),
-        'M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Merchant ID.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Merchant ID.'),
+        'M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Merchant ID.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Seller ID / MWS Auth Token'),
         'M2E Pro was not able to get access to the Amazon account. Reason: %error_message%' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Amazon account. Reason: %error_message%')
     )); ?>);
 
@@ -165,6 +170,7 @@
                             <?php if ($isEdit) : ?>
                                 <input type="hidden" name="marketplace_id" value="<?php echo $formData['marketplace_id']; ?>" />
                                 <input type="hidden" name="merchant_id" value="<?php echo $formData['merchant_id']; ?>" />
+                                <input type="hidden" name="token" value="<?php echo $formData['token']; ?>" />
                             <?php endif; ?>
 
                         </td>
@@ -193,12 +199,24 @@
 
                     <tr id="marketplaces_merchant_id_container" <?php if (!$isEdit) echo ' style="display:none;"'; ?>>
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Merchant ID'); ?>: <span class="required">*</span></label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Seller ID'); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value" style="width: auto;">
-                            <input type="text" class="M2ePro-marketplace-merchant-id input-text" name="merchant_id" <?php if ($isEdit) echo ' value="'.$formData['merchant_id'].'"'; ?> <?php if ($isEdit) echo ' disabled="disabled"'; ?> class="input-text M2ePro-required-when-visible" />
+                            <input id="merchant_id" type="text" class="M2ePro-marketplace-merchant input-text" name="merchant_id" <?php if ($isEdit) echo ' value="'.$formData['merchant_id'].'"'; ?> <?php if ($isEdit) echo ' disabled="disabled"'; ?> class="input-text M2ePro-required-when-visible" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Paste generated Merchant ID from Amazon. (It must look like: A15UFR7CZVW5YA).'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Paste generated Seller ID from Amazon. (It must look like: A15UFR7CZVW5YA).'); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr id="marketplaces_token_container" <?php if (!$isEdit) echo ' style="display:none;"'; ?>>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('MWS Auth Token'); ?>: <span class="required">*</span></label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <input id="token" type="text" class="M2ePro-marketplace-merchant input-text" name="token" <?php if ($isEdit) echo ' value="'.$formData['token'].'"'; ?> class="input-text M2ePro-required-when-visible" />
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('Paste generated MWS Auth Token from Amazon. (It must look like: amzn.mws.bna3f75c-a683-49c7-6da0-749y33313dft).'); ?></span>
                             </p>
                         </td>
                     </tr>

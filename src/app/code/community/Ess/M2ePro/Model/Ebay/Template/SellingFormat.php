@@ -26,9 +26,10 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const QTY_MODE_ATTRIBUTE     = 4;
     const QTY_MODE_PRODUCT_FIXED = 5;
 
-    const QTY_MAX_POSTED_MODE_OFF = 0;
-    const QTY_MAX_POSTED_MODE_ON = 1;
+    const QTY_MODIFICATION_MODE_OFF = 0;
+    const QTY_MODIFICATION_MODE_ON = 1;
 
+    const QTY_MIN_POSTED_DEFAULT_VALUE = 1;
     const QTY_MAX_POSTED_DEFAULT_VALUE = 10;
 
     const TAX_CATEGORY_MODE_NONE      = 0;
@@ -266,7 +267,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'mode'      => $this->getQtyMode(),
             'value'     => $this->getQtyNumber(),
             'attribute' => $this->getData('qty_custom_attribute'),
-            'qty_max_posted_value_mode' => $this->getQtyMaxPostedValueMode(),
+            'qty_modification_mode' => $this->getQtyModificationMode(),
+            'qty_min_posted_value'      => $this->getQtyMinPostedValue(),
             'qty_max_posted_value'      => $this->getQtyMaxPostedValue(),
             'qty_percentage'            => $this->getQtyPercentage()
         );
@@ -293,19 +295,24 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     //-------------------------
 
-    public function getQtyMaxPostedValueMode()
+    public function getQtyModificationMode()
     {
-        return (int)$this->getData('qty_max_posted_value_mode');
+        return (int)$this->getData('qty_modification_mode');
     }
 
-    public function isQtyMaxPostedValueModeOn()
+    public function isQtyModificationModeOn()
     {
-        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_ON;
+        return $this->getQtyModificationMode() == self::QTY_MODIFICATION_MODE_ON;
     }
 
-    public function isQtyMaxPostedValueModeOff()
+    public function isQtyModificationModeOff()
     {
-        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_OFF;
+        return $this->getQtyModificationMode() == self::QTY_MODIFICATION_MODE_OFF;
+    }
+
+    public function getQtyMinPostedValue()
+    {
+        return (int)$this->getData('qty_min_posted_value');
     }
 
     public function getQtyMaxPostedValue()
@@ -908,7 +915,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'qty_custom_value' => 1,
             'qty_custom_attribute' => '',
             'qty_percentage' => 100,
-            'qty_max_posted_value_mode' => self::QTY_MAX_POSTED_MODE_OFF,
+            'qty_modification_mode' => self::QTY_MODIFICATION_MODE_OFF,
+            'qty_min_posted_value' => self::QTY_MIN_POSTED_DEFAULT_VALUE,
             'qty_max_posted_value' => self::QTY_MAX_POSTED_DEFAULT_VALUE,
 
             'vat_percent'    => 0,
@@ -962,7 +970,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     {
         $simpleSettings = $this->getDefaultSettingsSimpleMode();
 
-        $simpleSettings['qty_max_posted_value_mode'] = self::QTY_MAX_POSTED_MODE_ON;
+        $simpleSettings['qty_modification_mode'] = self::QTY_MODIFICATION_MODE_ON;
 
         return $simpleSettings;
     }
@@ -970,16 +978,17 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     // #######################################
 
     /**
-     * @param bool|array $asArrays
+     * @param bool $asArrays
+     * @param string|array $columns
      * @return array
      */
-    public function getAffectedListingsProducts($asArrays = true)
+    public function getAffectedListingsProducts($asArrays = true, $columns = '*')
     {
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
         $templateManager->setTemplate(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT);
 
         $listingsProducts = $templateManager->getAffectedOwnerObjects(
-            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asArrays
+            Ess_M2ePro_Model_Ebay_Template_Manager::OWNER_LISTING_PRODUCT, $this->getId(), $asArrays, $columns
         );
 
         $listings = $templateManager->getAffectedOwnerObjects(
@@ -991,7 +1000,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             $tempListingsProducts = $listing->getChildObject()
                                             ->getAffectedListingsProductsByTemplate(
                                                 Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
-                                                $asArrays
+                                                $asArrays, $columns
                                             );
 
             foreach ($tempListingsProducts as $listingProduct) {
@@ -1006,10 +1015,8 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $neededColumns = array('id');
-        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
-
-        if (!$listingsProducts) {
+        $listingsProducts = $this->getAffectedListingsProducts(true, array('id'));
+        if (empty($listingsProducts)) {
             return;
         }
 

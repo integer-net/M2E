@@ -801,7 +801,11 @@ class Ess_M2ePro_Model_Play_Listing_Product extends Ess_M2ePro_Model_Component_C
                 $qty = (int)$roundingFunction(($qty/100)*$src['qty_percentage']);
             }
 
-            if ($src['qty_max_posted_value_mode'] && $qty > $src['qty_max_posted_value']) {
+            if ($src['qty_modification_mode'] && $qty < $src['qty_min_posted_value']) {
+                $qty = 0;
+            }
+
+            if ($src['qty_modification_mode'] && $qty > $src['qty_max_posted_value']) {
                 $qty = $src['qty_max_posted_value'];
             }
         }

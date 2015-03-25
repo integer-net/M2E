@@ -10,11 +10,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
     const TIMEOUT_INCREMENT_FOR_ONE_IMAGE = 20; // seconds
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker[]
-     */
-    protected $lockers = array();
-
-    /**
      * @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger
      */
     protected $logger = NULL;
@@ -26,35 +21,22 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
     // ########################################
 
-    public function __construct(array $params = array(),
-                                Ess_M2ePro_Model_Marketplace $marketplace,
-                                Ess_M2ePro_Model_Account $account)
-    {
-        $defaultParams = array(
-            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
-        );
-        $params = array_merge($defaultParams, $params);
-
-        parent::__construct($params,$marketplace,
-                            $account,NULL);
-    }
-
-    // ########################################
-
     public function process()
     {
-        $this->getLogger()->setStatus(
-            Ess_M2ePro_Helper_Data::STATUS_SUCCESS
-        );
-
-        if (!$this->isNeedSendRequest()) {
-            return array();
-        }
-
-        $this->eventBeforeProcess();
-
         try {
+
+            $this->getLogger()->setStatus(
+                Ess_M2ePro_Helper_Data::STATUS_SUCCESS
+            );
+
+            if (!$this->isNeedSendRequest()) {
+                return array();
+            }
+
+            $this->eventBeforeProcess();
+
             $result = parent::process();
+
         } catch (Exception $exception) {
             $this->eventAfterProcess();
             throw $exception;
@@ -72,9 +54,9 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
     // ----------------------------------------
 
-    abstract protected function eventBeforeProcess();
+    protected function eventBeforeProcess() {}
 
-    abstract protected function eventAfterProcess();
+    protected function eventAfterProcess() {}
 
     // ########################################
 
@@ -106,25 +88,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
     // ########################################
 
     /**
-     * @param int $listingProductId
-     * @return Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker
-     */
-    protected function getLocker($listingProductId)
-    {
-        if (empty($this->lockers[$listingProductId])) {
-
-            /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Locker $locker */
-
-            $locker = Mage::getModel('M2ePro/Ebay_Listing_Product_Action_Locker');
-            $locker->setListingProductId($listingProductId);
-
-            $this->lockers[$listingProductId] = $locker;
-        }
-
-        return $this->lockers[$listingProductId];
-    }
-
-    /**
      * @return Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger
      */
     protected function getLogger()
@@ -135,14 +98,11 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
             $logger = Mage::getModel('M2ePro/Ebay_Listing_Product_Action_Logger');
 
-            if (isset($this->params['logs_action_id'])) {
-                $logger->setActionId((int)$this->params['logs_action_id']);
-            } else {
-                $logger->setActionId(
-                    Mage::getModel('M2ePro/Listing_Log')->getNextActionId()
-                );
+            if (!isset($this->params['logs_action_id']) || !isset($this->params['status_changer'])) {
+                throw new Exception('Product connector has not received some params');
             }
 
+            $logger->setActionId((int)$this->params['logs_action_id']);
             $logger->setAction($this->getLogAction());
 
             switch ($this->params['status_changer']) {

@@ -624,32 +624,28 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
     // ########################################
 
     /**
-     * @param bool|array $asArrays
+     * @param bool $asArrays
+     * @param string|array $columns
      * @return array
      */
-    public function getAffectedListingsProducts($asArrays = true)
+    public function getAffectedListingsProducts($asArrays = true, $columns = '*')
     {
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
         $listingProductCollection = Mage::helper('M2ePro/Component_Play')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id', $this->getId());
 
-        if ($asArrays === false) {
-            return (array)$listingProductCollection->getItems();
-        }
-
-        if (is_array($asArrays) && !empty($asArrays)) {
+        if (is_array($columns) && !empty($columns)) {
             $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
-            $listingProductCollection->getSelect()->columns($asArrays);
+            $listingProductCollection->getSelect()->columns($columns);
         }
 
-        return (array)$listingProductCollection->getData();
+        return $asArrays ? (array)$listingProductCollection->getData() : (array)$listingProductCollection->getItems();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $neededColumns = array('id', 'synch_status', 'synch_reasons');
-        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
-
-        if (!$listingsProducts) {
+        $listingsProducts = $this->getAffectedListingsProducts(true, array('id', 'synch_status', 'synch_reasons'));
+        if (empty($listingsProducts)) {
             return;
         }
 

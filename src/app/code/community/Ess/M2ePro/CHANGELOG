@@ -1,3 +1,29 @@
+* 6.2.4.2 (r7990) (01/03/2015)
+
+* Improvement: [eBay] Ability to use translation service for products with different attribute sets (attributes level)
+* Fix: [eBay] Some fixes for Magento with version less than 1.5.x.x (attributes / attributes sets compatibility)
+* Fix: [Amazon] The same Merchant SKU is being listed now. Merchant SKU must be unique for each Amazon item
+
+* 6.2.4.1 (r7782) (26/01/2015)
+
+* Added: [eBay] Ability to set "Minimum QTY to be listed" into Selling Format Template
+* Fix: [eBay] "Notice: Undefined index: marketplace_id" during setup of categories
+
+* 6.2.4 (r7742) (18/01/2015)
+
+* Added: [eBay] Ability to use "Click And Collect" shipping feature for AU site
+* Added: [Amazon] Amazon MWS authorization token (will be required from 31 March 2015)
+* Fix: Lock Item feature didn't work for List/Relist/Revise/Stop connectors
+* Fix: "Cannot send headers; headers already sent" when cron of the extension is working
+* Fix: [eBay] Some error during marketplace inventory data synchronization (getting of changes from channel)
+* Fix: [eBay] The price is not revised/relisted if it was changed on eBay channel side
+* Fix: [eBay] All whitespaces were removed from compatibility note for ePIDs and KTypes
+* Fix: [eBay] Auto actions did not work sometimes if they were created through "Sell On Another eBay Site" tool
+* Fix: [eBay] Wrong grouping of the logs for separated Magento Products in the Listing Grid
+* Fix: [eBay] Wrong "Filled/Empty" filter for "Compatibility" column in listing "Settings" view
+* Fix: [eBay] Duplicate magento orders in some cases
+* Fix: [Amazon / Rakuten.com / Play.com] Magento order was not created for variation product in some cases
+
 * 6.2.3 (r7568) (05/12/2014)
 
 * Added: [eBay] Strike Through Prices for Spain, France, Italy marketplaces

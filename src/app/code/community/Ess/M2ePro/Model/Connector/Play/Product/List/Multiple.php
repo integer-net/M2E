@@ -37,9 +37,9 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
     // ########################################
 
-    protected function prepareListingsProducts($listingProducts)
+    protected function filterManualListingsProducts()
     {
-        foreach ($listingProducts as $key => $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
@@ -47,41 +47,64 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
                 // M2ePro_TRANSLATIONS
                 // Item is already on Play.com, or not available.
-                $this->addListingsProductsLogsMessage($listingProduct,
-                                                      'Item is already on Play.com, or not available.',
-                                                      Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+                $this->addListingsProductsLogsMessage(
+                    $listingProduct,
+                    'Item is already on Play.com, or not available.',
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
 
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
-            $addingSku = $listingProduct->getChildObject()->getSku();
-            empty($addingSku) && $addingSku = $listingProduct->getChildObject()->getAddingSku();
+            /** @var Ess_M2ePro_Model_Play_Listing_Product $playListingProduct */
+            $playListingProduct = $listingProduct->getChildObject();
+
+            if ($playListingProduct->isVariationProduct() && !$playListingProduct->isVariationMatched()) {
+
+                // M2ePro_TRANSLATIONS
+                // You have to select variation.
+                $this->addListingsProductsLogsMessage(
+                    $listingProduct,
+                    'You have to select variation.',
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
+
+                $this->removeAndUnlockListingProduct($listingProduct);
+                continue;
+            }
+
+            $addingSku = $playListingProduct->getSku();
+            empty($addingSku) && $addingSku = $playListingProduct->getAddingSku();
 
             if (!$this->validateSku($addingSku,$listingProduct)) {
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             if ($this->isSkuExistsInM2ePro($addingSku,$listingProduct)) {
 
-                if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
-                    unset($listingProducts[$key]);
+                if ($playListingProduct->getPlayListing()->isGenerateSkuModeNo()) {
+                    $this->removeAndUnlockListingProduct($listingProduct);
                     continue;
                 }
 
                 $addingSku = $this->generateSku($listingProduct);
 
                 if ($addingSku === false) {
-                    // -> Mage::helper('M2ePro')->__('Can\'t generate SKU.');
+
+                    // M2ePro_TRANSLATIONS
+                    // Can't generate SKU.
                     $this->addListingsProductsLogsMessage(
-                        $listingProduct, 'Can\'t generate SKU.',
+                        $listingProduct,
+                        'Can\'t generate SKU.',
                         Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );
 
-                    unset($listingProducts[$key]);
+                    $this->removeAndUnlockListingProduct($listingProduct);
                     continue;
                 }
             }
@@ -90,29 +113,27 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             $listingProduct->setData('sku',$addingSku);
         }
 
-        $this->checkSkuExistence($listingProducts);
+        $this->checkSkuExistence();
 
-        foreach ($listingProducts as $key => $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
             // exception happened
             if (is_null($listingProduct->getData('found_on_play'))) {
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             if ($listingProduct->getData('found_on_play')) {
                 $this->linkItem($listingProduct);
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
             if (!$this->checkGeneralConditions($listingProduct)) {
-                unset($listingProducts[$key]);
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
         }
-
-        return array_values($listingProducts);
     }
 
     // ########################################
@@ -146,7 +167,6 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
         }
 
         $this->checkQtyWarnings();
-
         $this->addSkusToQueue($tempSkus);
 
         return $requestData;
@@ -156,8 +176,11 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
     private function checkGeneralConditions(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $addingGeneralId = $listingProduct->getChildObject()->getGeneralId();
-        $addingGeneralIdType = $listingProduct->getChildObject()->getGeneralIdType();
+        /** @var Ess_M2ePro_Model_Play_Listing_Product $playListingProduct */
+        $playListingProduct = $listingProduct->getChildObject();
+
+        $addingGeneralId = $playListingProduct->getGeneralId();
+        $addingGeneralIdType = $playListingProduct->getGeneralIdType();
 
         if ($this->params['status_changer'] == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER &&
             (empty($addingGeneralId) || empty($addingGeneralIdType))) {
@@ -168,24 +191,28 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             $message .= 'in the Actions dropdown.';
             $message .= ' Assigned Play.com Identifier will be displayed in Play.com Identifier column.';
 
-            $this->addListingsProductsLogsMessage($listingProduct, $message,
-                                                  Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                  Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->addListingsProductsLogsMessage(
+                $listingProduct,
+                $message,
+                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
 
             return false;
         }
 
         empty($addingGeneralId) &&
-            $addingGeneralId = $listingProduct->getChildObject()->getAddingGeneralId();
+            $addingGeneralId = $playListingProduct->getAddingGeneralId();
         empty($addingGeneralIdType) &&
-            $addingGeneralIdType = $listingProduct->getChildObject()->getAddingGeneralIdType();
+            $addingGeneralIdType = $playListingProduct->getAddingGeneralIdType();
 
         if (empty($addingGeneralId) || empty($addingGeneralIdType)) {
 
             // M2ePro_TRANSLATIONS
             // Identifier is not provided. Please, check Listing settings.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'Identifier is not provided. Please, check Listing settings.',
+                $listingProduct,
+                'Identifier is not provided. Please, check Listing settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -193,16 +220,17 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             return false;
         }
 
-        $addingCondition = $listingProduct->getChildObject()->getCondition();
-        empty($addingCondition) && $addingCondition = $listingProduct->getChildObject()->getAddingCondition();
+        $addingCondition = $playListingProduct->getCondition();
+        empty($addingCondition) && $addingCondition = $playListingProduct->getAddingCondition();
 
-        $validConditions = $listingProduct->getListing()->getChildObject()->getConditionValues();
+        $validConditions = $playListingProduct->getPlayListing()->getConditionValues();
 
         if (empty($addingCondition) || !in_array($addingCondition,$validConditions)) {
             // M2ePro_TRANSLATIONS
             // Condition is invalid or missed. Please, check Listing Channel and product settings.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'Condition is invalid or missed. Please, check Listing Channel and product settings.',
+                $listingProduct,
+                'Condition is invalid or missed. Please, check Listing Channel and product settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -210,16 +238,17 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             return false;
         }
 
-        $addingConditionNote = $listingProduct->getChildObject()->getConditionNote();
+        $addingConditionNote = $playListingProduct->getConditionNote();
         if (is_null($addingConditionNote)) {
-            $addingConditionNote = $listingProduct->getChildObject()->getAddingConditionNote();
+            $addingConditionNote = $playListingProduct->getAddingConditionNote();
         }
 
         if (is_null($addingConditionNote)) {
             // M2ePro_TRANSLATIONS
             // Comment is invalid or missed. Please, check Listing Channel and product settings.
             $this->addListingsProductsLogsMessage(
-            $listingProduct, 'Comment is invalid or missed. Please, check Listing Channel and product settings.',
+                $listingProduct,
+                'Comment is invalid or missed. Please, check Listing Channel and product settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -231,7 +260,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             // M2ePro_TRANSLATIONS
             // The length of comment must be less than 1000 characters.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'The length of comment must be less than 1000 characters.',
+                $listingProduct,
+                'The length of comment must be less than 1000 characters.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -239,8 +269,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             return false;
         }
 
-        $dispatchTo = $listingProduct->getChildObject()->getAddingDispatchTo();
-        empty($dispatchTo) && $dispatchTo = $listingProduct->getChildObject()->getDispatchTo();
+        $dispatchTo = $playListingProduct->getAddingDispatchTo();
+        empty($dispatchTo) && $dispatchTo = $playListingProduct->getDispatchTo();
 
         $validDispatchTo = array(
             Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH,
@@ -261,8 +291,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             return false;
         }
 
-        $dispatchFrom = $listingProduct->getChildObject()->getAddingDispatchFrom();
-        empty($dispatchFrom) && $dispatchFrom = $listingProduct->getChildObject()->getDispatchFrom();
+        $dispatchFrom = $playListingProduct->getAddingDispatchFrom();
+        empty($dispatchFrom) && $dispatchFrom = $playListingProduct->getDispatchFrom();
 
         if (empty($dispatchFrom)) {
             // M2ePro_TRANSLATIONS
@@ -280,9 +310,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
         if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
             $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK) {
 
-            $priceGbr = $listingProduct->getChildObject()->getPriceGbr(true);
-
-            if ($priceGbr <= 0) {
+            if ($playListingProduct->getPriceGbr(true) <= 0) {
                 // M2ePro_TRANSLATIONS
                 // The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
@@ -300,9 +328,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
         if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
             $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA) {
 
-            $priceEuro = $listingProduct->getChildObject()->getPriceEuro(true);
-
-            if ($priceEuro <= 0) {
+            if ($playListingProduct->getPriceEuro(true) <= 0) {
                 // M2ePro_TRANSLATIONS
                 // The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.
                 $this->addListingsProductsLogsMessage(
@@ -328,7 +354,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
             // -> Mage::helper('M2ePro')->__('Reference Code is not provided. Please, check Listing settings.');
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'Reference Code is not provided. Please, check Listing settings.',
+                $listingProduct,
+                'Reference Code is not provided. Please, check Listing settings.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -337,10 +364,12 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
         }
 
         if (strlen($sku) > Ess_M2ePro_Model_Play_Listing_Product::SKU_MAX_LENGTH) {
+
        // M2ePro_TRANSLATIONS
        // The length of Reference Code must be less than 26 characters.
             $this->addListingsProductsLogsMessage(
-                $listingProduct, 'The length of Reference Code must be less than 26 characters.',
+                $listingProduct,
+                'The length of Reference Code must be less than 26 characters.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -353,9 +382,9 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
     // ########################################
 
-    private function checkSkuExistence($listingProducts)
+    private function checkSkuExistence()
     {
-        $listingProductsPacks = array_chunk($listingProducts,5,true);
+        $listingProductsPacks = array_chunk($this->listingsProducts,5,true);
 
         foreach ($listingProductsPacks as $listingProductsPack) {
 
@@ -403,14 +432,15 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
                 }
             }
         }
-
-        return $listingProducts;
     }
 
     // ----------------------------------------
 
     private function isSkuExistsInM2ePro($sku, Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
+        /** @var Ess_M2ePro_Model_Play_Listing_Product $playListingProduct */
+        $playListingProduct = $listingProduct->getChildObject();
+
         // check in 3rd party by account and marketplace
 
         $listingOtherCollection = Mage::helper('M2ePro/Component_Play')
@@ -421,7 +451,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
         if ($listingOtherCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
+            if ($playListingProduct->getPlayListing()->isGenerateSkuModeNo()) {
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
 'The same Reference Code was found among 3rd Party Listings. Reference Code must be unique the product to be listed.',
@@ -451,7 +481,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
         if ($listingProductCollection->getSize() > 0) {
 
-            if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
+            if ($playListingProduct->getPlayListing()->isGenerateSkuModeNo()) {
 //->__('The same Reference Code was found among M2E Listings. Reference Code must be unique the product to be listed.');
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
@@ -469,7 +499,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
         $queue = $this->getQueueOfSkus();
         if (in_array($sku,$queue,true) || isset($this->skusToCheck[$sku])) {
 
-            if ($listingProduct->getChildObject()->getPlayListing()->isGenerateSkuModeNo()) {
+            if ($playListingProduct->getPlayListing()->isGenerateSkuModeNo()) {
                 $this->addListingsProductsLogsMessage(
                     $listingProduct,
 'The product with the same Reference Code is being listed now. Reference Code must be unique the product to be listed.',
@@ -488,16 +518,19 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
 
     private function generateSku(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
+        /** @var Ess_M2ePro_Model_Play_Listing_Product $playListingProduct */
+        $playListingProduct = $listingProduct->getChildObject();
+
         $countTriedTemp = 0;
         do {
-            $newSku  = $listingProduct->getChildObject()->getAddingSku();
+            $newSku  = $playListingProduct->getAddingSku();
             $newSku .= '_' . $listingProduct->getProductId() . '_' . $listingProduct->getId();
 
             if (strlen($newSku) >= (Ess_M2ePro_Model_Play_Listing_Product::SKU_MAX_LENGTH - 5)) {
                 $newSku = 'SKU_' . $listingProduct->getProductId() . '_' .$listingProduct->getId();
             }
 
-            $newSku = $listingProduct->getChildObject()->createRandomSku($newSku);
+            $newSku = $playListingProduct->createRandomSku($newSku);
 
         } while ($this->isSkuExistsInM2ePro($newSku,$listingProduct) && ++$countTriedTemp <= 5);
 
@@ -528,6 +561,20 @@ class Ess_M2ePro_Model_Connector_Play_Product_List_Multiple
             'product_id' => $listingProduct->getProductId(),
             'store_id' => $listingProduct->getListing()->getStoreId()
         );
+
+        if ($listingProduct->getChildObject()->isVariationsReady()) {
+
+            $variations = $listingProduct->getVariations(true);
+            /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
+            $variation = reset($variations);
+            $options = $variation->getOptions();
+
+            $dataForAdd['variation_options'] = array();
+            foreach ($options as $optionData) {
+                $dataForAdd['variation_options'][$optionData['attribute']] = $optionData['option'];
+            }
+            $dataForAdd['variation_options'] = json_encode($dataForAdd['variation_options']);
+        }
 
         Mage::getModel('M2ePro/Play_Item')->setData($dataForAdd)->save();
 

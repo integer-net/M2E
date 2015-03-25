@@ -27,9 +27,14 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Template_Category_Collection
 
         $where = '';
         foreach ($primaryCategoriesData as $categoryData) {
+
             $where && $where .= ' OR ';
+
             $categoryData['category_main_id'] = (int)$categoryData['category_main_id'];
-            $where .= "(category_main_id   = {$categoryData['category_main_id']} AND";
+            $categoryData['marketplace_id']   = (int)$categoryData['marketplace_id'];
+
+            $where .= "(marketplace_id  = {$categoryData['marketplace_id']} AND";
+            $where .= " category_main_id   = {$categoryData['category_main_id']} AND";
             $where .= " category_main_mode = {$conn->quote($categoryData['category_main_mode'])} AND";
             $where .= " category_main_attribute = {$conn->quote($categoryData['category_main_attribute'])}) ";
         }

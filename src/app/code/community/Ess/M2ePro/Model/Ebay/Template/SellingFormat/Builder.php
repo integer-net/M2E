@@ -90,8 +90,12 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
             $prepared['qty_percentage'] = (int)$data['qty_percentage'];
         }
 
-        if (isset($data['qty_max_posted_value_mode'])) {
-            $prepared['qty_max_posted_value_mode'] = (int)$data['qty_max_posted_value_mode'];
+        if (isset($data['qty_modification_mode'])) {
+            $prepared['qty_modification_mode'] = (int)$data['qty_modification_mode'];
+        }
+
+        if (isset($data['qty_min_posted_value'])) {
+            $prepared['qty_min_posted_value'] = (int)$data['qty_min_posted_value'];
         }
 
         if (isset($data['qty_max_posted_value'])) {

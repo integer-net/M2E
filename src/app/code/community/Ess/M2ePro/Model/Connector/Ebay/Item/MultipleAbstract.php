@@ -8,7 +8,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
     extends Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 {
     /**
-     * @var array[Ess_M2ePro_Model_Listing_Product]
+     * @var Ess_M2ePro_Model_Listing_Product[]
      */
     protected $listingsProducts = array();
 
@@ -29,34 +29,42 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
 
     // ########################################
 
+    /**
+     * @param array $params
+     * @param Ess_M2ePro_Model_Listing_Product[] $listingsProducts
+     * @throws Exception
+     */
     public function __construct(array $params = array(), array $listingsProducts)
     {
-        if (count($listingsProducts) == 0) {
+        if (empty($listingsProducts)) {
             throw new Exception('Multiple Item Connector has received empty array');
         }
 
+        /** @var Ess_M2ePro_Model_Account $account */
+        $account = reset($listingsProducts)->getAccount();
+        /** @var Ess_M2ePro_Model_Marketplace $marketplace */
+        $marketplace = reset($listingsProducts)->getMarketplace();
+
         foreach($listingsProducts as $listingProduct) {
+
+            $listingProduct->loadInstance($listingProduct->getId());
+
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
                 throw new Exception('Multiple Item Connector has received invalid product data type');
             }
-        }
 
-        $tempAccount = $listingsProducts[0]->getAccount();
-        $tempMarketplace = $listingsProducts[0]->getMarketplace();
-
-        foreach($listingsProducts as $listingProduct) {
-
-            if ($tempAccount->getId() != $listingProduct->getAccount()->getId()) {
+            if ($account->getId() != $listingProduct->getListing()->getAccountId()) {
                 throw new Exception('Multiple Item Connector has received products from different accounts');
             }
 
-            if ($tempMarketplace->getId() != $listingProduct->getMarketplace()->getId()) {
+            if ($marketplace->getId() != $listingProduct->getListing()->getMarketplaceId()) {
                 throw new Exception('Multiple Item Connector has received products from different marketplaces');
             }
+
+            $this->listingsProducts[$listingProduct->getId()] = $listingProduct;
         }
 
-        $this->listingsProducts = $listingsProducts;
-        parent::__construct($params,$tempMarketplace,$tempAccount);
+        parent::__construct($params,$marketplace,$account);
     }
 
     // ########################################
@@ -105,40 +113,90 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
         return $result;
     }
 
-    protected function processResponseInfo($responseInfo)
+    // ----------------------------------------
+
+    protected function eventAfterProcess()
     {
-        try {
-            parent::processResponseInfo($responseInfo);
-        } catch (Exception $exception) {
-
-            $message = array(
-                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR,
-                parent::MESSAGE_TEXT_KEY => $exception->getMessage()
-            );
-
-            foreach ($this->listingsProducts as $listingProduct) {
-                $this->getLogger()->logListingProductMessage($listingProduct, $message,
-                                                             Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
-            }
-
-            throw $exception;
-        }
+        $this->unlockListingsProducts();
     }
 
     // ########################################
 
-    protected function eventBeforeProcess()
+    protected function isNeedSendRequest()
     {
         foreach ($this->listingsProducts as $listingProduct) {
-            $this->getLocker($listingProduct->getId())->update();
+
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
+            $lockItem = Mage::getModel('M2ePro/LockItem');
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK . '_listing_product_' . $listingProduct->getId());
+
+            if ($listingProduct->isLockedObject(NULL) ||
+                $listingProduct->isLockedObject('in_action') ||
+                $lockItem->isExist()) {
+
+                $message = array(
+                    // M2ePro_TRANSLATIONS
+                    // Another action is being processed. Try again when the action is completed.
+                    parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
+                                              . 'Try again when the action is completed.',
+                    parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
+                );
+
+                $this->getLogger()->logListingProductMessage($listingProduct, $message,
+                                                             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+
+                unset($this->listingsProducts[$listingProduct->getId()]);
+                continue;
+            }
+        }
+
+        $this->lockListingsProducts();
+        $this->filterManualListingsProducts();
+
+        return !empty($this->listingsProducts);
+    }
+
+    // -----------------------------------------
+
+    protected function lockListingsProducts()
+    {
+        foreach ($this->listingsProducts as $listingProduct) {
+
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
+            $lockItem = Mage::getModel('M2ePro/LockItem');
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK . '_listing_product_' . $listingProduct->getId());
+
+            $lockItem->create();
+            $lockItem->makeShutdownFunction();
         }
     }
 
-    protected function eventAfterProcess()
+    protected function unlockListingsProducts()
     {
         foreach ($this->listingsProducts as $listingProduct) {
-            $this->getLocker($listingProduct->getId())->remove();
+
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
+            $lockItem = Mage::getModel('M2ePro/LockItem');
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK . '_listing_product_' . $listingProduct->getId());
+
+            $lockItem->remove();
         }
+    }
+
+    // -----------------------------------------
+
+    abstract protected function filterManualListingsProducts();
+
+    protected function removeAndUnlockListingProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$listingProduct->getId());
+        $lockItem->remove();
+
+        unset($this->listingsProducts[$listingProduct->getId()]);
     }
 
     // ########################################
@@ -166,14 +224,11 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
      */
     protected function getListingProduct($id)
     {
-        foreach ($this->listingsProducts as $listingProduct) {
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            if ($listingProduct->getId() == $id) {
-                return $listingProduct;
-            }
+        if (!isset($this->listingsProducts[$id])) {
+            throw new Exception('Listing product was not found');
         }
 
-        throw new Exception('Listing product was not found');
+        return $this->listingsProducts[$id];
     }
 
     /**

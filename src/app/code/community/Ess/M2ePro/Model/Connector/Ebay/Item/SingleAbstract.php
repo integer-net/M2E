@@ -31,7 +31,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
 
     public function __construct(array $params = array(), Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $this->listingProduct = $listingProduct;
+        $this->listingProduct = $listingProduct->loadInstance($listingProduct->getId());
         parent::__construct($params,$this->listingProduct->getMarketplace(),$this->listingProduct->getAccount());
     }
 
@@ -55,35 +55,64 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
         return $result;
     }
 
-    protected function processResponseInfo($responseInfo)
+    // ----------------------------------------
+
+    protected function eventAfterProcess()
     {
-        try {
-            parent::processResponseInfo($responseInfo);
-        } catch (Exception $exception) {
-
-            $message = array(
-                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR,
-                parent::MESSAGE_TEXT_KEY => $exception->getMessage()
-            );
-
-           $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
-
-            throw $exception;
-        }
+        $this->unlockListingProduct();
     }
 
     // ########################################
 
-    protected function eventBeforeProcess()
+    protected function isNeedSendRequest()
     {
-        $this->getLocker($this->listingProduct->getId())->update();
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$this->listingProduct->getId());
+
+        if ($this->listingProduct->isLockedObject(NULL) ||
+            $this->listingProduct->isLockedObject('in_action') ||
+            $lockItem->isExist()) {
+
+            $message = array(
+                // M2ePro_TRANSLATIONS
+                // Another action is being processed. Try again when the action is completed.
+                parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
+                                           .'Try again when the action is completed.',
+                parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
+            );
+
+            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
+                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+
+            return false;
+        }
+
+        $this->lockListingProduct();
+        return $this->filterManualListingProduct();
     }
 
-    protected function eventAfterProcess()
+    // -----------------------------------------
+
+    protected function lockListingProduct()
     {
-        $this->getLocker($this->listingProduct->getId())->remove();
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$this->listingProduct->getId());
+
+        $lockItem->create();
+        $lockItem->makeShutdownFunction();
     }
+
+    protected function unlockListingProduct()
+    {
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$this->listingProduct->getId());
+
+        $lockItem->remove();
+    }
+
+    // -----------------------------------------
+
+    abstract protected function filterManualListingProduct();
 
     // ########################################
 

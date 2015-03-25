@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
     extends Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
 {
-    private $failedListingProductIds = array();
-
     // ########################################
 
     protected function getCommand()
@@ -36,10 +34,6 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            if (in_array($listingProduct->getId(),$this->failedListingProductIds)) {
-                continue;
-            }
-
             $requestDataObject = $this->getRequestDataObject($listingProduct);
             $imagesTimeout += self::TIMEOUT_INCREMENT_FOR_ONE_IMAGE * $requestDataObject->getTotalImagesCount();
         }
@@ -49,7 +43,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
 
     // ########################################
 
-    protected function isNeedSendRequest()
+    protected function filterManualListingsProducts()
     {
         foreach ($this->listingsProducts as $listingProduct) {
 
@@ -67,25 +61,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
                 $this->getLogger()->logListingProductMessage($listingProduct, $message,
                                                              Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
-                $this->failedListingProductIds[] = $listingProduct->getId();
-                continue;
-            }
-
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
-
-                $message = array(
-                    // M2ePro_TRANSLATIONS
-                    // Another action is being processed. Try again when the action is completed.
-                    parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
-                                               .'Try again when the action is completed.',
-                    parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
-                );
-
-                $this->getLogger()->logListingProductMessage($listingProduct, $message,
-                                                             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-
-                $this->failedListingProductIds[] = $listingProduct->getId();
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
@@ -101,7 +77,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
                 $this->getLogger()->logListingProductMessage($listingProduct, $message,
                                                              Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
-                $this->failedListingProductIds[] = $listingProduct->getId();
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
 
@@ -123,16 +99,10 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
                 $this->getLogger()->logListingProductMessage($listingProduct, $message,
                                                              Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
-                $this->failedListingProductIds[] = $listingProduct->getId();
+                $this->removeAndUnlockListingProduct($listingProduct);
                 continue;
             }
         }
-
-        if (count($this->listingsProducts) <= count($this->failedListingProductIds)) {
-            return false;
-        }
-
-        return true;
     }
 
     protected function getRequestData()
@@ -144,10 +114,6 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Multiple
         foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-            if (in_array($listingProduct->getId(),$this->failedListingProductIds)) {
-                continue;
-            }
 
             $this->getRequestObject($listingProduct)->clearVariations();
 

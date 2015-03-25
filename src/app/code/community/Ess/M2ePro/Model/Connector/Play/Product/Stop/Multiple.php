@@ -39,42 +39,44 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_Multiple
 
     // ########################################
 
-    protected function prepareListingsProducts($listingsProducts)
+    protected function filterManualListingsProducts()
     {
-        $tempListingsProducts = array();
-
-        foreach ($listingsProducts as $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            if (!$listingProduct->isListed() && isset($this->params['remove']) && (bool)$this->params['remove']) {
-                $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
-                $listingProduct->deleteInstance();
+            if (!$listingProduct->isStoppable()) {
+
+                $this->removeAndUnlockListingProduct($listingProduct);
+
+                if (!isset($this->params['remove']) || !(bool)$this->params['remove']) {
+
+                    // M2ePro_TRANSLATIONS
+                    // Item is not listed or not available
+                    $this->addListingsProductsLogsMessage(
+                        $listingProduct,
+                        'Item is not listed or not available',
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                    );
+                } else {
+                    $listingProduct->addData(array('status'=>Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED))->save();
+                    $listingProduct->deleteInstance();
+                }
+
                 continue;
             }
 
-            if (!$listingProduct->isListed()) {
+            /** @var Ess_M2ePro_Model_Play_Listing_Product $playListingProduct */
+            $playListingProduct = $listingProduct->getChildObject();
 
-                if (!isset($this->params['remove']) || !(bool)$this->params['remove']) {
-                    // M2ePro_TRANSLATIONS
-                    // Item is not listed or not available
-                    $this->addListingsProductsLogsMessage($listingProduct, 'Item is not listed or not available',
-                                                          Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                          Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-
-                    continue;
-                }
-            }
-
-            $dispatchTo = $listingProduct->getChildObject()->getDispatchTo();
-            empty($dispatchTo) && $dispatchTo = $listingProduct->getChildObject()->getAddingDispatchTo();
+            $dispatchTo = $playListingProduct->getDispatchTo();
+            empty($dispatchTo) && $dispatchTo = $playListingProduct->getAddingDispatchTo();
 
             if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
                 $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK) {
 
-                $priceGbr = $listingProduct->getChildObject()->getPriceGbr(true);
-
-                if ($priceGbr <= 0) {
+                if ($playListingProduct->getPriceGbr(true) <= 0) {
                 // M2ePro_TRANSLATIONS
                 // The price GBP must be greater than 0. Please, check the Selling Format Template and Product settings.
                     $this->addListingsProductsLogsMessage(
@@ -85,6 +87,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_Multiple
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );
 
+                    $this->removeAndUnlockListingProduct($listingProduct);
                     continue;
                 }
             }
@@ -92,9 +95,7 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_Multiple
             if ($dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ||
                 $dispatchTo == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA) {
 
-                $priceEuro = $listingProduct->getChildObject()->getPriceEuro(true);
-
-                if ($priceEuro <= 0) {
+                if ($playListingProduct->getPriceEuro(true) <= 0) {
                 // M2ePro_TRANSLATIONS
                 // The price EUR must be greater than 0. Please, check the Selling Format Template and Product settings.
                     $this->addListingsProductsLogsMessage(
@@ -105,14 +106,11 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_Multiple
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );
 
+                    $this->removeAndUnlockListingProduct($listingProduct);
                     continue;
                 }
             }
-
-            $tempListingsProducts[] = $listingProduct;
         }
-
-        return $tempListingsProducts;
     }
 
     // ########################################

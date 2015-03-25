@@ -16,7 +16,9 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
      */
     public function process($action, $products, array $params = array())
     {
-        $result = Ess_M2ePro_Helper_Data::STATUS_ERROR;
+        $params = array_merge(array(
+            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
+        ), $params);
 
         $this->logsActionId = Mage::getModel('M2ePro/Listing_Other_Log')->getNextActionId();
         $params['logs_action_id'] = $this->logsActionId;
@@ -92,14 +94,23 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
             $logModel = Mage::getModel('M2ePro/Listing_Other_Log');
             $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
-            $logModel->addGlobalMessage(
-                Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
-                $this->logsActionId,
-                Ess_M2ePro_Model_Listing_Other_Log::ACTION_UNKNOWN,
-                Mage::helper('M2ePro')->__($exception->getMessage()),
-                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
-            );
+            $action = $this->recognizeActionForLogging($connectorNameSingle);
+            $initiator = $this->recognizeInitiatorForLogging($params);
+
+            foreach ($products as $product) {
+
+                /** @var Ess_M2ePro_Model_Listing_Other $product */
+
+                $logModel->addProductMessage(
+                    $product->getId(),
+                    $initiator,
+                    $this->logsActionId,
+                    $action,
+                    Mage::helper('M2ePro')->__($exception->getMessage()),
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+                );
+            }
 
             $results[] = Ess_M2ePro_Helper_Data::STATUS_ERROR;
         }
@@ -136,6 +147,46 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
         }
 
         return $productsTemp;
+    }
+
+    // ----------------------------------------
+
+    protected function recognizeInitiatorForLogging(array $params)
+    {
+        $statusChanger = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN;
+        isset($params['status_changer']) && $statusChanger = $params['status_changer'];
+
+        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+
+        if ($statusChanger == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN;
+        } else if ($statusChanger == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_USER;
+        } else {
+            $initiator = Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION;
+        }
+
+        return $initiator;
+    }
+
+    protected function recognizeActionForLogging($connectorNameSingle)
+    {
+        $action = Ess_M2ePro_Model_Listing_Log::ACTION_UNKNOWN;
+
+        switch ($connectorNameSingle)
+        {
+            case 'Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single':
+                $action = Ess_M2ePro_Model_Listing_Other_Log::ACTION_RELIST_PRODUCT;
+                break;
+            case 'Ess_M2ePro_Model_Connector_Ebay_OtherItem_Revise_Single':
+                $action = Ess_M2ePro_Model_Listing_Other_Log::ACTION_REVISE_PRODUCT;
+                break;
+            case 'Ess_M2ePro_Model_Connector_Ebay_OtherItem_Stop_Single':
+                $action = Ess_M2ePro_Model_Listing_Other_Log::ACTION_STOP_PRODUCT;
+                break;
+        }
+
+        return $action;
     }
 
     // ########################################

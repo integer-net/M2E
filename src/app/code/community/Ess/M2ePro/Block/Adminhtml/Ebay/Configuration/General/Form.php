@@ -80,6 +80,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
 
         $attributesForPartsCompatibility = Mage::getResourceModel('catalog/product_attribute_collection')
             ->addVisibleFilter()
+            ->addFieldToFilter('backend_type', array('eq' => 'text'))
             ->addFieldToFilter('frontend_input', array('eq' => 'textarea'))
             ->toArray();
 

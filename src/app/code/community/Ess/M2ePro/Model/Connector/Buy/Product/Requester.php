@@ -8,77 +8,79 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
     extends Ess_M2ePro_Model_Connector_Buy_Requester
 {
     protected $logsActionId = NULL;
-    protected $neededRemoveLocks = array();
 
     protected $isProcessingItems = false;
     protected $status = Ess_M2ePro_Helper_Data::STATUS_SUCCESS;
 
+    /** @var Ess_M2ePro_Model_Listing_Product[] $listingsProducts */
     protected $listingsProducts = array();
     protected $listingProductRequestsData = array();
 
     // ########################################
 
+    /**
+     * @param array $params
+     * @param Ess_M2ePro_Model_Listing_Product[] $listingsProducts
+     * @throws Exception
+     */
     public function __construct(array $params = array(), array $listingsProducts)
     {
-        $defaultParams = array(
-            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
-        );
-        $params = array_merge($defaultParams, $params);
-
-        if (isset($params['logs_action_id'])) {
-            $this->logsActionId = (int)$params['logs_action_id'];
-            unset($params['logs_action_id']);
-        } else {
-            $this->logsActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
+        if (!isset($params['logs_action_id']) || !isset($params['status_changer'])) {
+            throw new Exception('Product connector has not received some params');
         }
 
-        if (count($listingsProducts) == 0) {
+        $this->logsActionId = (int)$params['logs_action_id'];
+
+        if (empty($listingsProducts)) {
             throw new Exception('Product connector has received empty array');
         }
 
+        /** @var Ess_M2ePro_Model_Account $account */
+        $account = reset($listingsProducts)->getAccount();
+
         foreach($listingsProducts as $listingProduct) {
+
+            $listingProduct->loadInstance($listingProduct->getId());
+
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
                 throw new Exception('Product connector has received invalid product data type');
             }
-        }
 
-        $accountObj = $listingsProducts[0]->getListing()->getAccount();
-
-        foreach($listingsProducts as $listingProduct) {
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            if ($accountObj->getId() != $listingProduct->getListing()->getAccountId()) {
+            if ($account->getId() != $listingProduct->getListing()->getAccountId()) {
                 throw new Exception('Product connector has received products from different accounts');
             }
+
+            $this->listingsProducts[$listingProduct->getId()] = $listingProduct;
         }
 
-        parent::__construct($params,$accountObj);
-
-        $listingsProducts = $this->filterLockedListingsProducts($listingsProducts);
-        $listingsProducts = $this->prepareListingsProducts($listingsProducts);
-
-        $this->listingsProducts = array_values($listingsProducts);
-    }
-
-    public function __destruct()
-    {
-        $this->checkUnlockListingProducts();
+        parent::__construct($params,$account);
     }
 
     // ########################################
 
     public function process()
     {
-        $this->setStatus(Ess_M2ePro_Helper_Data::STATUS_SUCCESS);
-        $this->setIsProcessingItems(false);
+        try {
 
-        if (count($this->listingsProducts) <= 0) {
-            return;
+            $this->setIsProcessingItems(false);
+            $this->setStatus(Ess_M2ePro_Helper_Data::STATUS_SUCCESS);
+
+            $this->filterLockedListingsProducts();
+            $this->lockListingsProducts();
+            $this->filterManualListingsProducts();
+
+            if (empty($this->listingsProducts)) {
+                return;
+            }
+
+            $this->setIsProcessingItems(true);
+
+            parent::process();
+
+        } catch (Exception $exception) {
+            $this->unlockListingsProducts();
+            throw $exception;
         }
-
-        $this->setIsProcessingItems(true);
-
-        $this->updateOrLockListingProducts();
-        parent::process();
 
         // When all items are failed in response
         (isset($this->response['data']['messages'])) && $tempMessages = $this->response['data']['messages'];
@@ -86,7 +88,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
             $this->setStatus(Ess_M2ePro_Helper_Data::STATUS_ERROR);
         }
 
-        $this->checkUnlockListingProducts();
+        $this->unlockListingsProducts();
     }
 
     protected function getResponserParams()
@@ -113,7 +115,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
         }
 
         return array(
-            'account_id' => $this->listingsProducts[0]->getListing()->getAccountId(),
+            'account_id' => reset($this->listingsProducts)->getListing()->getAccountId(),
             'action_identifier' => $this->getActionIdentifier(),
             'listing_log_action' => $this->getListingsLogsCurrentAction(),
             'logs_action_id' => $this->logsActionId,
@@ -164,31 +166,31 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
 
     // ########################################
 
-    protected function updateOrLockListingProducts()
+    protected function lockListingsProducts()
     {
-        foreach ($this->listingsProducts as $product) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
-            /** @var $product Ess_M2ePro_Model_Listing_Product */
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
             $lockItem = Mage::getModel('M2ePro/LockItem');
-            $lockItem->setNick(Ess_M2ePro_Helper_Component_Buy::NICK.'_listing_product_'.$product->getId());
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Buy::NICK.'_listing_product_'.$listingProduct->getId());
 
-            if (!$lockItem->isExist()) {
-                $lockItem->create();
-                $lockItem->makeShutdownFunction();
-                $this->neededRemoveLocks[$product->getId()] = $lockItem;
-            }
-
-            $lockItem->activate();
+            $lockItem->create();
+            $lockItem->makeShutdownFunction();
         }
     }
 
-    protected function checkUnlockListingProducts()
+    protected function unlockListingsProducts()
     {
-        foreach ($this->neededRemoveLocks as $lockItem) {
-            $lockItem->isExist() && $lockItem->remove();
+        foreach ($this->listingsProducts as $listingProduct) {
+
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
+            $lockItem = Mage::getModel('M2ePro/LockItem');
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Buy::NICK.'_listing_product_'.$listingProduct->getId());
+
+            $lockItem->remove();
         }
-        $this->neededRemoveLocks = array();
     }
 
     // ########################################
@@ -242,8 +244,6 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
 
     abstract protected function getListingsLogsCurrentAction();
 
-    abstract protected function prepareListingsProducts($listingsProducts);
-
     // ########################################
 
     public function getStatus()
@@ -295,44 +295,47 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
 
     // ########################################
 
-    protected function filterLockedListingsProducts($listingsProducts)
+    protected function filterLockedListingsProducts()
     {
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-        foreach ($listingsProducts as $key => $listingProduct) {
+        foreach ($this->listingsProducts as $listingProduct) {
 
-            if (!in_array($this->getActionIdentifier(),array('stop','stop_and_remove'))) {
-                if ($listingProduct->getChildObject()->isVariationProduct() &&
-                    !$listingProduct->getChildObject()->isVariationMatched()) {
-                    // M2ePro_TRANSLATIONS
-                    // You have to select variation first.
-                    $this->addListingsProductsLogsMessage(
-                        $listingProduct, 'You have to select variation first.',
-                        Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
-                    );
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-                    unset($listingsProducts[$key]);
-                    continue;
-                }
-            }
+            $lockItem = Mage::getModel('M2ePro/LockItem');
+            $lockItem->setNick(Ess_M2ePro_Helper_Component_Buy::NICK.'_listing_product_'.$listingProduct->getId());
 
             if ($listingProduct->isLockedObject(NULL) ||
                 $listingProduct->isLockedObject('in_action') ||
-                $listingProduct->isLockedObject($this->getActionIdentifier().'_action')) {
+                $listingProduct->isLockedObject($this->getActionIdentifier().'_action') ||
+                $lockItem->isExist()
+            ) {
+
                 // M2ePro_TRANSLATIONS
                 // Another action is being processed. Try again when the action is completed.
                 $this->addListingsProductsLogsMessage(
-                    $listingProduct, 'Another action is being processed. Try again when the action is completed.',
+                    $listingProduct,
+                    'Another action is being processed. Try again when the action is completed.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
 
-                unset($listingsProducts[$key]);
+                unset($this->listingsProducts[$listingProduct->getId()]);
                 continue;
             }
         }
+    }
 
-        return $listingsProducts;
+    abstract protected function filterManualListingsProducts();
+
+    // ----------------------------------------
+
+    protected function removeAndUnlockListingProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick(Ess_M2ePro_Helper_Component_Buy::NICK.'_listing_product_'.$listingProduct->getId());
+        $lockItem->remove();
+
+        unset($this->listingsProducts[$listingProduct->getId()]);
     }
 
     // ########################################
@@ -403,8 +406,8 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
         }
 
         if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_BACKORDERS) {
-            // M2ePro_TRANSLATIONS
-            // During the quantity calculation the settings in the "Backorders" field were taken into consideration.
+        // M2ePro_TRANSLATIONS
+        // During the quantity calculation the settings in the "Backorders" field were taken into consideration.
             $this->addListingsProductsLogsMessage(
                 $listingProduct,
                 'During the quantity calculation the settings in the "Backorders" '.

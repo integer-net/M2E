@@ -65,7 +65,7 @@ class Ess_M2ePro_Helper_Magento_Store_View
         return $this->defaultStore;
     }
 
-    public  function getDefaultStoreId()
+    public function getDefaultStoreId()
     {
         return (int)$this->getDefault()->getId();
     }

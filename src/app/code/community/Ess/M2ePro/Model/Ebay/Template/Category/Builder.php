@@ -18,30 +18,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Builder
             $categoryTemplateData['category_main_path'] = $data['category_main_path'];
         }
 
-        $existingTemplates = Mage::getModel('M2ePro/Ebay_Template_Category')->getCollection()
-            ->getItemsByPrimaryCategories(
-                array($categoryTemplateData)
-            );
-
-        /* @var $existingCategoryTemplate Ess_M2ePro_Model_Ebay_Template_Category */
-        foreach ($existingTemplates as $existingCategoryTemplate) {
-            $specifics = $existingCategoryTemplate->getSpecifics();
-
-            foreach ($specifics as &$specific) {
-                unset($specific['id'], $specific['template_category_id']);
-            }
-            unset($specific);
-
-            foreach ($data['specifics'] as &$specific) {
-                unset($specific['id'], $specific['template_category_id']);
-            }
-            unset($specific);
-
-            if ($specifics == $data['specifics']) {
-                return $existingCategoryTemplate;
-            }
-        }
-
         $categoryTemplate = Mage::getModel('M2ePro/Ebay_Template_Category')->setData($categoryTemplateData);
         $categoryTemplate->save();
         //------------------------------

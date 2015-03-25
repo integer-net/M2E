@@ -47,9 +47,10 @@ class Ess_M2ePro_Model_Connector_Amazon_Account_Add_Entity
         );
 
         return array(
-            'title' => $this->account->getTitle(),
-            'user_merchant_id' => $this->params['merchant_id'],
-            'marketplace_id' => $marketplaceObject->getNativeId()
+            'title'          => $this->account->getTitle(),
+            'merchant_id'    => $this->params['merchant_id'],
+            'token'          => $this->params['token'],
+            'marketplace_id' => $marketplaceObject->getNativeId(),
         );
     }
 

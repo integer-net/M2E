@@ -743,30 +743,29 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
     // ########################################
 
     /**
-     * @param bool|array $asArrays
      * @param string $template
+     * @param bool $asArrays
+     * @param string|array $columns
      * @return array
      */
-    public function getAffectedListingsProductsByTemplate($template, $asArrays = true)
+    public function getAffectedListingsProductsByTemplate($template, $asArrays = true, $columns = '*')
     {
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager');
         $templateManager->setTemplate($template);
 
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $collection */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $collection->addFieldToFilter('listing_id', $this->getId());
-        $collection->addFieldToFilter($templateManager->getModeColumnName(),
-                                      Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT);
+        $collection->addFieldToFilter(
+            $templateManager->getModeColumnName(), Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT
+        );
 
-        if ($asArrays === false) {
-            return (array)$collection->getItems();
-        }
-
-        if (is_array($asArrays) && !empty($asArrays)) {
+        if (is_array($columns) && !empty($columns)) {
             $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
-            $collection->getSelect()->columns($asArrays);
+            $collection->getSelect()->columns($columns);
         }
 
-        return (array)$collection->getData();
+        return $asArrays ? (array)$collection->getData() : (array)$collection->getItems();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
@@ -784,7 +783,7 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
                 $newTemplates[$template]->getDataSnapshot(),
                 $oldTemplates[$template]->getDataSnapshot(),
                 $this->getAffectedListingsProductsByTemplate(
-                    $template,
+                    $template, true,
                     $template == Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION ?
                         array('id', 'synch_status', 'synch_reasons') : array('id')
                 )

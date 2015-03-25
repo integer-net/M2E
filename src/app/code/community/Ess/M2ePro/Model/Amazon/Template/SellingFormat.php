@@ -16,9 +16,10 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
     const QTY_MODE_ATTRIBUTE     = 4;
     const QTY_MODE_PRODUCT_FIXED = 5;
 
-    const QTY_MAX_POSTED_MODE_OFF = 0;
-    const QTY_MAX_POSTED_MODE_ON = 1;
+    const QTY_MODIFICATION_MODE_OFF = 0;
+    const QTY_MODIFICATION_MODE_ON = 1;
 
+    const QTY_MIN_POSTED_DEFAULT_VALUE = 1;
     const QTY_MAX_POSTED_DEFAULT_VALUE = 10;
 
     const PRICE_NOT_SET   = 4;
@@ -115,7 +116,8 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
             'mode'      => $this->getQtyMode(),
             'value'     => $this->getQtyNumber(),
             'attribute' => $this->getData('qty_custom_attribute'),
-            'qty_max_posted_value_mode' => $this->getQtyMaxPostedValueMode(),
+            'qty_modification_mode'     => $this->getQtyModificationMode(),
+            'qty_min_posted_value'      => $this->getQtyMinPostedValue(),
             'qty_max_posted_value'      => $this->getQtyMaxPostedValue(),
             'qty_percentage'            => $this->getQtyPercentage()
         );
@@ -142,19 +144,24 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     //-------------------------
 
-    public function getQtyMaxPostedValueMode()
+    public function getQtyModificationMode()
     {
-        return (int)$this->getData('qty_max_posted_value_mode');
+        return (int)$this->getData('qty_modification_mode');
     }
 
-    public function isQtyMaxPostedValueModeOn()
+    public function isQtyModificationModeOn()
     {
-        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_ON;
+        return $this->getQtyModificationMode() == self::QTY_MODIFICATION_MODE_ON;
     }
 
-    public function isQtyMaxPostedValueModeOff()
+    public function isQtyModificationModeOff()
     {
-        return $this->getQtyMaxPostedValueMode() == self::QTY_MAX_POSTED_MODE_OFF;
+        return $this->getQtyModificationMode() == self::QTY_MODIFICATION_MODE_OFF;
+    }
+
+    public function getQtyMinPostedValue()
+    {
+        return (int)$this->getData('qty_min_posted_value');
     }
 
     public function getQtyMaxPostedValue()
@@ -413,37 +420,34 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
     // ########################################
 
     /**
-     * @param bool|array $asArrays
+     * @param bool $asArrays
+     * @param string|array $columns
      * @return array
      */
-    public function getAffectedListingsProducts($asArrays = true)
+    public function getAffectedListingsProducts($asArrays = true, $columns = '*')
     {
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Collection $listingCollection */
         $listingCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing');
         $listingCollection->addFieldToFilter('template_selling_format_id', $this->getId());
         $listingCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
         $listingCollection->getSelect()->columns('id');
 
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
         $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id',array('in' => $listingCollection->getSelect()));
 
-        if ($asArrays === false) {
-            return (array)$listingProductCollection->getItems();
-        }
-
-        if (is_array($asArrays) && !empty($asArrays)) {
+        if (is_array($columns) && !empty($columns)) {
             $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
-            $listingProductCollection->getSelect()->columns($asArrays);
+            $listingProductCollection->getSelect()->columns($columns);
         }
 
-        return (array)$listingProductCollection->getData();
+        return $asArrays ? (array)$listingProductCollection->getData() : (array)$listingProductCollection->getItems();
     }
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $neededColumns = array('id');
-        $listingsProducts = $this->getAffectedListingsProducts($neededColumns);
-
-        if (!$listingsProducts) {
+        $listingsProducts = $this->getAffectedListingsProducts(true, array('id'));
+        if (empty($listingsProducts)) {
             return;
         }
 

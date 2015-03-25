@@ -19,6 +19,13 @@ class Ess_M2ePro_Adminhtml_Development_InspectionController
         echo '<pre>'.print_r(Mage::app()->getCache(), true);
     }
 
+    public function resourcesSettingsAction()
+    {
+        $resourcesConfig = Mage::getConfig()->getNode('global/resources');
+        $resourcesConfig = json_decode(json_encode((array)$resourcesConfig), true);
+        echo '<pre>'.print_r($resourcesConfig, true).'</pre>';
+    }
+
     //#############################################
 
     public function cronScheduleTableAction()

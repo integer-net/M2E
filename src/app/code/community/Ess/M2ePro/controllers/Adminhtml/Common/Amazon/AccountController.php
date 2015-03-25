@@ -79,7 +79,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
         $keys = array(
             'title',
             'marketplace_id',
-            'merchant_id'
+            'merchant_id',
+            'token',
         );
         foreach ($keys as $key) {
             if (isset($post[$key])) {
@@ -387,6 +388,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
 
             if (!$accountObj->isLockedObject('server_synchronize')) {
 
+                /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
                 $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
 
                 if (!$isEdit) {
@@ -394,9 +396,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
                     Mage::helper('M2ePro/Module_License')->setTrial(Ess_M2ePro_Helper_Component_Amazon::NICK);
 
                     $params = array(
-                        'title' => $post['title'],
-                        'marketplace_id' => (int)$post['marketplace_id'],
-                        'merchant_id' => $post['merchant_id'],
+                        'title'            => $post['title'],
+                        'marketplace_id'   => (int)$post['marketplace_id'],
+                        'merchant_id'      => $post['merchant_id'],
+                        'token'            => $post['token'],
                         'related_store_id' => (int)$post['related_store_id']
                     );
 
@@ -405,9 +408,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
                 } else {
 
                     $newData = array(
-                        'title' => $post['title'],
-                        'marketplace_id' => (int)$post['marketplace_id'],
-                        'merchant_id' => $post['merchant_id'],
+                        'title'            => $post['title'],
+                        'marketplace_id'   => (int)$post['marketplace_id'],
+                        'merchant_id'      => $post['merchant_id'],
+                        'token'            => $post['token'],
                         'related_store_id' => (int)$post['related_store_id']
                     );
 
@@ -459,7 +463,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
 
     public function checkAuthAction()
     {
-        $merchantId = $this->getRequest()->getParam('merchant_id');
+        $merchantId    = $this->getRequest()->getParam('merchant_id');
+        $token         = $this->getRequest()->getParam('token');
         $marketplaceId = $this->getRequest()->getParam('marketplace_id');
 
         $result = array (
@@ -467,7 +472,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
             'reason' => null
         );
 
-        if ($merchantId && $marketplaceId) {
+        if ($merchantId && $token && $marketplaceId) {
 
             $marketplaceNativeId = Mage::helper('M2ePro/Component_Amazon')
                 ->getCachedObject('Marketplace',$marketplaceId)
@@ -476,6 +481,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
             $params = array(
                 'marketplace' => $marketplaceNativeId,
                 'merchant_id' => $merchantId,
+                'token'       => $token,
             );
 
             try {

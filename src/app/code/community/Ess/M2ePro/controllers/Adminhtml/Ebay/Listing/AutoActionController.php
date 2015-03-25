@@ -128,9 +128,10 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
 
         if ($categoryWasChanged) {
             $templateData = array(
-                'category_main_id' => 0,
-                'category_main_mode' => $categoryMode,
-                'category_main_attribute' => ''
+                'category_main_id'        => 0,
+                'category_main_mode'      => $categoryMode,
+                'category_main_attribute' => '',
+                'marketplace_id'          => $listing->getMarketplaceId()
             );
 
             if ($categoryMode == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY) {

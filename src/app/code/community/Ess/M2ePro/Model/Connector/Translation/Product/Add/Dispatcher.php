@@ -28,7 +28,6 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
 
         foreach ($sortedProducts as $chunk) {
 
-            $listingId = (int)$chunk['listing_id'];
             $products = (array)$chunk['products'];
 
             if (count($products) <= 0) {
@@ -41,7 +40,7 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
 
             for ($i=0; $i<count($products);$i+=100) {
                 $productsForRequest = array_slice($products,$i,100);
-                $results[] = $this->processProducts($listingId, $productsForRequest, $params);
+                $results[] = $this->processProducts($productsForRequest, $params);
             }
         }
 
@@ -63,13 +62,11 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
     // ########################################
 
     /**
-     * @param int $listingId
      * @param array $products
      * @param array $params
      * @return int
      */
-    protected function processProducts($listingId, array $products,
-                                       array $params = array())
+    protected function processProducts(array $products, array $params = array())
     {
         try {
 

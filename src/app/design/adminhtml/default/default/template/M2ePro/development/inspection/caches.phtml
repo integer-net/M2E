@@ -1,43 +1,46 @@
 <table class="form-list" cellspacing="0" cellpadding="0">
 
-    <tr>
-        <td class="label">
-            <label><?php echo Mage::helper('M2ePro')->__('APC'); ?>: </label>
-        </td>
-        <td class="value">
-            <?php if (Mage::helper('M2ePro/Client_Cache')->isApcAvailable()) { ?>
-                <span>Installed</span><?php if (Mage::helper('M2ePro/Client_Cache')->isApcEnabled()) : echo '<span class="red"> <b>(Enabled)</b></span>'; endif; ?>
-            <?php } else { ?>
-                <span>Not Installed</span>
-            <?php } ?>
-        </td>
-    </tr>
+    <?php if (Mage::helper('M2ePro/Client_Cache')->isApcAvailable()) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('APC'); ?>: </label>
+            </td>
+            <td class="value">
+                <span><?php echo Mage::helper('M2ePro')->__('Installed'); ?></span>
+                <?php if (Mage::helper('M2ePro/Client_Cache')->isApcEnabled()) : ?>
+                    <span class="red" style="font-weight: bold;"> (<?php echo Mage::helper('M2ePro')->__('Enabled'); ?>)</span>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
 
-    <tr>
-        <td class="label">
-            <label><?php echo Mage::helper('M2ePro')->__('Memcached'); ?>: </label>
-        </td>
-        <td class="value">
-            <?php if (Mage::helper('M2ePro/Client_Cache')->isMemchachedAvailable()) { ?>
-                <span>Installed</span><?php if (Mage::helper('M2ePro/Client_Cache')->isMemchachedEnabled()) : echo '<span class="red"> <b>(Enabled)</b></span>'; endif; ?>
-            <?php } else { ?>
-                <span>Not Installed</span>
-            <?php } ?>
-        </td>
-    </tr>
+    <?php if (Mage::helper('M2ePro/Client_Cache')->isMemchachedAvailable()) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Memcached'); ?>: </label>
+            </td>
+            <td class="value">
+                <span><?php echo Mage::helper('M2ePro')->__('Installed'); ?></span>
+                <?php if (Mage::helper('M2ePro/Client_Cache')->isMemchachedEnabled()) : ?>
+                    <span class="red" style="font-weight: bold;"> (<?php echo Mage::helper('M2ePro')->__('Enabled'); ?>)</span>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
 
-    <tr>
-        <td class="label">
-            <label><?php echo Mage::helper('M2ePro')->__('Redis'); ?>: </label>
-        </td>
-        <td class="value">
-            <?php if (Mage::helper('M2ePro/Client_Cache')->isRedisAvailable()) { ?>
-                <span>Installed</span><?php if (Mage::helper('M2ePro/Client_Cache')->isRedisEnabled()) : echo '<span class="red"> <b>(Enabled)</b></span>'; endif; ?>
-            <?php } else { ?>
-                <span>Not Installed</span>
-            <?php } ?>
-        </td>
-    </tr>
+    <?php if (Mage::helper('M2ePro/Client_Cache')->isRedisAvailable()) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Redis'); ?>: </label>
+            </td>
+            <td class="value">
+                <span><?php echo Mage::helper('M2ePro')->__('Installed'); ?></span>
+                <?php if (Mage::helper('M2ePro/Client_Cache')->isRedisEnabled()) : ?>
+                    <span class="red" style="font-weight: bold;"> (<?php echo Mage::helper('M2ePro')->__('Enabled'); ?>)</span>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
 
     <tr>
         <td class="label">
@@ -47,7 +50,18 @@
             <span <?php if (Mage::helper('M2ePro/Client_Cache')->isWrongCacheConfiguration()) : echo 'style="color: red; font-weight: bold;"'; endif; ?>><?php echo get_class(Mage::app()->getCache()->getBackend()); ?></span>
         </td>
         <td class="value">
-            <a style="margin-left: 10px;" href="<?php echo $this->getUrl('*/adminhtml_development_inspection/cacheSettings'); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Show Settings'); ?></a>
+            <a style="margin-left: 10px;" href="<?php echo $this->getUrl('*/adminhtml_development_inspection/cacheSettings'); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('show settings'); ?></a>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Resources Config'); ?>: </label>
+        </td>
+        <td class="value">
+        </td>
+        <td class="value">
+            <a style="margin-left: 10px;" href="<?php echo $this->getUrl('*/adminhtml_development_inspection/resourcesSettings'); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('show'); ?></a>
         </td>
     </tr>
 
@@ -57,10 +71,15 @@
         </td>
         <td class="value">
             <?php if (defined('COMPILER_INCLUDE_PATH')) { ?>
-                <span style="color: red">Enabled [<?php echo Mage::getModel('compiler/process')->getCollectedFilesCount(); ?>]</span>
+                <span style="color: red"><b>Enabled</b> [<?php echo Mage::getModel('compiler/process')->getCollectedFilesCount(); ?>]</span>
             <?php } else { ?>
                 <span>Disabled</span>
             <?php } ?>
         </td>
+        <?php if (defined('COMPILER_INCLUDE_PATH')) : ?>
+            <td class="value">
+                <a style="margin-left: 10px;" href="<?php echo $this->getUrl('*/adminhtml_development_tools_magento/refreshCompilation'); ?>"><?php echo Mage::helper('M2ePro')->__('refresh'); ?></a>
+            </td>
+        <?php endif; ?>
     </tr>
 </table>

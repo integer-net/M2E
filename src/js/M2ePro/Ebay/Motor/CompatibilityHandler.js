@@ -332,7 +332,7 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
         }
         var note = $('mass_note').value;
 
-        note = note.replace(/\s/g, '');
+        note = note.trim();
 
         var attributeContent = [];
         grid.massaction.getCheckedValues().split(',').each(function(id) {
@@ -388,7 +388,7 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
     {
         if ($('note_view_' + id).getStyle('display') == 'none') {
             var value = $('note_edit_' + id).value;
-            value = value.replace(/\s/g, '');
+            value = value.trim();
 
             if (!isCancel) {
                 $('note_view_' + id).innerHTML = value;

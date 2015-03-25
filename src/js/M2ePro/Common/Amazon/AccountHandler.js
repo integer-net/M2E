@@ -11,14 +11,16 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
                                                 M2ePro.formData.id,
                                                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Amazon::NICK'));
 
-        Validation.add('M2ePro-marketplace-merchant-id', M2ePro.translator.translate('M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Merchant ID.'), function(value, el){
+        Validation.add('M2ePro-marketplace-merchant', M2ePro.translator.translate('M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Merchant ID.'), function(value, el){
             // reset error message to the default
             this.error = M2ePro.translator.translate('M2E Pro was not able to get access to the Amazon account. Please, make sure, that you choose correct option on MWS Authorization page and enter correct Merchant ID.');
 
+            var merchant_id    = $('merchant_id').value;
+            var token          = $('token').value;
             var marketplace_id = $('marketplace_id').value;
 
             var pattern = /^[A-Z0-9]*$/;
-            if (!pattern.test(value)) {
+            if (!pattern.test(merchant_id)) {
                 return false;
             }
 
@@ -30,7 +32,8 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
                     method: 'post',
                     asynchronous : false,
                     parameters : {
-                        merchant_id : value,
+                        merchant_id    : merchant_id,
+                        token          : token,
                         marketplace_id : marketplace_id
                     },
                     onSuccess: function (transport)
@@ -127,18 +130,25 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
             obj.hide();
         });
 
-        $('marketplaces_application_name_container').show();
         $('marketplaces_related_store_id_container').show();
         $('marketplaces_merchant_id_container').show();
+        $('marketplaces_token_container').show();
 
-        $('marketplaces_developer_key_container_'+id).show();
-        $('marketplaces_register_url_container_'+id).show();
+        self.showGetAccessData(id);
 
 //        if ($('marketplace_current_mode_'+id).value == 0) {
 //            $('marketplaces_register_url_container_'+id).show();
 //            $('marketplaces_application_name_container_'+id).show();
 //            $('marketplaces_developer_key_container_'+id).show();
 //        }
+    },
+
+    showGetAccessData: function(id)
+    {
+        $('marketplaces_application_name_container').show();
+
+        $('marketplaces_developer_key_container_'+id).show();
+        $('marketplaces_register_url_container_'+id).show();
     },
 
     //----------------------------------

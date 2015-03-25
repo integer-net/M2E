@@ -239,7 +239,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
     protected function printDebugData()
     {
-        if (Mage::helper('M2ePro/Module')->isProductionEnvironment()) {
+        if (!Mage::helper('M2ePro/Module')->isDevelopmentEnvironment()) {
             return;
         }
 

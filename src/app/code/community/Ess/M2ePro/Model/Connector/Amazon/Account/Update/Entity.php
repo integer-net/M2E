@@ -41,12 +41,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Account_Update_Entity
 
     protected function getRequestData()
     {
-        $params = $this->params;
-        if (isset($this->params['merchant_id'])) {
-            $params['user_merchant_id'] = $params['merchant_id'];
-            unset($params['merchant_id']);
-        }
-        return $params;
+        return $this->params;
     }
 
     // ########################################

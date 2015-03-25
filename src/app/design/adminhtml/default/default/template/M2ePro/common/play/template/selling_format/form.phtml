@@ -31,7 +31,8 @@ $default = array(
     'qty_custom_value' => 1,
     'qty_custom_attribute' => '',
     'qty_percentage' => 100,
-    'qty_max_posted_value_mode' => Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON,
+    'qty_modification_mode' => Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODIFICATION_MODE_ON,
+    'qty_min_posted_value' => Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MIN_POSTED_DEFAULT_VALUE,
     'qty_max_posted_value' => Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MAX_POSTED_DEFAULT_VALUE,
 
     'price_gbr_mode' => Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_PRODUCT,
@@ -93,7 +94,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
 
     M2ePro.formData.qty_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_mode']); ?>';
-    M2ePro.formData.qty_max_posted_value_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_max_posted_value_mode']); ?>';
+    M2ePro.formData.qty_modification_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_modification_mode']); ?>';
     M2ePro.formData.qty_custom_attribute = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['qty_custom_attribute']); ?>';
 
     // virtual attribute for QTY_FIXED replacement
@@ -124,8 +125,8 @@ $isEdit = !!$this->getRequest()->getParam('id');
             .observe('change', PlayTemplateSellingFormatHandlerObj.qty_mode_change)
             .simulate('change');
 
-        $('qty_max_posted_value_mode')
-            .observe('change', PlayTemplateSellingFormatHandlerObj.qtyMaxPostedMode_change)
+        $('qty_modification_mode')
+            .observe('change', PlayTemplateSellingFormatHandlerObj.qtyPostedMode_change)
             .simulate('change');
 
         $('price_gbr_mode')
@@ -285,17 +286,30 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 </tr>
 
                 <!-- Max Posted QTY-->
-                <tr id="qty_max_posted_value_mode_tr" style="display: none;">
+                <tr id="qty_modification_mode_tr" style="display: none;">
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Conditional Quantity'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="qty_max_posted_value_mode" name="qty_max_posted_value_mode" class="required-entry">
-                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MAX_POSTED_MODE_OFF; ?>" <?php if ($formData['qty_max_posted_value_mode'] == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MAX_POSTED_MODE_OFF): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON; ?>" <?php if ($formData['qty_max_posted_value_mode'] == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MAX_POSTED_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
+                        <select id="qty_modification_mode" name="qty_modification_mode" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF; ?>" <?php if ($formData['qty_modification_mode'] == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Disabled'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODIFICATION_MODE_ON; ?>" <?php if ($formData['qty_modification_mode'] == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODIFICATION_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('<i>Enables</i> to set the quantity that will be sent on Play.com.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="qty_min_posted_value_tr" style="display: none;">
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Min Quantity to Be Listed'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td id="qty_min_posted_value_td" class="value" style="width: auto;">
+                        <input id="qty_min_posted_value" name="qty_min_posted_value" value="<?php echo $this->escapeHtml($formData['qty_min_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in stock but set a min qty to be listed of 5, item will not be listed on Play.com.</br>
+Otherwise, the item will be listed with quantity according to the settings in the Selling Format Template.'); ?></span>
                         </p>
                     </td>
                 </tr>
