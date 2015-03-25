@@ -1,9 +1,9 @@
-src/app/code/community/Ess/*                            app/code/community/Ess/
+src/app/code/community/Ess/M2ePro                       app/code/community/Ess/M2ePro
 src/app/design/adminhtml/default/default/layout/*       app/design/adminhtml/default/default/layout/
-src/app/design/adminhtml/default/default/template/*     app/design/adminhtml/default/default/template/
+src/app/design/adminhtml/default/default/template/M2ePro     app/design/adminhtml/default/default/template/M2ePro
 src/app/etc/modules/*                                   app/etc/modules/
 src/app/locale/en_GB/*                                  app/locale/en_GB/
 src/app/locale/de_DE/*                                  app/locale/de_DE/
 src/js/M2ePro                                           js/M2ePro
-src/skin/adminhtml/default/default/*                    skin/adminhtml/default/default/
-src/skin/adminhtml/default/enterprise/*                 skin/adminhtml/default/enterprise/
+src/skin/adminhtml/default/default/M2ePro               skin/adminhtml/default/default/M2ePro
+src/skin/adminhtml/default/enterprise/M2ePro            skin/adminhtml/default/enterprise/M2ePro
