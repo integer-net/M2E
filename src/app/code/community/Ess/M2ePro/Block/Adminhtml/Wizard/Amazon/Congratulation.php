@@ -8,22 +8,9 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Congratulation extends Ess_M2ePro
 {
     // ########################################
 
-    protected function _beforeToHtml()
+    protected function getHeaderTextHtml()
     {
-        $temp = parent::_beforeToHtml();
-
-        // Set header text
-        //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Congratulations! (Magento Amazon Integration)');
-        //------------------------------
-
-        return $temp;
-    }
-
-    protected function _toHtml()
-    {
-        return parent::_toHtml()
-            . $this->helper('M2ePro/Module_Wizard')->createBlock('congratulation_content',$this->getNick())->toHtml();
+        return 'Congratulations! (Magento Amazon Integration)';
     }
 
     // ########################################

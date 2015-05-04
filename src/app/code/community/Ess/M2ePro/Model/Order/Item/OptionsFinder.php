@@ -72,7 +72,7 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
             $associatedProduct = $this->getGroupedAssociatedProduct();
 
             if (is_null($associatedProduct)) {
-                throw new Exception('There is no associated product found for grouped product.');
+                throw new Exception('There is no associated Product found for Grouped Product.');
             }
 
             return array(
@@ -117,7 +117,7 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
             }
 
             if (count($configurableAssociatedProducts) != 1) {
-                throw new LogicException('There is no associated product found for configurable product.');
+                throw new LogicException('There is no associated Product found for Configurable Product.');
             }
 
             return $configurableAssociatedProducts;
@@ -204,7 +204,7 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
         // ---------------
 
         if ($this->productType == Ess_M2ePro_Model_Magento_Product::TYPE_CONFIGURABLE && $this->hasFailedOptions()) {
-            throw new Exception('There is no associated product found for configurable product.');
+            throw new Exception('There is no associated Product found for Configurable Product.');
         }
 
         return array(

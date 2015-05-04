@@ -67,7 +67,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Marketplaces
 
         $componentName = '';
         if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Play::TITLE.' ';
+            $componentName = Mage::helper('M2ePro/Component_Play')->getTitle() . ' ';
         }
 
         $params = $this->getParams();
@@ -76,7 +76,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Marketplaces
         $marketplace = Mage::helper('M2ePro/Component_Play')
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
-        $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($componentName.$marketplace->getTitle()));
+        $this->getActualLockItem()->setTitle($componentName.Mage::helper('M2ePro')->__($marketplace->getTitle()));
     }
 
     public function performActions()

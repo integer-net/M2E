@@ -41,7 +41,7 @@ JS;
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
-                'label'   => Mage::helper('M2ePro')->__('Create an M2E Listing'),
+                'label'   => Mage::helper('M2ePro')->__('Create an M2E Pro Listing'),
                 'onclick' => $onClick,
                 'id' => 'create_listing_button'
             ) );

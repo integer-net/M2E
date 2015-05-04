@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
 {
+    const API_APACHE_HANDLER = 'apache2handler';
+
     // ########################################
 
     public function getHost()
@@ -124,11 +126,25 @@ class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
         return @php_sapi_name();
     }
 
+    // ----------------------------------------
+
+    public function isPhpApiApacheHandler()
+    {
+        return $this->getPhpApiName() == self::API_APACHE_HANDLER;
+    }
+
+    public function isPhpApiFastCgi()
+    {
+        return !$this->isPhpApiApacheHandler();
+    }
+
+    // ----------------------------------------
+
     public function getPhpSettings()
     {
         return array(
             'memory_limit' => $this->getMemoryLimit(),
-            'max_execution_time' => @ini_get('max_execution_time'),
+            'max_execution_time' => $this->isPhpApiApacheHandler() ? @ini_get('max_execution_time') : null,
             'phpinfo' => $this->getPhpInfoArray()
         );
     }

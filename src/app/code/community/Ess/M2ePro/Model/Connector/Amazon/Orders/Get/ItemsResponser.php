@@ -4,12 +4,9 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsResponser extends Ess_M2ePro_Model_Connector_Amazon_Responser
+abstract class Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsResponser
+    extends Ess_M2ePro_Model_Connector_Amazon_Responser
 {
-    // ########################################
-
-    protected function unsetLocks($fail = false, $message = NULL) {}
-
     // ########################################
 
     protected function validateResponseData($response)
@@ -21,12 +18,12 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsResponser extends Ess_M2
         return true;
     }
 
-    protected function processResponseData($response)
+    protected function prepareResponseData($response)
     {
         /* @var $marketplace Ess_M2ePro_Model_Marketplace */
         $marketplace = $this->getObjectByParam('Account','account_id')->getChildObject()->getMarketplace();
 
-        $orders = array();
+        $preparedOrders = array();
 
         foreach ($response['items'] as $orderData) {
 
@@ -83,10 +80,10 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsResponser extends Ess_M2
                 );
             }
 
-            $orders[] = $order;
+            $preparedOrders[] = $order;
         }
 
-        return $orders;
+        return $preparedOrders;
     }
 
     private function parseShippingAddress(array $shippingData, Ess_M2ePro_Model_Marketplace $marketplace)

@@ -110,7 +110,7 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
             return $this->_redirect('*/*/index');
         }
         if (is_null($task)) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select item(s) to clear'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Item(s) to clear'));
             return $this->_redirect('*/*/index');
         }
 
@@ -119,7 +119,7 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
                 ->clearMessages($task);
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The synchronization task log has been successfully cleaned.')
+            Mage::helper('M2ePro')->__('The Synchronization Task log has been successfully cleaned.')
         );
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('index'));
     }

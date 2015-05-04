@@ -2,8 +2,8 @@
     <?php echo Mage::helper('M2ePro')->__(
         'Choose how you want to deal with feedback from eBay buyers.<br/><br/>
         If you choose to import feedback from buyers, you can also choose whether to set up automatic responses.<br/><br/>
-        <b>Note:</b> Settings made here only take effect if <b>Feedback Synchronization</b> is enabled in %root_node_label% > Configuration > Synchronization.',
-    Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()); ?>
+        <b>Note:</b> Settings made here only take effect if <b>Feedback Synchronization</b> is enabled in %menu_path% > Synchronization.',
+    Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration')); ?>
 </div>
 
 <?php
@@ -100,7 +100,7 @@
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
                                 '<b>Cycle Mode</b> cycles through the template responses you set up below in turn.<br/>
-                                <b>Random Mode</b> uses a random template response<br/>
+                                <b>Random Mode</b> uses a random template response.<br/>
                                 <b>Disabled</b> means no automatic responses to feedback will be made.'
                             ); ?></span>
                         </p>

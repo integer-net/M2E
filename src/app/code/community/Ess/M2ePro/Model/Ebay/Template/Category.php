@@ -21,9 +21,9 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     private $marketplaceModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Magento_Product
+     * @var Ess_M2ePro_Model_Ebay_Template_Category_Source[]
      */
-    private $magentoProductModel = NULL;
+    private $categorySourceModels = array();
 
     // ########################################
 
@@ -47,7 +47,7 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
         }
 
         $this->marketplaceModel = NULL;
-        $this->magentoProductModel = NULL;
+        $this->categorySourceModels = array();
 
         $this->delete();
         return true;
@@ -80,38 +80,40 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     //---------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Ebay_Template_Category_Source
      */
-    public function getMagentoProduct()
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
-        return $this->magentoProductModel;
-    }
+        $productId = $magentoProduct->getProductId();
 
-    /**
-     * @param Ess_M2ePro_Model_Magento_Product $instance
-     */
-    public function setMagentoProduct(Ess_M2ePro_Model_Magento_Product $instance)
-    {
-        $this->magentoProductModel = $instance;
+        if (!empty($this->categorySourceModels[$productId])) {
+            return $this->categorySourceModels[$productId];
+        }
+
+        $this->categorySourceModels[$productId] = Mage::getModel('M2ePro/Ebay_Template_Category_Source');
+        $this->categorySourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->categorySourceModels[$productId]->setCategoryTemplate($this);
+
+        return $this->categorySourceModels[$productId];
     }
 
     // #######################################
 
+    /**
+     * @param bool $asObjects
+     * @param array $filters
+     * @return array|Ess_M2ePro_Model_Ebay_Template_Category_Specific[]
+     */
     public function getSpecifics($asObjects = false, array $filters = array())
     {
         $specifics = $this->getRelatedSimpleItems('Ebay_Template_Category_Specific','template_category_id',
                                                   $asObjects, $filters);
 
         if ($asObjects) {
+            /** @var Ess_M2ePro_Model_Ebay_Template_Category_Specific $specific */
             foreach ($specifics as $specific) {
-
-                /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
                 $specific->setCategoryTemplate($this);
-
-                /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
-                if (!is_null($this->getMagentoProduct())) {
-                    $specific->setMagentoProduct($this->getMagentoProduct());
-                }
             }
         }
 
@@ -154,55 +156,39 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
         );
     }
 
-    //----------------------------------------
-
-    public function getMainCategory()
+    public function getCategoryPath(Ess_M2ePro_Model_Listing $listing, $withId = true)
     {
         $src = $this->getCategoryMainSource();
 
-        if ($src['mode'] == self::CATEGORY_MODE_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
-    }
-
-    // #######################################
-
-    public function getCategoryPath(Ess_M2ePro_Model_Listing $listing, $withId = true)
-    {
         $data = array(
-            'category_main_id' => $this->getData('category_main_id'),
-            'category_main_mode' => $this->getData('category_main_mode'),
-            'category_main_path' => $this->getData('category_main_path'),
-            'category_main_attribute' => $this->getData('category_main_attribute'),
+            'category_main_id'        => $src['value'],
+            'category_main_mode'      => $src['mode'],
+            'category_main_path'      => $src['path'],
+            'category_main_attribute' => $src['attribute'],
         );
 
         Mage::helper('M2ePro/Component_Ebay_Category')->fillCategoriesPaths($data,$listing);
 
-        if ($withId && $this->getData('category_main_mode') == self::CATEGORY_MODE_EBAY) {
-            $data['category_main_path'] .= ' ('.$data['category_main_id'].')';
+        $path = $data['category_main_path'];
+        if ($withId && $src['mode'] == self::CATEGORY_MODE_EBAY) {
+            $path .= ' ('.$src['value'].')';
         }
 
-        return $data['category_main_path'];
+        return $path;
     }
 
     // #######################################
-
-    public function getTrackingAttributes()
-    {
-        return array();
-    }
 
     public function getUsedAttributes()
     {
         $usedAttributes = array();
 
-        if ($this->getData('category_main_mode') == self::CATEGORY_MODE_ATTRIBUTE) {
-            $usedAttributes[] = $this->getData('category_main_attribute');
+        $categoryMainSrc = $this->getCategoryMainSource();
+
+        if ($categoryMainSrc['mode'] == self::CATEGORY_MODE_ATTRIBUTE) {
+            $usedAttributes[] = $categoryMainSrc['attribute'];
         }
 
-        /** @var Ess_M2ePro_Model_Ebay_Template_Category_Specific $specificModel */
         foreach($this->getSpecifics(true) as $specificModel) {
             $usedAttributes = array_merge($usedAttributes, $specificModel->getUsedAttributes());
         }
@@ -229,7 +215,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     public function getDefaultSettings()
     {
         return array(
-
             'category_main_id' => 0,
             'category_main_path' => '',
             'category_main_mode' => self::CATEGORY_MODE_EBAY,
@@ -272,13 +257,13 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_category');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_category');
         return parent::delete();
     }
 

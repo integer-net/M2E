@@ -106,8 +106,8 @@ class Ess_M2ePro_Helper_Magento_Store extends Mage_Core_Helper_Abstract
         }
 
         $path = $store->getWebsite()->getName();
-        $path .= ' -> ' . $store->getGroup()->getName();
-        $path .= ' -> ' . $store->getName();
+        $path .= ' > ' . $store->getGroup()->getName();
+        $path .= ' > ' . $store->getName();
 
         return $path;
     }

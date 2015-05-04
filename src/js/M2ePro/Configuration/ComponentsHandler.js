@@ -5,19 +5,6 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
 
     initialize: function()
     {
-        Validation.add('M2ePro-require-select-component', M2ePro.translator.translate('You should enable at least one component.'), function(value) {
-
-            var isComponentSelected = false;
-
-            $$('.M2ePro-component-other').each(function(el) {
-                if ($(el).value == 1) {
-                    isComponentSelected = true;
-                }
-            });
-
-            return isComponentSelected;
-        });
-
         Validation.add('M2ePro-check-default-component', M2ePro.translator.translate('Default component should be enabled.'), function(value) {
 
             var componentDefault        = $('view_common_component_default').value.toLowerCase(),
@@ -40,7 +27,7 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    component_mode_change : function()
+    component_mode_change: function()
     {
         var enabledComponents = 0;
 
@@ -70,7 +57,7 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    updateDefaultComponentSelect : function()
+    updateDefaultComponentSelect: function()
     {
         var html       = '',
             selected   = '',
@@ -81,7 +68,7 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK')
             ];
 
-        components.each(function(nick){
+        components.each(function(nick) {
 
             if ($('component_' + nick + '_mode').value == 1) {
 
@@ -96,26 +83,6 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
         });
 
         $('view_common_component_default').innerHTML = html;
-    },
-
-    //----------------------------------
-
-    completeStep : function()
-    {
-        var self = this;
-
-        if(configEditForm.validate()) {
-            new Ajax.Request( M2ePro.url.get('formSubmit', $('config_edit_form').serialize(true)) ,
-                {
-                    method: 'get',
-                    asynchronous: true,
-                    onSuccess: function(transport)
-                    {
-                        window.opener.completeStep = 1;
-                        window.close();
-                    }
-                });
-        };
     }
 
     //----------------------------------

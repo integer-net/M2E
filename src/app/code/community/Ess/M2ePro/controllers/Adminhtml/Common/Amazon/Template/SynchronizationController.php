@@ -12,8 +12,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
     protected function _initAction()
     {
         $this->loadLayout()
-             ->_title(Mage::helper('M2ePro')->__('Templates'))
-             ->_title(Mage::helper('M2ePro')->__('Synchronization Templates'));
+             ->_title(Mage::helper('M2ePro')->__('Policies'))
+             ->_title(Mage::helper('M2ePro')->__('Synchronization Policies'));
 
         $this->getLayout()->getBlock('head')
              ->addJs('M2ePro/Common/Amazon/Template/SynchronizationHandler.js');
@@ -46,7 +46,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
         $model = Mage::helper('M2ePro/Component_Amazon')->getModel('Template_Synchronization')->load($id);
 
         if (!$model->getId() && $id) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Template does not exist'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Policy does not exist'));
             return $this->_redirect('*/adminhtml_common_template_synchronization/index');
         }
 
@@ -107,7 +107,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
             'revise_update_qty_max_applied_value_mode',
             'revise_update_qty_max_applied_value',
             'revise_update_price',
+            'revise_update_details',
+            'revise_update_images',
             'revise_change_selling_format_template',
+            'revise_change_description_template',
             'revise_change_listing'
         );
         foreach ($keys as $key) {
@@ -122,6 +125,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
         $keys = array(
             'relist_mode',
             'relist_filter_user_lock',
+            'relist_send_data',
             'relist_status_enabled',
             'relist_is_in_stock',
             'relist_qty_magento',
@@ -171,7 +175,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
         $id = $model->getId();
         //--------------------
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Template was successfully saved'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Policy was successfully saved'));
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list',array(),array('edit'=>array('id'=>$id))));
     }
 

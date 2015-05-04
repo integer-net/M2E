@@ -13,8 +13,10 @@ class Ess_M2ePro_Model_Play_Synchronization_Orders_Receive_Responser
 
     // ##########################################################
 
-    protected function unsetLocks($fail = false, $message = NULL)
+    public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
+        parent::unsetProcessingLocks($processingRequest);
+
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItemPrefix = Ess_M2ePro_Model_Play_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX;
@@ -26,35 +28,29 @@ class Ess_M2ePro_Model_Play_Synchronization_Orders_Receive_Responser
 
         // --------------------
 
-        $tempObjects = array(
-            $this->getAccount(),
-            Mage::helper('M2ePro/Component_Play')->getMarketplace()
+        $this->getAccount()->deleteObjectLocks(NULL, $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks('synchronization', $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks('synchronization_play', $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks(
+            Ess_M2ePro_Model_Play_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX, $processingRequest->getHash()
         );
+    }
 
-        $tempLocks = array(
-            NULL,
-            'synchronization', 'synchronization_play',
-            $lockItemPrefix
+    public function eventFailedExecuting($message)
+    {
+        parent::eventFailedExecuting($message);
+
+        $this->getSynchronizationLog()->addMessage(
+            Mage::helper('M2ePro')->__($message),
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+            Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
         );
-
-        /* @var Ess_M2ePro_Model_Abstract $object */
-        foreach ($tempObjects as $object) {
-            foreach ($tempLocks as $lock) {
-                $object->deleteObjectLocks($lock,$this->hash);
-            }
-        }
-
-        $fail && $this->getSynchronizationLog()->addMessage(Mage::helper('M2ePro')->__($message),
-                                                       Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                       Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
     }
 
     // ##########################################################
 
     protected function processResponseData($response)
     {
-        $response = parent::processResponseData($response);
-
         try {
 
             $account = $this->getAccount();

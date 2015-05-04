@@ -1,0 +1,10 @@
+<div id="block_notice_common_orders_list" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Orders'); ?>">
+    <?php
+    $menuPath = Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/account');
+    echo Mage::helper('M2ePro')->__('This page contains all orders.<br/><br/>
+    Use Accounts dropdown to filter orders by accounts.
+    If Magento Order, Invoice or / and Shipment was not created automatically,
+    you can create them manually by using appropriate options in the <strong>Action</strong> dropdown.<br/><br/>
+    <b>Note:</b> Automatic creation of Magento Orders, Invoices, and Shipments executes according to <i class="underline">Accounts Settings</i> in (%menu_path% > [Amazon/Rakutem.com/Play.com ] > Orders tab).', $menuPath);
+    ?>
+</div>

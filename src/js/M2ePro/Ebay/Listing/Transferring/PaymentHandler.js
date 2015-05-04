@@ -118,38 +118,36 @@ EbayListingTransferringPaymentHandler = Class.create(CommonHandler, {
             return;
         }
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/getPaymentUrl'),
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : {
-                    account_id: $('transferring_ebay_account').value,
-                    amount:     $('transferring_payment_amount').value,
-                    currency :  $('transferring_payment_currency').value
-                },
-                onSuccess: function (transport)
-                {
-                    if (transport.responseText.evalJSON()['result'] != 'success') {
-                        return;
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/getPaymentUrl'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {
+                account_id: $('transferring_ebay_account').value,
+                amount:     $('transferring_payment_amount').value,
+                currency:  $('transferring_payment_currency').value
+            },
+            onSuccess: function(transport) {
+                if (transport.responseText.evalJSON()['result'] != 'success') {
+                    return;
+                }
+
+                var win = window.open(transport.responseText.evalJSON()['payment_url']);
+                win.focus();
+
+                var intervalId = setInterval(function() {
+                    if (!win.closed) { return; }
+                    clearInterval(intervalId);
+                    if (typeof EbayListingTransferringHandlerObj != 'undefined') {
+                        EbayListingTransferringHandlerObj.refreshTranslationAccount();
+                    } else if (typeof EbayListingTransferringTranslateHandlerObj != 'undefined') {
+                        EbayListingTransferringTranslateHandlerObj.refreshTranslationAccount();
                     }
 
-                    var win = window.open(transport.responseText.evalJSON()['payment_url']);
-                    win.focus();
+                }, 1000);
 
-                    var intervalId = setInterval(function() {
-                        if (!win.closed) { return; }
-                        clearInterval(intervalId);
-                        if (typeof EbayListingTransferringHandlerObj != 'undefined') {
-                            EbayListingTransferringHandlerObj.refreshTranslationAccount();
-                        } else if (typeof EbayListingTransferringTranslateHandlerObj != 'undefined') {
-                            EbayListingTransferringTranslateHandlerObj.refreshTranslationAccount();
-                        }
-
-                    }, 1000);
-
-                    EbayListingTransferringPaymentHandlerObj.popUp.close();
-                }
-            });
+                EbayListingTransferringPaymentHandlerObj.popUp.close();
+            }
+        });
     }
 
     //----------------------------------

@@ -1,5 +1,7 @@
 EbayTemplateEditHandler = Class.create(CommonHandler, {
 
+    //----------------------------------
+
     templateNick: null,
 
     showConfirmMsg: true,
@@ -8,18 +10,18 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
 
     initialize: function()
     {
-        Validation.add('validate-title-uniqueness', M2ePro.translator.translate('Policy title is not unique.'), function(value, el)
-        {
+        Validation.add('validate-title-uniqueness', M2ePro.translator.translate('Policy title is not unique.'), function(value, el) {
+
             var unique = false;
 
-            new Ajax.Request( M2ePro.url.get('adminhtml_ebay_template/isTitleUnique') ,
-            {
-                method: 'get',
-                asynchronous : false,
-                parameters : {
-                    title : $('title').value
+            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_template/isTitleUnique'), {
+                method: 'post',
+                asynchronous: false,
+                parameters: {
+                    id_value: $$('input[name="'+EbayTemplateEditHandlerObj.templateNick+'[id]"]')[0].value,
+                    title: $('title').value
                 },
-                onSuccess: function (transport)
+                onSuccess: function(transport)
                 {
                     unique = transport.responseText.evalJSON()['unique'];
                 }
@@ -37,12 +39,12 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
 
         new Ajax.Request(M2ePro.url.get('adminhtml_ebay_template/getTemplateHtml'), {
             method: 'get',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 marketplace_id: marketplaceId
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
                 var editFormData = $('edit_form_data');
                 if (!editFormData) {
                     editFormData = document.createElement('div');
@@ -120,7 +122,6 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
                 height: 80,
                 width: 650,
                 zIndex: 2100,
-                recenterAuto: false,
                 destroyOnClose: true,
                 hideEffect: Element.hide,
                 showEffect: Element.show,

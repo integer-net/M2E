@@ -20,6 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
         $this->setId('ebayListingViewGridMagento'.$listing->getId());
         //------------------------------
 
+        $this->hideMassactionColumn = true;
         $this->hideMassactionDropDown = true;
         $this->showAdvancedFilterProductsOption = false;
     }
@@ -89,14 +90,15 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
             array('lp' => 'M2ePro/Listing_Product'),
             'product_id=entity_id',
             array(
-                'listing_product_id' => 'id',
+                'id' => 'id',
+                'ebay_status' => 'status',
                 'additional_data' => 'additional_data'
             ),
             '{{table}}.listing_id='.(int)$listing->getId()
         );
         $collection->joinTable(
             array('elp' => 'M2ePro/Ebay_Listing_Product'),
-            'listing_product_id=listing_product_id',
+            'listing_product_id=id',
             array(
                 'end_date'              => 'end_date',
                 'start_date'            => 'start_date',
@@ -127,7 +129,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
         $store = $this->_getStore();
 
         if ($store->getId()) {
-            //$collection->addStoreFilter($store);
             $collection->joinAttribute(
                 'price', 'catalog_product/price', 'entity_id', NULL, 'left', $store->getId()
             );
@@ -163,7 +164,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
     protected function _prepareColumns()
     {
         $this->addColumn('product_id', array(
-            'header'    => Mage::helper('M2ePro')->__('Product ID'),
+            'header'    => Mage::helper('M2ePro')->__('ID'),
             'align'     => 'right',
             'width'     => '100px',
             'type'      => 'number',
@@ -173,7 +174,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
         ));
 
         $this->addColumn('name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title'),
+            'header'    => Mage::helper('M2ePro')->__('Title'),
             'align'     => 'left',
             //'width'     => '100px',
             'type'      => 'text',
@@ -234,7 +235,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
         ));
 
         $this->addColumn('qty', array(
-            'header'    => Mage::helper('M2ePro')->__('Qty'),
+            'header'    => Mage::helper('M2ePro')->__('QTY'),
             'align'     => 'right',
             'width'     => '100px',
             'type'      => 'number',
@@ -298,16 +299,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
             }
         }
         return parent::_addColumnFilterToCollection($column);
-    }
-
-    // ####################################
-
-    protected function _prepareMassaction()
-    {
-        $this->setMassactionIdField('entity_id');
-        $this->setMassactionIdFieldOnlyIndexValue(true);
-
-        return parent::_prepareMassaction();
     }
 
     // ####################################

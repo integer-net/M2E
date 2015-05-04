@@ -22,7 +22,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Selling Format Templates');
+        $this->_headerText = Mage::helper('M2ePro')->__('Selling Format Policies');
         //------------------------------
 
         // Set buttons actions
@@ -46,7 +46,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat
 
         //------------------------------
         $this->_addButton('add', array(
-            'label'     => Mage::helper('M2ePro')->__('Add Selling Format Template'),
+            'label'     => Mage::helper('M2ePro')->__('Add Selling Format Policy'),
             'onclick'   => $this->getAddButtonOnClickAction(),
             'class'     => 'add add-button-drop-down'
         ));
@@ -68,6 +68,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat
     protected function getPlayNewUrl()
     {
         return $this->getUrl('*/adminhtml_common_play_template_sellingFormat/new');
+    }
+
+    // ########################################
+
+    public function getGridHtml()
+    {
+        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_template_sellingFormat_help');
+        return $helpBlock->toHtml() . parent::getGridHtml();
     }
 
     // ########################################

@@ -1,6 +1,10 @@
-EbayListingMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler,{
+EbayListingMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler, {
+
+    //----------------------------------
 
     runningNow: false,
+
+    //----------------------------------
 
     start: function($super,title,status)
     {
@@ -15,7 +19,7 @@ EbayListingMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler,{
         this.save_click(M2ePro.url.get('adminhtml_ebay_listing_create/index'))
     },
 
-    runTask : function(title, url, callBackWhenEnd)
+    runTask: function(title, url, callBackWhenEnd)
     {
         title = title || '';
         url = url || '';
@@ -26,12 +30,11 @@ EbayListingMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler,{
         }
 
         var self = this;
-        new Ajax.Request( M2ePro.url.get('adminhtml_general/synchCheckState') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_general/synchCheckState'), {
             method: 'get',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 if (transport.responseText == self.stateExecuting) {
 
                     self.start(
@@ -47,31 +50,28 @@ EbayListingMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler,{
 
                     self.start(title, M2ePro.translator.translate('Preparing to start. Please wait ...'));
 
-                    new Ajax.Request( url ,
-                    {
+                    new Ajax.Request(url, {
                         method: 'get', asynchronous: true
                     });
 
                     setTimeout(function() {
                         self.startGetExecutingInfo(callBackWhenEnd);
                     },2000);
-
                 }
             }
         });
     },
 
-    startGetExecutingInfo : function(callBackWhenEnd)
+    startGetExecutingInfo: function(callBackWhenEnd)
     {
         callBackWhenEnd = callBackWhenEnd || '';
 
         var self = this;
-        new Ajax.Request( M2ePro.url.get('adminhtml_general/synchGetExecutingInfo') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_general/synchGetExecutingInfo'), {
             method:'get',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 var data = transport.responseText.evalJSON(true);
 
                 if (data.mode == self.stateExecuting) {
@@ -113,4 +113,5 @@ EbayListingMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler,{
         });
     }
 
+    //----------------------------------
 });

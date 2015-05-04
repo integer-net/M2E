@@ -33,7 +33,6 @@ VideoTutorialHandler.prototype = Object.extend(new CommonHandler(), {
             width: 900,
             height: 525,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show,
             closeCallback: function() {

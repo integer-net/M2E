@@ -18,7 +18,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_ItemsResponser
         return true;
     }
 
-    protected function processResponseData($response)
+    protected function prepareResponseData($response)
     {
         $products = array();
 
@@ -48,12 +48,8 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_ItemsResponser
             $products[] = $product;
         }
 
-        $this->processParsedResult($products);
+        return $products;
     }
-
-    // ########################################
-
-    abstract protected function processParsedResult($result);
 
     // ########################################
 }

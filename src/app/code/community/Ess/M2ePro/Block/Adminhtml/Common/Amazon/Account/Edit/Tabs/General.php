@@ -41,13 +41,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit_Tabs_General extends
             }
         }
 
-        $marketplaces = Mage::helper('M2ePro/Component_Amazon')->getCollection('Marketplace')
-                                           ->addFieldToFilter('status',Ess_M2ePro_Model_Marketplace::STATUS_ENABLE)
-                                           ->addFieldToFilter('developer_key',array('notnull' => true))
-                                           ->toArray();
-
+        $marketplaces = Mage::helper('M2ePro/Component_Amazon')->getMarketplacesAvailableForApiCreation();
+        $marketplaces = $marketplaces->toArray();
         $this->marketplaces = $marketplaces['items'];
-        //var_dump($this->marketplaces); exit();
 
         return parent::_beforeToHtml();
     }

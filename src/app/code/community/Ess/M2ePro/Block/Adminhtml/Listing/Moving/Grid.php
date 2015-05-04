@@ -44,7 +44,6 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Moving_Grid extends Mage_Adminhtml_Bloc
         }
 
         $this->addAccountAndMarketplaceFilter($collection);
-        $this->addAttributeSetFilter($collection);
 
         $this->setCollection($collection);
 
@@ -73,30 +72,6 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Moving_Grid extends Mage_Adminhtml_Bloc
             'frame_callback' => array($this, 'callbackColumnTitle')
         ));
 
-        $this->addColumn('products_total_count', array(
-            'header'        => Mage::helper('M2ePro')->__('Total Items'),
-            'align'        => 'right',
-            'type'         => 'number',
-            'width'        => '100px',
-            'index'        => 'products_total_count',
-            'filter_index' => 'products_total_count',
-            'frame_callback' => array($this, 'callbackColumnSourceTotalItems')
-        ));
-
-        $this->addColumn('source_products', array(
-            'header'        => Mage::helper('M2ePro')->__('Source'),
-            'align'        => 'left',
-            'type'         => 'options',
-            'width'        => '100px',
-            'index'        => 'source_products',
-            'options'      => array(
-                Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CUSTOM=>Mage::helper('M2ePro')->__('Products List'),
-                Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CATEGORIES=>Mage::helper('M2ePro')->__('Categories')
-            ),
-            'filter_index' => 'source_products',
-            'frame_callback' => array($this, 'callbackColumnSource')
-        ));
-
         $this->addColumn('store_name', array(
             'header'        => Mage::helper('M2ePro')->__('Store View'),
             'align'        => 'left',
@@ -106,6 +81,16 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Moving_Grid extends Mage_Adminhtml_Bloc
             'filter'    => false,
             'sortable'  => false,
             'frame_callback' => array($this, 'callbackColumnStore')
+        ));
+
+        $this->addColumn('products_total_count', array(
+            'header'        => Mage::helper('M2ePro')->__('Total Items'),
+            'align'        => 'right',
+            'type'         => 'number',
+            'width'        => '100px',
+            'index'        => 'products_total_count',
+            'filter_index' => 'products_total_count',
+            'frame_callback' => array($this, 'callbackColumnSourceTotalItems')
         ));
 
         $this->addColumn('actions', array(
@@ -171,33 +156,13 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Moving_Grid extends Mage_Adminhtml_Bloc
 
     protected function _toHtml()
     {
-        $emptyGrid = json_encode(false);
-
-        $warning = '';
-        if ($this->getCollection()->getSize() < 1) {
-            $warning = Mage::helper('M2ePro')->__(
-                'Listings, which have the same Attribute Set, Marketplace and Account were not found.'
-            );
-            $emptyGrid = json_encode(true);
-            $warning = <<<HTML
-<div class="warning-msg" id="empty_grid_warning">
-    <div style="margin: 10px 0 10px 35px; font-weight: bold;">$warning</div>
-</div>
-HTML;
-            $warning = Mage::helper('M2ePro')->escapeJS($warning);
-        }
+        $buttonBlockHtml = ($this->canDisplayContainer()) ? $this->getNewListingBtnHtml(): '';
 
         $javascriptsMain = <<<JAVASCRIPT
 <script type="text/javascript">
 
     var warning_msg_block = $('empty_grid_warning');
     warning_msg_block && warning_msg_block.remove();
-
-    if ({$emptyGrid}) {
-        $('{$this->getId()}').insert({
-            before: '{$warning}'
-        });
-    }
 
     $$('#listingMovingGrid div.grid th').each(function(el){
         el.style.padding = '2px 4px';
@@ -210,7 +175,7 @@ HTML;
 </script>
 JAVASCRIPT;
 
-        return parent::_toHtml() . $javascriptsMain;
+        return parent::_toHtml() . $buttonBlockHtml . $javascriptsMain;
     }
 
     // ####################################
@@ -236,25 +201,32 @@ JAVASCRIPT;
         $collection->addFieldToFilter('`main_table`.`account_id`', $accountId);
     }
 
-    protected function addAttributeSetFilter($collection)
+    // ####################################
+
+    protected function getNewListingBtnHtml()
     {
-        $attrSetId = Mage::helper('M2ePro/Data_Global')->getValue('attrSetId');
+        $componentMode = Mage::helper('M2ePro/Data_Global')->getValue('componentMode');
 
-        $collection->getSelect()
-            ->join(array('as'=>Mage::getResourceModel('M2ePro/AttributeSet')->getMainTable()),
-                   '`main_table`.`id` = `as`.`object_id`',
-                   null);
+        //------------------------------
+        $newListingUrl = $this->getUrl('*/adminhtml_common_listing_create/index', array(
+            'step' => 1,
+            'clear' => 1,
+            'account_id' => Mage::helper('M2ePro/Data_Global')->getValue('accountId'),
+            'marketplace_id' => Mage::helper('M2ePro/Data_Global')->getValue('marketplaceId'),
+            'creation_mode' => Ess_M2ePro_Helper_View::LISTING_CREATION_MODE_LISTING_ONLY,
+            'component' => $componentMode
+        ));
 
-        if (is_array($attrSetId)) {
-            $collection->addFieldToFilter('`as`.`attribute_set_id`', array('in'=>$attrSetId));
-            $collection->getSelect()
-                ->group('main_table.id')
-                ->having('COUNT(`main_table`.`id`) >= ?', count($attrSetId));
-        } else {
-            $collection->addFieldToFilter('`as`.`attribute_set_id`', $attrSetId);
-        }
+        $data = array(
+            'id'    => 'listingProductMoving_addNew_listing_button',
+            'label' => Mage::helper('M2ePro')->__('Add New Listing'),
+            'style' => 'float: right;',
+            'onclick' => $this->getData('moving_handler_js') . '.startListingCreation(\''.$newListingUrl.'\')'
+        );
+        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        //------------------------------
 
-        $collection->addFieldToFilter('`as`.`object_type`', Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_LISTING);
+        return $buttonBlock->toHtml();
     }
 
     // ####################################

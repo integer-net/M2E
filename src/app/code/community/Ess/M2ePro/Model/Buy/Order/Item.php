@@ -196,13 +196,13 @@ class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_B
 
         if (!is_null($channelItem) && !$buyAccount->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by M2E Pro is disabled in Account settings.'
+                'Magento Order creation for Items listed by M2E Pro is disabled in Account settings.'
             );
         }
 
         if (is_null($channelItem) && !$buyAccount->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by 3rd party software is disabled in Account settings.'
+                'Magento Order creation for Items listed by 3rd party software is disabled in Account settings.'
             );
         }
     }

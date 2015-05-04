@@ -135,10 +135,8 @@ EbayListingCategorySpecificWrapperHandler = Class.create(CommonHandler, {
                 category: category
             },
             onSuccess: function(transport) {
-
                 this.setCurrentCategory(category);
                 callback && callback.call(this, transport);
-
             }.bind(this)
         });
     },
@@ -182,7 +180,6 @@ EbayListingCategorySpecificWrapperHandler = Class.create(CommonHandler, {
                     setLocation(M2ePro.url.get('adminhtml_ebay_listing/review'))
                 }
             });
-
         });
     },
 
@@ -200,7 +197,6 @@ EbayListingCategorySpecificWrapperHandler = Class.create(CommonHandler, {
             width: 430,
             height: 250,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -234,5 +230,4 @@ EbayListingCategorySpecificWrapperHandler = Class.create(CommonHandler, {
     }
 
     //----------------------------------
-
 });

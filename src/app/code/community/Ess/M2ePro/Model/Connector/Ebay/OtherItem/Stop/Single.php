@@ -16,7 +16,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Stop_Single
         return array('item','update','end');
     }
 
-    protected function getLogAction()
+    protected function getLogsAction()
     {
         return Ess_M2ePro_Model_Listing_Other_Log::ACTION_STOP_PRODUCT;
     }

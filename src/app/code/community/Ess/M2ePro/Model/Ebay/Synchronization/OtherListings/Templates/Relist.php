@@ -42,7 +42,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Relist
 
     private function immediatelyChangedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was changed');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was changed');
 
         $changedListingsOthers = $this->getChangedInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
@@ -100,7 +100,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Relist
 
         // Correct synchronization
         //--------------------
-        if (!$listingOther->getAccount()->getChildObject()->isOtherListingsMappedSynchronizationEnabled()) {
+        if (!$ebaySynchronizationTemplate->isMode()) {
             return false;
         }
 

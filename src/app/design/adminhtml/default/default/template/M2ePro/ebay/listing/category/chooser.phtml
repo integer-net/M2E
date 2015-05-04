@@ -41,6 +41,7 @@
     EbayListingCategoryChooserHandlerObj.setSelectedCategories(<?php echo json_encode($this->getInternalData()); ?>);
     EbayListingCategoryChooserHandlerObj.setAttributes(<?php echo json_encode($this->getAttributes()); ?>);
     EbayListingCategoryChooserHandlerObj.setInterfaceMode(<?php echo json_encode($this->getInterfaceMode()); ?>);
+    EbayListingCategoryChooserHandlerObj.setIsWizardMode(<?php echo json_encode(!Mage::helper('M2ePro/View_Ebay')->isInstallationWizardFinished()); ?>);
 
     <?php if ($isSingleCategoryMode): ?>
         EbayListingCategoryChooserHandlerObj.setSingleCategoryMode(<?php echo json_encode($isSingleCategoryMode); ?>);

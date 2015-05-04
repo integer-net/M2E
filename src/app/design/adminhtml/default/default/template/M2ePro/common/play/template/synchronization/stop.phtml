@@ -1,8 +1,8 @@
 <div id="block_notice_play_template_synchronization_stop" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Stop Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Stop Rules define the conditions when Play.com items listing must be
-    stopped, depending on Magento product state.<br/><br/>
-    <b>Note:</b> If all Stop Conditions are set to <i>No</i> or <i>No Action</i>, then the stop option for Play.com items is disabled.<br/>
-    If all Stop Conditions are enabled, then an item will be stopped if at least one of Stop Conditions is met.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('Stop Rules define the conditions when Play.com Items listing must be
+    stopped, depending on Magento Product state.<br/><br/>
+    <b>Note:</b> If all Stop Conditions are set to <i>No</i> or <i>No Action</i>, then the stop option for Play.com Items is disabled.<br/>
+    If all Stop Conditions are enabled, then an Item will be stopped if at least one of Stop Conditions is met.'); ?>
 </div>
 
 <?php
@@ -68,7 +68,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::STOP_OUT_OFF_STOCK_YES; ?>" <?php if ($formData['stop_status_disabled'] == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_STATUS_DISABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops item(s) if its status has been changed to \'Disabled\' in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if its status has been changed to \'Disabled\' in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -83,14 +83,14 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::STOP_OUT_OFF_STOCK_YES; ?>" <?php if ($formData['stop_out_off_stock'] == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_OUT_OFF_STOCK_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops item(s) if its stock availability has been changed to \'Out of Stock\' in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if its stock availability has been changed to \'Out of Stock\' in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Stop When Magento QTY Is'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Stop When Magento Quantity Is'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="stop_qty_magento" name="stop_qty_magento" class="required-entry" qty_type="magento">
@@ -100,7 +100,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN; ?>" <?php if ($formData['stop_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops item(s) if Magento quantity has been changed and meets the conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if Magento Quantity has been changed and meets the conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -128,7 +128,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Stop When Calculated QTY Is'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Stop When Calculated Quantity Is'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="stop_qty_calculated" name="stop_qty_calculated" class="required-entry" qty_type="calculated">
@@ -138,7 +138,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN; ?>" <?php if ($formData['stop_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::STOP_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops item(s) if calculated quantity according to the selling format template has been changed and meets the conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if calculated Quantity according to the selling format policy has been changed and meets the conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>

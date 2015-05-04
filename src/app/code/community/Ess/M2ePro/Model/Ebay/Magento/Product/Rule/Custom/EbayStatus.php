@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Ebay_Magento_Product_Rule_Custom_EbayStatus
 
     public function getValueByProductInstance(Mage_Catalog_Model_Product $product)
     {
-        return $product->getData('status');
+        return $product->getData('ebay_status');
     }
 
     public function getInputType()

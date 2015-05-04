@@ -37,7 +37,7 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
 
         var filters = $$('#'+this.containerId+' .filter input', '#'+this.containerId+' .filter select');
         var elements = [];
-        for(var i in filters){
+        for(var i in filters) {
             if(filters[i].value && filters[i].value.length) elements.push(filters[i]);
         }
         if (!this.doFilterCallback || (this.doFilterCallback && this.doFilterCallback())) {
@@ -47,6 +47,8 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
             for (var param in ruleParams) {
                 numParams++;
             }
+
+            this.reloadParams = this.reloadParams || {};
 
             for (var reloadParam in this.reloadParams) {
                 reloadParam.match('^rule|^hide') && delete this.reloadParams[reloadParam];
@@ -69,6 +71,10 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
 
     resetFilter: function()
     {
+        if (!this.reloadParams) {
+            this.reloadParams = Object.extend({});
+        }
+
         for (var reloadParam in this.reloadParams) {
             reloadParam.match('^rule|^hide') && delete this.reloadParams[reloadParam];
         }
@@ -113,15 +119,6 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
     getSelectedProducts: function()
     {
         var selectedProducts = window[this.getGridId() + '_massactionJsObject'].checkedString;
-        if (window.location.href.indexOf('/step/') + 1 && !selectedProducts) {
-            var isEmpty = confirm(M2ePro.text.create_empty_listing_message);
-
-            if (isEmpty) {
-                return true;
-            }
-
-            return false;
-        }
 
         if (!selectedProducts) {
             alert(M2ePro.text.select_items_message);

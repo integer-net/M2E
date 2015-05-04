@@ -49,6 +49,16 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
     const WEIGHT_MODE_CUSTOM_VALUE = 1;
     const WEIGHT_MODE_CUSTOM_ATTRIBUTE = 2;
 
+    /**
+     * @var Ess_M2ePro_Model_Buy_Template_NewProduct
+     */
+    private $newProductTemplateModel = NULL;
+
+    /**
+     * @var Ess_M2ePro_Model_Buy_Template_NewProduct_Core_Source[]
+     */
+    private $newProductCoreSourceModels = array();
+
     // ########################################
 
     public function _construct()
@@ -65,12 +75,64 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
             return false;
         }
 
-        $this->delete();
-
-        return true;
+        $temp = parent::deleteInstance();
+        $temp && $this->newProductTemplateModel = NULL;
+        $temp && $this->newProductCoreSourceModels = array();
+        return $temp;
     }
 
     // ########################################
+
+    /**
+     * @return Ess_M2ePro_Model_Buy_Template_NewProduct
+     */
+    public function getNewProductTemplate()
+    {
+        if (is_null($this->newProductTemplateModel)) {
+
+            $this->newProductTemplateModel = Mage::helper('M2ePro')->getCachedObject(
+                'Buy_Template_NewProduct', $this->getTemplateNewProductId(), NULL, array('template')
+            );
+        }
+
+        return $this->newProductTemplateModel;
+    }
+
+    /**
+     * @param Ess_M2ePro_Model_Buy_Template_NewProduct $instance
+     */
+    public function setNewProductTemplate(Ess_M2ePro_Model_Buy_Template_NewProduct $instance)
+    {
+        $this->newProductTemplateModel = $instance;
+    }
+
+    //------------------------------------------
+
+    /**
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Buy_Template_NewProduct_Core_Source
+     */
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
+    {
+        $productId = $magentoProduct->getProductId();
+
+        if (!empty($this->newProductCoreSourceModels[$productId])) {
+            return $this->newProductCoreSourceModels[$productId];
+        }
+
+        $this->newProductCoreSourceModels[$productId] = Mage::getModel('M2ePro/Buy_Template_NewProduct_Core_Source');
+        $this->newProductCoreSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->newProductCoreSourceModels[$productId]->setNewProductCoreTemplate($this);
+
+        return $this->newProductCoreSourceModels[$productId];
+    }
+
+    // ########################################
+
+    public function getTemplateNewProductId()
+    {
+        return (int)$this->getData('template_new_product_id');
+    }
 
     public function getSellerSkuCustomAttribute()
     {
@@ -527,8 +589,8 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
 
     public function getArrayFeatures()
     {
-        return is_null($this->getData('features_template')) ? array() :
-                json_decode($this->getData('features_template'),true);
+        $value = $this->getData('features_template');
+        return is_null($value) ? array() : json_decode($value, true);
     }
 
     public function getFeaturesAttributes()

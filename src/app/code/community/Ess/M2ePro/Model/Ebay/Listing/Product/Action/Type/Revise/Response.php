@@ -75,43 +75,43 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
 
         $sequenceString = '';
 
-        if ($this->getRequestData()->hasVariationsData()) {
+        if ($this->getRequestData()->hasVariations()) {
             // M2ePro_TRANSLATIONS
             // variations
             $sequenceString .= 'variations,';
         }
 
-        if ($this->getRequestData()->hasQtyData()) {
+        if ($this->getRequestData()->hasQty()) {
             // M2ePro_TRANSLATIONS
-            // qty
-            $sequenceString .= 'qty,';
+            // QTY
+            $sequenceString .= 'QTY,';
         }
 
-        if ($this->getRequestData()->hasPriceData()) {
+        if ($this->getRequestData()->hasPrice()) {
             // M2ePro_TRANSLATIONS
-            // price
-            $sequenceString .= 'price,';
+            // Price
+            $sequenceString .= 'Price,';
         }
 
-        if ($this->getRequestData()->hasTitleData()) {
+        if ($this->getRequestData()->hasTitle()) {
             // M2ePro_TRANSLATIONS
             // title
             $sequenceString .= 'title,';
         }
 
-        if ($this->getRequestData()->hasSubtitleData()) {
+        if ($this->getRequestData()->hasSubtitle()) {
             // M2ePro_TRANSLATIONS
             // subtitle
             $sequenceString .= 'subtitle,';
         }
 
-        if ($this->getRequestData()->hasDescriptionData()) {
+        if ($this->getRequestData()->hasDescription()) {
             // M2ePro_TRANSLATIONS
             // description
             $sequenceString .= 'description,';
         }
 
-        if ($this->getRequestData()->hasImagesData()) {
+        if ($this->getRequestData()->hasImages()) {
             // M2ePro_TRANSLATIONS
             // images
             $sequenceString .= 'images,';
@@ -122,6 +122,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
             // Item was successfully revised
             return 'Item was successfully revised';
         }
+
         // M2ePro_TRANSLATIONS
         // was successfully revised
         return ucfirst(trim($sequenceString,',')).' was successfully revised';
@@ -159,12 +160,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
         }
 
         if (!$this->getEbayListingProduct()->isListingTypeFixed() ||
-            !$this->getRequestData()->hasVariationsData() ||
+            !$this->getRequestData()->hasVariations() ||
             !isset($data['online_buyitnow_price'])) {
             return $data;
         }
 
-        $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPriceData(true);
+        $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPrice(true);
 
         return $data;
     }

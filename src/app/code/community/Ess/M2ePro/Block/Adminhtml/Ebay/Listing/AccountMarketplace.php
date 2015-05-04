@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AccountMarketplace
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Creating A New M2E Listing');
+        $this->_headerText = Mage::helper('M2ePro')->__('Creating A New M2E Pro Listing');
         //------------------------------
 
         // Set buttons actions

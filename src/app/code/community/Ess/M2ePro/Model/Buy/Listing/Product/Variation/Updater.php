@@ -9,62 +9,75 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Updater
 {
     // ########################################
 
-    public function updateVariations(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    public function process(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $options = array();
-
-        if ($listingProduct->getMagentoProduct()->isProductWithoutVariations()) {
-
-            $listingProduct->setData('is_variation_product',
-                                     Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_NO)
-                           ->save();
-
-            if ($listingProduct->getChildObject()->isVariationMatched()) {
-                $listingProduct->getChildObject()->updateVariationOptions($options);
-                $listingProduct->getChildObject()->unsetMatchedVariation();
-            }
-
+        if ($this->checkChangeAsVariationProduct($listingProduct)) {
             return;
         }
 
-        $listingProduct->setData('is_variation_product',
-                                 Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_YES)
-                       ->save();
-
-        $magentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
-        foreach ($magentoVariations['set'] as $attribute => $value) {
-            $options[] = array(
-                'attribute' => $attribute,
-                'option' => NULL
-            );
-        }
-
-        if (!$listingProduct->getChildObject()->isVariationMatched()) {
-            $listingProduct->getChildObject()->updateVariationOptions($options);
+        if ($this->checkChangeAsNotVariationProduct($listingProduct)) {
             return;
         }
 
-        // observe variation removal in Magento
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
 
-        $currentVariation = $this->prepareCurrentVariations($listingProduct->getVariations(true));
-        if (!isset($currentVariation[0]) || !isset($currentVariation[0]['options'])) {
+        if (!$variationManager->isVariationProduct()) {
             return;
         }
-        $currentVariation = reset($currentVariation);
-        $magentoVariations = $this->prepareMagentoVariations($magentoVariations);
 
-        foreach ($magentoVariations as $magentoVariation) {
-            if ($this->isEqualVariations($magentoVariation['options'],$currentVariation['options'])) {
-                return;
-            }
+        $this->checkVariationStructureChanges($listingProduct);
+    }
+
+    // ########################################
+
+    private function checkChangeAsVariationProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+        $isVariationMagentoProduct = $listingProduct->getMagentoProduct()->isProductWithVariations();
+
+        if (!$isVariationMagentoProduct || $variationManager->isVariationProduct()) {
+            return false;
         }
 
-        foreach ($listingProduct->getVariations(true) as $variation) {
-            $variation->deleteInstance();
+        $listingProduct->setData('is_variation_product',1)->save();
+        $variationManager->resetProductVariation();
+
+        return true;
+    }
+
+    private function checkChangeAsNotVariationProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+        $isVariationMagentoProduct = $listingProduct->getMagentoProduct()->isProductWithVariations();
+
+        if ($isVariationMagentoProduct || !$variationManager->isVariationProduct()) {
+            return false;
         }
 
-        $listingProduct->getChildObject()->updateVariationOptions($options);
-        $listingProduct->getChildObject()->unsetMatchedVariation();
+        $variationManager->clearVariationData();
+        $listingProduct->setData('is_variation_product', 0)->save();
+
+        return true;
+    }
+
+    // ----------------------------------------
+
+    private function checkVariationStructureChanges(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+
+        if (!$variationManager->isActualProductAttributes()) {
+            $variationManager->resetProductVariation();
+            return;
+        }
+
+        if ($variationManager->isVariationProductMatched() && !$variationManager->isActualProductVariation()) {
+            $variationManager->unsetProductVariation();
+        }
     }
 
     // ########################################

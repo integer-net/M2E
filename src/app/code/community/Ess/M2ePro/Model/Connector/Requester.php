@@ -25,98 +25,92 @@ abstract class Ess_M2ePro_Model_Connector_Requester extends Ess_M2ePro_Model_Con
             $responseData = array($responseData);
         }
 
-        $isProcessingResponse = isset($responseData['processing_id']);
+        /** @var Ess_M2ePro_Model_Connector_ResponserRunner $responserRunner */
 
-        if ($isProcessingResponse) {
-            $processingId = (string)$responseData['processing_id'];
-        } else {
-            $processingId = $this->createNewRandomHash();
-        }
-
-        /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-        $processingRequest = $this->createProcessingRequest($processingId);
-        $this->setLocks($processingRequest->getHash());
-
-        if (!$isProcessingResponse) {
-
+        if (isset($responseData['processing_id'])) {
             /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-            $modelName = $processingRequest->getResponserModel();
-            $className = Mage::getConfig()->getModelClassName($modelName);
-
-            /** @var $responserObject Ess_M2ePro_Model_Connector_Responser */
-            $responserObject = new $className($processingRequest);
-            $responserObject->processCompleted((array)$responseData,(array)$this->messages);
+            $processingRequest = $this->createProcessingRequest((string)$responseData['processing_id']);
+            $responserRunner = $processingRequest->getResponserRunner();
+        } else {
+            $responserRunner = Mage::getModel('M2ePro/Connector_ResponserRunner');
+            $responserRunner->setResponserModelName($this->getResponserModelName());
+            $responserRunner->setResponserParams($this->getResponserParams());
         }
+
+        $responserRunner->start($this);
+
+        if (isset($responseData['processing_id'])) {
+            return null;
+        }
+
+        $processResult = $responserRunner->process($responseData, $this->messages);
+        if (!$processResult) {
+            return false;
+        }
+
+        return $responserRunner->getParsedResponseData();
     }
-
-    //-----------------------------------------
-
-    abstract protected function setLocks($hash);
 
     // ########################################
 
-    private function createNewRandomHash()
-    {
-        $domain = Mage::helper('M2ePro/Client')->getDomain();
-        return sha1(rand(1,1000000).microtime(true).$domain);
-    }
+    public function eventBeforeExecuting() {}
 
-    private function createProcessingRequest($processingId)
+    // ----------------------------------------
+
+    public function eventBeforeProcessing() {}
+
+    public function setProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest) {}
+
+    // ########################################
+
+    protected function createProcessingRequest($processingId)
     {
-        // Create request
-        //------------------
-        $dataForAdd = array(
-            'hash'             => $this->createNewRandomHash(),
-            'processing_hash'  => $processingId,
-            'component'        => strtolower($this->getComponent()),
-            'perform_type'     => $this->getPerformType(),
-            'request_body'     => json_encode($this->request),
-            'responser_model'  => $this->makeResponserModel(),
-            'responser_params' => json_encode((array)$this->getResponserParams()),
-            'expiration_date'  => $this->getProcessingExpirationDate()
+        $processingRequestData = array_merge(
+            $this->getProcessingData(),
+            array(
+                'processing_hash' => $processingId,
+                'hash' => Mage::helper('M2ePro')->generateUniqueHash(Mage::helper('M2ePro/Client')->getDomain()),
+            )
         );
 
-        return Mage::getModel('M2ePro/Processing_Request')->setData($dataForAdd)->save();
+        /** @var Ess_M2ePro_Model_Processing_Request $processingRequest */
+        $processingRequest = Mage::getModel('M2ePro/Processing_Request');
+        $processingRequest->setData($processingRequestData);
+        $processingRequest->save();
+
+        return $processingRequest;
+    }
+
+    protected function getProcessingData()
+    {
+        $expirationDate = Mage::helper('M2ePro')->getDate(
+            Mage::helper('M2ePro')->getCurrentGmtDate(true)+Ess_M2ePro_Model_Processing_Request::MAX_LIFE_TIME_INTERVAL
+        );
+
+        return array(
+            'component'        => strtolower($this->getComponent()),
+            'perform_type'     => Ess_M2ePro_Model_Processing_Request::PERFORM_TYPE_SINGLE,
+            'request_body'     => json_encode($this->request),
+            'responser_model'  => $this->getResponserModelName(),
+            'responser_params' => json_encode((array)$this->getResponserParams()),
+            'expiration_date'  => $expirationDate,
+        );
     }
 
     // ########################################
 
-    protected function makeResponserModel()
+    protected function getResponserModelName()
     {
-        return 'M2ePro/Connector_'.(string)$this->getResponserModel();
+        $responserClassName = preg_replace('/Requester$/', '', get_class($this)).'Responser';
+        $responserModelName = preg_replace('/^Ess_M2ePro_Model_/', 'M2ePro/', $responserClassName);
+
+        return $responserModelName;
     }
 
-    //-----------------------------------------
-
-    protected function getProcessingExpirationDate()
+    protected function getResponserParams()
     {
-        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-        return Mage::helper('M2ePro')->getDate($currentTimeStamp + $this->getProcessingExpirationInterval());
+        return $this->params;
     }
-
-    protected function getProcessingExpirationInterval()
-    {
-        return Ess_M2ePro_Model_Processing_Request::MAX_LIFE_TIME_INTERVAL;
-    }
-
-    protected function getPerformType()
-    {
-        return Ess_M2ePro_Model_Processing_Request::PERFORM_TYPE_SINGLE;
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @abstract
-     * @return string
-     */
-    abstract protected function getResponserModel();
-
-    /**
-     * @abstract
-     * @return array
-     */
-    abstract protected function getResponserParams();
 
     // ########################################
 }

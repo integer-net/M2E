@@ -254,13 +254,13 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         if ($this->order->isUseGlobalShippingProgram()) {
             $comments[] = '<b>'.
                           Mage::helper('M2ePro')->__('Global Shipping Program is used for this order').
-                          '</b><br />';
+                          '</b><br/>';
         }
 
         $buyerMessage = $this->order->getBuyerMessage();
         if (!empty($buyerMessage)) {
             $comment = '<b>' . Mage::helper('M2ePro')->__('Checkout Message From Buyer') . ': </b>';
-            $comment .= $buyerMessage . '<br />';
+            $comment .= $buyerMessage . '<br/>';
 
             $comments[] = $comment;
         }

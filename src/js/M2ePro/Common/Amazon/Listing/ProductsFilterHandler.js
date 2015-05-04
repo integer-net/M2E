@@ -1,6 +1,8 @@
 AmazonListingProductsFilterHandler = Class.create();
 AmazonListingProductsFilterHandler.prototype = Object.extend(new CommonHandler(), {
 
+    //----------------------------------
+
     templateSellingFormatId: null,
     marketplaceId: null,
 

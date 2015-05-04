@@ -6,7 +6,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
     initialize: function()
     {
         this.setValidationCheckRepetitionValue('M2ePro-synchronization-tpl-title',
-                                                M2ePro.translator.translate('The specified title is already used for other template. Template title must be unique.'),
+                                                M2ePro.translator.translate('The specified Title is already used for other Policy. Policy Title must be unique.'),
                                                 'Template_Synchronization', 'title', 'id',
                                                 M2ePro.formData.id,
                                                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK'));
@@ -15,8 +15,8 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
             return value.match(/^\d{2}:\d{2}$/g);
         });
 
-        Validation.add('validate-qty', M2ePro.translator.translate('Wrong value. Only integer numbers.'), function(value, el)
-        {
+        Validation.add('validate-qty', M2ePro.translator.translate('Wrong value. Only integer numbers.'), function(value, el) {
+
             if (!el.up('tr').visible()) {
                 return true;
             }
@@ -32,8 +32,8 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
             return true;
         });
 
-        Validation.add('M2ePro-validate-conditions-between', M2ePro.translator.translate('Must be greater than "Min".'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-conditions-between', M2ePro.translator.translate('Must be greater than "Min".'), function(value, el) {
+
             var minValue = $(el.id.replace('_max','')).value;
 
             if (!el.up('tr').visible()) {
@@ -45,8 +45,8 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
         //-----------------
 
         //-----------------
-        Validation.add('M2ePro-validate-stop-relist-conditions-product-status', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-stop-relist-conditions-product-status', M2ePro.translator.translate('Inconsistent settings in Relist and Stop rules.'), function(value, el) {
+
             if (PlayTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
             }
@@ -58,8 +58,8 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
             return true;
         });
 
-        Validation.add('M2ePro-validate-stop-relist-conditions-stock-availability', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-stop-relist-conditions-stock-availability', M2ePro.translator.translate('Inconsistent settings in Relist and Stop rules.'), function(value, el) {
+
             if (PlayTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
             }
@@ -71,8 +71,8 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
             return true;
         });
 
-        Validation.add('M2ePro-validate-stop-relist-conditions-item-qty', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-stop-relist-conditions-item-qty', M2ePro.translator.translate('Inconsistent settings in Relist and Stop rules.'), function(value, el) {
+
             if (PlayTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
             }
@@ -120,7 +120,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
 
     //----------------------------------
 
-    isRelistModeDisabled : function()
+    isRelistModeDisabled: function()
     {
         return $('relist_mode').value == 0;
     },
@@ -130,16 +130,16 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
     duplicate_click: function($headId)
     {
         this.setValidationCheckRepetitionValue('M2ePro-synchronization-tpl-title',
-                                                M2ePro.translator.translate('The specified title is already used for other template. Template title must be unique.'),
+                                                M2ePro.translator.translate('The specified Title is already used for other Policy. Policy Title must be unique.'),
                                                 'Template_Synchronization', 'title', '','',
                                                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK'));
 
-        CommonHandlerObj.duplicate_click($headId, M2ePro.translator.translate('Add Synchronization Template.'));
+        CommonHandlerObj.duplicate_click($headId, M2ePro.translator.translate('Add Synchronization Policy.'));
     },
 
     //----------------------------------
 
-    stopQty_change : function()
+    stopQty_change: function()
     {
         var qtyType = this.getAttribute('qty_type');
 
@@ -166,7 +166,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
         }
     },
 
-    listMode_change : function()
+    listMode_change: function()
     {
         if ($('list_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_NONE')) {
             $('magento_block_play_template_synchronization_list_rules').hide();
@@ -177,7 +177,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
         }
     },
 
-    listQty_change : function()
+    listQty_change: function()
     {
         var qtyType = this.getAttribute('qty_type');
 
@@ -204,7 +204,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
         }
     },
 
-    relistMode_change : function()
+    relistMode_change: function()
     {
         if ($('relist_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::RELIST_MODE_NONE')) {
             $('relist_filter_user_lock_tr_container').hide();
@@ -218,7 +218,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
         }
     },
 
-    relistQty_change : function()
+    relistQty_change: function()
     {
         var qtyType = this.getAttribute('qty_type');
 
@@ -245,7 +245,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
         }
     },
 
-    reviseQty_change : function()
+    reviseQty_change: function()
     {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Template_Synchronization::REVISE_UPDATE_QTY_YES')) {
             $('revise_update_qty_max_applied_value_mode_tr').show();
@@ -259,7 +259,7 @@ CommonPlayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHan
         }
     },
 
-    reviseQtyMaxAppliedValueMode_change : function()
+    reviseQtyMaxAppliedValueMode_change: function()
     {
         $('revise_update_qty_max_applied_value_tr').hide();
 

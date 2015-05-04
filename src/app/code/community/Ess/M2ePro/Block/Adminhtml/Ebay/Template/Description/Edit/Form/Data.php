@@ -11,6 +11,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
     private $attributeSets = array();
 
     public $attributes = array();
+    public $generalAttributes = array();
     public $M2eProAttributes = array();
     public $attributesConfigurable = array();
 
@@ -30,6 +31,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
         $this->attributeSets = Mage::helper('M2ePro/Data_Global')->getValue('ebay_attribute_sets');
 //        $this->attributes = Mage::helper('M2ePro/Data_Global')->getValue('ebay_attributes');
         $this->attributes = Mage::helper('M2ePro/Magento_Attribute')->getAll();
+        $this->generalAttributes = Mage::helper('M2ePro/Magento_Attribute')->getGeneralFromAllAttributeSets();
 //        $this->attributesConfigurable = Mage::helper('M2ePro/Magento_Attribute')
 //            ->getAllConfigurableByAttributeSets($this->attributeSets);
         $this->attributesConfigurable = Mage::helper('M2ePro/Magento_Attribute')->getAllConfigurable();
@@ -38,7 +40,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
             'title' => Mage::helper('M2ePro')->__('Title'),
             'subtitle' => Mage::helper('M2ePro')->__('Subtitle'),
             'condition' => Mage::helper('M2ePro')->__('Condition'),
-            'condition_description' => Mage::helper('M2ePro')->__('Condition Description'),
+            'condition_description' => Mage::helper('M2ePro')->__('Seller Notes'),
             'buy_it_now_price' => Mage::helper('M2ePro')->__('Buy It Now Price'),
             'start_price' => Mage::helper('M2ePro')->__('Start Price'),
             'reserve_price' => Mage::helper('M2ePro')->__('Reserve Price'),
@@ -83,7 +85,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label'   => Mage::helper('M2ePro')->__('Insert'),
-                'onclick' => "EbayTemplateDescriptionHandlerObj.appendToText"
+                'onclick' => "AttributeHandlerObj.appendToText"
                 ."('select_attributes_for_subtitle', 'subtitle_template');",
                 'class' => 'add_subtitle_button'
             ) );
@@ -95,7 +97,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label' => Mage::helper('M2ePro')->__('Insert'),
-                'onclick' => "EbayTemplateDescriptionHandlerObj.appendToText"
+                'onclick' => "AttributeHandlerObj.appendToText"
                 ."('select_attributes_for_title', 'title_template');",
                 'class' => 'select_attributes_for_title_button'
             ) );
@@ -107,7 +109,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label'   => Mage::helper('M2ePro')->__('Insert'),
-                'onclick' => "EbayTemplateDescriptionHandlerObj.appendToText"
+                'onclick' => "AttributeHandlerObj.appendToText"
                 ."('select_attributes_for_condition_note', 'condition_note_template');",
                 'class' => 'add_condition_note_button'
             ) );
@@ -130,9 +132,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label'   => Mage::helper('M2ePro')->__('Insert'),
-                'onclick' => "EbayTemplateDescriptionHandlerObj.appendToTextarea"
-                ."('#' + $('select_attributes').value + '#');",
-                'class' => 'add_product_attribute_button',
+                'onclick' => "AttributeHandlerObj.appendToTextarea('#' + $('select_attributes').value + '#');",
+                'class'   => 'add_product_attribute_button',
             ) );
         $this->setChild('add_product_attribute_button',$buttonBlock);
         //------------------------------
@@ -142,7 +143,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
             ->createBlock('adminhtml/widget_button')
             ->setData( array(
                 'label'   => Mage::helper('M2ePro')->__('Insert'),
-                'onclick' => "EbayTemplateDescriptionHandlerObj.appendToTextarea"
+                'onclick' => "AttributeHandlerObj.appendToTextarea"
                 ."('#value[' + $('select_m2epro_attributes').value + ']#');",
                 'class' => 'add_product_attribute_button',
             ) );

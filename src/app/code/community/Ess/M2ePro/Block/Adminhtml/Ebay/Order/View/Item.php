@@ -94,7 +94,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Item extends Mage_Adminhtml_Blo
         ));
 
         $this->addColumn('qty_sold', array(
-            'header'    => Mage::helper('M2ePro')->__('Qty'),
+            'header'    => Mage::helper('M2ePro')->__('QTY'),
             'align'     => 'left',
             'width'     => '80px',
             'index'     => 'qty_purchased'
@@ -133,7 +133,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Item extends Mage_Adminhtml_Blo
      */
     public function callbackColumnProduct($value, $row, $column, $isExport)
     {
-        $html = '<b>'.Mage::helper('M2ePro')->escapeHtml($row->getTitle()).'</b><br />';
+        $html = '<b>'.Mage::helper('M2ePro')->escapeHtml($row->getTitle()).'</b><br/>';
 
         $variation = $row->getChildObject()->getVariation();
         if (!empty($variation)) {
@@ -145,7 +145,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Item extends Mage_Adminhtml_Blo
 <span style="font-weight: bold; font-style: italic; padding-left: 10px;">
 {$optionNameHtml}:&nbsp;
 </span>
-{$optionValueHtml}<br />
+{$optionValueHtml}<br/>
 HTML;
             }
         }

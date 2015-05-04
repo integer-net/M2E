@@ -124,18 +124,6 @@ class Ess_M2ePro_Model_Play_Listing_Other extends Ess_M2ePro_Model_Component_Chi
         return $this->getData('condition_note');
     }
 
-    //-----------------------------------------
-
-    public function getStartDate()
-    {
-        return $this->getData('start_date');
-    }
-
-    public function getEndDate()
-    {
-        return $this->getData('end_date');
-    }
-
     // ########################################
 
     public function getRelatedStoreId()

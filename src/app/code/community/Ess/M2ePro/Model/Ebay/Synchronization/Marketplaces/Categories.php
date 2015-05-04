@@ -35,7 +35,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
 
     protected function initialize()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues(
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues(
             Ess_M2ePro_Helper_Component_Ebay_Category_Ebay::CACHE_TAG
         );
     }
@@ -106,8 +106,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
                 'parent_category_id' => $data['parent_id'],
                 'level' => $data['level'],
                 'is_leaf' => $data['is_leaf'],
-                'features' => json_encode($data['features']),
-                'attribute_set_id' => $data['attribute_set_id']
+                'features' => json_encode($data['features'])
             );
 
             $connWrite->insert($tableCategories, $insertData);

@@ -108,7 +108,7 @@ class Ess_M2ePro_Adminhtml_DevelopmentController
     {
         Mage::helper('M2ePro/Module')->setDevelopmentModeMode(true);
 
-        $this->_getSession()->addSuccess('Development mode was activated.');
+        $this->_getSession()->addSuccess('Development mode has been Enabled.');
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDebugTabUrl());
     }
 
@@ -116,7 +116,7 @@ class Ess_M2ePro_Adminhtml_DevelopmentController
     {
         Mage::helper('M2ePro/Module')->setDevelopmentModeMode(false);
 
-        $this->_getSession()->addSuccess('Development mode was activated.');
+        $this->_getSession()->addSuccess('Development mode has been Disabled.');
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDebugTabUrl());
     }
 

@@ -66,7 +66,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$account->getId());
             $this->getActualOperationHistory()->addTimePoint(
                 __METHOD__.'create_magento_orders'.$account->getId(),
-                'Create magento orders'
+                'Create Magento orders'
             );
 
             // M2ePro_TRANSLATIONS

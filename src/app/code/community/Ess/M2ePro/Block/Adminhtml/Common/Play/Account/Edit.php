@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Account_Edit extends Mage_Adminhtml
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentName = Mage::helper('M2ePro/Component_Play')->getTitle();
             $headerTextEdit = Mage::helper('M2ePro')->__("Edit %component_name% Account", $componentName);
             $headerTextAdd = Mage::helper('M2ePro')->__("Add %component_name% Account", $componentName);
         } else {
@@ -58,14 +58,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Account_Edit extends Mage_Adminhtml
             $wizardHelper->getStep('play') == 'account'
         ) {
             //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'PlayAccountHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-            //------------------------------
-
-            //------------------------------
             $this->_addButton('save_and_continue', array(
                 'label'     => Mage::helper('M2ePro')->__('Save And Continue Edit'),
                 'onclick'   => 'PlayAccountHandlerObj.save_and_edit_click(\'\',\'playAccountEditTabs\')',
@@ -92,20 +84,31 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Account_Edit extends Mage_Adminhtml
                 //------------------------------
             }
         } else {
+
+            if ((bool)$this->getRequest()->getParam('close_on_save',false)) {
+
+                if ($this->getRequest()->getParam('id')) {
+                    $this->_addButton('save', array(
+                        'label'     => Mage::helper('M2ePro')->__('Save And Close'),
+                        'onclick'   => 'PlayAccountHandlerObj.saveAndClose()',
+                        'class'     => 'save'
+                    ));
+                } else {
+                    $this->_addButton('save_and_continue', array(
+                        'label'     => Mage::helper('M2ePro')->__('Save And Continue Edit'),
+                        'onclick'   => 'PlayAccountHandlerObj.save_and_edit_click(\'\',\'playAccountEditTabs\')',
+                        'class'     => 'save'
+                    ));
+                }
+                return;
+            }
+
             //------------------------------
             $url = Mage::helper('M2ePro')->getBackUrl('list');
             $this->_addButton('back', array(
                 'label'     => Mage::helper('M2ePro')->__('Back'),
                 'onclick'   => 'PlayAccountHandlerObj.back_click(\'' . $url .'\')',
                 'class'     => 'back'
-            ));
-            //------------------------------
-
-            //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'PlayAccountHandlerObj.reset_click()',
-                'class'     => 'reset'
             ));
             //------------------------------
 

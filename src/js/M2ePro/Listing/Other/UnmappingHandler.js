@@ -4,7 +4,7 @@ ListingOtherUnmappingHandler = Class.create(ActionHandler, {
 
     options: {},
 
-    setOptions: function (options)
+    setOptions: function(options)
     {
         this.options = Object.extend(this.options, options);
         return this;
@@ -12,14 +12,14 @@ ListingOtherUnmappingHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    run: function ()
+    run: function()
     {
         this.unmappingProducts(
             this.gridHandler.getSelectedProductsString()
         );
     },
 
-    unmappingProducts: function (productsString)
+    unmappingProducts: function(productsString)
     {
         new Ajax.Request(this.options.url.unmappingProducts, {
             method: 'post',
@@ -27,7 +27,8 @@ ListingOtherUnmappingHandler = Class.create(ActionHandler, {
                 componentMode: this.options.customData.componentMode,
                 product_ids: productsString
             },
-            onSuccess: (function (transport) {
+            onSuccess: (function(transport) {
+
                 MagentoMessageObj.clearAll();
 
                 if (transport.responseText == '1') {

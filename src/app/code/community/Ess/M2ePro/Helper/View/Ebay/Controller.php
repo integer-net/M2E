@@ -64,7 +64,7 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
     private function addTokenExpirationDateNotificationMessage(
                             Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        $tokenExpirationMessages = Mage::helper('M2ePro/Data_Cache')->getValue(
+        $tokenExpirationMessages = Mage::helper('M2ePro/Data_Cache_Permanent')->getValue(
             'ebay_accounts_token_expiration_messages'
         );
 
@@ -87,14 +87,14 @@ class Ess_M2ePro_Helper_View_Ebay_Controller extends Mage_Core_Helper_Abstract
                 $tokenExpirationTimeStamp = strtotime($accountData['token_expired_date']);
 // M2ePro_TRANSLATIONS
 /*
-The token for "%account_title%" eBay Account has been expired.<br>
+The token for "%account_title%" eBay Account has been expired.<br/>
 Please, go to %menu_label% > Configuration > eBay Account >
 <a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.
 (You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.
 Do not forget to press Save button after returning back to Magento
  */
                 $textToTranslate =
-                    'The token for "%account_title%" eBay Account has been expired.<br>'.
+                    'The token for "%account_title%" eBay Account has been expired.<br/>'.
                     'Please, go to %menu_label% > Configuration > eBay Account >'.
                     '<a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.'.
                     '(You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.'.
@@ -117,14 +117,14 @@ Do not forget to press Save button after returning back to Magento
 // M2ePro_TRANSLATIONS
 /*
 Attention! The token for "%account_title%" eBay Account will be expired soon ( %date% ).
-<br>Please, go to %menu_label% > Configuration > eBay Account >
+<br/>Please, go to %menu_label% > Configuration > eBay Account >
 <a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.
 (You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.
 Do not forget to press Save button after returning back to Magento
  */
                 $textToTranslate =
                    'Attention! The token for "%account_title%" eBay Account will be expired soon ( %date% ).'.
-                    '<br>Please, go to %menu_label% > Configuration > eBay Account >'.
+                    '<br/>Please, go to %menu_label% > Configuration > eBay Account >'.
                     '<a href="%url%" target="_blank">General TAB</a>, click on the Get Token button.'.
                     '(You will be redirected to the eBay website.) Sign-in and press I Agree on eBay page.'.
                     'Do not forget to press Save button after returning back to Magento';
@@ -149,7 +149,7 @@ Do not forget to press Save button after returning back to Magento
                 }
             }
 
-            Mage::helper('M2ePro/Data_Cache')->setValue('ebay_accounts_token_expiration_messages',
+            Mage::helper('M2ePro/Data_Cache_Permanent')->setValue('ebay_accounts_token_expiration_messages',
                                                          $tokenExpirationMessages,
                                                          array('account','ebay'),
                                                          60*60*24);
@@ -164,7 +164,7 @@ Do not forget to press Save button after returning back to Magento
     private function addMarketplacesCategoriesVersionNotificationMessage(
                             Ess_M2ePro_Controller_Adminhtml_BaseController $controller)
     {
-        $outdatedMarketplaces = Mage::helper('M2ePro/Data_Cache')->getValue('outdated_marketplaces');
+        $outdatedMarketplaces = Mage::helper('M2ePro/Data_Cache_Permanent')->getValue('outdated_marketplaces');
 
         if ($outdatedMarketplaces === false) {
             $readConn = Mage::getSingleton('core/resource')->getConnection('core_read');
@@ -182,7 +182,8 @@ Do not forget to press Save button after returning back to Magento
             }
 
             $marketplacesCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Marketplace')
-                ->addFieldToFilter('id',array('in' => $ids));
+                ->addFieldToFilter('id',array('in' => $ids))
+                ->setOrder('sorder','ASC');
 
             $outdatedMarketplaces = array();
             /* @var $marketplace Ess_M2ePro_Model_Marketplace */
@@ -190,7 +191,7 @@ Do not forget to press Save button after returning back to Magento
                 $outdatedMarketplaces[] = $marketplace->getTitle();
             }
 
-            Mage::helper('M2ePro/Data_Cache')->setValue('outdated_marketplaces',
+            Mage::helper('M2ePro/Data_Cache_Permanent')->setValue('outdated_marketplaces',
                                                          $outdatedMarketplaces,
                                                          array('ebay','marketplace'),
                                                          60*60*24);
@@ -204,13 +205,13 @@ Do not forget to press Save button after returning back to Magento
 // %marketplace_title% data was changed on eBay. You need to synchronize it the extension works properly. Please, go to %menu_label% > Configuration > <a href="%url%" target="_blank">eBay Sites</a> and click the Save And Update button.
 
         $message = '%marketplace_title% data was changed on eBay. You need to synchronize it'.
-            ' the extension works properly. Please, go to %menu_label% > Configuration > '.
+            ' the extension works properly. Please, go to %menu_path% > '.
             '<a href="%url%" target="_blank">eBay Sites</a> and click the Save And Update button.';
 
         $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
             $message,
             implode(', ',$outdatedMarketplaces),
-            Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+            Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
             $controller->getUrl(
                 '*/adminhtml_ebay_marketplace',
                 array('tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_MARKETPLACE)

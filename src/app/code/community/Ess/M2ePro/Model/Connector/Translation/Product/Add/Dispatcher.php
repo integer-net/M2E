@@ -36,7 +36,7 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
 
             $params['source_language'] = $chunk['language']['source'];
             $params['target_language'] = $chunk['language']['target'];
-            $params['service']      = $chunk['service'];
+            $params['service']         = $chunk['service'];
 
             for ($i=0; $i<count($products);$i+=100) {
                 $productsForRequest = array_slice($products,$i,100);
@@ -70,7 +70,7 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_Dispatcher
     {
         try {
 
-            $connector = new Ess_M2ePro_Model_Connector_Translation_Product_Add_Multiple($params,$products);
+            $connector = new Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleRequester($params,$products);
             $connector->process();
 
             $this->isProcessingItems = $connector->isProcessingItems();

@@ -19,16 +19,9 @@ class Ess_M2ePro_Model_Marketplace extends Ess_M2ePro_Model_Component_Parent_Abs
 
     // ########################################
 
-    public function isLocked($onlyMainConditions = false)
+    public function isLocked()
     {
-        if (!$onlyMainConditions && parent::isLocked()) {
-            return true;
-        }
-
-        return (bool)Mage::getModel('M2ePro/Listing')
-                            ->getCollection()
-                            ->addFieldToFilter('marketplace_id', $this->getId())
-                            ->getSize();
+        return true;
     }
 
     public function deleteInstance()
@@ -131,13 +124,13 @@ class Ess_M2ePro_Model_Marketplace extends Ess_M2ePro_Model_Component_Parent_Abs
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
         return parent::delete();
     }
 

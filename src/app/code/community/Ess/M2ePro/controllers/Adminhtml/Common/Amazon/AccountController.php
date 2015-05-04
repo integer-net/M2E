@@ -51,6 +51,13 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
             return $this->indexAction();
         }
 
+        $marketplaces = Mage::helper('M2ePro/Component_Amazon')->getMarketplacesAvailableForApiCreation();
+        if ($marketplaces->getSize() <= 0) {
+            $message = 'You should select and update at least one Amazon marketplace.';
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__($message));
+            return $this->indexAction();
+        }
+
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
 
         $this->_initAction()
@@ -403,7 +410,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
                         'related_store_id' => (int)$post['related_store_id']
                     );
 
-                    $dispatcherObject->processConnector('account', 'add' ,'entity', $params, $id);
+                    $dispatcherObject->processConnector('account', 'add' ,'entityRequester', $params, $id);
 
                 } else {
 
@@ -418,7 +425,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
                     $params = array_diff_assoc($newData, $oldData);
 
                     if (!empty($params)) {
-                        $dispatcherObject->processConnector('account', 'update' ,'entity', $params, $id);
+                        $dispatcherObject->processConnector('account', 'update' ,'entityRequester', $params, $id);
                     }
                 }
             }
@@ -429,9 +436,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
             Mage::helper('M2ePro/Module_Exception')->process($exception);
 
             // M2ePro_TRANSLATIONS
-            // The Amazon access obtaining is currently unavailable.<br />Reason: %error_message%
+            // The Amazon access obtaining is currently unavailable.<br/>Reason: %error_message%
 
-            $error = 'The Amazon access obtaining is currently unavailable.<br />Reason: %error_message%';
+            $error = 'The Amazon access obtaining is currently unavailable.<br/>Reason: %error_message%';
             $error = Mage::helper('M2ePro')->__($error, $exception->getMessage());
 
             $this->_getSession()->addError($error);

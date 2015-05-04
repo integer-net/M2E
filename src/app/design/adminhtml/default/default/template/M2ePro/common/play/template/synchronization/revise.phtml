@@ -1,11 +1,11 @@
 <div id="block_notice_play_template_synchronization_revise" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Revise Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Revise Rules are the conditions, at which automatic full and partial listings revising features are enabled.
-<br/>If the certain condition is enabled (<i>Yes</i> is chosen in appropriate line) and met,
-then Play.com Listings, which were listed using current Synchronization Template,
-will be automatically fully or partially updated.<br/>
+    <?php echo Mage::helper('M2ePro')->__('Revise Rules are the conditions, at which automatic full and partial Listings revising features are enabled.
+    <br/>If the certain condition is enabled (<i>Yes</i> is chosen in appropriate line) and met,
+    then Play.com Listings, which were listed using current Synchronization Policy,
+    will be automatically fully or partially updated.<br/>
     <ul class="list">
-        <li><b>Partial Revise</b> - contains list of product details, which changes you want to be reflected on Play.com.</li>
-        <li><b>Full Revise</b> - contains groups of M2E settings. If any data of these groups (Selling Format Template, Listing Channel Settings) is changed, then listings, which use these templates in their settings, will be automatically fully revised.</li>
+        <li><b>Partial Revise</b> - if there are changes introduced to the indicated parameters of the Magento Item, Play.com Items will be updated with just the specific data that has changed.</li>
+        <li><b>Full Revise</b> - contains groups of M2E Pro settings. If any data in these groups (<i class="underline">Selling Format Policy</i>, <i class="underline">Listing Settings</i>) is changed, then Listings, which use these Policies in their settings, will be automatically fully revised.</li>
     </ul>'); ?>
 </div>
 
@@ -73,7 +73,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::REVISE_UPDATE_QTY_YES; ?>" <?php if ($formData['revise_update_qty'] == Ess_M2ePro_Model_Play_Template_Synchronization::REVISE_UPDATE_QTY_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises quantity on Play.com listing(s) when the quantity or attribute for quantity of its product is changed in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Quantity on Play.com Listing(s) when the Quantity or Attribute for Quantity of a Product is changed in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -89,7 +89,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON; ?>" <?php if ($formData['revise_update_qty_max_applied_value_mode'] == Ess_M2ePro_Model_Play_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Updates Play.com qty only when the Condition you set below is met.
+                                <span><?php echo Mage::helper('M2ePro')->__('Updates Play.com QTY only when the Condition you set below is met.
                             <br/><b>Note:</b> By using this option you can significantly increase Synchronization performance.'); ?></span>
                         </p>
                     </td>
@@ -123,7 +123,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::REVISE_UPDATE_PRICE_YES; ?>" <?php if ($formData['revise_update_price'] == Ess_M2ePro_Model_Play_Template_Synchronization::REVISE_UPDATE_PRICE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises price on Play.com listing(s) when the price(s) or attribute(s) for price(s) of its product is (are) changed in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Price on Play.com Listing(s) when the Price or Attribute for Price of a Product is changed in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -148,7 +148,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Selling Format Template'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Selling Format Policy'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="revise_change_selling_format_template" name="revise_change_selling_format_template" class="required-entry">
@@ -156,14 +156,14 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_selling_format_template'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Play.com listing(s) if its Selling Format Template was changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Play.com Listing(s) if its Selling Format Policy was changed.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Listing Channel Settings'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Listing Settings'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="revise_change_listing" name="revise_change_listing" class="required-entry">
@@ -171,7 +171,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES; ?>" <?php if ($formData['revise_change_listing'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Play.com listing(s) if its Listing Settings was changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Play.com Listing(s) if its Listing Settings were changed.'); ?></span>
                         </p>
                     </td>
                 </tr>

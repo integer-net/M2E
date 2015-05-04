@@ -196,13 +196,13 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
         if (!is_null($channelItem) && !$this->getPlayAccount()->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by M2E Pro is disabled in Account settings.'
+                'Magento Order creation for Items listed by M2E Pro is disabled in Account settings.'
             );
         }
 
         if (is_null($channelItem) && !$this->getPlayAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by 3rd party software is disabled in Account settings.'
+                'Magento Order creation for Items listed by 3rd party software is disabled in Account settings.'
             );
         }
     }

@@ -6,12 +6,12 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     initialize: function()
     {
         this.setValidationCheckRepetitionValue('M2ePro-account-title',
-                                                M2ePro.translator.translate('The specified title is already used for other account. Account title must be unique.'),
+                                                M2ePro.translator.translate('The specified Title is already used for other Account. Account Title must be unique.'),
                                                 'Account', 'title', 'id',
                                                 M2ePro.formData.id,
                                                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK'));
 
-        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('You must enable marketplace first.'), function(value, el) {
+        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one attribute for Product mapping.'), function(value, el) {
 
             if ($('other_listings_mapping_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_MODE_NO')) {
                 return true;
@@ -28,7 +28,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return isAttributeSelected;
         });
 
-        Validation.add('M2ePro-access', M2ePro.translator.translate('M2E Pro was not able to get access to the Play.com account. Please, make sure, that you enter correct Play.com login and password. If everything is correct but you still unable to access your account, please contact Play.com Customer Service Department on 0845 800 1020 (UK only) or +44 (0)1534 877595 (outside UK).'), function(value, el){
+        Validation.add('M2ePro-access', M2ePro.translator.translate('M2E Pro was not able to get access to the Play.com account. Please, make sure, that you enter correct Play.com login and password. If everything is correct but you still unable to access your account, please contact Play.com Customer Service Department on 0845 800 1020 (UK only) or +44 (0)1534 877595 (outside UK).'), function(value, el) {
 
             var checkResult = false,
                 login = $('login').value,
@@ -39,20 +39,18 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
                 return true;
             }
 
-            new Ajax.Request( M2ePro.url.get('adminhtml_common_play_account/checkAuth') ,
-                {
-                    method: 'post',
-                    asynchronous : false,
-                    parameters : {
-                        login : login,
-                        password : password,
-                        panel_mode : panel_mode
-                    },
-                    onSuccess: function (transport)
-                    {
-                        checkResult = transport.responseText.evalJSON()['result'];
-                    }
-                });
+            new Ajax.Request(M2ePro.url.get('adminhtml_common_play_account/checkAuth'), {
+                method: 'post',
+                asynchronous: false,
+                parameters: {
+                    login: login,
+                    password: password,
+                    panel_mode: panel_mode
+                },
+                onSuccess: function(transport) {
+                    checkResult = transport.responseText.evalJSON()['result'];
+                }
+            });
 
             return checkResult;
         });
@@ -62,30 +60,30 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         });
 
         Validation.add('M2ePro-account-customer-id', M2ePro.translator.translate('No Customer entry is found for specified ID.'), function(value) {
+
             var checkResult = false;
 
             if ($('magento_orders_customer_id_container').getStyle('display') == 'none') {
                 return true;
             }
 
-            new Ajax.Request(M2ePro.url.get('adminhtml_general/checkCustomerId'),
-                {
-                    method: 'post',
-                    asynchronous : false,
-                    parameters : {
-                        customer_id : value,
-                        id          : M2ePro.formData.id
-                    },
-                    onSuccess: function (transport)
-                    {
-                        checkResult = transport.responseText.evalJSON()['ok'];
-                    }
-                });
+            new Ajax.Request(M2ePro.url.get('adminhtml_general/checkCustomerId'), {
+                method: 'post',
+                asynchronous: false,
+                parameters: {
+                    customer_id : value,
+                    id          : M2ePro.formData.id
+                },
+                onSuccess: function(transport) {
+                    checkResult = transport.responseText.evalJSON()['ok'];
+                }
+            });
 
             return checkResult;
         });
 
         Validation.add('M2ePro-account-order-number-prefix', M2ePro.translator.translate('Prefix length should not be greater than 5 characters.'), function(value) {
+
             if ($('magento_orders_number_prefix_mode').value == 0) {
                 return true;
             }
@@ -123,7 +121,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    other_listings_synchronization_change : function()
+    other_listings_synchronization_change: function()
     {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES')) {
             $('other_listings_mapping_mode_tr').show();
@@ -136,7 +134,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    other_listings_mapping_mode_change : function()
+    other_listings_mapping_mode_change: function()
     {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_MODE_YES')) {
             $('magento_block_play_accounts_other_listings_product_mapping').show();
@@ -160,52 +158,48 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    mapping_general_id_mode_change : function()
+    mapping_general_id_mode_change: function()
     {
+        $('mapping_general_id_attribute').value = '';
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_GENERAL_ID_MODE_NONE')) {
             $('mapping_general_id_priority_td').hide();
-            $('mapping_general_id_attribute_tr').hide();
         } else {
             $('mapping_general_id_priority_td').show();
-            $('mapping_general_id_attribute_tr').show();
+            PlayAccountHandlerObj.updateHiddenValue(this, $('mapping_general_id_attribute'));
         }
     },
 
-    mapping_sku_mode_change : function()
+    mapping_sku_mode_change: function()
     {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_NONE')) {
             $('mapping_sku_priority_td').hide();
-            $('mapping_sku_attribute_tr').hide();
         } else {
             $('mapping_sku_priority_td').show();
 
+            $('mapping_sku_attribute').value = '';
             if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_CUSTOM_ATTRIBUTE')) {
-                $('mapping_sku_attribute_tr').show();
-            } else {
-                $('mapping_sku_attribute_tr').hide();
+                PlayAccountHandlerObj.updateHiddenValue(this, $('mapping_sku_attribute'));
             }
         }
     },
 
-    mapping_title_mode_change : function()
+    mapping_title_mode_change: function()
     {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE')) {
             $('mapping_title_priority_td').hide();
-            $('mapping_title_attribute_tr').hide();
         } else {
             $('mapping_title_priority_td').show();
 
+            $('mapping_title_attribute').value = '';
             if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_CUSTOM_ATTRIBUTE')) {
-                $('mapping_title_attribute_tr').show();
-            } else {
-                $('mapping_title_attribute_tr').hide();
+                PlayAccountHandlerObj.updateHiddenValue(this, $('mapping_title_attribute'));
             }
         }
     },
 
     //----------------------------------
 
-    move_mode_change : function()
+    move_mode_change: function()
     {
         if ($('other_listings_move_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MOVE_TO_LISTINGS_ENABLED')) {
             $('other_listings_move_synch_tr').show();
@@ -216,7 +210,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    ordersModeChange : function()
+    ordersModeChange: function()
     {
         var self = PlayAccountHandlerObj;
 
@@ -235,7 +229,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.magentoOrdersListingsOtherModeChange();
     },
 
-    magentoOrdersListingsModeChange : function()
+    magentoOrdersListingsModeChange: function()
     {
         var self = PlayAccountHandlerObj;
 
@@ -251,7 +245,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.changeVisibilityForOrdersModesRelatedBlocks();
     },
 
-    magentoOrdersListingsStoreModeChange : function()
+    magentoOrdersListingsStoreModeChange: function()
     {
         if ($('magento_orders_listings_store_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM')) {
             $('magento_orders_listings_store_id_container').show();
@@ -262,7 +256,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('magento_orders_listings_store_id').value = '';
     },
 
-    magentoOrdersListingsOtherModeChange : function()
+    magentoOrdersListingsOtherModeChange: function()
     {
         var self = PlayAccountHandlerObj;
 
@@ -281,7 +275,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.changeVisibilityForOrdersModesRelatedBlocks();
     },
 
-    magentoOrdersListingsOtherProductModeChange : function()
+    magentoOrdersListingsOtherProductModeChange: function()
     {
         if ($('magento_orders_listings_other_product_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE')) {
             $('magento_orders_listings_other_product_mode_note').hide();
@@ -292,13 +286,13 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    magentoOrdersNumberSourceChange : function()
+    magentoOrdersNumberSourceChange: function()
     {
         var self = PlayAccountHandlerObj;
         self.renderOrderNumberExample();
     },
 
-    magentoOrdersNumberPrefixModeChange : function()
+    magentoOrdersNumberPrefixModeChange: function()
     {
         var self = PlayAccountHandlerObj;
 
@@ -312,13 +306,13 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.renderOrderNumberExample();
     },
 
-    magentoOrdersNumberPrefixPrefixChange : function()
+    magentoOrdersNumberPrefixPrefixChange: function()
     {
         var self = PlayAccountHandlerObj;
         self.renderOrderNumberExample();
     },
 
-    renderOrderNumberExample : function()
+    renderOrderNumberExample: function()
     {
         var orderNumber = $('sample_magento_order_id').value;
         if ($('magento_orders_number_source').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_NUMBER_SOURCE_CHANNEL')) {
@@ -332,7 +326,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('order_number_example_container').update(orderNumber);
     },
 
-    magentoOrdersCustomerModeChange : function()
+    magentoOrdersCustomerModeChange: function()
     {
         var customerMode = $('magento_orders_customer_mode').value;
 
@@ -354,7 +348,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('magento_orders_customer_new_group_id').value = '';
     },
 
-    magentoOrdersStatusMappingModeChange : function()
+    magentoOrdersStatusMappingModeChange: function()
     {
         // Reset dropdown selected values to default
         $('magento_orders_status_mapping_processing').value = M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::MAGENTO_ORDERS_STATUS_MAPPING_PROCESSING');
@@ -371,7 +365,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('magento_orders_shipment_mode').disabled = disabled;
     },
 
-    changeVisibilityForOrdersModesRelatedBlocks : function()
+    changeVisibilityForOrdersModesRelatedBlocks: function()
     {
         var self = PlayAccountHandlerObj;
 
@@ -403,6 +397,27 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('magento_block_play_accounts_magento_orders_rules').show();
             $('magento_block_play_accounts_magento_orders_tax').show();
         }
+    },
+
+    //----------------------------------
+
+    saveAndClose: function()
+    {
+        var url = typeof M2ePro.url.urls.formSubmit == 'undefined' ?
+        M2ePro.url.formSubmit + 'back/'+base64_encode('list')+'/' :
+            M2ePro.url.get('formSubmit', {'back': base64_encode('list')});
+
+        if (!editForm.validate()) {
+            return;
+        }
+
+        new Ajax.Request(url, {
+            method: 'post',
+            parameters: Form.serialize($(editForm.formId)),
+            onSuccess: function() {
+                window.close();
+            }
+        });
     }
 
     //----------------------------------

@@ -133,7 +133,6 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
             'settings',
             'backups',
             'exceptions',
-            'analytic',
             'marketplaces',
             'cron'
         );

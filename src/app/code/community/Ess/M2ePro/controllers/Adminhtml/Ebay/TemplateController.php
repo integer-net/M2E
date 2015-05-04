@@ -18,8 +18,8 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addCss('M2ePro/css/Plugin/DropDown.css')
-            ->addJs('M2ePro/AttributeSetHandler.js')
             ->addJs('M2ePro/TemplateHandler.js')
+            ->addJs('M2ePro/AttributeHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Template/SwitcherHandler.js')
             ->addJs('M2ePro/Ebay/Template/EditHandler.js')
             ->addJs('M2ePro/Ebay/Template/PaymentHandler.js')
@@ -462,7 +462,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
 
     public function isTitleUniqueAction()
     {
-        $id = $this->getRequest()->getParam('id');
+        $id = $this->getRequest()->getParam('id_value');
         $nick = $this->getRequest()->getParam('nick');
         $title = $this->getRequest()->getParam('title');
 

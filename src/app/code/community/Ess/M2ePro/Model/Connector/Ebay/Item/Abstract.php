@@ -60,7 +60,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
     // ########################################
 
-    abstract protected function getLogAction();
+    abstract protected function getLogsAction();
 
     abstract protected function getActionType();
 
@@ -103,7 +103,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
             }
 
             $logger->setActionId((int)$this->params['logs_action_id']);
-            $logger->setAction($this->getLogAction());
+            $logger->setAction($this->getLogsAction());
 
             switch ($this->params['status_changer']) {
                 case Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN:

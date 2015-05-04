@@ -28,7 +28,8 @@ class Ess_M2ePro_Adminhtml_Common_ConfigurationController
     public function indexAction()
     {
         $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_configuration_linker'))
+            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_configuration_linker','',
+                          array('show_header'=>true)))
             ->renderLayout();
     }
 

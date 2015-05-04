@@ -61,7 +61,7 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
                 } elseif ($attributeCode == 'weight') {
                     $value = (float)$value;
                 } elseif (in_array($attributeCode, array('price', 'special_price'))) {
-                    $value = Mage::helper('M2ePro')->parsePrice($value, false);
+                    $value = round($value, 2);
                     $storeId = $magentoProduct->getProduct()->getStoreId();
                     $store = Mage::app()->getStore($storeId);
                     $value = $store->formatPrice($value, false);
@@ -240,10 +240,10 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
             $str = preg_replace('~(</?' . $no_p . '[^>]*+>)</p>~i', '$1', $str);
         }
 
-        // Convert single linebreaks to <br />
+        // Convert single linebreaks to <br/>
         $br = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/renderer/description/','convert_linebreaks');
         if (is_null($br) || (bool)(int)$br === true) {
-            $str = preg_replace('~(?<!\n)\n(?!\n)~', "<br />\n", $str);
+            $str = preg_replace('~(?<!\n)\n(?!\n)~', "<br/>\n", $str);
         }
 
         return $str;

@@ -28,6 +28,8 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_cache_config',
             'm2epro_synchronization_config',
 
+            'm2epro_registry',
+
             'm2epro_lock_item',
             'm2epro_locked_object',
             'm2epro_product_change',
@@ -35,7 +37,6 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_processing_request',
             'm2epro_synchronization_log',
 
-            'm2epro_attribute_set',
             'm2epro_exceptions_filters',
             'm2epro_stop_queue',
             'm2epro_migration_v6',
@@ -44,11 +45,13 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_account',
             'm2epro_marketplace',
 
+            'm2epro_template_description',
             'm2epro_template_selling_format',
             'm2epro_template_synchronization',
 
             'm2epro_listing',
-            'm2epro_listing_category',
+            'm2epro_listing_auto_category',
+            'm2epro_listing_auto_category_group',
             'm2epro_listing_log',
             'm2epro_listing_other',
             'm2epro_listing_other_log',
@@ -75,7 +78,6 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_ebay_feedback_template',
             'm2epro_ebay_item',
             'm2epro_ebay_listing',
-            'm2epro_ebay_listing_auto_category',
             'm2epro_ebay_listing_auto_category_group',
             'm2epro_ebay_listing_other',
             'm2epro_ebay_listing_product',
@@ -105,6 +107,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_amazon_dictionary_specific',
             'm2epro_amazon_item',
             'm2epro_amazon_listing',
+            'm2epro_amazon_listing_auto_category_group',
             'm2epro_amazon_listing_other',
             'm2epro_amazon_listing_product',
             'm2epro_amazon_listing_product_variation',
@@ -113,9 +116,9 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_amazon_order',
             'm2epro_amazon_order_item',
             'm2epro_amazon_processed_inventory',
-            'm2epro_amazon_template_new_product',
-            'm2epro_amazon_template_new_product_description',
-            'm2epro_amazon_template_new_product_specific',
+            'm2epro_amazon_template_description',
+            'm2epro_amazon_template_description_definition',
+            'm2epro_amazon_template_description_specific',
             'm2epro_amazon_template_selling_format',
             'm2epro_amazon_template_synchronization',
 
@@ -123,6 +126,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_buy_dictionary_category',
             'm2epro_buy_item',
             'm2epro_buy_listing',
+            'm2epro_buy_listing_auto_category_group',
             'm2epro_buy_listing_other',
             'm2epro_buy_listing_product',
             'm2epro_buy_listing_product_variation',
@@ -139,6 +143,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_play_account',
             'm2epro_play_item',
             'm2epro_play_listing',
+            'm2epro_play_listing_auto_category_group',
             'm2epro_play_listing_other',
             'm2epro_play_listing_product',
             'm2epro_play_listing_product_variation',
@@ -212,6 +217,29 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
         }
 
         return $result;
+    }
+
+    // --------------------------------------------
+
+    public function isTableHorizontal($tableName)
+    {
+        return $this->isTableHorizontalChild($tableName) || $this->isTableHorizontalParent($tableName);
+    }
+
+    public function isTableHorizontalChild($tableName)
+    {
+        $horizontalTables = $this->getHorizontalTables();
+
+        $modifiedTableName = str_replace(Mage::helper('M2ePro/Component')->getComponents(), '', $tableName);
+        $modifiedTableName = str_replace('__', '_', $modifiedTableName);
+
+        return !array_key_exists($tableName, $horizontalTables) &&
+                array_key_exists($modifiedTableName, $horizontalTables);
+    }
+
+    public function isTableHorizontalParent($tableName)
+    {
+        return array_key_exists($tableName, $this->getHorizontalTables());
     }
 
     // --------------------------------------------
@@ -307,6 +335,8 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
 
     public function getTableInfo($tableName)
     {
+        $tableName = str_replace(Mage::helper('M2ePro/Magento')->getDatabaseTablesPrefix(), '', $tableName);
+
         if (!$this->isTableExists($tableName)) {
             return false;
         }

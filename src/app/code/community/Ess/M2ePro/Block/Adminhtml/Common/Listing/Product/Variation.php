@@ -26,7 +26,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation exten
             $this->listingProduct = Mage::helper('M2ePro/Component')->getComponentObject(
                 $this->getComponent(), 'Listing_Product', $this->getListingProductId()
             );
-            $this->listingProduct->enableCache();
+            $this->listingProduct->getMagentoProduct()->enableCache();
         }
         return $this->listingProduct;
     }
@@ -34,7 +34,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation exten
     public function getMagentoVariationsSets()
     {
         if (is_null($this->magentoVariationsSets)) {
-            $temp = $this->getListingProduct()->getMagentoProduct()->getProductVariations();
+            $temp = $this->getListingProduct()
+                ->getMagentoProduct()
+                ->getVariationInstance()
+                ->getVariationsTypeStandard();
             $this->magentoVariationsSets = $temp['set'];
         }
 
@@ -44,7 +47,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation exten
     public function getMagentoVariationsCombinations()
     {
         if (is_null($this->magentoVariationsCombinations)) {
-            $temp = $this->getListingProduct()->getMagentoProduct()->getProductVariations();
+            $temp = $this->getListingProduct()
+                ->getMagentoProduct()
+                ->getVariationInstance()
+                ->getVariationsTypeStandard();
             $this->magentoVariationsCombinations = $temp['variations'];
         }
 

@@ -121,8 +121,8 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             array('id IN (?)' => $templateIds)
         );
 
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_othercategory');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_category');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_othercategory');
 
         if (empty($post['specifics_data'])) {
             $this->setSynchStatusNeed($oldSnapshots, $categoryModelName);
@@ -150,8 +150,6 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             foreach ($specifics as $specific) {
                 $specificData = array(
                     'mode' => (int)$specific['mode'],
-                    'mode_relation_id' => (int)$specific['mode_relation_id'],
-                    'attribute_id' => $specific['attribute_id'],
                     'attribute_title' => $specific['attribute_title'],
                     'value_mode' => (int)$specific['value_mode'],
                     'value_ebay_recommended' => $specific['value_ebay_recommended'],
@@ -166,8 +164,8 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             }
         }
 
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_category');
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_othercategory');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_category');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_othercategory');
 
         $this->setSynchStatusNeed($oldSnapshots, $categoryModelName);
     }
@@ -243,7 +241,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                         ->getAttributeLabel($selectedCategory['value']);
 
                     $selectedCategory['path'] = Mage::helper('M2ePro')->__('Magento Attribute');
-                    $selectedCategory['path'] .= ' -> ' . $attributeLabel;
+                    $selectedCategory['path'] .= ' > ' . $attributeLabel;
                     break;
             }
         }
@@ -335,7 +333,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                         break;
                     case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE:
                         $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($selectedValue);
-                        $selectedPath = Mage::helper('M2ePro')->__('Magento Attribute') . ' -> ' . $attributeLabel;
+                        $selectedPath = Mage::helper('M2ePro')->__('Magento Attribute') . ' > ' . $attributeLabel;
 
                         break;
                 }
@@ -429,7 +427,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                 break;
             case Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE:
                 $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($value);
-                $path = Mage::helper('M2ePro')->__('Magento Attribute') . ' -> ' . $attributeLabel;
+                $path = Mage::helper('M2ePro')->__('Magento Attribute') . ' > ' . $attributeLabel;
 
                 break;
         }
@@ -579,14 +577,14 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
         $categoryMode = $this->getRequest()->getParam('category_mode');
         $categoryValue = $this->getRequest()->getParam('category_value');
         $marketplaceId = $this->getRequest()->getParam('marketplace_id');
-        $divId = $this->getRequest()->getParam('div_id');
+        $uniqueId = $this->getRequest()->getParam('unique_id');
 
         $categoryBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_category_specific');
 
         $categoryBlock->setMarketplaceId($marketplaceId);
         $categoryBlock->setCategoryMode($categoryMode);
         $categoryBlock->setCategoryValue($categoryValue);
-        $categoryBlock->setDivId($divId);
+        $categoryBlock->setUniqueId($uniqueId);
         $categoryBlock->setSelectedSpecifics($specifics);
 
         $this->getResponse()->setBody($categoryBlock->toHtml());
@@ -634,31 +632,27 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                 $ebayRecommendedTemp = (array)$post['item_specifics_value_ebay_recommended_'.$i];
             }
             foreach ($ebayRecommendedTemp as $key=>$temp) {
-                $tempParsed = explode('-|-||-|-',$temp);
-                $ebayRecommendedTemp[$key] = array(
-                    'id' => base64_decode($tempParsed[0]),
-                    'value' => base64_decode($tempParsed[1])
-                );
+                $ebayRecommendedTemp[$key] = base64_decode($temp);
             }
 
             $attributeValue = '';
             $customAttribute = '';
 
-            $itemSpecificsConst = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS;
-            $attributeSetSpecificsConst = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ATTRIBUTE_SET;
-            if ($post['item_specifics_mode_'.$i] == $itemSpecificsConst
-                || $post['item_specifics_mode_'.$i] == $attributeSetSpecificsConst
-            ) {
+            if ($post['item_specifics_mode_'.$i] ==
+                Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS) {
+
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_VALUE;
                 if ((int)$post['item_specifics_value_mode_' . $i] == $temp) {
                     $attributeValue = $post['item_specifics_value_custom_value_'.$i];
                     $customAttribute = '';
+                    $ebayRecommendedTemp = '';
                 }
 
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_ATTRIBUTE;
                 if ((int)$post['item_specifics_value_mode_'.$i] == $temp) {
                     $customAttribute = $post['item_specifics_value_custom_attribute_'.$i];
                     $attributeValue = '';
+                    $ebayRecommendedTemp = '';
                 }
 
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_EBAY_RECOMMENDED;
@@ -671,22 +665,23 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                 if ((int)$post['item_specifics_value_mode_'.$i] == $temp) {
                     $customAttribute = '';
                     $attributeValue = '';
+                    $ebayRecommendedTemp = '';
                 }
 
                 $itemSpecifics[] = array(
                     'mode'                   => (int)$post['item_specifics_mode_'.$i],
-                    'mode_relation_id'       => (int)$post['item_specifics_mode_relation_id_'.$i],
-                    'attribute_id'           => $post['item_specifics_attribute_id_'.$i],
                     'attribute_title'        => $post['item_specifics_attribute_title_'.$i],
                     'value_mode'             => (int)$post['item_specifics_value_mode_'.$i],
-                    'value_ebay_recommended' => json_encode($ebayRecommendedTemp),
+                    'value_ebay_recommended' => !empty($ebayRecommendedTemp) ? json_encode($ebayRecommendedTemp) : '',
                     'value_custom_value'     => $attributeValue,
                     'value_custom_attribute' => $customAttribute
                 );
             }
 
-            $customSpecificsConst = Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS;
-            if ($post['item_specifics_mode_'.$i] == $customSpecificsConst) {
+            if ($post['item_specifics_mode_'.$i] ==
+                Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS) {
+
+                $attributeTitle = '';
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_VALUE;
                 if ((int)$post['custom_item_specifics_value_mode_' . $i] == $temp) {
                     $attributeTitle = $post['custom_item_specifics_label_custom_value_'.$i];
@@ -696,7 +691,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_ATTRIBUTE;
                 if ((int)$post['custom_item_specifics_value_mode_'.$i] == $temp) {
-                    $attributeTitle = $post['item_specifics_value_custom_attribute_'.$i];
+                    $attributeTitle = '';
                     $attributeValue = '';
                     $customAttribute = $post['item_specifics_value_custom_attribute_'.$i];
                 }
@@ -710,11 +705,9 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 
                 $itemSpecifics[] = array(
                     'mode'                      => (int)$post['item_specifics_mode_' . $i],
-                    'mode_relation_id'          => 0,
-                    'attribute_id'              => 0,
                     'attribute_title'           => $attributeTitle,
                     'value_mode'                => (int)$post['custom_item_specifics_value_mode_' . $i],
-                    'value_ebay_recommended'    => json_encode(array()),
+                    'value_ebay_recommended'    => '',
                     'value_custom_value'        => $attributeValue,
                     'value_custom_attribute'    => $customAttribute
                 );
@@ -751,7 +744,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             $updateBind[$typePrefix.'attribute'] = $post['category_value'];
 
             $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($post['category_value']);
-            $updateBind[$typePrefix.'path'] = Mage::helper('M2ePro')->__('Magento Attribute').' -> '.$attributeLabel;
+            $updateBind[$typePrefix.'path'] = Mage::helper('M2ePro')->__('Magento Attribute').' > '.$attributeLabel;
         } else {
             $updateBind[$typePrefix.'id'] = '';
             $updateBind[$typePrefix.'attribute'] = '';
@@ -768,7 +761,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
             ->getMainTable();
 
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
         $dbSelect = $connRead->select();
 
         $dbSelect->from($categoryTemplateTable, 'id')->where($typePrefix.'mode = ?', $post['old_category_mode']);
@@ -809,7 +802,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
     private function getSavedCategoryPath($type, $id)
     {
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
         $dbSelect = $connRead->select();
 
         $tableName = Mage::getModel('M2ePro/Ebay_Template_OtherCategory')->getResource()->getMainTable();

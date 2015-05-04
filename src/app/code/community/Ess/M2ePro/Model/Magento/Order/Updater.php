@@ -199,8 +199,8 @@ class Ess_M2ePro_Model_Magento_Order_Updater
 
         !is_array($comments) && $comments = array($comments);
 
-        $header = '<br /><b><u>' . Mage::helper('M2ePro')->__('M2E Pro Notes') . ':</u></b><br /><br />';
-        $comments = implode('<br /><br />', $comments);
+        $header = '<br/><b><u>' . Mage::helper('M2ePro')->__('M2E Pro Notes') . ':</u></b><br/><br/>';
+        $comments = implode('<br/><br/>', $comments);
 
         $this->magentoOrder->addStatusHistoryComment($header . $comments);
         $this->needSave = true;

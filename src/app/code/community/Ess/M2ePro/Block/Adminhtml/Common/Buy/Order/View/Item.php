@@ -80,7 +80,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View_Item extends Mage_Adminht
         ));
 
         $this->addColumn('qty', array(
-            'header'    => Mage::helper('M2ePro')->__('Qty'),
+            'header'    => Mage::helper('M2ePro')->__('QTY'),
             'align'     => 'left',
             'width'     => '80px',
             'index'     => 'qty'
@@ -122,7 +122,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View_Item extends Mage_Adminht
             $sku = Mage::helper('M2ePro')->escapeHtml($row->getSku());
 
             $skuHtml = <<<HTML
-<b>{$skuLabel}:</b> {$sku}<br />
+<b>{$skuLabel}:</b> {$sku}<br/>
 HTML;
         }
 
@@ -130,7 +130,7 @@ HTML;
 //        $referenceId = Mage::helper('M2ePro')->escapeHtml($row->getGeneralId());
 //
 //        $generalIdHtml = <<<HTML
-//<b>{$referenceIdLabel}:</b> {$referenceId}<br />
+//<b>{$referenceIdLabel}:</b> {$referenceId}<br/>
 //HTML;
 
         $itemUrl = Mage::helper('M2ePro/Component_Buy')->getItemUrl($row->getGeneralId());
@@ -179,7 +179,7 @@ HTML;
         $itemTitle = Mage::helper('M2ePro')->escapeHtml($row->getTitle());
 
         return <<<HTML
-<b>{$itemTitle}</b><br />
+<b>{$itemTitle}</b><br/>
 <div style="padding-left: 10px;">
     {$skuHtml}
 </div>

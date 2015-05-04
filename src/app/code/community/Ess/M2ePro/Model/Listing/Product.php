@@ -33,10 +33,6 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     // ########################################
 
-    public $isCacheEnabled = false;
-
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Listing
      */
@@ -226,9 +222,7 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     public function getAdditionalData()
     {
-        $additionalData = $this->getData('additional_data');
-        is_string($additionalData) && $additionalData = json_decode($additionalData,true);
-        return is_array($additionalData) ? $additionalData : array();
+        return $this->getSettings('additional_data');
     }
 
     //----------------------------------------
@@ -382,52 +376,9 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
 
     // ########################################
 
-    public function duplicate()
-    {
-        $duplicatedListingProduct = $this->getListing()->addProduct($this->getProductId(),false,false);
-
-        //not for eBay hack
-        if ($this->getComponentMode() == Ess_M2ePro_Helper_Component_Ebay::NICK) {
-            return $duplicatedListingProduct;
-        }
-
-        if (!$this->getChildObject()->isVariationsReady()) {
-            return $duplicatedListingProduct;
-        }
-
-        $variations = $this->getVariations(true);
-        $variation = reset($variations);
-
-        $duplicatedListingProduct->getChildObject()->setMatchedVariation($variation->getOptions());
-
-        return $duplicatedListingProduct;
-    }
-
     public function getTrackingAttributes()
     {
         return $this->getChildObject()->getTrackingAttributes();
-    }
-
-    // ########################################
-
-    public function clearCache()
-    {
-        $this->getMagentoProduct()->clearCache();
-        return $this;
-    }
-
-    public function enableCache()
-    {
-        $this->isCacheEnabled = true;
-        $this->getMagentoProduct()->enableCache();
-        return $this;
-    }
-
-    public function disableCache()
-    {
-        $this->isCacheEnabled = false;
-        $this->getMagentoProduct()->disableCache();
-        return $this;
     }
 
     // ########################################

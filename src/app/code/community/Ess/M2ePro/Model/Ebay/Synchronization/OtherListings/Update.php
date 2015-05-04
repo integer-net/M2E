@@ -193,26 +193,17 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
         $firstItem = $listingOtherCollection->getFirstItem();
 
         $sinceTime = $firstItem->getData('start_date');
-        $items = $this->receiveSkusFromEbay($account, $sinceTime);
+        $receivedData = $this->receiveSkusFromEbay($account, $sinceTime);
 
-        if (count($items) <= 0) {
+        if (empty($receivedData['items'])) {
             foreach ($listingOtherCollection->getItems() as $listingOther) {
                 $listingOther->getChildObject()->setData('sku','')->save();
             }
             return;
         }
 
-        //-- removed eBay item ID can lead to the issue and getting SKU process freezes
-        $isItemIdReturned = false;
-        foreach ($items as $item) {
-            if ($item['id'] == $firstItem->getData('item_id')) {
-                $isItemIdReturned = true;
-                break;
-            }
-        }
-        !$isItemIdReturned && $firstItem->getChildObject()->setData('sku','')->save();
-
-        $this->updateSkusByReceivedItems($account, $listingOtherCollection, $items);
+        $this->updateSkusForReceivedItems($listingOtherCollection, $account, $receivedData['items']);
+        $this->updateSkusForNotReceivedItems($listingOtherCollection, $receivedData['to_time']);
     }
 
     //####################################
@@ -263,7 +254,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
 
     // -----------------------------------
 
-    private function updateSkusByReceivedItems(Ess_M2ePro_Model_Account $account, $listingOtherCollection, array $items)
+    private function updateSkusForReceivedItems($listingOtherCollection,Ess_M2ePro_Model_Account $account,array $items)
     {
         /** @var $mappingModel Ess_M2ePro_Model_Ebay_Listing_Other_Mapping */
         $mappingModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Mapping');
@@ -289,6 +280,26 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
         }
     }
 
+    //-- eBay item IDs which were removed can lead to the issue and getting SKU process freezes
+    private function updateSkusForNotReceivedItems($listingOtherCollection, $toTimeReceived)
+    {
+        foreach ($listingOtherCollection->getItems() as $listingOther) {
+
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Other $ebayListingOther */
+            $ebayListingOther = $listingOther->getChildObject();
+
+            if (!is_null($ebayListingOther->getSku())) {
+                continue;
+            }
+
+            if (strtotime($ebayListingOther->getStartDate()) >= strtotime($toTimeReceived)) {
+                continue;
+            }
+
+            $ebayListingOther->setData('sku', '')->save();
+        }
+    }
+
     private function receiveSkusFromEbay(Ess_M2ePro_Model_Account $account, $sinceTime)
     {
         $sinceTime = new DateTime($sinceTime,new DateTimeZone('UTC'));
@@ -309,7 +320,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             return array();
         }
 
-        return (array)$responseData['items'];
+        return $responseData;
     }
 
     //####################################

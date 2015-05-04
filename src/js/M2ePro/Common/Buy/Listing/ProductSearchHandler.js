@@ -1,4 +1,4 @@
-BuyListingProductSearchHandler = Class.create(ActionHandler,{
+BuyListingProductSearchHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
@@ -8,25 +8,25 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
 
         $super(gridHandler);
 
-        $('productSearchMenu_cancel_button').observe('click', function(){
+        $('productSearchMenu_cancel_button').observe('click', function() {
             popUp.close();
         });
 
-        $('productSearch_submit_button').observe('click',function(event){
+        $('productSearch_submit_button').observe('click',function(event) {
             self.searchGeneralIdManual(self.params.productId);
         });
 
-        $('productSearch_reset_button').observe('click',function(event){
+        $('productSearch_reset_button').observe('click',function(event) {
             $('query').value = '';
             $('productSearch_grid').hide();
         });
 
-        $('productSearch_back_button').observe('click',function(event){
+        $('productSearch_back_button').observe('click',function(event) {
             popUp.close();
             self.openPopUp(0, self.params.title, self.params.productId);
         });
 
-        $('productSearch_cancel_button').observe('click',function(event){
+        $('productSearch_cancel_button').observe('click',function(event) {
             popUp.close();
         });
 
@@ -47,7 +47,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
 
     //----------------------------------
 
-    params: {autoMapErrorFlag : false},
+    params: {autoMapErrorFlag: false},
 
     //----------------------------------
 
@@ -71,7 +71,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
                 width: 750,
                 height: 500
             },
-            autoMapErrorFlag : false
+            autoMapErrorFlag: false
         };
 
         popUp = Dialog.info(null, {
@@ -80,12 +80,11 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
             closable: true,
             className: "magento",
             windowClassName: "popup-window",
-            title: "&quot;" + title + "&quot;",
+            title: title,
             top: 70,
             width: (mode ==0) ? this.params.size_menu.width : this.params.size_main.width,
             height: (mode ==0) ? this.params.size_menu.height : this.params.size_main.height,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -106,9 +105,10 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
             new Ajax.Request(self.options.url.suggestedBuyComSkuGrid, {
                 method: 'post',
                 parameters: {
-                    product_id : productId
+                    product_id: productId
                 },
-                onSuccess: function (transport) {
+                onSuccess: function(transport) {
+
                     $('productSearch_grid').update(transport.responseText);
                     $('productSearch_grid').show();
                     $('productSearch_cleanSuggest_button').observe('click', function() {
@@ -126,7 +126,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
 
     //----------------------------------
 
-    showSearchManualPrompt: function ()
+    showSearchManualPrompt: function()
     {
         var self = this;
 
@@ -138,12 +138,11 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
             closable: true,
             className: "magento",
             windowClassName: "popup-window",
-            title: "&quot;" + self.params.title + "&quot;",
+            title: self.params.title,
             top: 100,
             width: this.params.size_main.width,
             height: this.params.size_main.height,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -159,7 +158,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         $('query').value = '';
     },
 
-    showSearchGeneralIdAutoPrompt: function ()
+    showSearchGeneralIdAutoPrompt: function()
     {
         if (confirm(M2ePro.translator.translate('Are you sure?'))) {
             popUp.close();
@@ -167,7 +166,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         }
     },
 
-    showUnmapFromGeneralIdPrompt: function (productId)
+    showUnmapFromGeneralIdPrompt: function(productId)
     {
         MagentoMessageObj.clearAll();
         var self = this;
@@ -177,7 +176,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         }
     },
 
-    addNewGeneralId: function (listingProductIds)
+    addNewGeneralId: function(listingProductIds)
     {
         if (!this.options.customData.isMarketplaceSynchronized) {
             alert(this.options.text.not_synchronized_marketplace.replace('%code%',this.options.customData.marketplace.code));
@@ -214,10 +213,11 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         new Ajax.Request(self.options.url.searchBuyComSkuManual, {
             method: 'post',
             parameters: {
-                query : query,
-                product_id : productId
+                query: query,
+                product_id: productId
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
+
                 transport = transport.responseText.evalJSON();
 
                 if(transport.result == 'success') {
@@ -265,7 +265,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         self.sendPartsOfProducts(selectedProductsParts,selectedProductsParts.length);
     },
 
-    sendPartsOfProducts : function(parts,totalPartsCount)
+    sendPartsOfProducts: function(parts,totalPartsCount)
     {
         var self = this;
 
@@ -298,9 +298,9 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         new Ajax.Request(self.options.url.searchBuyComSkuAuto, {
             method: 'post',
             parameters: {
-                product_ids : partString
+                product_ids: partString
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
 
                 if (transport.responseText == 1) {
                     self.params.autoMapErrorFlag = true;
@@ -338,10 +338,10 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         new Ajax.Request(self.options.url.mapToBuyComSku, {
             method: 'post',
             parameters: {
-                product_id : productId,
-                general_id : generalId
+                product_id: productId,
+                general_id: generalId
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
                 if (transport.responseText == 0) {
                     self.gridHandler.unselectAllAndReload();
                 } else {
@@ -364,9 +364,9 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
         new Ajax.Request(self.options.url.unmapFromBuyComSku, {
             method: 'post',
             parameters: {
-                product_ids : productIds
+                product_ids: productIds
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
 
                 if (!transport.responseText.isJSON()) {
                     alert(transport.responseText);
@@ -381,7 +381,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler,{
                 MagentoMessageObj.clearAll();
                 MagentoMessageObj['add' + response.type[0].toUpperCase() + response.type.slice(1)](response.message);
             },
-            onComplete: function () {
+            onComplete: function() {
                 if (self.flagSuccess == true && afterDoneFunction != undefined) {
                     afterDoneFunction();
                 }

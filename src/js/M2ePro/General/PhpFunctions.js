@@ -1,9 +1,9 @@
-function implode( glue, pieces )
+function implode(glue, pieces)
 {
-    return ( ( pieces instanceof Array ) ? pieces.join ( glue ) : pieces );
+    return ((pieces instanceof Array) ? pieces.join (glue) : pieces);
 }
 
-function explode( delimiter, string )
+function explode(delimiter, string)
 {
     var emptyArray = { 0: '' };
 
@@ -29,14 +29,14 @@ function explode( delimiter, string )
         return emptyArray;
     }
 
-    if ( delimiter === true ) {
+    if (delimiter === true) {
         delimiter = '1';
     }
 
     return string.toString().split (delimiter.toString());
 }
 
-function array_unique( array )
+function array_unique(array)
 {
     var p, i, j;
     for (i = array.length; i;) {
@@ -51,7 +51,7 @@ function array_unique( array )
     return true;
 }
 
-function trim( value )
+function trim(value)
 {
     var re = /\s*((\S+\s*)*)/;
     value = value.replace(re, "$1");
@@ -62,14 +62,14 @@ function trim( value )
     return value;
 }
 
-function ltrim ( str, charlist )
+function ltrim (str, charlist)
 {
     charlist = !charlist ? ' \\s\u00A0' : (charlist+'').replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g, '$1');
     var re = new RegExp('^[' + charlist + ']+', 'g');
     return (str+'').replace(re, '');
 }
 
-function rtrim ( str, charlist )
+function rtrim (str, charlist)
 {
     charlist = !charlist ? ' \\s\u00A0' : (charlist+'').replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g, '\\$1');
     var re = new RegExp('[' + charlist + ']+$', 'g');
@@ -78,11 +78,9 @@ function rtrim ( str, charlist )
 
 function getCookie (c_name)
 {
-    if (document.cookie.length>0)
-    {
+    if (document.cookie.length>0) {
         c_start = document.cookie.indexOf(c_name + "=");
-        if (c_start != -1)
-        {
+        if (c_start != -1) {
             c_start = c_start + c_name.length+1;
             c_end=document.cookie.indexOf(";",c_start);
             if (c_end==-1) c_end=document.cookie.length;
@@ -105,15 +103,15 @@ function deleteCookie(name, path, domain)
 {
     if (getCookie(name)) {
         document.cookie = name + "=" +
-                          ( ( path ) ? ";path=" + path : "") +
-                          ( ( domain ) ? ";domain=" + domain : "" ) +
+                          ((path) ? ";path=" + path : "") +
+                          ((domain) ? ";domain=" + domain : "") +
                           ";expires=Thu, 01-Jan-1970 00:00:01 GMT";
     }
 }
 
 function ucwords (str)
 {
-    return (str + '').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+    return (str + '').replace(/^([a-z])|\s+([a-z])/g, function($1) {
         return $1.toUpperCase();
     });
 }
@@ -123,14 +121,14 @@ function strip_tags (input, allowed)
     allowed = (((allowed || "") + "").toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join(''); // making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
     var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi,
         commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
-    return input.replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {        return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
+    return input.replace(commentsAndPhpTags, '').replace(tags, function($0, $1) {        return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
     });
 }
 
-function sha1 ( str )
+function sha1 (str)
 {
     var rotate_left = function(n,s) {
-            var t4 = ( n<<s ) | (n>>>(32-s));
+            var t4 = (n<<s) | (n>>>(32-s));
             return t4;
         };
 
@@ -140,7 +138,7 @@ function sha1 ( str )
             var vh;
             var vl;
 
-            for( i=0; i<=6; i+=2 ) {
+            for(i=0; i<=6; i+=2) {
                 vh = (val>>>(i*4+4))&0x0f;
                 vl = (val>>>(i*4))&0x0f;
                 str += vh.toString(16) + vl.toString(16);
@@ -153,7 +151,7 @@ function sha1 ( str )
             var i;
             var v;
 
-            for( i=7; i>=0; i-- ) {
+            for(i=7; i>=0; i--) {
                 v = (val>>>(i*4))&0x0f;
                 str += v.toString(16);
             }
@@ -175,13 +173,13 @@ function sha1 ( str )
     var str_len = str.length;
 
     var word_array = new Array();
-    for( i=0; i<str_len-3; i+=4 ) {
+    for(i=0; i<str_len-3; i+=4) {
         j = str.charCodeAt(i)<<24 | str.charCodeAt(i+1)<<16 |
         str.charCodeAt(i+2)<<8 | str.charCodeAt(i+3);
-        word_array.push( j );
+        word_array.push(j);
     }
 
-    switch ( str_len % 4 ) {
+    switch (str_len % 4) {
         case 0:
             i = 0x080000000;
         break;
@@ -196,16 +194,16 @@ function sha1 ( str )
         break;
     }
 
-    word_array.push( i );
+    word_array.push(i);
 
-    while( (word_array.length % 16) != 14 ) word_array.push( 0 );
+    while((word_array.length % 16) != 14) word_array.push(0);
 
-    word_array.push( str_len>>>29 );
-    word_array.push( (str_len<<3)&0x0ffffffff );
+    word_array.push(str_len>>>29);
+    word_array.push((str_len<<3)&0x0ffffffff);
 
-    for ( blockstart=0; blockstart<word_array.length; blockstart+=16 ) {
-        for( i=0; i<16; i++ ) W[i] = word_array[blockstart+i];
-        for( i=16; i<=79; i++ ) W[i] = rotate_left(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16], 1);
+    for (blockstart=0; blockstart<word_array.length; blockstart+=16) {
+        for(i=0; i<16; i++) W[i] = word_array[blockstart+i];
+        for(i=16; i<=79; i++) W[i] = rotate_left(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16], 1);
 
         A = H0;
         B = H1;
@@ -213,7 +211,7 @@ function sha1 ( str )
         D = H3;
         E = H4;
 
-        for( i= 0; i<=19; i++ ) {
+        for(i= 0; i<=19; i++) {
             temp = (rotate_left(A,5) + ((B&C) | (~B&D)) + E + W[i] + 0x5A827999) & 0x0ffffffff;
             E = D;
             D = C;
@@ -222,7 +220,7 @@ function sha1 ( str )
             A = temp;
         }
 
-        for( i=20; i<=39; i++ ) {
+        for(i=20; i<=39; i++) {
             temp = (rotate_left(A,5) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1) & 0x0ffffffff;
             E = D;
             D = C;
@@ -231,7 +229,7 @@ function sha1 ( str )
             A = temp;
         }
 
-        for( i=40; i<=59; i++ ) {
+        for(i=40; i<=59; i++) {
             temp = (rotate_left(A,5) + ((B&C) | (B&D) | (C&D)) + E + W[i] + 0x8F1BBCDC) & 0x0ffffffff;
             E = D;
             D = C;
@@ -240,7 +238,7 @@ function sha1 ( str )
             A = temp;
         }
 
-        for( i=60; i<=79; i++ ) {
+        for(i=60; i<=79; i++) {
             temp = (rotate_left(A,5) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6) & 0x0ffffffff;
             E = D;
             D = C;
@@ -260,7 +258,7 @@ function sha1 ( str )
     return temp.toLowerCase();
 }
 
-function utf8_encode ( str_data )
+function utf8_encode (str_data)
 {
     str_data = str_data.replace(/\r\n/g,"\n");
     var utftext = "";
@@ -288,32 +286,29 @@ function utf8_decode(utftext)
     var i = 0;
     var c = c1 = c2 = 0;
 
-    while ( i < utftext.length ) {
+    while (i < utftext.length) {
 
         c = utftext.charCodeAt(i);
 
         if (c < 128) {
             string += String.fromCharCode(c);
             i++;
-        }
-        else if((c > 191) && (c < 224)) {
+        } else if((c > 191) && (c < 224)) {
             c2 = utftext.charCodeAt(i+1);
             string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
             i += 2;
-        }
-        else {
+        } else {
             c2 = utftext.charCodeAt(i+1);
             c3 = utftext.charCodeAt(i+2);
             string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
             i += 3;
         }
-
     }
 
     return string;
 }
 
-function md5 ( str )
+function md5 (str)
 {
     var RotateLeft = function(lValue, iShiftBits) {
             return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
@@ -374,7 +369,7 @@ function md5 ( str )
             var lWordArray=Array(lNumberOfWords-1);
             var lBytePosition = 0;
             var lByteCount = 0;
-            while ( lByteCount < lMessageLength ) {
+            while (lByteCount < lMessageLength) {
                 lWordCount = (lByteCount-(lByteCount % 4))/4;
                 lBytePosition = (lByteCount % 4)*8;
                 lWordArray[lWordCount] = (lWordArray[lWordCount] | (str.charCodeAt(lByteCount)<<lBytePosition));
@@ -552,7 +547,6 @@ function base64_decode(input)
         if (enc4 != 64) {
             output = output + String.fromCharCode(chr3);
         }
-
     }
 
     output = utf8_decode(output);
@@ -561,38 +555,38 @@ function base64_decode(input)
 
 }
 
-function strpos( haystack, needle, offset )
+function strpos(haystack, needle, offset)
 {
-    var i = haystack.indexOf( needle, offset ); // returns -1
+    var i = haystack.indexOf(needle, offset); // returns -1
     return i >= 0 ? i : false;
 }
 
-function str_replace ( search, replace, subject )
+function str_replace (search, replace, subject)
 {
-    if(!(replace instanceof Array)){
+    if(!(replace instanceof Array)) {
         replace=new Array(replace);
-        if(search instanceof Array){
-            while(search.length>replace.length){
+        if(search instanceof Array) {
+            while(search.length>replace.length) {
                 replace[replace.length]=replace[0];
             }
         }
     }
 
     if(!(search instanceof Array))search=new Array(search);
-    while(search.length>replace.length){
+    while(search.length>replace.length) {
         replace[replace.length]='';
     }
 
-    if(subject instanceof Array){
-        for(k in subject){
+    if(subject instanceof Array) {
+        for(k in subject) {
             subject[k]=str_replace(search,replace,subject[k]);
         }
         return subject;
     }
 
-    for(var k=0; k<search.length; k++){
+    for(var k=0; k<search.length; k++) {
         var i = subject.indexOf(search[k]);
-        while(i>-1){
+        while(i>-1) {
             subject = subject.replace(search[k], replace[k]);
             i = subject.indexOf(search[k],i);
         }
@@ -644,8 +638,7 @@ function decodeHtmlentities(s)
 
 function version_compare(a, b)
 {
-    if (a === b)
-    {
+    if (a === b) {
        return 0;
     }
 
@@ -658,26 +651,22 @@ function version_compare(a, b)
     for (var i = 0; i < len; i++)
     {
         // A bigger than B
-        if (parseInt(a_components[i]) > parseInt(b_components[i]))
-        {
+        if (parseInt(a_components[i]) > parseInt(b_components[i])) {
             return 1;
         }
 
         // B bigger than A
-        if (parseInt(a_components[i]) < parseInt(b_components[i]))
-        {
+        if (parseInt(a_components[i]) < parseInt(b_components[i])) {
             return -1;
         }
     }
 
     // If one's a prefix of the other, the longer one is greater.
-    if (a_components.length > b_components.length)
-    {
+    if (a_components.length > b_components.length) {
         return 1;
     }
 
-    if (a_components.length < b_components.length)
-    {
+    if (a_components.length < b_components.length) {
         return -1;
     }
 
@@ -712,4 +701,8 @@ function array_intersect (arr1) {
   }
 
   return retArr;
+}
+
+function addslashes(str) {    // Quote string with slashes
+    return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 }

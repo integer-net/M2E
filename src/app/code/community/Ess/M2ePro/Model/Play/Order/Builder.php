@@ -283,7 +283,7 @@ class Ess_M2ePro_Model_Play_Order_Builder extends Varien_Object
         try {
             $this->order->cancelMagentoOrder();
         } catch (Exception $e) {
-            $magentoOrderComments[] = 'Order cannot be canceled in magento. Reason: ' . $e->getMessage();
+            $magentoOrderComments[] = 'Order cannot be canceled in Magento. Reason: ' . $e->getMessage();
         }
 
         /** @var $magentoOrderUpdater Ess_M2ePro_Model_Magento_Order_Updater */

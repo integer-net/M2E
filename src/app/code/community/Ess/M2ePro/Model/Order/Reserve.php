@@ -221,7 +221,7 @@ class Ess_M2ePro_Model_Order_Reserve
 
         if ($productsDeletedCount > 0) {
             $this->order->addWarningLog(
-                'QTY for %number% product(s) was not changed. Reason: Product(s) does not exist.',
+                'QTY for %number% Product(s) was not changed. Reason: Product(s) does not exist.',
                 array(
                     '!number' => $productsDeletedCount
                 )
@@ -257,7 +257,7 @@ class Ess_M2ePro_Model_Order_Reserve
                     $result = false;
 
                     $this->order->addErrorLog(
-                        'Qty for product "%name%" cannot be reserved. Reason: %msg%',
+                        'QTY for Product "%name%" cannot be reserved. Reason: %msg%',
                         array(
                             '!name' => $magentoProduct->getName(),
                             'msg' => $e->getMessage()

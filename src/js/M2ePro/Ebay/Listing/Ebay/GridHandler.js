@@ -46,18 +46,8 @@ EbayListingEbayGridHandler = Class.create(EbayListingViewGridHandler, {
 
     getLogViewUrl: function(rowId)
     {
-        var temp = this.getProductIdByRowId(rowId);
-
-        var regExpImg= new RegExp('<img[^><]*>','gi');
-        var regExpHr= new RegExp('<hr>','gi');
-
-        temp = temp.replace(regExpImg,'');
-        temp = temp.replace(regExpHr,'');
-
-        var productId = strip_tags(temp).trim();
-
-        return M2ePro.url.get('adminhtml_ebay_log/listing',{
-            filter: base64_encode('product_id[from]='+productId+'&product_id[to]='+productId)
+        return M2ePro.url.get('adminhtml_ebay_log/listingProduct', {
+            listing_product_id: rowId
         });
     },
 
@@ -85,15 +75,14 @@ EbayListingEbayGridHandler = Class.create(EbayListingViewGridHandler, {
     {
         var self = this;
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/getEstimatedFees'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/getEstimatedFees'), {
             method: 'get',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 listing_product_id: listingProductId
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
                 var response = transport.responseText.evalJSON();
 
                 if (response.error) {
@@ -136,5 +125,4 @@ EbayListingEbayGridHandler = Class.create(EbayListingViewGridHandler, {
     }
 
     //----------------------------------
-
 });

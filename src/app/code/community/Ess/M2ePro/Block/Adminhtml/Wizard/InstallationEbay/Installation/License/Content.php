@@ -25,46 +25,43 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_License_Co
 
     protected function _beforeToHtml()
     {
-        //-------------------------------
-
         $defaultStoreId = Mage::helper('M2ePro/Magento_Store')->getDefaultStoreId();
 
+        //-------------------------------
         $countries = Mage::getModel('Adminhtml/System_Config_Source_Country')->toOptionArray();
         $countries[0] = array(
             'value' => '',
             'label' => '',
         );
-        $this->setData(
-            'countries',
-            $countries
-        );
-
-        $this->setData(
-            'country',
-            Mage::getStoreConfig('general/country/default',$defaultStoreId)
-        );
-
+        $this->setData('available_countries', $countries);
         //-------------------------------
 
+        //-------------------------------
         $userId = Mage::getSingleton('admin/session')->getUser()->getId();
         $user = Mage::getModel('admin/user')->load($userId)->getData();
 
         $tempPath = defined('Mage_Shipping_Model_Config::XML_PATH_ORIGIN_CITY')
-            ? Mage_Shipping_Model_Config::XML_PATH_ORIGIN_CITY
-            : 'shipping/origin/city';
-        $user['city'] = Mage::getStoreConfig(
-            $tempPath, $defaultStoreId
-        );
+            ? Mage_Shipping_Model_Config::XML_PATH_ORIGIN_CITY : 'shipping/origin/city';
+        $user['city'] = Mage::getStoreConfig($tempPath, $defaultStoreId);
 
         $tempPath = defined('Mage_Shipping_Model_Config::XML_PATH_ORIGIN_POSTCODE')
-            ? Mage_Shipping_Model_Config::XML_PATH_ORIGIN_POSTCODE
-            : 'shipping/origin/postcode';
-        $user['postal_code'] = Mage::getStoreConfig(
-            $tempPath, $defaultStoreId
-        );
+            ? Mage_Shipping_Model_Config::XML_PATH_ORIGIN_POSTCODE : 'shipping/origin/postcode';
+        $user['postal_code'] = Mage::getStoreConfig($tempPath, $defaultStoreId);
+
+        $user['country'] = Mage::getStoreConfig('general/country/default', $defaultStoreId);
+        //-------------------------------
+
+        //-------------------------------
+        $earlierFormData = Mage::getModel('M2ePro/Registry')->load('wizard_license_form_data', 'key')
+                                                            ->getData('value');
+
+        if ($earlierFormData) {
+            $earlierFormData = (array)json_decode($earlierFormData, true);
+            $user = array_merge($user, $earlierFormData);
+        }
 
         $this->addData($user);
-
+        $this->setData('isLicenseStepFinished', $earlierFormData && Mage::helper('M2ePro/Module_License')->getKey());
         //-------------------------------
 
         //-------------------------------
@@ -108,16 +105,17 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_License_Co
 
     public function getCountryLabelByCode($code)
     {
-        $countryLabel = '';
-
         foreach (Mage::getModel('Adminhtml/System_Config_Source_Country')->toOptionArray() as $country) {
             if ($country['value'] == $code) {
-                $countryLabel = $country['label'];
-                break;
+                return $country['label'];
             }
         }
 
-        return $countryLabel;
+        if (!empty($code)) {
+            return $code;
+        }
+
+        return '';
     }
 
     // ########################################

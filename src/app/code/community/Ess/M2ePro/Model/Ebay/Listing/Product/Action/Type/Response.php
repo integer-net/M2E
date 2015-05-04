@@ -190,7 +190,7 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
     protected function updateVariationsValues($saveQtySold)
     {
         if (!$this->getRequestData()->isVariationItem() ||
-            !$this->getRequestData()->hasVariationsData()) {
+            !$this->getRequestData()->hasVariations()) {
             return;
         }
 
@@ -231,8 +231,8 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
 
     protected function appendStatusHiddenValue($data)
     {
-        if (($this->getRequestData()->hasQtyData() && $this->getRequestData()->getQtyData() <= 0) ||
-            ($this->getRequestData()->hasVariationsData() && $this->getRequestData()->getVariationQtyData() <= 0)) {
+        if (($this->getRequestData()->hasQty() && $this->getRequestData()->getQty() <= 0) ||
+            ($this->getRequestData()->hasVariations() && $this->getRequestData()->getVariationQty() <= 0)) {
             $data['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN;
         }
         return $data;
@@ -268,10 +268,10 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
     {
         $data['online_qty_sold'] = 0;
 
-        if ($this->getRequestData()->hasVariationsData()) {
-            $data['online_qty'] = $this->getRequestData()->getVariationQtyData();
-        } else if ($this->getRequestData()->hasQtyData()) {
-            $data['online_qty'] = $this->getRequestData()->getQtyData();
+        if ($this->getRequestData()->hasVariations()) {
+            $data['online_qty'] = $this->getRequestData()->getVariationQty();
+        } else if ($this->getRequestData()->hasQty()) {
+            $data['online_qty'] = $this->getRequestData()->getQty();
         }
 
         return $data;
@@ -284,22 +284,22 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
             $data['online_start_price'] = NULL;
             $data['online_reserve_price'] = NULL;
 
-            if ($this->getRequestData()->hasVariationsData()) {
-                $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPriceData(false);
-            } else if ($this->getRequestData()->hasPriceFixedData()) {
-                $data['online_buyitnow_price'] = $this->getRequestData()->getPriceFixedData();
+            if ($this->getRequestData()->hasVariations()) {
+                $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPrice(false);
+            } else if ($this->getRequestData()->hasPriceFixed()) {
+                $data['online_buyitnow_price'] = $this->getRequestData()->getPriceFixed();
             }
 
         } else {
 
-            if ($this->getRequestData()->hasPriceStartData()) {
-                $data['online_start_price'] = $this->getRequestData()->getPriceStartData();
+            if ($this->getRequestData()->hasPriceStart()) {
+                $data['online_start_price'] = $this->getRequestData()->getPriceStart();
             }
-            if ($this->getRequestData()->hasPriceReserveData()) {
-                $data['online_reserve_price'] = $this->getRequestData()->getPriceReserveData();
+            if ($this->getRequestData()->hasPriceReserve()) {
+                $data['online_reserve_price'] = $this->getRequestData()->getPriceReserve();
             }
-            if ($this->getRequestData()->hasPriceBuyItNowData()) {
-                $data['online_buyitnow_price'] = $this->getRequestData()->getPriceBuyItNowData();
+            if ($this->getRequestData()->hasPriceBuyItNow()) {
+                $data['online_buyitnow_price'] = $this->getRequestData()->getPriceBuyItNow();
             }
         }
 
@@ -308,20 +308,20 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
 
     protected function appendOnlineInfoDataValues($data)
     {
-        if ($this->getRequestData()->hasSkuData()) {
-            $data['online_sku'] = $this->getRequestData()->getSkuData();
+        if ($this->getRequestData()->hasSku()) {
+            $data['online_sku'] = $this->getRequestData()->getSku();
         }
 
-        if ($this->getRequestData()->hasTitleData()) {
-            $data['online_title'] = $this->getRequestData()->getTitleData();
+        if ($this->getRequestData()->hasTitle()) {
+            $data['online_title'] = $this->getRequestData()->getTitle();
         }
 
-        if ($this->getRequestData()->hasPrimaryCategoryData()) {
+        if ($this->getRequestData()->hasPrimaryCategory()) {
 
             $data['online_category'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
-                $this->getRequestData()->getPrimaryCategoryData(),
+                $this->getRequestData()->getPrimaryCategory(),
                 $this->getMarketplace()->getId()
-            ).' ('.$this->getRequestData()->getPrimaryCategoryData().')';
+            ).' ('.$this->getRequestData()->getPrimaryCategory().')';
         }
 
         return $data;
@@ -335,8 +335,8 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
             $data['additional_data'] = $this->getListingProduct()->getAdditionalData();
         }
 
-        if ($this->getRequestData()->hasOutOfStockControlData()) {
-            $data['additional_data']['out_of_stock_control'] = $this->getRequestData()->getOutOfStockControlData();
+        if ($this->getRequestData()->hasOutOfStockControl()) {
+            $data['additional_data']['out_of_stock_control'] = $this->getRequestData()->getOutOfStockControl();
         }
 
         return $data;
@@ -384,8 +384,8 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
 
         if (!isset($responseParams['is_images_upload_error']) || !$responseParams['is_images_upload_error']) {
 
-            if ($this->getRequestData()->hasImagesData()) {
-                $imagesData = $this->getRequestData()->getImagesData();
+            if ($this->getRequestData()->hasImages()) {
+                $imagesData = $this->getRequestData()->getImages();
 
                 if (isset($imagesData['images'])) {
                     $data['additional_data']['ebay_product_images_hash'] =
@@ -393,8 +393,8 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
                 }
             }
 
-            if ($this->getRequestData()->hasVariationsImagesData()) {
-                $imagesData = $this->getRequestData()->getVariationsImagesData();
+            if ($this->getRequestData()->hasVariationsImages()) {
+                $imagesData = $this->getRequestData()->getVariationsImages();
                 $data['additional_data']['ebay_product_variation_images_hash'] =
                     Mage::helper('M2ePro/Component_Ebay')->getImagesHash($imagesData);
             }

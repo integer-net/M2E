@@ -57,14 +57,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
             ));
         }
         //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'   => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick' => 'CommonHandlerObj.reset_click()',
-            'class'   => 'reset'
-        ));
-        //------------------------------
     }
 
     // ####################################
@@ -82,9 +74,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $translations = json_encode(array(
             'Mapping Product' => $helper->__('Mapping Product'),
             'Product does not exist.' => $helper->__('Product does not exist.'),
-            'Please enter correct product ID.' => $helper->__('Please enter correct product ID.'),
+            'Please enter correct Product ID.' => $helper->__('Please enter correct Product ID.'),
             'Product(s) was successfully mapped.' => $helper->__('Product(s) was successfully mapped.'),
-            'Please enter correct product ID or SKU' => $helper->__('Please enter correct product ID or SKU')
+            'Please enter correct Product ID or SKU' => $helper->__('Please enter correct Product ID or SKU')
         ));
 
         // todo next (change)
@@ -110,15 +102,16 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $tryToMoveToListing = $this->getUrl('*/adminhtml_listing_other_moving/tryToMoveToListing');
         $moveToListing = $this->getUrl('*/adminhtml_listing_other_moving/moveToListing');
 
-        $popupTitle = $helper->escapeJs($helper->__('Moving eBay Items.'));
-        $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
+        $popupTitle = $helper->escapeJs($helper->__('Moving eBay Items'));
+        $popupTitleSingle = $helper->escapeJs($helper->__('Moving eBay Item'));
+        $failedProductsPopupTitle = $helper->escapeJs($helper->__('Product(s) failed to move'));
 
         $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs($helper->__(
             'Products were not moved. <a target="_blank" href="%url%">View log</a> for details.', $logViewUrl
         ));
         $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.',$logViewUrl
+            'Some of the Products were not moved. <a target="_blank" href="%url%">View log</a> for details.',$logViewUrl
         ));
 
         $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully mapped.'));
@@ -130,11 +123,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
 
         // M2ePro_TRANSLATIONS
-        // Current eBay version only supports simple products in mapping. Please, choose simple product.
-        $temp = 'Current eBay version only supports simple products in mapping. Please, choose simple product.';
+        // Current eBay version only supports Simple Products in mapping. Please, choose Simple Product.
+        $temp = 'Current eBay version only supports Simple Products in mapping. Please, choose Simple Product.';
         $selectSimpleProductMessage = $helper->escapeJs($helper->__($temp));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% Product(s).'));
 
         $getErrorsSummary = $this->getUrl('*/adminhtml_listing_other/getErrorsSummary');
 
@@ -159,7 +152,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
         $temp .= '<a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($temp));
 
-        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on eBay.'));
+        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% Product(s) data on eBay.'));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = Mage::helper('M2ePro')->escapeJs(
@@ -187,16 +180,16 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
             Mage::helper('M2ePro')->__('Stopping On eBay And Removing From Listing Selected Items')
         );
 
-        $invalidDataMessage = $helper->escapeJs($helper->__('Please enter correct product ID.'));
-        $enterProductOrSkuMessage = $helper->escapeJs($helper->__('Please enter correct product ID or SKU'));
+        $invalidDataMessage = $helper->escapeJs($helper->__('Please enter correct Product ID.'));
+        $enterProductOrSkuMessage = $helper->escapeJs($helper->__('Please enter correct Product ID or SKU'));
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
-        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped products must be selected.'));
+        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped Products must be selected.'));
         $selectTheSameTypeProducts = $helper->escapeJs(
-            $helper->__('Selected items must belong to the same Account and Marketplace.')
+            $helper->__('Selected Items must belong to the same Account and Site.')
         );
 
         $selectItemsMessage = $helper->escapeJs($helper->__(
-            'Please select the products you want to perform the action on.'
+            'Please select the Products you want to perform the action on.'
         ));
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
@@ -243,6 +236,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
     M2eProEbay.text.processing_data_message = '{$processingDataMessage}';
 
     M2eProEbay.text.popup_title = '{$popupTitle}';
+    M2eProEbay.text.popup_title_single = '{$popupTitleSingle}';
     M2eProEbay.text.failed_products_popup_title = '{$failedProductsPopupTitle}';
     M2eProEbay.text.successfully_moved = '{$successfullyMovedMessage}';
     M2eProEbay.text.products_were_not_moved = '{$productsWereNotMovedMessage}';

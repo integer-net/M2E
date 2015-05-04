@@ -48,9 +48,10 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Request
 
     protected function initializeVariations()
     {
-        /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater $updater */
-        $updater = Mage::getModel('M2ePro/Ebay_Listing_Product_Variation_Updater');
-        $updater->updateVariations($this->getListingProduct());
+        /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater $variationUpdater */
+        $variationUpdater = Mage::getModel('M2ePro/Ebay_Listing_Product_Variation_Updater');
+        $variationUpdater->process($this->getListingProduct());
+        $variationUpdater->afterMassProcessEvent();
 
         $isVariationItem = $this->getEbayListingProduct()->isVariationsReady();
 

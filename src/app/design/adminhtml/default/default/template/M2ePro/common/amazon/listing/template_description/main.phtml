@@ -1,0 +1,14 @@
+<div id="templateDescription_pop_up_content">
+    <div style="padding: 5px 0px;">
+
+        <?php if(count($this->getMessages()) > 0) : ?>
+        <div id="templateDescription_error_block">
+            <?php echo $this->getWarnings(); ?>
+        </div>
+        <?php endif; ?>
+        <p style="padding-top: 5px;"><?php echo $this->getReasonMessage(); ?></p>
+        <div id="templateDescription_grid" style="margin: 10px auto; height: 380px !important; overflow-y: auto; overflow-x: hidden;">
+        </div>
+
+    </div>
+</div>

@@ -162,7 +162,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Orders_Update
         /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Play_Dispatcher */
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Dispatcher');
         $dispatcherObject->processConnector(
-            'orders', 'update', 'shipping', array('items' => $items), $account
+            'orders', 'update', 'shippingRequester', array('items' => $items), $account
         );
     }
 

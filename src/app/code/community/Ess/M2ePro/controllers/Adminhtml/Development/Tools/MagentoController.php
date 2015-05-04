@@ -28,7 +28,7 @@ class Ess_M2ePro_Adminhtml_Development_Tools_MagentoController
 <h2 style="margin: 20px 0 0 10px">Overwritten Models
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -70,7 +70,7 @@ HTML;
 <h2 style="margin: 20px 0 0 10px">Local Pool Overwrites
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -118,7 +118,7 @@ HTML;
         $html .= <<<HTML
 
 <h2 style="margin: 20px 0 0 10px">Event Observers</h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -187,7 +187,7 @@ HTML;
 <h2 style="margin: 20px 0 0 10px">Installed Modules
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>

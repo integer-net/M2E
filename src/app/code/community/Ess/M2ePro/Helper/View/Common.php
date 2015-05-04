@@ -22,15 +22,15 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         $componentsLabels = array();
 
         if (Mage::helper('M2ePro/Component_Amazon')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
+            $componentsLabels[] = Mage::helper('M2ePro/Component_Amazon')->getTitle();
         }
 
         if (Mage::helper('M2ePro/Component_Buy')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentsLabels[] = Mage::helper('M2ePro/Component_Buy')->getTitle();
         }
 
         if (Mage::helper('M2ePro/Component_Play')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentsLabels[] = Mage::helper('M2ePro/Component_Play')->getTitle();
         }
 
         if (count($componentsLabels) <= 0 || count($componentsLabels) > 2) {
@@ -38,6 +38,12 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         }
 
         return implode(' / ', $componentsLabels);
+    }
+
+    public function getMenuPath($pathNick)
+    {
+        $rootMenuNode = Mage::getConfig()->getNode('adminhtml/menu/m2epro_common');
+        return Mage::helper('M2ePro/View')->getMenuPath($rootMenuNode, $pathNick, $this->getMenuRootNodeLabel());
     }
 
     // ########################################
@@ -92,6 +98,24 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
 
         $tempTitle = $this->getMenuRootNodeLabel();
         !empty($tempTitle) && $menuArray[self::MENU_ROOT_NODE_NICK]['label'] = $tempTitle;
+
+        // Amazon Description Templates
+        //---------------------------------
+        if (!Mage::helper('M2ePro/Component_Amazon')->isActive()) {
+
+            unset($menuArray[self::MENU_ROOT_NODE_NICK]['children']['templates']['children']['description']);
+            $menuArray[self::MENU_ROOT_NODE_NICK]
+                      ['children']['templates']['children']['synchronization']['last'] = true;
+        }
+
+        if (Mage::helper('M2ePro/Component_Amazon')->isActive() &&
+            Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
+
+            $menuTitle = Mage::helper('M2ePro')->__('Description Policies');
+            $menuArray[self::MENU_ROOT_NODE_NICK]
+                      ['children']['templates']['children']['description']['label'] = $menuTitle;
+        }
+        //---------------------------------
 
         // Add wizard menu item
         //---------------------------------

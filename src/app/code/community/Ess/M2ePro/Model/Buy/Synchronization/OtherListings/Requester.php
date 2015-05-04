@@ -5,19 +5,14 @@
  */
 
 class Ess_M2ePro_Model_Buy_Synchronization_OtherListings_Requester
-    extends Ess_M2ePro_Model_Connector_Buy_Inventory_Get_Items
+    extends Ess_M2ePro_Model_Connector_Buy_Inventory_Get_ItemsRequester
 {
     // ########################################
 
-    protected function makeResponserModel()
+    public function setProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
-        return 'M2ePro/Buy_Synchronization_OtherListings_Responser';
-    }
+        parent::setProcessingLocks($processingRequest);
 
-    // ########################################
-
-    protected function setLocks($hash)
-    {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
 
@@ -29,23 +24,12 @@ class Ess_M2ePro_Model_Buy_Synchronization_OtherListings_Requester
 
         $lockItem->create();
 
-        $tempObjects = array(
-            $this->account,
-            Mage::helper('M2ePro/Component_Buy')->getMarketplace()
+        $this->account->addObjectLock(NULL, $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization', $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization_buy', $processingRequest->getHash());
+        $this->account->addObjectLock(
+            Ess_M2ePro_Model_Buy_Synchronization_OtherListings::LOCK_ITEM_PREFIX, $processingRequest->getHash()
         );
-
-        $tempLocks = array(
-            NULL,
-            'synchronization', 'synchronization_buy',
-            Ess_M2ePro_Model_Buy_Synchronization_OtherListings::LOCK_ITEM_PREFIX
-        );
-
-        /* @var $object Ess_M2ePro_Model_Abstract */
-        foreach ($tempObjects as $object) {
-            foreach ($tempLocks as $lock) {
-                $object->addObjectLock($lock, $hash);
-            }
-        }
     }
 
     // ########################################

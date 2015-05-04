@@ -407,6 +407,7 @@ $connection->delete($installer->getTable('m2epro_ebay_dictionary_shipping_catego
 $connection->delete($installer->getTable('m2epro_ebay_item'), $where);
 $connection->delete($installer->getTable('m2epro_marketplace'), array('id = 23'));
 $connection->delete($installer->getTable('m2epro_ebay_marketplace'), $where);
+$connection->delete($installer->getTable('m2epro_ebay_dictionary_motor_specific'), $where);
 $connection->delete($installer->getTable('m2epro_ebay_template_category'), $where);
 $connection->delete($installer->getTable('m2epro_ebay_template_other_category'), $where);
 $connection->delete($installer->getTable('m2epro_ebay_template_payment'), $where);

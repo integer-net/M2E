@@ -10,6 +10,27 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Header extends Mage_Adminhtml_Bloc
 
     // ########################################
 
+    public function getComponent()
+    {
+        if($this->getListing()->isComponentModeEbay()) {
+            return Mage::helper('M2ePro')->__('eBay');
+        }
+
+        if($this->getListing()->isComponentModeAmazon()) {
+            return Mage::helper('M2ePro')->__('Amazon');
+        }
+
+        if($this->getListing()->isComponentModeBuy()) {
+            return Mage::helper('M2ePro')->__('Rakuten');
+        }
+
+        if($this->getListing()->isComponentModePlay()) {
+            return Mage::helper('M2ePro')->__('Play');
+        }
+
+        return '';
+    }
+
     public function getProfileTitle()
     {
         return $this->cutLongLines($this->getListing()->getTitle());

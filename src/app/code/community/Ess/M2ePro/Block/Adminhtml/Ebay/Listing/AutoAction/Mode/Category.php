@@ -38,7 +38,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AutoAction_Mode_Category extends M
             'id'      => 'confirm_button',
             'class'   => 'confirm_button',
             'label'   => Mage::helper('M2ePro')->__('Save'),
-            'onclick' => 'EbayListingAutoActionHandlerObj.confirm();',
+            'onclick' => 'ListingAutoActionHandlerObj.confirm();',
             'style'   => 'display: none;'
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
@@ -73,7 +73,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AutoAction_Mode_Category extends M
             'id'      => 'add_button',
             'class'   => 'add_button add',
             'label'   => Mage::helper('M2ePro')->__('Add New Rule'),
-            'onclick' => 'EbayListingAutoActionHandlerObj.categoryStepOne();',
+            'onclick' => 'ListingAutoActionHandlerObj.categoryStepOne();',
             'style'   => $groupGrid->getCollection()->getSize() == 0 ? 'display: none;' : ''
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
@@ -85,7 +85,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AutoAction_Mode_Category extends M
             'id'      => 'add_first_button',
             'class'   => 'add_first_button add',
             'label'   => Mage::helper('M2ePro')->__('Add New Rule'),
-            'onclick' => 'EbayListingAutoActionHandlerObj.categoryStepOne();'
+            'onclick' => 'ListingAutoActionHandlerObj.categoryStepOne();'
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         $this->setChild('add_first_button', $buttonBlock);

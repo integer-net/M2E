@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit extends Mage_Adminht
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
+            $componentName = Mage::helper('M2ePro/Component_Amazon')->getTitle();
             $headerTextEdit = Mage::helper('M2ePro')->__("Edit %component_name% Account", $componentName);
             $headerTextAdd = Mage::helper('M2ePro')->__("Add %component_name% Account", $componentName);
         } else {
@@ -57,14 +57,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit extends Mage_Adminht
             $wizardHelper->getStep('amazon') == 'account') {
 
             //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'AmazonAccountHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-            //------------------------------
-
-            //------------------------------
             $this->_addButton('save_and_continue', array(
                 'label'     => Mage::helper('M2ePro')->__('Save And Continue Edit'),
                 'onclick'   => 'AmazonAccountHandlerObj.save_and_edit_click(\'\',\'amazonAccountEditTabs\')',
@@ -91,6 +83,25 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit extends Mage_Adminht
                 //------------------------------
             }
         } else {
+
+            if ((bool)$this->getRequest()->getParam('close_on_save',false)) {
+
+                if ($this->getRequest()->getParam('id')) {
+                    $this->_addButton('save', array(
+                        'label'     => Mage::helper('M2ePro')->__('Save And Close'),
+                        'onclick'   => 'AmazonAccountHandlerObj.saveAndClose()',
+                        'class'     => 'save'
+                    ));
+                } else {
+                    $this->_addButton('save_and_continue', array(
+                        'label'     => Mage::helper('M2ePro')->__('Save And Continue Edit'),
+                        'onclick'   => 'AmazonAccountHandlerObj.save_and_edit_click(\'\',\'amazonAccountEditTabs\')',
+                        'class'     => 'save'
+                    ));
+                }
+                return;
+            }
+
             //------------------------------
             $url = Mage::helper('M2ePro')->getBackUrl('list');
             $this->_addButton('back', array(
@@ -101,12 +112,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit extends Mage_Adminht
             //------------------------------
 
             //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'AmazonAccountHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-
             if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data') &&
                 Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getId()
             ) {

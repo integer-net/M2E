@@ -43,14 +43,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
             $this->setEnabledTab($this->getTabIdByWizardNick($this->activeWizardNick));
 
             //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'MarketplaceHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-            //------------------------------
-
-            //------------------------------
             $this->_addButton('close', array(
                 'label'     => Mage::helper('M2ePro')->__('Save And Complete This Step'),
                 'onclick'   => 'MarketplaceHandlerObj.completeStepAction();',
@@ -58,13 +50,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
             ));
             //------------------------------
         } else {
-            //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'MarketplaceHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-            //------------------------------
 
             //------------------------------
             $this->addButton('run_update_all', array(

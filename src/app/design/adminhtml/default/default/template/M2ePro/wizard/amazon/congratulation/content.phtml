@@ -14,69 +14,44 @@
 $synchronizationTemplatesUrl = $this->getUrl('*/adminhtml_common_template_synchronization/index');
 $sellingFormatTemplatesUrl = $this->getUrl('*/adminhtml_common_template_sellingFormat/index');
 
-$listingsUrl = $this->getUrl('*/adminhtml_common_listing/index',array('tab'=>'amazon'));
+$newListingsUrl = $this->getUrl('*/adminhtml_common_listing_create/index', array(
+    'step' => '1',
+    'clear' => 'yes',
+    'component' => Ess_M2ePro_Helper_Component_Amazon::NICK
+));
 $docsLink = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
 
-$menuLabel = Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
 ?>
 
 <div id="block_notice_wizard_congratulation" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
-    <table>
-        <tr>
-            <td>
-                <a href="javascript:" onclick="M2eProAmazonCongratulationTutorialHandlerObj.openPopUp()">
-                    <img src="<?php echo $this->getSkinUrl('M2ePro/images/amazon-video-thumbnail.png'); ?>" alt="">
-                </a>
-                <h4 style="text-align: center"><?php echo Mage::helper('M2ePro')->__('Amazom Listings (10 min. video)'); ?></h4>
-            </td>
 
-            <td style="padding: 10px  0 0 30px">
-
-                <h3><?php echo Mage::helper('M2ePro')->__('With M2E, listing your Magento inventory on Amazon couldn\'t be easier.'); ?></h3>
-                <br/>
-                <p>
-                    <?php
-                        echo Mage::helper('M2ePro')->__(
-                            '<strong>The main settings were successfully set.</strong> <br/><br/>
-                            Now you can continue working with extension.
-                            <br/>
-                            You can see below the short instructions, you may follow to start
-                            listing on Amazon quickly.<br/> The more detailed information can be found in the <a href="%url%" target="_blank">Documentation</a>.<br/><br/>',
-                            $docsLink
-                        );
-                    ?>
-                </p>
-                <br/>
-
-            </td>
-        </tr>
-    </table>
-
-    <div style="margin-top: 25px">
+    <h3><?php echo Mage::helper('M2ePro')->__('With M2E Pro, listing your Magento inventory on Amazon couldn\'t be easier.'); ?></h3>
+    <br/>
+    <p>
         <?php
             echo Mage::helper('M2ePro')->__(
-                '<strong>The next steps you need to perform are:</strong><br/><br/>
+                '<strong>The main settings were successfully set.</strong> <br/><br/>
+                Now you can continue working with extension.
+                <br/>
+                The more detailed information can be found in the <a href="%url%" target="_blank">Documentation</a>.<br/><br/>',
+                $docsLink
+            );
+        ?>
+    </p>
 
-                <span style="text-decoration: underline;"><strong>1)</strong> Selling Format Template creation:</span><br/>
-                Navigate to %menu_label_1% > Templates > <a href="%url_1%" target="_blank">Selling Format Templates</a>,
-                Press on the Add Selling Format Template button;
-                Fill in all necessary data;
-                Save the template.<br/><br/>
+    <div style="margin-top: 5px">
+        <?php
+            echo Mage::helper('M2ePro')->__(
+                'On the next step you should create the first M2E Pro Listing (group of Magento Products). <br/><br/>
 
-                <span style="text-decoration: underline;"><strong>2)</strong> Synchronization Template creation:</span><br/>
-                Navigate to %menu_label_2% > Templates > <a href="%url_2%" target="_blank">Synchronization Templates</a>;
-                Press on the Add Synchronization Template button;
-                Fill in all necessary data;
-                Save the template.<br/><br/>
+                During Listing creation you will have a possibility to specify main Settings for Products such as Price, Condition, Quantity, Automatic Synchronization Rules etc.
 
-                After completing these two necessary steps, you can start to create Listings (%menu_label_3% > Manage
-
-                Listings > <a href="%url_3%" target="_blank">Listings</a>), add Magento products to them and list on Amazon.<br/><br/>
-                <em>Thank you for choosing M2E Pro.</em>',
-                $menuLabel, $sellingFormatTemplatesUrl, $menuLabel, $synchronizationTemplatesUrl, $menuLabel, $listingsUrl
+                <br/><br/><a class="custom-button" href="%new_listing_url%" target="_blank"><span><span><span>Start to create first M2E Pro Listing</span></span></span></a>',
+                $newListingsUrl
             );
         ?>
     </div>
+
 </div>
 
 <div id="amazon_congratulation_video_tutorial_pop_up" style="display: none;">

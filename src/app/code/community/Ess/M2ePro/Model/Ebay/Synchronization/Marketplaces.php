@@ -62,7 +62,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces
 
         $componentName = '';
         if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Ebay::TITLE.' ';
+            $componentName = Mage::helper('M2ePro/Component_Ebay')->getTitle() . ' ';
         }
 
         $params = $this->getParams();
@@ -72,7 +72,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
         $marketplace->getNativeId() == 100 && $componentName = '';
-        $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($componentName.$marketplace->getTitle()));
+        $this->getActualLockItem()->setTitle($componentName.Mage::helper('M2ePro')->__($marketplace->getTitle()));
     }
 
     protected function performActions()
@@ -84,7 +84,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces
         $result = !$this->processTask('Marketplaces_MotorsSpecifics') ? false : $result;
         $result = !$this->processTask('Marketplaces_MotorsKtypes') ? false : $result;
 
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
 
         return $result;
     }

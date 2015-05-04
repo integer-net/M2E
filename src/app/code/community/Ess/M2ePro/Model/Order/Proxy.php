@@ -274,14 +274,14 @@ abstract class Ess_M2ePro_Model_Order_Proxy
 <b>Attention!</b> The Order Prices are incorrect.
 Conversion was not performed as "{$this->getCurrency()}" currency is not enabled.
 Default currency "{$store->getBaseCurrencyCode()}" was used instead.
-Please, enable currency in System -> Configuration -> Currency Setup.
+Please, enable currency in System > Configuration > Currency Setup.
 COMMENT;
         } elseif ($currencyConvertRate == 0) {
             $comments[] = <<<COMMENT
 <b>Attention!</b> The Order Prices are incorrect.
 Conversion was not performed as there's no rate for "{$this->getCurrency()}".
 Default currency "{$store->getBaseCurrencyCode()}" was used instead.
-Please, add currency convert rate in System -> Manage Currency -> Rates.
+Please, add currency convert rate in System > Manage Currency > Rates.
 COMMENT;
         } else {
             $comments[] = <<<COMMENT

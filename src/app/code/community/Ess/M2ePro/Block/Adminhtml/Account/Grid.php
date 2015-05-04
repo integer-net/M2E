@@ -22,7 +22,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Mage_Adminhtml_Bl
 
         // Initialization block
         //------------------------------
-        $this->setId($view . 'accountGrid');
+        $this->setId($view . 'AccountGrid');
         //------------------------------
 
         // Set default values
@@ -39,7 +39,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Mage_Adminhtml_Bl
     protected function _prepareCollection()
     {
         // Get collection of accounts
-        $collection = Mage::getModel('M2ePro/Account')->getCollection();
+        $collection = $this->getCollection();
+        if (is_null($collection)) {
+            $collection = Mage::getModel('M2ePro/Account')->getCollection();
+        }
 
         $components = $this->viewComponentHelper->getActiveComponents();
         $collection->addFieldToFilter('main_table.component_mode', array('in'=>$components));
@@ -113,7 +116,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Mage_Adminhtml_Bl
 
         // Set delete action
         //--------------------------------
-        $confirm = 'Attention! By deleting account you delete all information on it from M2E Pro server. ';
+        $confirm = 'Attention! By deleting account you delete all information on it from M2E Pro Server. ';
         $confirm .= 'This will cause inappropriate work of all accounts\' copies.';
         $confirm  = Mage::helper('M2ePro')->__($confirm);
 

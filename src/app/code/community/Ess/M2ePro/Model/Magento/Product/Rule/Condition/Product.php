@@ -192,7 +192,11 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
         $attributes['category_ids'] = Mage::helper('catalogrule')->__('Category');
 
         foreach ($this->getCustomFilters() as $filterId => $instanceName) {
-            $attributes[$filterId] = $this->getCustomFilterInstance($filterId)->getLabel();
+            $customFilterInstance = $this->getCustomFilterInstance($filterId);
+
+            if ($customFilterInstance instanceof Ess_M2ePro_Model_Magento_Product_Rule_Custom_Abstract) {
+                $attributes[$filterId] = $customFilterInstance->getLabel();
+            }
         }
     }
 
@@ -313,7 +317,7 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
 
         switch ($this->getAttribute()) {
             case 'sku': case 'category_ids':
-            $image = Mage::getDesign()->getSkinUrl('images/rule_chooser_trigger.gif');
+            $image = Mage::getDesign()->getSkinUrl('M2ePro/images/rule_chooser_trigger.gif');
             break;
         }
 
@@ -431,13 +435,13 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
         if ($this->isFilterCustom($this->getAttribute())
             && $this->getCustomFilterInstance($this->getAttribute())->getInputType() == 'date'
         ) {
-            $element->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'));
+            $element->setImage(Mage::getDesign()->getSkinUrl('M2ePro/images/grid-cal.gif'));
         }
 
         if (is_object($this->getAttributeObject())) {
             switch ($this->getAttributeObject()->getFrontendInput()) {
                 case 'date':
-                    $element->setImage(Mage::getDesign()->getSkinUrl('images/grid-cal.gif'));
+                    $element->setImage(Mage::getDesign()->getSkinUrl('M2ePro/images/grid-cal.gif'));
                     break;
             }
         }

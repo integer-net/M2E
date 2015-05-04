@@ -34,7 +34,6 @@ ListingMovingHandler = Class.create(ActionHandler, {
             width: 900,
             height: 500,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -59,11 +58,13 @@ ListingMovingHandler = Class.create(ActionHandler, {
                     componentMode: self.options.customData.componentMode,
                     accountId: response.accountId,
                     marketplaceId: response.marketplaceId,
-                    attrSetId: Object.toJSON(response.attrSetId),
                     ignoreListings: self.options.customData.ignoreListings
                 },
-                onSuccess: function (transport) {
-                    self.openPopUp(transport.responseText,self.options.text.popup_title);
+                onSuccess: function(transport) {
+                    var title = selectedProducts.length == 1 ?
+                        self.options.text.popup_title_single + '&nbsp;"' + self.gridHandler.getProductNameByRowId(selectedProducts[0]) + '"' :
+                        self.options.text.popup_title;
+                    self.openPopUp(transport.responseText,title);
                 }
             });
         };
@@ -74,7 +75,8 @@ ListingMovingHandler = Class.create(ActionHandler, {
                 componentMode: self.options.customData.componentMode,
                 selectedProducts: Object.toJSON(self.selectedProducts)
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
+
                 if (transport.responseText == 1) {
                     alert(self.options.text.select_only_mapped_products);
                 } else if (transport.responseText == 2) {
@@ -161,7 +163,8 @@ ListingMovingHandler = Class.create(ActionHandler, {
                 selectedProducts: Object.toJSON(self.selectedProducts),
                 listingId: listingId
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
+
                 self.popUp.close();
                 self.scroll_page_to_top();
 
@@ -201,7 +204,7 @@ ListingMovingHandler = Class.create(ActionHandler, {
                 accountId: accountId,
                 marketplaceId: marketplaceId
             },
-            onSuccess: (function (transport) {
+            onSuccess: (function(transport) {
                 callback.call(this);
             }).bind(this)
         });
@@ -209,11 +212,11 @@ ListingMovingHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    startEbayListingCreation: function(url, response){
+    startListingCreation: function(url, response) {
         var self = this;
         var win = window.open(url);
 
-        var intervalId = setInterval(function(){
+        var intervalId = setInterval(function() {
             if (!win.closed) {
                 return;
             }
@@ -224,4 +227,5 @@ ListingMovingHandler = Class.create(ActionHandler, {
         }, 1000);
     }
 
+    //----------------------------------
 });

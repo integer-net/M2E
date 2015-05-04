@@ -73,7 +73,7 @@ class Ess_M2ePro_Helper_Module_Wizard extends Mage_Core_Helper_Abstract
             return $this->cache[$nick][$key];
         }
 
-        if (($this->cache = Mage::helper('M2ePro/Data_Cache')->getValue('wizard')) !== false) {
+        if (($this->cache = Mage::helper('M2ePro/Data_Cache_Permanent')->getValue('wizard')) !== false) {
             $this->cache = json_decode($this->cache, true);
             return $this->cache[$nick][$key];
         }
@@ -89,7 +89,7 @@ class Ess_M2ePro_Helper_Module_Wizard extends Mage_Core_Helper_Abstract
 
         $this->cache[$nick][$key] = $value;
 
-        Mage::helper('M2ePro/Data_Cache')->setValue('wizard',
+        Mage::helper('M2ePro/Data_Cache_Permanent')->setValue('wizard',
                                                     json_encode($this->cache),
                                                     array('wizard'),
                                                     60*60);
@@ -251,7 +251,7 @@ FUNCTION;
             unset($this->cache[$id]);
         }
 
-        Mage::helper('M2ePro/Data_Cache')->setValue('wizard',
+        Mage::helper('M2ePro/Data_Cache_Permanent')->setValue('wizard',
                                                     json_encode($this->cache),
                                                     array('wizard'),
                                                     60*60);

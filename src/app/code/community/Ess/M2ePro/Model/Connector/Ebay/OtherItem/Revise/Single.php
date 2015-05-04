@@ -16,7 +16,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Revise_Single
         return array('item','update','revise');
     }
 
-    protected function getLogAction()
+    protected function getLogsAction()
     {
         return Ess_M2ePro_Model_Listing_Other_Log::ACTION_REVISE_PRODUCT;
     }
@@ -34,8 +34,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Revise_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // The item either is not listed or not available
-                parent::MESSAGE_TEXT_KEY => 'The item either is not listed or not available',
+                // The Item either is not listed or not available
+                parent::MESSAGE_TEXT_KEY => 'The Item either is not listed or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 

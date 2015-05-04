@@ -14,7 +14,7 @@ class Ess_M2ePro_Adminhtml_ListingController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select item(s) to clear.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Item(s) to clear.'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -36,6 +36,26 @@ class Ess_M2ePro_Adminhtml_ListingController
         );
         $block = $this->getLayout()->createBlock('M2ePro/adminhtml_log_errorsSummary','',$blockParams);
         return $this->getResponse()->setBody($block->toHtml());
+    }
+
+    //#############################################
+
+    public function saveListingAdditionalDataAction()
+    {
+        $listingId = $this->getRequest()->getParam('id');
+        $paramName = $this->getRequest()->getParam('param_name');
+        $paramValue = $this->getRequest()->getParam('param_value');
+
+        if (empty($listingId) || empty($paramName) || empty($paramValue)) {
+            return $this->getResponse()->setBody('You should provide correct parameters.');
+        }
+
+        $listing = Mage::helper('M2ePro/Component')->getUnknownObject('Listing', $listingId);
+
+        $listing->setSetting('additional_data', $paramName, $paramValue);
+        $listing->save();
+
+        return $this->getResponse()->setBody(0);
     }
 
     //#############################################

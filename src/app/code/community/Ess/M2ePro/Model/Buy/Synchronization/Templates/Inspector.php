@@ -7,38 +7,10 @@
 class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
     extends Ess_M2ePro_Model_Synchronization_Templates_Inspector
 {
-    private $_checkedListListingsProductsIds = array();
-    private $_checkedRelistListingsProductsIds = array();
-    private $_checkedStopListingsProductsIds = array();
-
-    private $_checkedQtyListingsProductsIds = array();
-    private $_checkedPriceListingsProductsIds = array();
-
-    //####################################
-
-    public function makeRunner()
-    {
-        $runner = Mage::getModel('M2ePro/Synchronization_Templates_Runner');
-        $runner->setConnectorModel('Connector_Buy_Product_Dispatcher');
-        $runner->setMaxProductsPerStep(100);
-        return $runner;
-    }
-
     //####################################
 
     public function isMeetListRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedListListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedListListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Buy available status
-        //--------------------
         if (!$listingProduct->isNotListed()) {
             return false;
         }
@@ -47,43 +19,51 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                                               array())
-        ) {
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-            return false;
-        }
-        //--------------------
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product $buyListingProduct */
+        $buyListingProduct = $listingProduct->getChildObject();
 
-        /* @var $buySynchronizationTemplate Ess_M2ePro_Model_Buy_Template_Synchronization */
-        $buySynchronizationTemplate = $listingProduct->getChildObject()->getBuySynchronizationTemplate();
-
-        // Correct synchronization
-        //--------------------
-        if(!$buySynchronizationTemplate->isListMode()) {
-            return false;
+        if (!$buyListingProduct->getGeneralId()) {
+            $searchGeneralId = $buyListingProduct->getListingSource()->getSearchGeneralId();
+            if (empty($searchGeneralId)) {
+                return false;
+            }
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
+        $buySynchronizationTemplate = $buyListingProduct->getBuySynchronizationTemplate();
+
+        if (!$buySynchronizationTemplate->isListMode()) {
             return false;
         }
-        //--------------------
+
+        $variationManager = $buyListingProduct->getVariationManager();
+
+        if ($variationManager->isVariationProduct() && !$variationManager->isVariationProductMatched()) {
+            return false;
+        }
 
         $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
-        // Check filters
-        //--------------------
-        if($buySynchronizationTemplate->isListStatusEnabled()) {
+        $additionalData = $listingProduct->getAdditionalData();
+
+        if ($buySynchronizationTemplate->isListStatusEnabled()) {
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
+                $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                    'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                     Status of Magento Product is Disabled (%date%) though in Synchronization Rules “Product Status”
+                     is set to Enabled.',
+                    array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                );
+                $additionalData['synch_template_list_rules_note'] = $note;
+
+                $listingProduct->setSettings('additional_data', $additionalData)->save();
+
                 return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+            } else if ($variationManager->isVariationProduct() && $variationManager->isVariationProductMatched()) {
 
                 $temp = $variationResource->isAllStatusesDisabled(
                     $listingProduct->getId(),
@@ -91,16 +71,36 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 );
 
                 if (!is_null($temp) && $temp) {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Status of Magento Product Variation is Disabled though in Synchronization Rules
+                         “Product Status“ is set to Enabled.',
+                        array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                    );
+                    $additionalData['synch_template_list_rules_note'] = $note;
+
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+
                     return false;
                 }
             }
         }
 
-        if($buySynchronizationTemplate->isListIsInStock()) {
+        if ($buySynchronizationTemplate->isListIsInStock()) {
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
+                $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                    'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                     Stock Availability of Magento Product is Out of Stock though in
+                     Synchronization Rules “Stock Availability” is set to In Stock.',
+                    array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                );
+                $additionalData['synch_template_list_rules_note'] = $note;
+
+                $listingProduct->setSettings('additional_data', $additionalData)->save();
+
                 return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+            } else if ($variationManager->isVariationProduct() && $variationManager->isVariationProductMatched()) {
 
                 $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
                     $listingProduct->getId(),
@@ -108,86 +108,179 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 );
 
                 if (!is_null($temp) && $temp) {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Stock Availability of Magento Product Variation is Out of Stock though
+                         in Synchronization Rules “Stock Availability” is set to In Stock.',
+                        array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                    );
+                    $additionalData['synch_template_list_rules_note'] = $note;
+
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+
                     return false;
                 }
             }
         }
 
-        if($buySynchronizationTemplate->isListWhenQtyMagentoHasValue()) {
+        if ($buySynchronizationTemplate->isListWhenQtyMagentoHasValue()) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(true);
+            $productQty = (int)$buyListingProduct->getQty(true);
 
             $typeQty = (int)$buySynchronizationTemplate->getListWhenQtyMagentoHasValueType();
             $minQty = (int)$buySynchronizationTemplate->getListWhenQtyMagentoHasValueMin();
             $maxQty = (int)$buySynchronizationTemplate->getListWhenQtyMagentoHasValueMax();
 
-            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_LESS &&
-                $productQty <= $minQty) {
-                $result = true;
+            $note = '';
+
+            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_LESS) {
+                if ($productQty <= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Magento Quantity“ is set to less then  %template_min_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_MORE &&
-                $productQty >= $minQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_MORE) {
+                if ($productQty >= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Magento Quantity” is set to more then  %template_min_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_BETWEEN &&
-                $productQty >= $minQty && $productQty <= $maxQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_BETWEEN) {
+                if ($productQty >= $minQty && $productQty <= $maxQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Magento Quantity” is set between  %template_min_qty% and %template_max_qty%',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!template_max_qty' => $maxQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
             if (!$result) {
+                if (!empty($note)) {
+                    $additionalData['synch_template_list_rules_note'] = $note;
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+                }
+
                 return false;
             }
         }
 
-        if($buySynchronizationTemplate->isListWhenQtyCalculatedHasValue()) {
+        if ($buySynchronizationTemplate->isListWhenQtyCalculatedHasValue()) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+            $productQty = (int)$buyListingProduct->getQty(false);
 
             $typeQty = (int)$buySynchronizationTemplate->getListWhenQtyCalculatedHasValueType();
             $minQty = (int)$buySynchronizationTemplate->getListWhenQtyCalculatedHasValueMin();
             $maxQty = (int)$buySynchronizationTemplate->getListWhenQtyCalculatedHasValueMax();
 
-            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_LESS &&
-                $productQty <= $minQty) {
-                $result = true;
+            $note = '';
+
+            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_LESS) {
+                if ($productQty <= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Calculated Quantity” is set to less then %template_min_qty%',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_MORE &&
-                $productQty >= $minQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_MORE) {
+                if ($productQty >= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Calculated Quantity” is set to more then  %template_min_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_BETWEEN &&
-                $productQty >= $minQty && $productQty <= $maxQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Buy_Template_Synchronization::LIST_QTY_BETWEEN) {
+                if ($productQty >= $minQty && $productQty <= $maxQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Calculated Quantity” is set between  %template_min_qty% and %template_max_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!template_max_qty' => $maxQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
             if (!$result) {
+                if (!empty($note)) {
+                    $additionalData['synch_template_list_rules_note'] = $note;
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+                }
+
                 return false;
             }
         }
-        //--------------------
+
+        if ($listingProduct->getSynchStatus() != Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED &&
+            $this->isTriedToList($listingProduct) &&
+            $this->isChangeInitiatorOnlyInspector($listingProduct)
+        ) {
+            return false;
+        }
 
         return true;
     }
 
     public function isMeetRelistRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedRelistListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedRelistListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Buy available status
-        //--------------------
         if (!$listingProduct->isStopped()) {
             return false;
         }
@@ -196,48 +289,38 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,
-                                               array())
-        ) {
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-           return false;
-        }
-        //--------------------
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product $buyListingProduct */
+        $buyListingProduct = $listingProduct->getChildObject();
 
-        /* @var $buySynchronizationTemplate Ess_M2ePro_Model_Buy_Template_Synchronization */
-        $buySynchronizationTemplate = $listingProduct->getChildObject()->getBuySynchronizationTemplate();
+        $buySynchronizationTemplate = $buyListingProduct->getBuySynchronizationTemplate();
 
-        // Correct synchronization
-        //--------------------
-        if(!$buySynchronizationTemplate->isRelistMode()) {
+        if (!$buySynchronizationTemplate->isRelistMode()) {
             return false;
         }
 
         if ($buySynchronizationTemplate->isRelistFilterUserLock() &&
-            $listingProduct->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER) {
+            $listingProduct->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER
+        ) {
             return false;
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
+        $variationManager = $buyListingProduct->getVariationManager();
+
+        if ($variationManager->isVariationProduct() && !$variationManager->isVariationProductMatched()) {
             return false;
         }
-        //--------------------
 
         $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
-        // Check filters
-        //--------------------
-        if($buySynchronizationTemplate->isRelistStatusEnabled()) {
+        if ($buySynchronizationTemplate->isRelistStatusEnabled()) {
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
                 return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+            } else if ($variationManager->isVariationProduct() && $variationManager->isVariationProductMatched()) {
 
                 $temp = $variationResource->isAllStatusesDisabled(
                     $listingProduct->getId(),
@@ -250,11 +333,11 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             }
         }
 
-        if($buySynchronizationTemplate->isRelistIsInStock()) {
+        if ($buySynchronizationTemplate->isRelistIsInStock()) {
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
                 return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+            } else if ($variationManager->isVariationProduct() && $variationManager->isVariationProductMatched()) {
 
                 $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
                     $listingProduct->getId(),
@@ -267,10 +350,10 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             }
         }
 
-        if($buySynchronizationTemplate->isRelistWhenQtyMagentoHasValue()) {
+        if ($buySynchronizationTemplate->isRelistWhenQtyMagentoHasValue()) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(true);
+            $productQty = (int)$buyListingProduct->getQty(true);
 
             $typeQty = (int)$buySynchronizationTemplate->getRelistWhenQtyMagentoHasValueType();
             $minQty = (int)$buySynchronizationTemplate->getRelistWhenQtyMagentoHasValueMin();
@@ -296,10 +379,10 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             }
         }
 
-        if($buySynchronizationTemplate->isRelistWhenQtyCalculatedHasValue()) {
+        if ($buySynchronizationTemplate->isRelistWhenQtyCalculatedHasValue()) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+            $productQty = (int)$buyListingProduct->getQty(false);
 
             $typeQty = (int)$buySynchronizationTemplate->getRelistWhenQtyCalculatedHasValueType();
             $minQty = (int)$buySynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMin();
@@ -324,24 +407,12 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return false;
             }
         }
-        //--------------------
 
         return true;
     }
 
     public function isMeetStopRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedStopListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedStopListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Buy available status
-        //--------------------
         if (!$listingProduct->isListed()) {
             return false;
         }
@@ -350,39 +421,21 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
-                                               array())
-        ) {
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-            return false;
-        }
-        //--------------------
-
-        /* @var $buySynchronizationTemplate Ess_M2ePro_Model_Buy_Template_Synchronization */
-        $buySynchronizationTemplate = $listingProduct->getChildObject()->getBuySynchronizationTemplate();
-
-        // Correct synchronization
-        //--------------------
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
-            return false;
-        }
-        //--------------------
-
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product $buyListingProduct */
+        $buyListingProduct = $listingProduct->getChildObject();
+        $buySynchronizationTemplate = $buyListingProduct->getBuySynchronizationTemplate();
+        $variationManager = $buyListingProduct->getVariationManager();
         $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
-        // Check filters
-        //--------------------
         if ($buySynchronizationTemplate->isStopStatusDisabled()) {
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
                 return true;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+            } else if ($variationManager->isVariationProduct() && $variationManager->isVariationProductMatched()) {
 
                 $temp = $variationResource->isAllStatusesDisabled(
                     $listingProduct->getId(),
@@ -399,7 +452,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
                 return true;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+            } else if ($variationManager->isVariationProduct() && $variationManager->isVariationProductMatched()) {
 
                 $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
                     $listingProduct->getId(),
@@ -414,7 +467,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
 
         if ($buySynchronizationTemplate->isStopWhenQtyMagentoHasValue()) {
 
-            $productQty = (int)$listingProduct->getChildObject()->getQty(true);
+            $productQty = (int)$buyListingProduct->getQty(true);
 
             $typeQty = (int)$buySynchronizationTemplate->getStopWhenQtyMagentoHasValueType();
             $minQty = (int)$buySynchronizationTemplate->getStopWhenQtyMagentoHasValueMin();
@@ -438,7 +491,7 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
 
         if ($buySynchronizationTemplate->isStopWhenQtyCalculatedHasValue()) {
 
-            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+            $productQty = (int)$buyListingProduct->getQty(false);
 
             $typeQty = (int)$buySynchronizationTemplate->getStopWhenQtyCalculatedHasValueType();
             $minQty = (int)$buySynchronizationTemplate->getStopWhenQtyCalculatedHasValueMin();
@@ -459,31 +512,14 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
                 return true;
             }
         }
-        //--------------------
 
         return false;
     }
 
     //------------------------------------
 
-    public function inspectReviseQtyRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    public function isMeetReviseGeneralRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedQtyListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedQtyListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Prepare actions params
-        //--------------------
-        $actionParams = array('only_data'=>array('qty'=>true));
-        //--------------------
-
-        // Buy available status
-        //--------------------
         if (!$listingProduct->isListed()) {
             return false;
         }
@@ -492,41 +528,43 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                               $actionParams)
-        ) {
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-           return false;
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product $buyListingProduct */
+        $buyListingProduct = $listingProduct->getChildObject();
+        $variationManager = $buyListingProduct->getVariationManager();
+
+        if ($variationManager->isVariationProduct() && !$variationManager->isVariationProductMatched()) {
+            return false;
         }
-        //--------------------
 
-        /* @var $buySynchronizationTemplate Ess_M2ePro_Model_Buy_Template_Synchronization */
-        $buySynchronizationTemplate = $listingProduct->getChildObject()->getBuySynchronizationTemplate();
+        return true;
+    }
 
-        // Correct synchronization
-        //--------------------
+    //------------------------------------
+
+    public function isMeetReviseQtyRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
+            return false;
+        }
+
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product $buyListingProduct */
+        $buyListingProduct = $listingProduct->getChildObject();
+
+        $buySynchronizationTemplate = $buyListingProduct->getBuySynchronizationTemplate();
+
         if (!$buySynchronizationTemplate->isReviseWhenChangeQty()) {
             return false;
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
-            return false;
-        }
-        //--------------------
-
-        // Check filters
-        //--------------------
         $isMaxAppliedValueModeOn = $buySynchronizationTemplate->isReviseUpdateQtyMaxAppliedValueModeOn();
         $maxAppliedValue = $buySynchronizationTemplate->getReviseUpdateQtyMaxAppliedValue();
 
-        $productQty = $listingProduct->getChildObject()->getQty();
-        $channelQty = $listingProduct->getChildObject()->getOnlineQty();
+        $productQty = $buyListingProduct->getQty();
+        $channelQty = $buyListingProduct->getOnlineQty();
 
         //-- Check ReviseUpdateQtyMaxAppliedValue
         if ($isMaxAppliedValueModeOn && $productQty > $maxAppliedValue && $channelQty > $maxAppliedValue) {
@@ -534,82 +572,69 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
         }
 
         if ($productQty > 0 && $productQty != $channelQty) {
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           $actionParams);
             return true;
         }
-        //--------------------
 
         return false;
     }
 
-    public function inspectRevisePriceRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    public function isMeetRevisePriceRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedPriceListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedPriceListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Prepare actions params
-        //--------------------
-        $actionParams = array('only_data'=>array('price'=>true));
-        //--------------------
-
-        // Buy available status
-        //--------------------
-        if (!$listingProduct->isListed()) {
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
             return false;
         }
 
-        if (!$listingProduct->isRevisable()) {
-            return false;
-        }
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product $buyListingProduct */
+        $buyListingProduct = $listingProduct->getChildObject();
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                               $actionParams)
-        ) {
-            return false;
-        }
+        $buySynchronizationTemplate = $buyListingProduct->getBuySynchronizationTemplate();
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-           return false;
-        }
-        //--------------------
-
-        /* @var $buySynchronizationTemplate Ess_M2ePro_Model_Buy_Template_Synchronization */
-        $buySynchronizationTemplate = $listingProduct->getChildObject()->getBuySynchronizationTemplate();
-
-        // Correct synchronization
-        //--------------------
         if (!$buySynchronizationTemplate->isReviseWhenChangePrice()) {
             return false;
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
+        return $buyListingProduct->getPrice() != $buyListingProduct->getOnlinePrice();
+    }
+
+    //------------------------------------
+
+    public function isMeetReviseSynchReasonsRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $reasons = $listingProduct->getSynchReasons();
+        if (empty($reasons)) {
             return false;
         }
-        //--------------------
 
-        // Check filters
-        //--------------------
-        $currentPrice = $listingProduct->getChildObject()->getPrice();
-        $onlinePrice = $listingProduct->getChildObject()->getOnlinePrice();
-
-        if ($currentPrice != $onlinePrice) {
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           $actionParams);
-            return true;
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
+            return false;
         }
-        //--------------------
+
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product $buyListingProduct */
+        $buyListingProduct = $listingProduct->getChildObject();
+
+        $synchronizationTemplate = $buyListingProduct->getSynchronizationTemplate();
+        $buySynchronizationTemplate = $buyListingProduct->getBuySynchronizationTemplate();
+
+        foreach ($reasons as $reason) {
+
+            $method = 'isRevise'.ucfirst($reason);
+
+            if (method_exists($synchronizationTemplate, $method)) {
+                if ($synchronizationTemplate->$method()) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (method_exists($buySynchronizationTemplate, $method)) {
+                if ($buySynchronizationTemplate->$method()) {
+                    return true;
+                }
+
+                continue;
+            }
+        }
 
         return false;
     }

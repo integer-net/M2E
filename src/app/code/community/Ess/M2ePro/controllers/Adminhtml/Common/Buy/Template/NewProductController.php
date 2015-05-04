@@ -32,7 +32,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addJs('M2ePro/Plugin/ProgressBar.js')
             ->addJs('M2ePro/Plugin/AreaWrapper.js')
-            ->addJs('M2ePro/AttributeSetHandler.js')
+            ->addJs('M2ePro/AttributeHandler.js')
             ->addJs('M2ePro/Common/Buy/Template/NewProduct/Handler.js')
             ->addJs('M2ePro/Common/Buy/Template/NewProduct/AttributeHandler.js');
 
@@ -72,7 +72,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
                 ->getListingId();
 
             $errorMessage = Mage::helper('M2ePro')->__(
-                'Please select Not Listed items without Rakuten.com SKU assigned.'
+                'Please select Not Listed Items without Rakuten.com SKU assigned.'
             );
             $this->_getSession()->addError($errorMessage);
             return $this->_redirect('*/adminhtml_common_buy_listing/view',array(
@@ -96,7 +96,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
     public function addAction()
     {
         if (count($this->listingProductIds) < 1 && is_null($this->getRequest()->getParam('id'))) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Not Listed items.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Not Listed Items.'));
             return $this->_redirect('*/adminhtml_common_listing', array(
                 'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY
             ));
@@ -145,30 +145,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
             'category_id'    => (int)$post['category']['native_id'],
         ));
         $buyTemplateNewProductInstance->save();
-
-        // Delete old Attribute sets
-        //--------------------
-        $oldAttributeSets = $buyTemplateNewProductInstance->getAttributeSets();
-        foreach ($oldAttributeSets as $oldAttributeSet) {
-            /** @var $oldAttributeSet Ess_M2ePro_Model_AttributeSet */
-            $oldAttributeSet->deleteInstance();
-        }
-        //--------------------
-
-        // Add new Attribute sets templates
-        if (!is_array($post['category']['attribute_sets'])) {
-            $post['category']['attribute_sets'] = explode(',', $post['category']['attribute_sets']);
-        }
-
-        foreach ($post['category']['attribute_sets'] as $newAttributeSet) {
-            $dataForAdd = array(
-                'object_type' => Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_BUY_TEMPLATE_NEW_PRODUCT,
-                'object_id' => (int)$buyTemplateNewProductInstance->getId(),
-                'attribute_set_id' => (int)$newAttributeSet
-            );
-            Mage::getModel('M2ePro/AttributeSet')->setData($dataForAdd)->save();
-        }
-        //--------------------
 
         // Saving core info
         //----------------------------
@@ -310,7 +286,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
             return $this->map($buyTemplateNewProductInstance);
         }
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Template has been successfully saved.'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Policy has been successfully saved.'));
 
         if ($listingProductId = $this->getRequest()->getParam('listing_product_id')) {
 
@@ -335,19 +311,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
         /* @var $buyTemplateNewProductInstance Ess_M2ePro_Model_Buy_Template_NewProduct */
         $buyTemplateNewProductInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct')->loadInstance($id);
-
-        $temp = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_BUY_TEMPLATE_NEW_PRODUCT;
-        $templateAttributeSetsCollection = Mage::getModel('M2ePro/AttributeSet')->getCollection();
-        $templateAttributeSetsCollection->addFieldToFilter('object_id', $id)
-            ->addFieldToFilter('object_type', $temp);
-
-        $templateAttributeSetsCollection->getSelect()
-            ->reset(Zend_Db_Select::COLUMNS)
-            ->columns('attribute_set_id');
-
-        $buyTemplateNewProductInstance->setData(
-            'attribute_sets', $templateAttributeSetsCollection->getColumnValues('attribute_set_id')
-        );
 
         $formData['category']  = $buyTemplateNewProductInstance->getCoreTemplate()->getData();
         $formData['category'] = array_merge($formData['category'], $buyTemplateNewProductInstance->getData());
@@ -388,7 +351,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
         if (!$countOfSuccessfullyDeletedTemplates) {
             $this->_getSession()->addError(
-                'New SKU template(s) cannot be deleted as it has assigned product(s)'
+                'New SKU Policy(ies) cannot be deleted as it has assigned Product(s)'
             );
             return $this->_redirectUrl($this->_getRefererUrl());
         }
@@ -401,7 +364,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         }
 
         $this->_getSession()->addError(Mage::helper('M2ePro')->__(
-            'Some of the New SKU template(s) cannot be deleted as they have assigned product(s)'
+            'Some of the New SKU Policy(ies) cannot be deleted as they have assigned Product(s)'
         ));
         return $this->_redirectUrl($this->_getRefererUrl());
     }
@@ -496,7 +459,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
     private function map(Ess_M2ePro_Model_Buy_Template_NewProduct $buyTemplateNewProductInstance)
     {
         if (count($this->listingProductIds) < 1) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('There are no items to assign.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('There are no Items to assign.'));
             return $this->_redirect('*/adminhtml_common_listing');
         }
 
@@ -511,7 +474,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
             ->getObject('Listing_Product',reset($this->listingProductIds))
             ->getListingId();
 
-        $tempMessage = Mage::helper('M2ePro')->__('Template has been successfully assigned.');
+        $tempMessage = Mage::helper('M2ePro')->__('Policy has been successfully assigned.');
         $this->_getSession()->addSuccess($tempMessage);
 
         return $this->_redirect('*/adminhtml_common_buy_listing/view',array(
@@ -529,7 +492,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
         if (empty($listingProductIds)) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__(
-                'Please select at least 1 listing product.'
+                'Please select at least 1 Listing Product.'
             ));
         }
 

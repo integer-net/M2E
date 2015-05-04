@@ -11,8 +11,8 @@
 
                 <div id="block_notice_play_synchronization_stock_level" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
                     <?php $inspectorMode = ($this->inspectorMode == 1)?'<span style="color: green"> (enabled) </span>':''; ?>
-                    <?php echo Mage::helper('M2ePro')->__('If catalog updates in your magento performed using import/export tools, custom scripts or direct changes in database,
-                    then, you can use <a target="_blank" href="%url%#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> %mode_status% functionality to detect changes in products\' price and quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl(), $inspectorMode) ?>
+                    <?php echo Mage::helper('M2ePro')->__('If catalog updates in your Magento performed using import/export tools, custom scripts or direct changes in database,
+                    then, you can use <a target="_blank" href="%url%#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> %mode_status% functionality to detect changes in Products\' Price and Quantity.', Mage::helper('M2ePro/View_Configuration')->getSettingsUrl(), $inspectorMode) ?>
                 </div>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -28,7 +28,7 @@
                                 <option value="1"<?php if (1 == $templates_mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__("Updates and synchronizes Play.com Listings according to<br/>Synchronization Templates' rules."); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__("Updates and synchronizes Play.com Listings according to Synchronization Policies' rules."); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -60,9 +60,9 @@
                     <div id="block_notice_play_synchronization_revise_all" style="<?php if (!$templates_mode) echo 'display: none'; ?>" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
                         <?php echo Mage::helper('M2ePro')->__(
-    'If your Play.com listings for some reason were asynchronized with the products in Magento, <a href="javascript:" onclick="%script_code%">turn on</a> the Revise All action to catch data up.
-        <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
-    <br><br>
+    'If your Play.com listings for some reason were asynchronized with the Products in Magento, <a href="javascript:" onclick="%script_code%">turn on</a> the Revise All action to catch data up.
+        <br/>Revise is performed by the Inventory Synchronization, 100 Items per a cycle.
+    <br/><br/>
         ',
     'SynchronizationHandlerObj.showReviseAllConfirmPopup(\''.Ess_M2ePro_Helper_Component_Play::NICK.'\');'
                         )?>
@@ -121,7 +121,7 @@
                                 <option value="1"<?php if (1 == $orders_mode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes Play.com Orders for accounts,<br/>which have enabled Import Play.com Orders in their<br/>Accounts settings.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes Play.com Orders for accounts, which have enabled Import Play.com Orders in their Accounts settings.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -175,7 +175,7 @@
                                 <option value="1"<?php if (1 == $otherListingsMode) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for Play.com<br/>accounts, which have enabled Import 3rd Party Listings<br/>in their Accounts settings.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for Play.com accounts, which have enabled Import 3rd Party Listings in their Accounts settings.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -213,7 +213,7 @@
     <div style="margin: 17px 0">
 
         <?php echo Mage::helper('M2ePro')->__(
-            'Click \'Confirm\' and Revise will be performed by the Inventory Synchronization, 100 items per a cycle.'
+            'Click \'Confirm\' and Revise will be performed by the Inventory Synchronization, 100 Items per a cycle.'
         ); ?>
 
     </div>

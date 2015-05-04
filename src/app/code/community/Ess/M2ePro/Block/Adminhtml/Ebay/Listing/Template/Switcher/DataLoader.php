@@ -256,7 +256,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Switcher_DataLoader
             || $source instanceof Ess_M2ePro_Model_Ebay_Template_Shipping
             || $source instanceof Ess_M2ePro_Model_Ebay_Template_Return
             || $source instanceof Ess_M2ePro_Model_Template_SellingFormat
-            || $source instanceof Ess_M2ePro_Model_Ebay_Template_Description
+            || $source instanceof Ess_M2ePro_Model_Template_Description
             || $source instanceof Ess_M2ePro_Model_Template_Synchronization
         ) {
             return true;
@@ -264,6 +264,41 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Switcher_DataLoader
 
         return false;
     }
+
+    private function isHorizontalTemplate($source)
+    {
+        if ($source instanceof Ess_M2ePro_Model_Template_SellingFormat ||
+            $source instanceof Ess_M2ePro_Model_Template_Synchronization ||
+            $source instanceof Ess_M2ePro_Model_Template_Description) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // -----------------------------------
+
+    private function getTemplateNick($source)
+    {
+        if (!$this->isHorizontalTemplate($source)) {
+            return $source->getNick();
+        }
+
+        $nick = null;
+
+        if ($source instanceof Ess_M2ePro_Model_Template_SellingFormat) {
+            $nick = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT;
+        } elseif ($source instanceof Ess_M2ePro_Model_Template_Synchronization) {
+            $nick = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
+        } elseif ($source instanceof Ess_M2ePro_Model_Template_Description) {
+            $nick = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION;
+        }
+
+        return $nick;
+    }
+
+    // ########################################
 
     private function getDataFromTemplate($source, array $params = array())
     {
@@ -275,13 +310,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Switcher_DataLoader
             $marketplaceId = (int)$params['marketplace_id'];
         }
 
-        if ($source instanceof Ess_M2ePro_Model_Template_SellingFormat) {
-            $nick = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT;
-        } elseif ($source instanceof Ess_M2ePro_Model_Template_Synchronization) {
-            $nick = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION;
-        } else {
-            $nick = $source->getNick();
-        }
+        $nick = $this->getTemplateNick($source);
 
         return array(
             'account_id'                 => NULL,

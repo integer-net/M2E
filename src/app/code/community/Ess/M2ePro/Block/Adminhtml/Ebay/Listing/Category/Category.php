@@ -47,6 +47,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Category
 
         //------------------------------
         $this->_addButton('next', array(
+            'id'        => 'ebay_listing_category_continue_btn',
             'label'     => Mage::helper('M2ePro')->__('Continue'),
             'class'     => 'scalable next',
             'onclick'   => "EbayListingCategoryCategoryGridHandlerObj.validate()"

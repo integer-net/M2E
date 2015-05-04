@@ -111,16 +111,16 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Grid extends Mage_Admin
         return <<<HTML
 
 {$value}
-<br />
-<br />
+<br/>
+<br/>
 <div id="note_{$row[$idKey]}">
     <span id="note_view_{$row[$idKey]}"></span>
     <div id="note_edit_{$row[$idKey]}_container" style="display: none">
         <textarea id="note_edit_{$row[$idKey]}"></textarea>
-        <br />
+        <br/>
     </div>
     <span id="note_edit_link_{$row[$idKey]}" style="display: none;">
-        <br />
+        <br/>
         <a href="javascript:void(0)"
            onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row[$idKey]}')">{$editLabel}</a>
     </span>

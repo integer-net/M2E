@@ -87,7 +87,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Policies_Receive
 
             /** @var $marketplace Ess_M2ePro_Model_Marketplace **/
 
-            $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
+            $this->getActualOperationHistory()->addText('Starting site "'.$marketplace->getTitle().'"');
 
             foreach ($accounts as $account) {
 

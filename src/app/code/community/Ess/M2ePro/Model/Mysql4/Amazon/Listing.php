@@ -23,6 +23,8 @@ class Ess_M2ePro_Model_Mysql4_Amazon_Listing
 
     public function updateStatisticColumns()
     {
+        $this->updateStatisticCountColumns();
+
         $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
         $amazonListingProductTable = Mage::getResourceModel('M2ePro/Amazon_Listing_Product')->getMainTable();
@@ -44,6 +46,79 @@ class Ess_M2ePro_Model_Mysql4_Amazon_Listing
         $query = "UPDATE `{$listingTable}`
                   SET `items_active_count` =  IFNULL((".$select->__toString()."),0)
                   WHERE `component_mode` = '".Ess_M2ePro_Helper_Component_Amazon::NICK."'";
+
+        $this->_getWriteAdapter()->query($query);
+    }
+
+    private function updateStatisticCountColumns()
+    {
+        $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
+        $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
+        $amazonListingProductTable = Mage::getResourceModel('M2ePro/Amazon_Listing_Product')->getMainTable();
+
+        $totalCountSelect = $this->_getReadAdapter()
+            ->select()
+            ->from(
+                array('lp' => $listingProductTable),
+                new Zend_Db_Expr('COUNT(*)')
+            )
+            ->join(
+                array('alp' => $amazonListingProductTable),
+                'lp.id = alp.listing_product_id',
+                array()
+            )
+            ->where("`listing_id` = `{$listingTable}`.`id`")
+            ->where("`variation_parent_id` IS NULL");
+
+        $statusListed = Ess_M2ePro_Model_Listing_Product::STATUS_LISTED;
+        $statusNotListed = Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED;
+        $statusStoped = Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED;
+        $statusBlocked = Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED;
+
+        $activeCountSelect = $this->_getReadAdapter()
+            ->select()
+            ->from(
+                array('lp' => $listingProductTable),
+                new Zend_Db_Expr('COUNT(*)')
+            )
+            ->join(
+                array('alp' => $amazonListingProductTable),
+                'lp.id = alp.listing_product_id',
+                array()
+            )
+            ->where("`listing_id` = `{$listingTable}`.`id`")
+            ->where("`variation_parent_id` IS NULL")
+            ->where("lp.status = {$statusListed} OR
+                (alp.is_variation_parent = 1 AND alp.variation_child_statuses REGEXP '\"{$statusListed}\":[^0]')");
+
+        $inactiveCountSelect = $this->_getReadAdapter()
+            ->select()
+            ->from(
+                array('lp' => $listingProductTable),
+                new Zend_Db_Expr('COUNT(*)')
+            )
+            ->join(
+                array('alp' => $amazonListingProductTable),
+                'lp.id = alp.listing_product_id',
+                array()
+            )
+            ->where("`listing_id` = `{$listingTable}`.`id`")
+            ->where("`variation_parent_id` IS NULL")
+            ->where("(lp.status != {$statusListed} AND alp.is_variation_parent = 0) OR (
+                alp.is_variation_parent = 1  AND (
+                    alp.variation_child_statuses IS NULL OR
+                    alp.variation_child_statuses REGEXP '\"{$statusListed}\":[0]' AND (
+                        alp.variation_child_statuses REGEXP '\"{$statusNotListed}\":[^0]' OR
+                        alp.variation_child_statuses REGEXP '\"{$statusStoped}\":[^0]' OR
+                        alp.variation_child_statuses REGEXP '\"{$statusBlocked}\":[^0]'
+                    )
+                )
+            )");
+
+        $query = "UPDATE `{$listingTable}`
+                  SET `products_total_count` = (".$totalCountSelect->__toString()."),
+                      `products_active_count` = (".$activeCountSelect->__toString()."),
+                      `products_inactive_count` = (".$inactiveCountSelect->__toString().")";
 
         $this->_getWriteAdapter()->query($query);
     }

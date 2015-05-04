@@ -20,7 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_ModeConfir
     {
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('M2E Mode');
+        $this->_headerText = Mage::helper('M2ePro')->__('M2E Pro Mode');
         //------------------------------
 
         //------------------------------

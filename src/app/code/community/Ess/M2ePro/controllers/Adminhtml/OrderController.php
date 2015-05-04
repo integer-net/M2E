@@ -67,7 +67,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select order(s).'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Order(s).'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -118,7 +118,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select order(s).'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Order(s).'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -171,7 +171,7 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         if (is_null($item->getId())) {
             $this->getResponse()->setBody(json_encode(array(
-                'error' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Order item does not exist.'))
+                'error' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Order Item does not exist.'))
             )));
 
             return;
@@ -261,12 +261,12 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         $orderItem->assignProduct($productData['entity_id']);
 
-        $orderItem->getOrder()->addSuccessLog('Order item "%title%" was successfully mapped.', array(
+        $orderItem->getOrder()->addSuccessLog('Order Item "%title%" was successfully mapped.', array(
             'title' => $orderItem->getChildObject()->getTitle()
         ));
 
         $this->getResponse()->setBody(json_encode(array(
-            'success'  => Mage::helper('M2ePro')->__('Order item was successfully mapped.'),
+            'success'  => Mage::helper('M2ePro')->__('Order Item was successfully mapped.'),
             'continue' => $orderItem->getMagentoProduct()->hasRequiredOptions()
         )));
     }
@@ -336,12 +336,12 @@ class Ess_M2ePro_Adminhtml_OrderController
             );
         }
 
-        $orderItem->getOrder()->addSuccessLog('Order item "%title%" options were successfully configured.', array(
+        $orderItem->getOrder()->addSuccessLog('Order Item "%title%" options were successfully configured.', array(
             'title' => $orderItem->getChildObject()->getTitle()
         ));
 
         $this->getResponse()->setBody(json_encode(array(
-            'success' => Mage::helper('M2ePro')->__('Order item options were successfully configured.')
+            'success' => Mage::helper('M2ePro')->__('Order Item options were successfully configured.')
         )));
     }
 

@@ -182,7 +182,7 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_ProductChan
     {
         Mage::getModel('M2ePro/ProductChange')
                     ->addUpdateAction($listingProduct->getProductId(),
-                                       Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION);
+                                       Ess_M2ePro_Model_ProductChange::INITIATOR_INSPECTOR);
 
         foreach ($listingProduct->getVariations(true) as $variation) {
 
@@ -194,7 +194,7 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_ProductChan
 
                 Mage::getModel('M2ePro/ProductChange')
                         ->addUpdateAction($option->getProductId(),
-                                          Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION);
+                                          Ess_M2ePro_Model_ProductChange::INITIATOR_INSPECTOR);
             }
         }
     }

@@ -15,6 +15,10 @@
         'formSubmit' => $this->getUrl('M2ePro/adminhtml_configuration_logsCleaning/save')
     )); ?>);
 
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'Please enter a valid value greater than 14 days.' => Mage::helper('M2ePro')->__('Please enter a valid value greater than 14 days.')
+    )); ?>);
+
     Event.observe(window, 'load', function() {
         LogCleaningHandlerObj = new ConfigurationLogCleaningHandler();
 
@@ -43,7 +47,6 @@
     .columns .form-list td:nth-child(4) {
         width: 90px;
     }
-
 </style>
 
 <form id="<?php echo $this->getForm()->getId(); ?>" action="<?php echo $this->getForm()->getData('action'); ?>" method="post" enctype="multipart/form-data">
@@ -99,7 +102,7 @@
                             <label for="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days"><?php echo Mage::helper('M2ePro')->__('Keep For (days)'); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value">
-                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
+                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible M2ePro-logs-clearing-interval input-text" />
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>
@@ -167,7 +170,7 @@
                             <label for="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days"><?php echo Mage::helper('M2ePro')->__('Keep For (days)'); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value">
-                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
+                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_OTHER_LISTINGS]; ?>" type="text" class="M2ePro-required-when-visible M2ePro-logs-clearing-interval input-text" />
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>
@@ -235,7 +238,7 @@
                             <label for="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days"><?php echo Mage::helper('M2ePro')->__('Keep For (days)'); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value">
-                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS]; ?>" type="text" class="M2ePro-required-when-visible input-text" />
+                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_SYNCHRONIZATIONS]; ?>" type="text" class="M2ePro-required-when-visible M2ePro-logs-clearing-interval input-text" />
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>
@@ -303,7 +306,7 @@
                             <label for="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days"><?php echo Mage::helper('M2ePro')->__('Keep For (days)'); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value">
-                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS]; ?>" type="text" disabled="disabled" class="M2ePro-required-when-visible input-text" />
+                            <input id="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" name="<?php echo Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS; ?>_log_days" value="<?php echo $this->days[Ess_M2ePro_Model_Log_Cleaning::LOG_ORDERS]; ?>" type="text" disabled="disabled" class="M2ePro-required-when-visible M2ePro-logs-clearing-interval input-text" />
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__('Specify for how long you want to keep log data before it is automatically cleared.'); ?></span>
                             </p>

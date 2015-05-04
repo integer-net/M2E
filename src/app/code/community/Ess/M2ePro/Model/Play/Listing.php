@@ -10,7 +10,6 @@
  */
 class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Play_Abstract
 {
-    const SKU_MODE_NOT_SET          = 0;
     const SKU_MODE_PRODUCT_ID       = 3;
     const SKU_MODE_DEFAULT          = 1;
     const SKU_MODE_CUSTOM_ATTRIBUTE = 2;
@@ -45,7 +44,6 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
     const SHIPPING_PRICE_EURO_MODE_CUSTOM_VALUE      = 1;
     const SHIPPING_PRICE_EURO_MODE_CUSTOM_ATTRIBUTE  = 2;
 
-    const CONDITION_MODE_NOT_SET          = 0;
     const CONDITION_MODE_DEFAULT          = 1;
     const CONDITION_MODE_CUSTOM_ATTRIBUTE = 2;
 
@@ -60,10 +58,8 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
     const CONDITION_COLLECTABLE_AVERAGE    = 'Collectable; Average';
     const CONDITION_REFURBISHED            = 'Refurbished';
 
-    const CONDITION_NOTE_MODE_NOT_SET          = 0;
     const CONDITION_NOTE_MODE_NONE             = 3;
     const CONDITION_NOTE_MODE_CUSTOM_VALUE     = 1;
-    const CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE = 2;
 
     // ########################################
 
@@ -76,6 +72,9 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
      * @var Ess_M2ePro_Model_Template_Synchronization
      */
     private $synchronizationTemplateModel = NULL;
+
+    /** @var Ess_M2ePro_Model_Play_Listing_Source[] */
+    private $listingSourceModels = array();
 
     // ########################################
 
@@ -93,6 +92,27 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
         $temp && $this->sellingFormatTemplateModel = NULL;
         $temp && $this->synchronizationTemplateModel = NULL;
         return $temp;
+    }
+
+    // ########################################
+
+    /**
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Play_Listing_Source
+     */
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
+    {
+        $productId = $magentoProduct->getProductId();
+
+        if (!empty($this->listingSourceModels[$productId])) {
+            return $this->listingSourceModels[$productId];
+        }
+
+        $this->listingSourceModels[$productId] = Mage::getModel('M2ePro/Play_Listing_Source');
+        $this->listingSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->listingSourceModels[$productId]->setListing($this->getParentObject());
+
+        return $this->listingSourceModels[$productId];
     }
 
     // ########################################
@@ -203,11 +223,6 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
 
     // ########################################
 
-    public function getAttributeSets()
-    {
-        return $this->getParentObject()->getAttributeSets();
-    }
-
     public function getProducts($asObjects = false, array $filters = array())
     {
         return $this->getParentObject()->getProducts($asObjects,$filters);
@@ -223,11 +238,6 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
     public function getSkuMode()
     {
         return (int)$this->getData('sku_mode');
-    }
-
-    public function isSkuNotSetMode()
-    {
-        return $this->getSkuMode() == self::SKU_MODE_NOT_SET;
     }
 
     public function isSkuProductIdMode()
@@ -363,9 +373,29 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
     public function getDispatchFromSource()
     {
         return array(
-            'mode'      => $this->getDispatchFromMode(),
-            'value'     => $this->getData('dispatch_from_value'),
+            'mode'  => $this->getDispatchFromMode(),
+            'value' => $this->getData('dispatch_from_value'),
         );
+    }
+
+    //-------------------------
+
+    public function getDispatchFrom()
+    {
+        $result = '';
+        $src = $this->getDispatchFromSource();
+
+        if ($src['mode'] == Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_NOT_SET) {
+            $result = NULL;
+        }
+
+        if ($src['mode'] == Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT) {
+            $result = $src['value'];
+        }
+
+        is_string($result) && $result = trim($result);
+
+        return $result;
     }
 
     //-------------------------
@@ -461,11 +491,6 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
         return (int)$this->getData('condition_mode');
     }
 
-    public function isConditionNotSetMode()
-    {
-        return $this->getConditionMode() == self::CONDITION_MODE_NOT_SET;
-    }
-
     public function isConditionDefaultMode()
     {
         return $this->getConditionMode() == self::CONDITION_MODE_DEFAULT;
@@ -518,11 +543,6 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
         return (int)$this->getData('condition_note_mode');
     }
 
-    public function isConditionNoteNotSetMode()
-    {
-        return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_NOT_SET;
-    }
-
     public function isConditionNoteNoneMode()
     {
         return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_NONE;
@@ -533,17 +553,11 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
         return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_CUSTOM_VALUE;
     }
 
-    public function isConditionNoteAttributeMode()
-    {
-        return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE;
-    }
-
     public function getConditionNoteSource()
     {
         return array(
             'mode'      => $this->getConditionNoteMode(),
-            'value'     => $this->getData('condition_note_value'),
-            'attribute' => $this->getData('condition_note_custom_attribute')
+            'value'     => $this->getData('condition_note_value')
         );
     }
 
@@ -599,8 +613,6 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
             'condition_note' => $listingOtherProduct->getChildObject()->getConditionNote(),
             'dispatch_to' => $listingOtherProduct->getChildObject()->getDispatchTo(),
             'dispatch_from' => $listingOtherProduct->getChildObject()->getDispatchFrom(),
-            'start_date' => $listingOtherProduct->getChildObject()->getStartDate(),
-            'end_date' => $listingOtherProduct->getChildObject()->getEndDate(),
             'status' => $listingOtherProduct->getStatus(),
             'status_changer' => $listingOtherProduct->getStatusChanger()
         );
@@ -656,13 +668,13 @@ class Ess_M2ePro_Model_Play_Listing extends Ess_M2ePro_Model_Component_Child_Pla
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::delete();
     }
 

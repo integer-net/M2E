@@ -62,6 +62,16 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Preview_Form extends 
         $this->setChild('display_random_product_description',$buttonBlock);
         //------------------------------
 
+        //------------------------------
+        $this->setChild(
+            'store_switcher',
+            $this->getLayout()->createBlock(
+                'M2ePro/adminhtml_storeSwitcher', '', array('id'       => 'store_id',
+                                                            'selected' => $this->getData('store_id'))
+            )
+        );
+        //------------------------------
+
         return parent::_beforeToHtml();
     }
 

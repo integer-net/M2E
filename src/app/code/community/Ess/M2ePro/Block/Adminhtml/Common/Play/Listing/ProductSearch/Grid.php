@@ -162,7 +162,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_ProductSearch_Grid extends 
             foreach ($specific as $option) {
                 $specificsHtml .= '<option value="'.$option.'">'.$option.'</option>';
             }
-            $specificsHtml .= '</select><br />';
+            $specificsHtml .= '</select><br/>';
         }
 
         $specificsJsonContainer = '<div id="skus_'.$id.'" style="display: none;">'.
@@ -231,7 +231,7 @@ JAVASCRIPT;
         //------------------------------
         $data = array(
             'id'    => 'productSearch_cleanSuggest_button',
-            'label' => Mage::helper('M2ePro')->__('Clear Search Result'),
+            'label' => Mage::helper('M2ePro')->__('Clear Search Results'),
             'class' => 'productSearch_cleanSuggest_button'
         );
         $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);

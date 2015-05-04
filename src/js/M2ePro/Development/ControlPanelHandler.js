@@ -8,7 +8,7 @@ ControlPanelHandler.prototype = Object.extend(new CommonHandler(), {
         var cmdKeys = [67, 77, 68];
         var cmdPressedKeys = [];
 
-        document.observe('keyup', function (event) {
+        document.observe('keyup', function(event) {
 
             if (cmdPressedKeys.length < cmdKeys.length) {
                 if (cmdKeys[cmdPressedKeys.length] == event.keyCode) {

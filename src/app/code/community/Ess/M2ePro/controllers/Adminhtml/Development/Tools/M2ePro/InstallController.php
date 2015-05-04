@@ -43,7 +43,7 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_InstallController
 <h2 style="margin: 20px 0 0 10px">Installation History
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -161,7 +161,7 @@ HTML;
                                     ->processVirtual('files','get','info');
 
         if (count($responseData) <= 0) {
-            echo $this->getEmptyResultsHtml('No files info for this M2E version on server.');
+            echo $this->getEmptyResultsHtml('No files info for this M2E Pro version on server.');
             return;
         }
 
@@ -202,7 +202,7 @@ HTML;
 <h2 style="margin: 20px 0 0 10px">Files Validity
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -248,7 +248,7 @@ HTML;
                                              array('tables_info' => json_encode($tablesInfo)));
 
         if (!isset($responseData['diff'])) {
-            echo $this->getEmptyResultsHtml('No tables info for this M2E version on server.');
+            echo $this->getEmptyResultsHtml('No tables info for this M2E Pro version on server.');
             return;
         }
 
@@ -263,7 +263,7 @@ HTML;
 <h2 style="margin: 20px 0 0 10px">Tables Structure Validity
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -282,7 +282,7 @@ HTML;
                     foreach ($resultRow['info']['diff_data'] as $diffCode => $diffValue) {
                         $additionalInfo .= "<b>{$diffCode}</b>: '{$diffValue}'. ";
                         $additionalInfo .= "<b>original:</b> '{$resultRow['info']['original_data'][$diffCode]}'.";
-                        $additionalInfo .= "</br>";
+                        $additionalInfo .= "<br/>";
                     }
                 }
 
@@ -337,7 +337,7 @@ HTML;
                                 ->processVirtual('configs','get','info');
 
         if (!isset($responseData['configs_info'])) {
-            echo $this->getEmptyResultsHtml('No configs info for this M2E version on server.');
+            echo $this->getEmptyResultsHtml('No configs info for this M2E Pro version on server.');
             return;
         }
 
@@ -366,7 +366,7 @@ HTML;
 <h2 style="margin: 20px 0 0 10px">Configs Validity
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -468,7 +468,7 @@ HTML;
 <h2 style="margin: 20px 0 0 10px">Files Difference
     <span style="color: #808080; font-size: 15px;">({$filePath})</span>
 </h2>
-<br>
+<br/>
 HTML;
 
         if (isset($responseData['html'])) {
@@ -500,7 +500,7 @@ HTML;
 <h2 style="margin: 20px 0 0 10px">UnWritable Directories
     <span style="color: #808080; font-size: 15px;">(%count% entries)</span>
 </h2>
-<br>
+<br/>
 
 <table class="grid" cellpadding="0" cellspacing="0">
     <tr>
@@ -547,7 +547,7 @@ HTML;
         $connWrite->update(
             Mage::getSingleton('core/resource')->getTableName('m2epro_wizard'),
             array('status' => 0, 'step' => null),
-            '`nick` <> \'migrationToV6\''
+            '`nick` <> \'migrationToV6\' AND `nick` <> \'migrationNewAmazon\''
         );
 
         Mage::helper('M2ePro/Magento')->clearCache();

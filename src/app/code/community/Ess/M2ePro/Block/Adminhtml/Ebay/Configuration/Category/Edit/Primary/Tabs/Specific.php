@@ -103,7 +103,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Edit_Primary_Tabs_S
         $tcTable = Mage::getModel('M2ePro/Ebay_Template_Category')->getResource()->getMainTable();
 
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $select = $connRead->select();
         $select->from(array('tc' => $tcTable), array('id', 'create_date'))

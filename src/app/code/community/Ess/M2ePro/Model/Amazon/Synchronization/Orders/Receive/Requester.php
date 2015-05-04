@@ -5,19 +5,14 @@
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive_Requester
-    extends Ess_M2ePro_Model_Connector_Amazon_Orders_Get_Items
+    extends Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsRequester
 {
     // ##########################################################
 
-    protected function makeResponserModel()
+    public function setProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
-        return 'M2ePro/Amazon_Synchronization_Orders_Receive_Responser';
-    }
+        parent::setProcessingLocks($processingRequest);
 
-    // ##########################################################
-
-    protected function setLocks($hash)
-    {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
 
@@ -28,26 +23,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive_Requester
         $lockItem->setMaxInactiveTime(Ess_M2ePro_Model_Processing_Request::MAX_LIFE_TIME_INTERVAL);
         $lockItem->create();
 
-        // ----------------------
-
-        $tempObjects = array(
-            $this->account,
-            $this->account->getChildObject()->getMarketplace()
+        $this->account->addObjectLock(NULL, $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization', $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization_amazon', $processingRequest->getHash());
+        $this->account->addObjectLock(
+            Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX, $processingRequest->getHash()
         );
-
-        $tempLocks = array(
-            NULL,
-            'synchronization', 'synchronization_amazon',
-            Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX
-        );
-
-        /* @var $object Ess_M2ePro_Model_Abstract */
-        foreach ($tempObjects as $object) {
-            foreach ($tempLocks as $lock) {
-                $object->addObjectLock($lock,$hash);
-            }
-
-        }
     }
 
     // ##########################################################

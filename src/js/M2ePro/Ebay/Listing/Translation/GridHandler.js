@@ -56,7 +56,7 @@ EbayListingTranslationGridHandler = Class.create(EbayListingViewGridHandler, {
 
         var productId = strip_tags(temp).trim();
 
-        return M2ePro.url.get('adminhtml_ebay_log/listing',{
+        return M2ePro.url.get('adminhtml_ebay_log/listing', {
             filter: base64_encode('product_id[from]='+productId+'&product_id[to]='+productId)
         });
     },
@@ -69,5 +69,4 @@ EbayListingTranslationGridHandler = Class.create(EbayListingViewGridHandler, {
     }
 
     //----------------------------------
-
 });

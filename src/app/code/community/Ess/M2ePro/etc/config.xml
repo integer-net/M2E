@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>6.2.4.2</version>
+            <version>6.3.0</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -130,19 +130,24 @@
                     </orders>
 
                     <templates module="M2ePro">
-                        <title>Templates</title>
+                        <title>Policies</title>
                         <sort_order>3</sort_order>
                         <children>
                             <selling_format module="M2ePro">
-                                <title>Selling Format Templates</title>
+                                <title>Selling Format Policies</title>
                                 <sort_order>1</sort_order>
                                 <action>M2ePro/adminhtml_common_template_sellingFormat/index</action>
                             </selling_format>
                             <synchronization module="M2ePro">
-                                <title>Synchronization Templates</title>
+                                <title>Synchronization Policies</title>
                                 <sort_order>2</sort_order>
                                 <action>M2ePro/adminhtml_common_template_synchronization/index</action>
                             </synchronization>
+                            <description module="M2ePro">
+                                <title>Amazon (Beta) Description Policies</title>
+                                <sort_order>3</sort_order>
+                                <action>M2ePro/adminhtml_common_amazon_template_description/index</action>
+                            </description>
                         </children>
                     </templates>
 
@@ -293,17 +298,21 @@
                                 </orders>
 
                                 <templates>
-                                    <title>Templates</title>
+                                    <title>Policies</title>
                                     <sort_order>3</sort_order>
                                     <children>
                                         <selling_format>
-                                            <title>Selling Format Templates</title>
+                                            <title>Selling Format Policies</title>
                                             <sort_order>1</sort_order>
                                         </selling_format>
                                         <synchronization>
-                                            <title>Synchronization Templates</title>
+                                            <title>Synchronization Policies</title>
                                             <sort_order>2</sort_order>
                                         </synchronization>
+                                        <description>
+                                            <title>Amazon Description Policies</title>
+                                            <sort_order>3</sort_order>
+                                        </description>
                                     </children>
                                 </templates>
 
@@ -420,164 +429,185 @@
 
         <events>
 
+            <!-- system configuration -->
+
             <controller_action_predispatch_adminhtml_system_config_save>
                 <observers>
-                    <ess_M2ePro_observer_config>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Magento_Configuration</class>
-                        <method>systemConfigSaveAction</method>
-                    </ess_M2ePro_observer_config>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>systemConfigurationSaveAction</method>
+                    </M2ePro_observer>
                 </observers>
             </controller_action_predispatch_adminhtml_system_config_save>
+
+            <!-- products -->
+
             <catalog_product_save_before>
                 <observers>
-                    <ess_M2ePro_observer_product>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Product</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>catalogProductSaveBefore</method>
-                    </ess_M2ePro_observer_product>
+                    </M2ePro_observer>
                 </observers>
             </catalog_product_save_before>
             <catalog_product_save_after>
                 <observers>
-                    <ess_M2ePro_observer_product>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Product</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>catalogProductSaveAfter</method>
-                    </ess_M2ePro_observer_product>
+                    </M2ePro_observer>
                 </observers>
             </catalog_product_save_after>
 
             <catalog_product_delete_before>
                 <observers>
-                    <ess_M2ePro_observer_product>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Product</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>catalogProductDeleteBefore</method>
-                    </ess_M2ePro_observer_product>
+                    </M2ePro_observer>
                 </observers>
             </catalog_product_delete_before>
+
+            <!-- categories & stock items -->
+
             <catalog_category_change_products>
                 <observers>
-                    <ess_M2ePro_observer_category>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Category</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>catalogCategoryChangeProducts</method>
-                    </ess_M2ePro_observer_category>
+                    </M2ePro_observer>
                 </observers>
             </catalog_category_change_products>
+
             <cataloginventory_stock_item_save_after>
                 <observers>
-                    <ess_M2ePro_observer_stock_item>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_StockItem</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>catalogInventoryStockItemSaveAfter</method>
-                    </ess_M2ePro_observer_stock_item>
+                    </M2ePro_observer>
                 </observers>
             </cataloginventory_stock_item_save_after>
 
-            <sales_order_save_after>
+            <!-- synchronization -->
+
+            <m2epro_synchronization_before_start>
                 <observers>
-                    <ess_M2ePro_observer_order>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Order</class>
-                        <method>salesOrderSaveAfter</method>
-                    </ess_M2ePro_observer_order>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>synchronizationBeforeStart</method>
+                    </M2ePro_observer>
                 </observers>
-            </sales_order_save_after>
+            </m2epro_synchronization_before_start>
+
+            <m2epro_synchronization_after_end>
+                <observers>
+                    <M2ePro_observer>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>synchronizationAfterStart</method>
+                    </M2ePro_observer>
+                </observers>
+            </m2epro_synchronization_after_end>
+
+            <!-- external orders -->
 
             <sales_order_invoice_pay>
                 <observers>
-                    <ess_M2ePro_observer_invoice>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Invoice</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>salesOrderInvoicePay</method>
-                    </ess_M2ePro_observer_invoice>
+                    </M2ePro_observer>
                 </observers>
             </sales_order_invoice_pay>
+
             <sales_order_shipment_save_after>
                 <observers>
-                    <ess_M2ePro_observer_shipment>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Shipment</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>salesOrderShipmentSaveAfter</method>
-                    </ess_M2ePro_observer_shipment>
+                    </M2ePro_observer>
                 </observers>
             </sales_order_shipment_save_after>
+
+            <sales_order_save_after>
+                <observers>
+                    <M2ePro_observer>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>salesOrderSaveAfter</method>
+                    </M2ePro_observer>
+                </observers>
+            </sales_order_save_after>
+
             <sales_convert_quote_item_to_order_item>
                 <observers>
-                    <ess_M2ePro_observer_order>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Order</class>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
                         <method>salesConvertQuoteItemToOrderItem</method>
-                    </ess_M2ePro_observer_order>
+                    </M2ePro_observer>
                 </observers>
             </sales_convert_quote_item_to_order_item>
 
+            <!-- internal orders -->
+
             <m2epro_associate_ebay_order_item_to_product>
                 <observers>
-                    <ess_M2ePro_observer_ebay_order_product>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Ebay_Order_Item</class>
-                        <method>associateItemWithProduct</method>
-                    </ess_M2ePro_observer_ebay_order_product>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>associateEbayItemWithProduct</method>
+                    </M2ePro_observer>
                 </observers>
             </m2epro_associate_ebay_order_item_to_product>
             <m2epro_associate_amazon_order_item_to_product>
                 <observers>
-                    <ess_M2ePro_observer_amazon_order_product>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Amazon_Order_Item</class>
-                        <method>associateItemWithProduct</method>
-                    </ess_M2ePro_observer_amazon_order_product>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>associateAmazonItemWithProduct</method>
+                    </M2ePro_observer>
                 </observers>
             </m2epro_associate_amazon_order_item_to_product>
             <m2epro_associate_buy_order_item_to_product>
                 <observers>
-                    <ess_M2ePro_observer_buy_order_product>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Buy_Order_Item</class>
-                        <method>associateItemWithProduct</method>
-                    </ess_M2ePro_observer_buy_order_product>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>associateBuyItemWithProduct</method>
+                    </M2ePro_observer>
                 </observers>
             </m2epro_associate_buy_order_item_to_product>
             <m2epro_associate_play_order_item_to_product>
                 <observers>
-                    <ess_M2ePro_observer_play_order_product>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Play_Order_Item</class>
-                        <method>associateItemWithProduct</method>
-                    </ess_M2ePro_observer_play_order_product>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>associatePlayItemWithProduct</method>
+                    </M2ePro_observer>
                 </observers>
             </m2epro_associate_play_order_item_to_product>
+
+            <!-- amazon orders -->
+
             <m2epro_amazon_fba_magento_order_place_after>
                 <observers>
-                    <revert_ordered_qty>
+                    <M2ePro_observer>
                         <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_Amazon_Order</class>
-                        <method>revertOrderedQty</method>
-                    </revert_ordered_qty>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>revertAmazonOrderedQty</method>
+                    </M2ePro_observer>
                 </observers>
             </m2epro_amazon_fba_magento_order_place_after>
-
-            <m2epro_synchronization_before_start>
-                <observers>
-                    <disable_stock_item_automatic_reindex>
-                        <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_StockItem</class>
-                        <method>disableAutomaticReindex</method>
-                    </disable_stock_item_automatic_reindex>
-                </observers>
-            </m2epro_synchronization_before_start>
-            <m2epro_synchronization_after_end>
-                <observers>
-                    <enable_stock_item_automatic_reindex>
-                        <type>singleton</type>
-                        <class>Ess_M2ePro_Model_Observer_StockItem</class>
-                        <method>enableAutomaticReindex</method>
-                    </enable_stock_item_automatic_reindex>
-                </observers>
-            </m2epro_synchronization_after_end>
 
         </events>
         <models>
@@ -604,6 +634,10 @@
                         <table>m2epro_synchronization_config</table>
                     </Config_Synchronization>
 
+                    <Registry>
+                        <table>m2epro_registry</table>
+                    </Registry>
+
                     <LockItem>
                         <table>m2epro_lock_item</table>
                     </LockItem>
@@ -623,9 +657,6 @@
                         <table>m2epro_synchronization_log</table>
                     </Synchronization_Log>
 
-                    <AttributeSet>
-                        <table>m2epro_attribute_set</table>
-                    </AttributeSet>
                     <StopQueue>
                         <table>m2epro_stop_queue</table>
                     </StopQueue>
@@ -704,11 +735,37 @@
                         <table>m2epro_play_template_synchronization</table>
                     </Play_Template_Synchronization>
 
+                    <Template_Description>
+                        <table>m2epro_template_description</table>
+                    </Template_Description>
+                    <Ebay_Template_Description>
+                        <table>m2epro_ebay_template_description</table>
+                    </Ebay_Template_Description>
+                    <Amazon_Template_Description>
+                        <table>m2epro_amazon_template_description</table>
+                    </Amazon_Template_Description>
+
                     <!-- LISTINGS -->
 
-                    <Listing_Category>
-                        <table>m2epro_listing_category</table>
-                    </Listing_Category>
+                    <Listing_Auto_Category>
+                        <table>m2epro_listing_auto_category</table>
+                    </Listing_Auto_Category>
+
+                    <Listing_Auto_Category_Group>
+                        <table>m2epro_listing_auto_category_group</table>
+                    </Listing_Auto_Category_Group>
+                    <Ebay_Listing_Auto_Category_Group>
+                        <table>m2epro_ebay_listing_auto_category_group</table>
+                    </Ebay_Listing_Auto_Category_Group>
+                    <Amazon_Listing_Auto_Category_Group>
+                        <table>m2epro_amazon_listing_auto_category_group</table>
+                    </Amazon_Listing_Auto_Category_Group>
+                    <Buy_Listing_Auto_Category_Group>
+                        <table>m2epro_buy_listing_auto_category_group</table>
+                    </Buy_Listing_Auto_Category_Group>
+                    <Play_Listing_Auto_Category_Group>
+                        <table>m2epro_play_listing_auto_category_group</table>
+                    </Play_Listing_Auto_Category_Group>
 
                     <Listing_Log>
                         <table>m2epro_listing_log</table>
@@ -858,13 +915,6 @@
                         <table>m2epro_ebay_order_external_transaction</table>
                     </Ebay_Order_ExternalTransaction>
 
-                    <Ebay_Listing_Auto_Category>
-                        <table>m2epro_ebay_listing_auto_category</table>
-                    </Ebay_Listing_Auto_Category>
-                    <Ebay_Listing_Auto_Category_Group>
-                        <table>m2epro_ebay_listing_auto_category_group</table>
-                    </Ebay_Listing_Auto_Category_Group>
-
                     <Ebay_Template_Payment>
                         <table>m2epro_ebay_template_payment</table>
                     </Ebay_Template_Payment>
@@ -883,9 +933,6 @@
                     <Ebay_Template_Return>
                         <table>m2epro_ebay_template_return</table>
                     </Ebay_Template_Return>
-                    <Ebay_Template_Description>
-                        <table>m2epro_ebay_template_description</table>
-                    </Ebay_Template_Description>
                     <Ebay_Template_Policy>
                         <table>m2epro_ebay_template_policy</table>
                     </Ebay_Template_Policy>
@@ -905,15 +952,12 @@
                         <table>m2epro_amazon_item</table>
                     </Amazon_Item>
 
-                    <Amazon_Template_NewProduct>
-                        <table>m2epro_amazon_template_new_product</table>
-                    </Amazon_Template_NewProduct>
-                    <Amazon_Template_NewProduct_Specific>
-                        <table>m2epro_amazon_template_new_product_specific</table>
-                    </Amazon_Template_NewProduct_Specific>
-                    <Amazon_Template_NewProduct_Description>
-                        <table>m2epro_amazon_template_new_product_description</table>
-                    </Amazon_Template_NewProduct_Description>
+                    <Amazon_Template_Description_Definition>
+                        <table>m2epro_amazon_template_description_definition</table>
+                    </Amazon_Template_Description_Definition>
+                    <Amazon_Template_Description_Specific>
+                        <table>m2epro_amazon_template_description_specific</table>
+                    </Amazon_Template_Description_Specific>
 
                     <!-- BUY -->
 
@@ -992,27 +1036,27 @@
         <events>
             <sales_convert_quote_item_to_order_item>
                 <observers>
-                    <m2epro_cron_giftmessage>
+                    <M2ePro_observer>
                         <type>model</type>
                         <class>giftmessage/observer</class>
                         <method>salesEventConvertQuoteItemToOrderItem</method>
-                    </m2epro_cron_giftmessage>
+                    </M2ePro_observer>
                 </observers>
             </sales_convert_quote_item_to_order_item>
             <sales_order_item_save_commit_after>
                 <observers>
-                    <m2epro_cron_downloadable_observer>
+                    <M2ePro_observer>
                         <class>downloadable/observer</class>
                         <method>saveDownloadableOrderItem</method>
-                    </m2epro_cron_downloadable_observer>
+                    </M2ePro_observer>
                 </observers>
             </sales_order_item_save_commit_after>
             <sales_order_save_commit_after>
                 <observers>
-                    <m2epro_cron_downloadable_observer>
+                    <M2ePro_observer>
                         <class>downloadable/observer</class>
                         <method>setLinkStatus</method>
-                    </m2epro_cron_downloadable_observer>
+                    </M2ePro_observer>
                 </observers>
             </sales_order_save_commit_after>
         </events>

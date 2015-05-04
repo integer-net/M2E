@@ -61,7 +61,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View extends Mage_Adminhtml_Block_
 
         //------------------------------
         $this->_addButton('edit_templates', array(
-            'label'   => Mage::helper('M2ePro')->__('Edit Listing Settings'),
+            'label'   => Mage::helper('M2ePro')->__('Edit Settings'),
             'onclick' => '',
             'class'   => 'drop_down edit_default_settings_drop_down'
         ));
@@ -281,29 +281,30 @@ HTML;
 
         //------------------------------
         $translations = json_encode(array(
-            'Automatic Actions' => $helper->__('Automatic Actions'),
+            'Auto Add/Remove Rules' => $helper->__('Auto Add/Remove Rules'),
             'Based on Magento Categories' => $helper->__('Based on Magento Categories'),
             'You must select at least 1 category.' => $helper->__('You must select at least 1 category.'),
             'Rule with the same title already exists.' => $helper->__('Rule with the same title already exists.'),
             'Compatibility Attribute' => $helper->__('Compatibility Attribute'),
             'Sell on Another eBay Site' => $helper->__('Sell on Another eBay Site'),
+            'Product' => $helper->__('Product'),
             'Translation Service' => $helper->__('Translation Service'),
             'You must select at least 1 listing.' => $helper->__('You must select at least 1 listing.'),
             'Data migration.' => $helper->__('Data migration...'),
-            'Creating templates in process. Please wait...' =>
+            'Creating policies in process. Please wait...' =>
                 $helper->__('Creating policies in process. Please wait...'),
             'Creating translation account in process. Please wait...' =>
                 $helper->__('Creating translation account in process. Please wait...'),
             'Creating listing in process. Please wait...' =>
                 $helper->__('Creating listing in process. Please wait...'),
-            'Adding products in process. Please wait...' =>
-                $helper->__('Adding products in process. Please wait...'),
-            'Products failed to add' => $helper->__('Failed products'),
-            'Migration success.' => $helper->__('The products have been successfully added into Destination listing.'),
-            'Migration error.' => $helper->__('The products have not been added into Destination listing'
-                                           .' because products with the same Magento Product IDs already exist there.'),
-            'Some products categories settings are not set or attributes for title or description are empty.' =>
-                $helper->__('Some products Categories settings are not set'
+            'Adding Products in process. Please wait...' =>
+                $helper->__('Adding Products in process. Please wait...'),
+            'Products failed to add' => $helper->__('Failed Products'),
+            'Migration success.' => $helper->__('The Products have been successfully added into Destination listing.'),
+            'Migration error.' => $helper->__('The Products have not been added into Destination listing'
+                                           .' because Products with the same Magento Product IDs already exist there.'),
+            'Some Products categories settings are not set or attributes for title or description are empty.' =>
+                $helper->__('Some Products Categories settings are not set'
                            .' or attributes for Title or Description are empty.'),
             'Another Synchronization Is Already Running.' => $helper->__('Another Synchronization Is Already Running.'),
             'Getting information. Please wait ...' => $helper->__('Getting information. Please wait ...'),
@@ -330,7 +331,7 @@ HTML;
         if (!$this->getRequest()->isXmlHttpRequest()) {
             $html .= <<<HTML
 <script type="text/javascript">
-    EbayListingAutoActionHandlerObj = new EbayListingAutoActionHandler();
+    ListingAutoActionHandlerObj = new EbayListingAutoActionHandler();
 </script>
 HTML;
         }
@@ -347,21 +348,6 @@ HTML;
     protected function getDefaultSettingsButtonDropDownItems()
     {
         $items = array();
-
-        //------------------------------
-        $url = $this->getUrl(
-            '*/adminhtml_ebay_template/editListing',
-            array(
-                'id' => $this->listing->getId(),
-                'tab' => 'general'
-            )
-        );
-        $items[] = array(
-            'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Payment and Shipping'),
-            'target' => '_blank'
-        );
-        //------------------------------
 
         //------------------------------
         $url = $this->getUrl(
@@ -396,11 +382,26 @@ HTML;
         //------------------------------
 
         //------------------------------
+        $url = $this->getUrl(
+            '*/adminhtml_ebay_template/editListing',
+            array(
+                'id' => $this->listing->getId(),
+                'tab' => 'general'
+            )
+        );
+        $items[] = array(
+            'url' => $url,
+            'label' => Mage::helper('M2ePro')->__('Payment and Shipping'),
+            'target' => '_blank'
+        );
+        //------------------------------
+
+        //------------------------------
         if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
             $items[] = array(
                 'url' => 'javascript: void(0);',
-                'onclick' => 'EbayListingAutoActionHandlerObj.loadAutoActionHtml();',
-                'label' => Mage::helper('M2ePro')->__('Automatic Actions')
+                'onclick' => 'ListingAutoActionHandlerObj.loadAutoActionHtml();',
+                'label' => Mage::helper('M2ePro')->__('Auto Add/Remove Rules')
             );
         }
         //------------------------------

@@ -27,16 +27,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_ProductSearch_Main extends 
 
         //------------------------------
         $data = array(
-            'id'    => 'productSearch_reset_button',
-            'label' => Mage::helper('M2ePro')->__('Reset'),
-            'class' => 'productSearch_reset_button submit'
-        );
-        $buttonSubmitBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
-        $this->setChild('productSearch_reset_button', $buttonSubmitBlock);
-        //------------------------------
-
-        //------------------------------
-        $data = array(
             'id'    => 'productSearch_back_button',
             'label' => Mage::helper('M2ePro')->__('Back'),
             'class' => 'productSearch_back_button'

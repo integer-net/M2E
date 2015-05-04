@@ -14,7 +14,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Revise_Single
         return array('item','update','revise');
     }
 
-    protected function getLogAction()
+    protected function getLogsAction()
     {
         return Ess_M2ePro_Model_Listing_Log::ACTION_REVISE_PRODUCT_ON_COMPONENT;
     }
@@ -37,8 +37,9 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Revise_Single
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
-            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->getLogger()->logListingProductMessage(
+                $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
 
             return false;
         }
@@ -52,8 +53,9 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Revise_Single
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
-            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->getLogger()->logListingProductMessage(
+                $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
 
             return false;
         }
@@ -104,8 +106,9 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Revise_Single
             );
         }
 
-        $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+        $this->getLogger()->logListingProductMessage(
+            $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+        );
 
         return $response;
     }

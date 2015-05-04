@@ -10,22 +10,21 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         });
 
         Validation.add('M2ePro-account-customer-id', M2ePro.translator.translate('No Customer entry is found for specified ID.'), function(value) {
+
             var checkResult = false;
 
             if ($('magento_orders_customer_id_container').getStyle('display') == 'none') {
                 return true;
             }
 
-            new Ajax.Request(M2ePro.url.get('adminhtml_general/checkCustomerId'),
-            {
+            new Ajax.Request(M2ePro.url.get('adminhtml_general/checkCustomerId'), {
                 method: 'post',
-                asynchronous : false,
-                parameters : {
+                asynchronous: false,
+                parameters: {
                     customer_id : value,
                     id          : M2ePro.formData.id
                 },
-                onSuccess: function (transport)
-                {
+                onSuccess: function(transport) {
                     checkResult = transport.responseText.evalJSON()['ok'];
                 }
             });
@@ -34,6 +33,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         });
 
         Validation.add('M2ePro-account-order-number-prefix', M2ePro.translator.translate('Prefix length should not be greater than 5 characters.'), function(value) {
+
             if ($('magento_orders_number_prefix_mode').value == 0) {
                 return true;
             }
@@ -42,21 +42,20 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         });
 
         Validation.add('M2ePro-account-feedback-templates', M2ePro.translator.translate('You should create at least one response template.'), function(value) {
+
             if (value == 0) {
                 return true;
             }
 
             var checkResult = false;
 
-            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateCheck'),
-            {
+            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateCheck'), {
                 method: 'post',
-                asynchronous : false,
-                parameters : {
-                    id : M2ePro.formData.id
+                asynchronous: false,
+                parameters: {
+                    id: M2ePro.formData.id
                 },
-                onSuccess: function (transport)
-                {
+                onSuccess: function(transport) {
                     checkResult = transport.responseText.evalJSON()['ok'];
                 }
             });
@@ -64,7 +63,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return checkResult;
         });
 
-        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one attribute for product mapping.'), function(value, el) {
+        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one attribute for Product mapping.'), function(value, el) {
 
             if ($('other_listings_mapping_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_MODE_NO')) {
                 return true;
@@ -84,7 +83,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    updateHiddenValue : function(elementMode, elementHidden)
+    updateHiddenValue: function(elementMode, elementHidden)
     {
         var value = elementMode.options[elementMode.selectedIndex].getAttribute('value_hack');
         elementHidden.value = value;
@@ -96,13 +95,13 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var url = typeof M2ePro.url.urls.formSubmit == 'undefined' ?
                 M2ePro.url.formSubmit + 'back/'+base64_encode('list')+'/' :
-                M2ePro.url.get('formSubmit',{'back': base64_encode('list')});
+                M2ePro.url.get('formSubmit', {'back': base64_encode('list')});
 
         if (!editForm.validate()) {
             return;
         }
 
-        new Ajax.Request(url,{
+        new Ajax.Request(url, {
             method: 'post',
             parameters: Form.serialize($(editForm.formId)),
             onSuccess: function() {
@@ -125,28 +124,27 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     update_account_title: function()
     {
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/update_account_title'),
-            {
-                method: 'post',
-                parameters : {
-                    id : M2ePro.formData.id,
-                    mode : $('mode').value
-                },
-                onSuccess: function (transport)
-                {
-                    var response = transport.responseText.evalJSON();
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/update_account_title'), {
+            method: 'post',
+            parameters: {
+                id: M2ePro.formData.id,
+                mode: $('mode').value
+            },
+            onSuccess: function(transport) {
 
-                    if (response['status'] == 'success') {
-                        var title;
-                        if (response['url'] != '') {
-                            title = '<a target="_blank" href="' + response['url'] + '">' + response['title'] + '</a>';
-                        } else {
-                            title = response['title'];
-                        }
-                        $('account_title').update(title);
+                var response = transport.responseText.evalJSON();
+
+                if (response['status'] == 'success') {
+                    var title;
+                    if (response['url'] != '') {
+                        title = '<a target="_blank" href="' + response['url'] + '">' + response['title'] + '</a>';
+                    } else {
+                        title = response['title'];
                     }
+                    $('account_title').update(title);
                 }
-            });
+            }
+        });
     },
 
     //----------------------------------
@@ -159,12 +157,12 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         if ($('token_expired_date').value == '') {
             $('token_expired_date').value = '0';
         }
-        this.submitForm(M2ePro.url.get('adminhtml_ebay_account/beforeGetToken',{'id': M2ePro.formData.id}));
+        this.submitForm(M2ePro.url.get('adminhtml_ebay_account/beforeGetToken', {'id': M2ePro.formData.id}));
     },
 
     //----------------------------------
 
-    feedbacksReceiveChange : function()
+    feedbacksReceiveChange: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -178,7 +176,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.feedbacksAutoResponseChange();
     },
 
-    feedbacksAutoResponseChange : function()
+    feedbacksAutoResponseChange: function()
     {
         if ($('feedbacks_auto_response').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::FEEDBACKS_AUTO_RESPONSE_NONE')) {
             $('block_accounts_feedbacks_templates').hide();
@@ -191,7 +189,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    feedbacksOpenAddForm : function()
+    feedbacksOpenAddForm: function()
     {
         $('block_accounts_feedbacks_form_template_title_add').show();
         $('block_accounts_feedbacks_form_template_title_edit').hide();
@@ -207,7 +205,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('feedbacks_templates_body_validate').hide();
     },
 
-    feedbacksOpenEditForm : function(id,body)
+    feedbacksOpenEditForm: function(id,body)
     {
         $('block_accounts_feedbacks_form_template_title_add').hide();
         $('block_accounts_feedbacks_form_template_title_edit').show();
@@ -223,7 +221,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('feedbacks_templates_body_validate').hide();
     },
 
-    feedbacksCancelForm : function()
+    feedbacksCancelForm: function()
     {
         $('block_accounts_feedbacks_form_template_title_add').hide();
         $('block_accounts_feedbacks_form_template_title_edit').hide();
@@ -241,7 +239,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    feedbacksAddAction : function()
+    feedbacksAddAction: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -252,23 +250,21 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('feedbacks_templates_body_validate').hide();
         }
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateEdit'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateEdit'), {
             method: 'post',
-            asynchronous : false,
-            parameters : {
-                account_id : M2ePro.formData.id,
-                body : $('feedbacks_templates_body').value
+            asynchronous: false,
+            parameters: {
+                account_id: M2ePro.formData.id,
+                body: $('feedbacks_templates_body').value
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
                 self.feedbacksCancelForm();
                 eval('ebayAccountEditTabsFeedbackGrid'+M2ePro.formData.id+'JsObject.reload();');
             }
         });
     },
 
-    feedbacksEditAction : function()
+    feedbacksEditAction: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -279,38 +275,34 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('feedbacks_templates_body_validate').hide();
         }
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateEdit'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateEdit'), {
             method: 'post',
-            asynchronous : false,
-            parameters : {
-                id : $('feedbacks_templates_id').value,
-                account_id : M2ePro.formData.id,
-                body : $('feedbacks_templates_body').value
+            asynchronous: false,
+            parameters: {
+                id: $('feedbacks_templates_id').value,
+                account_id: M2ePro.formData.id,
+                body: $('feedbacks_templates_body').value
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
                 self.feedbacksCancelForm();
                 eval('ebayAccountEditTabsFeedbackGrid'+M2ePro.formData.id+'JsObject.reload();');
             }
         });
     },
 
-    feedbacksDeleteAction : function(id)
+    feedbacksDeleteAction: function(id)
     {
         if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return false;
         }
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateDelete'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_account/feedbackTemplateDelete'), {
             method: 'post',
-            asynchronous : false,
-            parameters : {
-                id : id
+            asynchronous: false,
+            parameters: {
+                id: id
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
                 eval('ebayAccountEditTabsFeedbackGrid'+M2ePro.formData.id+'JsObject.reload();');
             }
         });
@@ -318,19 +310,19 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    ebayStoreUpdate : function()
+    ebayStoreUpdate: function()
     {
         var self = EbayAccountHandlerObj;
-        self.submitForm(M2ePro.url.get('formSubmit',{'update_ebay_store': 1, 'back': base64_encode('edit')}));
+        self.submitForm(M2ePro.url.get('formSubmit', {'update_ebay_store': 1, 'back': base64_encode('edit')}));
     },
 
-    ebayStoreSelectCategory : function(id)
+    ebayStoreSelectCategory: function(id)
     {
         $('ebay_store_categories_selected_container').show();
         $('ebay_store_categories_selected').value = id;
     },
 
-    ebayStoreSelectCategoryHide : function()
+    ebayStoreSelectCategoryHide: function()
     {
         $('ebay_store_categories_selected_container').hide();
         $('ebay_store_categories_selected').value = '';
@@ -338,7 +330,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    ordersModeChange : function()
+    ordersModeChange: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -357,7 +349,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.magentoOrdersListingsOtherModeChange();
     },
 
-    magentoOrdersListingsModeChange : function()
+    magentoOrdersListingsModeChange: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -373,7 +365,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.changeVisibilityForOrdersModesRelatedBlocks();
     },
 
-    magentoOrdersListingsStoreModeChange : function()
+    magentoOrdersListingsStoreModeChange: function()
     {
         if ($('magento_orders_listings_store_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_STORE_MODE_CUSTOM')) {
             $('magento_orders_listings_store_id_container').show();
@@ -384,7 +376,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('magento_orders_listings_store_id').value = '';
     },
 
-    magentoOrdersListingsOtherModeChange : function()
+    magentoOrdersListingsOtherModeChange: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -403,7 +395,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.changeVisibilityForOrdersModesRelatedBlocks();
     },
 
-    magentoOrdersListingsOtherProductModeChange : function()
+    magentoOrdersListingsOtherProductModeChange: function()
     {
         if ($('magento_orders_listings_other_product_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IGNORE')) {
             $('magento_orders_listings_other_product_mode_note').hide();
@@ -414,13 +406,13 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    magentoOrdersNumberSourceChange : function()
+    magentoOrdersNumberSourceChange: function()
     {
         var self = EbayAccountHandlerObj;
         self.renderOrderNumberExample();
     },
 
-    magentoOrdersNumberPrefixModeChange : function()
+    magentoOrdersNumberPrefixModeChange: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -434,13 +426,13 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         self.renderOrderNumberExample();
     },
 
-    magentoOrdersNumberPrefixPrefixChange : function()
+    magentoOrdersNumberPrefixPrefixChange: function()
     {
         var self = EbayAccountHandlerObj;
         self.renderOrderNumberExample();
     },
 
-    renderOrderNumberExample : function()
+    renderOrderNumberExample: function()
     {
         var orderNumber = $('sample_magento_order_id').value;
         if ($('magento_orders_number_source').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_NUMBER_SOURCE_CHANNEL')) {
@@ -454,7 +446,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('order_number_example_container').update(orderNumber);
     },
 
-    magentoOrdersCustomerModeChange : function()
+    magentoOrdersCustomerModeChange: function()
     {
         var customerMode = $('magento_orders_customer_mode').value;
 
@@ -478,7 +470,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 //        $('magento_orders_customer_new_newsletter_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_CUSTOMER_NEW_SUBSCRIPTION_MODE_NO');
     },
 
-    magentoOrdersStatusMappingModeChange : function()
+    magentoOrdersStatusMappingModeChange: function()
     {
         // Reset dropdown selected values to default
         $('magento_orders_status_mapping_new').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::MAGENTO_ORDERS_STATUS_MAPPING_NEW');
@@ -497,7 +489,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         $('magento_orders_shipment_mode').disabled = disabled;
     },
 
-    magentoOrdersCreationModeChange : function()
+    magentoOrdersCreationModeChange: function()
     {
         var creationMode = $('magento_orders_creation_mode').value;
 
@@ -512,7 +504,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    changeVisibilityForOrdersModesRelatedBlocks : function()
+    changeVisibilityForOrdersModesRelatedBlocks: function()
     {
         var self = EbayAccountHandlerObj;
 
@@ -550,7 +542,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //---------------------------------------
 
-    other_listings_synchronization_change : function()
+    other_listings_synchronization_change: function()
     {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES')) {
             $('other_listings_mapping_mode_tr').show();
@@ -564,14 +556,12 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    other_listings_mapping_mode_change : function()
+    other_listings_mapping_mode_change: function()
     {
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_MODE_YES')) {
             $('magento_block_ebay_accounts_other_listings_product_mapping').show();
-            $('magento_block_ebay_accounts_other_listings_product_synchronization_mapped').show();
         } else {
             $('magento_block_ebay_accounts_other_listings_product_mapping').hide();
-            $('magento_block_ebay_accounts_other_listings_product_synchronization_mapped').hide();
 
             $('mapping_sku_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_SKU_MODE_NONE');
             $('mapping_title_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_MAPPING_TITLE_MODE_NONE');
@@ -590,7 +580,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
        }
     },
 
-    mapping_sku_mode_change : function()
+    mapping_sku_mode_change: function()
     {
         var self        = EbayAccountHandlerObj,
             attributeEl = $('mapping_sku_attribute');
@@ -606,7 +596,7 @@ EbayAccountHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    mapping_title_mode_change : function()
+    mapping_title_mode_change: function()
     {
         var self        = EbayAccountHandlerObj,
             attributeEl = $('mapping_title_attribute');

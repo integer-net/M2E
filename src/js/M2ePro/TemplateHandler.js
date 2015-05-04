@@ -17,13 +17,12 @@ TemplateHandler = Class.create(CommonHandler, {
         parameters += '&check_attributes_availability=' + encodeURIComponent(checkAttributesAvailability);
         parameters += data;
 
-        new Ajax.Request( M2ePro.url.templateCheckMessages ,
-        {
+        new Ajax.Request(M2ePro.url.templateCheckMessages, {
             method: 'post',
             asynchronous: true,
             parameters: parameters,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 var messages = transport.responseText.evalJSON()['messages'];
 
                 if (messages.length == 0) {

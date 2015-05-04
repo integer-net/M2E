@@ -5,19 +5,14 @@
  */
 
 class Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive_Requester
-    extends Ess_M2ePro_Model_Connector_Buy_Orders_Get_Items
+    extends Ess_M2ePro_Model_Connector_Buy_Orders_Get_ItemsRequester
 {
     // ##########################################################
 
-    protected function makeResponserModel()
+    public function setProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
-        return 'M2ePro/Buy_Synchronization_Orders_Receive_Responser';
-    }
+        parent::setProcessingLocks($processingRequest);
 
-    // ##########################################################
-
-    protected function setLocks($hash)
-    {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItemPrefix = Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX;
@@ -27,25 +22,12 @@ class Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive_Requester
         $lockItem->setMaxInactiveTime(Ess_M2ePro_Model_Processing_Request::MAX_LIFE_TIME_INTERVAL);
         $lockItem->create();
 
-        // --------------------
-
-        $tempObjects = array(
-            $this->account,
-            Mage::helper('M2ePro/Component_Buy')->getMarketplace()
+        $this->account->addObjectLock(NULL, $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization', $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization_buy', $processingRequest->getHash());
+        $this->account->addObjectLock(
+            Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX, $processingRequest->getHash()
         );
-
-        $tempLocks = array(
-            NULL,
-            'synchronization', 'synchronization_buy',
-            $lockItemPrefix
-        );
-
-        /* @var Ess_M2ePro_Model_Abstract $object */
-        foreach ($tempObjects as $object) {
-            foreach ($tempLocks as $lock) {
-                $object->addObjectLock($lock,$hash);
-            }
-        }
     }
 
     // ##########################################################

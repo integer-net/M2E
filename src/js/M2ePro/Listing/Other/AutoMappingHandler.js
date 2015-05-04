@@ -52,7 +52,7 @@ ListingOtherAutoMappingHandler = Class.create(ActionHandler, {
         self.sendPartsOfProducts(selectedProductsParts,selectedProductsParts.length,0);
     },
 
-    sendPartsOfProducts : function(parts,totalPartsCount,isFailed)
+    sendPartsOfProducts: function(parts,totalPartsCount,isFailed)
     {
         var self = this;
 
@@ -89,9 +89,9 @@ ListingOtherAutoMappingHandler = Class.create(ActionHandler, {
             method: 'post',
             parameters: {
                 componentMode: self.options.customData.componentMode,
-                product_ids : partString
+                product_ids: partString
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
 
                 var percents = (100/totalPartsCount)*(totalPartsCount-parts.length);
 

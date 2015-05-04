@@ -13,7 +13,9 @@ class Ess_M2ePro_Model_Magento_Product
     const TYPE_DOWNLOADABLE = 'downloadable';
     const TYPE_VIRTUAL      = 'virtual';
 
-    const GROUPED_PRODUCT_ATTRIBUTE_LABEL = 'Option';
+    const BUNDLE_PRICE_TYPE_DYNAMIC = 0;
+    const BUNDLE_PRICE_TYPE_FIXED   = 1;
+
     const THUMBNAIL_IMAGE_CACHE_TIME = 604800;
 
     const TAX_CLASS_ID_NONE = 0;
@@ -54,6 +56,9 @@ class Ess_M2ePro_Model_Magento_Product
      */
     private $_productModel = NULL;
 
+    /** @var Ess_M2ePro_Model_Magento_Product_Variation */
+    protected $_variationInstance = NULL;
+
     // ########################################
 
     public $notFoundAttributes = array();
@@ -81,7 +86,7 @@ class Ess_M2ePro_Model_Magento_Product
      * @param int|null $productId
      * @param int|null $storeId
      * @throws Exception
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @return Ess_M2ePro_Model_Magento_Product | Ess_M2ePro_Model_Magento_Product_Cache
      */
     public function loadProduct($productId = NULL, $storeId = NULL)
     {
@@ -215,7 +220,23 @@ class Ess_M2ePro_Model_Magento_Product
             throw new Exception('Load instance first');
         }
 
-        $typeInstance = $this->getProduct()->getTypeInstance();
+        /** @var Mage_Catalog_Model_Product_Type_Abstract $typeInstance */
+        if ($this->isConfigurableType() && !$this->getProduct()->getData('overridden_type_instance_injected')) {
+
+            $config = Mage_Catalog_Model_Product_Type::getTypes();
+
+            $typeInstance = Mage::getModel('M2ePro/Magento_Product_Type_Configurable');
+            $typeInstance->setProduct($this->getProduct());
+            $typeInstance->setConfig($config['configurable']);
+
+            $this->getProduct()->setTypeInstance($typeInstance);
+            $this->getProduct()->setTypeInstance($typeInstance, true);
+            $this->getProduct()->setData('overridden_type_instance_injected', true);
+
+        } else {
+            $typeInstance = $this->getProduct()->getTypeInstance();
+        }
+
         $typeInstance->setStoreFilter($this->getStoreId());
 
         return $typeInstance;
@@ -451,6 +472,25 @@ class Ess_M2ePro_Model_Magento_Product
 
     // ########################################
 
+    public function getBundlePriceType()
+    {
+        return (int)$this->getProduct()->getPriceType();
+    }
+
+    // ----------------------------------------
+
+    public function isBundlePriceTypeDynamic()
+    {
+        return $this->getBundlePriceType() == self::BUNDLE_PRICE_TYPE_DYNAMIC;
+    }
+
+    public function isBundlePriceTypeFixed()
+    {
+        return $this->getBundlePriceType() == self::BUNDLE_PRICE_TYPE_FIXED;
+    }
+
+    // ########################################
+
     public function isProductWithVariations()
     {
         return !$this->isProductWithoutVariations();
@@ -531,11 +571,14 @@ class Ess_M2ePro_Model_Magento_Product
 
     public function getPrice()
     {
-        return (double)$this->getProduct()->getPrice();
+        // for bundle with dynamic price and grouped always returns 0
+        return (float)$this->getProduct()->getPrice();
     }
 
     public function setPrice($value)
     {
+        // there is no any sense to set price for bundle
+        // with dynamic price or grouped
         return $this->getProduct()->setPrice($value);
     }
 
@@ -543,21 +586,44 @@ class Ess_M2ePro_Model_Magento_Product
 
     public function getSpecialPrice()
     {
-        $fromDate = strtotime($this->getSpecialPriceFromDate());
-        $toDate = strtotime($this->getSpecialPriceToDate());
-
-        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-
-        if ($currentTimeStamp < $fromDate || $currentTimeStamp > $toDate) {
-            return 0;
+        if (!$this->isSpecialPriceActual()) {
+            return NULL;
         }
 
-        return (double)$this->getProduct()->getSpecialPrice();
+        // for grouped always returns 0
+        $specialPriceValue = (float)$this->getProduct()->getSpecialPrice();
+
+        if ($this->isBundleType()) {
+
+            if ($this->isBundlePriceTypeDynamic()) {
+                // there is no reason to calculate it
+                // because product price is not defined at all
+                $specialPriceValue = 0;
+            } else {
+                $specialPriceValue = round((($this->getPrice() * $specialPriceValue) / 100), 2);
+            }
+        }
+
+        return (float)$specialPriceValue;
     }
 
     public function setSpecialPrice($value)
     {
+        // there is no any sense to set price for grouped
+        // it sets percent instead of price value for bundle
         return $this->getProduct()->setSpecialPrice($value);
+    }
+
+    //-----------------------------------------
+
+    public function isSpecialPriceActual()
+    {
+        $fromDate = strtotime($this->getSpecialPriceFromDate());
+        $toDate = strtotime($this->getSpecialPriceToDate());
+        $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
+
+        return $currentTimeStamp >= $fromDate && $currentTimeStamp <= $toDate &&
+               (float)$this->getProduct()->getSpecialPrice() > 0;
     }
 
     //-----------------------------------------
@@ -744,7 +810,7 @@ class Ess_M2ePro_Model_Magento_Product
         // Prepare bundle options format usable for search
         $productInstance = $this->getTypeInstance();
 
-        $optionCollection = $productInstance->getOptionsCollection($product);
+        $optionCollection = $productInstance->getOptionsCollection();
         $optionsData = $optionCollection->getData();
 
         foreach ($optionsData as $singleOption) {
@@ -1139,633 +1205,16 @@ class Ess_M2ePro_Model_Magento_Product
         return $this->getTypeInstance()->hasRequiredOptions($product);
     }
 
-    // ########################################
-
-    public function getProductVariations()
-    {
-        $variations = array();
-        $variationsSet = array();
-
-        if ($this->isConfigurableType()) {
-
-            $tempInfo = $this->_getConfigurableOptionsForVariation();
-            isset($tempInfo['set']) && $variationsSet = $tempInfo['set'];
-            isset($tempInfo['variations']) && $variations = $tempInfo['variations'];
-
-        } else {
-
-            if ($this->isSimpleType()) {
-
-                $tempInfo = $this->_getCustomOptionsForVariation();
-                isset($tempInfo['set']) && $variationsSet = $tempInfo['set'];
-                isset($tempInfo['variations']) && $variations = $tempInfo['variations'];
-
-            } else if ($this->isBundleType()) {
-
-                $tempInfo = $this->_getBundleOptionsForVariation();
-                isset($tempInfo['set']) && $variationsSet = $tempInfo['set'];
-                isset($tempInfo['variations']) && $variations = $tempInfo['variations'];
-
-            } elseif ($this->isGroupedType()) {
-
-                $tempInfo = $this->_getGroupedOptionsForVariation();
-                isset($tempInfo['set']) && $variationsSet = $tempInfo['set'];
-                isset($tempInfo['variations']) && $variations = $tempInfo['variations'];
-            }
-
-            $countOfCombinations = 1;
-
-            foreach ($variationsSet as $set) {
-                $countOfCombinations *= count($set);
-            }
-
-            if ($countOfCombinations > 100000) {
-                $variationsSet = array();
-                $variations = array();
-            } else {
-                $this->prepareVariationsScope($variations);
-                $variations = $this->prepareRawVariations($variations, $variationsSet);
-            }
-        }
-
-        return array(
-            'set' => $variationsSet,
-            'variations' => $variations,
-        );
-    }
-
     //-----------------------------------------
 
-    protected function _getCustomOptionsForVariation()
+    public function getVariationInstance()
     {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_SIMPLE) {
-            return array();
+        if (!is_null($this->_variationInstance)) {
+            return $this->_variationInstance;
         }
 
-        $variationOptionsTitle = array();
-        $variationOptionsList = array();
-
-        foreach ($product->getOptions() as $productCustomOptions) {
-
-            if (!(bool)(int)$productCustomOptions->getData('is_require')) {
-                continue;
-            }
-
-            if (in_array($productCustomOptions->getType(), array('drop_down', 'radio', 'multiple', 'checkbox'))) {
-
-                $optionCombinationTitle = array();
-                $possibleVariationProductOptions = array();
-
-                $optionTitle = $productCustomOptions->getTitle();
-                if ($optionTitle == '') {
-                    $optionTitle = $productCustomOptions->getDefaultTitle();
-                }
-
-                foreach ($productCustomOptions->getValues() as $option) {
-
-                    $optionCombinationTitle[] = $option->getTitle();
-
-                    $possibleVariationProductOptions[] = array(
-                        'product_id' => $product->getId(),
-                        'product_type' => $product->getTypeId(),
-                        'attribute' => $optionTitle,
-                        'option' => $option->getTitle()
-                    );
-                }
-
-                $variationOptionsTitle[$optionTitle] = $optionCombinationTitle;
-                $variationOptionsList[] = $possibleVariationProductOptions;
-            }
-        }
-
-        return array(
-            'set' => $variationOptionsTitle,
-            'variations' => $variationOptionsList
-        );
-    }
-
-    protected function _getBundleOptionsForVariation()
-    {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_BUNDLE) {
-            return array();
-        }
-
-        $productInstance = $this->getTypeInstance();
-        $optionCollection = $productInstance->getOptionsCollection($product);
-
-        $variationOptionsTitle = array();
-        $variationOptionsList = array();
-
-        foreach ($optionCollection as $singleOption) {
-
-            if (!(bool)(int)$singleOption->getData('required')) {
-                continue;
-            }
-
-            $optionTitle = $singleOption->getTitle();
-            $optionTitle == '' && $optionTitle = $singleOption->getDefaultTitle();
-
-            if (isset($variationOptionsTitle[$optionTitle])) {
-                continue;
-            }
-
-            $optionCombinationTitle = array();
-            $possibleVariationProductOptions = array();
-
-            $selectionsCollectionItems = $productInstance->getSelectionsCollection(
-                array(0 => $singleOption->getId()), $product
-            )->getItems();
-
-            foreach ($selectionsCollectionItems as $item) {
-                $optionCombinationTitle[] = $item->getName();
-                $possibleVariationProductOptions[] = array(
-                    'product_id' => $item->getProductId(),
-                    'product_type' => $product->getTypeId(),
-                    'attribute' => $optionTitle,
-                    'option' => $item->getName()
-                );
-            }
-
-            $variationOptionsTitle[$optionTitle] = $optionCombinationTitle;
-            $variationOptionsList[] = $possibleVariationProductOptions;
-        }
-
-        return array(
-            'set' => $variationOptionsTitle,
-            'variations' => $variationOptionsList
-        );
-    }
-
-    protected function _getGroupedOptionsForVariation()
-    {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_GROUPED) {
-            return array();
-        }
-
-        $optionCombinationTitle = array();
-
-        $possibleVariationProductOptions = array();
-        $associatedProducts = $this->getTypeInstance()->getAssociatedProducts();
-
-        foreach ($associatedProducts as $singleProduct) {
-
-            $optionCombinationTitle[] = $singleProduct->getName();
-
-            $possibleVariationProductOptions[] = array(
-                'product_id' => $singleProduct->getId(),
-                'product_type' => $product->getTypeId(),
-                'attribute' => self::GROUPED_PRODUCT_ATTRIBUTE_LABEL,
-                'option' => $singleProduct->getName()
-            );
-        }
-
-        $variationOptionsTitle[self::GROUPED_PRODUCT_ATTRIBUTE_LABEL] = $optionCombinationTitle;
-        $variationOptionsList[] = $possibleVariationProductOptions;
-
-        return array(
-            'set' => $variationOptionsTitle,
-            'variations' => $variationOptionsList
-        );
-    }
-
-    protected function _getConfigurableOptionsForVariation()
-    {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_CONFIGURABLE) {
-            return array();
-        }
-
-        /** @var $productTypeInstance Mage_Catalog_Model_Product_Type_Configurable */
-        $productTypeInstance = $this->getTypeInstance();
-
-        $attributes = array();
-
-        foreach ($productTypeInstance->getConfigurableAttributes($product) as $configurableAttribute) {
-
-            /** @var $configurableAttribute Mage_Catalog_Model_Product_Type_Configurable_Attribute */
-            $configurableAttribute->setStoteId($this->getStoreId());
-
-            /** @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
-            $attribute = $configurableAttribute->getProductAttribute();
-            $attribute->setStoreId($this->getStoreId());
-
-            $attributeLabel = '';
-
-            if (!(int)$configurableAttribute->getData('use_default')) {
-                $attributeLabel = $configurableAttribute->getData('label');
-            }
-
-            if ($attributeLabel == '') {
-
-                if ($this->getStoreId() && $tempStoreLabels = $attribute->getStoreLabels()) {
-                    if (isset($tempStoreLabels[$this->getStoreId()])) {
-                        $attributeLabel = $tempStoreLabels[$this->getStoreId()];
-                    }
-                }
-
-                $attributeLabel == '' && $attributeLabel = $attribute->getFrontendLabel();
-            }
-
-            $attributes[$attribute->getAttributeCode()] = $attributeLabel;
-        }
-
-        $variations = array();
-
-        foreach ($productTypeInstance->getUsedProducts(null, $product) as $childProduct) {
-
-            $variation = array();
-            $childProduct->setStoreId($this->getStoreId());
-
-            foreach ($attributes as $attributeCode => $attributeLabel) {
-
-                $attributeValue = Mage::getModel('M2ePro/Magento_Product')
-                                            ->setProduct($childProduct)
-                                            ->getAttributeValue($attributeCode);
-
-                if (empty($attributeValue)) {
-                    break;
-                }
-
-                $variation[] = array(
-                    'product_id' => $childProduct->getId(),
-                    'product_type' => self::TYPE_CONFIGURABLE,
-                    'attribute' => $attributeLabel,
-                    'attribute_code' => $attributeCode,
-                    'option' => $attributeValue,
-                );
-            }
-
-            if (count($attributes) == count($variation)) {
-                $variations[] = $variation;
-            }
-        }
-
-        $set = array();
-
-        foreach ($variations as $variation) {
-            foreach ($variation as $option) {
-                if (empty($set[$option['attribute_code']])) {
-                    $set[$option['attribute_code']] = array(
-                        'label' => $option['attribute'],
-                        'options' => array(),
-                    );
-                }
-
-                $set[$option['attribute_code']]['options'][] = $option['option'];
-            }
-        }
-
-        $resultSet = array();
-        foreach ($set as $code => $data) {
-            $options = $this->sortAttributeOptions($code, array_values(array_unique($data['options'])));
-            $resultSet[$data['label']] = $options;
-        }
-
-        return array(
-            'set'        => $resultSet,
-            'variations' => $variations
-        );
-    }
-
-    protected function sortAttributeOptions($attributeCode, $options)
-    {
-        $attribute = Mage::getModel('catalog/product')->getResource()->getAttribute($attributeCode);
-
-        /** @var Mage_Eav_Model_Resource_Entity_Attribute_Option_Collection $optionCollection */
-        $optionCollection = Mage::getModel('eav/entity_attribute_option')->getCollection();
-        $optionCollection->setAttributeFilter($attribute->getId());
-        $optionCollection->setPositionOrder();
-        $optionCollection->setStoreFilter($this->getStoreId());
-
-        $sortedOptions = array();
-        foreach ($optionCollection as $option) {
-            if (!in_array($option->getValue(), $options) ||
-                in_array($option->getValue(), $sortedOptions)) {
-                continue;
-            }
-
-            $sortedOptions[] = $option->getValue();
-        }
-
-        return $sortedOptions;
-    }
-
-    //-----------------------------------------
-
-    protected function prepareRawVariations(&$optionsScope, &$set,
-                                            $optionScopeIndex = 0)
-    {
-        $resultVariations = array();
-
-        if (!isset($optionsScope[$optionScopeIndex])) {
-            return $resultVariations;
-        }
-
-        $subVariations = $this->prepareRawVariations($optionsScope,$set,
-                                                     $optionScopeIndex+1);
-
-        if (count($subVariations) <= 0) {
-
-            foreach ($optionsScope[$optionScopeIndex] as $option) {
-                $resultVariations[] = array($option);
-            }
-
-            return $resultVariations;
-        }
-
-        foreach ($optionsScope[$optionScopeIndex] as $option) {
-
-            if (!isset($set[$option['attribute']]) ||
-                !in_array($option['option'],$set[$option['attribute']])) {
-                continue;
-            }
-
-            foreach ($subVariations as $subVariation) {
-                $subVariation[] = $option;
-                $resultVariations[] = $subVariation;
-            }
-        }
-
-        return $resultVariations;
-    }
-
-    protected function prepareVariationsScope(&$optionsScope)
-    {
-        $tempArray = array();
-
-        foreach ($optionsScope as $key => $optionScope) {
-
-            $temp = reset($optionScope);
-            $attribute = $temp['attribute'];
-
-            if (isset($tempArray[$attribute])) {
-                unset($optionsScope[$key]);
-                continue;
-            }
-
-            $tempArray[$attribute] = 1;
-        }
-    }
-
-    // ########################################
-
-    public function getProductVariationsForOrder()
-    {
-        if ($this->isSimpleType()) {
-            return $this->_getCustomOptionsForOrder();
-        }
-
-        if ($this->isBundleType()) {
-            return $this->_getBundleOptionsForOrder();
-        }
-
-        if ($this->isGroupedType()) {
-            return $this->_getGroupedOptionsForOrder();
-        }
-
-        if ($this->isConfigurableType()) {
-            return $this->_getConfigurableOptionsForOrder();
-        }
-
-        return array();
-    }
-
-    //-----------------------------------------
-
-    protected function _getCustomOptionsForOrder()
-    {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_SIMPLE) {
-            return array();
-        }
-
-        $customOptions = array();
-
-        $productOptions = $product->getOptions();
-
-        foreach ($productOptions as $option) {
-
-            if (!(bool)(int)$option->getData('is_require')) {
-                continue;
-            }
-
-            $customOption = array(
-                'option_id' => $option->getData('option_id'),
-                'values'    => array(),
-                'labels'    => array_filter(array(
-                    trim($option->getData('store_title')),
-                    trim($option->getData('title')),
-                    trim($option->getData('default_title'))
-                ))
-            );
-
-            $values = $option->getValues();
-
-            foreach ($values as $value) {
-                $customOption['values'][] = array(
-                    'product_ids' => array($this->getProductId()),
-                    'value_id' => $value->getData('option_type_id'),
-                    'labels'   => array_filter(array(
-                        trim($value->getData('store_title')),
-                        trim($value->getData('title')),
-                        trim($value->getData('default_title'))
-                        //trim($value->getData('sku'))
-                    ))
-                );
-            }
-
-            if (count($customOption['values']) == 0) {
-                continue;
-            }
-
-            $customOptions[] = $customOption;
-        }
-
-        return $customOptions;
-    }
-
-    protected function _getBundleOptionsForOrder()
-    {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_BUNDLE) {
-            return array();
-        }
-
-        $bundleOptions = array();
-
-        $productInstance = $this->getTypeInstance();
-
-        $optionsCollection = $productInstance->getOptionsCollection($product);
-        $selectionsCollection = $productInstance->getSelectionsCollection($optionsCollection->getAllIds(), $product);
-
-        foreach ($optionsCollection as $option) {
-            if (!$option->getData('required')) {
-                continue;
-            }
-
-            $bundleOption = array(
-                'option_id' => $option->getData('option_id'),
-                'values'    => array(),
-                'labels'    => array_filter(array(
-                    trim($option->getData('default_title')),
-                    trim($option->getData('title'))
-                ))
-            );
-
-            foreach ($selectionsCollection as $selection) {
-                if ($option->getData('option_id') != $selection->getData('option_id')) {
-                    continue;
-                }
-
-                $bundleOption['values'][] = array(
-                    'product_ids' => array($selection->getData('product_id')),
-                    'value_id'   => $selection->getData('selection_id'),
-                    'labels'     => array(
-                        trim($selection->getData('name'))
-                    )
-                );
-            }
-
-            if (count($bundleOption['values']) == 0) {
-                continue;
-            }
-
-            $bundleOptions[] = $bundleOption;
-        }
-
-        return $bundleOptions;
-    }
-
-    protected function _getGroupedOptionsForOrder()
-    {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_GROUPED) {
-            return array();
-        }
-
-        return $this->getTypeInstance()->getAssociatedProducts();
-    }
-
-    protected function _getConfigurableOptionsForOrder()
-    {
-        $product = $this->getProduct();
-
-        if ($product->getTypeId() != self::TYPE_CONFIGURABLE) {
-            return array();
-        }
-
-        /** @var $productTypeInstance Mage_Catalog_Model_Product_Type_Configurable */
-        $productTypeInstance = $this->getTypeInstance();
-
-        $configurableOptions = array();
-
-        foreach ($productTypeInstance->getConfigurableAttributes($product) as $configurableAttribute) {
-
-            /** @var $configurableAttribute Mage_Catalog_Model_Product_Type_Configurable_Attribute */
-            $configurableAttribute->setStoteId($this->getStoreId());
-
-            /** @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
-            $attribute = $configurableAttribute->getProductAttribute();
-            $attribute->setStoreId($this->getStoreId());
-
-            $configurableOption = array(
-                'option_id' => $configurableAttribute->getAttributeId(),
-                'labels' => array_filter(array_merge(
-                    array_map('trim',array_values($attribute->getStoreLabels())),
-                    array(
-                        trim($configurableAttribute->getData('label')),
-                        trim($attribute->getFrontendLabel())
-                    )
-                )),
-                'values' => $this->getConfigurableAttributeValuesForOrder($configurableAttribute)
-            );
-
-            if (count($configurableOption['values']) == 0) {
-                continue;
-            }
-
-            $configurableOptions[] = $configurableOption;
-        }
-
-        return $configurableOptions;
-    }
-
-    //-----------------------------------------
-
-    private function getConfigurableAttributeValuesForOrder($configurableAttribute)
-    {
-        $product = $this->getProduct();
-
-        /** @var $productTypeInstance Mage_Catalog_Model_Product_Type_Configurable */
-        $productTypeInstance = $this->getTypeInstance();
-
-        /** @var $configurableAttribute Mage_Catalog_Model_Product_Type_Configurable_Attribute */
-        /** @var $attribute Mage_Catalog_Model_Resource_Eav_Attribute */
-        $attribute = $configurableAttribute->getProductAttribute();
-        $attribute->setStoreId($this->getStoreId());
-
-        $values = array();
-        $options = $this->getConfigurableAttributeOptionsForOrder($attribute);
-
-        foreach ($options as $option) {
-
-            foreach ($productTypeInstance->getUsedProducts(null, $product) as $associatedProduct) {
-
-                if ($option['value_id'] != $associatedProduct->getData($attribute->getAttributeCode())) {
-                    continue;
-                }
-
-                $attributeOptionKey = $configurableAttribute->getAttributeId() . ':' . $option['value_id'];
-
-                if (!isset($values[$attributeOptionKey])) {
-                    $values[$attributeOptionKey] = $option;
-                }
-
-                $values[$attributeOptionKey]['product_ids'][] = $associatedProduct->getId();
-            }
-        }
-
-        return array_values($values);
-    }
-
-    private function getConfigurableAttributeOptionsForOrder($attribute)
-    {
-        $options = $attribute->getSource()->getAllOptions(false, false);
-        $defaultOptions = $attribute->getSource()->getAllOptions(false, true);
-
-        $mergedOptions = array();
-
-        foreach ($options as $option) {
-
-            $mergedOption = array(
-                'product_ids' => array(),
-                'value_id' => $option['value'],
-                'labels' => array(
-                    trim($option['label'])
-                )
-            );
-
-            foreach ($defaultOptions as $defaultOption) {
-                if ($defaultOption['value'] == $option['value']) {
-                    $mergedOption['labels'][] = trim($defaultOption['label']);
-                    break;
-                }
-            }
-
-            $mergedOptions[] = $mergedOption;
-        }
-
-        return $mergedOptions;
+        $this->_variationInstance = Mage::getModel('M2ePro/Magento_Product_Variation')->setMagentoProduct($this);
+        return $this->_variationInstance;
     }
 
     // ########################################

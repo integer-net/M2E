@@ -1,23 +1,26 @@
 <div id="block_notice_amazon_template_synchronization_revise" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Revise Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Revise Rules are the conditions, at which automatic full and partial listings revising features are enabled.
-<br/>If the certain condition is enabled (<i>Yes</i> is chosen in appropriate line) and met,
-then Amazon Listings, which were listed using current Synchronization Template,
-will be automatically fully or partially updated.<br/>
+    <?php echo Mage::helper('M2ePro')->__('Revise Rules are the conditions, at which automatic full and partial Listings revising features are enabled.
+    <br/>If the certain condition is enabled (<i>Yes</i> is chosen in appropriate line) and met,
+    then Amazon Listings, which were listed using current Synchronization Policy,
+    will be automatically fully or partially updated.<br/>
     <ul class="list">
-        <li><b>Partial Revise</b> - contains list of product details, which changes you want to be reflected on Amazon.</li>
-        <li><b>Full Revise</b> - contains groups of M2E settings. If any data of these groups (Selling Format Template, Listing Channel Settings) is changed, then listings, which use these templates in their settings, will be automatically fully revised.</li>
+        <li><b>Partial Revise</b> - if there are changes introduced to the indicated parameters of the Magento Item, Amazon Items will be updated with just the specific data that has changed.</li>
+        <li><b>Full Revise</b> - contains groups of M2E Pro settings. If any data in these groups (<i class="underline">Selling Format Policy</i>, <i class="underline">Listing Settings</i>, <i class="underline">Description Policy</i>) is changed, then Listings, which use these Policies in their settings, will be automatically fully revised.</li>
     </ul>'); ?>
 </div>
 
 <?php
     $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->toArray() : array();
     $defaults = array(
-        'revise_update_qty' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_YES,
+        'revise_update_qty'                        => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_YES,
         'revise_update_qty_max_applied_value_mode' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON,
-        'revise_update_qty_max_applied_value' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT,
-        'revise_update_price' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_YES,
-        'revise_change_selling_format_template' => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES,
-        'revise_change_listing' => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES
+        'revise_update_qty_max_applied_value'      => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT,
+        'revise_update_price'                      => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_YES,
+        'revise_update_details'                    => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_DETAILS_YES,
+        'revise_update_images'                     => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_IMAGES_YES,
+        'revise_change_selling_format_template'    => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES,
+        'revise_change_description_template'       => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES,
+        'revise_change_listing'                    => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES
     );
 
     $formData = array_merge($defaults, $formData);
@@ -75,7 +78,7 @@ will be automatically fully or partially updated.<br/>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_YES; ?>" <?php if ($formData['revise_update_qty'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises quantity on Amazon listing(s) when the quantity or attribute for quantity of its product is changed in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Quantity on Amazon Listing(s) when the Quantity or Attribute for Quantity of a Product is changed in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -91,8 +94,8 @@ will be automatically fully or partially updated.<br/>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON; ?>" <?php if ($formData['revise_update_qty_max_applied_value_mode'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Updates Amazon qty only when the Condition you set below is met.
-                            <br/><b>Note:</b> By using this option you can significantly increase Synchronization performance.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Updates Amazon QTY only when the Condition you set below is met.
+                            <br/><br/><b>Note:</b> By using this Option you can significantly increase Synchronization performance.'); ?></span>
                             </p>
                     </td>
                 </tr>
@@ -124,9 +127,45 @@ will be automatically fully or partially updated.<br/>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_NONE; ?>" <?php if ($formData['revise_update_price'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_YES; ?>" <?php if ($formData['revise_update_price'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
-                         <p class="note">
-                             <span><?php echo Mage::helper('M2ePro')->__('Automatically revises price on Amazon listing(s) when the price(s) or attribute(s) for price(s) of its product is (are) changed in Magento.'); ?></span>
-                         </p>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Price on Amazon Listing(s) when the Price or Attribute for Price of a Product is changed in Magento.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="value" colspan="2" style="width: auto;">
+                        <hr style="border: 1px solid silver; border-bottom: none;">
+                    </td>
+                <tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Details'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_update_details" name="revise_update_details" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_DETAILS_NONE; ?>" <?php if ($formData['revise_update_details'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_DETAILS_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_DETAILS_YES; ?>" <?php if ($formData['revise_update_details'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_DETAILS_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises data on Amazon Listing(s) if there are changes made to the Magento Attributes used for Description.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Images'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_update_images" name="revise_update_images" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_IMAGES_NONE; ?>" <?php if ($formData['revise_update_images'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_IMAGES_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_IMAGES_YES; ?>" <?php if ($formData['revise_update_images'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_IMAGES_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Images on Amazon Listing(s) if the Image or Attribute for Image of the Item is changed in Magento.'); ?></span>
+                        </p>
                     </td>
                 </tr>
 
@@ -150,7 +189,7 @@ will be automatically fully or partially updated.<br/>
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Selling Format Template'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Selling Format Policy'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="revise_change_selling_format_template" name="revise_change_selling_format_template" class="required-entry">
@@ -158,14 +197,29 @@ will be automatically fully or partially updated.<br/>
                             <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_selling_format_template'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon listing(s) if its Selling Format Template was changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon Listing(s) if its Selling Format Policy was changed.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Listing Channel Settings'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Description Policy'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_change_description_template" name="revise_change_description_template" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE; ?>" <?php if ($formData['revise_change_description_template'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_description_template'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon Listing(s) if its Description Policy was changed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Listing Settings'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="revise_change_listing" name="revise_change_listing" class="required-entry">
@@ -173,7 +227,7 @@ will be automatically fully or partially updated.<br/>
                             <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES; ?>" <?php if ($formData['revise_change_listing'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon listing(s) if its Listing Settings was changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon Listing(s) if its Listing Settings were changed.'); ?></span>
                         </p>
                     </td>
                 </tr>

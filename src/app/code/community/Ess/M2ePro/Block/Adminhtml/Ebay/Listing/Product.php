@@ -63,8 +63,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product extends Mage_Adminhtml_Blo
         //------------------------------
         if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
             $this->_addButton('auto_action', array(
-                'label'     => Mage::helper('M2ePro')->__('Automatic Actions'),
-                'onclick'   => 'EbayListingAutoActionHandlerObj.loadAutoActionHtml();'
+                'label'     => Mage::helper('M2ePro')->__('Auto Add/Remove Rules'),
+                'onclick'   => 'ListingAutoActionHandlerObj.loadAutoActionHtml();'
             ));
         }
         //------------------------------
@@ -137,7 +137,7 @@ HTML;
 
         $onclick = <<<JS
 ListingProductAddHandlerObj.autoactionPopup.close();
-EbayListingAutoActionHandlerObj.loadAutoActionHtml();
+ListingAutoActionHandlerObj.loadAutoActionHtml();
 JS;
         $data = array(
             'label'   => Mage::helper('M2ePro')->__('Start Configure'),
@@ -150,12 +150,12 @@ JS;
     <div style="margin: 10px; height: 153px">
         {$helper->__(
 '<b>
-    Do you want to set up a rule by which products will be automatically added or deleted from the current M2E listing?
+ Do you want to set up a rule by which Products will be automatically added or deleted from the current M2E Pro listing?
 </b>.
-<br><br>
-Click Start Configure to create a rule<br> or Cancel if you do not want to do it now.
-<br><br>
-<b>Note:</b> You can always return to it by clicking Automatic Action button on this page.'
+<br/><br/>
+Click Start Configure to create a rule<br/> or Cancel if you do not want to do it now.
+<br/><br/>
+<b>Note:</b> You can always return to it by clicking Auto Add/Remove Rules button on this page.'
         )}
     </div>
 
@@ -198,14 +198,14 @@ JS;
         // -------------------------------------
 
         // M2ePro_TRANSLATIONS
-        // Choose <b>Yes</b> if you want to override the default settings for this M2E Pro listing and to choose different settings for certain products.
+        // Choose <b>Yes</b> if you want to override the default settings for this M2E Pro listing and to choose different settings for certain Products.
         return <<<HTML
 <div id="settings_popup_content" style="display: none">
     <div style="margin: 10px; height: 150px">
-        <h3>{$helper->__('Do you want to customize the M2E Pro listing settings for some products?')}</h3>
+        <h3>{$helper->__('Do you want to customize the M2E Pro listing settings for some Products?')}</h3>
         <br/>
         <p>{$helper->__('Choose <b>Yes</b> if you want to override the default settings for this M2E Pro listing '.
-                        'and to choose different settings for certain products.')}</p>
+                        'and to choose different settings for certain Products.')}</p>
     </div>
 
     <div class="clear"></div>

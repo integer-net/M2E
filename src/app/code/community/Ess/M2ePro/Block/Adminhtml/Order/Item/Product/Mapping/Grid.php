@@ -65,7 +65,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Mapping_Grid extends Mage_Ad
         ));
 
         $this->addColumn('title', array(
-            'header'       => Mage::helper('M2ePro')->__('Product Title / SKU'),
+            'header'       => Mage::helper('M2ePro')->__('Product Title / Product SKU'),
             'align'        => 'left',
             'type'         => 'text',
             'width'        => '350px',
@@ -140,10 +140,6 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Mapping_Grid extends Mage_Ad
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
         $value = '<div style="margin-left: 3px">'.Mage::helper('M2ePro')->escapeHtml($value);
 
         $sku = $row->getData('sku');

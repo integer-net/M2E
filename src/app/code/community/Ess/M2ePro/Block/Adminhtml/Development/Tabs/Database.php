@@ -19,7 +19,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database extends Mage_Adminhtm
         $this->_controller = 'adminhtml_development_tabs_database';
         //------------------------------
 
-        $this->setTemplate('M2ePro/development/tabs/database/grid/container.phtml');
+        $this->setTemplate('M2ePro/widget/grid/container/only_content.phtml');
     }
 
     // ########################################

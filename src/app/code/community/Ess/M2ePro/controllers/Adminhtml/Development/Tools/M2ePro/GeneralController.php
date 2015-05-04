@@ -77,7 +77,7 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_GeneralController
         <h2 style="margin: 20px 0 0 10px">Broken Tables
             <span style="color: #808080; font-size: 15px;">({$brokenTables['total_count']} entries)</span>
         </h2>
-        <br>
+        <br/>
         <form method="GET" action="{$currentUrl}">
             <input type="hidden" name="action" value="repair" />
             <table class="grid" cellpadding="0" cellspacing="0">
@@ -210,7 +210,7 @@ HTML;
             $existsStoreIds[] = (int)$item->getStoreId();
         }
 
-        $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $connection = Mage::getSingleton('core/resource')->getConnection('core_read');
         $storeRelatedColumns = Mage::helper('M2ePro/Module_Database_Structure')->getStoreRelatedColumns();
 
         $usedStoresIds = array();
@@ -372,9 +372,9 @@ HTML;
                 }
             }
 
-            printf('Deleted options on %s count = %d <br>', $component, $deletedOptions);
-            printf('Deleted variations on %s count = %d <br>', $component, $deletedVariations);
-            printf('Deleted products on %s count = %d <br>', $component, $deletedProducts);
+            printf('Deleted options on %s count = %d <br/>', $component, $deletedOptions);
+            printf('Deleted variations on %s count = %d <br/>', $component, $deletedVariations);
+            printf('Deleted products on %s count = %d <br/>', $component, $deletedProducts);
         }
     }
 
@@ -434,7 +434,7 @@ HTML;
         echo '</pre>';
 
         echo '<h2 style="color:red;">Errors</h2>';
-        echo curl_errno($curlObject) . ' ' . curl_error($curlObject) . '<br><br>';
+        echo curl_errno($curlObject) . ' ' . curl_error($curlObject) . '<br/><br/>';
 
         curl_close($curlObject);
     }

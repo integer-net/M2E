@@ -3,20 +3,21 @@ CommonHandler.prototype = {
 
     // --------------------------------
 
-    initialize : function() {},
+    initialize: function() {},
 
     //----------------------------------
 
     initCommonValidators: function()
     {
         Validation.add('M2ePro-required-when-visible', M2ePro.translator.translate('This is a required field.'), function(value, el) {
+
             var hidden = false;
             hidden = !$(el).visible();
 
             while (!hidden) {
                 el = $(el).up();
                 hidden = !el.visible();
-                if (el == document || el.hasClassName('entry-edit')) {
+                if ($(el).up() == document || el.hasClassName('entry-edit')) {
                     break;
                 }
             }
@@ -25,6 +26,7 @@ CommonHandler.prototype = {
         });
 
         Validation.add('M2ePro-required-when-visible-and-enabled', M2ePro.translator.translate('This is a required field.'), function(value, el) {
+
             var hidden = false;
             var disabled = false;
             hidden = !$(el).visible();
@@ -46,6 +48,7 @@ CommonHandler.prototype = {
         });
 
         Validation.add('M2ePro-validation-float', M2ePro.translator.translate('Invalid input data. Decimal value required. Example 12.05'), function(value, element) {
+
             if (!element.visible()) {
                 return true;
             }
@@ -86,18 +89,12 @@ CommonHandler.prototype = {
         setLocation(url.replace(/#$/, ''));
     },
 
-    reset_click: function()
-    {
-        var url = window.location.href;
-        setLocation(url.replace(/#$/, ''));
-    },
-
     //----------------------------------
 
     save_click: function(url)
     {
         if (typeof url == 'undefined' || url == '') {
-            url = M2ePro.url.get('formSubmit',{'back': base64_encode('list')});
+            url = M2ePro.url.get('formSubmit', {'back': base64_encode('list')});
         }
         this.submitForm(url);
     },
@@ -111,7 +108,7 @@ CommonHandler.prototype = {
                 tabsUrl = '|tab=' + $$('#' + tabsId + ' a.active')[0].name;
             }
 
-            url = M2ePro.url.get('formSubmit',{'back': base64_encode('edit' + tabsUrl)});
+            url = M2ePro.url.get('formSubmit', {'back': base64_encode('edit' + tabsUrl)});
         }
         this.submitForm(url);
     },
@@ -189,6 +186,11 @@ CommonHandler.prototype = {
 
     //----------------------------------
 
+    updateHiddenValue : function(elementMode, elementHidden)
+    {
+        elementHidden.value = elementMode.options[elementMode.selectedIndex].getAttribute('attribute_code');
+    },
+
     hideEmptyOption: function(select)
     {
         $(select).select('.empty') && $(select).select('.empty').length && $(select).select('.empty')[0].hide();
@@ -219,29 +221,25 @@ CommonHandler.prototype = {
         component = component || null;
 
         Validation.add(idInput, textError, function(value) {
-
             var checkResult = false;
 
-            new Ajax.Request( M2ePro.url.get('adminhtml_general/validationCheckRepetitionValue') ,
-            {
+            new Ajax.Request(M2ePro.url.get('adminhtml_general/validationCheckRepetitionValue'), {
                 method: 'post',
-                asynchronous : false,
-                parameters : {
-                    model : model,
-                    data_field : dataField,
-                    data_value : value,
-                    id_field : idField,
-                    id_value : idValue,
-                    component : component
+                asynchronous: false,
+                parameters: {
+                    model: model,
+                    data_field: dataField,
+                    data_value: value,
+                    id_field: idField,
+                    id_value: idValue,
+                    component: component
                 },
-                onSuccess: function (transport)
-                {
+                onSuccess: function(transport) {
                     checkResult = transport.responseText.evalJSON()['result'];
                 }
             });
 
             return checkResult;
-
         });
     }
 

@@ -27,5 +27,4 @@ EbayConfigurationHandler.prototype = Object.extend(new CommonHandler(), {
     }
 
     //----------------------------------
-
 });

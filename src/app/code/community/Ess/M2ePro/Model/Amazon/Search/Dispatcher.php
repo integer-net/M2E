@@ -8,21 +8,29 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
 {
     // ########################################
 
-    public function runManual(Ess_M2ePro_Model_Listing_Product $listingProduct, $query)
+    public function runCustom(Ess_M2ePro_Model_Listing_Product $listingProduct, $query)
     {
         if (empty($query)) {
             return false;
         }
 
         try {
-            return Mage::getModel('M2ePro/Amazon_Search_Manual')->process($listingProduct,(string)$query);
+
+            /** @var Ess_M2ePro_Model_Amazon_Search_Custom $customSearch */
+            $customSearch = Mage::getModel('M2ePro/Amazon_Search_Custom');
+            $customSearch->setListingProduct($listingProduct);
+            $customSearch->setQuery($query);
+
+            $searchResult = $customSearch->process();
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);
-            return false;
+            $searchResult = false;
         }
+
+        return $searchResult;
     }
 
-    public function runAutomatic(array $listingsProducts)
+    public function runSettings(array $listingsProducts)
     {
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($listingsProducts as $key => $listingProduct) {
@@ -38,17 +46,20 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
             }
         }
 
-        if (count($listingsProducts) <= 0) {
+        if (empty($listingsProducts)) {
             return false;
         }
 
         try {
 
-            $automaticDispatcher = Mage::getModel('M2ePro/Amazon_Search_Automatic');
+            /** @var Ess_M2ePro_Model_Amazon_Search_Settings $settingsSearch */
+            $settingsSearch = Mage::getModel('M2ePro/Amazon_Search_Settings');
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
             foreach ($listingsProducts as $listingProduct) {
-                $automaticDispatcher->process($listingProduct);
+                $settingsSearch->setListingProduct($listingProduct);
+                $settingsSearch->resetStep();
+                $settingsSearch->process();
             }
 
         } catch (Exception $exception) {
@@ -63,9 +74,12 @@ class Ess_M2ePro_Model_Amazon_Search_Dispatcher
 
     private function checkSearchConditions(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
         return $listingProduct->isNotListed() &&
-               !$listingProduct->getChildObject()->getTemplateNewProductId() &&
-               !$listingProduct->getChildObject()->getGeneralId();
+               !$amazonListingProduct->isGeneralIdOwner() &&
+               !$amazonListingProduct->getGeneralId();
     }
 
     // ########################################

@@ -34,5 +34,4 @@ EbayListingProductSourceCategoriesSummaryGridHandler = Class.create(GridHandler,
     }
 
     //----------------------------------
-
 });

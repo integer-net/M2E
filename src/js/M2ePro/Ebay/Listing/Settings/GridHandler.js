@@ -8,7 +8,7 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
 
         this.movingHandler = new ListingMovingHandler(this);
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
 
             editPrimaryCategorySettingsAction: function(id) {
                 this.editCategorySettings(id);
@@ -16,16 +16,16 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
             editStorePrimaryCategorySettingsAction: function(id) {
                 this.editCategorySettings(id);
             }.bind(this),
-            editAllSettingsAction: function (id) {
+            editAllSettingsAction: function(id) {
                 this.editSettings(id);
             }.bind(this),
-            editGeneralSettingsAction: function (id) {
+            editGeneralSettingsAction: function(id) {
                 this.editSettings(id, 'general');
             }.bind(this),
-            editSellingSettingsAction: function (id) {
+            editSellingSettingsAction: function(id) {
                 this.editSettings(id, 'selling');
             }.bind(this),
-            editSynchSettingsAction: function (id) {
+            editSynchSettingsAction: function(id) {
                 this.editSettings(id, 'synchronization');
             }.bind(this),
 
@@ -47,16 +47,14 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
 
     showCompatibilityDetails: function(listingProductId, compatibilityType)
     {
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/motorViewDetails') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/motorViewDetails'), {
             method: 'get',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 listing_product_id: listingProductId,
                 compatibility_type: compatibilityType
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
                 this.openPopUp(
                     M2ePro.translator.translate('Compatibility Attribute'),
                     transport.responseText,
@@ -74,16 +72,17 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
     {
         this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_template/editListingProduct') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_template/editListingProduct'), {
             method: 'post',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 ids: this.selectedProductsIds.join(','),
                 tab: tab || ''
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
+                this.unselectAll();
+
                 var title = this.getPopUpTitle(tab, this.getSelectedProductsTitles());
 
                 this.openPopUp(title, transport.responseText);
@@ -118,13 +117,11 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
         requestParams['ids'] = this.selectedProductsIds.join(',');
         //----------------------------------
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_template/saveListingProduct') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_template/saveListingProduct'), {
             method: 'post',
-            asynchronous : true,
-            parameters : requestParams,
-            onSuccess: function (transport)
-            {
+            asynchronous: true,
+            parameters: requestParams,
+            onSuccess: function(transport) {
                 Windows.getFocusedWindow().close();
                 this.getGridObj().doFilter();
             }.bind(this)
@@ -192,7 +189,12 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
     {
         this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
         if (this.selectedProductsIds.length) {
-            EbayListingTransferringHandlerObj.loadActionHtml(this.selectedProductsIds);
+            this.unselectAll();
+
+            var productName = this.selectedProductsIds.length == 1 ?
+                this.getProductNameByRowId(this.selectedProductsIds[0]) : null;
+
+            EbayListingTransferringHandlerObj.loadActionHtml(this.selectedProductsIds, null, productName);
         }
     },
 

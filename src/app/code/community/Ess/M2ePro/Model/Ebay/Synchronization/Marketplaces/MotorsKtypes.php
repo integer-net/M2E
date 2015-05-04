@@ -57,13 +57,13 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsKtypes
         $partNumber = 1;
         $this->deleteAllKtypesForMarketplace($marketplace);
 
-        while (true) {
+        for ($i = 0; $i < 100; $i++) {
 
             $this->getActualLockItem()->setPercents($this->getPercentsStart());
 
             $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
                                                              'Get KTypes from eBay');
-            $response = $this->receiveFromEbay($marketplace,$partNumber);
+            $response = $this->receiveFromEbay($marketplace, $partNumber);
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 
             if (empty($response)) {
@@ -71,20 +71,20 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsKtypes
             }
 
             $this->getActualLockItem()->setStatus(
-                'Processing KTypes data ('.(int)$response['current'].'/'.(int)$response['total'].')'
+                'Processing KTypes data ('.(int)$partNumber.'/'.(int)$response['total_parts'].')'
             );
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
             $this->getActualLockItem()->activate();
 
             $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
                                                              'Save KTypes to DB');
-            $this->saveKtypesToDb($marketplace,$response['parts']);
+            $this->saveKtypesToDb($marketplace, $response['data']);
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
 
             $this->getActualLockItem()->setPercents($this->getPercentsEnd());
             $this->getActualLockItem()->activate();
 
-            $partNumber = $response['next'];
+            $partNumber = $response['next_part'];
 
             if (is_null($partNumber)) {
                 break;
@@ -98,19 +98,18 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsKtypes
 
     protected function receiveFromEbay(Ess_M2ePro_Model_Marketplace $marketplace, $partNumber)
     {
-        $partSize = (int)$this->getConfigValue($this->getFullSettingsPath(), 'part_size');
-
         $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-            ->processVirtual('marketplace','get','motorsKtypes',
-                array('part_number' => $partNumber, 'part_size' => $partSize),
-                NULL,$marketplace->getId(),NULL,NULL);
+                          ->processVirtual(
+                              'marketplace','get','motorsKtypes',
+                               array('part_number' => $partNumber),
+                               NULL,$marketplace->getId()
+                          );
 
-        if (is_null($response) || empty($response['parts'])) {
+        if (is_null($response) || empty($response['data'])) {
             $response = array();
-        } else {
-            $this->getActualOperationHistory()->addText('Total received parts from eBay: '.count($response['parts']));
         }
 
+        $this->getActualOperationHistory()->addText('Total received parts from eBay: '.count($response['data']));
         return $response;
     }
 
@@ -123,53 +122,45 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsKtypes
         $connWrite->delete($tableMotorsKtypes,array('marketplace_id = ?'=>$marketplace->getId()));
     }
 
-    protected function saveKtypesToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $parts)
+    protected function saveKtypesToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $data)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tableMotorsKtype = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_motor_ktype');
 
-        $iteration = 0;
+        $iteration            = 0;
         $iterationsForOneStep = 1000;
+        $totalCountItems      = count($data['items']);
+        $percentsForOneStep   = ($this->getPercentsInterval()/2) / ($totalCountItems/$iterationsForOneStep);
+        $itemsForInsert       = array();
 
-        $totalCountItems = 0;
-        foreach ($parts as $part) {
-            $totalCountItems += count($part['items']);
-        }
+        for ($i = 0; $i < $totalCountItems; $i++) {
 
-        $percentsForOneStep = ($this->getPercentsInterval()/2) / ($totalCountItems/$iterationsForOneStep);
+            $item = $data['items'][$i];
 
-        foreach ($parts as $part) {
-            $itemsForInsert = array();
+            $itemsForInsert[] = array(
+                'marketplace_id' => $marketplace->getId(),
+                'ktype'          => (int)$item['ktype'],
+                'make'           => $item['make'],
+                'model'          => $item['model'],
+                'variant'        => $item['variant'],
+                'body_style'     => $item['body_style'],
+                'type'           => $item['type'],
+                'from_year'      => (int)$item['from_year'],
+                'to_year'        => (int)$item['to_year'],
+                'engine'         => $item['engine'],
+            );
 
-            for ($i = 0; $i < count($part['items']); $i++) {
+            if (count($itemsForInsert) >= 100 || $i >= ($totalCountItems - 1)) {
+                $connWrite->insertMultiple($tableMotorsKtype, $itemsForInsert);
+                $itemsForInsert = array();
+            }
 
-                $item = $part['items'][$i];
-
-                $itemsForInsert[] = array(
-                    'marketplace_id' => $marketplace->getId(),
-                    'ktype'          => (int)$item['ktype'],
-                    'make'           => $item['make'],
-                    'model'          => $item['model'],
-                    'variant'        => $item['variant'],
-                    'body_style'     => $item['body_style'],
-                    'type'           => $item['type'],
-                    'from_year'      => (int)$item['from_year'],
-                    'to_year'        => (int)$item['to_year'],
-                    'engine'         => $item['engine'],
+            if (++$iteration % $iterationsForOneStep == 0) {
+                $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;
+                $this->getActualLockItem()->setPercents(
+                    $this->getPercentsStart() + $this->getPercentsInterval()/2 + $percentsShift
                 );
-
-                if (count($itemsForInsert) >= 100 || $i >= (count($part['items']) - 1)) {
-                    $connWrite->insertMultiple($tableMotorsKtype, $itemsForInsert);
-                    $itemsForInsert = array();
-                }
-
-                if (++$iteration % $iterationsForOneStep == 0) {
-                    $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;
-                    $this->getActualLockItem()->setPercents(
-                        $this->getPercentsStart() + $this->getPercentsInterval()/2 + $percentsShift
-                    );
-                }
             }
         }
     }

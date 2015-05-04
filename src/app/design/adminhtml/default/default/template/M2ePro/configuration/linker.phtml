@@ -4,6 +4,21 @@
     }
 </style>
 
+<?php if ($this->getData('show_header')) { ?>
+
+    <div class="content-header">
+        <table cellspacing="0">
+            <tr>
+                <td><h3><?php echo $this->getHeaderText() ?></h3></td>
+                <td class="form-buttons">
+                    <?php echo $this->getButtonsHtml() ?>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<?php } ?>
+
 <div id="block_notice_ebay_configuration_global" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Global Settings'); ?>">
     <?php echo Mage::helper('M2ePro')->__(
         'Settings are split into four categories. Descriptions for each category are below.'

@@ -3,7 +3,7 @@ MagentoMessage.prototype = {
 
     // --------------------------------
 
-    initialize : function() {},
+    initialize: function() {},
 
     // --------------------------------
 

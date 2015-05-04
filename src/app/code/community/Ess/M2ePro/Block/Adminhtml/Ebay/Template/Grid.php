@@ -71,13 +71,19 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Grid extends Mage_Adminhtml_Block
 
         // Prepare description collection
         // ----------------------------------
-        $collectionDescription = Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection();
+        $collectionDescription = Mage::getModel('M2ePro/Template_Description')->getCollection();
+        $collectionDescription->getSelect()->join(
+            array('ets' => Mage::getModel('M2ePro/Ebay_Template_Description')->getResource()->getMainTable()),
+            'main_table.id=ets.template_description_id',
+            array('is_custom_template')
+        );
         $collectionDescription->getSelect()->reset(Varien_Db_Select::COLUMNS);
         $collectionDescription->getSelect()->columns(
             array('id as template_id', 'title', new Zend_Db_Expr('\'0\' as `marketplace`'),
                 new Zend_Db_Expr('\''.Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION.'\' as `nick`'),
                 'create_date', 'update_date')
         );
+        $collectionDescription->addFieldToFilter('component_mode', Ess_M2ePro_Helper_Component_Ebay::NICK);
         $collectionDescription->addFieldToFilter('is_custom_template', 0);
         // ----------------------------------
 
@@ -297,6 +303,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Grid extends Mage_Adminhtml_Block
             $collection = Mage::getModel('M2ePro/Marketplace')->getCollection();
             $collection->addFieldToFilter('component_mode', Ess_M2ePro_Helper_Component_Ebay::NICK);
             $collection->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
+            $collection->setOrder('sorder', 'ASC');
 
             $this->enabledMarketplacesCollection = $collection;
         }

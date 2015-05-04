@@ -23,7 +23,16 @@
             <label><?php echo Mage::helper('M2ePro')->__('PHP'); ?>: </label>
         </td>
         <td class="value">
-            <?php echo $this->phpVersion . ' (' . $this->phpApi . ')'?>
+            <?php echo $this->phpVersion ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Server API'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo$this->phpApi ?>
         </td>
     </tr>
 
@@ -50,7 +59,16 @@
             <label><?php echo Mage::helper('M2ePro')->__('MySQL'); ?>: </label>
         </td>
         <td class="value">
-            <?php echo $this->mySqlVersion . ' (' . $this->mySqlDatabaseName .')' ?>
+            <?php echo $this->mySqlVersion ?>
+        </td>
+    </tr>
+
+    <tr>
+        <td class="label">
+            <label><?php echo Mage::helper('M2ePro')->__('Database'); ?>: </label>
+        </td>
+        <td class="value">
+            <?php echo $this->mySqlDatabaseName ?>
         </td>
     </tr>
 

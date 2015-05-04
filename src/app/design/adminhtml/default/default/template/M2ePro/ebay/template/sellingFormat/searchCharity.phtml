@@ -23,7 +23,7 @@
             <option value="id"><?php echo Mage::helper('M2ePro')->__('ID')?></option>
         </select>&nbsp;&nbsp;
         <?php echo $this->getChildHtml('submit_button');?>&nbsp;
-        <?php echo $this->getChildHtml('reset_button');?>
+        <a href="javascript:void(0)" id="searchCharity_reset"><?php echo Mage::helper('M2ePro')->__('Reset'); ?></a>
    </div>
 
     <div id="searchCharity_warning_block" class="msg" style="display: none;">

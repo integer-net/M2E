@@ -25,6 +25,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Marketplace_Edit_Form extends Mage_Adminht
     protected function _beforeToHtml()
     {
         //----------------------------
+        /** @var Ess_M2ePro_Model_Marketplace $tempMarketplaces */
         $tempMarketplaces = Mage::helper('M2ePro/Component_Ebay')->getCollection('Marketplace')
             ->setOrder('sorder','ASC')
             ->setOrder('title','ASC')
@@ -35,15 +36,19 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Marketplace_Edit_Form extends Mage_Adminht
 
         foreach($tempMarketplaces as $tempMarketplace) {
 
+            $isLocked = (bool)Mage::getModel('M2ePro/Listing')->getCollection()
+                ->addFieldToFilter('marketplace_id', $tempMarketplace->getId())
+                ->getSize();
+
             /* @var $tempMarketplace Ess_M2ePro_Model_Marketplace */
             $marketplaces[] = array(
                 'instance' => $tempMarketplace,
-                'params'   => array('locked'=>$tempMarketplace->isLocked())
+                'params'   => array('locked' => $isLocked)
             );
 
             $storedStatuses[] = array(
                 'marketplace_id' => $tempMarketplace->getMarketplaceId(),
-                'status' => $tempMarketplace->getStatus()
+                'status'         => $tempMarketplace->getStatus()
             );
         }
 

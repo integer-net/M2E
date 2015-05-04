@@ -49,7 +49,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Order_View extends Mage_Adminhtml_B
             //------------------------------
             $url = $this->getUrl('*/adminhtml_order/reservationCancel', array('ids' => $this->order->getId()));
             $this->_addButton('reservation_cancel', array(
-                'label'     => Mage::helper('M2ePro')->__('Cancel Qty Reserve'),
+                'label'     => Mage::helper('M2ePro')->__('Cancel QTY Reserve'),
                 'onclick'   => "confirmSetLocation(M2ePro.translator.translate('Are you sure?'), '".$url."');",
                 'class'     => 'scalable'
             ));
@@ -58,7 +58,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Order_View extends Mage_Adminhtml_B
             //------------------------------
             $url = $this->getUrl('*/adminhtml_order/reservationPlace', array('ids' => $this->order->getId()));
             $this->_addButton('reservation_place', array(
-                'label'     => Mage::helper('M2ePro')->__('Reserve Qty'),
+                'label'     => Mage::helper('M2ePro')->__('Reserve QTY'),
                 'onclick'   => "confirmSetLocation(M2ePro.translator.translate('Are you sure?'), '".$url."');",
                 'class'     => 'scalable'
             ));

@@ -339,7 +339,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
         }
 
         if (!$this->getParentLockItem()) {
-            throw new Exception('Parent Lock item must be specified');
+            throw new Exception('Parent Lock Item must be specified');
         }
 
         return $this->getParentLockItem();

@@ -103,13 +103,6 @@ class Ess_M2ePro_Model_Buy_Listing_Other extends Ess_M2ePro_Model_Component_Chil
         return (float)$this->getData('shipping_expedited_rate');
     }
 
-    //-----------------------------------------
-
-    public function getEndDate()
-    {
-        return $this->getData('end_date');
-    }
-
     // ########################################
 
     public function getRelatedStoreId()

@@ -106,9 +106,7 @@ SQL
 
     $indexList = $connection->getIndexList($motorsNewTableName);
     foreach ($newIndexes as $newIndex) {
-        if (!isset($indexList[strtoupper($newIndex)]) &&
-            $connection->tableColumnExists($motorsNewTableName, $newIndex) !== false) {
-
+        if (!isset($indexList[strtoupper($newIndex)])) {
             $connection->addKey($motorsNewTableName, $newIndex, $newIndex);
         }
     }

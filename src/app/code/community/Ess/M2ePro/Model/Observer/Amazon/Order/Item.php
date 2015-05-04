@@ -1,45 +1,39 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @copyright  Copyright (c) 2015 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Observer_Amazon_Order_Item
+class Ess_M2ePro_Model_Observer_Amazon_Order_Item extends Ess_M2ePro_Model_Observer_Abstract
 {
     //####################################
 
-    public function associateItemWithProduct(Varien_Event_Observer $observer)
+    public function process()
     {
-        try {
+        $sku = $this->getEvent()->getData('sku');
 
-            $sku = $observer->getEvent()->getData('sku');
-            $accountId = (int)$observer->getEvent()->getData('account_id');
-            $marketplaceId = (int)$observer->getEvent()->getData('marketplace_id');
-            $productId = (int)$observer->getEvent()->getData('product_id');
+        $accountId = (int)$this->getEvent()->getData('account_id');
+        $marketplaceId = (int)$this->getEvent()->getData('marketplace_id');
+        $productId = (int)$this->getEvent()->getData('product_id');
 
-            /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
-            $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other');
-            $collection->addFieldToFilter('main_table.account_id',$accountId);
-            $collection->addFieldToFilter('main_table.marketplace_id',$marketplaceId);
-            $collection->addFieldToFilter('second_table.sku',$sku);
+        /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
+        $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other');
 
-            if ($collection->getSize() > 0 && is_null($collection->getFirstItem()->getData('product_id'))) {
+        $collection->addFieldToFilter('second_table.sku',$sku);
+        $collection->addFieldToFilter('main_table.account_id',$accountId);
+        $collection->addFieldToFilter('main_table.marketplace_id',$marketplaceId);
 
-                /** @var $productOtherInstance Ess_M2ePro_Model_Listing_Other */
-                $productOtherInstance = $collection->getFirstItem();
+        if ($collection->getSize() > 0 && is_null($collection->getFirstItem()->getData('product_id'))) {
 
-                if (!$productOtherInstance->getAccount()->getChildObject()->isOtherListingsSynchronizationEnabled() ||
-                    !$productOtherInstance->getAccount()->getChildObject()->isOtherListingsMappingEnabled()) {
-                    return;
-                }
+            /** @var $productOtherInstance Ess_M2ePro_Model_Listing_Other */
+            $productOtherInstance = $collection->getFirstItem();
 
-                $productOtherInstance->mapProduct($productId, Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
+            if (!$productOtherInstance->getAccount()->getChildObject()->isOtherListingsSynchronizationEnabled() ||
+                !$productOtherInstance->getAccount()->getChildObject()->isOtherListingsMappingEnabled()) {
+                return;
             }
 
-        } catch (Exception $exception) {
-
-            Mage::helper('M2ePro/Module_Exception')->process($exception);
-            return;
+            $productOtherInstance->mapProduct($productId, Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
         }
     }
 

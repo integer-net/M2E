@@ -7,7 +7,7 @@
 abstract class Ess_M2ePro_Model_Connector_Play_Abstract extends Ess_M2ePro_Model_Connector_Command
 {
     const COMPONENT = 'Play';
-    const COMPONENT_VERSION = 1;
+    const COMPONENT_VERSION = 2;
 
     /**
      * @var Ess_M2ePro_Model_Account|null

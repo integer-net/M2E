@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit extends Mage_Adminhtml_
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+            $componentName = Mage::helper('M2ePro/Component_Buy')->getTitle();
             $headerTextEdit = $this->_headerText = Mage::helper('M2ePro')->__(
                 "Edit %component_name% Account",
                 $componentName
@@ -62,13 +62,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit extends Mage_Adminhtml_
         if ($wizardHelper->isActive('buy') &&
             $wizardHelper->getStep('buy') == 'account'
         ) {
-            //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'BuyAccountHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-            //------------------------------
 
             //------------------------------
             $this->_addButton('save_and_continue', array(
@@ -97,20 +90,31 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit extends Mage_Adminhtml_
                 //------------------------------
             }
         } else {
+
+            if ((bool)$this->getRequest()->getParam('close_on_save',false)) {
+
+                if ($this->getRequest()->getParam('id')) {
+                    $this->_addButton('save', array(
+                        'label'     => Mage::helper('M2ePro')->__('Save And Close'),
+                        'onclick'   => 'BuyAccountHandlerObj.saveAndClose()',
+                        'class'     => 'save'
+                    ));
+                } else {
+                    $this->_addButton('save_and_continue', array(
+                        'label'     => Mage::helper('M2ePro')->__('Save And Continue Edit'),
+                        'onclick'   => 'BuyAccountHandlerObj.save_and_edit_click(\'\',\'buyAccountEditTabs\')',
+                        'class'     => 'save'
+                    ));
+                }
+                return;
+            }
+
             //------------------------------
             $url = Mage::helper('M2ePro')->getBackUrl('list');
             $this->_addButton('back', array(
                 'label'     => Mage::helper('M2ePro')->__('Back'),
                 'onclick'   => 'BuyAccountHandlerObj.back_click(\'' . $url .'\')',
                 'class'     => 'back'
-            ));
-            //------------------------------
-
-            //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'BuyAccountHandlerObj.reset_click()',
-                'class'     => 'reset'
             ));
             //------------------------------
 

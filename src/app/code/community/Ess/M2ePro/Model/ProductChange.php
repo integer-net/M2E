@@ -10,9 +10,10 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
     const ACTION_UPDATE = 'update';
     const ACTION_DELETE = 'delete';
 
-    const CREATOR_TYPE_UNKNOWN = 0;
-    const CREATOR_TYPE_OBSERVER = 1;
-    const CREATOR_TYPE_SYNCHRONIZATION = 2;
+    const INITIATOR_UNKNOWN         = 0;
+    const INITIATOR_OBSERVER        = 1;
+    const INITIATOR_SYNCHRONIZATION = 2;
+    const INITIATOR_INSPECTOR       = 3;
 
     const UPDATE_ATTRIBUTE_CODE = '__INSTANCE__';
 
@@ -26,7 +27,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
     //####################################
 
-    public function addCreateAction($productId, $creatorType = self::CREATOR_TYPE_UNKNOWN)
+    public function addCreateAction($productId, $initiator = self::INITIATOR_UNKNOWN)
     {
         $tempCollection = Mage::getModel('M2ePro/ProductChange')
                                 ->getCollection()
@@ -39,7 +40,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
             $dataForAdd = array('product_id' => $productId,
                                 'action' => self::ACTION_CREATE,
-                                'creator_type' => $creatorType);
+                                'initiators' => $initiator);
 
             Mage::getModel('M2ePro/ProductChange')
                      ->setData($dataForAdd)
@@ -51,7 +52,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
         return false;
     }
 
-    public function addDeleteAction($productId, $creatorType = self::CREATOR_TYPE_UNKNOWN)
+    public function addDeleteAction($productId, $initiator = self::INITIATOR_UNKNOWN)
     {
         $tempCollection = Mage::getModel('M2ePro/ProductChange')
                                 ->getCollection()
@@ -64,7 +65,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
             $dataForAdd = array('product_id' => $productId,
                                 'action' => self::ACTION_DELETE,
-                                'creator_type' => $creatorType);
+                                'initiators' => $initiator);
 
             Mage::getModel('M2ePro/ProductChange')
                      ->setData($dataForAdd)
@@ -76,22 +77,23 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
         return false;
     }
 
-    public function addUpdateAction($productId, $creatorType = self::CREATOR_TYPE_UNKNOWN)
+    public function addUpdateAction($productId, $initiator = self::INITIATOR_UNKNOWN)
     {
-        $tempCollection = Mage::getModel('M2ePro/ProductChange')
+        /** @var Ess_M2ePro_Model_Mysql4_ProductChange_Collection $changeCollection */
+        $changeCollection = Mage::getModel('M2ePro/ProductChange')
                                 ->getCollection()
                                 ->addFieldToFilter('product_id', $productId)
                                 ->addFieldToFilter('action', self::ACTION_UPDATE)
                                 ->addFieldToFilter('attribute', self::UPDATE_ATTRIBUTE_CODE);
 
-        $tempChanges = $tempCollection->toArray();
+        $tempChanges = $changeCollection->toArray();
 
         if ($tempChanges['totalRecords'] <= 0) {
 
             $dataForAdd = array('product_id' => $productId,
                                 'action' => self::ACTION_UPDATE,
                                 'attribute' => self::UPDATE_ATTRIBUTE_CODE,
-                                'creator_type' => $creatorType);
+                                'initiators' => $initiator);
 
             Mage::getModel('M2ePro/ProductChange')
                      ->setData($dataForAdd)
@@ -99,6 +101,27 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
             return true;
         }
+
+        /** @var Ess_M2ePro_Model_ProductChange $change */
+        $change = reset($tempChanges['items']);
+
+        $initiators = explode(',', $change['initiators']);
+        if (in_array($initiator, $initiators)) {
+            return false;
+        }
+
+        $initiators[] = $initiator;
+        $initiators = implode(',', array_unique($initiators));
+
+        $dataForUpdate = array(
+            'count_changes' => $change['count_changes']+1,
+            'initiators'    => $initiators
+        );
+
+        Mage::getModel('M2ePro/ProductChange')
+            ->load($change['id'])
+            ->addData($dataForUpdate)
+            ->save();
 
         return false;
     }
@@ -107,7 +130,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
 
     public function updateAttribute($productId, $attribute,
                                     $valueOld, $valueNew,
-                                    $creatorType = self::CREATOR_TYPE_UNKNOWN,
+                                    $initiator = self::INITIATOR_UNKNOWN,
                                     $storeId = NULL)
     {
         $tempCollection = Mage::getModel('M2ePro/ProductChange')
@@ -137,7 +160,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
                                  'value_old' => $valueOld,
                                  'value_new' => $valueNew,
                                  'count_changes' => 1,
-                                 'creator_type' => $creatorType);
+                                 'initiators' => $initiator);
 
              Mage::getModel('M2ePro/ProductChange')
                      ->setData($dataForAdd)
@@ -155,10 +178,13 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
               return true;
 
         } else if ($valueOld != $valueNew) {
+             $initiators = explode(',', $tempChanges['items'][0]['initiators']);
+             $initiators[] = $initiator;
+             $initiators = implode(',', array_unique($initiators));
 
              $dataForUpdate = array('value_new' => $valueNew,
                                     'count_changes' => $tempChanges['items'][0]['count_changes']+1,
-                                    'creator_type' => $creatorType);
+                                    'initiators' => $initiators);
 
              Mage::getModel('M2ePro/ProductChange')
                      ->load($tempChanges['items'][0]['id'])
@@ -208,9 +234,9 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
         }
 
         $ids = implode(',',$ids);
-        $creatorObserver = self::CREATOR_TYPE_OBSERVER;
+        $initiator = self::INITIATOR_OBSERVER;
 
-        $this->clear("id IN ({$ids}) AND (update_date <= '{$date}' OR creator_type != {$creatorObserver})");
+        $this->clear("id IN ({$ids}) AND (update_date <= '{$date}' OR initiators NOT LIKE '%{$initiator}%')");
     }
 
     public function clearOutdated($maxLifeTime)

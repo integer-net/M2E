@@ -25,11 +25,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit_Tabs ex
 
     protected function _beforeToHtml()
     {
-        $this->addTab('source', array(
-            'label'   => Mage::helper('M2ePro')->__('Source'),
-            'title'   => Mage::helper('M2ePro')->__('Source'),
+        $this->addTab('general', array(
+            'label'   => Mage::helper('M2ePro')->__('General'),
+            'title'   => Mage::helper('M2ePro')->__('General'),
             'content' => $this->getLayout()
-                ->createBlock('M2ePro/adminhtml_ebay_listing_other_synchronization_edit_tabs_source')
+                ->createBlock('M2ePro/adminhtml_ebay_listing_other_synchronization_edit_tabs_general')
                 ->toHtml(),
         ))
             ->addTab('revise', array(
@@ -53,7 +53,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit_Tabs ex
                 ->createBlock('M2ePro/adminhtml_ebay_listing_other_synchronization_edit_tabs_stop')
                 ->toHtml(),
         ))
-            ->setActiveTab($this->getRequest()->getParam('tab', 'source'));
+            ->setActiveTab($this->getRequest()->getParam('tab', 'general'));
 
         return parent::_beforeToHtml();
     }

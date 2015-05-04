@@ -1,6 +1,6 @@
 <?php echo $this->getParentBlock()->getChildHtml('view_header'); ?>
 
-<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Choose how you want to display products for selection.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Choose how you want to display Products for selection.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
     <form id="<?php echo $this->getForm()->getId(); ?>" method="post" action="<?php echo $this->getUrl('*/*/*',array('_current' => true)); ?>">
 
@@ -16,10 +16,10 @@
             </div>
 
             <input id="categories" name="source" type="radio" value="categories">&nbsp;&nbsp;
-            <label style="font-weight: bold" for="categories"><?php echo Mage::helper('M2ePro')->__('Category'); ?></label>
+            <label style="font-weight: bold" for="categories"><?php echo Mage::helper('M2ePro')->__('Categories'); ?></label>
 
             <div style="margin: 10px 22px">
-                <?php echo Mage::helper('M2ePro')->__('Products grouped by Magento category.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('Products grouped by Magento Categories.'); ?>
             </div>
 
         </div>

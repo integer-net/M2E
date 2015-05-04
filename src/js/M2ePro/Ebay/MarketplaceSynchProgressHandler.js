@@ -1,15 +1,16 @@
 EbayMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler, {
 
-    printFinalMessage : function(resultType)
+    //----------------------------------
+
+    printFinalMessage: function(resultType)
     {
         var self = this;
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_marketplace/isExistDeletedCategories') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_marketplace/isExistDeletedCategories'), {
             method: 'post',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 if (transport.responseText == 1) {
                     MagentoMessageObj.addWarning(str_replace(
                         '%url%',
@@ -37,4 +38,5 @@ EbayMarketplaceSynchProgressHandler = Class.create(SynchProgressHandler, {
         });
     }
 
+    //----------------------------------
 });

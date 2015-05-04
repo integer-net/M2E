@@ -75,11 +75,11 @@ class Ess_M2ePro_Helper_Module_Cron extends Mage_Core_Helper_Abstract
         if (is_null($lastTypeChange)) {
 
             $tempTimeCacheKey = 'cron_start_time_of_checking_last_type_change';
-            $lastTypeChange = Mage::helper('M2ePro/Data_Cache')->getValue($tempTimeCacheKey);
+            $lastTypeChange = Mage::helper('M2ePro/Data_Cache_Permanent')->getValue($tempTimeCacheKey);
 
             if (empty($lastTypeChange)) {
                 $lastTypeChange = Mage::helper('M2ePro')->getCurrentGmtDate();
-                Mage::helper('M2ePro/Data_Cache')->setValue($tempTimeCacheKey,$lastTypeChange,array('cron'));
+                Mage::helper('M2ePro/Data_Cache_Permanent')->setValue($tempTimeCacheKey,$lastTypeChange,array('cron'));
             }
         }
 
@@ -108,11 +108,11 @@ class Ess_M2ePro_Helper_Module_Cron extends Mage_Core_Helper_Abstract
         if (is_null($lastAccess)) {
 
             $tempTimeCacheKey = 'cron_start_time_of_checking_last_access';
-            $lastAccess = Mage::helper('M2ePro/Data_Cache')->getValue($tempTimeCacheKey);
+            $lastAccess = Mage::helper('M2ePro/Data_Cache_Permanent')->getValue($tempTimeCacheKey);
 
             if (empty($lastAccess)) {
                 $lastAccess = Mage::helper('M2ePro')->getCurrentGmtDate();
-                Mage::helper('M2ePro/Data_Cache')->setValue($tempTimeCacheKey,$lastAccess,array('cron'));
+                Mage::helper('M2ePro/Data_Cache_Permanent')->setValue($tempTimeCacheKey,$lastAccess,array('cron'));
             }
         }
 
@@ -141,11 +141,11 @@ class Ess_M2ePro_Helper_Module_Cron extends Mage_Core_Helper_Abstract
         if (is_null($lastRun)) {
 
             $tempTimeCacheKey = 'cron_start_time_of_checking_last_run';
-            $lastRun = Mage::helper('M2ePro/Data_Cache')->getValue($tempTimeCacheKey);
+            $lastRun = Mage::helper('M2ePro/Data_Cache_Permanent')->getValue($tempTimeCacheKey);
 
             if (empty($lastRun)) {
                 $lastRun = Mage::helper('M2ePro')->getCurrentGmtDate();
-                Mage::helper('M2ePro/Data_Cache')->setValue($tempTimeCacheKey,$lastRun,array('cron'));
+                Mage::helper('M2ePro/Data_Cache_Permanent')->setValue($tempTimeCacheKey,$lastRun,array('cron'));
             }
         }
 

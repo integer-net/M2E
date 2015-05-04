@@ -1,5 +1,7 @@
 EbayListingCategoryProductSuggestedSearchHandler = Class.create(CommonHandler, {
 
+    //----------------------------------
+
     searchResult: {
         failed: 0,
         succeeded: 0
@@ -82,6 +84,7 @@ EbayListingCategoryProductSuggestedSearchHandler = Class.create(CommonHandler, {
                 ids: partString
             },
             onSuccess: function(transport) {
+
                 var percents = (100/partsCount)*(partsCount-parts.length);
                 var response = transport.responseText.evalJSON();
 
@@ -108,4 +111,5 @@ EbayListingCategoryProductSuggestedSearchHandler = Class.create(CommonHandler, {
         });
     }
 
+    //----------------------------------
 });

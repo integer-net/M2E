@@ -10,9 +10,11 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
     {
         parent::__construct();
 
+        $channel = $this->getRequest()->getParam('channel');
+
         // Initialization block
         //------------------------------
-        $this->setId('orderLogGrid');
+        $this->setId(ucfirst($channel) . 'OrderLogGrid');
         //------------------------------
 
         // Set default values
@@ -55,8 +57,13 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
             ));
         }
 
-        $components = Mage::helper('M2ePro/View')->getComponentHelper()->getActiveComponents();
-        $collection->addFieldToFilter('main_table.component_mode', array('in'=>$components));
+        $channel = $this->getData('channel');
+        if (!empty($channel)) {
+            $collection->getSelect()->where('main_table.component_mode = ?', $channel);
+        } else {
+            $components = Mage::helper('M2ePro/View')->getComponentHelper()->getActiveComponents();
+            $collection->addFieldToFilter('main_table.component_mode', array('in'=>$components));
+        }
 
         //--------------------------------
         if ($this->getRequest()->getParam('sort', 'create_date') == 'create_date') {
@@ -80,19 +87,6 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
             'index'     => 'create_date',
             'filter_index' => 'main_table.create_date'
         ));
-
-        if (!Mage::helper('M2ePro/View')->getComponentHelper()->isSingleActiveComponent()) {
-            $this->addColumn('component_mode', array(
-                'header'         => Mage::helper('M2ePro')->__('Channel'),
-                'align'          => 'right',
-                'width'          => '120px',
-                'type'           => 'options',
-                'index'          => 'component_mode',
-                'filter_index'   => 'main_table.component_mode',
-                'sortable'       => false,
-                'options'        => Mage::helper('M2ePro/View')->getComponentHelper()->getActiveComponentsTitles()
-            ));
-        }
 
         $this->addColumn('channel_order_id', array(
             'header'    => Mage::helper('M2ePro')->__('Order #'),
@@ -144,10 +138,10 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
             'type'      => 'options',
             'sortable'      => false,
             'options'   => array(
-                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => Mage::helper('M2ePro')->__('Error'),
-                Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => Mage::helper('M2ePro')->__('Warning'),
-                Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => Mage::helper('M2ePro')->__('Success'),
                 Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE => Mage::helper('M2ePro')->__('Notice'),
+                Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => Mage::helper('M2ePro')->__('Success'),
+                Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => Mage::helper('M2ePro')->__('Warning'),
+                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => Mage::helper('M2ePro')->__('Error'),
             ),
             'frame_callback' => array($this, 'callbackColumnType')
         ));
@@ -308,6 +302,9 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
 
     public function getGridUrl()
     {
-        return $this->getUrl('*/*/orderGrid', array('_current' => true));
+        return $this->getUrl('*/*/orderGrid', array(
+            '_current' => true,
+            'channel' => $this->getData('channel')
+        ));
     }
 }

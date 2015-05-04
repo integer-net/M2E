@@ -13,7 +13,7 @@ EbayListingTransferringBreadcrumbHandler.prototype = {
 
     highlightStep: function(stepName)
     {
-        $$('div[id^=step_]').each(function(el){el.removeClassName('selected');});
+        $$('div[id^=step_]').each(function(el) {el.removeClassName('selected');});
         $('step_' + stepName) && $('step_' + stepName).addClassName('selected');
         $('breadcrumb_container') && $('breadcrumb_container').show();
     },
@@ -26,7 +26,7 @@ EbayListingTransferringBreadcrumbHandler.prototype = {
     showSteps: function(steps)
     {
         var selectorSeparator = '.left .space';
-        ['destination', 'policy', 'translation', 'categories'].forEach(function(el){
+        ['destination', 'policy', 'translation', 'categories'].forEach(function(el) {
             var breadcrumb = $('step_' + el);
             if (breadcrumb) {
                 if (steps.indexOf(el) != -1) {
@@ -51,8 +51,8 @@ EbayListingTransferringBreadcrumbHandler.prototype = {
 
     setWidthStep: function()
     {
-        var showedBreadcrumbSteps = $$('div[id^=step_]').findAll(function(el){return el.visible();});
-        var showedBreadcrumbSeparators = $$('.left .space').findAll(function(el){return el.visible();});
+        var showedBreadcrumbSteps = $$('div[id^=step_]').findAll(function(el) {return el.visible();});
+        var showedBreadcrumbSeparators = $$('.left .space').findAll(function(el) {return el.visible();});
         var stepWidth = (100 - showedBreadcrumbSeparators.length * 0.3) / showedBreadcrumbSteps.length;
         var length = showedBreadcrumbSteps.length;
         for (var i = 0; i < length; i++) {

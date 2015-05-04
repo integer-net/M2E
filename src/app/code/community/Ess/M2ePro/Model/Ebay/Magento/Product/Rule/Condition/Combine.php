@@ -13,7 +13,25 @@ class Ess_M2ePro_Model_Ebay_Magento_Product_Rule_Condition_Combine
 
     // ####################################
 
-    protected function getEbaySelectOptions()
+    protected function getConditionCombine()
+    {
+        return $this->getType() . '|ebay|';
+    }
+
+    protected function getCustomLabel()
+    {
+        return Mage::helper('M2ePro')->__('eBay Values');
+    }
+
+    protected function getCustomOptions()
+    {
+        $attributes = $this->getCustomOptionsAttributes();
+        return !empty($attributes) ?
+            $this->getOptions('M2ePro/Ebay_Magento_Product_Rule_Condition_Product', $attributes, array('ebay'))
+            : array();
+    }
+
+    protected function getCustomOptionsAttributes()
     {
         return array(
             'ebay_item_id' => Mage::helper('M2ePro')->__('Item ID'),
@@ -29,39 +47,6 @@ class Ess_M2ePro_Model_Ebay_Magento_Product_Rule_Condition_Combine
             'ebay_status' => Mage::helper('M2ePro')->__('Status'),
             'ebay_start_date' => Mage::helper('M2ePro')->__('Start Date'),
             'ebay_end_date' => Mage::helper('M2ePro')->__('End Date'),
-        );
-    }
-
-    public function getNewChildSelectOptions()
-    {
-        $productAttributes = Mage::getModel('M2ePro/Ebay_Magento_Product_Rule_Condition_Product')->getAttributeOption();
-
-        $ebayValues = array();
-        foreach ($this->getEbaySelectOptions() as $code => $label) {
-            unset($productAttributes[$code]);
-
-            $ebayValues[] = array(
-                'value' => 'M2ePro/Ebay_Magento_Product_Rule_Condition_Product|ebay|'.$code,
-                'label' => $label,
-            );
-        }
-
-        $attributes = array();
-        foreach ($productAttributes as $code => $label) {
-            $attributes[] = array(
-                'value' => 'M2ePro/Magento_Product_Rule_Condition_Product|'.$code,
-                'label' => $label
-            );
-        }
-
-        return array(
-            array('value'=>'', 'label'=>Mage::helper('rule')->__('Please choose a condition to add...')),
-            array(
-                'label' => Mage::helper('M2ePro')->__('Conditions Combination'),
-                'value' => 'M2ePro/Ebay_Magento_Product_Rule_Condition_Combine|ebay|',
-            ),
-            array('label' => Mage::helper('M2ePro')->__('eBay Values'), 'value' => $ebayValues),
-            array('label' => Mage::helper('M2ePro')->__('Product Attribute'), 'value' => $attributes),
         );
     }
 

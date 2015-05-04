@@ -32,7 +32,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Edit extends Mage_Adminht
             $this->_headerText = Mage::helper('M2ePro')->__('Edit Listing Settings "%listing_title%"',
                                                             $listing->getTitle());
         } else {
-            $this->_headerText = Mage::helper('M2ePro')->__('Creating A New M2E Listing');
+            $this->_headerText = Mage::helper('M2ePro')->__('Creating A New M2E Pro Listing');
         }
         //------------------------------
 
@@ -123,7 +123,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Edit extends Mage_Adminht
             $sessionKey = 'ebay_listing_create';
             $sessionData = Mage::helper('M2ePro/Data_Session')->getValue($sessionKey);
             if ($currentStep == 4 && isset($sessionData['creation_mode']) && $sessionData['creation_mode'] ===
-                Ess_M2ePro_Helper_Component_Ebay::LISTING_CREATION_MODE_LISTING_ONLY) {
+                Ess_M2ePro_Helper_View::LISTING_CREATION_MODE_LISTING_ONLY) {
 
                 $nextStepBtnText = 'Complete';
             }

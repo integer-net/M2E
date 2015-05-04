@@ -217,7 +217,7 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
             foreach (array_chunk($combination['products'],$this->getMaxProductsPerStep()) as $products) {
 
                 $productsCount = count($products);
-                $countString = $productsCount.' '.Mage::helper('M2ePro')->__('product(s).');
+                $countString = $productsCount.' '.Mage::helper('M2ePro')->__('Product(s).');
 
                 if ($productsCount < 10) {
 
@@ -227,7 +227,7 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
                     }
 
                     $productsIds = implode('", "',$productsIds);
-                    $countString = Mage::helper('M2ePro')->__('product(s) with ID(s)')." \"{$productsIds}\".";
+                    $countString = Mage::helper('M2ePro')->__('Product(s) with ID(s)')." \"{$productsIds}\".";
                 }
 
                 $this->setStatus(Ess_M2ePro_Model_Listing_Product::getActionTitle($action).

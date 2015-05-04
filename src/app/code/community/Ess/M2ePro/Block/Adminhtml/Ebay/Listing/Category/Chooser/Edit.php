@@ -49,10 +49,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Chooser_Edit extends Mage
 
         //------------------------------
         $data = array(
-            'id'      => 'category_edit_done_button',
+            'id'      => 'category_edit_confirm_button',
             'class'   => '',
-            'label'   => Mage::helper('M2ePro')->__('Done'),
-            'onclick' => 'EbayListingCategoryChooserHandlerObj.doneCategory();',
+            'label'   => Mage::helper('M2ePro')->__('Confirm'),
+            'onclick' => 'EbayListingCategoryChooserHandlerObj.confirmCategory();',
         );
         $doneButton = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
         //------------------------------

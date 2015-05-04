@@ -25,6 +25,12 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
         return Mage::helper('M2ePro')->__(self::TITLE);
     }
 
+    public function getMenuPath($pathNick)
+    {
+        $rootMenuNode = Mage::getConfig()->getNode('adminhtml/menu/m2epro_ebay');
+        return Mage::helper('M2ePro/View')->getMenuPath($rootMenuNode, $pathNick, $this->getMenuRootNodeLabel());
+    }
+
     // ########################################
 
     public function getWizardInstallationNick()

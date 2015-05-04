@@ -98,7 +98,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Same_Specific extends Mag
             );
         } else {
             $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($categoryValue);
-            $this->_selectedCategoryPath = Mage::helper('M2ePro')->__('Magento Attribute') . ' -> ' . $attributeLabel;
+            $this->_selectedCategoryPath = Mage::helper('M2ePro')->__('Magento Attribute') . ' > ' . $attributeLabel;
         }
         // --------------------------------------
     }

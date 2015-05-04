@@ -33,28 +33,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
         //------------------------------
 
         //------------------------------
-        $url = $this->getUrl('*/adminhtml_common_log/listing', array('back' => $backUrl));
-        $this->_addButton('general_log', array(
-            'label'     => Mage::helper('M2ePro')->__('General Log'),
-            'onclick'   => 'setLocation(\'' . $url .'\')',
-            'class'     => 'button_link'
-        ));
-        //------------------------------
-
-        //------------------------------
         $url = $this->getUrl('*/adminhtml_common_listing/search', array('back' => $backUrl));
         $this->_addButton('search_products', array(
-            'label'     => Mage::helper('M2ePro')->__('Search Products'),
+            'label'     => Mage::helper('M2ePro')->__('Search'),
             'onclick'   => 'setLocation(\'' . $url . '\')',
             'class'     => 'button_link search'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
 
@@ -77,17 +60,62 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
 
     // ########################################
 
+    protected function _toHtml()
+    {
+        $urls = json_encode(array(
+            'adminhtml_common_listing/saveTitle' => Mage::helper('adminhtml')
+                                                        ->getUrl('M2ePro/adminhtml_common_listing/saveTitle')
+        ));
+
+        $translations = json_encode(array(
+            'Cancel' => Mage::helper('M2ePro')->__('Cancel'),
+            'Save' => Mage::helper('M2ePro')->__('Save'),
+            'Edit Listing Title' => Mage::helper('M2ePro')->__('Edit Listing Title'),
+        ));
+
+        $uniqueTitleTxt = Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')
+            ->__('The specified title is already used for other listing. Listing title must be unique.'));
+
+        $constants = Mage::helper('M2ePro')
+            ->getClassConstantAsJson('Ess_M2ePro_Helper_Component_'.ucfirst($this->getActiveTab()));
+
+        $javascripts = <<<HTML
+
+<script type="text/javascript">
+
+    Event.observe(window, 'load', function() {
+        M2ePro.url.add({$urls});
+        M2ePro.translator.add({$translations});
+    });
+
+    M2ePro.text.title_not_unique_error = '{$uniqueTitleTxt}';
+
+    M2ePro.php.setConstants(
+        {$constants},
+        'Ess_M2ePro_Helper_Component'
+    );
+
+    var editListingTitle = function(el)
+    {
+        EditListingTitleObj.gridId = listingJsTabs.activeTab.id.replace('listing_', '') + 'ListingGrid';
+        EditListingTitleObj.openPopup(el);
+    }
+
+    EditListingTitleObj = new EditListingTitle();
+
+</script>
+
+HTML;
+
+        return parent::_toHtml().$javascripts;
+    }
+
+    // ########################################
+
     protected function getAmazonTabBlock()
     {
         if (!$this->getChild('amazon_tab')) {
-            $tutorialShown = Mage::helper('M2ePro/Module')->getConfig()
-                ->getGroupValue('/view/common/amazon/listing/', 'tutorial_shown');
-
-            if (!$tutorialShown) {
-                $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_tutorial');
-            } else {
-                $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing');
-            }
+            $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing');
 
             $this->setChild('amazon_tab', $block);
         }
@@ -97,21 +125,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
 
     public function getAmazonTabHtml()
     {
-        $tutorialShown = Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/view/common/amazon/listing/', 'tutorial_shown');
-
-        if (!$tutorialShown) {
-            return parent::getAmazonTabHtml();
-        }
-
-        $javascript = '';
-
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            $javascript = $this->getAmazonTabBlock()->getTemplatesButtonJavascript();
-        }
-
-        return $javascript .
-               $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_filter')->toHtml() .
+        return $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_filter')->toHtml() .
                parent::getAmazonTabHtml();
     }
 
@@ -120,14 +134,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
     protected function getBuyTabBlock()
     {
         if (!$this->getChild('buy_tab')) {
-            $tutorialShown = Mage::helper('M2ePro/Module')->getConfig()
-                ->getGroupValue('/view/common/buy/listing/', 'tutorial_shown');
-
-            if (!$tutorialShown) {
-                $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_tutorial');
-            } else {
-                $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing');
-            }
+            $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing');
 
             $this->setChild('buy_tab', $block);
         }
@@ -137,21 +144,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
 
     public function getBuyTabHtml()
     {
-        $tutorialShown = Mage::helper('M2ePro/Module')->getConfig()
-                ->getGroupValue('/view/common/buy/listing/', 'tutorial_shown');
-
-        if (!$tutorialShown) {
-            return parent::getBuyTabHtml();
-        }
-
-        $javascript = '';
-
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            $javascript = $this->getBuyTabBlock()->getTemplatesButtonJavascript();
-        }
-
-        return $javascript .
-               $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_filter')->toHtml() .
+        return $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_filter')->toHtml() .
                parent::getBuyTabHtml();
     }
 
@@ -160,14 +153,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
     protected function getPlayTabBlock()
     {
         if (!$this->getChild('play_tab')) {
-            $tutorialShown = Mage::helper('M2ePro/Module')->getConfig()
-                ->getGroupValue('/view/common/play/listing/', 'tutorial_shown');
-
-            if (!$tutorialShown) {
-                $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_tutorial');
-            } else {
-                $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing');
-            }
+            $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing');
 
             $this->setChild('play_tab', $block);
         }
@@ -177,21 +163,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
 
     public function getPlayTabHtml()
     {
-        $tutorialShown = Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/view/common/play/listing/', 'tutorial_shown');
-
-        if (!$tutorialShown) {
-            return parent::getPlayTabHtml();
-        }
-
-        $javascript = '';
-
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            $javascript = $this->getPlayTabBlock()->getTemplatesButtonJavascript();
-        }
-
-        return $javascript .
-               $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_filter')->toHtml() .
+        return $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_filter')->toHtml() .
                parent::getPlayTabHtml();
     }
 
@@ -245,9 +217,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing extends Ess_M2ePro_Block_Adminht
         }
 
         $javascript = '';
-        $javascript .= $this->getAmazonButtonsJavascript();
-        $javascript .= $this->getBuyButtonsJavascript();
-        $javascript .= $this->getPlayButtonsJavascript();
 
         return $javascript;
     }

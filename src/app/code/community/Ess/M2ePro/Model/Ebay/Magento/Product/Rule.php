@@ -4,16 +4,9 @@ class Ess_M2ePro_Model_Ebay_Magento_Product_Rule extends Ess_M2ePro_Model_Magent
 {
     // ####################################
 
-    protected function getConditionInstance($prefix)
+    public function getConditionClassName()
     {
-        $conditionInstance = Mage::getModel('M2ePro/Ebay_Magento_Product_Rule_Condition_Combine')
-            ->setRule($this)
-            ->setPrefix($prefix)
-            ->setValue(true)
-            ->setId(1)
-            ->setData($prefix, array());
-
-        return $conditionInstance;
+        return 'M2ePro/Ebay_Magento_Product_Rule_Condition_Combine';
     }
 
     // ####################################

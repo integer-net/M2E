@@ -38,6 +38,9 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         $this->executeQtyChanged();
         $this->executePriceChanged();
 
+        $this->executeDetailsChanged();
+        $this->executeImagesChanged();
+
         $this->executeNeedSynchronize();
         $this->executeTotal();
     }
@@ -46,15 +49,36 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
     private function executeQtyChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update quantity');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Quantity');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($changedListingsProducts as $listingProduct) {
-            $this->getInspector()->inspectReviseQtyRequirements($listingProduct);
+
+            $actionParams = array('only_data'=>array('qty'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetReviseQtyRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -62,15 +86,145 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
     private function executePriceChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update price');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Price');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($changedListingsProducts as $listingProduct) {
-            $this->getInspector()->inspectRevisePriceRequirements($listingProduct);
+            $actionParams = array('only_data'=>array('price'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetRevisePriceRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+        }
+
+        $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
+    }
+
+    private function executeDetailsChanged()
+    {
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update details');
+
+        $attributesForProductChange = array();
+        foreach (Mage::getModel('M2ePro/Amazon_Template_Description')->getCollection() as $template) {
+            /** @var Ess_M2ePro_Model_Amazon_Template_Description  $template */
+
+            $attributesForProductChange = array_merge(
+                $attributesForProductChange,
+                $template->getUsedDetailsAttributes()
+            );
+        }
+
+        foreach ($this->getChangedListingsProducts($attributesForProductChange) as $listingProduct) {
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
+
+            if (!$amazonListingProduct->isExistDescriptionTemplate()) {
+                continue;
+            }
+
+            $detailsAttributes = $amazonListingProduct->getAmazonDescriptionTemplate()->getUsedDetailsAttributes();
+
+            if (!in_array($listingProduct->getData('changed_attribute'), $detailsAttributes)) {
+                continue;
+            }
+
+            $actionParams = array('only_data'=>array('details'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetReviseDetailsRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+        }
+
+        $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
+    }
+
+    private function executeImagesChanged()
+    {
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update images');
+
+        $attributesForProductChange = array();
+        foreach (Mage::getModel('M2ePro/Amazon_Template_Description')->getCollection() as $template) {
+            /** @var Ess_M2ePro_Model_Amazon_Template_Description  $template */
+
+            $attributesForProductChange = array_merge(
+                $attributesForProductChange,
+                $template->getUsedImagesAttributes()
+            );
+        }
+
+        foreach ($this->getChangedListingsProducts($attributesForProductChange) as $listingProduct) {
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
+
+            if (!$amazonListingProduct->isExistDescriptionTemplate()) {
+                continue;
+            }
+
+            $imagesAttributes = $amazonListingProduct->getAmazonDescriptionTemplate()->getUsedImagesAttributes();
+
+            if (!in_array($listingProduct->getData('changed_attribute'), $imagesAttributes)) {
+                continue;
+            }
+
+            $actionParams = array('only_data'=>array('images'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetReviseImagesRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -85,14 +239,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
         $listingProductCollection->addFieldToFilter('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
-
-        $listingProductCollection->getSelect()->where(
-            '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_NO.
-            ' OR ('.
-                '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_YES.
-                ' AND `is_variation_matched` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_MATCHED_YES.
-            ')'
-        );
+        $listingProductCollection->addFieldToFilter('is_variation_parent', 0);
 
         $listingProductCollection->getSelect()->limit(100);
 
@@ -101,47 +248,27 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
             $listingProduct->setData('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP)->save();
 
-            /* @var $synchTemplate Ess_M2ePro_Model_Template_Synchronization */
-            $synchTemplate = $listingProduct->getListing()->getChildObject()->getSynchronizationTemplate();
+            $actionParams = array('all_data'=>true);
 
-            $isRevise = false;
-            foreach ($listingProduct->getSynchReasons() as $reason) {
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
 
-                $method = 'isRevise' . ucfirst($reason);
-
-                if (!method_exists($synchTemplate,$method)) {
-                    continue;
-                }
-
-                if ($synchTemplate->$method()) {
-                    $isRevise = true;
-                    break;
-                }
-            }
-
-            if (!$isRevise) {
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if ($this->getRunner()->isExistProduct($listingProduct,
-                                                   Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                                   array('all_data'=>true))
-            ) {
+            if (!$this->getInspector()->isMeetReviseSynchReasonsRequirements($listingProduct)) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
-                continue;
-            }
-
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
-                continue;
-            }
-
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           array('all_data'=>true));
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -165,7 +292,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         $collection = Mage::helper('M2ePro/Component_Amazon')
             ->getCollection('Listing_Product')
             ->addFieldToFilter('id',array('gt' => $lastListingProductProcessed))
-            ->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
+            ->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED)
+            ->addFieldToFilter('is_variation_parent', 0);
 
         $collection->getSelect()->limit($itemsPerCycle);
         $collection->getSelect()->order('id ASC');
@@ -173,25 +301,27 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($collection->getItems() as $listingProduct) {
 
-            if ($this->getRunner()->isExistProduct($listingProduct,
-                                                   Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                                   array('all_data'=>true))
-            ) {
+            $actionParams = array('all_data'=>true);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
+            if (!$this->getInspector()->isMeetReviseGeneralRequirements($listingProduct)) {
                 continue;
             }
 
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
-                continue;
-            }
-
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           array('all_data'=>true));
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $lastListingProduct = $collection->getLastItem()->getId();
@@ -212,6 +342,40 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         );
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
+    }
+
+    //####################################
+
+    private function getChangedListingsProducts(array $trackingAttributes)
+    {
+        $filteredChangedListingsProducts = array();
+
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
+        $changedListingsProducts = $this->getChangesHelper()->getInstancesByListingProduct(
+            array_unique($trackingAttributes), true
+        );
+
+        foreach ($changedListingsProducts as $changedListingProduct) {
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $changedListingProduct->getChildObject();
+
+            if ($amazonListingProduct->getVariationManager()->isVariationProduct()) {
+                continue;
+            }
+
+            $filteredChangedListingsProducts[$changedListingProduct->getId()] = $changedListingProduct;
+        }
+
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
+        $changedListingsProducts = $this->getChangesHelper()->getInstancesByVariationOption(
+            array_unique($trackingAttributes), true
+        );
+
+        foreach ($changedListingsProducts as $changedListingProduct) {
+            $filteredChangedListingsProducts[$changedListingProduct->getId()] = $changedListingProduct;
+        }
+
+        return $filteredChangedListingsProducts;
     }
 
     //####################################

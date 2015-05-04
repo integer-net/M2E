@@ -22,11 +22,16 @@ AmazonListingGridHandler = Class.create(CommonListingGridHandler, {
         this.movingHandler = new ListingMovingHandler(this);
         this.actionHandler = new AmazonListingActionHandler(this);
         this.productSearchHandler = new AmazonListingProductSearchHandler(this);
+        this.templateDescriptionHandler = new AmazonListingTemplateDescriptionHandler(this);
+        this.variationProductManageHandler = new AmazonListingVariationProductManageHandler(this);
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
 
             movingAction: this.movingHandler.run.bind(this.movingHandler),
             deleteAndRemoveAction: this.actionHandler.deleteAndRemoveAction.bind(this.actionHandler),
+
+            assignTemplateDescriptionIdAction: (function() { this.templateDescriptionHandler.validateProductsForTemplateDescriptionAssign(this.getSelectedProductsString())}).bind(this),
+            unassignTemplateDescriptionIdAction: (function() { this.templateDescriptionHandler.unassignFromTemplateDescrition(this.getSelectedProductsString())}).bind(this),
 
             assignGeneralIdAction: (function() { this.productSearchHandler.searchGeneralIdAuto(this.getSelectedProductsString())}).bind(this),
             newGeneralIdAction: (function() { this.productSearchHandler.addNewGeneralId(this.getSelectedProductsString())}).bind(this),
@@ -37,5 +42,4 @@ AmazonListingGridHandler = Class.create(CommonListingGridHandler, {
     }
 
     //----------------------------------
-
 });

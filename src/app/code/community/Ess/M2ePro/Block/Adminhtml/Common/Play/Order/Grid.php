@@ -211,13 +211,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Order_Grid extends Mage_Adminhtml_B
         // Set mass-action
         //--------------------------------
         $this->getMassactionBlock()->addItem('reservation_place', array(
-             'label'    => Mage::helper('M2ePro')->__('Reserve Qty'),
+             'label'    => Mage::helper('M2ePro')->__('Reserve QTY'),
              'url'      => $this->getUrl('*/adminhtml_order/reservationPlace'),
              'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
 
         $this->getMassactionBlock()->addItem('reservation_cancel', array(
-             'label'    => Mage::helper('M2ePro')->__('Cancel Qty Reserve'),
+             'label'    => Mage::helper('M2ePro')->__('Cancel QTY Reserve'),
              'url'      => $this->getUrl('*/adminhtml_order/reservationCancel'),
              'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
@@ -320,7 +320,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Order_Grid extends Mage_Adminhtml_B
 
         foreach ($items as $item) {
             if ($html != '') {
-                $html .= '<br />';
+                $html .= '<br/>';
             }
 
             $isShowEditLink = false;
@@ -362,7 +362,7 @@ HTML;
                 $skuHtml = <<<STRING
 <span style="padding-left: 10px;">
     <b>{$skuLabel}:</b> {$sku}
-</span><br />
+</span><br/>
 STRING;
             }
 
@@ -373,7 +373,7 @@ STRING;
 HTML;
 
             $html .= <<<HTML
-{$itemTitle}&nbsp;{$editItemHtml}<br />
+{$itemTitle}&nbsp;{$editItemHtml}<br/>
 <small>{$skuHtml}{$qtyHtml}</small>
 HTML;
         }
@@ -390,7 +390,7 @@ HTML;
         $html = Mage::helper('M2ePro')->escapeHtml($row->getData('buyer_name'));
 
         if ($row->getData('buyer_email') != '') {
-            $html .= '<br />';
+            $html .= '<br/>';
             $html .= '&lt;' . Mage::helper('M2ePro')->escapeHtml($row->getData('buyer_email')) . '&gt;';
         }
 

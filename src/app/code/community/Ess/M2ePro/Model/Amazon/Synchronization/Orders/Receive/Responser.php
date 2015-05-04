@@ -13,8 +13,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive_Responser
 
     // ##########################################################
 
-    protected function unsetLocks($fail = false, $message = NULL)
+    public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
+        parent::unsetProcessingLocks($processingRequest);
+
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
 
@@ -24,36 +26,29 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive_Responser
         $lockItem->setMaxInactiveTime(Ess_M2ePro_Model_Processing_Request::MAX_LIFE_TIME_INTERVAL);
         $lockItem->remove();
 
-        // ----------------------
-
-        $tempObjects = array(
-            $this->getAccount(), $this->getMarketplace()
+        $this->getAccount()->deleteObjectLocks(NULL, $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks('synchronization', $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks('synchronization_amazon', $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks(
+            Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX, $processingRequest->getHash()
         );
+    }
 
-        $tempLocks = array(
-            NULL,
-            'synchronization', 'synchronization_amazon',
-            Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive::LOCK_ITEM_PREFIX
-        );
+    public function eventFailedExecuting($message)
+    {
+        parent::eventFailedExecuting($message);
 
-        /* @var $object Ess_M2ePro_Model_Abstract */
-        foreach ($tempObjects as $object) {
-            foreach ($tempLocks as $lock) {
-                $object->deleteObjectLocks($lock,$this->hash);
-            }
-        }
-
-        $fail && $this->getSynchronizationLog()->addMessage(Mage::helper('M2ePro')->__($message),
+        $this->getSynchronizationLog()->addMessage(
+            Mage::helper('M2ePro')->__($message),
             Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-            Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
+            Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+        );
     }
 
     // ##########################################################
 
     protected function processResponseData($response)
     {
-        $response = parent::processResponseData($response);
-
         Mage::getSingleton('M2ePro/Order_Log_Manager')->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
 
         try {

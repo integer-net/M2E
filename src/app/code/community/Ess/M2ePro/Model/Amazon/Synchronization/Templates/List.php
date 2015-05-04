@@ -43,15 +43,26 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_List
 
     private function immediatelyChangedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was changed');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was changed');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            $actionParams = array('all_data'=>true);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
 
             if (!$this->getInspector()->isMeetListRequirements($listingProduct)) {
                 continue;
@@ -60,8 +71,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_List
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                array()
+                $actionParams
             );
+
+            $this->setListAttemptData($listingProduct);
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -69,29 +82,35 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_List
 
     private function immediatelyNotCheckedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was not checked');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was not checked');
 
-        /** @var $collection Varien_Data_Collection_Db */
+        /** @var $collection Ess_M2ePro_Model_Mysql4_Listing_Product_Collection */
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
+        $collection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
         $collection->addFieldToFilter('tried_to_list',0);
-
-        $collection->getSelect()->where(
-            '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_NO.
-            ' OR ('.
-                '`is_variation_product` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_YES.
-                ' AND `is_variation_matched` = '.Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_MATCHED_YES.
-            ')'
-        );
 
         $collection->getSelect()->limit(100);
 
         $listingsProducts = $collection->getItems();
 
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($listingsProducts as $listingProduct) {
 
-            $listingProduct->enableCache();
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
+            $listingProduct->getMagentoProduct()->enableCache();
             $listingProduct->setData('tried_to_list',1)->save();
+
+            $actionParams = array('all_data'=>true);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
 
             if (!$this->getInspector()->isMeetListRequirements($listingProduct)) {
                 continue;
@@ -100,11 +119,24 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_List
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                array()
+                $actionParams
             );
+
+            $this->setListAttemptData($listingProduct);
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
+    }
+
+    //####################################
+
+    private function setListAttemptData(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $additionalData = $listingProduct->getAdditionalData();
+        $additionalData['last_list_attempt_date'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+        $listingProduct->setSettings('additional_data', $additionalData);
+
+        $listingProduct->save();
     }
 
     //####################################

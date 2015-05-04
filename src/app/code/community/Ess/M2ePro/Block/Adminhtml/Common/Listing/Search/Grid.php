@@ -34,6 +34,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
         //--------------------------------
         $activeComponents = Mage::helper('M2ePro/View_Common_Component')->getActiveComponents();
 
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $collection */
         $collection = Mage::getModel('M2ePro/Listing_Product')->getCollection();
         $collection->addFieldToFilter(
             '`main_table`.`component_mode`', array('in' => $activeComponents)
@@ -45,6 +46,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
             array('listing_title'=>'title','store_id')
         );
         //--------------------------------
+
+        $collection->getSelect()->joinLeft(
+            array('alp' => Mage::getResourceModel('M2ePro/Amazon_Listing_Product')->getMainTable()),
+            'main_table.id=alp.listing_product_id',
+            array()
+        );
+
+        $collection->getSelect()->where('(
+            (`main_table`.`component_mode` = "'.Ess_M2ePro_Helper_Component_Amazon::NICK.'"
+                AND `alp`.variation_parent_id IS NULL)
+            OR `main_table`.`component_mode` IN ("'.Ess_M2ePro_Helper_Component_Buy::NICK.'",
+                                                 "'.Ess_M2ePro_Helper_Component_Play::NICK.'")
+        )');
 
         // Communicate with magento product table
         //--------------------------------
@@ -100,7 +114,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
         ));
 
         $this->addColumn('name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / SKU'),
+            'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / Product SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -207,10 +221,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
         $value = '<span>'.Mage::helper('M2ePro')->escapeHtml($value).'</span>';
 
         $urlParams = array();
@@ -235,6 +245,42 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
 
         $value .= '<br/><strong>'.Mage::helper('M2ePro')->__('SKU').':</strong> ';
         $value .= Mage::helper('M2ePro')->escapeHtml($tempSku);
+
+        $productOptions = array();
+
+        if ($row->isComponentModeAmazon()) {
+            if (!$row->getChildObject()->getVariationManager()->isIndividualType()) {
+                if ($row->getChildObject()->getVariationManager()->isVariationParent()) {
+                    $productOptions = $row->getChildObject()->getVariationManager()
+                        ->getTypeModel()->getProductAttributes();
+
+                    $value .= '<div style="font-size: 11px; font-weight: bold; color: grey;"><br/>';
+                    $value .= implode(', ', $productOptions);
+                    $value .= '</div>';
+                }
+                return $value;
+            }
+
+            if ($row->getChildObject()->getVariationManager()->getTypeModel()->isVariationProductMatched()) {
+                $productOptions = $row->getChildObject()->getVariationManager()->getTypeModel()->getProductOptions();
+            }
+        } else {
+            if ($row->getChildObject()->getVariationManager()->isVariationProductMatched()) {
+                $productOptions = $row->getChildObject()->getVariationManager()->getProductOptions();
+            }
+        }
+
+        if ($productOptions) {
+            $value .= '<br/>';
+            $value .= '<div style="font-size: 11px; color: grey;"><br/>';
+            foreach ($productOptions as $attribute => $option) {
+                !$option && $option = '--';
+                $value .= '<strong>' . Mage::helper('M2ePro')->escapeHtml($attribute) .
+                    '</strong>:&nbsp;' . Mage::helper('M2ePro')->escapeHtml($option) . '<br/>';
+            }
+            $value .= '</div>';
+            $value .= '<br/>';
+        }
 
         return $value;
     }
@@ -287,7 +333,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
         $altTitle = Mage::helper('M2ePro')->__('Go to listing');
-        $iconSrc = $this->getSkinUrl('M2ePro').'/images/goto_listing.png';
+        $iconSrc = $this->getSkinUrl('M2ePro/images/goto_listing.png');
         $url = $this->getUrl('*/adminhtml_common_'.$row->getData('component_mode').'_listing/view/',array(
             'id' => $row->getData('listing_id'),
             'filter' => base64_encode(

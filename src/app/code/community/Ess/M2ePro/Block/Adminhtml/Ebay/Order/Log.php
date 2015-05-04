@@ -37,7 +37,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Log extends Mage_Adminhtml_Block_Wid
 
         // Set template
         //------------------------------
-        $this->setTemplate('M2ePro/log/grid/container.phtml');
+        $this->setTemplate('M2ePro/widget/grid/container/only_content.phtml');
         //------------------------------
     }
 

@@ -215,11 +215,4 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
     }
 
     //#############################################
-
-    public function updateShippingStatusAction()
-    {
-        // todo
-    }
-
-    //#############################################
 }

@@ -10,23 +10,11 @@
  */
 class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
-    const QTY_MODE_PRODUCT       = 1;
-    const QTY_MODE_SINGLE        = 2;
-    const QTY_MODE_NUMBER        = 3;
-    const QTY_MODE_ATTRIBUTE     = 4;
-    const QTY_MODE_PRODUCT_FIXED = 5;
-
     const QTY_MODIFICATION_MODE_OFF = 0;
     const QTY_MODIFICATION_MODE_ON = 1;
 
     const QTY_MIN_POSTED_DEFAULT_VALUE = 1;
     const QTY_MAX_POSTED_DEFAULT_VALUE = 10;
-
-    const PRICE_NOT_SET   = 4;
-    const PRICE_NONE      = 0;
-    const PRICE_PRODUCT   = 1;
-    const PRICE_SPECIAL   = 2;
-    const PRICE_ATTRIBUTE = 3;
 
     const PRICE_VARIATION_MODE_PARENT   = 1;
     const PRICE_VARIATION_MODE_CHILDREN = 2;
@@ -58,16 +46,6 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     // ########################################
 
-    public function getAttributeSets()
-    {
-        return $this->getParentObject()->getAttributeSets();
-    }
-
-    public function getAttributeSetsIds()
-    {
-        return $this->getParentObject()->getAttributeSetsIds();
-    }
-
     public function getListings($asObjects = false, array $filters = array())
     {
         return $this->getRelatedComponentItems('Listing','template_selling_format_id',$asObjects,$filters);
@@ -82,27 +60,27 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     public function isQtyModeProduct()
     {
-        return $this->getQtyMode() == self::QTY_MODE_PRODUCT;
+        return $this->getQtyMode() == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT;
     }
 
     public function isQtyModeSingle()
     {
-        return $this->getQtyMode() == self::QTY_MODE_SINGLE;
+        return $this->getQtyMode() == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_SINGLE;
     }
 
     public function isQtyModeNumber()
     {
-        return $this->getQtyMode() == self::QTY_MODE_NUMBER;
+        return $this->getQtyMode() == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_NUMBER;
     }
 
     public function isQtyModeAttribute()
     {
-        return $this->getQtyMode() == self::QTY_MODE_ATTRIBUTE;
+        return $this->getQtyMode() == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE;
     }
 
     public function isQtyModeProductFixed()
     {
-        return $this->getQtyMode() == self::QTY_MODE_PRODUCT_FIXED;
+        return $this->getQtyMode() == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED;
     }
 
     public function getQtyNumber()
@@ -128,7 +106,7 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         $attributes = array();
         $src = $this->getQtySource();
 
-        if ($src['mode'] == self::QTY_MODE_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE) {
             $attributes[] = $src['attribute'];
         }
 
@@ -178,17 +156,17 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     public function isPriceModeProduct()
     {
-        return $this->getPriceMode() == self::PRICE_PRODUCT;
+        return $this->getPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT;
     }
 
     public function isPriceModeSpecial()
     {
-        return $this->getPriceMode() == self::PRICE_SPECIAL;
+        return $this->getPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL;
     }
 
     public function isPriceModeAttribute()
     {
-        return $this->getPriceMode() == self::PRICE_ATTRIBUTE;
+        return $this->getPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE;
     }
 
     public function getPriceCoefficient()
@@ -210,7 +188,7 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         $attributes = array();
         $src = $this->getPriceSource();
 
-        if ($src['mode'] == self::PRICE_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE) {
             $attributes[] = $src['attribute'];
         }
 
@@ -224,29 +202,24 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         return (int)$this->getData('sale_price_mode');
     }
 
-    public function isSalePriceModeNotSet()
-    {
-        return $this->getSalePriceMode() == self::PRICE_NOT_SET;
-    }
-
     public function isSalePriceModeNone()
     {
-        return $this->getSalePriceMode() == self::PRICE_NONE;
+        return $this->getSalePriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE;
     }
 
     public function isSalePriceModeProduct()
     {
-        return $this->getSalePriceMode() == self::PRICE_PRODUCT;
+        return $this->getSalePriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT;
     }
 
     public function isSalePriceModeSpecial()
     {
-        return $this->getSalePriceMode() == self::PRICE_SPECIAL;
+        return $this->getSalePriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL;
     }
 
     public function isSalePriceModeAttribute()
     {
-        return $this->getSalePriceMode() == self::PRICE_ATTRIBUTE;
+        return $this->getSalePriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE;
     }
 
     public function getSalePriceCoefficient()
@@ -268,7 +241,7 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         $attributes = array();
         $src = $this->getSalePriceSource();
 
-        if ($src['mode'] == self::PRICE_ATTRIBUTE) {
+        if ($src['mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE) {
             $attributes[] = $src['attribute'];
         }
 
@@ -422,9 +395,10 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
     /**
      * @param bool $asArrays
      * @param string|array $columns
+     * @param bool $onlyPhysicalUnits
      * @return array
      */
-    public function getAffectedListingsProducts($asArrays = true, $columns = '*')
+    public function getAffectedListingsProducts($asArrays = true, $columns = '*', $onlyPhysicalUnits = false)
     {
         /** @var Ess_M2ePro_Model_Mysql4_Listing_Collection $listingCollection */
         $listingCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing');
@@ -436,6 +410,10 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id',array('in' => $listingCollection->getSelect()));
 
+        if ($onlyPhysicalUnits) {
+            $listingProductCollection->addFieldToFilter('is_variation_parent', 0);
+        }
+
         if (is_array($columns) && !empty($columns)) {
             $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
             $listingProductCollection->getSelect()->columns($columns);
@@ -446,7 +424,7 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getAffectedListingsProducts(true, array('id'));
+        $listingsProducts = $this->getAffectedListingsProducts(true, array('id'), true);
         if (empty($listingsProducts)) {
             return;
         }
@@ -458,13 +436,13 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_sellingformat');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_sellingformat');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_sellingformat');
         return parent::delete();
     }
 

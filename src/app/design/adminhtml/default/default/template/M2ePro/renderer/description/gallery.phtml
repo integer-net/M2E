@@ -39,7 +39,7 @@
     <center class="<?php echo $galleryClass; ?>">
         <div class="gallery-image">
             <img name="view<?php echo $data['attribute_counter']; ?>" id="image<?php echo $data['attribute_counter']; ?>" src="<?php echo $data['src']; ?>"<?php if ($data['width'] != ''): echo " width={$data['width']}"; endif; ?><?php if ($data['height'] != ''): echo " height={$data['height']}"; endif; ?><?php if ($data['watermark'] != 0): echo ' m2e_watermark="1"'; endif; ?> style="<?php if ($data['margin'] != ''): echo "margin-bottom: {$data['margin']}px; margin-right: {$data['margin']}px;"; endif; ?>" />
-            <br />
+            <br/>
             <div style="<?php if ($data['width'] != ''): echo "width: {$data['width']}px"; endif; ?>">
                 <?php echo Mage::helper('M2ePro')->escapeHtml($data['gallery_hint']); ?>
             </div>
@@ -73,7 +73,7 @@
     <?php endif; ?>
 
     <?php if ($data['layout'] == Ess_M2ePro_Helper_Module_Renderer_Description::LAYOUT_MODE_COLUMN): ?>
-        <br />
+        <br/>
     <?php endif; ?>
 
 <?php endif; ?>

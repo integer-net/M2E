@@ -16,47 +16,17 @@ class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Chi
 
     // ########################################
 
-    public function isLocked()
+    public function getAmazonItems($asObjects = false, array $filters = array())
     {
-        if (parent::isLocked()) {
-            return true;
-        }
-
-        if (Mage::getModel('M2ePro/Amazon_Account')->getCollection()
-                    ->addFieldToFilter('marketplace_id',$this->getId())->getSize() > 0) {
-            return true;
-        }
-
-        return false;
+        return $this->getRelatedSimpleItems('Amazon_Item','marketplace_id',$asObjects,$filters);
     }
 
-    public function deleteInstance()
+    public function getDescriptionTemplates($asObjects = false, array $filters = array())
     {
-        if ($this->isLocked()) {
-            return false;
-        }
-
-        $categoriesTable  = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_category');
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($categoriesTable,array('marketplace_id = ?'=>$this->getId()));
-
-        $marketplacesTable  = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_marketplace');
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($marketplacesTable,array('marketplace_id = ?'=>$this->getId()));
-
-        $items = $this->getRelatedSimpleItems('Amazon_Item','marketplace_id',true);
-        foreach ($items as $item) {
-            $item->deleteInstance();
-        }
-
-        $newProductTemplates = $this->getRelatedSimpleItems('Amazon_Template_NewProduct','marketplace_id',true);
-        foreach ($newProductTemplates as $newProductTemplate) {
-            $newProductTemplate->deleteInstance();
-        }
-
-        $this->delete();
-        return true;
+        return $this->getRelatedSimpleItems('Amazon_Template_Description','marketplace_id',$asObjects,$filters);
     }
+
+    // ########################################
 
     public function getCurrency()
     {
@@ -73,6 +43,11 @@ class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Chi
     public function getDefaultCurrency()
     {
         return $this->getData('default_currency');
+    }
+
+    public function isAsinAvailable()
+    {
+        return (bool)$this->getData('is_asin_available');
     }
 
     // ########################################
@@ -108,13 +83,13 @@ class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Chi
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
         return parent::delete();
     }
 

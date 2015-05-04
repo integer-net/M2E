@@ -10,19 +10,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Play_Installation extends Ess_M2ePro_Blo
 
     protected function _beforeToHtml()
     {
-        //-------------------------------
-        $buttonBlock = $this->getLayout()
-            ->createBlock('adminhtml/widget_button')
-            ->setData( array(
-                'id' => 'wizard_complete',
-                'label'   => Mage::helper('M2ePro')->__('Complete Configuration'),
-                'onclick' => 'setLocation(\''.$this->getUrl('*/*/complete').'\');',
-                'class' => 'end_button',
-                'style' => 'display: none'
-            ) );
-        $this->setChild('end_button',$buttonBlock);
-        //-------------------------------
-
         // Steps
         //-------------------------------
         $this->setChild(
@@ -39,17 +26,21 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Play_Installation extends Ess_M2ePro_Blo
         );
         //-------------------------------
 
-        $temp = parent::_beforeToHtml();
-
-        // Set header text
-        //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Configuration Wizard (Magento Play.com Integration)');
-        //------------------------------
-
-        return $temp;
+        return parent::_beforeToHtml();
     }
 
     // ########################################
+
+    protected function getHeaderTextHtml()
+    {
+        return 'Configuration Wizard (Magento Play.com Integration)';
+    }
+
+    protected function appendButtons()
+    {
+        $this->appendWizardCompleteButton();
+        parent::appendButtons();
+    }
 
     protected function _toHtml()
     {

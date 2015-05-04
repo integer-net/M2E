@@ -30,6 +30,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Marketplace_Form extends Mage_Adm
     protected function _beforeToHtml()
     {
         //----------------------------
+        /** @var Ess_M2ePro_Model_Marketplace[] $marketplaces */
         $marketplaces = Mage::helper('M2ePro/Component_Amazon')->getCollection('Marketplace')
                                                         ->setOrder('group_title', 'ASC')
                                                         ->setOrder('sorder','ASC')
@@ -56,9 +57,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Marketplace_Form extends Mage_Adm
                 'status' => $marketplace->getStatus()
             );
 
+            $isLocked = (bool)Mage::helper('M2ePro/Component_Amazon')->getCollection('Account')
+                ->addFieldToFilter('marketplace_id', $marketplace->getId())
+                ->getSize();
+
             $marketplace = array(
                 'instance' => $marketplace,
-                'params'   => array('locked'=>$marketplace->isLocked())
+                'params'   => array('locked' => $isLocked)
             );
 
             $groups[count($groups)-1]['marketplaces'][] = $marketplace;

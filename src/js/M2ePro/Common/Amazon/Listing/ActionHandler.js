@@ -16,5 +16,4 @@ AmazonListingActionHandler = Class.create(ListingActionHandler, {
     }
 
     //----------------------------------
-
 });

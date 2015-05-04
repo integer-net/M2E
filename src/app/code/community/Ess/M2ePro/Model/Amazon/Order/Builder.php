@@ -333,7 +333,7 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
         try {
             $this->order->cancelMagentoOrder();
         } catch (Exception $e) {
-            $magentoOrderComments[] = 'Order cannot be canceled in magento. Reason: ' . $e->getMessage();
+            $magentoOrderComments[] = 'Order cannot be canceled in Magento. Reason: ' . $e->getMessage();
         }
 
         /** @var $magentoOrderUpdater Ess_M2ePro_Model_Magento_Order_Updater */

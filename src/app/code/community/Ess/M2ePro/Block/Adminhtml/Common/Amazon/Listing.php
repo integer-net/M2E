@@ -45,32 +45,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing extends Mage_Adminhtml_Bl
 
         //------------------------------
         $url = $this->getUrl(
-            '*/adminhtml_common_listing_other/index',
-            array(
-                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON,
-                'back' => $backUrl
-            )
-        );
-        $this->_addButton('goto_listing_other', array(
-            'label'     => Mage::helper('M2ePro')->__('3rd Party Listings'),
-            'onclick'   => 'setLocation(\'' . $url . '\')',
-            'class'     => 'button_link'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('goto_template', array(
-            'label'     => Mage::helper('M2ePro')->__('Templates'),
-            'onclick'   => '',
-            'class'     => 'button_link amazon-templates-drop-down'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $url = $this->getUrl(
             '*/adminhtml_common_log/listing',
             array(
-                'filter' => base64_encode('component_mode=' . Ess_M2ePro_Helper_Component_Amazon::NICK)
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON
             )
         );
         $this->_addButton('view_log', array(
@@ -88,24 +65,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing extends Mage_Adminhtml_Bl
             )
         );
         $this->_addButton('search_amazon_products', array(
-            'label'     => Mage::helper('M2ePro')->__('Search Items'),
+            'label'     => Mage::helper('M2ePro')->__('Search'),
             'onclick'   => 'setLocation(\'' . $url . '\')',
             'class'     => 'button_link search'
         ));
         //------------------------------
 
         //------------------------------
-        if (Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'CommonHandlerObj.reset_click()',
-                'class'     => 'reset'
-            ));
-        }
-        //------------------------------
-
-        //------------------------------
-        $url = $this->getUrl('*/adminhtml_common_amazon_listing/add', array('step' => '1', 'clear' => 'yes'));
+        $url = $this->getUrl('*/adminhtml_common_listing_create/index', array(
+            'step' => '1',
+            'clear' => 'yes',
+            'component' => Ess_M2ePro_Helper_Component_Amazon::NICK
+        ));
         $this->_addButton('add', array(
             'label'     => Mage::helper('M2ePro')->__('Add Listing'),
             'onclick'   => 'setLocation(\'' . $url . '\')',
@@ -136,7 +107,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing extends Mage_Adminhtml_Bl
         $url = $this->getUrl('*/adminhtml_common_template_sellingFormat/index', array('filter' => $filter));
         $items[] = array(
             'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Selling Format Templates'),
+            'label' => Mage::helper('M2ePro')->__('Selling Format Policies'),
             'target' => '_blank'
         );
         //------------------------------
@@ -145,7 +116,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing extends Mage_Adminhtml_Bl
         $url = $this->getUrl('*/adminhtml_common_template_synchronization/index', array('filter' => $filter));
         $items[] = array(
             'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Synchronization Templates'),
+            'label' => Mage::helper('M2ePro')->__('Synchronization Policies'),
             'target' => '_blank'
         );
         //------------------------------

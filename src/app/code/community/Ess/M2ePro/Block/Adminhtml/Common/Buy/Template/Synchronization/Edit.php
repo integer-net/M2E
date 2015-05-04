@@ -23,12 +23,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_Synchronization_Edit
         //------------------------------
         $helper = Mage::helper('M2ePro');
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = $helper->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
-            $headerTextEdit = $helper->__("Edit %component_name% Synchronization Template", $componentName);
-            $headerTextAdd = $helper->__("Add %component_name% Synchronization Template", $componentName);
+            $componentName = Mage::helper('M2ePro/Component_Buy')->getTitle();
+            $headerTextEdit = $helper->__("Edit %component_name% Synchronization Policy", $componentName);
+            $headerTextAdd = $helper->__("Add %component_name% Synchronization Policy", $componentName);
         } else {
-            $headerTextEdit = $helper->__("Edit Synchronization Template");
-            $headerTextAdd = $helper->__("Add Synchronization Template");
+            $headerTextEdit = $helper->__("Edit Synchronization Policy");
+            $headerTextAdd = $helper->__("Add Synchronization Policy");
         }
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data')
@@ -58,14 +58,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_Synchronization_Edit
             'label'     => Mage::helper('M2ePro')->__('Back'),
             'onclick'   => 'BuyTemplateSynchronizationHandlerObj.back_click(\'' . $url . '\')',
             'class'     => 'back'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'BuyTemplateSynchronizationHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
 

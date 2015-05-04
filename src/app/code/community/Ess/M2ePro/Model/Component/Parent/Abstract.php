@@ -123,19 +123,19 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
     public function getComponentTitle()
     {
         if ($this->isComponentModeEbay()) {
-            return Ess_M2ePro_Helper_Component_Ebay::TITLE;
+            return Mage::helper('M2ePro/Component_Ebay')->getTitle();
         }
 
         if ($this->isComponentModeAmazon()) {
-            return Ess_M2ePro_Helper_Component_Amazon::TITLE;
+            return Mage::helper('M2ePro/Component_Amazon')->getTitle();
         }
 
         if ($this->isComponentModeBuy()) {
-            return Ess_M2ePro_Helper_Component_Buy::TITLE;
+            return Mage::helper('M2ePro/Component_Buy')->getTitle();
         }
 
         if ($this->isComponentModePlay()) {
-            return Ess_M2ePro_Helper_Component_Play::TITLE;
+            return Mage::helper('M2ePro/Component_Play')->getTitle();
         }
 
         return '';

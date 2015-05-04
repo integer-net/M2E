@@ -50,6 +50,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_Other_SynchronizationController
             '/ebay/other_listing/source/attribute/'
         );
 
+        $temp['synchronization_mode'] = $configModel->getGroupValue('/ebay/other_listing/synchronization/', 'mode');
+
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $temp);
 
         $this->_initAction()
@@ -119,6 +121,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_Other_SynchronizationController
         $tempSourceData = $data;
         $data = array();
         //--------------------
+
+        $configModel->setGroupValue('/ebay/other_listing/synchronization/', 'mode', (int)$post['synchronization_mode']);
 
         // tab: Revise
         //--------------------

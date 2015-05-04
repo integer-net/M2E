@@ -6,6 +6,7 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
     initialize: function()
     {
         Validation.add('M2ePro-validate-condition-note-length', M2ePro.text.condition_note_length_error, function(value) {
+
             if ($('condition_note_mode').value != PlayListingChannelSettingsHandlerObj.CONDITION_NOTE_MODE_CUSTOM_VALUE) {
                 return true;
             }
@@ -44,16 +45,10 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
     {
         var self = PlayListingChannelSettingsHandlerObj;
 
+        $('sku_custom_attribute').value = '';
         if (this.value == self.SKU_MODE_CUSTOM_ATTRIBUTE) {
-            $('sku_custom_attribute_container').show();
-        } else {
-            $('sku_custom_attribute_container').hide();
+            self.updateHiddenValue(this, $('sku_custom_attribute'));
         }
-    },
-
-    sku_custom_attribute_change: function()
-    {
-        PlayListingChannelSettingsHandlerObj.hideEmptyOption($('sku_custom_attribute'));
     },
 
     //----------------------------------
@@ -67,9 +62,11 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
         }
         if (this.value == self.GENERAL_ID_MODE_GENERAL_ID) {
             $('general_id_attribute_label').innerHTML = M2ePro.text.general_id_label_play_id;
-            $('general_id_tips').innerHTML = M2ePro.text.general_id_tips_play_id;
+            $('general_id_tips_value').innerHTML = M2ePro.text.general_id_tips_play_id;
+            $('general_id_tips').show();
         } else {
-            $('general_id_tips').innerHTML = M2ePro.text.general_id_tips_default;
+            $('general_id_tips_value').innerHTML = M2ePro.text.general_id_tips_default;
+            $('general_id_tips').show();
         }
         if (this.value == self.GENERAL_ID_MODE_ISBN) {
             $('general_id_attribute_label').innerHTML = M2ePro.text.general_id_label_isbn;
@@ -77,8 +74,10 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
 
         if (this.value == self.GENERAL_ID_MODE_NOT_SET) {
             $('general_id_custom_attribute_container').hide();
+            $('general_id_tips').hide();
         } else {
             $('general_id_custom_attribute_container').show();
+            $('general_id_tips').show();
         }
     },
 
@@ -93,15 +92,14 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
     {
         var self = PlayListingChannelSettingsHandlerObj;
 
-        $('dispatch_to_value_tr').hide();
-        $('dispatch_to_custom_attribute_tr').hide();
-
+        $('dispatch_to_value').value = '';
+        $('dispatch_to_custom_attribute').value = '';
         if (this.value == self.DISPATCH_TO_MODE_DEFAULT) {
-            $('dispatch_to_value').simulate('change');
-            $('dispatch_to_value_tr').show();
+            self.dispatch_to_value_change.bind(this)();
+            self.updateHiddenValue(this, $('dispatch_to_value'));
         }
         if (this.value == self.DISPATCH_TO_MODE_CUSTOM_ATTRIBUTE) {
-            $('dispatch_to_custom_attribute_tr').show();
+            self.updateHiddenValue(this, $('dispatch_to_custom_attribute'));
 
             //$('shipping_price_gbr_mode').value = self.SHIPPING_PRICE_GBR_MODE_NONE;
             $('shipping_price_gbr_mode').simulate('change');
@@ -131,6 +129,7 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
         var self = PlayListingChannelSettingsHandlerObj;
 
         var dispatchToSelect = $('dispatch_to_mode');
+        var attributeCode = dispatchToSelect.options[dispatchToSelect.selectedIndex].getAttribute('attribute_code');
 
         if (dispatchToSelect.value == self.DISPATCH_TO_MODE_NOT_SET ||
             dispatchToSelect.value == self.DISPATCH_TO_MODE_CUSTOM_ATTRIBUTE) {
@@ -141,7 +140,7 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
             return;
         }
 
-        if (this.value == self.DISPATCH_TO_UK) {
+        if (attributeCode == self.DISPATCH_TO_UK) {
             $('shipping_price_gbr_mode_tr').show();
             $('shipping_price_hr').show();
 
@@ -149,9 +148,8 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
 
             $('shipping_price_euro_mode_tr').hide();
             $('shipping_price_euro_value_tr').hide();
-            $('shipping_price_euro_custom_attribute_tr').hide();
 
-        } else if (this.value == self.DISPATCH_TO_EUROPA) {
+        } else if (attributeCode == self.DISPATCH_TO_EUROPA) {
             $('shipping_price_euro_mode_tr').show();
             $('shipping_price_hr').show();
 
@@ -159,9 +157,8 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
 
             $('shipping_price_gbr_mode_tr').hide();
             $('shipping_price_gbr_value_tr').hide();
-            $('shipping_price_gbr_custom_attribute_tr').hide();
 
-        } else if (this.value == self.DISPATCH_TO_BOTH) {
+        } else if (attributeCode == self.DISPATCH_TO_BOTH) {
             $('shipping_price_gbr_mode_tr').show();
             $('shipping_price_euro_mode_tr').show();
             $('shipping_price_hr').show();
@@ -177,10 +174,9 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
     {
         var self = PlayListingChannelSettingsHandlerObj;
 
-        $('dispatch_from_value_tr').hide();
-
+        $('dispatch_from_value').value = '';
         if (this.value == self.DISPATCH_FROM_MODE_DEFAULT) {
-            $('dispatch_from_value_tr').show();
+            self.updateHiddenValue(this, $('dispatch_from_value'));
         }
     },
 
@@ -191,8 +187,8 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
         var self = PlayListingChannelSettingsHandlerObj;
 
         $('shipping_price_gbr_value_tr').hide();
-        $('shipping_price_gbr_custom_attribute_tr').hide();
 
+        $('shipping_price_gbr_custom_attribute').value = '';
         if ($('dispatch_to_value').value == self.DISPATCH_TO_EUROPA &&
             $('dispatch_to_mode').value == self.DISPATCH_TO_MODE_DEFAULT) {
             return;
@@ -201,7 +197,7 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
             $('shipping_price_gbr_value_tr').show();
         }
         if (this.value == self.SHIPPING_PRICE_GBR_MODE_CUSTOM_ATTRIBUTE) {
-            $('shipping_price_gbr_custom_attribute_tr').show();
+            self.updateHiddenValue(this, $('shipping_price_gbr_custom_attribute'));
         }
     },
 
@@ -210,8 +206,8 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
         var self = PlayListingChannelSettingsHandlerObj;
 
         $('shipping_price_euro_value_tr').hide();
-        $('shipping_price_euro_custom_attribute_tr').hide();
 
+        $('shipping_price_euro_custom_attribute').value = '';
         if ($('dispatch_to_value').value == self.DISPATCH_TO_UK &&
             $('dispatch_to_mode').value == self.DISPATCH_TO_MODE_DEFAULT) {
             return;
@@ -220,7 +216,7 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
             $('shipping_price_euro_value_tr').show();
         }
         if (this.value == self.SHIPPING_PRICE_EURO_MODE_CUSTOM_ATTRIBUTE) {
-            $('shipping_price_euro_custom_attribute_tr').show();
+            self.updateHiddenValue(this, $('shipping_price_euro_custom_attribute'));
         }
     },
 
@@ -230,28 +226,13 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
     {
         var self = PlayListingChannelSettingsHandlerObj;
 
-        var condition_note_mode = $('condition_note_mode');
-
-        $('condition_value_tr', 'condition_custom_attribute_tr').invoke('hide');
-
-        if (this.value == self.CONDITION_MODE_NOT_SET) {
-            $('condition_value_tr').hide();
-            $('condition_custom_attribute_tr').hide();
-        } else if (this.value == self.CONDITION_MODE_DEFAULT) {
-            $('condition_value_tr').show();
+        $('condition_custom_attribute').value = '';
+        $('condition_value').value = '';
+        if (this.value == self.CONDITION_MODE_DEFAULT) {
+            self.updateHiddenValue(this, $('condition_value'));
         } else {
-            $('condition_custom_attribute_tr').show();
+            self.updateHiddenValue(this, $('condition_custom_attribute'));
         }
-    },
-
-    condition_value_change: function()
-    {
-        PlayListingChannelSettingsHandlerObj.hideEmptyOption($('condition_value'));
-    },
-
-    condition_custom_attribute_change: function()
-    {
-        PlayListingChannelSettingsHandlerObj.hideEmptyOption($('condition_custom_attribute'));
     },
 
     //----------------------------------
@@ -260,18 +241,49 @@ PlayListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(),
     {
         var self = PlayListingChannelSettingsHandlerObj;
 
-        $('condition_note_value_tr', 'condition_note_custom_attribute_tr').invoke('hide');
-
         if (this.value == self.CONDITION_NOTE_MODE_CUSTOM_VALUE) {
             $('condition_note_value_tr').show();
-        } else if (this.value == self.CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE) {
-            $('condition_note_custom_attribute_tr').show();
+        } else {
+            $('condition_note_value_tr').hide();
         }
     },
 
-    condition_note_custom_attribute_change: function()
+    //----------------------------------
+
+    appendToText: function(ddId, targetId)
     {
-        PlayListingChannelSettingsHandlerObj.hideEmptyOption($('condition_note_custom_attribute'));
+        if ($(ddId).value == '') {
+            return;
+        }
+
+        var attributePlaceholder = '#' + $(ddId).value + '#',
+            element              = $(targetId);
+
+        if (document.selection) {
+            /* IE */
+            element.focus();
+            document.selection.createRange().text = attributePlaceholder;
+            element.focus();
+        } else if (element.selectionStart || element.selectionStart == '0') {
+            /* Webkit */
+            var startPos  = element.selectionStart,
+                endPos    = element.selectionEnd,
+                scrollTop = element.scrollTop,
+                tempValue;
+
+            tempValue = element.value.substring(0, startPos);
+            tempValue += attributePlaceholder;
+            tempValue += element.value.substring(endPos, element.value.length);
+            element.value = tempValue;
+
+            element.focus();
+            element.selectionStart = startPos + attributePlaceholder.length;
+            element.selectionEnd   = startPos + attributePlaceholder.length;
+            element.scrollTop      = scrollTop;
+        } else {
+            element.value += attributePlaceholder;
+            element.focus();
+        }
     }
 
     //----------------------------------

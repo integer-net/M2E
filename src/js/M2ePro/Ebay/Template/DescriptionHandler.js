@@ -5,7 +5,8 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
     initialize: function()
     {
-        Validation.add('M2ePro-validate-condition-note-length', M2ePro.translator.translate('Condition description must be less then 1000 symbols.'), function(value) {
+        Validation.add('M2ePro-validate-condition-note-length', M2ePro.translator.translate('Seller Notes must be less then 1000 symbols.'), function(value) {
+
             if ($('condition_note_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Description::CONDITION_NOTE_MODE_NONE')) {
                 return true;
             }
@@ -16,7 +17,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    simple_mode_disallowed_hide : function()
+    simple_mode_disallowed_hide: function()
     {
         $$('#template_description_data_container .simple_mode_disallowed').invoke('hide');
     },
@@ -287,7 +288,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
             && $('product_details_isbn').value == ''
             && $('product_details_brand').value == ''
         ) {
-            $$('.product-details-specification').each(function (element) {
+            $$('.product-details-specification').each(function(element) {
                 element.hide();
                 element.down('.value').down().selectedIndex = 1;
             });
@@ -363,32 +364,13 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
         template += ']#';
 
-        EbayTemplateDescriptionHandlerObj.appendToTextarea(template);
+        AttributeHandlerObj.appendToTextarea(template);
         EbayTemplateDescriptionHandlerObj.stopObservingImageAttributes();
-    },
-
-    appendToText: function(ddId, targetId)
-    {
-        var suffix = ' #' + $(ddId).value + '#';
-        $(targetId).value = $(targetId).value + suffix;
-    },
-
-    appendToTextarea: function(v)
-    {
-        var data;
-
-        if (wysiwygtext.isEnabled()) {
-            data = tinyMCE.get('description_template').getContent();
-            tinyMCE.get('description_template').setContent(data + ' ' + v);
-        } else {
-            data = $('description_template').value + ' ' + v;
-            $('description_template').value = data;
-        }
     },
 
     //----------------------------------
 
-    observeImageAttributes : function()
+    observeImageAttributes: function()
     {
         $('image_width_mode').observe('change', EbayTemplateDescriptionHandlerObj.image_width_mode_change);
         $('image_height_mode').observe('change', EbayTemplateDescriptionHandlerObj.image_height_mode_change);
@@ -402,7 +384,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
                 .observe('change', EbayTemplateDescriptionHandlerObj.display_products_images_change);
     },
 
-    stopObservingImageAttributes : function()
+    stopObservingImageAttributes: function()
     {
         $('image_width_mode').stopObserving();
         $('image_height_mode').stopObserving();
@@ -413,7 +395,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
         dialog_image_window.close();
     },
 
-    openInsertImageWindow : function()
+    openInsertImageWindow: function()
     {
         var self = EbayTemplateDescriptionHandlerObj;
 
@@ -428,7 +410,6 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
             width: 650,
             height: 350,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show,
             id: 'new-image',
@@ -456,7 +437,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    saveWatermarkImage : function(callback, params)
+    saveWatermarkImage: function(callback, params)
     {
         var form  = $('edit_form');
 
@@ -464,14 +445,14 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
         form.target = 'watermark_image_frame';
 
         if ($('watermark_image_frame') === null) {
-            document.body.appendChild(new Element('iframe',{
+            document.body.appendChild(new Element('iframe', {
                 id: 'watermark_image_frame',
                 name: 'watermark_image_frame',
                 style: 'display: none'
             }));
         }
 
-        $('watermark_image_frame').observe('load',function(){
+        $('watermark_image_frame').observe('load',function() {
             if (typeof callback == 'function') {
                 callback(params);
             }
@@ -482,7 +463,7 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    preview_click: function(attributeSets)
+    preview_click: function()
     {
         this.submitForm(
             M2ePro.url.get('adminhtml_ebay_template_description/preview'), true

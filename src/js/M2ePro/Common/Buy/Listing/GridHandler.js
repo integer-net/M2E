@@ -22,18 +22,15 @@ BuyListingGridHandler = Class.create(CommonListingGridHandler, {
         this.movingHandler = new ListingMovingHandler(this);
         this.productSearchHandler = new BuyListingProductSearchHandler(this);
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
 
             movingAction: this.movingHandler.run.bind(this.movingHandler),
 
             assignGeneralIdAction: (function() { this.productSearchHandler.searchGeneralIdAuto(this.getSelectedProductsString())}).bind(this),
             newGeneralIdAction: (function() { this.productSearchHandler.addNewGeneralId(this.getSelectedProductsString())}).bind(this),
             unassignGeneralIdAction: (function() { this.productSearchHandler.unmapFromGeneralId(this.getSelectedProductsString())}).bind(this)
-
         });
-
     }
 
     //----------------------------------
-
 });

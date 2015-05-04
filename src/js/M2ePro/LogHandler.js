@@ -28,7 +28,6 @@ LogHandler.prototype = Object.extend(new CommonHandler(), {
             width: 500,
             top: 200,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });

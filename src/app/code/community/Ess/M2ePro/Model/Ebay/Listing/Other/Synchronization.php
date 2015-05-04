@@ -52,6 +52,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization
     const STOP_QTY_BETWEEN = 2;
     const STOP_QTY_MORE    = 3;
 
+    const MODE_NONE = 0;
+    const MODE_YES  = 1;
+
     // ########################################
 
     public function getConfigValue($tab, $key)
@@ -64,6 +67,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization
     }
 
     // ########################################
+
+    public function isMode()
+    {
+        return $this->getConfigValue('synchronization', 'mode') != self::MODE_NONE;
+    }
+
+    //---------------------------------------
 
     public function isReviseWhenChangeQty()
     {

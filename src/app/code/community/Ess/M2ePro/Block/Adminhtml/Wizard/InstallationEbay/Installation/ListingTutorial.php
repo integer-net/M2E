@@ -20,7 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_ListingTut
     {
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('What Is An M2E Listing?');
+        $this->_headerText = Mage::helper('M2ePro')->__('What Is An M2E Pro Listing?');
         //------------------------------
 
         //------------------------------

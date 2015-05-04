@@ -4,17 +4,15 @@
  * @copyright  Copyright (c) 2011 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ListingSwitcher extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ListingSwitcher
+    extends Ess_M2ePro_Block_Adminhtml_Listing_View_ListingSwitcher_Abstract
 {
     public function __construct()
     {
         parent::__construct();
 
         // Initialization block
-        //------------------------------
-        $this->setId('ebayListingViewListingSwitcher');
-        //------------------------------
 
-        $this->setTemplate('M2ePro/ebay/listing/view/listing_switcher.phtml');
+        $this->setAddListingUrl('*/adminhtml_ebay_listing_create/index');
     }
 }

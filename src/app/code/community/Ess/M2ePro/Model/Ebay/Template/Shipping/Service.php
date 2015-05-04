@@ -22,9 +22,9 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
     private $shippingTemplateModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Magento_Product
+     * @var Ess_M2ePro_Model_Ebay_Template_Shipping_Service_Source[]
      */
-    private $magentoProductModel = NULL;
+    private $shippingServiceSourceModels = NULL;
 
     // ########################################
 
@@ -40,7 +40,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
     {
         $temp = parent::deleteInstance();
         $temp && $this->shippingTemplateModel = NULL;
-        $temp && $this->magentoProductModel = NULL;
+        $temp && $this->shippingServiceSourceModels = array();
         return $temp;
     }
 
@@ -55,9 +55,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
             $this->shippingTemplateModel = Mage::helper('M2ePro')->getCachedObject(
                 'Ebay_Template_Shipping', $this->getTemplateShippingId(), NULL, array('template')
             );
-            if (!is_null($this->getMagentoProduct())) {
-                $this->shippingTemplateModel->setMagentoProduct($this->getMagentoProduct());
-            }
         }
 
         return $this->shippingTemplateModel;
@@ -74,19 +71,22 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
     //------------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Service_Source
      */
-    public function getMagentoProduct()
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
-        return $this->magentoProductModel;
-    }
+        $productId = $magentoProduct->getProductId();
 
-    /**
-     * @param Ess_M2ePro_Model_Magento_Product $instance
-     */
-    public function setMagentoProduct(Ess_M2ePro_Model_Magento_Product $instance)
-    {
-        $this->magentoProductModel = $instance;
+        if (!empty($this->shippingServiceSourceModels[$productId])) {
+            return $this->shippingServiceSourceModels[$productId];
+        }
+
+        $this->shippingServiceSourceModels[$productId] = Mage::getModel('M2ePro/Ebay_Template_Shipping_Service_Source');
+        $this->shippingServiceSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->shippingServiceSourceModels[$productId]->setShippingServiceTemplate($this);
+
+        return $this->shippingServiceSourceModels[$productId];
     }
 
     // #######################################
@@ -139,23 +139,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
 
     //-----------------------------------------
 
-    public function getCostValue()
-    {
-        return $this->getData('cost_value');
-    }
-
-    public function getCostAdditionalValue()
-    {
-        return $this->getData('cost_additional_value');
-    }
-
-    public function getCostSurchargeValue()
-    {
-        return $this->getData('cost_surcharge_value');
-    }
-
-    //-----------------------------------------
-
     public function isCostModeFree()
     {
         return $this->getCostMode() == self::COST_MODE_FREE;
@@ -169,6 +152,23 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
     public function isCostModeCustomAttribute()
     {
         return $this->getCostMode() == self::COST_MODE_CUSTOM_ATTRIBUTE;
+    }
+
+    // #######################################
+
+    public function getCostValue()
+    {
+        return $this->getData('cost_value');
+    }
+
+    public function getCostAdditionalValue()
+    {
+        return $this->getData('cost_additional_value');
+    }
+
+    public function getCostSurchargeValue()
+    {
+        return $this->getData('cost_surcharge_value');
     }
 
     //-----------------------------------------
@@ -204,71 +204,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
         }
 
         return $attributes;
-    }
-
-    // #######################################
-
-    public function getCost()
-    {
-        $result = 0;
-
-        switch ($this->getCostMode()) {
-            case self::COST_MODE_FREE:
-                $result = 0;
-                break;
-            case self::COST_MODE_CUSTOM_VALUE:
-                $result = $this->getCostValue();
-                break;
-            case self::COST_MODE_CUSTOM_ATTRIBUTE:
-                $result = $this->getMagentoProduct()->getAttributeValue($this->getCostValue());
-                break;
-        }
-
-        is_string($result) && $result = str_replace(',','.',$result);
-
-        return round((float)$result,2);
-    }
-
-    public function getCostAdditional()
-    {
-        $result = 0;
-
-        switch ($this->getCostMode()) {
-            case self::COST_MODE_FREE:
-                $result = 0;
-                break;
-            case self::COST_MODE_CUSTOM_VALUE:
-                $result = $this->getCostAdditionalValue();
-                break;
-            case self::COST_MODE_CUSTOM_ATTRIBUTE:
-                $result = $this->getMagentoProduct()->getAttributeValue($this->getCostAdditionalValue());
-                break;
-        }
-
-        is_string($result) && $result = str_replace(',','.',$result);
-
-        return round((float)$result,2);
-    }
-
-    public function getCostSurcharge()
-    {
-        $result = 0;
-
-        switch ($this->getCostMode()) {
-            case self::COST_MODE_FREE:
-                $result = 0;
-                break;
-            case self::COST_MODE_CUSTOM_VALUE:
-                $result = $this->getCostSurchargeValue();
-                break;
-            case self::COST_MODE_CUSTOM_ATTRIBUTE:
-                $result = $this->getMagentoProduct()->getAttributeValue($this->getCostSurchargeValue());
-                break;
-        }
-
-        is_string($result) && $result = str_replace(',','.',$result);
-
-        return round((float)$result,2);
     }
 
     // #######################################

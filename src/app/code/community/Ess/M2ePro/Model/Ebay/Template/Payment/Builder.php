@@ -1,8 +1,14 @@
 <?php
 
+/*
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
+ */
+
 class Ess_M2ePro_Model_Ebay_Template_Payment_Builder
     extends Ess_M2ePro_Model_Ebay_Template_Builder_Abstract
 {
+    // ########################################
+
     public function build(array $data)
     {
         if (empty($data)) {
@@ -62,6 +68,8 @@ class Ess_M2ePro_Model_Ebay_Template_Payment_Builder
         return $template;
     }
 
+    // ########################################
+
     protected function validate(array $data)
     {
         //------------------------------
@@ -105,21 +113,21 @@ class Ess_M2ePro_Model_Ebay_Template_Payment_Builder
         return $prepared;
     }
 
+    // ########################################
+
     private function createService($templatePaymentId, $codeName)
     {
-        //------------------------------
         $data = array(
             'template_payment_id' => $templatePaymentId,
             'code_name' => $codeName
         );
-        //------------------------------
 
-        //------------------------------
         $model = Mage::getModel('M2ePro/Ebay_Template_Payment_Service');
         $model->addData($data);
         $model->save();
-        //------------------------------
 
         return $model;
     }
+
+    // ########################################
 }

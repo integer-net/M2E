@@ -123,7 +123,7 @@ $translations = json_encode($translations);
                 <div id="block_notice_ebay_synchronization_stock_level" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
                     <?php $inspectorMode = ($this->inspectorMode == 1) ? '<span style="color: green"> ('. Mage::helper('M2ePro')->__('enabled') .') </span>' : ''; ?>
                     <?php echo Mage::helper('M2ePro')->__(
-                        'If you change product price or quantity via direct database access, eg using import/export tools or custom scripts, enable
+                        'If you change Product Price or Quantity via direct database access, eg using import/export tools or custom scripts, enable
                         <a target="_blank" href="%url%#magento_block_configuration_settings_advanced">"Track Direct Database Changes"</a> %mode_status%.',
                         Mage::helper('M2ePro/View_Configuration')->getSettingsUrl(), $inspectorMode
                     ); ?>
@@ -173,9 +173,9 @@ $translations = json_encode($translations);
                     <div id="block_notice_ebay_synchronization_revise_all" style="<?php if (!$templates_mode) echo 'display: none'; ?>" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
                         <?php echo Mage::helper('M2ePro')->__(
-    'If your eBay listings for some reason were asynchronized with the products in Magento, <a href="javascript:" onclick="%script_code%">turn on</a> the Revise All action to catch data up.
-    <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
-<br><br>
+    'If your eBay listings for some reason were asynchronized with the Products in Magento, <a href="javascript:" onclick="%script_code%">turn on</a> the Revise All action to catch data up.
+    <br/>Revise is performed by the Inventory Synchronization, 100 Items per a cycle.
+<br/><br/>
     ',
     'SynchronizationHandlerObj.showReviseAllConfirmPopup(\''.Ess_M2ePro_Helper_Component_Ebay::NICK.'\');'
                         )?>
@@ -334,7 +334,7 @@ $translations = json_encode($translations);
                                 <option value="1"<?php if ($otherListingsMode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for eBay accounts, which have enabled Import 3rd Party Listings in their Accounts settings.<br/><strong>Note: </strong>Click "Synchronization Settings" to configure settings.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Imports and synchronizes 3rd Party Listings for eBay accounts, which have enabled Import 3rd Party Listings in their Accounts settings.<br/><b>Note:</b> Click "Synchronization Settings" to configure settings.'); ?></span>
                             </p>
                         </td>
                         <td class="value" id="ebay_other_listings_synchronization_settings_button_container" <?php if ($otherListingsMode != 1) echo ' style="display: none;"'; ?>>
@@ -373,7 +373,7 @@ $translations = json_encode($translations);
     <div style="margin: 17px 0">
 
         <?php echo Mage::helper('M2ePro')->__(
-            'Click \'Confirm\' and Revise will be performed by the Inventory Synchronization, 100 items per a cycle.'
+            'Click \'Confirm\' and Revise will be performed by the Inventory Synchronization, 100 Items per a cycle.'
         ); ?>
 
     </div>

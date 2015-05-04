@@ -1,9 +1,12 @@
 <script type="text/javascript">
 
     var initDropDown = function() {
-        $$('.<?php echo $this->getTargetCssClass() ?>')[0].innerHTML += '<?php echo Mage::helper('M2ePro')->escapeJs($this->getDropDownHtml()) ?>';
-        DropDownObj = new DropDown();
-        DropDownObj.prepare($$('.<?php echo $this->getTargetCssClass() ?>')[0]);
+        var ddEl = $$('.<?php echo $this->getTargetCssClass() ?>')[0];
+        if (ddEl) {
+            ddEl.innerHTML += '<?php echo Mage::helper('M2ePro')->escapeJs($this->getDropDownHtml()) ?>';
+            DropDownObj = new DropDown();
+            DropDownObj.prepare(ddEl);
+        }
     };
 
     <?php if (!$this->getRequest()->isXmlHttpRequest()): ?>

@@ -11,7 +11,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid_Column_Fil
     {
         $options = array();
 
-        $modelName = $this->getColumn()->getGrid()->getModelName();
+        $modelName = $this->getColumn()->getGrid()->modelName;
         $htmlName = $this->_getHtmlName();
 
         $colOptions = Mage::getModel('M2ePro/'.$modelName)

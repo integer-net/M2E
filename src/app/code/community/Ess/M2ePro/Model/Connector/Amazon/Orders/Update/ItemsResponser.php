@@ -18,33 +18,37 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Update_ItemsResponser
 
     // ########################################
 
-    protected function unsetLocks($fail = false, $message = NULL)
+    public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
-        $logs = array();
-        $currentDate = Mage::helper('M2ePro')->getCurrentGmtDate();
+        parent::unsetProcessingLocks($processingRequest);
+
+        foreach ($this->getOrders() as $order) {
+            $order->deleteObjectLocks('update_shipping_status', $processingRequest->getHash());
+        }
+    }
+
+    public function eventFailedExecuting($message)
+    {
+        parent::eventFailedExecuting($message);
 
         $logMessage = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
             'Amazon Order status was not updated. Reason: %msg%', array('msg' => $message)
         );
 
+        $logs = array();
+
         foreach ($this->getOrders() as $order) {
-            $order->deleteObjectLocks('update_shipping_status', $this->hash);
-
-            if ($fail) {
-                $logs[] = array(
-                    'order_id'       => $order->getId(),
-                    'message'        => $logMessage,
-                    'type'           => Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                    'component_mode' => Ess_M2ePro_Helper_Component_Amazon::NICK,
-                    'initiator'      => Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
-                    'create_date'    => $currentDate
-                );
-            }
+            $logs[] = array(
+                'order_id'       => $order->getId(),
+                'message'        => $logMessage,
+                'type'           => Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                'component_mode' => Ess_M2ePro_Helper_Component_Amazon::NICK,
+                'initiator'      => Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
+                'create_date'    => Mage::helper('M2ePro')->getCurrentGmtDate(),
+            );
         }
 
-        if (count($logs) > 0) {
-            $this->createLogEntries($logs);
-        }
+        $this->createLogEntries($logs);
     }
 
     // ########################################
@@ -222,8 +226,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Update_ItemsResponser
 
     private function createLogEntries(array $data)
     {
-        if (count($data) == 0) {
-            throw new InvalidArgumentException('Number of log entries cannot be zero.');
+        if (empty($data)) {
+            return;
         }
 
         /** @var $writeConnection Varien_Db_Adapter_Interface */

@@ -38,28 +38,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
         }
 
         //------------------------------
-        $url = $this->getUrl('*/adminhtml_common_listing/index');
-        $this->_addButton('goto_listings', array(
-            'label'     => Mage::helper('M2ePro')->__('Listings'),
-            'onclick'   => 'setLocation(\''. $url .'\')',
-            'class'     => 'button_link'
-        ));
-        //------------------------------
-
-        //------------------------------
         $url = $this->getUrl('*/adminhtml_common_log/listingOther');
         $this->_addButton('view_log', array(
             'label'     => Mage::helper('M2ePro')->__('View Log'),
             'onclick'   => 'window.open(\''.$url.'\')',
             'class'     => 'button_link'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
 
@@ -116,7 +99,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
             'Listings, which have the same Marketplace and Account were not found.'
         ));
         $createListing .= $helper->escapeJs($helper->__('Would you like to create one with default settings ?'));
-        $popupTitle = $helper->escapeJs($helper->__('Moving Amazon Items.'));
+        $popupTitle = $helper->escapeJs($helper->__('Moving Amazon Items'));
+        $popupTitleSingle = $helper->escapeJs($helper->__('Moving Amazon Item'));
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $confirmMessage = $helper->escapeJs($helper->__('Are you sure?'));
@@ -126,7 +110,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
             $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
+            'Some of the Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
         ));
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
@@ -136,16 +120,16 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the action on.')
         );
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% Product(s).'));
 
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
-        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped products must be selected.'));
+        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped Products must be selected.'));
         $selectTheSameTypeProducts = $helper->escapeJs(
-            $helper->__('Selected items must belong to the same Account and Marketplace.')
+            $helper->__('Selected Items must belong to the same Account and Marketplace.')
         );
 
         $successWord = $helper->escapeJs($helper->__('Success'));
@@ -177,6 +161,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
 
     M2eProAmazon.text.create_listing = '{$createListing}';
     M2eProAmazon.text.popup_title = '{$popupTitle}';
+    M2eProAmazon.text.popup_title_single = '{$popupTitleSingle}';
     M2eProAmazon.text.failed_products_popup_title = '{$failedProductsPopupTitle}';
     M2eProAmazon.text.confirm = '{$confirmMessage}';
     M2eProAmazon.text.successfully_moved = '{$successfullyMovedMessage}';
@@ -215,6 +200,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
             'amazon'
         );
 
+        // todo next (temp solution)
         AmazonListingOtherGridHandlerObj.movingHandler.setOptions(M2eProAmazon);
         AmazonListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProAmazon);
         AmazonListingOtherGridHandlerObj.removingHandler.setOptions(M2eProAmazon);
@@ -232,10 +218,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
 </script>
 JAVASCRIPT;
 
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_other_help');
-
         return $javascriptsMain .
-               $helpBlock->toHtml() .
                $this->getAmazonTabBlockFilterHtml() .
                parent::getAmazonTabHtml();
     }
@@ -251,9 +234,16 @@ JAVASCRIPT;
             'controller_name' => 'adminhtml_common_listing_other'
         ));
 
+        $marketPlaceFilterBlockHtml = $marketplaceFilterBlock->toHtml();
+        $accountFilterBlockHtml = $accountFilterBlock->toHtml();
+
+        if($marketPlaceFilterBlockHtml == '' && $accountFilterBlockHtml == '') {
+            return '';
+        }
+
         return '<div class="filter_block">' .
-               $marketplaceFilterBlock->toHtml() .
-               $accountFilterBlock->toHtml() .
+                $marketPlaceFilterBlockHtml .
+                $accountFilterBlockHtml .
                '</div>';
     }
 
@@ -307,7 +297,8 @@ JAVASCRIPT;
             'Listings, which have the same Marketplace and Account were not found.'
         ));
         $createListing .= $helper->escapeJs($helper->__('Would you like to create one with default settings ?'));
-        $popupTitle = $helper->escapeJs($helper->__('Moving Rakuten.com Items.'));
+        $popupTitle = $helper->escapeJs($helper->__('Moving Rakuten.com Items'));
+        $popupTitleSingle = $helper->escapeJs($helper->__('Moving Rakuten.com Item'));
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $confirmMessage = $helper->escapeJs($helper->__('Are you sure?'));
@@ -317,7 +308,7 @@ JAVASCRIPT;
             $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
+            'Some of the Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
         ));
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data.'));
@@ -327,11 +318,11 @@ JAVASCRIPT;
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the action on.')
         );
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% Product(s).'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -340,9 +331,9 @@ JAVASCRIPT;
         $closeWord = $helper->escapeJs($helper->__('Close'));
 
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
-        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped products must be selected.'));
+        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped Products must be selected.'));
         $selectTheSameTypeProducts = $helper->escapeJs(
-            $helper->__('Selected items must belong to the same Account and Marketplace.')
+            $helper->__('Selected Items must belong to the same Account and Marketplace.')
         );
 
         $javascriptsMain = <<<JAVASCRIPT
@@ -367,6 +358,7 @@ JAVASCRIPT;
 
     M2eProBuy.text.create_listing = '{$createListing}';
     M2eProBuy.text.popup_title = '{$popupTitle}';
+    M2eProBuy.text.popup_title_single = '{$popupTitleSingle}';
     M2eProBuy.text.failed_products_popup_title = '{$failedProductsPopupTitle}';
     M2eProBuy.text.confirm = '{$confirmMessage}';
     M2eProBuy.text.successfully_moved = '{$successfullyMovedMessage}';
@@ -405,6 +397,7 @@ JAVASCRIPT;
             'buy'
         );
 
+        // todo next (temp solution)
         BuyListingOtherGridHandlerObj.movingHandler.setOptions(M2eProBuy);
         BuyListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProBuy);
         BuyListingOtherGridHandlerObj.removingHandler.setOptions(M2eProBuy);
@@ -418,13 +411,11 @@ JAVASCRIPT;
 
     {$this->isAjax} ? init()
                     : Event.observe(window, 'load', init);
+
 </script>
 JAVASCRIPT;
 
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_other_help');
-
         return $javascriptsMain .
-            $helpBlock->toHtml() .
             $this->getBuyTabBlockFilterHtml() .
             parent::getBuyTabHtml();
     }
@@ -440,10 +431,17 @@ JAVASCRIPT;
             'controller_name' => 'adminhtml_common_listing_other'
         ));
 
+        $marketPlaceFilterBlockHtml = $marketplaceFilterBlock->toHtml();
+        $accountFilterBlockHtml = $accountFilterBlock->toHtml();
+
+        if($marketPlaceFilterBlockHtml == '' && $accountFilterBlockHtml == '') {
+            return '';
+        }
+
         return '<div class="filter_block">' .
-            $marketplaceFilterBlock->toHtml() .
-            $accountFilterBlock->toHtml() .
-            '</div>';
+                $marketPlaceFilterBlockHtml .
+                $accountFilterBlockHtml .
+                '</div>';
     }
 
     // ########################################
@@ -501,7 +499,8 @@ JAVASCRIPT;
             'Listings, which have the same Marketplace and Account were not found.'
         ));
         $createListing .= $helper->escapeJs($helper->__('Would you like to create one with default settings ?'));
-        $popupTitle = $helper->escapeJs($helper->__('Moving Play.com Items.'));
+        $popupTitle = $helper->escapeJs($helper->__('Moving Play.com Items'));
+        $popupTitleSingle = $helper->escapeJs($helper->__('Moving Play.com Item'));
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $confirmMessage = $helper->escapeJs($helper->__('Are you sure?'));
@@ -511,7 +510,7 @@ JAVASCRIPT;
             'Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
         ));
         $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Some of the products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
+            'Some of the Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
         ));
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
@@ -521,11 +520,11 @@ JAVASCRIPT;
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log'));
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the action on.')
         );
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
-        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% product(s).'));
+        $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% Product(s).'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -534,9 +533,9 @@ JAVASCRIPT;
         $closeWord = $helper->escapeJs($helper->__('Close'));
 
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
-        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped products must be selected.'));
+        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped Products must be selected.'));
         $selectTheSameTypeProducts = $helper->escapeJs(
-            $helper->__('Selected items must belong to the same Account and Marketplace.')
+            $helper->__('Selected Items must belong to the same Account and Marketplace.')
         );
 
         $javascriptsMain = <<<JAVASCRIPT
@@ -561,6 +560,7 @@ JAVASCRIPT;
 
     M2eProPlay.text.create_listing = '{$createListing}';
     M2eProPlay.text.popup_title = '{$popupTitle}';
+    M2eProPlay.text.popup_title_single = '{$popupTitleSingle}';
     M2eProPlay.text.failed_products_popup_title = '{$failedProductsPopupTitle}';
     M2eProPlay.text.confirm = '{$confirmMessage}';
     M2eProPlay.text.successfully_moved = '{$successfullyMovedMessage}';
@@ -599,15 +599,11 @@ JAVASCRIPT;
             'play'
         );
 
+        // todo next (temp solution)
         PlayListingOtherGridHandlerObj.movingHandler.setOptions(M2eProPlay);
         PlayListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProPlay);
         PlayListingOtherGridHandlerObj.removingHandler.setOptions(M2eProPlay);
         PlayListingOtherGridHandlerObj.unmappingHandler.setOptions(M2eProPlay);
-    }
-
-    if ($$('.tabs-horiz').first()) {
-        var playTabId = $$('.tabs-horiz').first().id + '_play';
-        $(playTabId).observe('click', init);
     }
 
     {$this->isAjax} ? init()
@@ -616,10 +612,7 @@ JAVASCRIPT;
 </script>
 JAVASCRIPT;
 
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_listing_other_help');
-
         return $javascriptsMain .
-            $helpBlock->toHtml() .
             $this->getPlayTabBlockFilterHtml() .
             parent::getPlayTabHtml();
     }
@@ -635,10 +628,17 @@ JAVASCRIPT;
             'controller_name' => 'adminhtml_common_listing_other'
         ));
 
+        $marketPlaceFilterBlockHtml = $marketplaceFilterBlock->toHtml();
+        $accountFilterBlockHtml = $accountFilterBlock->toHtml();
+
+        if($marketPlaceFilterBlockHtml == '' && $accountFilterBlockHtml == '') {
+            return '';
+        }
+
         return '<div class="filter_block">' .
-            $marketplaceFilterBlock->toHtml() .
-            $accountFilterBlock->toHtml() .
-            '</div>';
+                $marketPlaceFilterBlockHtml .
+                $accountFilterBlockHtml .
+                '</div>';
     }
 
     // ########################################
@@ -661,12 +661,12 @@ JAVASCRIPT;
 
             'Mapping Product' => $helper->__('Mapping Product'),
             'Product does not exist.' => $helper->__('Product does not exist.'),
-            'Please enter correct product ID.' => $helper->__('Please enter correct product ID.'),
+            'Please enter correct Product ID.' => $helper->__('Please enter correct Product ID.'),
             'Product(s) was successfully mapped.' => $helper->__('Product(s) was successfully mapped.'),
-            'Please enter correct product ID or SKU' => $helper->__('Please enter correct product ID or SKU'),
+            'Please enter correct Product ID or SKU' => $helper->__('Please enter correct Product ID or SKU'),
 
-            'Current version only supports simple products. Please, choose simple product.' => $helper->__(
-                'Current version only supports simple products. Please, choose simple product.'
+            'Current version only supports Simple Products. Please, choose Simple Product.' => $helper->__(
+                'Current version only supports Simple Products. Please, choose Simple Product.'
             ),
 
             'Item was not mapped as the chosen %product_id% Simple Product has Custom Options.' => $helper->__(
@@ -700,8 +700,10 @@ JAVASCRIPT;
 JAVASCRIPT;
 
         $mapToProductBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_listing_other_mapping');
+        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_other_help');
 
         return $javascriptsMain .
+               $helpBlock->toHtml() .
                $mapToProductBlock->toHtml() .
                parent::_componentsToHtml();
     }

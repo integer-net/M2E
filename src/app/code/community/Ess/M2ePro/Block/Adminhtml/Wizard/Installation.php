@@ -13,28 +13,30 @@ abstract class Ess_M2ePro_Block_Adminhtml_Wizard_Installation extends Ess_M2ePro
         // Initialization block
         //------------------------------
         $this->setId('wizard'.$this->getNick().'Installation');
-        //------------------------------
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Configuration Wizard');
-        //------------------------------
+        $this->_headerText = Mage::helper('M2ePro')->__($this->getHeaderTextHtml());
 
-        //------------------------------
-        $this->prepareButtons();
-
-        $url = $this->getUrl('*/*/skip');
-        $this->_addButton('skip', array(
-            'label'     => Mage::helper('M2ePro')->__('Skip Wizard'),
-            'onclick'   => 'WizardHandlerObj.skip(\''.$url.'\')',
-            'class'     => 'skip'
-        ));
-        //------------------------------
+        $this->removeButtons();
+        $this->appendButtons();
 
         $this->setTemplate('widget/form/container.phtml');
 
-        //------------------------------
         return parent::_beforeToHtml();
+    }
+
+    // ########################################
+
+    protected function appendButtons()
+    {
+        $this->appendWizardSkipButton();
+        parent::appendButtons();
+    }
+
+    protected function getHeaderTextHtml()
+    {
+        return 'Configuration Wizard!';
     }
 
     // ########################################

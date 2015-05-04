@@ -6,98 +6,61 @@
 
 abstract class Ess_M2ePro_Model_Connector_Responser
 {
-    /** @var Ess_M2ePro_Model_Processing_Request */
-    protected $processingRequest = NULL;
-
-    protected $hash = NULL;
-    protected $processingHash = NULL;
-
     protected $params = array();
-    protected $requestData = array();
-    protected $performType = Ess_M2ePro_Model_Processing_Request::PERFORM_TYPE_SINGLE;
 
     protected $messages = array();
     protected $resultType = Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_ERROR;
 
+    protected $parsedResponseData = array();
+
     // ########################################
 
-    public function __construct(Ess_M2ePro_Model_Processing_Request $processingRequest)
+    public function __construct(array $params = array())
     {
-        $this->processingRequest = $processingRequest;
-
-        $this->hash = $this->processingRequest->getHash();
-        $this->processingHash = $this->processingRequest->getProcessingHash();
-
-        $this->params = $this->processingRequest->getDecodedResponserParams();
-        $this->requestData = $this->processingRequest->getDecodedRequestBody();
-        $this->performType = $this->processingRequest->getPerformType();
+        $this->params = $params;
     }
 
     // ########################################
 
     public function process(array $responseBody = array(), array $messages = array())
     {
-        try {
+        $this->processResponseMessages($messages);
 
-            $this->processResponseMessages($messages);
-
-            if (!$this->validateResponseData($responseBody)) {
-                throw new Exception('Validation Failed. The server response data is not valid.');
-            }
-
-            $this->processResponseData($responseBody);
-
-        } catch (Exception $exception) {
-            Mage::helper('M2ePro/Module_Exception')->process($exception);
-            $this->completeUnsuccessfulProcessing($exception->getMessage());
-            return false;
+        if (!$this->validateResponseData($responseBody)) {
+            throw new Exception('Validation Failed. The server response data is not valid.');
         }
 
-        return true;
-    }
-
-    public function processCompleted(array $responseBody = array(), array $messages = array())
-    {
-        $result = $this->process($responseBody,$messages);
-        $result && $this->completeSuccessfulProcessing();
-    }
-
-    public function processFailed($message)
-    {
-        $this->completeUnsuccessfulProcessing($message);
-    }
-
-    //-----------------------------------------
-
-    public function completeSuccessfulProcessing()
-    {
-        try {
-            $this->unsetLocks();
-            $this->processingRequest->deleteInstance();
-        } catch (Exception $exception) {
-            $this->forceRemoveLockedObjectsAndRequest();
-            Mage::helper('M2ePro/Module_Exception')->process($exception);
-        }
-    }
-
-    public function completeUnsuccessfulProcessing($message)
-    {
-        try {
-            $this->unsetLocks(true,$message);
-            $this->processingRequest->deleteInstance();
-        } catch (Exception $exception) {
-            $this->forceRemoveLockedObjectsAndRequest();
-            Mage::helper('M2ePro/Module_Exception')->process($exception);
-        }
+        $this->parsedResponseData = $this->prepareResponseData($responseBody);
+        $this->processResponseData($this->parsedResponseData);
     }
 
     // ########################################
 
-    abstract protected function unsetLocks($isFailed = false, $message = NULL);
+    public function getParsedResponseData()
+    {
+        return $this->parsedResponseData;
+    }
+
+    // ########################################
+
+    public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest) {}
+
+    public function eventAfterProcessing() {}
+
+    //-----------------------------------------
+
+    public function eventFailedExecuting($message) {}
+
+    public function eventAfterExecuting() {}
 
     //-----------------------------------------
 
     abstract protected function validateResponseData($response);
+
+    protected function prepareResponseData($response)
+    {
+        return $response;
+    }
 
     abstract protected function processResponseData($response);
 
@@ -147,17 +110,6 @@ abstract class Ess_M2ePro_Model_Connector_Responser
         }
 
         return Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TYPE_SUCCESS;
-    }
-
-    protected function forceRemoveLockedObjectsAndRequest()
-    {
-        $table = Mage::getResourceModel('M2ePro/LockedObject')->getMainTable();
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($table,array('`related_hash` = ?'=>(string)$this->hash));
-
-        $table = Mage::getResourceModel('M2ePro/Processing_Request')->getMainTable();
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($table,array('`id` = ?'=>(int)$this->processingRequest->getId()));
     }
 
     // ########################################

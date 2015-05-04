@@ -97,8 +97,6 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
             'online_qty' => $otherListing->getChildObject()->getOnlineQty(),
             'condition' => $otherListing->getChildObject()->getCondition(),
             'condition_note' => $otherListing->getChildObject()->getConditionNote(),
-            'start_date' => NULL,
-            'end_date' => $otherListing->getChildObject()->getEndDate(),
             'status' => $otherListing->getStatus(),
             'status_changer' => $otherListing->getStatusChanger()
         );
@@ -164,7 +162,7 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         if (!$this->getAccount()->getChildObject()->isOtherListingsMoveToListingsSynchModeNone()) {
             Mage::getModel('M2ePro/ProductChange')
                 ->addUpdateAction( $otherListing->getProductId(),
-                                   Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION );
+                                   Ess_M2ePro_Model_ProductChange::INITIATOR_UNKNOWN );
         }
 
         $otherListing->deleteInstance();
@@ -208,18 +206,18 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
             'template_synchronization_id' => $this->getDefaultSynchronizationTemplate($otherListing)->getId(),
 
             'source_products' => Ess_M2ePro_Model_Listing::SOURCE_PRODUCTS_CUSTOM,
-            'categories_add_action' => Ess_M2ePro_Model_Listing::CATEGORIES_ADD_ACTION_NONE,
-            'categories_delete_action' => Ess_M2ePro_Model_Listing::CATEGORIES_DELETE_ACTION_NONE,
-            'sku_mode' => Ess_M2ePro_Model_Play_Listing::SKU_MODE_NOT_SET,
+
+            'sku_mode' => Ess_M2ePro_Model_Play_Listing::SKU_MODE_DEFAULT,
             'general_id_mode' => Ess_M2ePro_Model_Play_Listing::GENERAL_ID_MODE_NOT_SET,
             'search_by_magento_title_mode' =>
-                Ess_M2ePro_Model_Play_Listing::SEARCH_BY_MAGENTO_TITLE_MODE_YES,
+                Ess_M2ePro_Model_Play_Listing::SEARCH_BY_MAGENTO_TITLE_MODE_NONE,
 
             'dispatch_to_mode' => Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_MODE_NOT_SET,
             'dispatch_from_mode' => Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_NOT_SET,
 
-            'condition_mode' => Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_NOT_SET,
-            'condition_note_mode' => Ess_M2ePro_Model_Play_Listing::CONDITION_NOTE_MODE_NOT_SET,
+            'condition_mode' => Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT,
+            'condition_value' => Ess_M2ePro_Model_Play_Listing::CONDITION_NEW,
+            'condition_note_mode' => Ess_M2ePro_Model_Play_Listing::CONDITION_NOTE_MODE_NONE,
 
             'shipping_price_gbr_mode' =>
                                     Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_GBR_MODE_NONE,
@@ -229,16 +227,6 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
 
         $tempModel->addData($dataForAdd)->save();
         $this->tempObjectsCache['listing_'.$accountId] = $tempModel;
-
-        $attributesSets = Mage::helper('M2ePro/Magento_AttributeSet')->getAll();
-        foreach ($attributesSets as $attributeSet) {
-            $dataForAdd = array(
-                'object_type' => Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_LISTING,
-                'object_id' => (int)$tempModel->getId(),
-                'attribute_set_id' => (int)$attributeSet['attribute_set_id']
-            );
-            Mage::getModel('M2ePro/AttributeSet')->setData($dataForAdd)->save();
-        }
 
         return $tempModel;
     }
@@ -346,25 +334,15 @@ class Ess_M2ePro_Model_Play_Listing_Other_Moving
         $dataForAdd = array(
             'title' => 'Default',
 
-            'qty_mode' => Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT,
+            'qty_mode' => Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT,
             'qty_custom_value' => 1,
 
-            'price_gbr_mode' => Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_PRODUCT,
-            'price_euro_mode' => Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_PRODUCT
+            'price_gbr_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT,
+            'price_euro_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT
         );
 
         $tempModel->addData($dataForAdd)->save();
         $this->tempObjectsCache['selling_format_'.$marketplaceId] = $tempModel;
-
-        $attributesSets = Mage::helper('M2ePro/Magento_AttributeSet')->getAll();
-        foreach ($attributesSets as $attributeSet) {
-            $dataForAdd = array(
-                'object_type' => Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT,
-                'object_id' => (int)$tempModel->getId(),
-                'attribute_set_id' => (int)$attributeSet['attribute_set_id']
-            );
-            Mage::getModel('M2ePro/AttributeSet')->setData($dataForAdd)->save();
-        }
 
         return $tempModel;
     }

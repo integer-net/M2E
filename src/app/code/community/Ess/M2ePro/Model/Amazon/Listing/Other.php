@@ -88,18 +88,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Other extends Ess_M2ePro_Model_Component_C
             Ess_M2ePro_Model_Amazon_Listing_Product::IS_ISBN_GENERAL_ID_YES;
     }
 
-    //-----------------------------------------
-
-    public function getStartDate()
-    {
-        return $this->getData('start_date');
-    }
-
-    public function getEndDate()
-    {
-        return $this->getData('end_date');
-    }
-
     // ########################################
 
     public function getRelatedStoreId()

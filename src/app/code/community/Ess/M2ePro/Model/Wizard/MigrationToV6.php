@@ -18,6 +18,13 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
 
     // ########################################
 
+    public function getNick()
+    {
+        return Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK;
+    }
+
+    // ########################################
+
     public function removeEmptySteps()
     {
         $this->prepareCurrencyData();
@@ -30,30 +37,6 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
                 $this->steps = array_values($this->steps);
             }
         }
-    }
-
-    // ########################################
-
-    public function getPrevStep()
-    {
-        $currentStep = Mage::helper('M2ePro/Module_Wizard')->getStep(
-            Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK
-        );
-
-        $prevStepIndex = array_search($currentStep,$this->steps) - 1;
-
-        return isset($this->steps[$prevStepIndex]) ? $this->steps[$prevStepIndex] : false;
-    }
-
-    public function getNextStep()
-    {
-        $currentStep = Mage::helper('M2ePro/Module_Wizard')->getStep(
-            Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK
-        );
-
-        $nextStepIndex = array_search($currentStep,$this->steps) + 1;
-
-        return isset($this->steps[$nextStepIndex]) ? $this->steps[$nextStepIndex] : false;
     }
 
     // ########################################
@@ -172,7 +155,7 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
         foreach ($priceIds as $priceId) {
 
             if ($template->getData($priceId . '_mode') ==
-                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE) {
+                Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE) {
                 continue;
             }
 
@@ -209,7 +192,7 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
         foreach ($priceIds as $priceId) {
 
             if ($template->getData($priceId . '_mode') ==
-                Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE) {
+                Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE) {
                 continue;
             }
 
@@ -252,7 +235,7 @@ class Ess_M2ePro_Model_Wizard_MigrationToV6 extends Ess_M2ePro_Model_Wizard
         foreach ($priceIds as $priceId) {
 
             if ($template->getData($priceId . '_mode') ==
-                Ess_M2ePro_Model_Play_Template_SellingFormat::PRICE_ATTRIBUTE) {
+                Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE) {
                 continue;
             }
 

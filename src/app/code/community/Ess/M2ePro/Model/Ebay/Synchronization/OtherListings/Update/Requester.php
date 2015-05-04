@@ -5,19 +5,14 @@
  */
 
 class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update_Requester
-    extends Ess_M2ePro_Model_Connector_Ebay_Inventory_Get_Items
+    extends Ess_M2ePro_Model_Connector_Ebay_Inventory_Get_ItemsRequester
 {
     // ########################################
 
-    protected function makeResponserModel()
+    public function setProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
-        return 'M2ePro/Ebay_Synchronization_OtherListings_Update_Responser';
-    }
+        parent::setProcessingLocks($processingRequest);
 
-    // ########################################
-
-    protected function setLocks($hash)
-    {
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
 
@@ -29,20 +24,12 @@ class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update_Requester
 
         $lockItem->create();
 
-        $this->account->addObjectLock(NULL,$hash);
-        $this->account->addObjectLock('synchronization',$hash);
-        $this->account->addObjectLock('synchronization_ebay',$hash);
+        $this->account->addObjectLock(NULL, $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization', $processingRequest->getHash());
+        $this->account->addObjectLock('synchronization_ebay', $processingRequest->getHash());
         $this->account->addObjectLock(
             Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update::LOCK_ITEM_PREFIX,
-            $hash
-        );
-
-        $this->marketplace->addObjectLock(NULL,$hash);
-        $this->marketplace->addObjectLock('synchronization',$hash);
-        $this->marketplace->addObjectLock('synchronization_ebay',$hash);
-        $this->marketplace->addObjectLock(
-            Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update::LOCK_ITEM_PREFIX,
-            $hash
+            $processingRequest->getHash()
         );
     }
 

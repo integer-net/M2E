@@ -99,8 +99,8 @@
             M2ePro.formData.shippingMethods[i].locations = shipping.locations.evalJSON();
         });
 
-        AttributeSetHandlerObj = new AttributeSetHandler();
-        AttributeSetHandlerObj.attrData = '<?php echo $this->getAttributesJsHtml() ?>';
+        AttributeHandlerObj = new AttributeHandler();
+        AttributeHandlerObj.attrData = '<?php echo $this->getAttributesJsHtml() ?>';
 
         EbayTemplateShippingHandlerObj = new EbayTemplateShippingHandler();
 
@@ -293,7 +293,12 @@
 <input type="hidden" name="shipping[is_custom_template]" value="<?php echo $this->isCustom() ? 1 : 0; ?>" />
 
 <?php if($showBlockedAdvancedMode): ?>
-    <p style="font-size: 15px; font-weight: bolder; color: red;">This set of options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (Sell On eBay -> Configuration -> General -> Mode -> Advanced).</p>
+    <p style="font-size: 15px; font-weight: bolder; color: red;">
+        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration');
+        echo Mage::helper('M2ePro')->__(
+            'This set of options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
+        ?>
+    </p>
 <?php endif; ?>
 
 <div class="entry-edit" id="magento_block_ebay_template_shipping_form_data_location">
@@ -318,7 +323,7 @@
                             <?php endforeach; ?>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The country your product will be shipped from.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The Country your Product will be shipped from.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -330,7 +335,7 @@
                     <td class="value" style="width: auto;">
                         <input id="postal_code" name="shipping[postal_code]" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['postal_code']); ?>" type="text" class="M2ePro-location-or-postal-required M2ePro-required-if-calculated input-text" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Zip/postal code of the item location. Especially useful for \'Collection Only\' items.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Zip/postal code of the Item location. Especially useful for \'Collection Only\' Items.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -342,7 +347,7 @@
                     <td class="value" style="width: auto;">
                         <input id="address" name="shipping[address]" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['address']); ?>" type="text" class="M2ePro-location-or-postal-required input-text" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('City, State of the item location.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('City, State of the Item location.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -384,7 +389,7 @@
                             <?php if ($this->canDisplayFreightShippingType()): ?>
                                 <option id="local_shipping_mode_freight" value="<?php echo Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_FREIGHT; ?>"
                                     <?php if ($formData['local_shipping_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_FREIGHT): ?>selected="selected"<?php endif; ?>>
-                                    <?php echo Mage::helper('M2ePro')->__('Freight: large items'); ?>
+                                    <?php echo Mage::helper('M2ePro')->__('Freight: large Items'); ?>
                                 </option>
                             <?php endif; ?>
                             <option id="local_shipping_mode_local" value="<?php echo Ess_M2ePro_Model_Ebay_Template_Shipping::SHIPPING_TYPE_LOCAL; ?>"
@@ -411,8 +416,8 @@
                             <p class="note">
                                 <span>
                                      <?php echo Mage::helper('M2ePro')->__(
-                                         'You can set up shipping rate tables in eBay to set the amount you charge for postage by delivery method and destination and use them in your M2E Pro listings. Shipping rate tables are set up directly on eBay, not in M2E Pro.
-                                         To set up or edit shipping rate tables, log in to your seller account on eBay.'
+                                         'You can set up Shipping Rate Tables in eBay to set the amount you charge for postage by delivery method and destination and use them in your M2E Pro Listings. Shipping Rate Tables are set up directly on eBay, not in M2E Pro.
+                                         To set up or edit Shipping Rate Tables, log in to your seller account on eBay.'
                                      ); ?>
                                 </span>
                             </p>
@@ -480,7 +485,7 @@
                 <tr>
                     <td colspan="2">
                         <div id="block_notice_ebay_template_shipping_freight" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Freight'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes" style="width: 925px; display: none;">
-                            <?php echo Mage::helper('M2ePro')->__('Specify your own freight shipping options in your item description.'); ?>
+                            <?php echo Mage::helper('M2ePro')->__('Specify your own freight shipping options in your Item description.'); ?>
                         </div>
                     </td>
                 </tr>
@@ -519,7 +524,7 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'Dispatch (or handling) time is the time between when the buyer\'s payment clears and when you send the item.
+                                    'Dispatch (or handling) time is the time between when the buyer\'s payment clears and when you send the Item.
                                     Buyer dissatisfaction increases significantly when dispatch times are more than 3 days.
                                     We strongly encourage dispatch times of 3 days or less. If possible, dispatch the same day you get the buyer\'s payment.'
                                 ); ?>
@@ -541,7 +546,7 @@
                             <p class="note">
                                 <span>
                                     <?php echo Mage::helper('M2ePro')->__(
-                                        'Click & Collect at Argos enables your buyers to collect items at a time that suits them from over 650 Argos stores across the UK.
+                                        'Click & Collect at Argos enables your buyers to collect Items at a time that suits them from over 650 Argos stores across the UK.
                                          <br/>For more details please read <a href="http://sellercentre.ebay.co.uk/click-and-collect" target="_blank">this documentation</a>.'
                                     ) ;?>
                                 </span>
@@ -573,7 +578,7 @@
                             <select name="shipping[local_shipping_discount_profile_id][<?php echo $this->getAccountId(); ?>]" id="local_shipping_discount_profile_id_<?php echo $this->getAccountId(); ?>"></select>
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__(
-                                    'If you have flat shipping rules or calculated shipping rules set up in eBay, you can choose to use them here.<br/><br/>
+                                    'If you have Flat Shipping Rules or Calculated Shipping Rules set up in eBay, you can choose to use them here.<br/><br/>
                                     Click <b>Refresh Profiles</b> to get your latest shipping profiles from eBay.'
                                 ); ?></span>
                             </p>
@@ -610,7 +615,7 @@
 
                                                     <p class="note">
                                                          <span><?php echo Mage::helper('M2ePro')->__(
-                                                             'If you have flat shipping rules or calculated shipping rules set up in eBay, you can choose to use them here.<br/><br/>
+                                                             'If you have Flat Shipping Rules or Calculated Shipping Rules set up in eBay, you can choose to use them here.<br/><br/>
                                                              Click <b>Refresh Profiles</b> to get your latest shipping profiles from eBay.'
                                                          ); ?></span>
                                                     </p>
@@ -623,7 +628,7 @@
                                     <?php else: ?>
                                         <tr>
                                             <td colspan="4" style="text-align: center">
-                                                <?php echo Mage::helper('M2ePro')->__('You do not have eBay accounts added to M2E.')?>
+                                                <?php echo Mage::helper('M2ePro')->__('You do not have eBay Accounts added to M2E Pro.')?>
                                             </td>
                                         </tr>
                                     <?php endif; ?>
@@ -645,7 +650,7 @@
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Offers the shipping discounts according to the \'Promotional shipping rule (applies to all listings)\' settings in your eBay Account.
+                                'Offers the shipping discounts according to the \'Promotional shipping rule (applies to all Listings)\' settings in your eBay Account.
                                 Shipping discounts are set up directly on eBay, not in M2E Pro. To set up or edit shipping discounts, log in to your seller account on eBay.'
                             ); ?></span>
                         </p>
@@ -691,8 +696,8 @@
         <div class="hor-scroll">
 
             <div id="block_notice_ebay_template_general_general_cross_border_trade" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Cross Border Trade'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('The international site visibility feature allows qualifying listings to be posted on international sites.
-<br/>Buyers on these sites will see the listings exactly as you originally post them.
+                <?php echo Mage::helper('M2ePro')->__('The international site visibility feature allows qualifying Listings to be posted on international sites.
+<br/>Buyers on these sites will see the Listings exactly as you originally post them.
 <br/><br/><b>Note:</b> There may be additional eBay charges for this option.'); ?>
             </div>
 
@@ -757,8 +762,8 @@
                             </select>
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__(
-                                'Simplifies selling an item to an international buyer. Click <a href="http://pages.ebay.com/help/sell/shipping-globally.html" target="_blank">here</a> to find out more.
-                                <br /><br /><strong>Note:</strong> This option is available for eBay Motors only under "Parts & Accessories" category.'
+                                'Simplifies selling an Item to an international buyer. Click <a href="http://pages.ebay.com/help/sell/shipping-globally.html" target="_blank">here</a> to find out more.
+                                <br/><br/><b>Note:</b> This option is available for eBay Motors only under "Parts & Accessories" Category.'
                                 ); ?></span>
                             </p>
                         </td>
@@ -862,8 +867,8 @@
                             <p class="note">
                                 <span>
                                     <?php echo Mage::helper('M2ePro')->__(
-                                        'You can set up shipping rate tables in eBay to set the amount you charge for postage by delivery method and destination and use them in your M2E Pro listings. Shipping rate tables are set up directly on eBay, not in M2E Pro.
-                                        To set up or edit shipping rate tables, log in to your seller account on eBay.'
+                                        'You can set up Shipping Rate Tables in eBay to set the amount you charge for postage by delivery method and destination and use them in your M2E Pro Listings. Shipping Rate Tables are set up directly on eBay, not in M2E Pro.
+                                        To set up or edit Shipping Rate Tables, log in to your seller account on eBay.'
                                     ); ?>
                                 </span>
                             </p>
@@ -893,8 +898,8 @@
                         <td class="value">
                             <select name="shipping[international_shipping_discount_profile_id][<?php echo $this->getAccountId(); ?>]" id="international_shipping_discount_profile_id_<?php echo $this->getAccountId(); ?>"></select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Use the Flat Shipping Rule and Calculated Shipping Rule profiles, which were created on eBay.
-                                                                            <br /><br /><strong>Note:</strong> press "Refresh Profiles" button for upload new or refreshes eBay Shipping profiles.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Use the Flat Shipping Rule and Calculated Shipping Rule Profiles, which were created on eBay.
+                                                                            <br/><br/><b>Note:</b> Press "Refresh Profiles" button for upload new or refreshes eBay Shipping Profiles.'); ?></span>
                             </p>
                         </td>
                         <td class="value">
@@ -928,8 +933,8 @@
                                                 </select>
 
                                                 <p class="note">
-                                                        <span><?php echo Mage::helper('M2ePro')->__('Use the Flat Shipping Rule and Calculated Shipping Rule profiles, which were created on eBay.
-                                                                                                    <br /><br /><strong>Note:</strong> press "Refresh Profiles" button for upload new or refreshes eBay Shipping profiles.'); ?></span>
+                                                        <span><?php echo Mage::helper('M2ePro')->__('Use the Flat Shipping Rule and Calculated Shipping Rule Profiles, which were created on eBay.
+                                                                                                    <br/><br/><b>Note:</b> Press "Refresh Profiles" button for upload new or refreshes eBay Shipping Profiles.'); ?></span>
                                                 </p>
                                             </td>
                                             <td class="value">
@@ -940,7 +945,7 @@
                                 <?php else: ?>
                                     <tr>
                                         <td colspan="4" style="text-align: center">
-                                            <?php echo Mage::helper('M2ePro')->__('You do not have eBay accounts added to M2E.')?>
+                                            <?php echo Mage::helper('M2ePro')->__('You do not have eBay accounts added to M2E Pro.')?>
                                         </td>
                                     </tr>
                                 <?php endif; ?>
@@ -1068,7 +1073,7 @@
 
                     <tr id="dimensions_ca_tr" style="display: none;">
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Dimensions<br />(Width/Height/Depth)'); ?>:</label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Dimensions<br/>(Width/Height/Depth)'); ?>:</label>
                         </td>
                         <td class="value">
                                 <span id="dimension_width_attribute_span">
@@ -1166,7 +1171,7 @@
                                 </optgroup>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('The Weight Attribute must have the weight of the item.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('The Weight Attribute must have the weight of the Item.'); ?></span>
                             </p>
                         </td>
                         <td class="note">
@@ -1206,7 +1211,7 @@
         <div class="hor-scroll">
 
             <div id="block_notice_ebay_template_shipping_exclude_locations" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Excluded Locations'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('To exclude buyers in certain locations from purchasing your item, create a shipping exclusion list.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('To exclude buyers in certain locations from purchasing your Item, create a Shipping Exclusion List.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -1330,7 +1335,7 @@
 
         <div id="excluded_locations_popup_content_general" style="min-height: 380px;">
         <div id="block_notice_ebay_template_shipping_general_exclude_locations_popup" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Excluded Shipping Locations'); ?>">
-            <?php echo Mage::helper('M2ePro')->__('Select the regions or countries you don\'t ship to.'); ?>
+            <?php echo Mage::helper('M2ePro')->__('Select the Regions or Countries you don\'t ship to.'); ?>
         </div>
 
         <input type="hidden" id="excluded_locations_popup_hidden" value='' />
@@ -1413,7 +1418,7 @@
         </div>
 
         <div id="excluded_locations_popup_controls" style="float: right;">
-            <a href="javascript: void(0);" onclick="EbayTemplateShippingHandlerObj.excludeListPopup.close()">Cancel</a>
+            <a href="javascript:void(0);" onclick="EbayTemplateShippingHandlerObj.excludeListPopup.close()"><?php echo Mage::helper('M2ePro')->__('Cancel'); ?></a>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <?php echo $this->getChildHtml('save_popup_button'); ?>
         </div>

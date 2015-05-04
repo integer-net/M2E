@@ -153,7 +153,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Update
         /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
         $dispatcherObject->processConnector(
-            'orders', 'update', 'items', array('items' => $items), $account
+            'orders', 'update', 'itemsRequester', array('items' => $items), $account
         );
     }
 

@@ -43,7 +43,7 @@ abstract class Ess_M2ePro_Model_Connector_Translation_Requester extends Ess_M2eP
             $this->requestExtraData['account'] = $this->account->getChildObject()->getTranslationHash();
         }
 
-        parent::process();
+        return parent::process();
     }
 
     // ########################################

@@ -11,27 +11,30 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
     // --------------------------------
 
-    loadActionHtml: function(selectedProductsIds, callback)
+    loadActionHtml: function(selectedProductsIds, callback, productName)
     {
         this.actionHandler.setProductsIds(selectedProductsIds);
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/index') ,
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : {
-                    products_ids: [this.actionHandler.getProductsIds()]
-                },
-                onSuccess: function(transport)
-                {
-                    var content = transport.responseText;
-                    var title = M2ePro.translator.translate('Sell on Another eBay Site');
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/index'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {
+                products_ids: [this.actionHandler.getProductsIds()]
+            },
+            onSuccess: function(transport) {
 
-                    this.openPopUp(title, content);
+                var content = transport.responseText;
+                var title = M2ePro.translator.translate('Sell on Another eBay Site');
 
-                    callback && callback();
+                if (productName) {
+                    title += '&nbsp;' + M2ePro.translator.translate('Product') + '&nbsp;"' + productName + '"';
+                }
 
-                }.bind(this)
-            });
+                this.openPopUp(title, content);
+
+                callback && callback();
+
+            }.bind(this)
+        });
     },
 
     //----------------------------------
@@ -85,7 +88,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
         initializationMagentoBlocks();
 
         var itemStep = this.actionHandler.getItemStep();
-        ['tutorial', 'destination', 'policy', 'translation', 'categories'].forEach(function(el){
+        ['tutorial', 'destination', 'policy', 'translation', 'categories'].forEach(function(el) {
             if ($('data_container_step_' + el)) {
                 if (el == itemStep) {
                     $('data_container_step_' + el).show();
@@ -170,6 +173,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
         new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/getAccounts'), {
             method: 'get',
             onSuccess: function(transport) {
+
                 var accountSelector = $('transferring_account_id');
 
                 if (accountSelector) {
@@ -222,7 +226,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
         var self = this;
 
-        this.actionHandler.loadTargetListings(accountId, marketplaceId, storeId, function(){
+        this.actionHandler.loadTargetListings(accountId, marketplaceId, storeId, function() {
             var listingsSelector = $('transferring_existing_listing');
 
             if (listingsSelector) {
@@ -267,7 +271,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
         var self = this;
 
-        this.actionHandler.loadDataStepPolicy(accountId, marketplaceId, storeId, function(){
+        this.actionHandler.loadDataStepPolicy(accountId, marketplaceId, storeId, function() {
 
             self.actionHandler.pushStep('policy');
 
@@ -286,7 +290,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
         var self = this;
 
-        this.actionHandler.loadDataStepTranslation(account, function(){
+        this.actionHandler.loadDataStepTranslation(account, function() {
 
             self.actionHandler.pushStep('translation');
 
@@ -307,7 +311,6 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    //@todo logic!!!
     refreshBreadcrumb: function()
     {
         if ($('transferring_use_custom_settings')) {
@@ -481,6 +484,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
             method: 'post',
             parameters: params,
             onSuccess: function() {
+
                 var option = $('transferring_marketplace_id').down('option[value='+marketplaceId+']');
                 var title = 'eBay ' + option.innerHTML;
 
@@ -496,7 +500,6 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    //@todo is logic
     validate: function()
     {
         var validationResult = [];
@@ -556,11 +559,10 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
     refreshTranslationAccount: function()
     {
-        this.actionHandler.refreshTranslationAccount(function(){
+        this.actionHandler.refreshTranslationAccount(function() {
             $('transferring_translation_service') &&
                 EbayListingTransferringHandlerObj.translationServiceChange($('transferring_translation_service'));
         });
-
     },
 
     //----------------------------------
@@ -616,7 +618,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
 
     showFailedProducts: function()
     {
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/getFailedProductsGrid'), {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/getFailedProductsGrid'), {
             method: 'get',
             parameters: {
                 componentMode: M2ePro.customData.componentMode,
@@ -640,7 +642,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
                     hideEffect: Element.hide,
                     showEffect: Element.show,
                     closeCallback: function() {
-                        if (EbayListingTransferringHandlerObj.actionHandler.isNeedToSetCatalogPolicy()){
+                        if (EbayListingTransferringHandlerObj.actionHandler.isNeedToSetCatalogPolicy()) {
                             EbayListingTransferringHandlerObj.actionHandler.redirectToCategorySettings();
                         } else if (EbayListingTransferringHandlerObj.actionHandler.hasTargetListing()) {
                             if (!EbayListingTransferringHandlerObj.actionHandler.hasAllFailedTranslationProducts() &&
@@ -683,7 +685,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
         if (EbayListingTransferringHandlerObj.failedProductsPopUp) {
             EbayListingTransferringHandlerObj.failedProductsPopUp.close();
         } else if (EbayListingTransferringHandlerObj.actionHandler.hasSuccessProducts()) {
-            if (EbayListingTransferringHandlerObj.actionHandler.isNeedToSetCatalogPolicy()){
+            if (EbayListingTransferringHandlerObj.actionHandler.isNeedToSetCatalogPolicy()) {
                 EbayListingTransferringHandlerObj.actionHandler.redirectToCategorySettings();
             } else if (EbayListingTransferringHandlerObj.actionHandler.hasTargetListing()) {
 
@@ -718,16 +720,16 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
                 var countAccounts = $('transferring_account_id').options.length;
             }
 
-            EbayListingTransferringHandlerObj.refreshAccounts(function(){
+            EbayListingTransferringHandlerObj.refreshAccounts(function() {
                 if ($('transferring_account_id')) {
                     var selectAccount = $('transferring_account_id');
                     if (selectAccount.options.length != countAccounts) {
                         var maxValue = 0;
-                        $A(selectAccount.options).each(function(el){
+                        $A(selectAccount.options).each(function(el) {
                             if (parseInt(el.value) > maxValue) { maxValue = parseInt(el.value); el.selected = true; }
                         });
                     } else {
-                        $A(selectAccount.options).each(function(el){
+                        $A(selectAccount.options).each(function(el) {
                             if (el.value == targetAccount) { el.selected = true; }
                         });
                     }
@@ -747,7 +749,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
     {
         if (!el.value) { return; }
 
-        $A(el.options).each(function(el){
+        $A(el.options).each(function(el) {
             if (!el.value) { el.remove(); }
         });
         var marketplaceUrl = this.actionHandler.getMarketplaceUrl(el.value);
@@ -772,16 +774,16 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
         var intervalId = setInterval(function() {
             if (!win.closed) { return; }
             clearInterval(intervalId);
-            EbayListingTransferringHandlerObj.refreshStores(function(){
+            EbayListingTransferringHandlerObj.refreshStores(function() {
                 if ($('transferring_store_id')) {
                     var selectStore = $('transferring_store_id');
                     if (selectStore.options.length != countStores) {
                         var maxValue = 0;
-                        $A(selectStore.options).each(function(el){
+                        $A(selectStore.options).each(function(el) {
                         if (parseInt(el.value) > maxValue) { maxValue = parseInt(el.value); el.selected = true; }
                     });
                     } else {
-                        $A(selectStore.options).each(function(el){
+                        $A(selectStore.options).each(function(el) {
                             if (el.value == targetStore) { el.selected = true; }
                         });
                     }
@@ -799,7 +801,7 @@ EbayListingTransferringHandler = Class.create(CommonHandler, {
     existingListingChange: function(el)
     {
         if (!el.value) { return; }
-        el.childElements().each(function(el){
+        el.childElements().each(function(el) {
             if (!el.value) { el.remove(); }
         });
         this.refreshBreadcrumb();

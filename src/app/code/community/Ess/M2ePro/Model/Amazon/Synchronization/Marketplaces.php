@@ -62,7 +62,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces
 
         $componentName = '';
         if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Amazon::TITLE.' ';
+            $componentName = Mage::helper('M2ePro/Component_Amazon')->getTitle() . ' ';
         }
 
         $params = $this->getParams();
@@ -71,7 +71,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces
         $marketplace = Mage::helper('M2ePro/Component_Amazon')
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
-        $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($componentName.$marketplace->getTitle()));
+        $this->getActualLockItem()->setTitle($componentName.Mage::helper('M2ePro')->__($marketplace->getTitle()));
     }
 
     public function performActions()
@@ -82,7 +82,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces
         $result = !$this->processTask('Marketplaces_Categories') ? false : $result;
         $result = !$this->processTask('Marketplaces_Specifics') ? false : $result;
 
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
 
         return $result;
     }

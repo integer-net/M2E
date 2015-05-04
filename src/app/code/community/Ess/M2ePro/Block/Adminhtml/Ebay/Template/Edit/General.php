@@ -49,6 +49,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit_General extends Mage_Adminht
             $collection = Mage::getModel('M2ePro/Marketplace')->getCollection();
             $collection->addFieldToFilter('component_mode', Ess_M2ePro_Helper_Component_Ebay::NICK);
             $collection->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
+            $collection->setOrder('sorder', 'ASC');
 
             $this->enabledMarketplaces = $collection;
         }

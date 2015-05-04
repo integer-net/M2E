@@ -18,6 +18,13 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function getTitle()
+    {
+        return Mage::helper('M2ePro')->__(self::TITLE);
+    }
+
+    // ########################################
+
     public function isEnabled()
     {
         return (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/component/'.self::NICK.'/', 'mode');
@@ -119,9 +126,55 @@ class Ess_M2ePro_Helper_Component_Play extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function getValidDispatchToValues()
+    {
+        return array(
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH,
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK,
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA,
+        );
+    }
+
+    public function isValidDispatchTo($dispatchTo)
+    {
+        return in_array($dispatchTo, $this->getValidDispatchToValues());
+    }
+
+    // ----------------------------------------
+
+    public function getAllowedDispatchToValuesForGbr()
+    {
+        return array(
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH,
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK,
+        );
+    }
+
+    public function getAllowedDispatchToValuesForEuro()
+    {
+        return array(
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH,
+            Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA,
+        );
+    }
+
+    // ----------------------------------------
+
+    public function isDispatchToAllowedForGbr($dispatchTo)
+    {
+        return in_array($dispatchTo, $this->getAllowedDispatchToValuesForGbr());
+    }
+
+    public function isDispatchToAllowedForEuro($dispatchTo)
+    {
+        return in_array($dispatchTo, $this->getAllowedDispatchToValuesForEuro());
+    }
+
+    // ########################################
+
     public function clearCache()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues(self::NICK);
     }
 
     // ########################################

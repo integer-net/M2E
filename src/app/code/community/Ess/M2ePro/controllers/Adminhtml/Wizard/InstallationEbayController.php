@@ -221,15 +221,22 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         );
 
         $post = $this->getRequest()->getPost();
+        unset($post['form_key']);
         foreach ($keys as $key) {
             (!isset($post[$key]) || !$post[$key]) && $post[$key] = 'undefined';
         }
 
+        $registry = Mage::getModel('M2ePro/Registry')->load('wizard_license_form_data', 'key');
+        $registry->setData('key', 'wizard_license_form_data');
+        $registry->setData('value', json_encode($post));
+        $registry->save();
+
         if (!Mage::helper('M2ePro/Module_License')->getKey()) {
 
             $licenseResult = Mage::helper('M2ePro/Module_License')->obtainRecord(
-                $post['email'],$post['firstname'],$post['lastname'],
-                $post['country'],$post['city'],$post['postal_code']
+                $post['email'],
+                $post['firstname'], $post['lastname'],
+                $post['country'], $post['city'], $post['postal_code']
             );
 
             if (!$licenseResult) {

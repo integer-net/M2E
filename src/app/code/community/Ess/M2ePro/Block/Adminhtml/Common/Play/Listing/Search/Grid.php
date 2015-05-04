@@ -93,7 +93,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
         ));
 
         $this->addColumn('name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / SKU'),
+            'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / Product SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -138,7 +138,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
         ));
 
         $this->addColumn('online_qty', array(
-            'header' => Mage::helper('M2ePro')->__('Play.com QTY'),
+            'header' => Mage::helper('M2ePro')->__('QTY'),
             'align' => 'right',
             'width' => '70px',
             'type' => 'number',
@@ -148,7 +148,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
         ));
 
         $this->addColumn('online_price_gbr', array(
-            'header' => Mage::helper('M2ePro')->__('Play.com Price GBP'),
+            'header' => Mage::helper('M2ePro')->__('Price GBP'),
             'align' => 'right',
             'width' => '70px',
             'type' => 'number',
@@ -158,7 +158,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
         ));
 
         $this->addColumn('online_price_euro', array(
-            'header' => Mage::helper('M2ePro')->__('Play.com Price EUR'),
+            'header' => Mage::helper('M2ePro')->__('Price EUR'),
             'align' => 'right',
             'width' => '70px',
             'type' => 'number',
@@ -233,10 +233,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
         $value = '<span>'.Mage::helper('M2ePro')->escapeHtml($value).'</span>';
 
         $urlParams = array();
@@ -267,6 +263,22 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
             .Mage::helper('M2ePro')->__('SKU')
             .':</strong> '
             .Mage::helper('M2ePro')->escapeHtml($tempSku);
+
+        if ($row->getChildObject()->getVariationManager()->isVariationProduct() &&
+            $row->getChildObject()->getVariationManager()->isVariationProductMatched()
+        ) {
+            $productOptions = $row->getChildObject()->getVariationManager()->getProductOptions();
+
+            $value .= '<br/>';
+            $value .= '<div style="font-size: 11px; color: grey;"><br/>';
+            foreach ($productOptions as $attribute => $option) {
+                !$option && $option = '--';
+                $value .= '<strong>' . Mage::helper('M2ePro')->escapeHtml($attribute) .
+                    '</strong>:&nbsp;' . Mage::helper('M2ePro')->escapeHtml($option) . '<br/>';
+            }
+            $value .= '</div>';
+            $value .= '<br/>';
+        }
 
         return $value;
     }
@@ -392,33 +404,33 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
             switch ($lock->getTag()) {
 
                 case 'new_sku_action':
-                    $title = Mage::helper('M2ePro')->__('New SKU In Progress...');
-                    $value .= '<br><span style="color: #605fff">['.$title.']</span>';
+                    $title = Mage::helper('M2ePro')->__('New SKU in Progress...');
+                    $value .= '<br/><span style="color: #605fff">['.$title.']</span>';
                     break;
 
                 case 'list_action':
-                    $title = Mage::helper('M2ePro')->__('List In Progress...');
-                    $value .= '<br><span style="color: #605fff">['.$title.']</span>';
+                    $title = Mage::helper('M2ePro')->__('List in Progress...');
+                    $value .= '<br/><span style="color: #605fff">['.$title.']</span>';
                     break;
 
                 case 'relist_action':
-                    $title = Mage::helper('M2ePro')->__('Relist In Progress...');
-                    $value .= '<br><span style="color: #605fff">['.$title.']</span>';
+                    $title = Mage::helper('M2ePro')->__('Relist in Progress...');
+                    $value .= '<br/><span style="color: #605fff">['.$title.']</span>';
                     break;
 
                 case 'revise_action':
-                    $title = Mage::helper('M2ePro')->__('Revise In Progress...');
-                    $value .= '<br><span style="color: #605fff">['.$title.']</span>';
+                    $title = Mage::helper('M2ePro')->__('Revise in Progress...');
+                    $value .= '<br/><span style="color: #605fff">['.$title.']</span>';
                     break;
 
                 case 'stop_action':
-                    $title = Mage::helper('M2ePro')->__('Stop In Progress...');
-                    $value .= '<br><span style="color: #605fff">['.$title.']</span>';
+                    $title = Mage::helper('M2ePro')->__('Stop in Progress...');
+                    $value .= '<br/><span style="color: #605fff">['.$title.']</span>';
                     break;
 
                 case 'stop_and_remove_action':
-                    $title = Mage::helper('M2ePro')->__('Stop And Remove In Progress...');
-                    $value .= '<br><span style="color: #605fff">['.$title.']</span>';
+                    $title = Mage::helper('M2ePro')->__('Stop And Remove in Progress...');
+                    $value .= '<br/><span style="color: #605fff">['.$title.']</span>';
                     break;
 
                 default:
@@ -433,7 +445,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search_Grid extends Mage_Ad
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
         $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to listing'));
-        $iconSrc = $this->getSkinUrl('M2ePro').'/images/goto_listing.png';
+        $iconSrc = $this->getSkinUrl('M2ePro/images/goto_listing.png');
         $url = $this->getUrl('*/adminhtml_common_play_listing/view/', array(
             'id'=>$row->getData('listing_id'),
             'filter'=>base64_encode(

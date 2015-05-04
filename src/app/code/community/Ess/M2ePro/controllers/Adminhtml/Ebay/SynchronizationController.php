@@ -74,7 +74,7 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
         $task = $this->getRequest()->getParam('task');
 
         if (is_null($task)) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select item(s) to clear'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Item(s) to clear'));
             return $this->_redirect('*/*/index');
         }
 
@@ -209,9 +209,9 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
         if ($synchronizationEbayOtherListingsProcessing > 0) {
             $warningMessages[] = Mage::helper('M2ePro')->__(
                 'eBay 3rd Party Listings are being downloaded now. ' .
-                'They will be available soon in %menu_label% > Listings > 3rd Party. ' .
+                'They will be available soon in %menu_root% > 3rd Party. ' .
                 'You can continue working with M2E Pro.',
-                Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel()
+                Mage::helper('M2ePro/View_Ebay')->getMenuPath('listings')
             );
         }
 

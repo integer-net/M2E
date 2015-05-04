@@ -60,7 +60,8 @@ class Ess_M2ePro_Block_Adminhtml_Development_Info_Mysql_Module extends Mage_Admi
             'Config' => array(
                 'm2epro_primary_config',
                 'm2epro_config',
-                'm2epro_synchronization_config'
+                'm2epro_synchronization_config',
+                'm2epro_cache_config'
             )
         );
     }

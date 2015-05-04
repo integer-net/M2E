@@ -28,12 +28,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration extends Mage_Adminhtml_Block
         $this->removeButton('save');
         $this->removeButton('edit');
 
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-
         //------------------------------
         $this->setTemplate('M2ePro/ebay/configuration.phtml');
         //------------------------------

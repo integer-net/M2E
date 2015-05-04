@@ -1,3 +1,81 @@
+* 6.3.0 (r8630) (20/04/2015)
+
+* Added: Ability to see why Product was not listed automatically by Synchronization Policy Rules
+* Added: [eBay] Terapeak (terapeak.com) was integrated to the eBay View Mode of the Listing
+* Added: [Amazon] Understandable Help Blocks and Tips in many places
+* Added: [Amazon] Calculation of Price and QTY for Amazon Parent Product
+* Improvement: Many improvements of integrations and migrations wizards
+* Improvement: [Amazon] Search Tool of Amazon Parent/Child Products (ASIN/ISBN)
+* Improvement: [Amazon] Behaviour of how Magento Attributes are selected for source settings
+* Improvement: [Amazon] Bulk of improvements for Amazon Child Product on Seller View Mode of the listing
+* Fix: Wrong attributes labels of Configurable Product if Store View is different than "Default"
+* Fix: Critical issues in migration from 6.2.4.2 to 6.2.4.4 (for users with table prefix enabled)
+* Fix: Wrong usage of Database core_read and core_write connections (critical with LB conception)
+* Fix: Some icons were not shown because wrong paths to them (also magento version)
+* Fix: Several fixes of Advanced Filter feature for Listing View grids
+* Fix: [Ebay] Item specifics UI crash if selected attribute was removed
+* Fix: [Amazon] Ability to select another Amazon Category if former was removed by Amazon
+* Fix: [Amazon] Stop / Stop and Remove / Remove and Delete from listings actions fixes
+* Fix: [Amazon] A lot of fixes for management of Amazon Parent/Child Products
+* Fix: [Amazon] Some Products changes were written to the 3rd Party Listings logs
+
+* 6.2.4.5 (r8473) (09/04/2015) [Beta Testing / Nonpublic Release]
+
+* Improvement: [Amazon] Many help blocks and tip improvements
+* Improvement: [Amazon] Management of Magento Variational Products
+* Fix: Cron is not working sometimes (service issue)
+* Fix: Wrong filtering by Advanced Filter if Listing store view not "Admin Values"
+* Fix: "Track Direct Database changes" doesn't generate many list action errors
+* Fix: [eBay] Magento Attributes were available for selection in Simple Mode
+* Fix: [Amazon] "UPC/EAN is not found on Amazon..." error during list for New ASIN Products
+* Fix: [Amazon] Wrong number of Amazon Items for each listing in Listings grid
+* Fix: [Amazon] Manufacturer Part Number fixes in Description Policy
+* Removed: [Amazon] Useless Amazon Item data filtering on Magento View of listing grid
+
+* 6.2.4.4 (r8441) (07/04/2015) [Beta Testing / Nonpublic Release]
+
+* Improvements: Some sort of advanced filter improvements
+* Improvements: Many improvements of texts in help blocks and tips
+* Fix: Some major migration issues to the 6.2.4.3 version
+* Fix: Wrong attributes/options labels of Configurable Products
+* Fix: Channel tab is shown if only one Channel is enabled
+* Fix: Remove from Channel and Listing options did not work in some cases
+* Fix: [eBay] Magento Attributes were available for selection in Simple Mode
+* Fix: [Amazon] Issue if Magento Simple Product custom options are removed
+* Fix: [Amazon] Details and Images Revise Rules did not work for Simple Products
+* Fix: [Amazon] Sort order of Marketplaces in filters and dropdowns
+* Fix: [Amazon] Many fixes of Amazon Listings Management Interface
+* Fix: [Amazon] Many fixes of Description Policy creation/editing Interface
+
+* 6.2.4.3 (r8391) (05/04/2015) [Beta Testing / Nonpublic Release]
+
+* Added: Full support of Dynamic/Fixed prices for Bundle Products
+* Added: Support of Percents in Special Price for Bundle Products
+* Added: [Amazon] Full support of Amazon Products with Parent/Child relations
+* Added: [Amazon] Ability to update Amazon Product details through Description Policy
+* Added: [Amazon] Ability to sell Magento Variation product as Parent/Child Amazon Product
+* Added: [Amazon] Settings for automatic Product Details synchronization in Synchronization Policy
+* Improvement: Using of "Policy" term instead of "Template" for all integrations
+* Improvement: Magento Attributes are inserted to the cursor position for text fields
+* Improvement: [eBay] Some 3rd party Synchronization settings were moved from Account to Global Settings
+* Improvement: [eBay] Prevention of "Restricted Revise" error messages even if Orders Synchronization is disabled
+* Improvement: [Amazon] Ability to sell Magento Variation product with Certain options
+* Improvement: [Amazon] Many major improvements of search ASIN(s) tool (separately for simple and variation products)
+* Improvement: [Amazon / Rakuten.com / Play.com] User Interface is very similar to eBay integration
+* Improvement: [Amazon / Rakuten.com / Play.com] Automatic adding of Magento Products is similar with eBay integration
+* Improvement: [Amazon / Rakuten.com / Play.com] Ability to insert Magento Attributes to "Condition Note" value
+* Improvement: [Amazon / Rakuten.com / Play.com] Logging system to provide more Details for each record
+* Fix: Magento Products Title are displayed without any reductions in cells of grids
+* Fix: [eBay] Duplicating of Policy Title during Policy Settings Duplicating
+* Fix: [eBay] Filtering and Sorting "Available QTY" column in many places
+* Fix: [eBay] Many fixes for Items with "Out Of Stock" enabled in 3rd party listings
+* Fix: [eBay] SKU could remain in "receiving..." state much time in 3rd party listings
+* Fix: [eBay] "Condition Description" property was renamed to "Seller Notes"
+* Fix: [eBay] Many different fixes for last versions of Mozilla and Internet Explore browsers
+* Removed: Useless "Refresh" button in whole extension
+* Removed: [Amazon / Rakuten.com / Play.com] Necessity of Attributes Sets selection for creating Policies and Listings
+* Removed: [Amazon / Rakuten.com / Play.com] Not Set / Not changeable options for some settings in Policies and Listings
+
 * 6.2.4.2 (r7990) (01/03/2015)
 
 * Improvement: [eBay] Ability to use translation service for products with different attribute sets (attributes level)
@@ -193,14 +271,14 @@
 * Fix: [eBay] Donation problem when Selling Format Template used as Policy
 * Fix: [Play.com] update shipping status for orders did not work
 
-* 6.1.2 (r6218) (01/04/2014) [Beta Testing]
+* 6.1.2 (r6218) (01/04/2014) [Beta Testing / Nonpublic Release]
 
 * Fix: major fixes of migration to the extension of 6.1.1 version
 * Fix: wrong calculation of qty for list/relist/stop conditions in synchronization policy/template
 * Fix: manage qty settings when manage stock is disabled or backorders is enabled
 * Fix: ability to setup settings for "Manage Stock" and "Backorders" features
 
-* 6.1.1 (r6192) (26/03/2014) [Beta Testing]
+* 6.1.1 (r6192) (26/03/2014) [Beta Testing / Nonpublic Release]
 
 * Added: [eBay] support of Minimum Advertised Price (MAP) for US marketplace
 * Added: [eBay] ability to use Strike-Through Pricing for Australia marketplace
@@ -421,7 +499,7 @@
 * Fix: [eBay] "Product Price" option of "Price" is selected automatically, when "Listing Type" is "Fixed"
 * Fix: [Amazon] wrong state in magento order, if buyer supplied full state name
 
-* 6.0.1 (r5105) (06/08/2013) [Beta Testing]
+* 6.0.1 (r5105) (06/08/2013) [Beta Testing / Nonpublic Release]
 
 * Improvement: [eBay] Display sku for 3rd party listings on search page like at 3rd party listing view page
 * Improvement: [Amazon] Sale price start & end date is now taken from main product if variation price source = main
@@ -429,7 +507,7 @@
 * Fix: eBay listing products were showing in common listing search grid
 * Fix: Wrong state in magento order, if buyer supplied the whole state name instead of abbreviation
 
-* 6.0.0 (r5036) (31/07/2013) [Beta Testing / New Users]
+* 6.0.0 (r5036) (31/07/2013) [Beta Testing / Nonpublic Release / New Users]
 
 * Total new extension "M2E Pro eBay Integration"
 * Added: Separation of M2E Pro main menu to "Sell On eBay" and "Sell On Multi-Channels" (Amazon, Rakuten.com, Play.com)
@@ -622,523 +700,14 @@
 * Fix: incomplete magento orders for downloadable products
 * Fix: invalid qty in magento order if product was purchased several times
 
-* 5.0.1 (r3179) (14/02/2013) [Beta Testing]
+* 5.0.1 (r3179) (14/02/2013) [Beta Testing / Nonpublic Release]
 
 * Improvement: [Buy] Rakuten.com SKU lookup supports the multi-variations products
 * Improvement: [eBay] ability to disable required eBay specifics (multi-variation conflict)
 * Fix: [Buy] marketplace was disabled after installation or upgrade
 * Fix: [Buy] listings, synchronizations logs filters and sorts did not work properly
 
-* 5.0.0 (r3066) (04/02/2013) [Beta Testing]
+* 5.0.0 (r3066) (04/02/2013) [Beta Testing / Nonpublic Release]
 
 * Added: [Buy] Rakuten.com / Buy.com integration has been added
 * Fix: [eBay] Fatal error: Call to a member function getListingId() on a non-object
-
-* 4.2.9 (r3177) [Beta Testing]
-
-* Improvement: [Amazon] the sale price will be automatically revised by synchronization template
-* Improvement: [eBay] number of variations were increased to 250 instead 120 as before
-* Fix: [eBay] gallery images limitation "up to [N]" was wrong
-* Fix: custom status was not set for shipped magento orders
-* Fix: predefined customer email was updated in some cases
-* Fix: double qty decrease after placing of combined order for the same item
-* Fix: some installation problems with mysql configuration
-* Fix: wizard fatal error bug when extension has been updated through many versions
-
-* 4.2.8 (r3060)
-
-* Fix: [Amazon] ability to delete "Blocked" items
-* Fix: [eBay] Fatal error: Call to member function getMeasurementSystem() on a non-object
-* Fix: Call to undefined method Varien_Db_Adapter_Pdo_Mysql::isTableExists() (upgrade to 4.2.7)
-* Fix: wrong "Knowledge Base" url in the support page
-* Fix: critical issue when create listing from Categories Source
-
-* 4.2.7 (r3011)
-
-* Added: [Amazon] magento's gift messages support
-* Improvement: [eBay] shipping rate tables per weight
-* Fix: [Amazon] wrong totals in magento orders in some cases
-* Fix: [Amazon] buyer email was not shown in some cases
-* Fix: [eBay] parts compatibility tool broken for magento versions lower than 1.5.1
-* Fix: [eBay] parts compatibility tool caused empty grid at listing view page
-* Fix: [eBay] Warning: include(app/design/frontend/base/default/template/M2ePro/template/description/template/image.phtml): failed to open stream: No such file or directory
-* Fix: Base table or view not found: 1146 Table 'prefix_m2epro_ebay_motor_specific' doesn't exist
-* Fix: custom status was not set for shipped magento orders
-
-* 4.2.6 (r2901)
-
-* Fix: upgrade to the 4.2.5 critical issue(s)
-
-* 4.2.5 (r2886)
-
-* Added: [eBay] ability to add product gallery images from custom attribute
-* Added: [eBay] parts compatibility implementation
-* Added: [eBay] supersize images option for main and gallery images
-* Added: manual or automatic run mode column was added to the 3rd party log
-* Added: global magento admin panel notifications
-* Added: product tax class option in account's orders settings
-* Improvement: possibility to execute synchronization for single marketplace
-* Improvement: [Amazon] marketplace related store view was moved to the account 3rd party tab
-* Improvement: [Amazon] possibility to create magento orders for FBA orders without reducing inventory
-* Improvement: [eBay] receiving sku for the 3rd party listings
-* Improvement: [eBay] sending tracking details separately for each item in the order
-* Improvement: 3rd Party listings log improvements
-* Fix: [Amazon] automatic moving 3rd party listings critical issue
-* Fix: [Amazon] wrong totals in magento order for orders which have tax information and tax source set to amazon
-* Fix: [eBay] "Invalid <WeightMinor>. Enter a value between 0 and 15 for <WeightMinor>."
-* Fix: [eBay] wrong Buy It Now price when some variation item is out off stock
-* Fix: [eBay] wrong url for listings on Motors marketplace
-* Fix: [eBay] wrong price for configurable and bundle products
-* Fix: [eBay] did not used store view options titles for grouped products
-* Fix: [eBay] problem with uploading images with watermarks on eBay if its contains spaces in the path
-* Fix: [eBay] order information was not updated if order had a refund transactions
-* Fix: processing system caught "Instance does not exist"
-* Fix: perform automatically listing categories actions when new product has been added
-* Fix: SQLSTATE[42000]: Syntax error or access violation: 1142 UPDATE command denied to user 'user'@'host'
-* Fix: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'undefined' in 'where clause'
-* Removed: ability to select admin store in account's orders settings
-
-* 4.2.4 (r2619)
-
-* Fix: upgrade to the 4.2.3 critical issue
-* Fix: SQLSTATE[HY093]: Invalid parameter number: no parameters were bound
-
-* 4.2.3 (r2614)
-
-* Added: [Amazon] new "Inactive (Blocked)" status for items
-* Improvement: add log message when item status was changed on channel
-* Fix: [Amazon] problems with deleting product(s) from Amazon
-* Fix: [Amazon] wrong messages for actions when results were received
-* Fix: [Amazon] not listed items were set as active/inactive unexpectedly
-* Fix: [Amazon] account related store view was moved to the account 3rd party settings
-* Fix: [eBay] marketplace(s) related store view(s) was moved to the account 3rd party settings
-* Fix: [eBay] can't retrieve combined shipping discount profiles for non-US marketplaces
-* Fix: [eBay] Dimension is always set to None, General Template
-* Fix: move item from one listing to another : always empty grid
-* Fix: move item from one listing to another : showing empty grid warning message only the first time
-* Fix: Item (Mage_Catalog_Model_Product) with the same id "%item_id%" already exist
-* Fix: invisible products will not be added/listed by "Actions On Categories Products"
-* Fix: saving categories when listing is created as an empty listing
-
-* 4.2.2 (r2576)
-
-* Fix: [Amazon] wrong order subtotals at order view page
-* Fix: [eBay] can't update order status
-* Fix: empty customer field in dashboard for orders processed with guest checkout
-
-* 4.2.1 (r2566)
-
-* Added: [Amazon] optional search ASIN/ISBN by magento title
-* Fix: [Amazon] restock date was changed when "Not Set" option was selected
-* Fix: [Amazon] handling time was changed when "Not Set" option was selected
-* Fix: [eBay] General template: sku mode cannot be modified
-* Fix: new or deleted products within category did not have action
-* Fix: wrong state in magento order
-* Fix: wizard compatibility when PHP < 5.3
-
-* 4.2.0 (r2548)
-
-* Added: stock availability column in purchased items grid at order view page
-* Added: orders log grid
-* Added: edit shipping address in the order
-* Added: progress bar during adding products to listing
-* Added: add products to existing listing from categories
-* Added: [Amazon] fulfillment column in the orders grid
-* Added: [Amazon] the products could be deleted from sellercentral
-* Added: [Amazon] sale price start date and sale price end date from attributes
-* Added: [Amazon] "Not Set" option for the sale price
-* Added: [Amazon] handling time from attribute
-* Added: [Amazon] restock date in the listing channel settings
-* Added: [Amazon] gift wrap support in orders
-* Added: [eBay] combined shipping discounts support
-* Added: [eBay] import all account 3rd party inventory
-* Added: [eBay] watermark transparent settings in description template
-* Added: [eBay] restocking fee option for return policy in general template (for US and Motors)
-* Added: [eBay] "do not change" (empty) option in the "Gallery Type"
-* Added: [eBay] automatic 3rd party mapping to the magento products
-* Added: [eBay] 3rd party products have repeated automatic mapping
-* Added: [eBay] unpaid orders cancellation
-* Added: [eBay] 3rd party listings revise action
-* Added: [eBay] 3rd party listings automatic synchronization
-* Added: [eBay] shipping rate table for international shipping (for UK and DE)
-* Improvement: [Amazon] synchronization option for automatically moved 3rd party listings
-* Improvement: [Amazon] the synchronization will work manually without cron configuration
-* Improvement: [eBay] refund options in general template logic improved
-* Improvement: separate wizards for extension, eBay and Amazon configuration
-* Fix: [Amazon] Fatal error: Call to a member function join() on a non-object
-* Fix: [Amazon] do not create magento orders for FBA orders
-* Fix: [eBay] products are not revised when variations in category are disabled
-* Fix: [eBay] Custom Label (SKU) option was set wrong
-* Fix: [eBay] wrong order for configurable multi-variations options
-* Fix: [eBay] relist and stop actions for the 3rd party listings
-* Fix: [eBay] watermark for gallery images
-* Fix: [eBay] problems with watermarks when SSL connection is used
-* Fix: [eBay] 404 not found error message for view action at orders grid
-* Fix: [eBay] problems with required item condition
-* Fix: [eBay] zeros instead of negative values in external transactions
-* Fix: [eBay] stop action when several items were selected
-* Fix: [eBay] problem with variations options labels by store view
-* Fix: [eBay] wrong custom specific label when its source is "Custom Attribute"
-* Fix: [eBay] the product did not stop if all its variations is out off stock
-* Fix: wrong magento order totals for bundles with dynamic price
-* Fix: wrong magento order status with custom status mapping settings in account
-* Fix: some cases of "MySQL server has gone away"
-* Fix: the new or deleted products within category are detected by website instead of store view
-* Fix: Fatal error: Call to undefined method addExpressionFieldToSelect on magento versions lower than 1.4.1.x
-* Fix: Fatal error: Call to undefined method setShippingPriceIncludeTax on magento versions lower than 1.4.1.x
-* Fix: compatibility issues with magento orders on magento versions lower than 1.4.1.x
-
-* 4.1.1 (r2190)
-
-* Fix: error in order "Please specify region/state"
-
-* 4.1.0 (r2187)
-
-* Fix: Orders critical compatibility issue when PHP lower than 5.3.x version
-
-* 4.0.9 (r2185)
-
-* Added: "Video Tutorials" menu item was added to the "Help" section
-* Added: [Amazon] automatic linking to existing Amazon listings by SKU for "not listed" products
-* Added: [Amazon] listing settings, Product ID option added as SKU source
-* Added: [Amazon] automatic canceling of magento order when amazon order is canceled
-* Added: [eBay] option to scale watermark in whole image in description template
-* Fix: [Amazon] manual product mapping failed in some cases
-* Fix: [Amazon] recipient name is not shown at order view page
-* Fix: [Amazon] wrong number of items in order when customer purchased one item several times
-* Fix: [eBay] Relist schedule task error "Unrecognized method 'toArray()'"
-* Fix: [eBay] WYSIWYG Editor on description template page for Magento GO users
-* Fix: [eBay] listing actions failed on systems with Magento lower than 1.4.1.1
-* Fix: [eBay] wrong variation option titles by different store views
-* Fix: [eBay] problems with watermarks when SSL connection are used
-* Fix: some synchronization tasks failed on systems with php lower than 5.3
-* Fix: do not use first country region when state information is not available
-* Fix: global problems with immediately accounts deleting
-* Fix: shipping extensions compatibility error "Please specify a shipping method"
-
-* 4.0.8 (r2084)
-
-* Improvement: [Amazon] Products Filter block has been moved into a separate step/tab in Listing Add/Edit
-* Added: [eBay] Cross Border Trade feature into general template
-* Added: [eBay] Custom specifics for some categories was added
-* Added: [eBay] Condition from attribute when ebay category was selected
-* Fix: Some synchronizations froze unexpectedly during processing
-* Fix: [Amazon] Condition note was not properly sent
-* Fix: [eBay] Watermarks for different description templates and errors in some cases
-* Fix: [eBay] wrong weight minor value for values less than one tenth
-* Fix: [eBay] "Cash On Delivery" Cost did not work as expected
-* Fix: [Amazon] Instance does not exist error during orders synchronization
-* Fix: [Amazon] wrong buyer name in magento order/customer
-* Fix: [Amazon] impossible to add tracking details for shipped order
-
-* 4.0.7 (r1983)
-
-* Added: [Amazon] 3rd party listing will be automatic mapped when their sku is magento product id
-* Added: [eBay] watermarks for main and gallery images implementation
-* Improvement: [Amazon] ability to download inventory bigger than 50000 items
-* Fix: [Amazon] MerchantId validation before adding an account (now can validate 12 chars length IDs)
-
-* 4.0.6 (r1965)
-
-* Added: [Amazon] MerchantId validation before adding an account
-* Added: [Amazon] synchronization option for automatically moved 3rd party listings
-* Fix: [Amazon] wrong placed drop-down of sku attribute selecting
-* Fix: [Amazon] synchronization template do not hide relist settings
-* Fix: [eBay] default/3rd party synchronization freeze when returned more than 3000 changes
-
-* 4.0.5 (r1929)
-
-* Improvement: [eBay] required specifics implementation
-* Fix: [eBay] go to general template from listings grid
-* Fix: [Amazon] few critical processing action issues
-
-* 4.0.4 (r1901) [Beta]
-
-* Fix: Alabama state is used in magento order when state is not an abbreviation
-* Fix: [Amazon] handling time did not save in the listings settings
-* Fix: [Amazon] automatic search ASIN/ISBN set wrong vales
-
-* 4.0.3 (r1842) [Beta]
-
-* Improvement: [Amazon] one account match to the one marketplace
-* Improvement: [Amazon] show all tabs when new account is adding
-* Added: [Amazon] ASIN/ISBN search tool for listings items
-* Added: [Amazon] support handling time option
-* Added: [Amazon] 3rd party products have repeated automatic mapping
-* Fix: [Amazon] account adding is failed when several marketplaces are selected
-* Fix: [eBay] Item specifics of some eBay categories were not shown
-* Fix: [eBay] vat percent can be a float number
-* Fix: filters by account and marketplace did not work correctly on 3rd Party Listings page
-* Fix: [Amazon] wrong magento order prices for items with qty more than 1
-* Fix: [Amazon] Unknown column in where clause in order grid
-* Removed: [Amazon] "Synch. template" -> "Full Revise" -> "Description Template"
-
-* 4.0.2 (r1750) [Beta]
-
-* Fix: delete listing item when magento product was deleted
-* Fix: "products presented in other listings" did not take into the channel
-* Fix: zero price items in both m2epro and magento orders
-* Fix: "Tracking details were imported." message appears even if nothing was imported
-* Fix: duplicated "m2epro_config" and "ess_config" records was dropped
-* Fix: fatal error with message "Mixing of GROUP columns (MIN(),MAX(),COUNT(),...) with no GROUP columns is illegal if there is no GROUP BY clause"
-
-* 4.0.1 (r1703) [Beta]
-
-* Improvement: performance of variations details calculating
-* Added: [Amazon] sku length validation before adding new product
-* Fix: some database tables do not create with installation/upgrade
-* Fix: templates synchronization "Instance does not exist"
-* Fix: can't map product with quote in title
-* Fix: account/marketplace switcher does not work in some cases
-
-* 4.0.0 (r1674) [Beta]
-
-* Improvement: set variation to "Out Of Stock" state on eBay, when variation has sale
-* Added: integration of Amazon marketplaces [Beta]
-* Fix: incorrect sort order of variation options on eBay
-
-* 3.2.4 (r1700)
-
-* Fix: cannot create magento order for bundle product
-* Fix: exception happens when multiple items are stopped
-* Fix: magento order has wrongly added VAT in some cases
-
-* 3.2.3 (r1561)
-
-* Fix: impossible to create combined magento order
-* Fix: missing general template menu entry
-
-* 3.2.2 (r1525)
-
-* Fix: installation
-
-* 3.2.1 (r1517)
-
-* Fix: blank screen at order grid page
-* Fix: magento order not created for non-exist products in catalog
-
-* 3.2.0 (r1470)
-
-* Improved: added tax settings for magento order importing
-* Improved: send shipping data to eBay when relist action is running
-* Fix: variation is enabled when selected marketplace without support it
-* Fix: incorrect url for paypal transaction at magento order page with enabled secret key
-* Fix: invoice email contains secure information
-* Fix: exception 'Mage_Core_Exception' with message 'Mage registry key already exists
-* Fix: when listing source is categories, auto. actions don't work (magento go)
-* Fix: correct parsing magento description and short description
-* Fix: sometimes do not show variation options images on eBay
-* Fix: wrong shipping price in magento order when eBay order tax includes shipping tax
-* Fix: correct deleting products from listings when magento product is deleted
-* Fix: autocomplete error "Base table or view not found: m2epro_templates_attribute_sets doesn't exist"
-* Fix: 3rd party listings logs not removed when "clear all" button pressed in clearing logs page
-* Fix: error "Please specify a shipping method"
-* Fix: magento orders appeared with empty id's in some cases
-* Fix: tax block is not shown for eBay orders with VAT
-* Fix: ounces from attribute are not rounded up
-* Fix: crash when the "save and list" button is pressed
-* Fix: multiple repetitive items were imported for some orders
-* Fix: attributes in selectors were not sorted
-
-* 3.1.5 (r792)
-
-* Added: when product is added to the listing it may be listed automatically
-* Added: option is added to synch template that do not automatically list product
-* Improved: added Cash On Delivery payment method for eBay Italy
-* Improved: display eBay final value fee at order page
-* Improved: initiator column added to listings log
-* Improved: dropdown is replaced by autocomplete if the amount of templates more than 100
-* Fix: wrong dates in logs
-* Fix: wrong tracking data error
-* Fix: do not try revise title and subtitle when item has bid(s)
-* Fix: incorrect template path for custom payment info block
-* Fix: update best offer data when product price was changed
-* Fix: wrong getting default store id and default store website
-* Fix: product is not added to category if only one store has defined
-* Fix: wrong option name expected for grouped product when 3rd party order created
-* Fix: error "Please specify product option(s)" when attribute name has trailing spaces
-* Fix: undefined index error when user has no permissions for M2E
-* Fix: error in orders "Syntax error or access violation: 1064 you have an error in your SQL syntax"
-* Fix: error "Item with the same id already exists"
-* Fix: bug in general templates add/edit in Item Specifics when custom attribute is selected
-* Fix: error in orders "This customer email already exists"
-
-* 3.1.4 (r580)
-
-* Improved: update magento order comments when checkout message from buyer available
-* Improved: added support of multi-variation listings for eBay Italy
-* Improved: show all external transactions when available
-* Improved: multiple shipping address available for customer
-* Improved: two-lines street address support
-* Improved: speeding-up synchronization when a lot listings
-* Fix: wrong back url when click "View All Order Logs" button
-* Fix: wrong behaviour on recombining invoice
-* Fix: external transactions not appears on order update
-* Fix: recombining invoice fix
-* Fix: 1% tax applied to some orders
-
-* 3.1.3 (r500)
-
-* Improved: invoice pdf with complete payment information
-* Improved: possibility to update magento order payment data
-* Improved: when create magento order use first options values for products with variations listed as simple
-* Improved: added link to paypal transaction page when available
-* Improved: changing shipping/billing address when customer changed it on eBay
-* Fix: incorrect images urls (missing slash)
-* Fix: do not stop item by synchronization template
-* Fix: wrong state (Alabama) in US-orders addresses
-* Fix: do not use all feedback templates by cicle mode
-* Fix: abandoned cart issue
-
-* 3.1.2 (r394)
-
-* Improved: possibility to cancel magento orders for transactions, when combined order available
-* Improved: more readable order logs
-* Improved: IE9 and magento 1.6.x support
-* Improved: added interval setting to synchronization inspector
-* Fix: shipping status not updated
-* Fix: may not import tracking information in some situations
-* Fix: wrong configurable price when variation price get from associated products
-* Fix: wrong link to ebay item on order page for all marketplaces except USA
-* Fix: cannot save logs clearing settings when everything is disabled
-* Fix: measurement system after save always shows as metric
-* Fix: last instead of first custom option was used in magento order for simple product without variations
-* Fix: third party listings progressbar worked incorrectly
-
-* 3.1.1 (r353)
-
-* Improved: relist item without update it data
-* Improved: added search listings items tool
-* Improved: order log entries when order status has been updated on eBay
-* Improved: support importing tracking details from eBay
-* Improved: added partial product revise
-* Improved: when special price empty use main price
-* Improved: support special price from/to date
-* Improved: support ebay shipping rate table
-* Improved: support international shipping to locations without specified service
-* Improved: support free shipping for first flat/calculated domestic shipping service
-* Improved: support actions for multiple orders
-* Improved: display and search by selling manager record number in orders grid
-* Improved: search items by sku in orders grid
-* Improved: tax table is enabled for eBay motors
-* Improved: add option to getting price from associated products
-* Fix: wrong product details mode after migration process
-* Fix: ignore best offer accept and reject price when (<= 0)
-* Fix: ignore variation options when require is false
-* Fix: mixed EPS and self hosted images fail
-* Fix: low speed of synchronization when variations are changed
-* Fix: wrong price in magento order for products with tier price
-* Fix: categories with level more than 3 are not displayed during listing creation
-* Fix: error for tag <Item.ShippingDetails.CalculatedShippingRate.PackageWidth> when dimension source is none
-* Fix: wrong html for gallery with one image
-* Fix: error Please specify tracking_number in magento 1.6.*
-* Fix: show empty sku at listing view grid (conflict with other extension)
-* Fix: item do not relist and stop when categories set is source of it listing
-* Fix: get wrong magento product status when cron is running (trouble of relist action)
-* Fix: non-alphabetical sort order of templates in filters at listings grid
-
-* 3.1.0 (r252)
-
-* Fix: listing upgrades correct save all options
-* Fix: media gallery and image in product description
-* Fix: shipping cost changed when migration is run
-* Fix: replace comma to point in shipping cost value
-* Fix: wrong select attribute sets when template is duplicate
-* Fix: images qty 'All' for non-gallery view shows no images
-* Fix: wrong error message 'Product is out of stock' during order creation
-* Fix: wrong max gallery images amount in description templates
-
-* 3.0.9 (r231)
-
-* Improved: added checkout message from buyer
-* Fix: orders duplicated when fatal error occurred
-* Fix: revise fail when variation was purchased
-* Fix: correct revise and stop variation products
-* Fix: unexpected stop of variation product
-* Fix: unsupported operand types orders synch
-* Fix: can't get ebay sales list exception
-* Fix: incorrect prices for orders with tax
-* Fix: undefined index items in synchronization
-* Fix: cannot save eBay store category
-* Fix: feedback transaction id linked to wrong order
-* Fix: feedback item id linked to wrong item
-
-* 3.0.8 (r197)
-
-* Improved: more secure extension layout
-* Improved: magento go buttons support
-* Improved: inspector added to templates synchronization
-* Fix: migration tool shipping price with comma
-* Fix: migration tool gallery images count
-* Fix: store view products thumbnails not showed
-* Fix: request info is not defined, php configuration
-* Fix: account does not exist error
-* Fix: disabled calculated shipping for eBay Motors
-* Fix: vat rate not saves float value
-* Fix: incorrect price and special price formatting in description template
-
-* 3.0.7 (r164)
-
-* Improved: periodical update products thumbnails
-* Fix: fatal error synchronization undefined index: only_data
-* Fix: listing view grid same id already exist
-* Fix: progress bar count products of multiple ebay actions
-* Fix: correct count of upload gallery images
-* Fix: SQL syntax error of relist synchronization
-* Fix: creation synchronization template when migration run
-* Fix: unsupported image format fatal error message
-* Fix: order creation error "Please specify the product required option(s)"
-* Fix: multiple creation of magento products
-
-* 3.0.6 (r153)
-
-* Improved order grid with logs preview
-* Improved detect magento professional edition
-* Automatic migration of existing accounts during the migration
-* All new relist schedule logic of synchronization templates
-* Fix: automatic order creation error "headers already sent"
-* Fix: broken description media gallery when synchronization run
-* Fix: creating orders with fake (0000) zip-code for countries that don't have it
-* Fix: fatal error when was entered wrong license key
-* Fix: migration calculated shipping duplicate PRIMARY key
-* Fix: when connector duplicate ebay items
-* Fix: correct configurable attribute images
-* Fix: collision synchronization and changes of products
-* Fix: wrong validation license directory by cron
-
-* 3.0.5 (r125)
-
-* Fix: disabled payment methods issue
-* Fix: escapeHtml added for magento < 1.4.0
-* Fix: correct product delete issue
-
-* 3.0.4 (r122)
-
-* Fix: critical issue of license validation
-
-* 3.0.3 (r121)
-
-* Added FAQ block at support page
-* Added ability to send Tracking Number to eBay after order has status Shipped.
-* Added PayPal transaction information to magento orders transactions
-* Added synchronization for Singel Item and Custom Number QTY mode
-* Fix: correct price for bundle products
-* Fix: eBay images was limited to 12
-
-* 3.0.2 (r73)
-
-* Add Stock Availability column to listing view
-* Fix: success verification SSL certificate
-* Fix: correct price for configurable products
-
-* 3.0.1 (r50)
-
-* Code directory moved from local to community
-* Improved localization possibilities
-* Fix: incorrect price in orders for bundle products with custom price attribute
-* Fix: tracking number was not sent after creating invoice
-* Fix: no currency conversion for orders with custom currency
-
-* 3.0.0 (r6)
-
-* There are all new extension, named currently as "M2E Pro"

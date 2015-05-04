@@ -48,12 +48,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widg
             'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_ebay_account/index').'\')',
             'class'     => 'button_link'
         ));
-
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'EbayFeedbackHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
         //------------------------------
     }
 

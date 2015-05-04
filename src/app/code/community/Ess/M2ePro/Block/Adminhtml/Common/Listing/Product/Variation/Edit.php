@@ -31,7 +31,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Edit
     {
         $this->_prepareButtons();
 
-        if (!$this->getListingProduct()->getChildObject()->isVariationMatched()) {
+        $variationManager = $this->getListingProduct()->getChildObject()->getVariationManager();
+
+        if ($this->getListingProduct()->getComponentMode() == Ess_M2ePro_Helper_Component_Amazon::NICK) {
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
+
+            $isVariationMatched = $variationManager->getTypeModel()->isVariationProductMatched();
+        } else {
+            $isVariationMatched = $variationManager->isVariationProductMatched();
+        }
+
+        if (!$isVariationMatched) {
             return $this;
         }
 
@@ -56,22 +66,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Edit
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData(array(
-                'label' => Mage::helper('M2ePro')->__('Save'),
+                'label' => Mage::helper('M2ePro')->__('Confirm'),
                 'onclick' => '',
                 'class' => 'confirm',
                 'id' => 'variation_edit_confirm'
             ));
         $this->setChild('variation_edit_confirm', $buttonBlock);
-
-        $buttonBlock = $this->getLayout()
-            ->createBlock('adminhtml/widget_button')
-            ->setData(array(
-                'label' => Mage::helper('M2ePro')->__('Close'),
-                'onclick' => 'ListingProductVariationHandlerObj.editPopup.close();',
-                'class' => 'close',
-                'id' => 'variation_edit_close'
-            ));
-        $this->setChild('variation_edit_close', $buttonBlock);
     }
 
     //##############################################################

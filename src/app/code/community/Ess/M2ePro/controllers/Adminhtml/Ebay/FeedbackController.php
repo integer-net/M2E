@@ -52,8 +52,11 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
 
         $feedbackText = strip_tags($feedbackText);
 
+        /** @var Ess_M2ePro_Model_Ebay_Feedback $feedback */
         $feedback = Mage::getModel('M2ePro/Ebay_Feedback')->loadInstance($feedbackId);
-        $feedback->sendResponse($feedbackText, Ess_M2ePro_Model_Ebay_Feedback::TYPE_POSITIVE);
+        $result = $feedback->sendResponse($feedbackText, Ess_M2ePro_Model_Ebay_Feedback::TYPE_POSITIVE);
+
+        $this->getResponse()->setBody(json_encode(array('result' => ($result ? 'success' : 'failure'))));
     }
 
     //#############################################
@@ -134,7 +137,7 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
             return $this->_redirectUrl($itemUrl);
         }
 
-        $this->_getSession()->addError(Mage::helper('M2ePro')->__('Item\'s Marketplace is Unknown.'));
+        $this->_getSession()->addError(Mage::helper('M2ePro')->__('Item\'s Site is Unknown.'));
 
         return $this->_redirect('*/*/index');
     }

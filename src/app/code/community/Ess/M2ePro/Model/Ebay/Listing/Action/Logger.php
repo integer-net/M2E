@@ -22,6 +22,13 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Logger
         $this->actionId = (int)$id;
     }
 
+    public function getActionId()
+    {
+        return $this->actionId;
+    }
+
+    // ----------------------------------------
+
     public function setAction($value)
     {
         $this->action = (int)$value;

@@ -19,6 +19,13 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function getTitle()
+    {
+        return Mage::helper('M2ePro')->__(self::TITLE);
+    }
+
+    // ########################################
+
     public function isEnabled()
     {
         return (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/component/'.self::NICK.'/', 'mode');
@@ -143,6 +150,22 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function getMarketplacesAvailableForApiCreation()
+    {
+        return $this->getCollection('Marketplace')
+                    ->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE)
+                    ->addFieldToFilter('developer_key', array('notnull' => true))
+                    ->setOrder('sorder', 'ASC');
+    }
+
+    public function getMarketplacesAvailableForAsinCreation()
+    {
+        $collection = $this->getMarketplacesAvailableForApiCreation();
+        return $collection->addFieldToFilter('is_asin_available', 1);
+    }
+
+    // ########################################
+
     public function isASIN($string)
     {
         return !empty($string) &&
@@ -154,7 +177,7 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     public function clearCache()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues(self::NICK);
     }
 
     // ########################################

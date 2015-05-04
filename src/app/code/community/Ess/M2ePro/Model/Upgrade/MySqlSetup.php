@@ -87,8 +87,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
             return $this;
         }
         $sql = $this->prepareSql($sql);
-        $this->_conn->multi_query($sql);
-        return $this;
+        return parent::run($sql);
     }
 
     public function runSqlFile($path)
@@ -445,9 +444,12 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
     {
         return array(
             'm2epro_ebay_listing_auto_filter',
-            'm2epro_synchronization_run'
+            'm2epro_synchronization_run',
+            'm2epro_ebay_listing_auto_category',
+            'm2epro_ebay_dictionary_policy'
         );
     }
+
     //------------------------------------
 
     private function getConfigTablesV5()

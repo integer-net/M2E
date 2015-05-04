@@ -257,7 +257,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
     public function isRelistSendData()
     {
-        return $this->getData('relist_send_data') == self::RELIST_SEND_DATA_YES;
+        return $this->getData('relist_send_data') != self::RELIST_SEND_DATA_NONE;
     }
 
     public function isRelistStatusEnabled()
@@ -666,13 +666,13 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_synchronization');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_synchronization');
         return parent::delete();
     }
 

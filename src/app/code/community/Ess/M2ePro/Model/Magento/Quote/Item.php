@@ -42,7 +42,7 @@ class Ess_M2ePro_Model_Magento_Quote_Item
             $this->product = $this->getAssociatedGroupedProduct();
 
             if (is_null($this->product)) {
-                throw new Exception('There is no associated products found for grouped product.');
+                throw new Exception('There is no associated Products found for Grouped Product.');
             }
         } else {
             $this->product = $this->proxyItem->getProduct();

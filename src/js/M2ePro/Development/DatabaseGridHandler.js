@@ -2,6 +2,10 @@ DatabaseGridHandler = Class.create(GridHandler, {
 
     //----------------------------------
 
+    mergeModeCookieKey: 'database_tables_merge_mode_cookie_key',
+
+    //----------------------------------
+
     prepareActions: function()
     {
         this.actions = {
@@ -12,26 +16,50 @@ DatabaseGridHandler = Class.create(GridHandler, {
 
     //----------------------------------
 
+    switchMergeMode: function()
+    {
+        this.isMergeModeEnabled() ? this.setMergeMode('0') : this.setMergeMode('1');
+        window.location = M2ePro.url.get('adminhtml_development_database/manageTable');
+    },
+
+    isMergeModeEnabled: function()
+    {
+        var cookieValue = getCookie(this.mergeModeCookieKey);
+        return cookieValue != null && cookieValue != '0';
+    },
+
+    setMergeMode: function(value)
+    {
+        setCookie(this.mergeModeCookieKey, value, 3*365, '/');
+    },
+
+    //----------------------------------
+
+    mergeParentTable: function(component)
+    {
+        this.setMergeMode('1');
+        window.location = M2ePro.url.get('adminhtml_development_database/manageTable', {component: component});
+    },
+
+    //----------------------------------
+
     deleteTableRows: function(id)
     {
-
         var selectedIds = id ? id : DevelopmentDatabaseGridHandlerObj.getSelectedProductsString();
 
         if (id && !confirm('Are you sure?')) {
             return;
         }
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/deleteTableRows') ,
-            {
-                method:'post',
-                parameters : {
-                    ids: selectedIds
-                },
-                onSuccess: function(transport)
-                {
-                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload()
-                }
-            });
+        new Ajax.Request(M2ePro.url.get('adminhtml_development_database/deleteTableRows'), {
+            method:'post',
+            parameters: {
+                ids: selectedIds
+            },
+            onSuccess: function(transport) {
+                DevelopmentDatabaseGridHandlerObj.getGridObj().reload()
+            }
+        });
     },
 
     openTableCellsPopup: function(mode)
@@ -58,18 +86,16 @@ DatabaseGridHandler = Class.create(GridHandler, {
             showEffect: Element.show
         });
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/getTableCellsPopupHtml') ,
-            {
-                method: 'post',
-                parameters: {
-                    ids: self.getSelectedProductsString(),
-                    mode: mode
-                },
-                onSuccess: function(transport)
-                {
-                    popup.getContent().insert(transport.responseText);
-                }
-            });
+        new Ajax.Request(M2ePro.url.get('adminhtml_development_database/getTableCellsPopupHtml'), {
+            method: 'post',
+            parameters: {
+                ids: self.getSelectedProductsString(),
+                mode: mode
+            },
+            onSuccess: function(transport) {
+                popup.getContent().insert(transport.responseText);
+            }
+        });
 
         popup.showCenter(true);
     },
@@ -81,17 +107,15 @@ DatabaseGridHandler = Class.create(GridHandler, {
             return;
         }
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/updateTableCells') ,
-            {
-                method: 'post',
-                asynchronous : false,
-                parameters : Form.serialize($('development_tabs_database_table_cells_popup_form')),
-                onSuccess: function(transport)
-                {
-                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
-                    Windows.getFocusedWindow().close();
-                }
-            });
+        new Ajax.Request(M2ePro.url.get('adminhtml_development_database/updateTableCells'), {
+            method: 'post',
+            asynchronous: false,
+            parameters: Form.serialize($('development_tabs_database_table_cells_popup_form')),
+            onSuccess: function(transport) {
+                DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
+                Windows.getFocusedWindow().close();
+            }
+        });
     },
 
     confirmAddRow: function()
@@ -101,17 +125,15 @@ DatabaseGridHandler = Class.create(GridHandler, {
             return;
         }
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/addTableRow') ,
-            {
-                method: 'post',
-                asynchronous : false,
-                parameters : Form.serialize($('development_tabs_database_table_cells_popup_form')),
-                onSuccess: function(transport)
-                {
-                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
-                    Windows.getFocusedWindow().close();
-                }
-            });
+        new Ajax.Request(M2ePro.url.get('adminhtml_development_database/addTableRow'), {
+            method: 'post',
+            asynchronous: false,
+            parameters: Form.serialize($('development_tabs_database_table_cells_popup_form')),
+            onSuccess: function(transport) {
+                DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
+                Windows.getFocusedWindow().close();
+            }
+        });
     },
 
     //----------------------------------
@@ -170,18 +192,15 @@ DatabaseGridHandler = Class.create(GridHandler, {
         var cellId = 'table_row_cell_' + columnName + '_' + rowId;
         params['value_'+ columnName] = $(cellId + '_edit_input').value;
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_development_database/updateTableCells') ,
-            {
-                method: 'post',
-                asynchronous : false,
-                parameters : params,
-                onSuccess: function(transport)
-                {
-                    DevelopmentDatabaseGridHandlerObj.switchCellToView(cellId);
-                    DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
-                }
-            });
-
+        new Ajax.Request(M2ePro.url.get('adminhtml_development_database/updateTableCells'), {
+            method: 'post',
+            asynchronous: false,
+            parameters: params,
+            onSuccess: function(transport) {
+                DevelopmentDatabaseGridHandlerObj.switchCellToView(cellId);
+                DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
+            }
+        });
     },
 
     //----------------------------------
@@ -202,7 +221,7 @@ DatabaseGridHandler = Class.create(GridHandler, {
     {
         var result = false;
 
-        $$('#development_tabs_database_table_cells_popup .input_switcher').each(function(el){
+        $$('#development_tabs_database_table_cells_popup .input_switcher').each(function(el) {
             if (el.checked) {
                 result = true;
                 return true;
@@ -213,5 +232,4 @@ DatabaseGridHandler = Class.create(GridHandler, {
     }
 
     //----------------------------------
-
 });

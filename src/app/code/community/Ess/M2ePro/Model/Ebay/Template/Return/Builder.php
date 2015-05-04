@@ -1,8 +1,14 @@
 <?php
 
+/*
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
+ */
+
 class Ess_M2ePro_Model_Ebay_Template_Return_Builder
     extends Ess_M2ePro_Model_Ebay_Template_Builder_Abstract
 {
+    // ########################################
+
     public function build(array $data)
     {
         if (empty($data)) {
@@ -43,11 +49,13 @@ class Ess_M2ePro_Model_Ebay_Template_Return_Builder
         return $template;
     }
 
+    // ########################################
+
     protected function validate(array $data)
     {
         //------------------------------
         if (empty($data['marketplace_id'])) {
-            throw new LogicException('Marketplace ID is empty.');
+            throw new LogicException('eBay Site ID is empty.');
         }
         //------------------------------
 
@@ -98,4 +106,6 @@ class Ess_M2ePro_Model_Ebay_Template_Return_Builder
 
         return $prepared;
     }
+
+    // ########################################
 }

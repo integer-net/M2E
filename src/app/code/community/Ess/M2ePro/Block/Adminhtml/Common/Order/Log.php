@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2011 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Order_Log extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Order_Log extends Mage_Adminhtml_Block_Widget_Container
 {
     // ########################################
 
@@ -17,6 +17,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Order_Log extends Mage_Adminhtml_Block_W
         $this->setId('orderLog');
         $this->_blockGroup = 'M2ePro';
         $this->_controller = 'adminhtml_order_log';
+        //------------------------------
+
+        //------------------------------
+        $this->setTemplate('M2ePro/common/log/log.phtml');
         //------------------------------
 
         // Set header text
@@ -49,25 +53,22 @@ class Ess_M2ePro_Block_Adminhtml_Common_Order_Log extends Mage_Adminhtml_Block_W
             'onclick'   => 'setLocation(\'' .$this->getUrl('*/adminhtml_common_order/index').'\')',
             'class'     => 'button_link'
         ));
-
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
         //------------------------------
     }
 
     // ########################################
 
-    public function getGridHtml()
-    {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_order_log_help');
-        return $helpBlock->toHtml() . parent::getGridHtml();
-    }
-
     protected function _toHtml()
     {
+        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_order_log_help')->toHtml();
+
+        $logBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_log_tabs', '',
+            array(
+                'channel' => $this->getRequest()->getParam('channel'),
+                'log_type' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::LOG_TYPE_ID_ORDER
+            )
+        )->toHtml();
+
         $translations = json_encode(array(
             'Description' => Mage::helper('M2ePro')->__('Description')
         ));
@@ -86,7 +87,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Order_Log extends Mage_Adminhtml_Block_W
 
 JAVASCIRPT;
 
-        return $javascript . parent::_toHtml();
+        return $javascript . parent::_toHtml() . $helpBlock . $logBlock;
     }
 
     // ########################################

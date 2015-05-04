@@ -8,7 +8,7 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Store extends Mage_Core_Helper_A
 {
     // ########################################
 
-    public function getPath($categoryId, $accountId, $delimiter = ' -> ')
+    public function getPath($categoryId, $accountId, $delimiter = ' > ')
     {
         $pathData = $this->getPathData($categoryId, $accountId, 'title');
         return implode($delimiter, $pathData);

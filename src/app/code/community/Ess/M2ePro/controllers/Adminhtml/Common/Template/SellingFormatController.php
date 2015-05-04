@@ -12,8 +12,8 @@ class Ess_M2ePro_Adminhtml_Common_Template_SellingFormatController
     protected function _initAction()
     {
         $this->loadLayout()
-             ->_title(Mage::helper('M2ePro')->__('Templates'))
-             ->_title(Mage::helper('M2ePro')->__('Selling Format Templates'));
+             ->_title(Mage::helper('M2ePro')->__('Policies'))
+             ->_title(Mage::helper('M2ePro')->__('Selling Format Policies'));
 
         $this->getLayout()->getBlock('head')->addJs('M2ePro/Plugin/DropDown.js')
                                             ->addCss('M2ePro/css/Plugin/DropDown.css');
@@ -62,7 +62,7 @@ class Ess_M2ePro_Adminhtml_Common_Template_SellingFormatController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select item(s) to remove.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Item(s) to remove.'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -82,7 +82,7 @@ class Ess_M2ePro_Adminhtml_Common_Template_SellingFormatController
         $deleted && $this->_getSession()->addSuccess($tempString);
 
         $tempString  = Mage::helper('M2ePro')->__('%amount% record(s) are used in Listing(s).', $locked) . ' ';
-        $tempString .= Mage::helper('M2ePro')->__('Template must not be in use to be deleted.');
+        $tempString .= Mage::helper('M2ePro')->__('Policy must not be in use to be deleted.');
         $locked && $this->_getSession()->addError($tempString);
 
         $this->_redirect('*/*/index');

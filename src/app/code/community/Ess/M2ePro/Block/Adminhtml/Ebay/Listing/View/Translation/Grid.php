@@ -146,7 +146,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Translation_Grid
         ));
 
         $this->addColumn('name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title / SKU'),
+            'header'    => Mage::helper('M2ePro')->__('Product Title / Product SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -245,10 +245,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Translation_Grid
 
         $onlineTitle = $row->getData('online_title');
         !empty($onlineTitle) && $value = $onlineTitle;
-
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
 
         $value = '<span>'.Mage::helper('M2ePro')->escapeHtml($value).'</span>';
 
@@ -578,7 +574,7 @@ HTML;
                      .' <a target="_blank" href="%url%">View log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($tempString));
 
-        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% product(s) data on eBay.'));
+        $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% Product(s) data on eBay.'));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = Mage::helper('M2ePro')->escapeJs(
@@ -595,7 +591,7 @@ HTML;
             Mage::helper('M2ePro')->__('Stopping Translation')
         );
 
-        $selectItemsMessage = $helper->escapeJs($helper->__('Please select items.'));
+        $selectItemsMessage = $helper->escapeJs($helper->__('Please select Items.'));
         $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
@@ -609,7 +605,7 @@ HTML;
             'Payment for Translation Service. Help' => $helper->__('Payment for Translation Service'),
             'Specify a sum to be credited to an account.' =>
                 $helper->__('Specify a sum to be credited to an Account.'
-                        .' If you are planning to order more items for translation in future,'
+                        .' If you are planning to order more Items for translation in future,'
                         .' you can credit the sum greater than the one needed for current translation.'
                         .' Click <a href="%url%" target="_blank">here</a> to find out more.',
                     'http://docs.m2epro.com/display/eBayMagentoV6/Translation#Translation-Account.1'),

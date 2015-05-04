@@ -306,7 +306,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
 
         if (empty($value) && $mode == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
             $value = Mage::helper('M2ePro')->__('Magento Attribute') .
-                     ' -> ' .
+                     ' > ' .
                      Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($row->getData('value'));
         }
 
@@ -457,6 +457,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
             $collection = Mage::getModel('M2ePro/Marketplace')->getCollection();
             $collection->addFieldToFilter('component_mode', Ess_M2ePro_Helper_Component_Ebay::NICK);
             $collection->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
+            $collection->setOrder('sorder', 'ASC');
 
             $this->marketplacesOptions = $collection->toOptionHash();
         }

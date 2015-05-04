@@ -22,7 +22,7 @@ PlayListingGridHandler = Class.create(CommonListingGridHandler, {
         this.movingHandler = new ListingMovingHandler(this);
         this.productSearchHandler = new PlayListingProductSearchHandler(this);
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
 
             movingAction: this.movingHandler.run.bind(this.movingHandler),
 
@@ -34,5 +34,4 @@ PlayListingGridHandler = Class.create(CommonListingGridHandler, {
     }
 
     //----------------------------------
-
 });

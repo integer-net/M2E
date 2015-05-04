@@ -2,6 +2,9 @@
 
 class Ess_M2ePro_Block_Adminhtml_Log_Grid_Summary extends Mage_Adminhtml_Block_Widget
 {
+    const VIEW_LOG_LINK_SHOW = 0;
+    const VIEW_LOG_LINK_HIDE = 1;
+
     protected $tip = NULL;
     protected $iconSrc = NULL;
     protected $rows = array();
@@ -60,6 +63,14 @@ class Ess_M2ePro_Block_Adminhtml_Log_Grid_Summary extends Mage_Adminhtml_Block_W
         return $this->_data['hide_help_handler'];
     }
 
+    public function getHideViewLogLink()
+    {
+        if (!empty($this->_data['hide_view_log_link'])) {
+            return self::VIEW_LOG_LINK_HIDE;
+        }
+        return self::VIEW_LOG_LINK_SHOW;
+    }
+
     protected function getRows()
     {
         if (!isset($this->_data['rows']) || !is_array($this->_data['rows'])) {
@@ -113,7 +124,7 @@ class Ess_M2ePro_Block_Adminhtml_Log_Grid_Summary extends Mage_Adminhtml_Block_W
         }
 
         $this->tip = Mage::helper('M2ePro')->escapeHtml($tip);
-        $this->iconSrc = $this->getSkinUrl('M2ePro').'/images/log_statuses/'.$icon.'.png';
+        $this->iconSrc = $this->getSkinUrl('M2ePro/images/log_statuses/'.$icon.'.png');
         $this->rows = $rows;
         //--------------------------
 

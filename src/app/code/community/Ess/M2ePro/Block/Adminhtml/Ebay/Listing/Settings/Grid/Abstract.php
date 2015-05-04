@@ -289,10 +289,15 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
         $this->addColumn('actions', array(
             'header'    => Mage::helper('M2ePro')->__('Actions'),
             'align'     => 'left',
-            'width'     => '50px',
+            'width'     => '100px',
+            'type'      => 'action',
+            'index'     => 'actions',
             'filter'    => false,
             'sortable'  => false,
-            'frame_callback' => array($this, 'callbackColumnActions')
+            'renderer'  => 'M2ePro/adminhtml_grid_column_renderer_action',
+            'field' => 'id',
+            'group_order' => $this->getGroupOrder(),
+            'actions'     => $this->getColumnActionsItems()
         ));
     }
 
@@ -308,39 +313,53 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
 
         // Set mass-action
         //--------------------------------
-        $this->getMassactionBlock()->addItem('editAllSettings', array(
-             'label'    => Mage::helper('M2ePro')->__('Edit Settings'),
-             'url'      => '',
-        ));
-
-        $this->getMassactionBlock()->addItem('editGeneralSettings', array(
-             'label'    => Mage::helper('M2ePro')->__('Edit Payment and Shipping Settings'),
-             'url'      => '',
-        ));
-
-        $this->getMassactionBlock()->addItem('editSellingSettings', array(
-             'label'    => Mage::helper('M2ePro')->__('Edit Selling Settings'),
-             'url'      => '',
-        ));
-
-        $this->getMassactionBlock()->addItem('editSynchSettings', array(
-             'label'    => Mage::helper('M2ePro')->__('Edit Synchronization Settings'),
-             'url'      => '',
-        ));
-
+        $this->_prepareMassactionGroup()
+             ->_prepareMassactionItems();
         //--------------------------------
 
         return parent::_prepareMassaction();
+    }
+
+    protected function _prepareMassactionGroup()
+    {
+        $this->getMassactionBlock()->setGroups(array(
+            'edit_settings' => Mage::helper('M2ePro')->__('Edit Settings'),
+            'edit_categories_settings' => Mage::helper('M2ePro')->__('Edit Categories Settings'),
+            'other' => Mage::helper('M2ePro')->__('Other')
+        ));
+
+        return $this;
+    }
+
+    protected function _prepareMassactionItems()
+    {
+        $this->getMassactionBlock()->addItem('editAllSettings', array(
+            'label'    => Mage::helper('M2ePro')->__('All Settings'),
+            'url'      => '',
+        ), 'edit_settings');
+
+        $this->getMassactionBlock()->addItem('editSellingSettings', array(
+            'label'    => Mage::helper('M2ePro')->__('Selling'),
+            'url'      => '',
+        ), 'edit_settings');
+
+        $this->getMassactionBlock()->addItem('editSynchSettings', array(
+            'label'    => Mage::helper('M2ePro')->__('Synchronization'),
+            'url'      => '',
+        ), 'edit_settings');
+
+        $this->getMassactionBlock()->addItem('editGeneralSettings', array(
+            'label'    => Mage::helper('M2ePro')->__('Payment and Shipping'),
+            'url'      => '',
+        ), 'edit_settings');
+
+        return $this;
     }
 
     // ####################################
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
         $value = '<span>'.Mage::helper('M2ePro')->escapeHtml($value).'</span>';
 
         $sku = $row->getData('sku');
@@ -374,9 +393,9 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $paymentSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $paymentSettings = $helper->__('M2E Pro -> ') . $tm->getResultObject()->getTitle(); break;
+                $paymentSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY:
-                $paymentSettings = $helper->__('eBay -> ') . $tm->getResultObject()->getApiName(); break;
+                $paymentSettings = $helper->__('eBay > ') . $tm->getResultObject()->getApiName(); break;
         }
 
         $tm = $listingProduct->getTemplateManager(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING);
@@ -388,9 +407,9 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $shippingSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $shippingSettings = $helper->__('M2E Pro -> ') . $tm->getResultObject()->getTitle(); break;
+                $shippingSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY:
-                $shippingSettings = $helper->__('eBay -> ') . $tm->getResultObject()->getApiName(); break;
+                $shippingSettings = $helper->__('eBay > ') . $tm->getResultObject()->getApiName(); break;
         }
 
         $tm = $listingProduct->getTemplateManager(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN);
@@ -402,20 +421,20 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $returnSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $returnSettings = $helper->__('M2E Pro -> ') . $tm->getResultObject()->getTitle(); break;
+                $returnSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY:
-                $returnSettings = $helper->__('eBay -> ') . $tm->getResultObject()->getApiName(); break;
+                $returnSettings = $helper->__('eBay > ') . $tm->getResultObject()->getApiName(); break;
         }
 
         $html = <<<HTML
 <div style="padding: 4px; color: #666666">
-    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Payment')}</span><br>
-    <span>{$paymentSettings}</span><br>
+    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Payment')}</span><br/>
+    <span>{$paymentSettings}</span><br/>
 
-    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Shipping')}</span><br>
-    <span>{$shippingSettings}</span><br>
+    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Shipping')}</span><br/>
+    <span>{$shippingSettings}</span><br/>
 
-    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Return')}</span><br>
+    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Return')}</span><br/>
     <span>{$returnSettings}</span>
 </div>
 HTML;
@@ -443,7 +462,7 @@ HTML;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $sellingSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $sellingSettings = $helper->__('M2E Pro -> ') . $tm->getResultObject()->getTitle(); break;
+                $sellingSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
         }
 
         $tm = $listingProduct->getTemplateManager(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION);
@@ -455,15 +474,15 @@ HTML;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $descriptionSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $descriptionSettings = $helper->__('M2E Pro -> ') . $tm->getResultObject()->getTitle(); break;
+                $descriptionSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
         }
 
         $html = <<<HTML
 <div style="padding: 4px; color: #666666">
-    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Price, Quantity and Format')}</span><br>
-    <span>{$sellingSettings}</span><br>
+    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Price, Quantity and Format')}</span><br/>
+    <span>{$sellingSettings}</span><br/>
 
-    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Description')}</span><br>
+    <span style="text-decoration: underline; font-weight: bold">{$helper->__('Description')}</span><br/>
     <span>{$descriptionSettings}</span>
 </div>
 HTML;
@@ -491,12 +510,12 @@ HTML;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $synchSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $synchSettings = $helper->__('M2E Pro -> ') . $tm->getResultObject()->getTitle(); break;
+                $synchSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
         }
 
         $html = <<<HTML
 <div style="padding: 4px">
-    <span style="color: #666666">{$synchSettings}</span><br>
+    <span style="color: #666666">{$synchSettings}</span><br/>
 </div>
 HTML;
 
@@ -505,56 +524,54 @@ HTML;
 
     // ####################################
 
-    protected function getActionColumnOptions()
+    protected function getGroupOrder()
+    {
+        return array(
+            'edit_general_settings'    => Mage::helper('M2ePro')->__('Edit General Settings'),
+            'edit_categories_settings' => Mage::helper('M2ePro')->__('Edit Categories Settings'),
+            'other'                    => Mage::helper('M2ePro')->__('Other')
+        );
+    }
+
+    protected function getColumnActionsItems()
     {
         $helper = Mage::helper('M2ePro');
 
-        $options = array(
-            array(
-                'label' => $helper->__('Edit Settings'),
-                'value' => 'editAllSettings'
+        $actions = array(
+            'allSettings' => array(
+                'caption' => $helper->__('All Settings'),
+                'group' => 'edit_general_settings',
+                'field' => 'id',
+                'onclick_action' => 'EbayListingSettingsGridHandlerObj.actions[\'editAllSettingsAction\']'
             ),
-            array(
-                'label' => $helper->__('Edit Payment and Shipping Settings'),
-                'value' => 'editGeneralSettings'
+
+            'editSelling' => array(
+                'caption' => $helper->__('Selling'),
+                'group'   => 'edit_general_settings',
+                'field'   => 'id',
+                'onclick_action' => 'EbayListingSettingsGridHandlerObj.actions[\'editSellingSettingsAction\']'
             ),
-            array(
-                'label' => $helper->__('Edit Selling Settings'),
-                'value' => 'editSellingSettings'
+
+            'editSynchSettings' => array(
+                'caption' => $helper->__('Synchronization'),
+                'group'   => 'edit_general_settings',
+                'field'   => 'id',
+                'onclick_action' => 'EbayListingSettingsGridHandlerObj.actions[\'editSynchSettingsAction\']'
             ),
+
+            'paymentAndShipping' => array(
+                'caption' => $helper->__('Payment and Shipping'),
+                'group'   => 'edit_general_settings',
+                'field'   => 'id',
+                'onclick_action' => 'EbayListingSettingsGridHandlerObj.actions[\'editGeneralSettingsAction\']'
+            )
         );
 
-        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
-            $options[] = array(
-                'label' => $helper->__('Edit Synchronization Settings'),
-                'value' => 'editSynchSettings'
-            );
+        if (Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
+            unset($actions['editSynchSettings']);
         }
 
-        return $options;
-    }
-
-    public function callbackColumnActions($value,$row)
-    {
-        $id = (int)$row->getData('listing_product_id');
-
-        $optionsHtml = '<option></option>';
-
-        foreach ($this->getActionColumnOptions() as $option) {
-            $optionsHtml .= <<<HTML
-            <option value="{$option['value']}">{$option['label']}</option>
-HTML;
-        }
-
-        return <<<HTML
-<div style="padding: 5px;">
-    <select
-        style="width: 100px;"
-        onchange="this.value && EbayListingSettingsGridHandlerObj.actions[this.value + 'Action']({$id});">
-        {$optionsHtml}
-    </select>
-</div>
-HTML;
+        return $actions;
     }
 
     // ####################################

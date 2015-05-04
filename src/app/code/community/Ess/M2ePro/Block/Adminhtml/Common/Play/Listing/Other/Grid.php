@@ -72,7 +72,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
         ));
 
         $this->addColumn('title', array(
-            'header' => Mage::helper('M2ePro')->__('Product Title / Reference Code'),
+            'header' => Mage::helper('M2ePro')->__('Title / Reference Code'),
             'align'  => 'left',
             'type'   => 'text',
             'index'  => 'title',
@@ -92,7 +92,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
         ));
 
         $this->addColumn('online_qty', array(
-            'header' => Mage::helper('M2ePro')->__('Play.com QTY'),
+            'header' => Mage::helper('M2ePro')->__('QTY'),
             'align'  => 'right',
             'width'  => '100px',
             'type'   => 'number',
@@ -102,7 +102,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
         ));
 
         $this->addColumn('online_price_gbr', array(
-            'header' => Mage::helper('M2ePro')->__('Play.com GBP Price'),
+            'header' => Mage::helper('M2ePro')->__('GBP Price'),
             'align'  => 'right',
             'width'  => '100px',
             'type'   => 'number',
@@ -112,7 +112,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
         ));
 
         $this->addColumn('online_price_euro', array(
-            'header' => Mage::helper('M2ePro')->__('Play.com EUR Price'),
+            'header' => Mage::helper('M2ePro')->__('EUR Price'),
             'align'  => 'right',
             'width'  => '100px',
             'type'   => 'number',
@@ -158,7 +158,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
                     'url'     => array(
                         'base'   => '*/adminhtml_common_log/listingOther',
                         'params' => array(
-                            'back' => $backUrl
+                            'back' => $backUrl,
+                            'channel' => Ess_M2ePro_Helper_Component_Play::NICK
                         )
                     )
                 ),
@@ -187,28 +188,33 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
         $this->getMassactionBlock()->setFormFieldName('ids');
         //--------------------------------
 
+        $this->getMassactionBlock()->setGroups(array(
+            'mapping' => Mage::helper('M2ePro')->__('Mapping'),
+            'other'   => Mage::helper('M2ePro')->__('Other')
+        ));
+
         // Set mass-action
         //--------------------------------
         $this->getMassactionBlock()->addItem('autoMapping', array(
             'label'   => Mage::helper('M2ePro')->__('Map Item(s) Automatically'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'mapping');
         $this->getMassactionBlock()->addItem('moving', array(
             'label'   => Mage::helper('M2ePro')->__('Move Item(s) To Listing'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'other');
         $this->getMassactionBlock()->addItem('removing', array(
             'label'   => Mage::helper('M2ePro')->__('Remove Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'other');
         $this->getMassactionBlock()->addItem('unmapping', array(
             'label'   => Mage::helper('M2ePro')->__('Unmap Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'mapping');
         //--------------------------------
 
         return parent::_prepareMassaction();
@@ -240,7 +246,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
                          .Mage::helper('M2ePro')->__('Map').'</a>';
 
             if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
-                $htmlValue .= '<br>' . $row->getId();
+                $htmlValue .= '<br/>' . $row->getId();
             }
 
             return $htmlValue;
@@ -261,7 +267,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
             .'</a>';
 
         if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
-            $htmlValue .= '<br>' . $row->getId();
+            $htmlValue .= '<br/>' . $row->getId();
         }
 
         return $htmlValue;
@@ -269,11 +275,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Other_Grid extends Mage_Adm
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
-        $value = Mage::helper('M2ePro')->escapeHtml($value);
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-        $value = '<span>' . $value . '</span>';
+        $value = '<span>' . Mage::helper('M2ePro')->escapeHtml($value) . '</span>';
 
         $tempSku = $row->getData('sku');
         is_null($tempSku) && $tempSku = Mage::helper('M2ePro')->__('N/A');

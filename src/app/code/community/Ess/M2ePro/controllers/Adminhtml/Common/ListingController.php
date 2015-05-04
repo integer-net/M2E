@@ -16,10 +16,17 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
              ->_title(Mage::helper('M2ePro')->__('Listings'));
 
         $this->getLayout()->getBlock('head')
-             ->addJs('M2ePro/Plugin/DropDown.js')
              ->addCss('M2ePro/css/Plugin/DropDown.css')
+             ->addCss('M2ePro/css/Plugin/AutoComplete.css')
+
+             ->addJs('M2ePro/Plugin/DropDown.js')
              ->addJs('M2ePro/Plugin/AutoComplete.js')
-             ->addCss('M2ePro/css/Plugin/AutoComplete.css');
+             ->addJs('M2ePro/Plugin/ActionColumn.js')
+
+             ->addJs('M2ePro/Listing/EditListingTitle.js')
+            ;
+
+        $this->_initPopUp();
 
         return $this;
     }
@@ -35,39 +42,35 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
     {
         /*!(bool)Mage::getModel('M2ePro/Template_SellingFormat')->getCollection()->getSize() &&
         $this->_getSession()->addNotice(
-            Mage::helper('M2ePro')->__('You must create at least one selling format template first.')
+            Mage::helper('M2ePro')->__('You must create at least one selling format policy first.')
         );
 
         !(bool)Mage::getModel('M2ePro/Template_Synchronization')->getCollection()->getSize() &&
         $this->_getSession()->addNotice(
-            Mage::helper('M2ePro')->__('You must create at least one synchronization template first.')
+            Mage::helper('M2ePro')->__('You must create at least one synchronization policy first.')
         );*/
 
         $this->_initAction();
 
-        // Video tutorial
-        //-------------
-        $isListingTutorialShownForAmazon = Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/view/common/amazon/listing/', 'tutorial_shown');
-        $isListingTutorialShownForBuy = Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/view/common/buy/listing/', 'tutorial_shown');
-        $isListingTutorialShownForPlay = Mage::helper('M2ePro/Module')->getConfig()
-            ->getGroupValue('/view/common/play/listing/', 'tutorial_shown');
-
-        if (
-            (Mage::helper('M2ePro/Component_Amazon')->isActive() && !$isListingTutorialShownForAmazon)
-            ||
-            (Mage::helper('M2ePro/Component_Buy')->isActive() && !$isListingTutorialShownForBuy)
-            ||
-            (Mage::helper('M2ePro/Component_Play')->isActive() && !$isListingTutorialShownForPlay)
-        ) {
-            $this->_initPopUp();
-            $this->getLayout()->getBlock('head')->addJs('M2ePro/VideoTutorialHandler.js');
-        }
-        //-------------
-
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_listing'))
              ->renderLayout();
+    }
+
+    //#############################################
+
+    public function saveTitleAction()
+    {
+        $listingId = $this->getRequest()->getParam('id');
+        $title = $this->getRequest()->getParam('title');
+
+        if (is_null($listingId)) {
+            return;
+        }
+
+        $model = Mage::getModel('M2ePro/Listing')->loadInstance((int)$listingId);
+        $model->setTitle($title)->save();
+
+        Mage::getModel('M2ePro/Listing_Log')->updateListingTitle($listingId, $title);
     }
 
     //#############################################
@@ -232,7 +235,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             $component, 'Listing_Product', $listingProductId
         );
 
-        $magentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
+        $magentoVariations = $listingProduct->getMagentoProduct()->getVariationInstance()->getVariationsTypeStandard();
         $magentoVariations = $magentoVariations['variations'];
         foreach ($magentoVariations as $key => $magentoVariation) {
             foreach ($magentoVariation as $option) {
@@ -252,8 +255,12 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             )));
         }
 
-        $listingProduct->getChildObject()->unsetMatchedVariation();
-        $listingProduct->getChildObject()->setMatchedVariation(reset($magentoVariations));
+        if ($listingProduct->isComponentModeAmazon()) {
+            $individualModel = $listingProduct->getChildObject()->getVariationManager()->getTypeModel();
+        } else {
+            $individualModel = $listingProduct->getChildObject()->getVariationManager();
+        }
+        $individualModel->setProductVariation(reset($magentoVariations));
 
         return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
@@ -281,17 +288,35 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             $component, 'Listing_Product', $listingProductId
         );
 
-        if ($listingProduct->getChildObject()->isVariationsReady()) {
-            $listingProduct = $listingProduct->duplicate();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+
+        if ($listingProduct->isComponentModeAmazon()) {
+            $isVariationProductMatched = (
+                $variationManager->isIndividualType() &&
+                $variationManager->getTypeModel()->isVariationProductMatched()
+            );
+        } else {
+            $isVariationProductMatched = $variationManager->isVariationProductMatched();
         }
 
-        $magentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
+        if ($isVariationProductMatched) {
+            $listingProduct = $this->duplicateListingProduct($listingProduct);
+        } else {
+
+            $listingProduct->setData('search_settings_status', NULL);
+            $listingProduct->setData('search_settings_data', NULL);
+            $listingProduct->save();
+
+        }
+
+        $magentoVariations = $listingProduct->getMagentoProduct()->getVariationInstance()->getVariationsTypeStandard();
         $magentoVariations = $magentoVariations['variations'];
 
         $isFirst = true;
         foreach ($variationsData as $variationData) {
 
-            !$isFirst && $listingProduct = $listingProduct->duplicate();
+            !$isFirst && $listingProduct = $this->duplicateListingProduct($listingProduct);
             $isFirst = false;
 
             $tempMagentoVariations = $magentoVariations;
@@ -314,14 +339,64 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
                 )));
             }
 
-            $listingProduct->getChildObject()->unsetMatchedVariation();
-            $listingProduct->getChildObject()->setMatchedVariation(reset($tempMagentoVariations));
+            if ($listingProduct->isComponentModeAmazon()) {
+                /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $listingProductManager */
+                $listingProductManager = $listingProduct->getChildObject()->getVariationManager();
+
+                if ($listingProductManager->isRelationParentType() && $listingProductManager->modeCanBeSwitched()) {
+                    $listingProductManager->switchModeToAnother();
+                }
+                $individualModel = $listingProductManager->getTypeModel();
+            } else {
+                $individualModel = $listingProduct->getChildObject()->getVariationManager();
+            }
+            $individualModel->setProductVariation(reset($tempMagentoVariations));
         }
 
         return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
             'message' => Mage::helper('M2ePro')->__('Variation(s) has been successfully saved.')
         )));
+    }
+
+    public function variationResetAction()
+    {
+        $component = $this->getRequest()->getParam('component');
+        $listingProductId = (int)$this->getRequest()->getParam('listing_product_id');
+
+        if (!$listingProductId || !$component) {
+            return $this->getResponse()->setBody(json_encode(array(
+                'type' => 'error',
+                'message' => Mage::helper('M2ePro')->__(
+                    'For changing the Mode of working with Magento Variational Product
+                     you have to choose the Specific Product.'
+                )
+            )));
+        }
+
+        /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+        $listingProduct = Mage::helper('M2ePro/Component')->getComponentObject(
+            $component, 'Listing_Product', $listingProductId
+        );
+
+        $listingProduct->setData('search_settings_status', NULL);
+        $listingProduct->setData('search_settings_data', NULL);
+        $listingProduct->save();
+
+        $listingProductManager = $listingProduct->getChildObject()->getVariationManager();
+        if ($listingProductManager->isIndividualType() && $listingProductManager->modeCanBeSwitched()) {
+            $listingProductManager->switchModeToAnother();
+        }
+
+        $listingProductManager->getTypeModel()->getProcessor()->process();
+
+        return $this->getResponse()->setBody(json_encode(array(
+            'type' => 'success',
+            'message' => Mage::helper('M2ePro')->__(
+                'Mode of working with Magento Variational Product has been switched to work with Parent-Child Product.'
+            )
+        )));
+
     }
 
     //---------------------------------------------
@@ -345,7 +420,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             $component, 'Listing_Product', $listingProductId
         );
 
-        $magentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
+        $magentoVariations = $listingProduct->getMagentoProduct()->getVariationInstance()->getVariationsTypeStandard();
         $magentoVariations = $magentoVariations['variations'];
 
         if (!$this->getRequest()->getParam('unique',false)) {
@@ -363,8 +438,18 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
 
         foreach ($listingProducts as $listingProduct) {
 
-            if (!$listingProduct->getChildObject()->isVariationsReady()) {
-                continue;
+            $variationManager = $listingProduct->getChildObject()->getVariationManager();
+
+            if ($listingProduct->isComponentModeAmazon()) {
+                if (!($variationManager->isIndividualType() &&
+                    $variationManager->getTypeModel()->isVariationProductMatched())) {
+
+                    continue;
+                }
+            } else {
+                if (!$variationManager->isVariationProductMatched()) {
+                    continue;
+                }
             }
 
             $variations = $listingProduct->getVariations(true);
@@ -420,13 +505,37 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
                 $component, 'Listing_Product', $listingProductId
             );
 
-            $listingProduct->duplicate();
+            $this->duplicateListingProduct($listingProduct);
         }
 
         return $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
-            'message' => Mage::helper('M2ePro')->__('The items were successfully duplicated.')
+            'message' => Mage::helper('M2ePro')->__('The Items were successfully duplicated.')
         )));
+    }
+
+    //#############################################
+
+    private function duplicateListingProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $duplicatedListingProduct = $listingProduct->getListing()->addProduct(
+            $listingProduct->getProductId(),false,false
+        );
+
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+        if (!$variationManager->isVariationProduct()) {
+            return $duplicatedListingProduct;
+        }
+
+        if ($listingProduct->isComponentModeAmazon()) {
+            $duplicatedListingProductManager = $duplicatedListingProduct->getChildObject()->getVariationManager();
+
+            if ($variationManager->isIndividualType() && $duplicatedListingProductManager->modeCanBeSwitched()) {
+                $duplicatedListingProductManager->switchModeToAnother();
+            }
+        }
+
+        return $duplicatedListingProduct;
     }
 
     //#############################################

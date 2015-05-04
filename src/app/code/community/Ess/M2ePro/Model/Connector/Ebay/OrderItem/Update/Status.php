@@ -11,7 +11,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Update_Status
     // Shipping status was not updated (Item: %item_id%, Transaction: %trn_id%). Reason: %msg%
     // Shipping status was not updated (Item: %item_id%, Transaction: %trn_id%). Reason: eBay Failure.
     // Tracking number "%num%" for "%code%" has been sent to eBay (Item: %item_id%, Transaction: %trn_id%).
-    // Order item has been marked as shipped (Item: %item_id%, Transaction: %trn_id%).
+    // Order Item has been marked as Shipped (Item: %item_id%, Transaction: %trn_id%).
 
     /** @var $orderItem Ess_M2ePro_Model_Order_Item */
     private $orderItem;
@@ -109,7 +109,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Update_Status
                 '!trn_id'  => $this->orderItem->getChildObject()->getTransactionId(),
             ));
         } else {
-            $message = 'Order item has been marked as shipped (Item: %item_id%, Transaction: %trn_id%).';
+            $message = 'Order Item has been marked as Shipped (Item: %item_id%, Transaction: %trn_id%).';
             $this->orderItem->getOrder()->addSuccessLog($message, array(
                 '!item_id' => $this->orderItem->getChildObject()->getItemId(),
                 '!trn_id'  => $this->orderItem->getChildObject()->getTransactionId(),

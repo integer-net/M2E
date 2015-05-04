@@ -19,7 +19,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct extends Mage_Adm
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('New SKU Templates For Rakuten.com (Beta)');
+        $this->_headerText = Mage::helper('M2ePro')->__('New SKU Policies For Rakuten.com (Beta)');
         //------------------------------
 
         // Set buttons actions
@@ -51,14 +51,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct extends Mage_Adm
         ));
         //------------------------------
 
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-        //------------------------------
-
         $backUrl = Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_common_buy_template_newProduct');
 
         //------------------------------
@@ -69,7 +61,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct extends Mage_Adm
             )
         );
         $this->_addButton('new', array(
-            'label'     => Mage::helper('M2ePro')->__('Add New SKU Template'),
+            'label'     => Mage::helper('M2ePro')->__('Add New SKU Policy'),
             'onclick'   => 'setLocation(\''.$url.'\')',
             'class'     => 'add'
         ));

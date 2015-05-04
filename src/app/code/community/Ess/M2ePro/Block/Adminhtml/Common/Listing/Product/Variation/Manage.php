@@ -37,7 +37,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Manage
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData(array(
-                'label' => Mage::helper('M2ePro')->__('Add More Variations'),
+                'label' => Mage::helper('M2ePro')->__('Add Another Variation'),
                 'onclick' => '',
                 'class' => 'add',
                 'id' => 'add_more_variation_button'
@@ -56,23 +56,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Manage
             ));
         $this->setChild('variation_manage_confirm', $buttonBlock);
 
-        $buttonBlock = $this->getLayout()
-            ->createBlock('adminhtml/widget_button')
-            ->setData(array(
-                'label' => Mage::helper('M2ePro')->__('Close'),
-                'onclick' => 'ListingProductVariationHandlerObj.managePopup.close();',
-                'class' => 'close',
-                'id' => 'variation_manage_close'
-            ));
-        $this->setChild('variation_manage_close', $buttonBlock);
-
         //------------------------------
 
         $onClick = 'ListingProductVariationHandlerObj.manageGenerateAction(false);';
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData(array(
-                'label' => Mage::helper('M2ePro')->__('Generate All Combinations'),
+                'label' => Mage::helper('M2ePro')->__('Generate All Variations'),
                 'onclick' => $onClick,
                 'class' => 'button',
                 'id' => 'variation_manage_generate_all'
@@ -83,7 +73,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Manage
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')
             ->setData(array(
-                'label' => Mage::helper('M2ePro')->__('Generate Non-Existing Combinations'),
+                'label' => Mage::helper('M2ePro')->__('Generate Non-Existing Variations'),
                 'onclick' => $onClick,
                 'class' => 'button',
                 'id' => 'variation_manage_generate_unique'

@@ -1,8 +1,8 @@
 <div id="block_notice_ebay_listing_other_synchronization_stop" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Stop Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Define the conditions when you want eBay items stopped.
+    <?php echo Mage::helper('M2ePro')->__('Define the conditions when you want eBay Items stopped.
     <br/><br/>
-    <b>Note:</b> If all options are set to No or No Action, then the stop action is disabled.<br>
-If all options are enabled, then an item will be stopped if at least one of the Stop Conditions is met.'); ?>
+    <b>Note:</b> If all options are set to No or No Action, then the stop action is disabled.<br/>
+If all options are enabled, then an Item will be stopped if at least one of the Stop Conditions is met.'); ?>
 </div>
 
 <?php
@@ -25,6 +25,8 @@ If all options are enabled, then an item will be stopped if at least one of the 
         $('stop_qty')
             .observe('change', EbayListingOtherSynchronizationHandlerObj.stop_qty_change)
             .simulate('change');
+        $('ebayListingOtherSynchronizationEditTabs_stop')
+            .observe('click', EbayListingOtherSynchronizationHandlerObj.check_synchronization_mode);
     });
 
 </script>
@@ -82,7 +84,7 @@ If all options are enabled, then an item will be stopped if at least one of the 
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::STOP_QTY_BETWEEN; ?>" <?php if ($formData['stop_qty'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::STOP_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops eBay listing if its Magento quantity is changed and meets the conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops eBay listing if its Magento Quantity is changed and meets the conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>

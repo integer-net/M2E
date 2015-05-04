@@ -139,7 +139,7 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Response
     // ----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @return Ess_M2ePro_Model_Magento_Product_Cache
      */
     protected function getMagentoProduct()
     {
@@ -190,8 +190,8 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Response
     {
         $data['online_qty_sold'] = 0;
 
-        if ($this->getRequestData()->hasQtyData()) {
-            $data['online_qty'] = $this->getRequestData()->getQtyData();
+        if ($this->getRequestData()->hasQty()) {
+            $data['online_qty'] = $this->getRequestData()->getQty();
         }
 
         return $data;
@@ -199,8 +199,8 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Response
 
     protected function appendOnlinePriceValue($data)
     {
-        if ($this->getRequestData()->hasPriceFixedData()) {
-            $data['online_price'] = $this->getRequestData()->getPriceFixedData();
+        if ($this->getRequestData()->hasPriceFixed()) {
+            $data['online_price'] = $this->getRequestData()->getPriceFixed();
         }
 
         return $data;
@@ -208,8 +208,8 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Response
 
     protected function appendTitleValue($data)
     {
-        if ($this->getRequestData()->hasTitleData()) {
-            $data['title'] = $this->getRequestData()->getTitleData();
+        if ($this->getRequestData()->hasTitle()) {
+            $data['title'] = $this->getRequestData()->getTitle();
         }
 
         return $data;

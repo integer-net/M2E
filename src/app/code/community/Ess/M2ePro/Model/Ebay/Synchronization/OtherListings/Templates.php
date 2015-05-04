@@ -89,7 +89,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
 
     private function executeRunner()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Apply products changes on eBay');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Apply Products changes on eBay');
 
         $result = $this->runner->execute();
         $this->affectResultRunner($result);
@@ -127,7 +127,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
             ), $resultType, $resultPriority
         );
 
-        $this->getActualOperationHistory()->addText('Updating products on eBay ended with '.$resultString.'.');
+        $this->getActualOperationHistory()->addText('Updating Products on eBay ended with '.$resultString.'.');
     }
 
     //####################################

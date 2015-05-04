@@ -396,7 +396,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
         $logModel = Mage::getModel('M2ePro/Listing_Log');
         $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
-        $logActionId = $logModel->getNextActionId();
+        $logsActionId = $logModel->getNextActionId();
 
         $statusLogMessage = $this->getStatusLogMessage($status);
 
@@ -405,7 +405,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
             $listingProduct->getData('product_id'),
             $listingProduct->getId(),
             Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
-            $logActionId,
+            $logsActionId,
             Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL,
             $statusLogMessage,
             Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
@@ -417,8 +417,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
         }
 
         // M2ePro_TRANSLATIONS
-        // Duplicated item %item_id% was found and stopped on eBay.;
-        $textToTranslate = 'Duplicated item %item_id% was found and stopped on eBay.';
+        // Duplicated Item %item_id% was found and stopped on eBay.;
+        $textToTranslate = 'Duplicated Item %item_id% was found and stopped on eBay.';
         $duplicateDeletedMessage = Mage::helper('M2ePro')->__($textToTranslate, $duplicateItemId);
 
         $logModel->addProductMessage(
@@ -426,7 +426,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
             $listingProduct->getData('product_id'),
             $listingProduct->getId(),
             Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
-            $logActionId,
+            $logsActionId,
             Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL,
             $duplicateDeletedMessage,
             Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
@@ -468,9 +468,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
         }
 
         // M2ePro_TRANSLATIONS
-        // Duplicated item %item_id% was found and stopped on eBay.
+        // Duplicated Item %item_id% was found and stopped on eBay.
 
-        $textToTranslate = 'Duplicated item %item_id% was found and stopped on eBay.';
+        $textToTranslate = 'Duplicated Item %item_id% was found and stopped on eBay.';
         $duplicateDeletedMessage = Mage::helper('M2ePro')->__($textToTranslate, $duplicateItemId);
 
         $logModel->addProductMessage(

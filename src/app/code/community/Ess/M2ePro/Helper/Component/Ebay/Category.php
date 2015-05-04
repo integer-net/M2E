@@ -142,7 +142,7 @@ class Ess_M2ePro_Helper_Component_Ebay_Category extends Mage_Core_Helper_Abstrac
                 $resultData[$mode.'_mode'] = Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE;
                 $resultData[$mode.'_attribute'] = NULL;
                 $resultData[$mode.'_message'] = Mage::helper('M2ePro')->__(
-                    'Please, specify a value suitable for all chosen products.'
+                    'Please, specify a value suitable for all chosen Products.'
                 );
             }
         }
@@ -180,7 +180,7 @@ class Ess_M2ePro_Helper_Component_Ebay_Category extends Mage_Core_Helper_Abstrac
                 $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $data[$key.'_attribute'], $listing->getStoreId()
                 );
-                $data[$key.'_path'] = 'Magento Attribute' . ' -> ' . $attributeLabel;
+                $data[$key.'_path'] = 'Magento Attribute' . ' > ' . $attributeLabel;
             }
         }
     }

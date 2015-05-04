@@ -25,6 +25,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Rakuten_Marketplace_Form extends Mage_Ad
     protected function _beforeToHtml()
     {
         //----------------------------
+        /** @var Ess_M2ePro_Model_Marketplace[] $marketplaces */
         $marketplaces = array();
         $marketplaces[Ess_M2ePro_Helper_Component_Buy::NICK] = Mage::helper('M2ePro/Component_Buy')
                                                                         ->getCollection('Marketplace')->getFirstItem();
@@ -33,7 +34,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Rakuten_Marketplace_Form extends Mage_Ad
 
         $activeWizard = $this->getActiveWizard();
         if (!is_null($activeWizard)) {
-            $marketplaces = array($marketplaces[$activeWizard]);
+            $marketplaces = array($activeWizard => $marketplaces[$activeWizard]);
         }
 
         $groups = array();
@@ -41,7 +42,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Rakuten_Marketplace_Form extends Mage_Ad
         $previewGroup = '';
         $idGroup = 1;
 
-        foreach($marketplaces as $marketplace) {
+        foreach($marketplaces as $component => $marketplace) {
 
             if ($marketplace->getGroupTitle() != $previewGroup) {
                 $previewGroup = $marketplace->getGroupTitle();
@@ -58,9 +59,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Rakuten_Marketplace_Form extends Mage_Ad
                 'status' => $marketplace->getStatus()
             );
 
+            $isLocked = (bool)Mage::helper('M2ePro/Component_'.ucfirst($component))
+                ->getCollection('Account')
+                ->getSize();
+
             $marketplace = array(
                 'instance' => $marketplace,
-                'params'   => array('locked'=>$marketplace->isLocked())
+                'params'   => array('locked' => $isLocked)
             );
 
             $groups[count($groups)-1]['marketplaces'][] = $marketplace;

@@ -28,9 +28,9 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
     private $shippingTemplateModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Magento_Product
+     * @var Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated_Source[]
      */
-    private $magentoProductModel = NULL;
+    private $shippingCalculatedSourceModels = array();
 
     // ########################################
 
@@ -46,7 +46,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
     {
         $temp = parent::deleteInstance();
         $temp && $this->shippingTemplateModel = NULL;
-        $temp && $this->magentoProductModel = NULL;
+        $temp && $this->shippingCalculatedSourceModels = array();
         return $temp;
     }
 
@@ -61,9 +61,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
             $this->shippingTemplateModel = Mage::helper('M2ePro')->getCachedObject(
                 'Ebay_Template_Shipping', $this->getId(), NULL, array('template')
             );
-            if (!is_null($this->getMagentoProduct())) {
-                $this->shippingTemplateModel->setMagentoProduct($this->getMagentoProduct());
-            }
         }
 
         return $this->shippingTemplateModel;
@@ -80,19 +77,24 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
     //------------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated_Source
      */
-    public function getMagentoProduct()
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
-        return $this->magentoProductModel;
-    }
+        $productId = $magentoProduct->getProductId();
 
-    /**
-     * @param Ess_M2ePro_Model_Magento_Product $instance
-     */
-    public function setMagentoProduct(Ess_M2ePro_Model_Magento_Product $instance)
-    {
-        $this->magentoProductModel = $instance;
+        if (!empty($this->shippingCalculatedSourceModels[$productId])) {
+            return $this->shippingCalculatedSourceModels[$productId];
+        }
+
+        $this->shippingCalculatedSourceModels[$productId] = Mage::getModel(
+            'M2ePro/Ebay_Template_Shipping_Calculated_Source'
+        );
+        $this->shippingCalculatedSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->shippingCalculatedSourceModels[$productId]->setShippingCalculatedTemplate($this);
+
+        return $this->shippingCalculatedSourceModels[$productId];
     }
 
     // #######################################
@@ -195,103 +197,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
 
     // #######################################
 
-    public function getPackageSize()
-    {
-        $src = $this->getPackageSizeSource();
-
-        if ($src['mode'] == self::PACKAGE_SIZE_CUSTOM_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
-    }
-
-    public function getDimension()
-    {
-        $src = $this->getDimensionSource();
-
-        if ($src['mode'] == self::DIMENSION_NONE) {
-            return array();
-        }
-
-        if ($src['mode'] == self::DIMENSION_CUSTOM_ATTRIBUTE) {
-
-            $widthValue = str_replace(',','.',$this->getMagentoProduct()->getAttributeValue($src['width_attribute']));
-            $lengthValue = str_replace(',','.',$this->getMagentoProduct()->getAttributeValue($src['length_attribute']));
-            $depthValue = str_replace(',','.',$this->getMagentoProduct()->getAttributeValue($src['depth_attribute']));
-
-            return array(
-                'width' => $widthValue,
-                'length' => $lengthValue,
-                'depth' => $depthValue
-            );
-        }
-
-        return array(
-            'width' => $src['width_value'],
-            'length' => $src['length_value'],
-            'depth' => $src['depth_value']
-        );
-    }
-
-    public function getWeight()
-    {
-        $src = $this->getWeightSource();
-
-        if ($src['mode'] == self::WEIGHT_CUSTOM_ATTRIBUTE) {
-
-            $weightValue = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-            $weightValue = str_replace(',', '.', $weightValue);
-            $weightArray = explode('.', $weightValue);
-
-            $minor = $major = 0;
-            if (count($weightArray) >= 2) {
-                list($major, $minor) = $weightArray;
-
-                if ($minor > 0 && $this->isMeasurementSystemEnglish()) {
-                    $minor = ($minor / pow(10, strlen($minor))) * 16;
-                    $minor = ceil($minor);
-                    if ($minor == 16) {
-                        $major += 1;
-                        $minor = 0;
-                    }
-                }
-
-                if ($minor > 0 && $this->isMeasurementSystemMetric()) {
-                    $minor = ($minor / pow(10, strlen($minor))) * 1000;
-                    $minor = ceil($minor);
-                    if ($minor == 1000) {
-                        $major += 1;
-                        $minor = 0;
-                    }
-                }
-
-                $minor < 0 && $minor = 0;
-            } else {
-                $major = (int)$weightValue;
-            }
-
-            return array(
-                'minor' => (float)$minor,
-                'major' => (int)$major
-            );
-        }
-
-        if ($src['mode'] == self::WEIGHT_NONE) {
-            return array(
-                'minor' => 0,
-                'major' => 0
-            );
-        }
-
-        return array(
-            'minor' => (float)$src['minor'],
-            'major' => (int)$src['major']
-        );
-    }
-
-    // #######################################
-
     public function getLocalHandlingCost()
     {
         return (float)$this->getData('local_handling_cost');
@@ -322,13 +227,13 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated extends Ess_M2ePro_Mode
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_shipping_calculated');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_shipping_calculated');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_shipping_calculated');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_shipping_calculated');
         return parent::delete();
     }
 

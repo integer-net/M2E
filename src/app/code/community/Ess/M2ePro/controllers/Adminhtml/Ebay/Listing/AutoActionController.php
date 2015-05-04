@@ -28,7 +28,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
         //------------------------------
         $listingId = $this->getRequest()->getParam('listing_id');
         $autoMode  = $this->getRequest()->getParam('auto_mode');
-        $listing   = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $listingId);
+        $listing   = Mage::helper('M2ePro/Component')->getCachedUnknownObject('Listing', $listingId);
 
         Mage::helper('M2ePro/Data_Global')->setValue('listing', $listing);
         //------------------------------
@@ -40,16 +40,16 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
         $this->loadLayout();
 
         switch ($autoMode) {
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_GLOBAL:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_GLOBAL:
                 $block = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_autoAction_mode_global');
                 break;
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_WEBSITE:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_WEBSITE:
                 $block = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_autoAction_mode_website');
                 break;
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_CATEGORY:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_CATEGORY:
                 $block = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_autoAction_mode_category');
                 break;
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_NONE:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_NONE:
             default:
                 $block = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_autoAction_mode');
                 break;
@@ -64,12 +64,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
     {
         //------------------------------
         $listingId = $this->getRequest()->getParam('listing_id');
+        $groupId = $this->getRequest()->getParam('group_id');
         $autoMode  = $this->getRequest()->getParam('auto_mode');
         $listing   = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $listingId);
         //------------------------------
 
-        $template = $this->getCategoryTemplate($autoMode, $listing);
-        $otherTemplate = $this->getOtherCategoryTemplate($autoMode, $listing);
+        $template = $this->getCategoryTemplate($autoMode, $groupId, $listing);
+        $otherTemplate = $this->getOtherCategoryTemplate($autoMode, $groupId, $listing);
 
         $this->loadLayout();
 
@@ -93,6 +94,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
     {
         //------------------------------
         $listingId = $this->getRequest()->getParam('listing_id');
+        $groupId = $this->getRequest()->getParam('group_id');
         $autoMode = $this->getRequest()->getParam('auto_mode');
         $categoryMode = $this->getRequest()->getParam('category_mode');
         $categoryValue = $this->getRequest()->getParam('category_value');
@@ -104,13 +106,12 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
         /* @var $specific Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific */
         $specific = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_category_specific');
         $specific->setMarketplaceId($listing->getMarketplaceId());
-        $specific->setDivId('data_container');
         $specific->setCategoryMode($categoryMode);
         $specific->setCategoryValue($categoryValue);
 
         $categoryWasChanged = false;
 
-        $template = $this->getCategoryTemplate($autoMode, $listing);
+        $template = $this->getCategoryTemplate($autoMode, $groupId, $listing);
 
         if (!$template) {
             $categoryWasChanged = true;
@@ -154,27 +155,28 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
         $this->getResponse()->setBody($specific->toHtml());
     }
 
-    private function getCategoryTemplate($autoMode, $listing)
+    private function getCategoryTemplate($autoMode, $groupId, $listing)
     {
         $template = NULL;
 
         switch ($autoMode) {
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_GLOBAL:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_GLOBAL:
                 $template = $listing->getChildObject()->getAutoGlobalAddingCategoryTemplate();
                 break;
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_WEBSITE:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_WEBSITE:
                 $template = $listing->getChildObject()->getAutoWebsiteAddingCategoryTemplate();
                 break;
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_CATEGORY:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_CATEGORY:
                 if ($magentoCategoryId = $this->getRequest()->getParam('magento_category_id')) {
-                    $autoCategory = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category')
+                    $autoCategory = Mage::getModel('M2ePro/Listing_Auto_Category')
                         ->getCollection()
-                            ->addFieldToFilter('listing_id', $listing->getId())
+                            ->addFieldToFilter('group_id', $groupId)
                             ->addFieldToFilter('category_id', $magentoCategoryId)
                             ->getFirstItem();
 
                     if ($autoCategory->getId()) {
-                        $template = $autoCategory->getCategoryTemplate();
+                        $template = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group')
+                            ->loadInstance($groupId)->getCategoryTemplate();
                     }
                 }
                 break;
@@ -183,27 +185,28 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
         return $template;
     }
 
-    private function getOtherCategoryTemplate($autoMode, $listing)
+    private function getOtherCategoryTemplate($autoMode, $groupId, $listing)
     {
         $template = NULL;
 
         switch ($autoMode) {
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_GLOBAL:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_GLOBAL:
                 $template = $listing->getChildObject()->getAutoGlobalAddingOtherCategoryTemplate();
                 break;
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_WEBSITE:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_WEBSITE:
                 $template = $listing->getChildObject()->getAutoWebsiteAddingOtherCategoryTemplate();
                 break;
-            case Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_CATEGORY:
+            case Ess_M2ePro_Model_Listing::AUTO_MODE_CATEGORY:
                 if ($magentoCategoryId = $this->getRequest()->getParam('magento_category_id')) {
-                    $autoCategory = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category')
+                    $autoCategory = Mage::getModel('M2ePro/Listing_Auto_Category')
                         ->getCollection()
-                            ->addFieldToFilter('listing_id', $listing->getId())
+                            ->addFieldToFilter('group_id', $groupId)
                             ->addFieldToFilter('category_id', $magentoCategoryId)
                             ->getFirstItem();
 
                     if ($autoCategory->getId()) {
-                        $template = $autoCategory->getOtherCategoryTemplate();
+                        $template = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group')
+                            ->loadInstance($groupId)->getOtherCategoryTemplate();
                     }
                 }
                 break;
@@ -255,22 +258,22 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
         }
 
         $listingData = array(
-            'auto_mode' => Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_NONE,
-            'auto_global_adding_mode' => Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE,
+            'auto_mode' => Ess_M2ePro_Model_Listing::AUTO_MODE_NONE,
+            'auto_global_adding_mode' => Ess_M2ePro_Model_Listing::ADDING_MODE_NONE,
             'auto_global_adding_template_category_id' => NULL,
             'auto_global_adding_template_other_category_id' => NULL,
-            'auto_website_adding_mode' => Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE,
+            'auto_website_adding_mode' => Ess_M2ePro_Model_Listing::ADDING_MODE_NONE,
             'auto_website_adding_template_category_id' => NULL,
             'auto_website_adding_template_other_category_id' => NULL,
-            'auto_website_deleting_mode' => Ess_M2ePro_Model_Ebay_Listing::DELETING_MODE_NONE
+            'auto_website_deleting_mode' => Ess_M2ePro_Model_Listing::DELETING_MODE_NONE
         );
 
         $addingModeAddAndAssignCategory = Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_ADD_AND_ASSIGN_CATEGORY;
 
         // mode global
         //------------------------------
-        if ($data['auto_mode'] == Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_GLOBAL) {
-            $listingData['auto_mode'] = Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_GLOBAL;
+        if ($data['auto_mode'] == Ess_M2ePro_Model_Listing::AUTO_MODE_GLOBAL) {
+            $listingData['auto_mode'] = Ess_M2ePro_Model_Listing::AUTO_MODE_GLOBAL;
             $listingData['auto_global_adding_mode'] = $data['auto_global_adding_mode'];
 
             if ($data['auto_global_adding_mode'] == $addingModeAddAndAssignCategory) {
@@ -292,8 +295,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
 
         // mode website
         //------------------------------
-        if ($data['auto_mode'] == Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_WEBSITE) {
-            $listingData['auto_mode'] = Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_WEBSITE;
+        if ($data['auto_mode'] == Ess_M2ePro_Model_Listing::AUTO_MODE_WEBSITE) {
+            $listingData['auto_mode'] = Ess_M2ePro_Model_Listing::AUTO_MODE_WEBSITE;
             $listingData['auto_website_adding_mode'] = $data['auto_website_adding_mode'];
             $listingData['auto_website_deleting_mode'] = $data['auto_website_deleting_mode'];
 
@@ -316,29 +319,20 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
 
         // mode category
         //------------------------------
-        if ($data['auto_mode'] == Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_CATEGORY) {
-            $listingData['auto_mode'] = Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_CATEGORY;
+        if ($data['auto_mode'] == Ess_M2ePro_Model_Listing::AUTO_MODE_CATEGORY) {
+            $listingData['auto_mode'] = Ess_M2ePro_Model_Listing::AUTO_MODE_CATEGORY;
 
-            //------------------------------
-            $group = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group');
+            $group = Mage::helper('M2ePro/Component')
+                ->getComponentModel($this->getCustomViewNick(), 'Listing_Auto_Category_Group');
 
-            if ((int)$data['group_id'] > 0) {
-                $group->load((int)$data['group_id']);
+            if ((int)$data['id'] > 0) {
+                $group->loadInstance((int)$data['id']);
+            } else {
+                unset($data['id']);
             }
 
+            $group->addData($data);
             $group->setData('listing_id', $listingId);
-            $group->setData('title', $data['group_title']);
-            $group->save();
-            //------------------------------
-
-            //------------------------------
-            $autoCategoryData = array();
-            $autoCategoryData['group_id'] = $group->getId();
-            $autoCategoryData['listing_id'] = $listingId;
-            $autoCategoryData['adding_mode'] = $data['adding_mode'];
-            $autoCategoryData['deleting_mode'] = $data['deleting_mode'];
-            $autoCategoryData['adding_template_category_id'] = NULL;
-            //------------------------------
 
             if ($data['adding_mode'] == Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_ADD_AND_ASSIGN_CATEGORY) {
                 $builderData = $data['template_category_data'];
@@ -351,27 +345,22 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
                     $builderData
                 );
 
-                $autoCategoryData['adding_template_category_id'] = $categoryTemplate->getId();
-                $autoCategoryData['adding_template_other_category_id'] = $otherCategoryTemplate->getId();
+                $group->setData('adding_template_category_id', $categoryTemplate->getId());
+                $group->setData('adding_template_other_category_id', $otherCategoryTemplate->getId());
+            } else {
+                $group->setData('adding_template_category_id', NULL);
+                $group->setData('adding_template_other_category_id', NULL);
             }
+
+            $group->save();
+            $group->clearCategories();
 
             foreach ($data['categories'] as $categoryId) {
-                $autoCategory = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category')
-                    ->getCollection()
-                        ->addFieldToFilter('listing_id', $listingId)
-                        ->addFieldToFilter('category_id', $categoryId)
-                        ->getFirstItem();
-
-                $autoCategoryData['category_id'] = $categoryId;
-                $autoCategory->addData($autoCategoryData)->save();
+                $category = Mage::getModel('M2ePro/Listing_Auto_Category');
+                $category->setData('group_id', $group->getId());
+                $category->setData('category_id', $categoryId);
+                $category->save();
             }
-
-            Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category')
-                ->assignGroup(
-                    $listingId,
-                    $group->getId(),
-                    $data['categories']
-                );
         }
         //------------------------------
 
@@ -388,19 +377,19 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
         //------------------------------
 
         $data = array(
-            'auto_mode' => Ess_M2ePro_Model_Ebay_Listing::AUTO_MODE_NONE,
-            'auto_global_adding_mode' => Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE,
+            'auto_mode' => Ess_M2ePro_Model_Listing::AUTO_MODE_NONE,
+            'auto_global_adding_mode' => Ess_M2ePro_Model_Listing::ADDING_MODE_NONE,
             'auto_global_adding_template_category_id' => NULL,
             'auto_global_adding_template_other_category_id' => NULL,
-            'auto_website_adding_mode' => Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_NONE,
+            'auto_website_adding_mode' => Ess_M2ePro_Model_Listing::ADDING_MODE_NONE,
             'auto_website_adding_template_category_id' => NULL,
             'auto_website_adding_template_other_category_id' => NULL,
-            'auto_website_deleting_mode' => Ess_M2ePro_Model_Ebay_Listing::DELETING_MODE_NONE
+            'auto_website_deleting_mode' => Ess_M2ePro_Model_Listing::DELETING_MODE_NONE
         );
 
         $listing->addData($data)->save();
 
-        foreach ($listing->getChildObject()->getAutoCategoriesGroups(true) as $autoCategoryGroup) {
+        foreach ($listing->getAutoCategoriesGroups(true) as $autoCategoryGroup) {
             $autoCategoryGroup->deleteInstance();
         }
     }
@@ -409,12 +398,12 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
 
     public function deleteCategoryAction()
     {
-        $listingId = $this->getRequest()->getParam('listing_id');
+        $groupId = $this->getRequest()->getParam('group_id');
         $categoryId = $this->getRequest()->getParam('category_id');
 
-        $category = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category')
+        $category = Mage::getModel('M2ePro/Listing_Auto_Category')
             ->getCollection()
-                ->addFieldToFilter('listing_id', (int)$listingId)
+                ->addFieldToFilter('group_id', (int)$groupId)
                 ->addFieldToFilter('category_id', (int)$categoryId)
                 ->getFirstItem();
 
@@ -424,8 +413,9 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
 
         $category->deleteInstance();
 
-        Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category_Group')
-            ->deleteEmpty($listingId);
+        if(Mage::getResourceModel('M2ePro/Listing_Auto_Category_Group')->isEmpty($groupId)) {
+            Mage::getModel('M2ePro/Listing_Auto_Category_Group')->loadInstance($groupId)->deleteInstance();
+        }
     }
 
     //#############################################
@@ -434,7 +424,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
     {
         $groupId = $this->getRequest()->getParam('group_id');
 
-        Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group')
+        Mage::getModel('M2ePro/Listing_Auto_Category_Group')
             ->loadInstance($groupId)
             ->deleteInstance();
     }
@@ -451,7 +441,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_AutoActionController
             return $this->getResponse()->setBody(json_encode(array('unique' => false)));
         }
 
-        $collection = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group')
+        $collection = Mage::getModel('M2ePro/Listing_Auto_Category_Group')
             ->getCollection()
                 ->addFieldToFilter('listing_id', $listingId)
                 ->addFieldToFilter('title', $title);

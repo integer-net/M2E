@@ -10,7 +10,6 @@
  */
 class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
-    const SKU_MODE_NOT_SET          = 0;
     const SKU_MODE_PRODUCT_ID       = 3;
     const SKU_MODE_DEFAULT          = 1;
     const SKU_MODE_CUSTOM_ATTRIBUTE = 2;
@@ -27,7 +26,6 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
     const SEARCH_BY_MAGENTO_TITLE_MODE_NONE = 0;
     const SEARCH_BY_MAGENTO_TITLE_MODE_YES  = 1;
 
-    const CONDITION_MODE_NOT_SET          = 0;
     const CONDITION_MODE_DEFAULT          = 1;
     const CONDITION_MODE_CUSTOM_ATTRIBUTE = 2;
 
@@ -43,18 +41,19 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
     const CONDITION_REFURBISHED            = 'Refurbished';
     const CONDITION_CLUB                   = 'Club';
 
-    const CONDITION_NOTE_MODE_NOT_SET          = 0;
     const CONDITION_NOTE_MODE_NONE             = 3;
     const CONDITION_NOTE_MODE_CUSTOM_VALUE     = 1;
-    const CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE = 2;
 
-    const HANDLING_TIME_MODE_NONE             = 0;
+    const HANDLING_TIME_MODE_NONE             = 3;
     const HANDLING_TIME_MODE_RECOMMENDED      = 1;
     const HANDLING_TIME_MODE_CUSTOM_ATTRIBUTE = 2;
 
     const RESTOCK_DATE_MODE_NONE              = 1;
     const RESTOCK_DATE_MODE_CUSTOM_VALUE      = 2;
     const RESTOCK_DATE_MODE_CUSTOM_ATTRIBUTE  = 3;
+
+    const ADDING_MODE_ADD_AND_CREATE_NEW_ASIN_NO  = 0;
+    const ADDING_MODE_ADD_AND_CREATE_NEW_ASIN_YES = 1;
 
     // ########################################
 
@@ -67,6 +66,9 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
      * @var Ess_M2ePro_Model_Template_Synchronization
      */
     private $synchronizationTemplateModel = NULL;
+
+    /** @var Ess_M2ePro_Model_Amazon_Listing_Source[] */
+    private $listingSourceModels = array();
 
     // ########################################
 
@@ -84,6 +86,27 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         $temp && $this->sellingFormatTemplateModel = NULL;
         $temp && $this->synchronizationTemplateModel = NULL;
         return $temp;
+    }
+
+    // ########################################
+
+    /**
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Amazon_Listing_Source
+     */
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
+    {
+        $productId = $magentoProduct->getProductId();
+
+        if (!empty($this->listingSourceModels[$productId])) {
+            return $this->listingSourceModels[$productId];
+        }
+
+        $this->listingSourceModels[$productId] = Mage::getModel('M2ePro/Amazon_Listing_Source');
+        $this->listingSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->listingSourceModels[$productId]->setListing($this->getParentObject());
+
+        return $this->listingSourceModels[$productId];
     }
 
     // ########################################
@@ -194,11 +217,6 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
 
     // ########################################
 
-    public function getAttributeSets()
-    {
-        return $this->getParentObject()->getAttributeSets();
-    }
-
     public function getProducts($asObjects = false, array $filters = array())
     {
         return $this->getParentObject()->getProducts($asObjects,$filters);
@@ -211,14 +229,21 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
 
     // ########################################
 
+    public function getAutoGlobalAddingDescriptionTemplateId()
+    {
+        return (int)$this->getData('auto_global_adding_description_template_id');
+    }
+
+    public function getAutoWebsiteAddingDescriptionTemplateId()
+    {
+        return (int)$this->getData('auto_website_adding_description_template_id');
+    }
+
+    // ########################################
+
     public function getSkuMode()
     {
         return (int)$this->getData('sku_mode');
-    }
-
-    public function isSkuNotSetMode()
-    {
-        return $this->getSkuMode() == self::SKU_MODE_NOT_SET;
     }
 
     public function isSkuProductIdMode()
@@ -325,11 +350,6 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         return (int)$this->getData('condition_mode');
     }
 
-    public function isConditionNotSetMode()
-    {
-        return $this->getConditionMode() == self::CONDITION_MODE_NOT_SET;
-    }
-
     public function isConditionDefaultMode()
     {
         return $this->getConditionMode() == self::CONDITION_MODE_DEFAULT;
@@ -382,11 +402,6 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         return (int)$this->getData('condition_note_mode');
     }
 
-    public function isConditionNoteNotSetMode()
-    {
-        return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_NOT_SET;
-    }
-
     public function isConditionNoteNoneMode()
     {
         return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_NONE;
@@ -397,17 +412,11 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_CUSTOM_VALUE;
     }
 
-    public function isConditionNoteAttributeMode()
-    {
-        return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE;
-    }
-
     public function getConditionNoteSource()
     {
         return array(
             'mode'      => $this->getConditionNoteMode(),
-            'value'     => $this->getData('condition_note_value'),
-            'attribute' => $this->getData('condition_note_custom_attribute')
+            'value'     => $this->getData('condition_note_value')
         );
     }
 
@@ -505,22 +514,30 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
 
         $listingProduct = $result;
 
-        $listingProduct->getChildObject()
-                       ->getAmazonItem()
-                       ->setData('store_id',$this->getParentObject()->getStoreId())
-                       ->save();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+        $variationManager = $amazonListingProduct->getVariationManager();
+
+        if ($variationManager->isRelationParentType()) {
+            $variationManager->switchModeToAnother();
+        }
+
+        $amazonListingProduct->getAmazonItem()
+            ->setData('store_id', $this->getParentObject()->getStoreId())
+            ->save();
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Other $amazonListingOther */
+        $amazonListingOther = $listingOtherProduct->getChildObject();
 
         $dataForUpdate = array(
-            'general_id' => $listingOtherProduct->getChildObject()->getGeneralId(),
-            'sku' => $listingOtherProduct->getChildObject()->getSku(),
-            'online_price' => $listingOtherProduct->getChildObject()->getOnlinePrice(),
-            'online_qty' => $listingOtherProduct->getChildObject()->getOnlineQty(),
-            'is_afn_channel' => (int)$listingOtherProduct->getChildObject()->isAfnChannel(),
-            'is_isbn_general_id' => (int)$listingOtherProduct->getChildObject()->isIsbnGeneralId(),
-            'start_date' => $listingOtherProduct->getChildObject()->getStartDate(),
-            'end_date' => $listingOtherProduct->getChildObject()->getEndDate(),
-            'status' => $listingOtherProduct->getStatus(),
-            'status_changer' => $listingOtherProduct->getStatusChanger()
+            'general_id'         => $amazonListingOther->getGeneralId(),
+            'sku'                => $amazonListingOther->getSku(),
+            'online_price'       => $amazonListingOther->getOnlinePrice(),
+            'online_qty'         => $amazonListingOther->getOnlineQty(),
+            'is_afn_channel'     => (int)$amazonListingOther->isAfnChannel(),
+            'is_isbn_general_id' => (int)$amazonListingOther->isIsbnGeneralId(),
+            'status'             => $listingOtherProduct->getStatus(),
+            'status_changer'     => $listingOtherProduct->getStatusChanger()
         );
 
         $listingProduct->addData($dataForUpdate)->save();
@@ -540,13 +557,18 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
     /**
      * @param bool $asArrays
      * @param string|array $columns
+     * @param bool $onlyPhysicalUnits
      * @return array
      */
-    public function getAffectedListingsProducts($asArrays = true, $columns = '*')
+    public function getAffectedListingsProducts($asArrays = true, $columns = '*', $onlyPhysicalUnits = false)
     {
         /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
         $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('listing_id', $this->getId());
+
+        if ($onlyPhysicalUnits) {
+            $listingProductCollection->addFieldToFilter('is_variation_parent', 0);
+        }
 
         if (is_array($columns) && !empty($columns)) {
             $listingProductCollection->getSelect()->reset(Zend_Db_Select::COLUMNS);
@@ -558,7 +580,9 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
 
     public function setSynchStatusNeed($newData, $oldData)
     {
-        $listingsProducts = $this->getAffectedListingsProducts(true, array('id', 'synch_status', 'synch_reasons'));
+        $listingsProducts = $this->getAffectedListingsProducts(
+            true, array('id', 'synch_status', 'synch_reasons'), true
+        );
         if (empty($listingsProducts)) {
             return;
         }
@@ -570,13 +594,13 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::delete();
     }
 

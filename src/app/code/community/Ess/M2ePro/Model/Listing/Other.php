@@ -8,10 +8,6 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
 {
     // ########################################
 
-    public $isCacheEnabled = false;
-
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Account
      */
@@ -298,28 +294,6 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
             'Item was successfully unmapped',
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-    }
-
-    // ########################################
-
-    public function clearCache()
-    {
-        $this->getMagentoProduct()->clearCache();
-        return $this;
-    }
-
-    public function enableCache()
-    {
-        $this->isCacheEnabled = true;
-        $this->getMagentoProduct()->enableCache();
-        return $this;
-    }
-
-    public function disableCache()
-    {
-        $this->isCacheEnabled = false;
-        $this->getMagentoProduct()->disableCache();
-        return $this;
     }
 
     // ########################################

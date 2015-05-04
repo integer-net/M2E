@@ -28,7 +28,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
 
     protected function getPercentsEnd()
     {
-        return 25;
+        return 100;
     }
 
     //####################################
@@ -44,6 +44,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
 
         $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
 
+        $this->getActualLockItem()->setPercents($this->getPercentsStart());
+
         $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
                                                          'Get details from Amazon');
         $details = $this->receiveFromAmazon($marketplace);
@@ -55,6 +57,9 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
         $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),'Save details to DB');
         $this->saveDetailsToDb($marketplace,$details);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
+
+        $this->getActualLockItem()->setPercents($this->getPercentsEnd());
+        $this->getActualLockItem()->activate();
 
         $this->logSuccessfulOperation($marketplace);
     }
@@ -82,7 +87,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
 
         $data = array(
             'marketplace_id' => $marketplace->getId(),
-            'nodes'          => json_encode($details)
+            'product_data'   => (isset($details['product_data']) ? json_encode($details['product_data']) : NULL),
+            'vocabulary'     => (isset($details['vocabulary']) ? json_encode($details['vocabulary']) : NULL),
         );
 
         $connWrite->insert($tableMarketplaces, $data);

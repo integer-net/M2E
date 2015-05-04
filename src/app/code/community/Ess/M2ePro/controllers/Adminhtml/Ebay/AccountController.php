@@ -134,8 +134,8 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
             // M2ePro_TRANSLATIONS
-            // The eBay token obtaining is currently unavailable.<br />Reason: %error_message%
-            $error = 'The eBay token obtaining is currently unavailable.<br />Reason: %error_message%';
+            // The eBay token obtaining is currently unavailable.<br/>Reason: %error_message%
+            $error = 'The eBay token obtaining is currently unavailable.<br/>Reason: %error_message%';
             $error = Mage::helper('M2ePro')->__($error, $exception->getMessage());
 
             $this->_getSession()->addError($error);
@@ -216,8 +216,7 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         //--------------------
         $keys = array(
             'other_listings_synchronization',
-            'other_listings_mapping_mode',
-            'other_listings_synchronization_mapped_items_mode'
+            'other_listings_mapping_mode'
         );
         foreach ($keys as $key) {
             if (isset($post[$key])) {
@@ -559,7 +558,7 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         $tempString = Mage::helper('M2ePro')->__('%amount% record(s) were successfully deleted.', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
-        $tempString  = Mage::helper('M2ePro')->__('%amount% record(s) are used in M2E Listing(s).', $locked) . ' ';
+        $tempString  = Mage::helper('M2ePro')->__('%amount% record(s) are used in M2E Pro Listing(s).', $locked) . ' ';
         $tempString .= Mage::helper('M2ePro')->__('Account must not be in use to be deleted.');
         $locked && $this->_getSession()->addError($tempString);
 

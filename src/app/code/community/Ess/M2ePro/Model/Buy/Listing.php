@@ -10,7 +10,6 @@
  */
 class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_Abstract
 {
-    const SKU_MODE_NOT_SET          = 0;
     const SKU_MODE_PRODUCT_ID       = 3;
     const SKU_MODE_DEFAULT          = 1;
     const SKU_MODE_CUSTOM_ATTRIBUTE = 2;
@@ -27,7 +26,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
     const SEARCH_BY_MAGENTO_TITLE_MODE_NONE = 0;
     const SEARCH_BY_MAGENTO_TITLE_MODE_YES  = 1;
 
-    const CONDITION_MODE_NOT_SET          = 0;
     const CONDITION_MODE_DEFAULT          = 1;
     const CONDITION_MODE_CUSTOM_ATTRIBUTE = 2;
 
@@ -38,12 +36,9 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
     const CONDITION_USED_ACCEPTABLE        = 5;
     const CONDITION_REFURBISHED            = 10;
 
-    const CONDITION_NOTE_MODE_NOT_SET          = 0;
     const CONDITION_NOTE_MODE_NONE             = 3;
     const CONDITION_NOTE_MODE_CUSTOM_VALUE     = 1;
-    const CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE = 2;
 
-    const SHIPPING_MODE_NOT_SET            = 0;
     const SHIPPING_MODE_DISABLED           = 1;
     const SHIPPING_MODE_FREE               = 2;
     const SHIPPING_MODE_DEFAULT            = 3;
@@ -62,6 +57,9 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
      */
     private $synchronizationTemplateModel = NULL;
 
+    /** @var Ess_M2ePro_Model_Buy_Listing_Source[] */
+    private $listingSourceModels = array();
+
     // ########################################
 
     public function _construct()
@@ -78,6 +76,27 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
         $temp && $this->sellingFormatTemplateModel = NULL;
         $temp && $this->synchronizationTemplateModel = NULL;
         return $temp;
+    }
+
+    // ########################################
+
+    /**
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Buy_Listing_Source
+     */
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
+    {
+        $productId = $magentoProduct->getProductId();
+
+        if (!empty($this->listingSourceModels[$productId])) {
+            return $this->listingSourceModels[$productId];
+        }
+
+        $this->listingSourceModels[$productId] = Mage::getModel('M2ePro/Buy_Listing_Source');
+        $this->listingSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->listingSourceModels[$productId]->setListing($this->getParentObject());
+
+        return $this->listingSourceModels[$productId];
     }
 
     // ########################################
@@ -188,11 +207,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
 
     // ########################################
 
-    public function getAttributeSets()
-    {
-        return $this->getParentObject()->getAttributeSets();
-    }
-
     public function getProducts($asObjects = false, array $filters = array())
     {
         return $this->getParentObject()->getProducts($asObjects,$filters);
@@ -208,11 +222,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
     public function getSkuMode()
     {
         return (int)$this->getData('sku_mode');
-    }
-
-    public function isSkuNotSetMode()
-    {
-        return $this->getSkuMode() == self::SKU_MODE_NOT_SET;
     }
 
     public function isSkuProductIdMode()
@@ -309,11 +318,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
         return (int)$this->getData('condition_mode');
     }
 
-    public function isConditionNotSetMode()
-    {
-        return $this->getConditionMode() == self::CONDITION_MODE_NOT_SET;
-    }
-
     public function isConditionDefaultMode()
     {
         return $this->getConditionMode() == self::CONDITION_MODE_DEFAULT;
@@ -366,11 +370,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
         return (int)$this->getData('condition_note_mode');
     }
 
-    public function isConditionNoteNotSetMode()
-    {
-        return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_NOT_SET;
-    }
-
     public function isConditionNoteNoneMode()
     {
         return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_NONE;
@@ -381,17 +380,11 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
         return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_CUSTOM_VALUE;
     }
 
-    public function isConditionNoteAttributeMode()
-    {
-        return $this->getConditionNoteMode() == self::CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE;
-    }
-
     public function getConditionNoteSource()
     {
         return array(
             'mode'      => $this->getConditionNoteMode(),
-            'value'     => $this->getData('condition_note_value'),
-            'attribute' => $this->getData('condition_note_custom_attribute')
+            'value'     => $this->getData('condition_note_value')
         );
     }
 
@@ -400,11 +393,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
     public function getShippingStandardMode()
     {
         return (int)$this->getData('shipping_standard_mode');
-    }
-
-    public function isShippingStandardNotSetMode()
-    {
-        return $this->getShippingStandardMode() == self::SHIPPING_MODE_NOT_SET;
     }
 
     public function isShippingStandardFreeMode()
@@ -441,11 +429,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
     public function getShippingExpeditedMode()
     {
         return (int)$this->getData('shipping_expedited_mode');
-    }
-
-    public function isShippingExpeditedNotSetMode()
-    {
-        return $this->getShippingExpeditedMode() == self::SHIPPING_MODE_NOT_SET;
     }
 
     public function isShippingExpeditedDisabledMode()
@@ -489,11 +472,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
         return (int)$this->getData('shipping_one_day_mode');
     }
 
-    public function isShippingOneDayNotSetMode()
-    {
-        return $this->getShippingOneDayMode() == self::SHIPPING_MODE_NOT_SET;
-    }
-
     public function isShippingOneDayDisabledMode()
     {
         return $this->getShippingOneDayMode() == self::SHIPPING_MODE_DISABLED;
@@ -533,11 +511,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
     public function getShippingTwoDayMode()
     {
         return (int)$this->getData('shipping_two_day_mode');
-    }
-
-    public function isShippingTwoDayNotSetMode()
-    {
-        return $this->getShippingTwoDayMode() == self::SHIPPING_MODE_NOT_SET;
     }
 
     public function isShippingTwoDayDisabledMode()
@@ -621,7 +594,6 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
             'shipping_standard_rate'=>$listingOtherProduct->getChildObject()->getShippingStandardRate(),
             'shipping_expedited_mode'=>$listingOtherProduct->getChildObject()->getShippingExpeditedMode(),
             'shipping_expedited_rate'=>$listingOtherProduct->getChildObject()->getShippingExpeditedRate(),
-            'end_date' => $listingOtherProduct->getChildObject()->getEndDate(),
             'status' => $listingOtherProduct->getStatus(),
             'status_changer' => $listingOtherProduct->getStatusChanger()
         );
@@ -673,13 +645,13 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::delete();
     }
 

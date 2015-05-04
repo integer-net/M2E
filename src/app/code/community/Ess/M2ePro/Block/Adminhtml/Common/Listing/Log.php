@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block_Widget_Container
 {
     // ########################################
 
@@ -19,24 +19,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block
         $this->_controller = 'adminhtml_common_listing_log';
         //------------------------------
 
-        // Set header text
         //------------------------------
-        $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
-
-        if (isset($listingData['id'])) {
-
-            if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-                $component =  Mage::helper('M2ePro/Component')->getComponentTitle($listingData['component_mode']);
-                $headerText = Mage::helper('M2ePro')->__("Log For %component_name% Listing", $component);
-            } else {
-                $headerText = Mage::helper('M2ePro')->__("Log For Listing");
-            }
-
-            $this->_headerText = $headerText;
-            $this->_headerText .= ' "'.$this->escapeHtml($listingData['title']).'"';
-        } else {
-            $this->_headerText = Mage::helper('M2ePro')->__('Listings Log');
-        }
+        $this->setTemplate('M2ePro/common/log/log.phtml');
         //------------------------------
 
         // Set buttons actions
@@ -92,14 +76,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block
             //------------------------------
         }
 
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-        //------------------------------
-
         if (isset($listingData['id'])) {
             //------------------------------
             $url = $this->getUrl('*/*/*');
@@ -114,17 +90,134 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block
 
     // ########################################
 
-    public function getGridHtml()
+    public function getListingId()
     {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_log_help');
-        return $helpBlock->toHtml() . parent::getGridHtml();
+        return $this->getRequest()->getParam('id', false);
     }
+
+    // ----------------------------------------
+
+    /** @var Ess_M2ePro_Model_Listing $listing */
+    protected $listing = NULL;
+
+    /**
+     * @return Ess_M2ePro_Model_Listing|null
+     */
+    public function getListing()
+    {
+        if (is_null($this->listing)) {
+            $this->listing = Mage::helper('M2ePro/Component')
+                ->getCachedUnknownObject('Listing', $this->getListingId());
+        }
+
+        return $this->listing;
+    }
+
+    // ########################################
+
+    public function getListingProductId()
+    {
+        return $this->getRequest()->getParam('listing_product_id', false);
+    }
+
+    // ----------------------------------------
+
+    /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+    protected $listingProduct = NULL;
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product|null
+     */
+    public function getListingProduct()
+    {
+        if (is_null($this->listingProduct)) {
+            $this->listingProduct = Mage::helper('M2ePro/Component')
+                ->getUnknownObject('Listing_Product', $this->getListingProductId());
+        }
+
+        return $this->listingProduct;
+    }
+
+    // ########################################
+
+    protected function _beforeToHtml()
+    {
+        // Set header text
+        //------------------------------
+        $this->_headerText = '';
+
+        if ($this->getListingId()) {
+
+            $listing = $this->getListing();
+
+            if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
+                $component =  Mage::helper('M2ePro/Component')->getComponentTitle($listing->getComponentMode());
+                $this->_headerText = Mage::helper('M2ePro')->__(
+                    'Log For %component_name% Listing "%listing_title%"',
+                    $component, $this->escapeHtml($listing->getTitle())
+                );
+            } else {
+                $this->_headerText = Mage::helper('M2ePro')->__(
+                    'Log For Listing "%listing_title%"',
+                    $this->escapeHtml($listing->getTitle())
+                );
+            }
+
+        } else if ($this->getListingProductId()) {
+
+            $listingProduct = $this->getListingProduct();
+            $listing = $listingProduct->getListing();
+
+            $onlineTitle = $listingProduct->getOnlineTitle();
+            if (empty($onlineTitle)) {
+                $onlineTitle = $listingProduct->getMagentoProduct()->getName();
+            }
+
+            if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
+                $component =  Mage::helper('M2ePro/Component')->getComponentTitle($listing->getComponentMode());
+                $this->_headerText = Mage::helper('M2ePro')->__(
+                    'Log For Product "%product_name%" (ID:%product_id%) Of %component_name% Listing "%listing_title%"',
+                    $this->escapeHtml($onlineTitle),
+                    $listingProduct->getProductId(),
+                    $component,
+                    $this->escapeHtml($listing->getTitle())
+                );
+            } else {
+                $this->_headerText = Mage::helper('M2ePro')->__(
+                    'Log For Product "%product_name%" (ID:%product_id%) Of Listing "%listing_title%"',
+                    $this->escapeHtml($onlineTitle),
+                    $listingProduct->getProductId(),
+                    $this->escapeHtml($listing->getTitle())
+                );
+            }
+
+        } else {
+            $this->_headerText = Mage::helper('M2ePro')->__('Listings Log');
+        }
+        //------------------------------
+    }
+
+    // ########################################
 
     protected function _toHtml()
     {
+        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_log_help')->toHtml();
+
+        $logBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_log_tabs', '',
+            array(
+                'channel' => $this->getRequest()->getParam('channel'),
+                'log_type' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::LOG_TYPE_ID_LISTING
+            )
+        )->toHtml();
+
         $translations = json_encode(array(
             'Description' => Mage::helper('M2ePro')->__('Description')
         ));
+
+        $hideTabs = '';
+        if ($this->getListingId() || $this->getListingProductId()) {
+            $hideTabs = '$("commonLogTabs").hide();';
+        }
 
         $javascript = <<<JAVASCIRPT
 
@@ -134,13 +227,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block
 
     Event.observe(window, 'load', function() {
         LogHandlerObj = new LogHandler();
+        {$hideTabs}
     });
 
 </script>
 
 JAVASCIRPT;
 
-        return $javascript . parent::_toHtml();
+        return $javascript . parent::_toHtml() . $helpBlock . $logBlock;
     }
 
     // ########################################

@@ -16,7 +16,7 @@ ListingActionHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    startActions : function(title,url,selectedProductsParts)
+    startActions: function(title,url,selectedProductsParts)
     {
         MagentoMessageObj.clearAll();
         $('listing_container_errors_summary').hide();
@@ -31,7 +31,7 @@ ListingActionHandler = Class.create(ActionHandler, {
         self.sendPartsOfProducts(selectedProductsParts,selectedProductsParts.length,url);
     },
 
-    sendPartsOfProducts : function(parts,totalPartsCount,url)
+    sendPartsOfProducts: function(parts,totalPartsCount,url)
     {
         var self = this;
 
@@ -79,15 +79,13 @@ ListingActionHandler = Class.create(ActionHandler, {
                     actionIds += self.sendPartsResponses[i].action_id;
                 }
 
-                new Ajax.Request( self.options.url.getErrorsSummary + 'action_ids/' + actionIds + '/' ,
-                    {
-                        method:'get',
-                        onSuccess: function(transportSummary)
-                        {
-                            $('listing_container_errors_summary').innerHTML = transportSummary.responseText;
-                            $('listing_container_errors_summary').show();
-                        }
-                    });
+                new Ajax.Request(self.options.url.getErrorsSummary + 'action_ids/' + actionIds + '/' , {
+                    method:'get',
+                    onSuccess: function(transportSummary) {
+                        $('listing_container_errors_summary').innerHTML = transportSummary.responseText;
+                        $('listing_container_errors_summary').show();
+                    }
+                });
 
             } else if (combineResult == 'warning') {
                 var message = self.options.text.task_completed_warning_message;
@@ -120,7 +118,7 @@ ListingActionHandler = Class.create(ActionHandler, {
 
         var partExecuteString = '';
 
-        if (part.length <= 2) {
+        if (part.length <= 2 && self.gridHandler.gridId != 'amazonVariationProductManageGrid') {
 
             for (var i=0;i<part.length;i++) {
 
@@ -149,64 +147,63 @@ ListingActionHandler = Class.create(ActionHandler, {
 
         ListingProgressBarObj.setStatus(str_replace('%product_title%', partExecuteString, self.options.text.sending_data_message));
 
-        new Ajax.Request( url + 'id/' + self.gridHandler.listingId,
-            {
-                method: 'post',
-                parameters: {
-                    selected_products: partString
-                },
-                onSuccess: function(transport)
-                {
-                    if (!transport.responseText.isJSON()) {
+        new Ajax.Request(url + 'id/' + self.gridHandler.listingId, {
+            method: 'post',
+            parameters: {
+                selected_products: partString
+            },
+            onSuccess: function(transport) {
 
-                        if (transport.responseText != '') {
-                            alert(transport.responseText);
-                        }
+                if (!transport.responseText.isJSON()) {
 
-                        ListingProgressBarObj.hide();
-                        ListingProgressBarObj.reset();
-                        GridWrapperObj.unlock();
-                        $('loading-mask').setStyle({visibility: 'visible'});
-
-                        self.sendPartsResponses = new Array();
-
-                        self.gridHandler.unselectAllAndReload();
-
-                        return;
+                    if (transport.responseText != '') {
+                        alert(transport.responseText);
                     }
 
-                    var response = transport.responseText.evalJSON(true);
+                    ListingProgressBarObj.hide();
+                    ListingProgressBarObj.reset();
+                    GridWrapperObj.unlock();
+                    $('loading-mask').setStyle({visibility: 'visible'});
 
-                    if (response.error) {
-                        ListingProgressBarObj.hide();
-                        ListingProgressBarObj.reset();
-                        GridWrapperObj.unlock();
-                        $('loading-mask').setStyle({visibility: 'visible'});
+                    self.sendPartsResponses = new Array();
 
-                        self.sendPartsResponses = new Array();
+                    self.gridHandler.unselectAllAndReload();
 
-                        alert(response.message);
-
-                        return;
-                    }
-
-                    self.sendPartsResponses[self.sendPartsResponses.length] = response;
-
-                    var percents = (100/totalPartsCount)*(totalPartsCount-parts.length);
-
-                    if (percents <= 0) {
-                        ListingProgressBarObj.setPercents(0,0);
-                    } else if (percents >= 100) {
-                        ListingProgressBarObj.setPercents(100,0);
-                    } else {
-                        ListingProgressBarObj.setPercents(percents,1);
-                    }
-
-                    setTimeout(function() {
-                        self.sendPartsOfProducts(parts,totalPartsCount,url);
-                    },500);
+                    return;
                 }
-            });
+
+                var response = transport.responseText.evalJSON(true);
+
+                if (response.error) {
+                    ListingProgressBarObj.hide();
+                    ListingProgressBarObj.reset();
+                    GridWrapperObj.unlock();
+                    $('loading-mask').setStyle({visibility: 'visible'});
+
+                    self.sendPartsResponses = new Array();
+
+                    alert(response.message);
+
+                    return;
+                }
+
+                self.sendPartsResponses[self.sendPartsResponses.length] = response;
+
+                var percents = (100/totalPartsCount)*(totalPartsCount-parts.length);
+
+                if (percents <= 0) {
+                    ListingProgressBarObj.setPercents(0,0);
+                } else if (percents >= 100) {
+                    ListingProgressBarObj.setPercents(100,0);
+                } else {
+                    ListingProgressBarObj.setPercents(percents,1);
+                }
+
+                setTimeout(function() {
+                    self.sendPartsOfProducts(parts,totalPartsCount,url);
+                },500);
+            }
+        });
 
         return;
     },
@@ -288,12 +285,12 @@ ListingActionHandler = Class.create(ActionHandler, {
         var self = this;
         EbayListingTransferringTranslateHandlerObj.loadActionHtml(
             self.gridHandler.getSelectedProductsArray(),
-            function(){
+            function() {
                 self.startActions(
                     self.options.text.start_translate_selected_items_message,
                     self.options.url.runStartTranslateProducts,selectedProductsParts
                 );
-            },function(){
+            }, function() {
                 self.gridHandler.unselectAll();
         });
     },
@@ -316,5 +313,4 @@ ListingActionHandler = Class.create(ActionHandler, {
     }
 
     //----------------------------------
-
 });

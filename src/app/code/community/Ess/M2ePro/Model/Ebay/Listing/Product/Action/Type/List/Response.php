@@ -14,8 +14,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Response
         $data = array(
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_LISTED,
             'ebay_item_id' => $this->createEbayItem($response['ebay_item_id'])->getId(),
-            'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_OK,
-            'synch_reasons' => NULL
         );
 
         $data = $this->appendStatusHiddenValue($data);

@@ -55,14 +55,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Edit_ShippingAddress
         }
 
         //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-        //------------------------------
-
-        //------------------------------
         $this->_addButton('save', array(
             'label'     => Mage::helper('M2ePro')->__('Save Order Address'),
             'onclick'   => 'CommonHandlerObj.save_click()',
