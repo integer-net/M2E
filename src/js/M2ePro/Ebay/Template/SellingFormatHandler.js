@@ -318,7 +318,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
         priceNoneOption.show();
 
         priceLabel.innerHTML = M2ePro.translator.translate('"Buy It Now" Price') + ': ';
-        priceNote.innerHTML = M2ePro.translator.translate('The fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your listing.');
+        priceNote.innerHTML = M2ePro.translator.translate('The Fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your Listing.');
         bestOfferAcceptPercentageOption.innerHTML = M2ePro.translator.translate('% of "Buy It Now" Price');
         bestOfferRejectPercentageOption.innerHTML = M2ePro.translator.translate('% of "Buy It Now" Price');
 
@@ -332,7 +332,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
             }
 
             priceLabel.innerHTML = M2ePro.translator.translate('Price') + ': ';
-            priceNote.innerHTML = M2ePro.translator.translate('The fixed Price for immediate purchase.');
+            priceNote.innerHTML = M2ePro.translator.translate('The Fixed Price for immediate purchase.');
             bestOfferAcceptPercentageOption.innerHTML = M2ePro.translator.translate('% of Price');
             bestOfferRejectPercentageOption.innerHTML = M2ePro.translator.translate('% of Price');
         }
@@ -855,7 +855,7 @@ EbayTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandler(), 
 
                     if (transport.count) {
                         $('searchCharity_warning_block').show();
-                        $('searchCharity_warning_message').update(M2ePro.translator.translate('If you do not see the organization you were looking for, try to enter another keywords and run the search again.'));
+                        $('searchCharity_warning_message').update(M2ePro.translator.translate('If you do not see the organization you were looking for, try to enter another keywords and run the Search again.'));
                     }
                 } else {
                     $('searchCharity_error_block').show();

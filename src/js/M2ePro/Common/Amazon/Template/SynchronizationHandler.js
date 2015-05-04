@@ -46,7 +46,7 @@ CommonAmazonTemplateSynchronizationHandler.prototype = Object.extend(new CommonH
         //-----------------
 
         //-----------------
-        Validation.add('M2ePro-validate-stop-relist-conditions-product-status', M2ePro.translator.translate('Inconsistent settings in Relist and Stop rules.'), function(value, el) {
+        Validation.add('M2ePro-validate-stop-relist-conditions-product-status', M2ePro.translator.translate('Inconsistent Settings in Relist and Stop Rules.'), function(value, el) {
 
             if (AmazonTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
@@ -59,7 +59,7 @@ CommonAmazonTemplateSynchronizationHandler.prototype = Object.extend(new CommonH
             return true;
         });
 
-        Validation.add('M2ePro-validate-stop-relist-conditions-stock-availability', M2ePro.translator.translate('Inconsistent settings in Relist and Stop rules.'), function(value, el) {
+        Validation.add('M2ePro-validate-stop-relist-conditions-stock-availability', M2ePro.translator.translate('Inconsistent Settings in Relist and Stop Rules.'), function(value, el) {
 
             if (AmazonTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
@@ -72,7 +72,7 @@ CommonAmazonTemplateSynchronizationHandler.prototype = Object.extend(new CommonH
             return true;
         });
 
-        Validation.add('M2ePro-validate-stop-relist-conditions-item-qty', M2ePro.translator.translate('Inconsistent settings in Relist and Stop rules.'), function(value, el) {
+        Validation.add('M2ePro-validate-stop-relist-conditions-item-qty', M2ePro.translator.translate('Inconsistent Settings in Relist and Stop Rules.'), function(value, el) {
 
             if (AmazonTemplateSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;

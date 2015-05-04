@@ -88,46 +88,46 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other extends Ess_M2ePro_Block_A
         $removingProductsUrl = $this->getUrl('*/adminhtml_common_listing_other/removing');
         $unmappingProductsUrl = $this->getUrl('*/adminhtml_listing_other_mapping/unmapping');
 
-        $someProductsWereNotMappedMessage = 'No matches were found. Please change the mapping attributes in <strong>';
+        $someProductsWereNotMappedMessage = 'No matches were found. Please change the Mapping Attributes in <strong>';
         $someProductsWereNotMappedMessage .= 'Configuration > Account > 3rd Party Listings</strong> ';
         $someProductsWereNotMappedMessage .= 'or try to map manually.';
         $someProductsWereNotMappedMessage = $helper->escapeJs($helper->__($someProductsWereNotMappedMessage));
 
-        $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully mapped.'));
+        $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully Mapped.'));
 
         $createListing = $helper->escapeJs($helper->__(
             'Listings, which have the same Marketplace and Account were not found.'
         ));
-        $createListing .= $helper->escapeJs($helper->__('Would you like to create one with default settings ?'));
+        $createListing .= $helper->escapeJs($helper->__('Would you like to create one with Default Settings ?'));
         $popupTitle = $helper->escapeJs($helper->__('Moving Amazon Items'));
         $popupTitleSingle = $helper->escapeJs($helper->__('Moving Amazon Item'));
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $confirmMessage = $helper->escapeJs($helper->__('Are you sure?'));
 
-        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
+        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Products were not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Some of the Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
+            'Some of the Products were not Moved. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
-        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
-        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
+        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Unmapped.'));
+        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Removed.'));
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the Products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% Product(s).'));
 
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
-        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped Products must be selected.'));
+        $selectOnlyMapped = $helper->escapeJs($helper->__('Only Mapped Products must be selected.'));
         $selectTheSameTypeProducts = $helper->escapeJs(
             $helper->__('Selected Items must belong to the same Account and Marketplace.')
         );
@@ -286,41 +286,41 @@ JAVASCRIPT;
         $removingProductsUrl = $this->getUrl('*/adminhtml_common_listing_other/removing');
         $unmappingProductsUrl = $this->getUrl('*/adminhtml_listing_other_mapping/unmapping');
 
-        $someProductsWereNotMappedMessage = 'No matches were found. Please change the mapping attributes in <strong>';
+        $someProductsWereNotMappedMessage = 'No matches were found. Please change the Mapping Attributes in <strong>';
         $someProductsWereNotMappedMessage .= 'Configuration > Account > 3rd Party Listings</strong> ';
         $someProductsWereNotMappedMessage .= 'or try to map manually.';
         $someProductsWereNotMappedMessage = $helper->escapeJs($helper->__($someProductsWereNotMappedMessage));
 
-        $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully mapped.'));
+        $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully Mapped.'));
 
         $createListing = $helper->escapeJs($helper->__(
             'Listings, which have the same Marketplace and Account were not found.'
         ));
-        $createListing .= $helper->escapeJs($helper->__('Would you like to create one with default settings ?'));
+        $createListing .= $helper->escapeJs($helper->__('Would you like to create one with Default Settings ?'));
         $popupTitle = $helper->escapeJs($helper->__('Moving Rakuten.com Items'));
         $popupTitleSingle = $helper->escapeJs($helper->__('Moving Rakuten.com Item'));
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $confirmMessage = $helper->escapeJs($helper->__('Are you sure?'));
 
-        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
+        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Products were not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Products were not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Some of the Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
+            'Some of the Products were not Moved. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data.'));
-        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
-        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
+        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Unmapped.'));
+        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Removed.'));
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the Products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% Product(s).'));
 
@@ -331,7 +331,7 @@ JAVASCRIPT;
         $closeWord = $helper->escapeJs($helper->__('Close'));
 
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
-        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped Products must be selected.'));
+        $selectOnlyMapped = $helper->escapeJs($helper->__('Only Mapped Products must be selected.'));
         $selectTheSameTypeProducts = $helper->escapeJs(
             $helper->__('Selected Items must belong to the same Account and Marketplace.')
         );
@@ -488,41 +488,41 @@ JAVASCRIPT;
         $removingProductsUrl = $this->getUrl('*/adminhtml_common_listing_other/removing');
         $unmappingProductsUrl = $this->getUrl('*/adminhtml_listing_other_mapping/unmapping');
 
-        $someProductsWereNotMappedMessage = 'No matches were found. Please change the mapping attributes in <strong>';
+        $someProductsWereNotMappedMessage = 'No matches were found. Please change the Mapping Attributes in <strong>';
         $someProductsWereNotMappedMessage .= 'Configuration > Account > 3rd Party Listings</strong> ';
         $someProductsWereNotMappedMessage .= 'or try to map manually.';
         $someProductsWereNotMappedMessage = $helper->escapeJs($helper->__($someProductsWereNotMappedMessage));
 
-        $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully mapped.'));
+        $successfullyMappedMessage = $helper->escapeJs($helper->__('Product was successfully Mapped.'));
 
         $createListing = $helper->escapeJs($helper->__(
             'Listings, which have the same Marketplace and Account were not found.'
         ));
-        $createListing .= $helper->escapeJs($helper->__('Would you like to create one with default settings ?'));
+        $createListing .= $helper->escapeJs($helper->__('Would you like to create one with Default Settings ?'));
         $popupTitle = $helper->escapeJs($helper->__('Moving Play.com Items'));
         $popupTitleSingle = $helper->escapeJs($helper->__('Moving Play.com Item'));
         $failedProductsPopupTitle = $helper->escapeJs($helper->__('Products failed to move'));
 
         $confirmMessage = $helper->escapeJs($helper->__('Are you sure?'));
 
-        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
+        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
+            'Products were not Moved. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
         $someProductsWereNotMovedMessage = $helper->escapeJs($helper->__(
-            'Some of the Products were not moved. <a target="_blank" href="%url%">View log</a> for details.'
+            'Some of the Products were not Moved. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
 
         $notEnoughDataMessage = $helper->escapeJs($helper->__('Not enough data'));
-        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully unmapped.'));
-        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully removed.'));
+        $successfullyUnmappedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Unmapped.'));
+        $successfullyRemovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Removed.'));
 
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log'));
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the Products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $processingDataMessage = $helper->escapeJs($helper->__('Processing %product_title% Product(s).'));
 
@@ -533,7 +533,7 @@ JAVASCRIPT;
         $closeWord = $helper->escapeJs($helper->__('Close'));
 
         $autoMapProgressTitle = $helper->escapeJs($helper->__('Map Item(s) to Products'));
-        $selectOnlyMapped = $helper->escapeJs($helper->__('Only mapped Products must be selected.'));
+        $selectOnlyMapped = $helper->escapeJs($helper->__('Only Mapped Products must be selected.'));
         $selectTheSameTypeProducts = $helper->escapeJs(
             $helper->__('Selected Items must belong to the same Account and Marketplace.')
         );
@@ -662,15 +662,15 @@ JAVASCRIPT;
             'Mapping Product' => $helper->__('Mapping Product'),
             'Product does not exist.' => $helper->__('Product does not exist.'),
             'Please enter correct Product ID.' => $helper->__('Please enter correct Product ID.'),
-            'Product(s) was successfully mapped.' => $helper->__('Product(s) was successfully mapped.'),
+            'Product(s) was successfully Mapped.' => $helper->__('Product(s) was successfully Mapped.'),
             'Please enter correct Product ID or SKU' => $helper->__('Please enter correct Product ID or SKU'),
 
             'Current version only supports Simple Products. Please, choose Simple Product.' => $helper->__(
                 'Current version only supports Simple Products. Please, choose Simple Product.'
             ),
 
-            'Item was not mapped as the chosen %product_id% Simple Product has Custom Options.' => $helper->__(
-                'Item was not mapped as the chosen %product_id% Simple Product has Custom Options.'
+            'Item was not Mapped as the chosen %product_id% Simple Product has Custom Options.' => $helper->__(
+                'Item was not Mapped as the chosen %product_id% Simple Product has Custom Options.'
             )
 
         ));

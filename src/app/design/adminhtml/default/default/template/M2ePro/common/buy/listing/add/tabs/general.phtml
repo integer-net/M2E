@@ -9,7 +9,7 @@
 
 </style>
 <div id="block_notice_buy_listing_add_general_settings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General Settings'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This page sets the Rakuten.com details and Magento Store View you want to use for this M2E Pro Listing.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('This Page sets the Rakuten.com details and Magento Store View you want to use for this M2E Pro Listing.'); ?>
 </div>
 
 <script type="text/javascript">
@@ -40,7 +40,7 @@
 
     M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($this->getData('title'))); ?>';
 
-    M2ePro.text.title_not_unique_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified title is already used for other listing. Listing title must be unique.')); ?>';
+    M2ePro.text.title_not_unique_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified Title is already used for other Listing. Listing Title must be unique.')); ?>';
     M2ePro.text.wrong_date_time_format_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Invalid date time format string.')); ?>';
 
     M2ePro.php.setConstants(
@@ -116,7 +116,7 @@
                         ?>
                         <select <?php if($accountSelectionDisabled) echo 'disabled="disabled"' ?> id="account_id" name="account_id" class="required-entry" style="display: none"></select>
                         <p id="account_note" class="note" style="width: 0; height: 0; overflow: hidden">
-                            <span><?php echo Mage::helper('M2ePro')->__('This is the user name of your Buy Account.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('This is the user name of your Rakuten.com Account.'); ?></span>
                         </p>
                     </td>
                     <td class="value" <?php if($accountSelectionDisabled) echo 'style="visibility: hidden;"'?>>

@@ -516,7 +516,7 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select account(s) to remove.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Account(s) to remove.'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -678,10 +678,10 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
                 $url = $this->getUrl('*/adminhtml_ebay_category/index', array('filter' => base64_encode('state=0')));
 
         // M2ePro_TRANSLATIONS
-        // Some eBay store categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.
+        // Some eBay Store Categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.
                 $this->_getSession()->addWarning(
                     Mage::helper('M2ePro')->__(
-                        'Some eBay store categories were deleted from eBay. Click '.
+                        'Some eBay Store Categories were deleted from eBay. Click '.
                         '<a target="_blank" href="%url%">here</a> to check.', $url
                     )
                 );

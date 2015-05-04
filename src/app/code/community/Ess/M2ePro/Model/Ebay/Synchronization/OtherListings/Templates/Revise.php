@@ -79,7 +79,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executeTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update title');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Title');
 
         /** @var $tempModel Ess_M2ePro_Model_Ebay_Listing_Other_Source */
         $tempModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Source');
@@ -137,7 +137,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executeSubTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update subtitle');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Subtitle');
 
         /** @var $tempModel Ess_M2ePro_Model_Ebay_Listing_Other_Source */
         $tempModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Source');
@@ -194,7 +194,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executeDescriptionChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update description');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Description');
 
         /** @var $tempModel Ess_M2ePro_Model_Ebay_Listing_Other_Source */
         $tempModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Source');

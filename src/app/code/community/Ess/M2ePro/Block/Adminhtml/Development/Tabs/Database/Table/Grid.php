@@ -133,6 +133,8 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
                 'index'          => strtolower($column['name']),
                 'filter_index'   => $filterIndex,
                 'frame_callback' => array($this, 'callbackColumnData'),
+
+                'is_auto_increment' => strpos($column['extra'], 'increment') !== false
             );
 
             if ($this->getColumnType($column) == 'datetime') {
@@ -244,10 +246,17 @@ HTML;
         $inputValue = 'NULL';
         !is_null($value) && $inputValue = Mage::helper('M2ePro')->escapeHtml($value);
 
+        $divMouseActions = '';
+
+        if (!$column->getData('is_auto_increment')) {
+            $divMouseActions = <<<HTML
+onmouseover="DevelopmentDatabaseGridHandlerObj.mouseOverCell('{$cellId}');"
+onmouseout="DevelopmentDatabaseGridHandlerObj.mouseOutCell('{$cellId}');"
+HTML;
+        }
+
         return <<<HTML
-<div style="min-height: 20px;" id="{$cellId}"
-     onmouseover="DevelopmentDatabaseGridHandlerObj.mouseOverCell('{$cellId}');"
-     onmouseout="DevelopmentDatabaseGridHandlerObj.mouseOutCell('{$cellId}');">
+<div style="min-height: 20px;" id="{$cellId}" {$divMouseActions}>
 
     <span id="{$cellId}_view_container">{$tempValue}</span>
 

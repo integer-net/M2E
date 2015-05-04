@@ -613,14 +613,14 @@ HTML;
             'Compatibility Attribute ePIDs' => $helper->__('Compatibility Attribute ePIDs'),
             'Payment for Translation Service' => $helper->__('Payment for Translation Service'),
             'Payment for Translation Service. Help' => $helper->__('Payment for Translation Service'),
-            'Specify a sum to be credited to an account.' =>
+            'Specify a sum to be credited to an Account.' =>
                 $helper->__('Specify a sum to be credited to an Account.'
-                           .' If you are planning to order more Items for translation in future,'
-                           .' you can credit the sum greater than the one needed for current translation.'
+                           .' If you are planning to order more Items for Translation in future,'
+                           .' you can credit the sum greater than the one needed for current Translation.'
                            .' Click <a href="%url%" target="_blank">here</a> to find out more.',
                     'http://docs.m2epro.com/display/eBayMagentoV6/Translation#Translation-Account.1'),
             'Amount to Pay.' => $helper->__('Amount to Pay'),
-            'Insert amount to be credited to an account' => $helper->__('Insert amount to be credited to an account.'),
+            'Insert amount to be credited to an Account' => $helper->__('Insert amount to be credited to an Account.'),
             'Confirm' => $helper->__('Confirm'),
         ));
         //------------------------------
@@ -646,32 +646,32 @@ HTML;
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
         $taskCompletedSuccessMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has successfully completed.'));
+            $helper->__('"%task_title%" Task has successfully completed.'));
 
         // M2ePro_TRANSLATIONS
-        // %task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
-        $tempString = '"%task_title%" task has completed with warnings.'
-                     .' <a target="_blank" href="%url%">View log</a> for details.';
+        // %task_title%" Task has completed with warnings. <a target="_blank" href="%url%">View Log</a> for details.
+        $tempString = '"%task_title%" Task has completed with warnings.'
+                     .' <a target="_blank" href="%url%">View Log</a> for details.';
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__($tempString));
 
         // M2ePro_TRANSLATIONS
-        // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
-        $tempString = '"%task_title%" task has completed with errors. '
-                     .' <a target="_blank" href="%url%">View log</a> for details.';
+        // "%task_title%" Task has completed with errors. <a target="_blank" href="%url%">View Log</a> for details.
+        $tempString = '"%task_title%" Task has completed with errors. '
+                     .' <a target="_blank" href="%url%">View Log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($tempString));
 
         $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% Product(s) data on eBay.'));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = $helper->escapeJs(
-            $helper->__('The listing was locked by another process. Please try again later.')
+            $helper->__('The Listing was locked by another process. Please try again later.')
         );
         $listingEmptyMessage = $helper->escapeJs(
             $helper->__('Listing is empty.')
         );
 
         $selectItemsMessage = $helper->escapeJs($helper->__('Please select Items.'));
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -685,12 +685,12 @@ HTML;
         $tryToMoveToListing = $this->getUrl('*/adminhtml_listing_moving/tryToMoveToListing');
         $moveToListing = $this->getUrl('*/adminhtml_listing_moving/moveToListing');
 
-        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
+        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Product(s) was not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Some Product(s) was not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
 
         $popupTitle = $helper->escapeJs($helper->__('Moving eBay Items'));

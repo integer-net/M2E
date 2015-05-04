@@ -368,6 +368,12 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
         return $result;
     }
 
+    public function getColumnInfo($table, $columnName)
+    {
+        $info = $this->getTableInfo($table);
+        return isset($info[$columnName]) ? $info[$columnName] : null;
+    }
+
     public function getTableModel($tableName)
     {
         $tableModels = Mage::getConfig()->getNode('global/models/M2ePro_mysql4/entities');
@@ -381,12 +387,22 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
         return null;
     }
 
+    // --------------------------------------------
+
     public function getIdColumn($table)
     {
         $tableModel = $this->getTableModel($table);
         $tableModel = Mage::getModel('M2ePro/'.$tableModel);
 
         return $tableModel->getIdFieldName();
+    }
+
+    public function isIdColumnAutoIncrement($table)
+    {
+        $idColumn = $this->getIdColumn($table);
+        $columnInfo = $this->getColumnInfo($table, $idColumn);
+
+        return isset($columnInfo['extra']) && strpos($columnInfo['extra'], 'increment') !== false;
     }
 
     // --------------------------------------------

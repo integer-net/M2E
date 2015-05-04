@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_General
 {
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         if ($this->getVariationManager()->isRelationParentType() && !$this->validateParentListingProductFlags()) {
             return false;
@@ -54,9 +54,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_General
         $condition = $this->getAmazonListingProduct()->getListingSource()->getCondition();
         if (empty($condition)) {
 // M2ePro_TRANSLATIONS
-// You cannot list this Product because the Item condition is not specified. You can set the condition in the Selling Settings of the Listing.
-            $this->addMessage('You cannot list this Product because the Item condition is not specified.
-                               You can set the condition in the Selling Settings of the Listing.');
+// You cannot list this Product because the Item Condition is not specified. You can set the Condition in the Selling Settings of the Listing.
+            $this->addMessage('You cannot list this Product because the Item Condition is not specified.
+                               You can set the Condition in the Selling Settings of the Listing.');
             return false;
         }
 

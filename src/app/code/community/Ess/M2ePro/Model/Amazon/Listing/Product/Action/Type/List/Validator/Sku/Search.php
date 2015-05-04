@@ -29,7 +29,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_Sea
 
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         $sku = $this->getSku();
 
@@ -119,17 +119,17 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_Sea
     {
         if ($this->isExistInRequestSkus($sku)) {
 // M2ePro_TRANSLATIONS
-// During the listing process there was an Item found with the same SKU that is being listed. Please change the SKU or enable the Option Generate Merchant SKU.
-            $addMessages && $this->addMessage('During the listing process there was an Item found with
-                                               the same SKU that is being listed. Please change the SKU or enable
+// During the Listing Process there was an Item found with the same SKU that is being Listed. Please change the SKU or enable the Option Generate Merchant SKU.
+            $addMessages && $this->addMessage('During the Listing Process there was an Item found with
+                                               the same SKU that is being Listed. Please change the SKU or enable
                                                the Option Generate Merchant SKU.');
             return true;
         }
 
         if ($this->isExistInQueueOfSkus($sku)) {
 // M2ePro_TRANSLATIONS
-// Another Product with the same SKU is being listed simultaneously with this one. Please change the SKU or enable the Option Generate Merchant SKU.
-            $addMessages && $this->addMessage('Another Product with the same SKU is being listed simultaneously
+// Another Product with the same SKU is being Listed simultaneously with this one. Please change the SKU or enable the Option Generate Merchant SKU.
+            $addMessages && $this->addMessage('Another Product with the same SKU is being Listed simultaneously
                                 with this one. Please change the SKU or enable the Option Generate Merchant SKU.');
             return true;
         }
@@ -146,9 +146,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_Sea
 
         if ($this->isExistInOtherListings($sku)) {
 // M2ePro_TRANSLATIONS
-// Product with the same SKU is found in M2E Pro 3rd Party Listing. Please change the SKU or enable the option Generate Merchant SKU.
+// Product with the same SKU is found in M2E Pro 3rd Party Listing. Please change the SKU or enable the Option Generate Merchant SKU.
             $addMessages && $this->addMessage('Product with the same SKU is found in M2E Pro 3rd Party Listing.
-                                            Please change the SKU or enable the option Generate Merchant SKU.');
+                                            Please change the SKU or enable the Option Generate Merchant SKU.');
             return true;
         }
 

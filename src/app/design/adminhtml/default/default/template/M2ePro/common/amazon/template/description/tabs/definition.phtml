@@ -1,6 +1,6 @@
 <div id="block_notice_amazon_template_description_definition" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Definition'); ?>">
     <?php echo Mage::helper('M2ePro')->__(
-        'On this tab you can specify settings for common Product Information. <br/>
+        'On this Tab you can specify Settings for common Product Information. <br/>
         It is available to choose just those Magento Attributes that are used for all Attribute Sets. <br/><br/>
 
         <b>Note:</b> Title value is required for creation of all Description Policies because of technical reasons.'
@@ -341,10 +341,20 @@ $allAttributesByInputTypes = array(
                         <label><?php echo Mage::helper('M2ePro')->__('Brand'); ?>:</label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="brand_custom_attribute" name="definition[brand_custom_attribute]" value="<?php echo $formData['definition']['brand_custom_attribute']; ?>" />
+
                         <select id="brand_mode" name="definition[brand_mode]" class="select">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_NONE; ?>" <?php if ($formData['definition']['brand_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['brand_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['brand_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['brand_custom_attribute'], $generalAttributesByInputTypes['text_select'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::BRAND_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['brand_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Required for creating new ASIN/ISBN.'); ?></span>
@@ -361,32 +371,25 @@ $allAttributesByInputTypes = array(
                     </td>
                 </tr>
 
-                <tr id="brand_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Brand Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="brand_custom_attribute" name="definition[brand_custom_attribute]" class="M2ePro-required-when-visible">
-                            <option style="display: none;"></option>
-                            <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['brand_custom_attribute'], $generalAttributesByInputTypes['text_select']); ?>
-                            <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['brand_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                    <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
-
                 <tr>
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Manufacturer'); ?>:</label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="manufacturer_custom_attribute" name="definition[manufacturer_custom_attribute]" value="<?php echo $formData['definition']['manufacturer_custom_attribute']; ?>" />
+
                         <select id="manufacturer_mode" name="definition[manufacturer_mode]" class="select">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_NONE; ?>" <?php if ($formData['definition']['manufacturer_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['manufacturer_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['manufacturer_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['manufacturer_custom_attribute'], $generalAttributesByInputTypes['text_select'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['manufacturer_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Required for creating new ASIN/ISBN.'); ?></span>
@@ -403,32 +406,25 @@ $allAttributesByInputTypes = array(
                     </td>
                 </tr>
 
-                <tr id="manufacturer_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="manufacturer_custom_attribute" name="definition[manufacturer_custom_attribute]" class="M2ePro-required-when-visible">
-                            <option style="display: none;"></option>
-                            <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['manufacturer_custom_attribute'], $generalAttributesByInputTypes['text_select']); ?>
-                            <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['manufacturer_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                    <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
-
                 <tr>
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Part Number'); ?>:</label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="manufacturer_part_number_custom_attribute" name="definition[manufacturer_part_number_custom_attribute]" value="<?php echo $formData['definition']['manufacturer_part_number_custom_attribute']; ?>" />
+
                         <select id="manufacturer_part_number_mode" name="definition[manufacturer_part_number_mode]" class="select">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_NONE; ?>" <?php if ($formData['definition']['manufacturer_part_number_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['manufacturer_part_number_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['manufacturer_part_number_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['manufacturer_part_number_custom_attribute'], $generalAttributesByInputTypes['text'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::MANUFACTURER_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['manufacturer_part_number_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Manufacturer Part Number of the Product(s). Max. 40 characters.'); ?></span>
@@ -442,25 +438,6 @@ $allAttributesByInputTypes = array(
                     </td>
                     <td class="value">
                         <input id="manufacturer_part_number_custom_value" name="definition[manufacturer_part_number_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['definition']['manufacturer_part_number_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
-                    </td>
-                </tr>
-
-                <tr id="manufacturer_part_number_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Part Number Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="manufacturer_part_number_attribute_td">
-                            <select id="manufacturer_part_number_custom_attribute" name="definition[manufacturer_part_number_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['manufacturer_part_number_custom_attribute'], $generalAttributesByInputTypes['text']); ?>
-                                <?php foreach($generalAttributesByInputTypes['text'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['manufacturer_part_number_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
                     </td>
                 </tr>
 
@@ -487,36 +464,23 @@ $allAttributesByInputTypes = array(
                         <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
+                        <input type="hidden" id="image_main_attribute" name="definition[image_main_attribute]" value="<?php echo $formData['definition']['image_main_attribute']; ?>" />
+
                         <select id="image_main_mode" name="definition[image_main_mode]">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_NONE; ?>" <?php if ($formData['definition']['image_main_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_PRODUCT; ?>" <?php if ($formData['definition']['image_main_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_ATTRIBUTE; ?>" <?php if ($formData['definition']['image_main_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
-                        </select>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Required for creating new ASIN/ISBN.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
 
-                <tr id="image_main_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Main Image Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value" style="width: auto;">
-                        <div id="image_main_attribute_td">
-                            <select id="image_main_attribute" name="definition[image_main_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['image_main_attribute'], $generalAttributesByInputTypes['text_images']); ?>
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['image_main_attribute'], $generalAttributesByInputTypes['text_images'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_ATTRIBUTE); ?>
                                 <?php foreach($generalAttributesByInputTypes['text_images'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['image_main_attribute']): ?>selected="selected"<?php endif; ?>>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['image_main_attribute']): ?>selected="selected"<?php endif; ?>>
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                     </option>
                                 <?php endforeach; ?>
-                            </select>
-                        </div>
+                            </optgroup>
+                        </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose Media Image Attribute or Attribute, that contains absolute url.
-                            <br/>i.e. http://mymagentostore.com/images/baseimage.jpg'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Required for creating new ASIN/ISBN.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -526,53 +490,30 @@ $allAttributesByInputTypes = array(
                         <label for="gallery_images_mode"><?php echo Mage::helper('M2ePro')->__('Additional Images'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
+                        <input type="hidden" id="gallery_images_limit" name="definition[gallery_images_limit]" value="<?php echo $formData['definition']['gallery_images_limit']; ?>" />
+                        <input type="hidden" id="gallery_images_attribute" name="definition[gallery_images_attribute]" value="<?php echo $formData['definition']['gallery_images_attribute']; ?>" />
+
                         <select id="gallery_images_mode" name="definition[gallery_images_mode]">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_NONE; ?>" <?php if ($formData['definition']['gallery_images_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_PRODUCT; ?>" <?php if ($formData['definition']['gallery_images_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Images'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_ATTRIBUTE; ?>" <?php if ($formData['definition']['gallery_images_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
-                        </select>
-                    </td>
-                </tr>
 
-                <tr id="gallery_images_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Additional Images Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value" style="width: auto;">
-                        <div id="gallery_images_attribute_td">
-                            <select id="gallery_images_attribute" name="definition[gallery_images_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['gallery_images_attribute'], $generalAttributesByInputTypes['text_images']); ?>
+                            <optgroup label="Product Images Quantity">
+                                <option attribute_code="1" <?php if ($formData['definition']['gallery_images_limit'] == 1 && ($formData['definition']['gallery_images_mode'] != Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_NONE)): echo ' selected="selected"'; endif; ?>>1</option>
+                                <?php for ($i = 2; $i <= 8; $i++): ?>
+                                    <option attribute_code="<?php echo $i; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_PRODUCT; ?>" <?php if ($formData['definition']['gallery_images_limit'] == $i): echo ' selected="selected"'; endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->__('Up to').' '.$i; ?>
+                                    </option>
+                                <?php endfor ?>
+                            </optgroup>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['gallery_images_attribute'], $generalAttributesByInputTypes['text_images'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_ATTRIBUTE); ?>
                                 <?php foreach($generalAttributesByInputTypes['text_images'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['gallery_images_attribute']): ?>selected="selected"<?php endif; ?>>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['gallery_images_attribute']): ?>selected="selected"<?php endif; ?>>
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                     </option>
                                 <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <p class="note">
-                            <?php echo Mage::helper('M2ePro')->__('Choose Text, Multiple Select or Dropdown type attribute. In Text type attribute urls must be separated with comma.
-                                <br/>e.g.  http://mymagentostore.com/images/baseimage1.jpg,  http://mymagentostore.com/images/baseimage2.jpg'); ?>
-                        </p>
-                    </td>
-                </tr>
-
-                <tr id="gallery_images_limit_tr" style="display: none;">
-                    <td class="label">
-                        <label for="gallery_images_limit"><?php echo Mage::helper('M2ePro')->__('Additional Images Quantity'); ?>:</label>
-                    </td>
-                    <td class="value" style="width: auto;">
-
-                        <select id="gallery_images_limit" name="definition[gallery_images_limit]">
-                            <option value="1" <?php if ($formData['definition']['gallery_images_limit'] == 1): echo ' selected="selected"'; endif; ?>>1</option>
-                            <?php for ($i = 2; $i <= 8; $i++): ?>
-                                <option value="<?php echo $i; ?>" <?php if ($formData['definition']['gallery_images_limit'] == $i): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Up to').' '.$i; ?></option>
-                            <?php endfor ?>
+                            </optgroup>
                         </select>
-
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The number of Additional Images. The images will be taken from Magento Product settings.'); ?></span>
-                        </p>
                     </td>
                 </tr>
 
@@ -750,41 +691,26 @@ $allAttributesByInputTypes = array(
                         <label><?php echo Mage::helper('M2ePro')->__('Measure Units') ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="item_dimensions_volume_unit_of_measure_custom_value" name="definition[item_dimensions_volume_unit_of_measure_custom_value]" value="<?php echo $formData['definition']['item_dimensions_volume_unit_of_measure_custom_value']; ?>" />
+                        <input type="hidden" id="item_dimensions_volume_unit_of_measure_custom_attribute" name="definition[item_dimensions_volume_unit_of_measure_custom_attribute]" value="<?php echo $formData['definition']['item_dimensions_volume_unit_of_measure_custom_attribute']; ?>" />
+
                         <select id="item_dimensions_volume_unit_of_measure_mode" name="definition[item_dimensions_volume_unit_of_measure_mode]" class="select M2ePro-required-when-visible">
                             <option style="display: none;"></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['item_dimensions_volume_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['item_dimensions_volume_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
-                        </select>
-                    </td>
-                </tr>
 
-                <tr id="item_dimensions_volume_unit_of_measure_custom_value_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Measure Units Value'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="item_dimensions_volume_unit_of_measure_custom_value" name="definition[item_dimensions_volume_unit_of_measure_custom_value]" class="M2ePro-required-when-visible">
-                            <option value="" style="display: none"></option>
-                            <?php foreach($this->getDimensionsUnits() as $unitName) : ?>
-                                <option value="<?php echo $unitName; ?>" <?php if ($formData['definition']['item_dimensions_volume_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
+                            <optgroup label="Custom Value">
+                                <?php foreach($this->getDimensionsUnits() as $unitName) : ?>
+                                    <option attribute_code="<?php echo $unitName; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['item_dimensions_volume_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
 
-                <tr id="item_dimensions_volume_unit_of_measure_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Measure Units Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="item_dimensions_volume_unit_of_measure_custom_attribute" name="definition[item_dimensions_volume_unit_of_measure_custom_attribute]" class="M2ePro-required-when-visible">
-                            <option style="display: none;"></option>
-                            <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['item_dimensions_volume_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select']); ?>
-                            <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['item_dimensions_volume_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                    <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                </option>
-                            <?php endforeach; ?>
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['item_dimensions_volume_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['item_dimensions_volume_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                     </td>
                 </tr>
@@ -800,10 +726,20 @@ $allAttributesByInputTypes = array(
                         <label><?php echo Mage::helper('M2ePro')->__('Weight'); ?>:</label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="item_dimensions_weight_custom_attribute" name="definition[item_dimensions_weight_custom_attribute]" value="<?php echo $formData['definition']['item_dimensions_weight_custom_attribute']; ?>" />
+
                         <select id="item_dimensions_weight_mode" name="definition[item_dimensions_weight_mode]" class="select M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_NONE; ?>" <?php if ($formData['definition']['item_dimensions_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['item_dimensions_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['item_dimensions_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['item_dimensions_weight_custom_attribute'], $generalAttributesByInputTypes['text_weight'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_weight'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['item_dimensions_weight_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Physical weight of Products without package'); ?></span>
@@ -820,63 +756,31 @@ $allAttributesByInputTypes = array(
                     </td>
                 </tr>
 
-                <tr id="item_dimensions_weight_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Weight Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="item_dimensions_weight_custom_attribute" name="definition[item_dimensions_weight_custom_attribute]" class="M2ePro-required-when-visible">
-                            <option style="display: none;"></option>
-                            <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['item_dimensions_weight_custom_attribute'], $generalAttributesByInputTypes['text_weight']); ?>
-                            <?php foreach($generalAttributesByInputTypes['text_weight'] as $attribute) : ?>
-                                <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['item_dimensions_weight_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                    <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
-
                 <tr id="item_dimensions_weight_unit_of_measure_mode_tr" style="display: none;">
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Weight Units'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="item_dimensions_weight_unit_of_measure_custom_value" name="definition[item_dimensions_weight_unit_of_measure_custom_value]" value="<?php echo $formData['definition']['item_dimensions_weight_unit_of_measure_custom_value']; ?>" />
+                        <input type="hidden" id="item_dimensions_weight_unit_of_measure_custom_attribute" name="definition[item_dimensions_weight_unit_of_measure_custom_attribute]" value="<?php echo $formData['definition']['item_dimensions_weight_unit_of_measure_custom_attribute']; ?>" />
+
                         <select id="item_dimensions_weight_unit_of_measure_mode" name="definition[item_dimensions_weight_unit_of_measure_mode]" class="select M2ePro-required-when-visible">
                             <option value="" style="display: none;"></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['item_dimensions_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['item_dimensions_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
-                        </select>
-                    </td>
-                </tr>
 
-                <tr id="item_dimensions_weight_unit_of_measure_custom_value_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Weight Units Value'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="item_dimensions_weight_unit_of_measure_custom_value" name="definition[item_dimensions_weight_unit_of_measure_custom_value]" class="input-text M2ePro-required-when-visible">
-                            <option value="" style="display: none"></option>
-                            <?php foreach($this->getWeightUnits() as $unitName) : ?>
-                                <option value="<?php echo $unitName; ?>" <?php if ($formData['definition']['item_dimensions_weight_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
+                            <optgroup label="Custom Value">
+                                <?php foreach($this->getWeightUnits() as $unitName) : ?>
+                                    <option attribute_code="<?php echo $unitName; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['item_dimensions_weight_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
 
-                <tr id="item_dimensions_weight_unit_of_measure_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Weight Units Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="item_dimensions_weight_unit_of_measure_custom_attribute" name="definition[item_dimensions_weight_unit_of_measure_custom_attribute]" class="M2ePro-required-when-visible">
-                            <option style="display: none;"></option>
-                            <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['item_dimensions_weight_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select']); ?>
-                            <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['item_dimensions_weight_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                    <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                </option>
-                            <?php endforeach; ?>
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['item_dimensions_weight_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['item_dimensions_weight_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                     </td>
                 </tr>
@@ -968,41 +872,26 @@ $allAttributesByInputTypes = array(
                         <label><?php echo Mage::helper('M2ePro')->__('Measure Units'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="package_dimensions_volume_unit_of_measure_custom_value" name="definition[package_dimensions_volume_unit_of_measure_custom_value]" value="<?php echo $formData['definition']['package_dimensions_volume_unit_of_measure_custom_value']; ?>" />
+                        <input type="hidden" id="package_dimensions_volume_unit_of_measure_custom_attribute" name="definition[package_dimensions_volume_unit_of_measure_custom_attribute]" value="<?php echo $formData['definition']['package_dimensions_volume_unit_of_measure_custom_attribute']; ?>" />
+
                         <select id="package_dimensions_volume_unit_of_measure_mode" name="definition[package_dimensions_volume_unit_of_measure_mode]" class="select M2ePro-required-when-visible">
                             <option value="" style="display: none;"></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['package_dimensions_volume_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['package_dimensions_volume_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
-                        </select>
-                    </td>
-                </tr>
 
-                <tr id="package_dimensions_volume_unit_of_measure_custom_value_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Measure Units Value'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="package_dimensions_volume_unit_of_measure_custom_value" name="definition[package_dimensions_volume_unit_of_measure_custom_value]" class="M2ePro-required-when-visible">
-                            <option value="" style="display: none"></option>
-                            <?php foreach($this->getDimensionsUnits() as $unitName) : ?>
-                                <option value="<?php echo $unitName; ?>" <?php if ($formData['definition']['package_dimensions_volume_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
+                            <optgroup label="Magento Attribute">
+                                <?php foreach($this->getDimensionsUnits() as $unitName) : ?>
+                                    <option attribute_code="<?php echo $unitName; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['package_dimensions_volume_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
 
-                <tr id="package_dimensions_volume_unit_of_measure_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Measure Units Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="package_dimensions_volume_unit_of_measure_custom_attribute" name="definition[package_dimensions_volume_unit_of_measure_custom_attribute]" class="M2ePro-required-when-visible">
-                            <option style="display: none;"></option>
-                            <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['package_dimensions_volume_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select']); ?>
-                            <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['package_dimensions_volume_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                    <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                </option>
-                            <?php endforeach; ?>
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['package_dimensions_volume_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::DIMENSION_VOLUME_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['package_dimensions_volume_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                     </td>
                 </tr>
@@ -1030,10 +919,20 @@ $allAttributesByInputTypes = array(
                         <label><?php echo Mage::helper('M2ePro')->__('Package Weight'); ?>:</label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="package_weight_custom_attribute" name="definition[package_weight_custom_attribute]" value="<?php echo $formData['definition']['package_weight_custom_attribute']; ?>" />
+
                         <select id="package_weight_mode" name="definition[package_weight_mode]" class="select M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_NONE; ?>" <?php if ($formData['definition']['package_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['package_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['package_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['package_weight_custom_attribute'], $generalAttributesByInputTypes['text_weight'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_weight'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['package_weight_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Package Weight of the Product(s).'); ?></span>
@@ -1050,68 +949,32 @@ $allAttributesByInputTypes = array(
                     </td>
                 </tr>
 
-                <tr id="package_weight_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Package Weight Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="package_weight_attribute_td">
-                            <select id="package_weight_custom_attribute" name="definition[package_weight_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['package_weight_custom_attribute'], $generalAttributesByInputTypes['text_weight']); ?>
-                                <?php foreach($generalAttributesByInputTypes['text_weight'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['package_weight_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </td>
-                </tr>
-
                 <tr id="package_weight_unit_of_measure_mode_tr" style="display: none;">
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Package Weight Units'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="package_weight_unit_of_measure_custom_value" name="definition[package_weight_unit_of_measure_custom_value]" value="<?php echo $formData['definition']['package_weight_unit_of_measure_custom_value']; ?>" />
+                        <input type="hidden" id="package_weight_unit_of_measure_custom_attribute" name="definition[package_weight_unit_of_measure_custom_attribute]" value="<?php echo $formData['definition']['package_weight_unit_of_measure_custom_attribute']; ?>" />
+
                         <select id="package_weight_unit_of_measure_mode" name="definition[package_weight_unit_of_measure_mode]" class="select M2ePro-required-when-visible">
                             <option value="" style="display: none;"></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['package_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['package_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
-                        </select>
-                    </td>
-                </tr>
 
-                <tr id="package_weight_unit_of_measure_custom_value_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Package Weight Units Value'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="package_weight_unit_of_measure_custom_value" name="definition[package_weight_unit_of_measure_custom_value]" class="input-text M2ePro-required-when-visible">
-                            <option value="" style="display: none"></option>
-                            <?php foreach($this->getWeightUnits() as $unitName) : ?>
-                                <option value="<?php echo $unitName; ?>" <?php if ($formData['definition']['package_weight_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
+                            <optgroup label="Custom Value">
+                                <?php foreach($this->getWeightUnits() as $unitName) : ?>
+                                    <option attribute_code="<?php echo $unitName; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['package_weight_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
 
-                <tr id="package_weight_unit_of_measure_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Package Weight Units Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="package_weight_unit_of_measure_attribute_td">
-                            <select id="package_weight_unit_of_measure_custom_attribute" name="definition[package_weight_unit_of_measure_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['package_weight_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select']); ?>
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['package_weight_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE); ?>
                                 <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['package_weight_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['package_weight_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                     </option>
                                 <?php endforeach; ?>
-                            </select>
-                        </div>
+                            </optgroup>
+                        </select>
                     </td>
                 </tr>
 
@@ -1126,10 +989,20 @@ $allAttributesByInputTypes = array(
                         <label><?php echo Mage::helper('M2ePro')->__('Shipping Weight'); ?>:</label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="shipping_weight_custom_attribute" name="definition[shipping_weight_custom_attribute]" value="<?php echo $formData['definition']['shipping_weight_custom_attribute']; ?>" />
+
                         <select id="shipping_weight_mode" name="definition[shipping_weight_mode]" class="select M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_NONE; ?>" <?php if ($formData['definition']['shipping_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['shipping_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['shipping_weight_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['shipping_weight_custom_attribute'], $generalAttributesByInputTypes['text_weight'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_weight'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['shipping_weight_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Shipping Weight of the Product(s).'); ?></span>
@@ -1146,68 +1019,32 @@ $allAttributesByInputTypes = array(
                     </td>
                 </tr>
 
-                <tr id="shipping_weight_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Shipping Weight Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="shipping_weight_attribute_td">
-                            <select id="shipping_weight_custom_attribute" name="definition[shipping_weight_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['shipping_weight_custom_attribute'], $generalAttributesByInputTypes['text_weight']); ?>
-                                <?php foreach($generalAttributesByInputTypes['text_weight'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['shipping_weight_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </td>
-                </tr>
-
                 <tr id="shipping_weight_unit_of_measure_mode_tr" style="display: none;">
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Shipping Weight Units'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="shipping_weight_unit_of_measure_custom_value" name="definition[shipping_weight_unit_of_measure_custom_value]" value="<?php echo $formData['definition']['shipping_weight_unit_of_measure_custom_value']; ?>" />
+                        <input type="hidden" id="shipping_weight_unit_of_measure_custom_attribute" name="definition[shipping_weight_unit_of_measure_custom_attribute]" value="<?php echo $formData['definition']['shipping_weight_unit_of_measure_custom_attribute']; ?>" />
+
                         <select id="shipping_weight_unit_of_measure_mode" name="definition[shipping_weight_unit_of_measure_mode]" class="select M2ePro-required-when-visible">
                             <option value="" style="display: none;"></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['shipping_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['definition']['shipping_weight_unit_of_measure_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
-                        </select>
-                    </td>
-                </tr>
 
-                <tr id="shipping_weight_unit_of_measure_custom_value_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Shipping Weight Units Value'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <select id="shipping_weight_unit_of_measure_custom_value" name="definition[shipping_weight_unit_of_measure_custom_value]" class="input-text M2ePro-required-when-visible">
-                            <option value="" style="display: none"></option>
-                            <?php foreach($this->getWeightUnits() as $unitName) : ?>
-                                <option value="<?php echo $unitName; ?>" <?php if ($formData['definition']['shipping_weight_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
+                            <optgroup label="Custom Value">
+                                <?php foreach($this->getWeightUnits() as $unitName) : ?>
+                                    <option attribute_code="<?php echo $unitName; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['definition']['shipping_weight_unit_of_measure_custom_value'] == $unitName): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($unitName); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
 
-                <tr id="shipping_weight_unit_of_measure_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Shipping Weight Units Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="shipping_weight_unit_of_measure_attribute_td">
-                            <select id="shipping_weight_unit_of_measure_custom_attribute" name="definition[shipping_weight_unit_of_measure_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['shipping_weight_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select']); ?>
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['shipping_weight_unit_of_measure_custom_attribute'], $generalAttributesByInputTypes['text_select'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE); ?>
                                 <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['definition']['shipping_weight_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::WEIGHT_UNIT_OF_MEASURE_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['shipping_weight_unit_of_measure_custom_attribute']): ?>selected="selected"<?php endif; ?>>
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                     </option>
                                 <?php endforeach; ?>
-                            </select>
-                        </div>
+                            </optgroup>
+                        </select>
                     </td>
                 </tr>
 

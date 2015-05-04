@@ -614,12 +614,12 @@ HTML;
         $text = 'Are you sure?';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
         // M2ePro_TRANSLATIONS
-        // eBay could not assign categories for %product_tite% Products.
-        $text = 'eBay could not assign categories for %product_title% Products.';
+        // eBay could not assign Categories for %product_tite% Products.
+        $text = 'eBay could not assign Categories for %product_title% Products.';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
         // M2ePro_TRANSLATIONS
-        // Suggested Categories were successfully received for %product_title% Product(s).
-        $text = 'Suggested Categories were successfully received for %product_title% Product(s).';
+        // Suggested Categories were successfully Received for %product_title% Product(s).
+        $text = 'Suggested Categories were successfully Received for %product_title% Product(s).';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
         // M2ePro_TRANSLATIONS
         // Set eBay Category

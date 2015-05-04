@@ -5,7 +5,7 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
 
     initialize: function()
     {
-        Validation.add('M2ePro-check-default-component', M2ePro.translator.translate('Default component should be enabled.'), function(value) {
+        Validation.add('M2ePro-check-default-component', M2ePro.translator.translate('Default Component should be enabled.'), function(value) {
 
             var componentDefault        = $('view_common_component_default').value.toLowerCase(),
                 componentsEnabledNumber = 0;

@@ -83,7 +83,7 @@
     )) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'If you do not see the organization you were looking for, try to enter another keywords and run the search again.' => Mage::helper('M2ePro')->__('If you do not see the organization you were looking for, try to enter another keywords and run the search again.')
+        'If you do not see the organization you were looking for, try to enter another keywords and run the Search again.' => Mage::helper('M2ePro')->__('If you do not see the organization you were looking for, try to enter another keywords and run the Search again.')
     )) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
@@ -99,8 +99,8 @@
         'Price' => Mage::helper('M2ePro')->__('Price'),
         '"Buy It Now" Price' => Mage::helper('M2ePro')->__('"Buy It Now" Price'),
 
-        'The fixed Price for immediate purchase.' => Mage::helper('M2ePro')->__('The fixed Price for immediate purchase.'),
-        'The fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your listing.' => Mage::helper('M2ePro')->__('The fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your listing.'),
+        'The Fixed Price for immediate purchase.' => Mage::helper('M2ePro')->__('The Fixed Price for immediate purchase.'),
+        'The Fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your Listing.' => Mage::helper('M2ePro')->__('The Fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your Listing.'),
 
         '% of Price' => Mage::helper('M2ePro')->__('% of Price'),
         '% of "Buy It Now" Price' => Mage::helper('M2ePro')->__('% of "Buy It Now" Price')
@@ -266,7 +266,7 @@
     <p style="font-size: 15px; font-weight: bolder; color: red;">
         <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration');
             echo Mage::helper('M2ePro')->__(
-            'This set of options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
+            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
         ?>
     </p>
 <?php endif; ?>
@@ -310,12 +310,12 @@
 
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose whether Products listed with this Policy on eBay Auction-style or Fixed Price.<br/>
+                                'Choose whether Products Listed with this Policy on eBay Auction-style or Fixed Price.<br/>
                                 Auction-style Listings are best if you are unsure of the value of your Item, eg because it is unique. Fixed Price Listings are good if you know the Price you want to get for your Item.'
                             ); ?></span>
                             <span class="simple_mode_disallowed"><?php echo Mage::helper('M2ePro')->__(
-                                '<br/><br/>Alternatively, you can specify a Magento attribute to set the listing type depending on the attribute value set for each Product.<br/>
-                                For Fixed Price Listings, set the attribute value to <b>FixedPriceItem</b>; for Auction-style listings, set the attribute value to <b>Chinese</b>.'
+                                '<br/><br/>Alternatively, you can specify a Magento Attribute to set the Listing type depending on the Attribute Value set for each Product.<br/>
+                                For Fixed Price Listings, set the Attribute Value to <b>FixedPriceItem</b>; for Auction-style Listings, set the Attribute Value to <b>Chinese</b>.'
                             ); ?></span>
                         </p>
 
@@ -335,8 +335,8 @@
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Making your Listing Private means that the details of the Listing won\'t be shown on the Feedback Profile page for you or the buyer.<br/><br/>
-                                This can be useful in cases where you or the buyer might want to be discreet about the Item and/or the final Price - such as the sale of high-priced Items or approved pharmaceutical Products.
+                                'Making your Listing Private means that the details of the Listing won\'t be shown on the Feedback Profile Page for you or the Buyer.<br/><br/>
+                                This can be useful in cases where you or the Buyer might want to be discreet about the Item and/or the final Price - such as the sale of high-priced Items or approved pharmaceutical Products.
                                 You should only make your Listing Private for a specific reason.'
                             ); ?></span>
                         </p>
@@ -357,7 +357,7 @@
                                 <?php echo Mage::helper('M2ePro')->__(
                                     'If <strong>Yes</strong>, this indicates that you elect to offer the Item exclusively to business users. <br/>
                                      If <strong>No</strong>, this indicates that you elect to offer the Item to all users. <br/><br/>
-                                     Applicable only to business sellers residing in Germany, Austria, or Switzerland who are listing in a B2B VAT-enabled Category on the eBay Germany (DE), Austria (AT), or Switzerland (CH) sites. <br/>
+                                     Applicable only to business Sellers residing in Germany, Austria, or Switzerland who are Listing in a B2B VAT-enabled Category on the eBay Germany (DE), Austria (AT), or Switzerland (CH) Sites. <br/>
                                      If this argument is <strong>Yes</strong>, you must have a valid VAT-ID registered with eBay, and <i>BusinessSeller</i> must also be true.'
                                 ); ?>
                             </span>
@@ -421,7 +421,7 @@
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('The length of time your eBay Listing will be active. You can have it last 1, 3, 5, 7, 10, 30 days or Good \'Til Cancelled.
                                                                         <br/>Good \'Til Cancelled Listings renew automatically every 30 days unless all of the Items sell, you end the Listing, or the Listing breaches an eBay Policy.'); ?></span>
-                            <span id="duration_attribute_note" style="display: none;"><?php echo Mage::helper('M2ePro')->__('<br/>Attribute must contain a whole number. If you choose "Good Till Cancelled" the attribute must contain 100.'); ?></span>
+                            <span id="duration_attribute_note" style="display: none;"><?php echo Mage::helper('M2ePro')->__('<br/>Attribute must contain a whole number. If you choose "Good Till Cancelled" the Attribute must contain 100.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -441,10 +441,10 @@
 
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'This is useful if you have run Out Of Stock of an Item that you have listed on eBay.
+                                'This is useful if you have run Out Of Stock of an Item that you have Listed on eBay.
                                 If you choose <b>Yes</b>, the eBay Listing is hidden temporarily instead of being ended completely.
-                                When new stock for the Item arrives, you can use automatic or manual Revise rules to update the inventory and the eBay Listing will appear again.<br/><br/>
-                                <b>Note:</b> Once you list a Product with this option it cannot be changed. To cancel it you should end the eBay Listing before listing the Item again.'
+                                When new Stock for the Item arrives, you can use automatic or manual Revise Rules to update the Inventory and the eBay Listing will appear again.<br/><br/>
+                                <b>Note:</b> Once you list a Product with this option it cannot be changed. To cancel it you should end the eBay Listing before Listing the Item again.'
                             ); ?></span>
                         </p>
 
@@ -483,7 +483,7 @@
                                 <b>Product Quantity:</b> the number of Items on eBay will be the same as in Magento.<br/>
                                 <b>Single Item:</b> only one Item will be available on eBay.<br/>
                                 <b>Custom Value:</b> set a Quantity in the Policy here.<br/>
-                                <b>Magento Attribute:</b> takes the number from the attribute you specify.'
+                                <b>Magento Attribute:</b> takes the number from the Attribute you specify.'
                             ); ?></span>
                         </p>
 
@@ -512,7 +512,7 @@
                             <?php endfor; ?>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of Items number to be listed on eBay basing on Product Quantity or Magento attribute. E.g., if Quantity Percentage is set to 10% and Product Quantity is 100, the Quantity to be listed on eBay will be calculated as <br/>100 *10%  = 10.<br/>'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of Items number to be Listed on eBay basing on Product Quantity or Magento Attribute. E.g., if Quantity Percentage is set to 10% and Product Quantity is 100, the Quantity to be Listed on eBay will be calculated as <br/>100 *10%  = 10.<br/>'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -529,9 +529,9 @@
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose whether to limit the amount of stock you list on eBay, eg because you want to set some stock aside for sales off eBay.<br/><br/>
-                                If this setting is <b>Enabled</b> you can specify the maximum Quantity to be listed.
-                                If this setting is <b>Disabled</b> all stock for the Product will be listed as available on eBay.'
+                                'Choose whether to limit the amount of Stock you list on eBay, eg because you want to set some Stock aside for sales off eBay.<br/><br/>
+                                If this Setting is <b>Enabled</b> you can specify the maximum Quantity to be Listed.
+                                If this Setting is <b>Disabled</b> all Stock for the Product will be Listed as available on eBay.'
                             ); ?></span>
                         </p>
                     </td>
@@ -544,8 +544,8 @@
                     <td id="qty_min_posted_value_td" class="value" style="width: auto;">
                         <input id="qty_min_posted_value" name="selling_format[qty_min_posted_value]" value="<?php echo $this->escapeHtml($formData['qty_min_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in stock but set a Minimum Quantity to Be Listed of 5, Item will not be listed on eBay.<br/>
-Otherwise, the Item will be listed with Quantity according to the settings in the Price, Quantity and Format Policy'); ?>
+                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in Stock but set a Minimum Quantity to Be Listed of 5, Item will not be Listed on eBay.<br/>
+Otherwise, the Item will be Listed with Quantity according to the Settings in the Price, Quantity and Format Policy'); ?>
                             </span>
                         </p>
                     </td>
@@ -558,7 +558,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                     <td id="qty_max_posted_value_td" class="value" style="width: auto;">
                         <input id="qty_max_posted_value" name="selling_format[qty_max_posted_value]" value="<?php echo $this->escapeHtml($formData['qty_max_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Set a maximum number to sell on eBay, e.g. if you have 10 Items in stock but want to keep 2 Items back, set a Maximum Quantity of 8.'); ?>
+                            <span><?php echo Mage::helper('M2ePro')->__('Set a maximum number to sell on eBay, e.g. if you have 10 Items in Stock but want to keep 2 Items back, set a Maximum Quantity of 8.'); ?>
                             </span>
                         </p>
                     </td>
@@ -576,7 +576,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
                                 'Choose how you want to list Configurable, Grouped, Bundle and Simple With Custom Options Products.
-                                Choosing <b>Yes</b> will list these types of Products as if they are Simple Products without variations.'
+                                Choosing <b>Yes</b> will list these types of Products as if they are Simple Products without Variations.'
                             ); ?></span>
                         </p>
                     </td>
@@ -610,8 +610,8 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                         <input name="selling_format[vat_percent]" value="<?php echo $formData['vat_percent']; ?>" type="text" class="M2ePro-validate-vat input-text" />
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'To specify a VAT Rate, you must have an eBay business account and list the Item on a VAT-enabled site: Ireland, India, Switzerland, Spain, Holland, Belgium, Italy, Germany, France, Austria or United Kingdom.
-                                The Item\'s VAT information appears on the Item\'s listing page.'
+                                'To specify a VAT Rate, you must have an eBay business Account and list the Item on a VAT-enabled Site: Ireland, India, Switzerland, Spain, Holland, Belgium, Italy, Germany, France, Austria or United Kingdom.
+                                The Item\'s VAT information appears on the Item\'s Listing Page.'
                             ); ?></span>
                         </p>
                     </td>
@@ -628,8 +628,8 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose if you want to use the Tax Table for your eBay Account to charge sales tax.
-                                Tax Tables are set up directly on eBay, not in M2E Pro. To set up or edit Tax Tables, log in to your seller account on eBay.
+                                'Choose if you want to use the Tax Table for your eBay Account to charge Sales Tax.
+                                Tax Tables are set up directly on eBay, not in M2E Pro. To set up or edit Tax Tables, Log in to your Seller Account on eBay.
                                 They are available only for Canada, Canada (Fr), USA and eBay Motors.'
                             ); ?></span>
                         </p>
@@ -717,7 +717,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                     <li class="notice-msg">
                         <span>
                             <?php echo Mage::helper('M2ePro')->__(
-                                'eBay %marketplace_title% supports %currency_code% currencies. To switch the currency you want to sell for, go to %menu_path% > <a target="_blank" href="%url%">General</a>',
+                                'eBay %marketplace_title% supports %currency_code% Currencies. To switch the Currency you want to sell for, go to %menu_path% > <a target="_blank" href="%url%">General</a>',
                                 $this->getMarketplace()->getTitle(),
                                 $currencies,
                                 Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
@@ -742,7 +742,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose whether you want to add VAT to the Price when a Product is listed on eBay, using the VAT Rate or eBay Tax Table in the Taxation section above.<br/><br/>
+                                'Choose whether you want to add VAT to the Price when a Product is Listed on eBay, using the VAT Rate or eBay Tax Table in the Taxation Section above.<br/><br/>
                                  <b>Example:</b> For a Product with Magento Price = £10, VAT Rate = 19%, Price change percentage increase = 2%, the final eBay Price will be £12.14.<br/>
                                  Magento Price: £10<br/>
                                  VAT 19%: £10 * 19% = £1.90<br/>
@@ -773,7 +773,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                                                 <span class="tool-tip-message" style="font-size: 12px; display: none;">
                                                     <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                                     <span><?php echo Mage::helper('M2ePro')->__(
-                                                        'The currency for eBay listings. Automatically set based on the eBay site you chose earlier.'
+                                                        'The Currency for eBay Listings. Automatically set based on the eBay Site you chose earlier.'
                                                     ); ?></span>
                                             </span>
                                         </th>
@@ -789,8 +789,8 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                                                     <?php $currencyPlaceholder = is_null($currency) ? Mage::helper('M2ePro')->__('[CURRENCY]') : Mage::app()->getLocale()->currency($currency)->getSymbol(); ?>
 
                                                     <?php echo Mage::helper('M2ePro')->__(
-                                                        'A value you want the Magento Price to be modified while listing on eBay.<br/>
-                                                        Price change settings apply after VAT has been added.<br/><br/>
+                                                        'A value you want the Magento Price to be modified while Listing on eBay.<br/>
+                                                        Price change Settings apply after VAT has been added.<br/><br/>
                                                         <b>Absolute Value increase</b><br/>
                                                         This will increase the Price on eBay compared to the Price on Magento.<br/>
                                                         <b>Absolute Value decrease</b><br/>
@@ -1004,7 +1004,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                                         <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
                                             <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
-                                            <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento Product attribute to use for the Price for Configurable and Bundle Products options.'); ?></span>
+                                            <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento Product Attribute to use for the Price for Configurable and Bundle Products Options.'); ?></span>
                                         </span>
                                     </div>
                                 </td>
@@ -1049,7 +1049,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                                         <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
                                             <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
-                                            <span><?php echo Mage::helper('M2ePro')->__('The lowest Price at which you are selling an Item.<br/><b>Note:</b> eBay charges some additional fee for using this option.'); ?></span>
+                                            <span><?php echo Mage::helper('M2ePro')->__('The lowest Price at which you are selling an Item.<br/><b>Note:</b> eBay charges some additional fee for using this Option.'); ?></span>
                                         </span>
                                     </div>
 
@@ -1143,8 +1143,8 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
                                                     'The Strike-Through Price is the original Price of a Product that is discounted shown with a line through it.
-                                                    It is only available to certain sellers who have been pre-approved by eBay.<br/><br/>
-                                                    If you qualify to display Strike-Through Price choose the Magento attribute you want to use for it.'
+                                                    It is only available to certain Sellers who have been pre-approved by eBay.<br/><br/>
+                                                    If you qualify to display Strike-Through Price choose the Magento Attribute you want to use for it.'
                                                 ); ?>
                                             </span>
                                         </span>
@@ -1180,11 +1180,11 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                                                     '<strong>Recommended Retail Price</strong><br/>
                                                     This Price is recommended by the manufacturer to be used at the initial sale.<br/>
                                                     <strong>Previous Selling Price used on eBay</strong><br/>
-                                                    This Price was used in another listing on eBay 30 days prior to listing the Item, excluding shipping and handling.<br/>
+                                                    This Price was used in another Listing on eBay 30 days prior to Listing the Item, excluding shipping and handling.<br/>
                                                     <strong>Previous Selling Price used beyond eBay</strong><br/>
-                                                    This Price was used beyond eBay either online or offline 30 days prior to listing the Item, excluding shipping and handling.<br/>
+                                                    This Price was used beyond eBay either online or offline 30 days prior to Listing the Item, excluding shipping and handling.<br/>
                                                     <strong>Previous Selling Price used both on and beyond eBay</strong><br/>
-                                                    This Price was used both on and beyond eBay 30 days prior to listing the Item, excluding shipping and handling.'
+                                                    This Price was used both on and beyond eBay 30 days prior to Listing the Item, excluding shipping and handling.'
                                                 ); ?>
                                             </span>
                                         </span>
@@ -1271,11 +1271,11 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
                                                     '<strong>None</strong><br/>
-                                                    Discounted Price will not be shown during either Pre-Checkout or Checkout. A buyer will be aware of discount before the payment is done.<br/>
+                                                    Discounted Price will not be shown during either Pre-Checkout or Checkout. A Buyer will be aware of discount before the payment is done.<br/>
                                                     <strong>During Checkout</strong><br/>
-                                                    Discounted Price will be shown on the eBay Checkout flow page. A buyer will be aware of discount before the purchase is confirmed.<br/>
+                                                    Discounted Price will be shown on the eBay Checkout flow Page. A Buyer will be aware of discount before the purchase is confirmed.<br/>
                                                     <strong>PreCheckout</strong><br/>
-                                                    The information of discounted Price will be available on the Product page. A buyer will be aware of discount before he decides to make a purchase by clicking "See Price" link. Discounted Price will be shown in a pop-up window.'); ?>
+                                                    The information of discounted Price will be available on the Product Page. A Buyer will be aware of discount before he decides to make a purchase by clicking "See Price" link. Discounted Price will be shown in a pop-up window.'); ?>
                                             </span>
                                         </span>
                                     </div>
@@ -1443,7 +1443,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'The Best Offer option allows you to accept offers from buyers and negotiate a Price.
+                                    'The Best Offer Option allows you to accept offers from Buyers and negotiate a Price.
                                     You can accept Best Offers on fixed Price and Classified Ads in certain Categories, such as eBay Motors.'
                                 ); ?>
                             </span>

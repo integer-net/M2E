@@ -114,7 +114,7 @@ EbayMotorSpecificHandler.prototype = Object.extend(new CommonHandler(), {
         MagentoMessageObj.clearAll();
 
         if (self.isEmptySpecificsAttribute) {
-            MagentoMessageObj.addError(M2ePro.translator.translate('Please specify eBay motors compatibility attribute in %s > Configuration > <a target="_blank" href="%s">General</a>'));
+            MagentoMessageObj.addError(M2ePro.translator.translate('Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>'));
             return;
         }
 

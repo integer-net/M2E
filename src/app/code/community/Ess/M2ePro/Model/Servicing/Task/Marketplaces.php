@@ -22,17 +22,22 @@ class Ess_M2ePro_Model_Servicing_Task_Marketplaces extends Ess_M2ePro_Model_Serv
 
     public function processResponseData(array $data)
     {
-        if (isset($data['categories_versions']) && is_array($data['categories_versions'])) {
-            $this->processCategoriesVersions($data['categories_versions']);
+        if (isset($data['ebay_last_update_dates']) && is_array($data['ebay_last_update_dates'])) {
+            $this->processEbayLastUpdateDates($data['ebay_last_update_dates']);
+        }
+
+        if (isset($data['amazon_last_update_dates']) && is_array($data['amazon_last_update_dates'])) {
+            $this->processAmazonLastUpdateDates($data['amazon_last_update_dates']);
         }
     }
 
     // ########################################
 
-    protected function processCategoriesVersions($versions)
+    protected function processEbayLastUpdateDates($lastUpdateDates)
     {
         $enabledMarketplaces = Mage::helper('M2ePro/Component_Ebay')
-            ->getCollection('Marketplace')->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
+            ->getCollection('Marketplace')
+            ->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
 
         $writeConn = Mage::getSingleton('core/resource')->getConnection('core_write');
         $dictionaryTable = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_marketplace');
@@ -40,19 +45,51 @@ class Ess_M2ePro_Model_Servicing_Task_Marketplaces extends Ess_M2ePro_Model_Serv
         /* @var $marketplace Ess_M2ePro_Model_Marketplace */
         foreach ($enabledMarketplaces as $marketplace) {
 
-            if (!isset($versions[$marketplace->getNativeId()])) {
+            if (!isset($lastUpdateDates[$marketplace->getNativeId()])) {
                 continue;
             }
 
-            $serverVersion = (int)$versions[$marketplace->getNativeId()];
+            $serverLastUpdateDate = $lastUpdateDates[$marketplace->getNativeId()];
 
-            $expr = "IF(client_categories_version is NULL,{$serverVersion},client_categories_version)";
+            $expr = "IF(client_details_last_update_date is NULL, '{$serverLastUpdateDate}',
+                                                                 client_details_last_update_date)";
 
             $writeConn->update(
                 $dictionaryTable,
                 array(
-                    'server_categories_version' => $serverVersion,
-                    'client_categories_version' => new Zend_Db_Expr($expr)
+                    'server_details_last_update_date' => $serverLastUpdateDate,
+                    'client_details_last_update_date' => new Zend_Db_Expr($expr)
+                ),
+                array('marketplace_id = ?' => $marketplace->getId())
+            );
+        }
+    }
+
+    protected function processAmazonLastUpdateDates($lastUpdateDates)
+    {
+        $enabledMarketplaces = Mage::helper('M2ePro/Component_Amazon')
+            ->getMarketplacesAvailableForApiCreation();
+
+        $writeConn = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $dictionaryTable = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_marketplace');
+
+        /* @var $marketplace Ess_M2ePro_Model_Marketplace */
+        foreach ($enabledMarketplaces as $marketplace) {
+
+            if (!isset($lastUpdateDates[$marketplace->getNativeId()])) {
+                continue;
+            }
+
+            $serverLastUpdateDate = $lastUpdateDates[$marketplace->getNativeId()];
+
+            $expr = "IF(client_details_last_update_date is NULL, '{$serverLastUpdateDate}',
+                                                                 client_details_last_update_date)";
+
+            $writeConn->update(
+                $dictionaryTable,
+                array(
+                    'server_details_last_update_date' => $serverLastUpdateDate,
+                    'client_details_last_update_date' => new Zend_Db_Expr($expr)
                 ),
                 array('marketplace_id = ?' => $marketplace->getId())
             );

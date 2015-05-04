@@ -212,18 +212,37 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
         return $calculator->getVariationValue($this->getParentObject());
     }
 
-    public function getPrice($salePrice = false)
+    public function getPrice()
     {
-        if ($salePrice) {
-            $src = $this->getAmazonSellingFormatTemplate()->getSalePriceSource();
-        } else {
-            $src = $this->getAmazonSellingFormatTemplate()->getPriceSource();
-        }
+        $src = $this->getAmazonSellingFormatTemplate()->getPriceSource();
 
         /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
         $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
         $calculator->setSource($src)->setProduct($this->getListingProduct());
-        $calculator->setIsSalePrice($salePrice)->setModifyByCoefficient(true);
+        $calculator->setModifyByCoefficient(true);
+
+        return $calculator->getVariationValue($this->getParentObject());
+    }
+
+    public function getMapPrice()
+    {
+        $src = $this->getAmazonSellingFormatTemplate()->getMapPriceSource();
+
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getListingProduct());
+
+        return $calculator->getVariationValue($this->getParentObject());
+    }
+
+    public function getSalePrice()
+    {
+        $src = $this->getAmazonSellingFormatTemplate()->getSalePriceSource();
+
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getListingProduct());
+        $calculator->setIsSalePrice(true)->setModifyByCoefficient(true);
 
         return $calculator->getVariationValue($this->getParentObject());
     }

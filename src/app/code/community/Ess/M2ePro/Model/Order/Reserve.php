@@ -65,7 +65,7 @@ class Ess_M2ePro_Model_Order_Reserve
         }
 
         if ($this->order->getAccount()->getChildObject()->getQtyReservationDays() <= 0) {
-            throw new LogicException('QTY reservation is disabled in Account settings.');
+            throw new LogicException('QTY Reservation is disabled in Account Settings.');
         }
 
         $this->order->associateWithStore(false);
@@ -211,7 +211,7 @@ class Ess_M2ePro_Model_Order_Reserve
 
         if ($productsExistCount == 0 && $productsDeletedCount == 0) {
             $this->order->setData('reservation_state', self::STATE_UNKNOWN)->save();
-            throw new LogicException('The Order Item(s) was not mapped to Magento Product(s) or mapped incorrect.');
+            throw new LogicException('The Order Item(s) was not Mapped to Magento Product(s) or Mapped incorrect.');
         }
 
         if ($productsExistCount == 0) {

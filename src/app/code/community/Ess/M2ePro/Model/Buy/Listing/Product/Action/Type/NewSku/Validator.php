@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_NewSku_Validator
 {
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         if (!$this->validateLockedObject()) {
             return false;
@@ -36,8 +36,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_NewSku_Validator
         if (empty($newProductTemplateId)) {
 
             // M2ePro_TRANSLATIONS
-            // New SKU policy is required
-            $this->addMessage('New SKU policy is required');
+            // New SKU Policy is required
+            $this->addMessage('New SKU Policy is required');
 
             return false;
         }

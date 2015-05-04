@@ -42,7 +42,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
             'Marketplace', (int)$params['marketplace_id']
         );
 
-        $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
+        $this->getActualOperationHistory()->addText('Starting Marketplace "'.$marketplace->getTitle().'"');
 
         $this->getActualLockItem()->setPercents($this->getPercentsStart());
 
@@ -74,7 +74,12 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
                                                'marketplace' => $marketplace->getNativeId()),
                                          'info',NULL,NULL);
 
-        return is_null($details) ? array() : $details['details'];
+        if (is_null($details)) {
+            return array();
+        }
+
+        $details['details']['last_update'] = $details['last_update'];
+        return $details['details'];
     }
 
     protected function saveDetailsToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $details)
@@ -87,8 +92,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
 
         $data = array(
             'marketplace_id' => $marketplace->getId(),
-            'product_data'   => (isset($details['product_data']) ? json_encode($details['product_data']) : NULL),
-            'vocabulary'     => (isset($details['vocabulary']) ? json_encode($details['vocabulary']) : NULL),
+            'client_details_last_update_date' => isset($details['last_update']) ? $details['last_update'] : NULL,
+            'server_details_last_update_date' => isset($details['last_update']) ? $details['last_update'] : NULL,
+            'product_data'   => isset($details['product_data']) ? json_encode($details['product_data']) : NULL,
+            'vocabulary'     => isset($details['vocabulary']) ? json_encode($details['vocabulary']) : NULL,
         );
 
         $connWrite->insert($tableMarketplaces, $data);
@@ -97,10 +104,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         // M2ePro_TRANSLATIONS
-        // The "Details" action for Amazon Marketplace: "%mrk%" has been successfully completed.
+        // The "Details" Action for Amazon Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Details" action for Amazon Marketplace: "%mrk%" has been successfully completed.',
+            'The "Details" Action for Amazon Marketplace: "%mrk%" has been successfully completed.',
             array('mrk' => $marketplace->getTitle())
         );
 

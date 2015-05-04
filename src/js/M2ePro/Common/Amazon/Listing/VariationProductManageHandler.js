@@ -388,6 +388,7 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
                 var response = self.parseResponse(transport);
                 if(response.success) {
                     self.reloadSettings();
+                    self.loadVariationsGrid();
                 }
             }
         });
@@ -474,8 +475,9 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
 
     //---------------------------------
 
-    openVariationsTab: function () {
+    openVariationsTab: function (createNewAsin) {
         amazonVariationProductManageTabsJsTabs.showTabContent(amazonVariationProductManageTabsJsTabs.tabs[0]);
+        $('amazonVariationsProductManageVariationsGridIframe').contentWindow.ListingGridHandlerObj.showNewChildForm(createNewAsin);
     }
 
     //---------------------------------

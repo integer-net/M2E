@@ -160,7 +160,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Attribute
         }
 
         if (!$this->isAmountEqual()) {
-            throw new Exception('Amounts of source and destination attributes are not equal.');
+            throw new Exception('Amounts of Source and Destination Attributes are not equal.');
         }
     }
 

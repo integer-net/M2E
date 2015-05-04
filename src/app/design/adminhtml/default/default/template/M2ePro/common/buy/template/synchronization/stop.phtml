@@ -1,8 +1,8 @@
 <div id="block_notice_buy_template_synchronization_stop" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Stop Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Stop Rules define the conditions when Rakuten.com Items listing must be
-    stopped, depending on Magento Product state.<br/><br/>
-    <b>Note:</b> If all Stop Conditions are set to <i>No</i> or <i>No Action</i>, then the stop option for Rakuten.com Items is disabled.<br/>
-    If all Stop Conditions are enabled, then an Item will be stopped if at least one of Stop Conditions is met.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('Stop Rules define the Conditions when Rakuten.com Items Listing must be
+    Stopped, depending on Magento Product state.<br/><br/>
+    <b>Note:</b> If all Stop Conditions are set to <i>No</i> or <i>No Action</i>, then the Stop Option for Rakuten.com Items is disabled.<br/>
+    If all Stop Conditions are enabled, then an Item will be inactivated if at least one of the Stop Conditions is met.'); ?>
 </div>
 
 <?php
@@ -83,7 +83,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::STOP_OUT_OFF_STOCK_YES; ?>" <?php if ($formData['stop_out_off_stock'] == Ess_M2ePro_Model_Buy_Template_Synchronization::STOP_OUT_OFF_STOCK_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if its stock availability has been changed to \'Out of Stock\' in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if its Stock availability has been changed to \'Out of Stock\' in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -100,7 +100,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::STOP_QTY_BETWEEN; ?>" <?php if ($formData['stop_qty_magento'] == Ess_M2ePro_Model_Buy_Template_Synchronization::STOP_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if Magento Quantity has been changed and meets the conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if Magento Quantity has been changed and meets the Conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -138,7 +138,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::STOP_QTY_BETWEEN; ?>" <?php if ($formData['stop_qty_calculated'] == Ess_M2ePro_Model_Buy_Template_Synchronization::STOP_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if calculated Quantity according to the selling format policy has been changed and meets the conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops Item(s) if calculated Quantity according to the Selling Format Policy has been changed and meets the Conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>

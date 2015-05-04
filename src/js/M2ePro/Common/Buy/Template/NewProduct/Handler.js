@@ -25,7 +25,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         self.attributeHandler = attributeHandler;
 
         self.setValidationCheckRepetitionValue('M2ePro-new-sku-template-title',
-                                                M2ePro.translator.translate('The specified title is already used for another New SKU Policy.'),
+                                                M2ePro.translator.translate('The specified Title is already used for another New SKU Policy.'),
                                                 'Buy_Template_NewProduct', 'title', 'category_id',
                                                 M2ePro.formData.category.category_id);
 
@@ -59,7 +59,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             '- ' + M2ePro.translator.translate('Cannot contain additional text, graphics or inset images')
         ];
         self.notes.description = [
-            M2ePro.translator.translate('Text to describe the product. Should be one block of text or a single paragraph. Do not use special characters and html tags')
+            M2ePro.translator.translate('Text to describe the Product. Should be one block of text or a single paragraph. Do not use special characters and html tags')
         ];
 
         self.changeButton.insert({
@@ -648,7 +648,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
             win = win || new Window({
                 className: "magento",
-                title: M2ePro.translator.translate('All of your Product images should meet the following rules:'),
+                title: M2ePro.translator.translate('All of your Product Images should meet the following Rules:'),
                 width: 400,
                 height: 180,
                 zIndex: 100,

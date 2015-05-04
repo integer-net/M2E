@@ -88,6 +88,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
             'price_coefficient',
             'price_custom_attribute',
 
+            'map_price_mode',
+            'map_price_custom_attribute',
+
             'sale_price_mode',
             'sale_price_coefficient',
             'sale_price_custom_attribute',

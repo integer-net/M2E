@@ -414,8 +414,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
                     $logsActionId,
                     Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
                     // M2ePro_TRANSLATIONS
-                    // Categories settings are not set.
-                    'Categories settings are not set.',
+                    // Categories Settings are not set.
+                    'Categories Settings are not set.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -447,8 +447,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
                     $logsActionId,
                     Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
                     // M2ePro_TRANSLATIONS
-                    // Translation cannot be executed because attributes for title or description are empty.
-                    'Translation cannot be executed because attributes for title or description are empty.',
+                    // Translation cannot be executed because Attributes for Title or Description are empty.
+                    'Translation cannot be executed because Attributes for Title or Description are empty.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );

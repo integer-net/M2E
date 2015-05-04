@@ -11,7 +11,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
                                                 M2ePro.formData.id,
                                                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK'));
 
-        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one attribute for Product mapping.'), function(value, el) {
+        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one Attribute for Product Mapping.'), function(value, el) {
 
             if ($('other_listings_mapping_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Play_Account::OTHER_LISTINGS_MAPPING_MODE_NO')) {
                 return true;
@@ -28,7 +28,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return isAttributeSelected;
         });
 
-        Validation.add('M2ePro-access', M2ePro.translator.translate('M2E Pro was not able to get access to the Play.com account. Please, make sure, that you enter correct Play.com login and password. If everything is correct but you still unable to access your account, please contact Play.com Customer Service Department on 0845 800 1020 (UK only) or +44 (0)1534 877595 (outside UK).'), function(value, el) {
+        Validation.add('M2ePro-access', M2ePro.translator.translate('M2E Pro was not able to get access to the Play.com Account. Please, make sure, that you enter correct Play.com Login and Password. If everything is correct but you still unable to access your Account, please contact Play.com Customer Service Department on 0845 800 1020 (UK only) or +44 (0)1534 877595 (outside UK).'), function(value, el) {
 
             var checkResult = false,
                 login = $('login').value,
@@ -55,7 +55,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return checkResult;
         });
 
-        Validation.add('M2ePro-marketplace-disabled', M2ePro.translator.translate('You must enable marketplace first.'), function(value, el) {
+        Validation.add('M2ePro-marketplace-disabled', M2ePro.translator.translate('You must enable Marketplace first.'), function(value, el) {
             return false;
         });
 
@@ -104,7 +104,7 @@ CommonPlayAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     delete_click: function()
     {
-        if (!confirm(M2ePro.translator.translate('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'))) {
+        if (!confirm(M2ePro.translator.translate('Be attentive! By Deleting Account you delete all information on it from M2E Pro Server. This will cause inappropriate work of all Accounts\' copies.'))) {
             return;
         }
         setLocation(M2ePro.url.get('deleteAction'));

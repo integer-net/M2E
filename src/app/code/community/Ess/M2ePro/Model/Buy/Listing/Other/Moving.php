@@ -136,8 +136,8 @@ class Ess_M2ePro_Model_Buy_Listing_Other_Moving
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_MOVE_LISTING,
                                      // M2ePro_TRANSLATIONS
-                                     // Item was successfully moved
-                                     'Item was successfully moved',
+                                     // Item was successfully Moved
+                                     'Item was successfully Moved',
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
@@ -150,8 +150,8 @@ class Ess_M2ePro_Model_Buy_Listing_Other_Moving
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_FROM_OTHER_LISTING,
                                      // M2ePro_TRANSLATIONS
-                                     // Item was successfully moved
-                                     'Item was successfully moved',
+                                     // Item was successfully Moved
+                                     'Item was successfully Moved',
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 

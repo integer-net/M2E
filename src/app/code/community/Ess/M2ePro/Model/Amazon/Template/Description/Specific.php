@@ -148,7 +148,7 @@ class Ess_M2ePro_Model_Amazon_Template_Description_Specific extends Ess_M2ePro_M
 
     public function getTrackingAttributes()
     {
-        return array();
+        return $this->getUsedAttributes();
     }
 
     public function getUsedAttributes()

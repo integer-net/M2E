@@ -9,6 +9,8 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_DescriptionTemplate
     /** @var Ess_M2ePro_Model_Upgrade_MySqlSetup */
     private $installer = NULL;
 
+    private $forceAllSteps = false;
+
     //####################################
 
     public function getInstaller()
@@ -19,6 +21,13 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_DescriptionTemplate
     public function setInstaller(Ess_M2ePro_Model_Upgrade_MySqlSetup $installer)
     {
         $this->installer = $installer;
+    }
+
+    // -----------------------------------
+
+    public function setForceAllSteps($value = true)
+    {
+        $this->forceAllSteps = $value;
     }
 
     //####################################
@@ -169,6 +178,10 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_DescriptionTemplate
 
     private function isNeedToSkip()
     {
+        if ($this->forceAllSteps) {
+            return false;
+        }
+
         $connection = $this->installer->getConnection();
 
         $oldSpecific = $this->installer->getTable('m2epro_amazon_template_new_product_specific');
@@ -187,10 +200,15 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_DescriptionTemplate
 
     private function saveWizardNecessaryData()
     {
+        $marketplace = $this->installer->getTable('m2epro_marketplace');
+        $templateNewProduct = $this->installer->getTable('m2epro_amazon_template_new_product');
+
+        if (!$this->installer->tableExists($templateNewProduct)) {
+            return;
+        }
+
         $connection = $this->installer->getConnection();
 
-        $templateNewProduct = $this->installer->getTable('m2epro_amazon_template_new_product');
-        $marketplace = $this->installer->getTable('m2epro_marketplace');
         $result = $connection->query(<<<SQL
 
         SELECT `main_table`.`title`,
@@ -209,14 +227,13 @@ SQL
             $dataForInsert[] = $row;
         }
 
-        $dataForInsert = json_encode($dataForInsert);
-
-        $date = date('Y-m-d H:i:s', gmdate('U'));
+        $dateForInsert = $connection->quote(date('Y-m-d H:i:s', gmdate('U')));
+        $dataForInsert = $connection->quote(json_encode($dataForInsert));
 
         $this->installer->run(<<<SQL
 
         INSERT INTO `m2epro_registry` (`key`, `value`, update_date, create_date)
-        VALUES ('{$registryKey}', '{$dataForInsert}', '{$date}', '{$date}');
+        VALUES ('{$registryKey}', {$dataForInsert}, {$dateForInsert}, {$dateForInsert});
 
 SQL
 );
@@ -235,13 +252,16 @@ SQL
             $connection->dropKey($tempTable, 'template_new_product_id');
         }
 
-        $this->installer->run(<<<SQL
+        if ($connection->tableColumnExists($tempTable, 'template_new_product_id') !== false) {
+
+            $this->installer->run(<<<SQL
 
     UPDATE `m2epro_amazon_listing_product`
     SET template_new_product_id = NULL;
 
 SQL
-        );
+            );
+        }
 
         if ($connection->tableColumnExists($tempTable, 'template_new_product_id') !== false &&
             $connection->tableColumnExists($tempTable, 'template_description_id') === false) {

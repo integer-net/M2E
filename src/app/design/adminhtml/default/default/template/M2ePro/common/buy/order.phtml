@@ -211,9 +211,9 @@
 
                                 <?php
                                     if (!$this->isCurrencyAllowed()) {
-                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('Order currency is not enabled in Magento. Please, enable it in System > Configuration > Currency Setup.');
+                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('Order Currency is not enabled in Magento. Please, enable it in System > Configuration > Currency Setup.');
                                     } elseif (!$this->hasCurrencyConversionRate()) {
-                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('There\'s no rate for Order currency in Magento. Please, add currency convert rate in System > Manage Currency > Rates.');
+                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('There\'s no rate for Order Currency in Magento. Please, add Currency convert rate in System > Manage Currency > Rates.');
                                     }
                                 ?>
                             </td>

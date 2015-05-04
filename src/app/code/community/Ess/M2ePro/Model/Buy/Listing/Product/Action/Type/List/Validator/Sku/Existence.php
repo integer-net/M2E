@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Existe
 
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         if (empty($this->existenceResult['general_id'])) {
             return true;
@@ -55,7 +55,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Existe
         $linkingObject->link();
 
         $this->addMessage(
-            'Product was successfully found in Rakuten.com inventory
+            'Product was successfully found in Rakuten.com Inventory
              by Reference ID and linked to your Magento Product.',
             Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS
         );

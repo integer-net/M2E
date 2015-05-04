@@ -174,7 +174,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage
     protected function _prepareLayout()
     {
         if (count(Mage::helper('M2ePro/View_Common_Component')->getActiveComponents()) == 0) {
-            throw new LogicException('At least 1 channel should be enabled.');
+            throw new LogicException('At least 1 Channel should be enabled.');
         }
 
         $this->initializeTabs();

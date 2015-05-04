@@ -106,9 +106,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_OrderController
 
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
     // M2ePro_TRANSLATIONS
-    // Magento Order is already created for this Play.com Order. Press Create Order button to create new one.'
+    // Magento Order is already created for this Play.com Order. Press Create Order Button to create new one.'
             $message = 'Magento Order is already created for this Play.com Order. ' .
-                       'Press Create Order button to create new one.';
+                       'Press Create Order Button to create new one.';
 
             $this->_getSession()->addWarning(
                 Mage::helper('M2ePro')->__($message)

@@ -11,7 +11,7 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
 
     initialize: function()
     {
-        Validation.add('M2ePro-validate-ebay-template-title', M2ePro.translator.translate('Policy with the same title already exists.'), function(value, element) {
+        Validation.add('M2ePro-validate-ebay-template-title', M2ePro.translator.translate('Policy with the same Title already exists.'), function(value, element) {
 
             var templateNick = element.name.substr(0, element.name.indexOf('['));
 
@@ -362,7 +362,7 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
                 'name="'+templateNick+'[template_title]" ' +
                 'id="template_title" ' +
                 'style="width: 375px;" ' +
-                'placeholder="' + M2ePro.translator.translate('Please specify policy title') + '" ' +
+                'placeholder="' + M2ePro.translator.translate('Please specify Policy Title') + '" ' +
             '/>' +
             '</div>';
 

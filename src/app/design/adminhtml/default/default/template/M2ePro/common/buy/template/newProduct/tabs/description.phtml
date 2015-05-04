@@ -1,6 +1,6 @@
 <div id="block_notice_buy_template_new_product_template_core" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Description'); ?>">
     <?php echo Mage::helper('M2ePro')->__(
-        ' Description is used to design your Items\' description on Rakuten.com. The more information you provide the easier it is for buyers to make a choice.
+        ' Description is used to design your Items\' Description on Rakuten.com. The more information you provide the easier it is for Buyers to make a choice.
         <br/>
         <br/>
         It is possible to choose a Product Description or Product Short Description, which will be taken from Magento. Or you can create a Custom Description by adding necessary information.
@@ -178,7 +178,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_CUSTOM_TEMPLATE; ?>" <?php if ($formData['category']['title_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_CUSTOM_TEMPLATE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Item\'s title that buyers will see on Rakuten.com listing.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Item\'s Title that Buyers will see on Rakuten.com Listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -353,7 +353,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::IMAGE_MAIN_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['main_image_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::IMAGE_MAIN_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Image you will see on your Rakuten.com listing.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Image you will see on your Rakuten.com Listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -408,7 +408,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             </select>
                         </div>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose Text, Multiple Select or Dropdown type attribute. In Text type attribute urls must be separated with comma.
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose Text, Multiple Select or Dropdown type Attribute. In Text type Attribute urls must be separated with comma.
                                   <br/>e.g.  http://mymagentostore.com/images/baseimage1.jpg,  http://mymagentostore.com/images/baseimage2.jpg'); ?></span>
                         </p>
                     </td>
@@ -428,7 +428,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         </select>
 
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The number of Additional Images. The images will be taken from Magento Product settings.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The number of Additional Images. The images will be taken from Magento Product Settings.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -459,7 +459,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::KEYWORDS_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['keywords_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::KEYWORDS_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Search keywords that will help customers to find your Product. Separated by comma.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Search keywords that will help Customers to find your Product. Separated by comma.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -545,7 +545,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
         <div class="hor-scroll">
             <table class="form-list" cellspacing="0" cellpadding="0">
 
-                <!-- description -->
+                <!-- Description -->
                 <tr>
                     <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>: <span class="required">*</span></label>

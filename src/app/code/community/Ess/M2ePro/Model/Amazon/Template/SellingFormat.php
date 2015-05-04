@@ -197,6 +197,53 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     //-------------------------
 
+    public function getMapPriceMode()
+    {
+        return (int)$this->getData('map_price_mode');
+    }
+
+    public function isMapPriceModeNone()
+    {
+        return $this->getMapPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE;
+    }
+
+    public function isMapPriceModeProduct()
+    {
+        return $this->getMapPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT;
+    }
+
+    public function isMapPriceModeSpecial()
+    {
+        return $this->getMapPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL;
+    }
+
+    public function isMapPriceModeAttribute()
+    {
+        return $this->getMapPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE;
+    }
+
+    public function getMapPriceSource()
+    {
+        return array(
+            'mode'        => $this->getMapPriceMode(),
+            'attribute'   => $this->getData('map_price_custom_attribute')
+        );
+    }
+
+    public function getMapPriceAttributes()
+    {
+        $attributes = array();
+        $src = $this->getMapPriceSource();
+
+        if ($src['mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
+    //-------------------------
+
     public function getSalePriceMode()
     {
         return (int)$this->getData('sale_price_mode');
@@ -370,13 +417,7 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
 
     public function getTrackingAttributes()
     {
-        return array_unique(array_merge(
-            $this->getQtyAttributes(),
-            $this->getPriceAttributes(),
-            $this->getSalePriceAttributes(),
-            $this->getSalePriceStartDateAttributes(),
-            $this->getSalePriceEndDateAttributes()
-        ));
+        return $this->getUsedAttributes();
     }
 
     public function getUsedAttributes()
@@ -384,6 +425,7 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
         return array_unique(array_merge(
             $this->getQtyAttributes(),
             $this->getPriceAttributes(),
+            $this->getMapPriceAttributes(),
             $this->getSalePriceAttributes(),
             $this->getSalePriceStartDateAttributes(),
             $this->getSalePriceEndDateAttributes()

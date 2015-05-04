@@ -64,8 +64,8 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
         $this->response = @json_decode($this->response,true);
 
         if (!isset($this->response['response']) || !isset($this->response['data'])) {
-            throw new Exception('Please ensure that CURL library is installed on your server and it supports HTTPS
-            protocol. Also ensure that outgoing connection to m2epro.com, port 443 is allowed by firewall.');
+            throw new Exception('Please ensure that CURL library is installed on your Server and it supports HTTPS
+            protocol. Also ensure that outgoing Connection to m2epro.com, port 443 is allowed by firewall.');
         }
 
         $this->processResponseInfo($this->response['response']);
@@ -96,7 +96,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
         if ($internalServerErrorMessage != '') {
 
             throw new Exception(Mage::helper('M2ePro')->__(
-                "Internal server error(s) [%error_message%]",
+                "Internal Server error(s) [%error_message%]",
                 $internalServerErrorMessage
             ));
         }
@@ -114,7 +114,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
         if (!is_array($commandTemp) || !isset($commandTemp[0]) ||
             !isset($commandTemp[1]) || !isset($commandTemp[2])) {
-            throw new Exception('Requested command has invalid format.');
+            throw new Exception('Requested Command has invalid format.');
         }
 
         return array(
@@ -145,7 +145,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
         if (!is_array($commandTemp) || !isset($commandTemp[0]) ||
             !isset($commandTemp[1]) || !isset($commandTemp[2])) {
-            throw new Exception('Requested command has invalid format.');
+            throw new Exception('Requested Command has invalid format.');
         }
 
         $request = array(

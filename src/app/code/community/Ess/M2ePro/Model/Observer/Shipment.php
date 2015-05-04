@@ -91,10 +91,10 @@ class Ess_M2ePro_Model_Observer_Shipment extends Ess_M2ePro_Model_Observer_Abstr
 
         $chanelTitle = $order->getComponentTitle();
         // M2ePro_TRANSLATIONS
-        // Shipping Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank" >order log</a> for more details.
+        // Shipping Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank" >Order Log</a> for more details.
         $message = Mage::helper('M2ePro')->__(
             'Shipping Status for %chanel_title% Order was not updated.'.
-            ' View <a href="%url% target="_blank" >order log</a>'.
+            ' View <a href="%url% target="_blank" >Order Log</a>'.
             ' for more details.',
             $chanelTitle, $url
         );

@@ -27,15 +27,6 @@ class Ess_M2ePro_Model_Connector_Buy_Product_NewSku_MultipleResponser
 
     // ########################################
 
-    protected function validateResponseData($response)
-    {
-        if (!parent::validateResponseData($response)) {
-            return false;
-        }
-
-        return isset($response['skus']) && is_array($response['skus']);
-    }
-
     protected function processResponseData($response)
     {
         foreach ($this->listingsProducts as $listingProduct) {

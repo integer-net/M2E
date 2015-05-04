@@ -30,6 +30,10 @@
         <table>
             <?php foreach($this->getTableColumns() as $column) : ?>
 
+                <?php if (strpos($column['extra'], 'increment') !== false) {
+                    continue;
+                } ?>
+
                 <tr id="tr_column_id_<?php echo $column['name']; ?>">
                     <td style="min-width: 220px; height: 23px;" title="<?php echo $column['type']; ?>">
                         <?php if (isset($column['is_parent']) && $column['is_parent']) : ?><span style="color: orangered;">p:&nbsp;</span><?php endif; ?>

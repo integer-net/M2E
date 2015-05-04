@@ -273,11 +273,11 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             }
         }
 
-        $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) were successfully deleted', $deleted);
+        $tempString = Mage::helper('M2ePro')->__('%amount% Listing(s) were successfully deleted', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
         $tempString = Mage::helper('M2ePro')->__(
-            '%amount% listing(s) cannot be deleted because they have Items with status "In Progress".', $locked
+            '%amount% Listing(s) cannot be deleted because they have Items with Status "In Progress".', $locked
         );
         $locked && $this->_getSession()->addError($tempString);
 
@@ -620,7 +620,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         if (!(int)$listingProducts->getSize()) {
             return $this->getResponse()->setBody(json_encode(array(
                 'result'  => 'error',
-                'message' => Mage::helper('M2ePro')->__('Item is already being translated.'),
+                'message' => Mage::helper('M2ePro')->__('Item is already being Translated.'),
             )));
         }
 
@@ -978,8 +978,8 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
                     $logsActionId,
                     Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
                     // M2ePro_TRANSLATIONS
-                    // You cannot stop translation for Items not being translated.
-                    'You cannot stop translation for Items not being translated.',
+                    // You cannot stop Translation for Items not being Translated.
+                    'You cannot stop Translation for Items not being Translated.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -1004,8 +1004,8 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
                 $logsActionId,
                 Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
                 // M2ePro_TRANSLATIONS
-                // Translation has been successfully stopped
-                'Translation successfully stopped',
+                // Translation has been successfully Stopped
+                'Translation successfully Stopped',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );

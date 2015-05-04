@@ -13,11 +13,11 @@ ListingAutoActionHandler = Class.create(CommonHandler, {
 
     initialize: function()
     {
-        Validation.add('M2ePro-validate-category-selection', M2ePro.translator.translate('You must select at least 1 category.'), function() {
+        Validation.add('M2ePro-validate-category-selection', M2ePro.translator.translate('You must select at least 1 Category.'), function() {
             return categories_selected_items.length > 0
         });
 
-        Validation.add('M2ePro-validate-category-group-title', M2ePro.translator.translate('Rule with the same title already exists.'), function(value, element) {
+        Validation.add('M2ePro-validate-category-group-title', M2ePro.translator.translate('Rule with the same Title already exists.'), function(value, element) {
 
             var unique = true;
 

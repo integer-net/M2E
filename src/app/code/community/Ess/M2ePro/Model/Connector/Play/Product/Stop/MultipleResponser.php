@@ -12,8 +12,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Stop_MultipleResponser
     protected function getSuccessfulMessage(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         // M2ePro_TRANSLATIONS
-        // Item was successfully stopped
-        return 'Item was successfully stopped';
+        // Item was successfully Stopped
+        return 'Item was successfully Stopped';
     }
 
     // ########################################

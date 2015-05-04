@@ -318,6 +318,13 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             'condition_note_mode',
             'condition_note_value',
 
+            'image_main_mode',
+            'image_main_attribute',
+
+            'gallery_images_mode',
+            'gallery_images_limit',
+            'gallery_images_attribute',
+
             'handling_time_mode',
             'handling_time_value',
             'handling_time_custom_attribute',
@@ -375,7 +382,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
         $deleted && $this->_getSession()->addSuccess($tempString);
 
         $tempString = Mage::helper('M2ePro')->__(
-            '%amount% Listing(s) have listed Items and can not be deleted', $locked
+            '%amount% Listing(s) have Listed Items and can not be deleted', $locked
         );
         $locked && $this->_getSession()->addError($tempString);
 
@@ -953,7 +960,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
         if (count($filteredLockedProducts) != count($filteredProductsIdsByType)) {
             $tempCount = count($filteredLockedProducts) - count($filteredProductsIdsByType);
             $errors[] = Mage::helper('M2ePro')->__(
-                '%count% Items are Simple with custom options or Bundle Magento Products.', $tempCount
+                '%count% Items are Simple with Custom Options or Bundle Magento Products.', $tempCount
             );
             $errorMsgProductsCount += $tempCount;
         }
@@ -1124,8 +1131,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             if (count($productsIdsTemp) < count($productsIds)) {
                 $message = '<p>'
                     . Mage::helper('M2ePro')->__(
-                        'Description Policy cannot be unassigned because the Products are in action or
-                         in the process of new ASIN(s)/ISBN(s) creation.')
+                        'Description Policy cannot be unassigned because the Products are in Action or
+                         in the process of new ASIN(s)/ISBN(s) Creation.')
                     . '</p>';
                 $type = 'warning';
             }

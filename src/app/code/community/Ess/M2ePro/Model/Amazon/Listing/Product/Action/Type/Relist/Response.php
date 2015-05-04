@@ -36,13 +36,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Relist_Response
     {
         if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
             // M2ePro_TRANSLATIONS
-            // Item was successfully relisted
-            return 'Item was successfully relisted';
+            // Item was successfully Relisted
+            return 'Item was successfully Relisted';
         }
 
         // M2ePro_TRANSLATIONS
-        // QTY was successfully relisted
-        return 'QTY was successfully relisted';
+        // QTY was successfully Relisted
+        return 'QTY was successfully Relisted';
     }
 
     // ########################################

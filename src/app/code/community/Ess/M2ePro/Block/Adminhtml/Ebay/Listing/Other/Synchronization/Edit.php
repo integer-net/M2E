@@ -67,7 +67,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
     {
         $translations = array();
 
-        $text = 'Inconsistent settings in Relist and Stop rules.';
+        $text = 'Inconsistent Settings in Relist and Stop Rules.';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
 
         $text = 'Must be greater than "Min".';

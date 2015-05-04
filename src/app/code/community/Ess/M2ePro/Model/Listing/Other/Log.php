@@ -17,18 +17,18 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
     const _ACTION_STOP_PRODUCT = 'Stop Product';
 
     const ACTION_ADD_LISTING = 4;
-    const _ACTION_ADD_LISTING = 'Add new listing';
+    const _ACTION_ADD_LISTING = 'Add new Listing';
     const ACTION_DELETE_LISTING = 5;
-    const _ACTION_DELETE_LISTING = 'Delete existing listing';
+    const _ACTION_DELETE_LISTING = 'Delete existing Listing';
 
     const ACTION_MAP_LISTING = 6;
-    const _ACTION_MAP_LISTING = 'Map listing to Magento Product';
+    const _ACTION_MAP_LISTING = 'Map Listing to Magento Product';
 
     const ACTION_UNMAP_LISTING = 8;
-    const _ACTION_UNMAP_LISTING = 'Unmap listing from Magento Product';
+    const _ACTION_UNMAP_LISTING = 'Unmap Listing from Magento Product';
 
     const ACTION_MOVE_LISTING = 7;
-    const _ACTION_MOVE_LISTING = 'Move to existing M2E Pro listing';
+    const _ACTION_MOVE_LISTING = 'Move to existing M2E Pro Listing';
 
     const ACTION_CHANGE_PRODUCT_PRICE = 10;
     const _ACTION_CHANGE_PRODUCT_PRICE = 'Change of Product Price in Magento Store';
@@ -37,7 +37,7 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
     const ACTION_CHANGE_PRODUCT_QTY = 12;
     const _ACTION_CHANGE_PRODUCT_QTY = 'Change of Product QTY in Magento Store';
     const ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY = 13;
-    const _ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY = 'Change of Product stock availability in Magento Store';
+    const _ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY = 'Change of Product Stock availability in Magento Store';
     const ACTION_CHANGE_PRODUCT_STATUS = 14;
     const _ACTION_CHANGE_PRODUCT_STATUS = 'Change of Product status in Magento Store';
 
@@ -48,7 +48,7 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
     const _ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE = 'Change of Product Special Price to date in Magento Store';
 
     const ACTION_CHANGE_CUSTOM_ATTRIBUTE = 17;
-    const _ACTION_CHANGE_CUSTOM_ATTRIBUTE = 'Change of Product custom attribute in Magento Store';
+    const _ACTION_CHANGE_CUSTOM_ATTRIBUTE = 'Change of Product Custom Attribute in Magento Store';
 
     const ACTION_CHANGE_STATUS_ON_CHANNEL = 18;
     const _ACTION_CHANGE_STATUS_ON_CHANNEL = 'Change Item status on Channel';

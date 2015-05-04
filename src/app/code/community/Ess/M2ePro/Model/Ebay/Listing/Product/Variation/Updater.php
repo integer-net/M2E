@@ -49,7 +49,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
             $listingProduct->setData(
                 self::VALIDATE_MESSAGE_DATA_KEY,
-                'The Product was listed as a Simple Product because M2E Pro
+                'The Product was Listed as a Simple Product because M2E Pro
                  cannot retrieve Magento variations from this Product.'
             );
 
@@ -71,8 +71,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
             // Color: Blue, Size: XL, ...
 
             $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
-            'The Product was listed as a Simple Product as it has limitation for multi-variation Items. '.
-            'Reason: number of options more than 5.'
+            'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+            'Reason: number of Options more than 5.'
             );
 
             return array(
@@ -90,8 +90,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
                 $listingProduct->setData(
                     self::VALIDATE_MESSAGE_DATA_KEY,
-                    'The Product was listed as a Simple Product as it has limitation for multi-variation Items. '.
-                    'Reason: number of values for each option more than 60.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: number of values for each Option more than 60.'
                 );
 
                 return array(
@@ -106,7 +106,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
             // Not more that 250 possible variations
 
             $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
-            'The Product was listed as a Simple Product as it has limitation for multi-variation Items. '.
+            'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
             'Reason: sum of quantities of all possible Products options more than 250.'
             );
 

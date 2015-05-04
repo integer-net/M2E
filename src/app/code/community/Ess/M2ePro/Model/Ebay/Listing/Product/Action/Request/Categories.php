@@ -182,7 +182,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
             $isSingleEpid = count($emptySavedEpids) > 1;
             $msg = 'The '.implode(', ', $emptySavedEpids).' ePID'.($isSingleEpid ? 's' : '');
             $msg .= ' specified in the Compatibility Attribute';
-            $msg .= ' were dropped out of the listing because '.($isSingleEpid ? 'it was' : 'they were');
+            $msg .= ' were dropped out of the Listing because '.($isSingleEpid ? 'it was' : 'they were');
             $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';
             $this->addWarningMessage($msg);
         }
@@ -211,7 +211,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
             $isSingleKtype = count($emptySavedKtypes) > 1;
             $msg = 'The '.implode(', ', $emptySavedKtypes).' KType'.($isSingleKtype ? 's' : '');
             $msg .= ' specified in the Compatibility Attribute';
-            $msg .= ' were dropped out of the listing because '.($isSingleKtype ? 'it was' : 'they were');
+            $msg .= ' were dropped out of the Listing because '.($isSingleKtype ? 'it was' : 'they were');
             $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';
             $this->addWarningMessage($msg);
         }

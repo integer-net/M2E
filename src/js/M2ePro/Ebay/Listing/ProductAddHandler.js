@@ -24,7 +24,7 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
         this.options.get_selected_products((function(selectedProducts) {
 
             if (!selectedProducts) {
-                return alert(M2ePro.translator.translate('Please select the Products you want to perform the action on.'));
+                return alert(M2ePro.translator.translate('Please select the Products you want to perform the Action on.'));
             }
 
             if (this.options.show_autoaction_popup) {

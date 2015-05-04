@@ -38,7 +38,7 @@ ConfigurationLicenseHandler.prototype = Object.extend(new CommonHandler(), {
                     window.opener.completeStep = 1;
                     window.close();
                 } else {
-                    MagentoMessageObj.addError(M2ePro.translator.translate('You must get valid Trial or Live license key.'));
+                    MagentoMessageObj.addError(M2ePro.translator.translate('You must get valid Trial or Live License Key.'));
                 }
             }
         });

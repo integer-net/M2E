@@ -448,10 +448,26 @@ HTML;
         $resource = Mage::getSingleton('core/resource');
         $queryObj = $resource->getConnection('core_read')
                              ->select()
-                             ->from($resource->getTableName('m2epro_listing_log'))
-                             ->where("description LIKE '%a duplicate of your item%'")
-                             ->order('id DESC')
-                             ->group(array('product_id', 'listing_id'))
+                             ->from(array('mll' => $resource->getTableName('m2epro_listing_log')))
+                             ->joinLeft(
+                                 array('ml' => $resource->getTableName('m2epro_listing')),
+                                 'mll.listing_id = ml.id',
+                                 array('marketplace_id')
+                             )
+                            ->joinLeft(
+                                array('mm' => $resource->getTableName('m2epro_marketplace')),
+                                'ml.marketplace_id = mm.id',
+                                array('marketplace_title' => 'title')
+                            )
+                             ->where("mll.description LIKE '%a duplicate of your item%' OR " . // ENG
+                                     "mll.description LIKE '%ette annonce est identique%' OR " . // FR
+                                     "mll.description LIKE '%ngebot ist identisch mit dem%' OR " .  // DE
+                                     "mll.description LIKE '%un duplicato del tuo oggetto%' OR " . // IT
+                                     "mll.description LIKE '%es un duplicado de tu art%'" // ESP
+                             )
+                             ->where("mll.component_mode = ?", 'ebay')
+                             ->order('mll.id DESC')
+                             ->group(array('mll.product_id', 'mll.listing_id'))
                              ->query();
 
         $duplicatesInfo = array();
@@ -462,11 +478,13 @@ HTML;
 
             $duplicatesInfo[] = array(
                 'listing_id'         => $row['listing_id'],
+                'listing_title'      => $row['listing_title'],
                 'product_id'         => $row['product_id'],
                 'product_title'      => $row['product_title'],
                 'listing_product_id' => $row['listing_product_id'],
                 'description'        => $row['description'],
-                'ebay_item_id'       => $ebayItemId
+                'ebay_item_id'       => $ebayItemId,
+                'marketplace_title'  => $row['marketplace_title']
             );
         }
 
@@ -478,20 +496,24 @@ HTML;
         $tableContent = <<<HTML
 <tr>
     <th>Listing ID</th>
+    <th>Listing Title</th>
     <th>Product ID</th>
     <th>Product Title</th>
     <th>Listing Product ID</th>
     <th>eBay Item ID</th>
+    <th>eBay Site</th>
 </tr>
 HTML;
         foreach ($duplicatesInfo as $row) {
             $tableContent .= <<<HTML
 <tr>
     <td>{$row['listing_id']}</td>
+    <td>{$row['listing_title']}</td>
     <td>{$row['product_id']}</td>
     <td>{$row['product_title']}</td>
     <td>{$row['listing_product_id']}</td>
     <td>{$row['ebay_item_id']}</td>
+    <td>{$row['marketplace_title']}</td>
 </tr>
 HTML;
         }

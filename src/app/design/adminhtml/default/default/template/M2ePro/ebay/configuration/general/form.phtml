@@ -47,7 +47,7 @@
                                     <option value="<?php echo Ess_M2ePro_Helper_View_Ebay::MODE_ADVANCED; ?>" <?php if ($this->view_ebay_mode == Ess_M2ePro_Helper_View_Ebay::MODE_ADVANCED): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Advanced'); ?></option>
                                 </select>
                                 <p class="note">
-                                    <span><?php echo Mage::helper('M2ePro')->__('There are two modes. Simple is suitable for new users and for those with a limited inventory. Advanced is suitable for the more experienced user.'); ?></span>
+                                    <span><?php echo Mage::helper('M2ePro')->__('There are two modes. Simple is suitable for new users and for those with a limited Inventory. Advanced is suitable for the more experienced user.'); ?></span>
                                 </p>
                             </td>
                         </tr>
@@ -84,7 +84,7 @@
                                 <option value="1" <?php if ($this->view_ebay_feedbacks_notification_mode): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Show a notification in Magento when you receive negative feedback on eBay.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Show a notification in Magento when you receive negative Feedback on eBay.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -148,7 +148,7 @@
                                     </select>
 
                                     <p class="note">
-                                        <span><?php echo Mage::helper('M2ePro')->__('Choose the currency you want to sell for.'); ?></span>
+                                        <span><?php echo Mage::helper('M2ePro')->__('Choose the Currency you want to sell for.'); ?></span>
                                     </p>
                                 </td>
                             </tr>
@@ -167,9 +167,9 @@
                             </select>
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__(
-                                    'Choose \'Yes\' to prevent M2E Pro listing a Product if it has already been added by another M2E Pro listing.<br/><br/>
-                                     This function is useful if you have automatic rules set up that list Products automatically as it will ensure a Product is listed only once.<br/><br/>
-                                     <b>Note:</b> Applies only to Products listed automatically on live eBay sites (ie not using a Sandbox account).'
+                                    'Choose \'Yes\' to prevent M2E Pro Listing a Product if it has already been added by another M2E Pro Listing.<br/><br/>
+                                     This function is useful if you have Automatic Rules set up that list Products automatically as it will ensure a Product is Listed only once.<br/><br/>
+                                     <b>Note:</b> Applies only to Products Listed automatically on live eBay Sites (ie not using a Sandbox Account).'
                                 ); ?></span>
                             </p>
                         </td>
@@ -189,8 +189,8 @@
 
             <div id="block_notice_ebay_category_parts_compatibility" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Compatibility'); ?>">
                 <?php echo Mage::helper('M2ePro')->__(
-                    'Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing.<br/>
-                    You can create one listing describing a single part and add a complete list of compatible vehicles'
+                    'Parts compatibility is a better way for Sellers to list parts that fit a variety of vehicles. This format adds standard information to your Listing.<br/>
+                    You can create one Listing describing a single part and add a complete list of compatible vehicles'
                 ); ?>
             </div>
 
@@ -224,17 +224,17 @@
                                     <td id="motors_specifics_attribute_td_note">
                                         <p class="note">
                                             <span><?php echo Mage::helper('M2ePro')->__(
-                                                    'Choose the attribute below that contains the Product Reference IDs (ePIDs) of compatible vehicles for the part.<br/>
-                                                     In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible Items.
+                                                    'Choose the Attribute below that contains the Product Reference IDs (ePIDs) of compatible vehicles for the part.<br/>
+                                                     In the M2E Pro Listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible Items.
                                                      <br/><br/>
-                                                     Only textarea attributes are shown.'
+                                                     Only Textarea Attributes are shown.'
                                                 ); ?></span>
                                         </p>
                                     </td>
                                 <?php else: ?>
                                     <td class="value">
                                         <div id="block_notice_ebay_configuration_motors_specifics_attribute" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
-                                            <?php echo Mage::helper('M2ePro')->__('You do not have textarea attributes.'); ?>
+                                            <?php echo Mage::helper('M2ePro')->__('You do not have Textarea Attributes.'); ?>
                                         </div>
                                     </td>
                                 <?php endif; ?>
@@ -261,17 +261,17 @@
                                     <td id="motors_ktypes_attribute_td_note">
                                         <p class="note">
                                             <span><?php echo Mage::helper('M2ePro')->__(
-                                                    'Choose the attribute below that contains the KTypes of compatible vehicles for the part.<br/>
-                                                     In the M2E Pro listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible Items.
+                                                    'Choose the Attribute below that contains the KTypes of compatible vehicles for the part.<br/>
+                                                     In the M2E Pro Listing, use the <b>Add Compatible Vehicles</b> tool to find necessary compatible Items.
                                                      <br/><br/>
-                                                     Only textarea attributes are shown.'
+                                                     Only Textarea Attributes are shown.'
                                                 ); ?></span>
                                         </p>
                                     </td>
                                 <?php else: ?>
                                     <td class="value">
                                         <div id="block_notice_ebay_configuration_motors_ktypes_attribute" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
-                                            <?php echo Mage::helper('M2ePro')->__('You do not have textarea attributes.'); ?>
+                                            <?php echo Mage::helper('M2ePro')->__('You do not have Textarea Attributes.'); ?>
                                         </div>
                                     </td>
                                 <?php endif; ?>

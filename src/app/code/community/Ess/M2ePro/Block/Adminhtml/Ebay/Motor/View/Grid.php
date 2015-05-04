@@ -389,8 +389,8 @@ HTML;
         ));
 
         $translations = json_encode(array(
-            'Please select Items you want to perform the action on.'
-                => Mage::helper('M2ePro')->__('Please select Items you want to perform the action on.'),
+            'Please select Items you want to perform the Action on.'
+                => Mage::helper('M2ePro')->__('Please select Items you want to perform the Action on.'),
             'Set Note' => Mage::helper('M2ePro')->__('Set Note'),
         ));
 

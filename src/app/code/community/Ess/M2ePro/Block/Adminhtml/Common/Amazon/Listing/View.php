@@ -214,13 +214,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
         $taskCompletedSuccessMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has successfully submitted to be processed.')
+            $helper->__('"%task_title%" Task has successfully submitted to be processed.')
         );
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__(
-            '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.'
+            '"%task_title%" Task has completed with warnings. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__(
-            '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.'
+            '"%task_title%" Task has completed with errors. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
 
         $lockedObjNoticeMessage = $helper->escapeJs($helper->__('Some Amazon request(s) are being processed now.'));
@@ -251,18 +251,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
                                                     ->escapeJs(Mage::helper('M2ePro')
                                                     ->__('Removing From Amazon And Listing Selected Items'));
 
-        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
+        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Product(s) was not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Some Product(s) was not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the Products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -327,18 +327,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
                 'In order to use New ASIN/ISBN functionality, please re-synchronize Marketplace data.'
             ).' '.
             $helper->__(
-                'Press "Save And Update" button after redirect on Marketplace page.'
+                'Press "Save And Update" Button after redirect on Marketplace Page.'
             )
         );
 
         $noVariationsLeftText = $helper->__('All variations are already added.');
 
-        $variationManageMatchedAttributesError = $helper->__('Please choose valid attributes.');
+        $variationManageMatchedAttributesError = $helper->__('Please choose valid Attributes.');
         $variationManageMatchedAttributesErrorDuplicateSelection =
-            $helper->__('You can not choose the same attribute twice.');
+            $helper->__('You can not choose the same Attribute twice.');
 
         $variationManageSkuPopUpTitle =
-            $helper->__('Enter Amazon Parent Product SKU.');
+            $helper->__('Enter Amazon Parent Product SKU');
 
         $switchToIndividualModePopUpTitle = $helper->__('Change "Manage Variations" Mode');
         $switchToParentModePopUpTitle = $helper->__('Change "Manage Variations" Mode');
@@ -348,8 +348,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         $translations = json_encode(array(
             'Auto Add/Remove Rules' => $helper->__('Auto Add/Remove Rules'),
             'Based on Magento Categories' => $helper->__('Based on Magento Categories'),
-            'You must select at least 1 category.' => $helper->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => $helper->__('Rule with the same title already exists.')
+            'You must select at least 1 Category.' => $helper->__('You must select at least 1 Category.'),
+            'Rule with the same Title already exists.' => $helper->__('Rule with the same Title already exists.')
         ));
 
         $javascriptsMain = <<<JAVASCRIPT

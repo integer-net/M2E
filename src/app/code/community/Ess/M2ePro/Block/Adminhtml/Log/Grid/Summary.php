@@ -116,7 +116,7 @@ class Ess_M2ePro_Block_Adminhtml_Log_Grid_Summary extends Mage_Adminhtml_Block_W
         // Get log icon
         //--------------------------
         $icon = 'normal';
-        $tip = Mage::helper('M2ePro')->__('Last action was completed successfully.');
+        $tip = Mage::helper('M2ePro')->__('Last Action was completed successfully.');
 
         if (isset($lastActionRow['type'])) {
             $tip = $this->getTipByType($lastActionRow['type']);
@@ -139,7 +139,7 @@ class Ess_M2ePro_Block_Adminhtml_Log_Grid_Summary extends Mage_Adminhtml_Block_W
             }
         }
 
-        return Mage::helper('M2ePro')->__('Last action was completed successfully.');
+        return Mage::helper('M2ePro')->__('Last Action was completed successfully.');
     }
 
     protected function getIconByType($type)

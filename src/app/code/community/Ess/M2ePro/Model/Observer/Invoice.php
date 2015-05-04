@@ -70,10 +70,10 @@ class Ess_M2ePro_Model_Observer_Invoice extends Ess_M2ePro_Model_Observer_Abstra
 
         $channelTitle = $order->getComponentTitle();
         // M2ePro_TRANSLATIONS
-        // Payment Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank">order log</a> for more details.
+        // Payment Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank">Order Log</a> for more details.
         $message  = Mage::helper('M2ePro')->__(
             'Payment Status for %chanel_title% Order was not updated.'.
-            ' View <a href="%url%" target="_blank">order log</a> for more details.',
+            ' View <a href="%url%" target="_blank">Order Log</a> for more details.',
             $channelTitle, $url
         );
 

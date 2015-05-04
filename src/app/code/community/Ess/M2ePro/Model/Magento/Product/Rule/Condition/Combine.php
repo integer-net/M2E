@@ -295,7 +295,7 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
     {
         $html = $this->getTypeElement()->getHtml().
             Mage::helper('M2ePro')->__(
-                'If %rule% of these conditions are %value%:',
+                'If %rule% of these Conditions are %value%:',
                 $this->getAggregatorElement()->getHtml(),
                 $this->getValueElement()->getHtml()
             );
@@ -319,7 +319,7 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
 
     public function asString($format='')
     {
-        $str = Mage::helper('M2ePro')->__("If %rule% of these conditions are %value%:",
+        $str = Mage::helper('M2ePro')->__("If %rule% of these Conditions are %value%:",
                                           $this->getAggregatorName(), $this->getValueName());
         return $str;
     }

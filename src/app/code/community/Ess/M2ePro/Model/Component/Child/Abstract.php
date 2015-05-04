@@ -36,7 +36,7 @@ abstract class Ess_M2ePro_Model_Component_Child_Abstract extends Ess_M2ePro_Mode
         $tempMode = $this->getComponentMode();
 
         if (is_null($tempMode)) {
-            throw new LogicException('Set component mode first');
+            throw new LogicException('Set Component Mode first');
         }
 
         $modelName = str_replace('M2ePro/'.ucwords($tempMode).'_','',$this->_resourceName);
@@ -70,7 +70,7 @@ abstract class Ess_M2ePro_Model_Component_Child_Abstract extends Ess_M2ePro_Mode
         $tempMode = $this->getComponentMode();
 
         if (is_null($tempMode)) {
-             throw new LogicException('Set component mode first');
+             throw new LogicException('Set Component Mode first');
         }
 
         $tempModel = Mage::helper('M2ePro/Component')->getComponentModel($tempMode,$modelName);

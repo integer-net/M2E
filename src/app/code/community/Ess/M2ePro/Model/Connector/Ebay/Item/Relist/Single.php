@@ -32,8 +32,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Relist_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // The Item either is listed, or not listed yet or not available
-                parent::MESSAGE_TEXT_KEY => 'The Item either is listed, or not listed yet or not available',
+                // The Item either is Listed, or not Listed yet or not available
+                parent::MESSAGE_TEXT_KEY => 'The Item either is Listed, or not Listed yet or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
@@ -48,8 +48,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Relist_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Categories settings are not set
-                parent::MESSAGE_TEXT_KEY => 'Categories settings are not set',
+                // Categories Settings are not set
+                parent::MESSAGE_TEXT_KEY => 'Categories Settings are not set',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
@@ -108,8 +108,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Relist_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Item was successfully relisted
-                parent::MESSAGE_TEXT_KEY => 'Item was successfully relisted',
+                // Item was successfully Relisted
+                parent::MESSAGE_TEXT_KEY => 'Item was successfully Relisted',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
             );
         }
@@ -143,7 +143,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Relist_Single
         $this->getResponseObject()->markAsPotentialDuplicate();
 
         $message = array(
-            parent::MESSAGE_TEXT_KEY => 'An error occured while listing the Item. '.
+            parent::MESSAGE_TEXT_KEY => 'An error occured while Listing the Item. '.
                 'The Item has been blocked. The next M2E Pro Synchronization will resolve the problem.',
             parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_WARNING
         );
@@ -185,7 +185,7 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Relist_Single
 
         $message = array(
             parent::MESSAGE_TEXT_KEY => 'M2E Pro was not able to send Condition on eBay.
-                                         Please try to perform the Relist action once more.',
+                                         Please try to perform the Relist Action once more.',
             parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_WARNING
         );
 

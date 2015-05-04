@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_General
 {
     const CONDITION_NOTE_MAX_LENGTH = 1000;
 
-    public function isValid()
+    public function validate()
     {
         if (!$this->getListingProduct()->isListable()) {
 
@@ -51,7 +51,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_General
         }
 
         if (empty($generalId)) {
-            $this->addMessage('Product cannot be listed because Identifier is not specified.');
+            $this->addMessage('Product cannot be Listed because Identifier is not specified.');
             return false;
         }
         $this->data['general_id'] = $generalId;
@@ -82,9 +82,9 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_General
         if (empty($condition) || !in_array($condition, $validConditions)) {
 
             // M2ePro_TRANSLATIONS
-            // Condition is invalid or missed. Please, check Listing Channel and Product settings.
+            // Condition is invalid or missed. Please, check Listing Channel and Product Settings.
             $this->addMessage(
-                'Condition is invalid or missed. Please, check Listing Channel and Product settings.'
+                'Condition is invalid or missed. Please, check Listing Channel and Product Settings.'
             );
 
             return false;
@@ -98,9 +98,9 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_General
         if (is_null($conditionNote)) {
 
             // M2ePro_TRANSLATIONS
-            // Comment is invalid or missed. Please, check Listing Channel and Product settings.
+            // Comment is invalid or missed. Please, check Listing Channel and Product Settings.
             $this->addMessage(
-                'Comment is invalid or missed. Please, check Listing Channel and Product settings.'
+                'Comment is invalid or missed. Please, check Listing Channel and Product Settings.'
             );
 
             return false;
@@ -124,9 +124,9 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_General
         if (Mage::helper('M2ePro/Component_Play')->isValidDispatchTo($dispatchTo)) {
 
             // M2ePro_TRANSLATIONS
-            // Delivery Region is invalid or missed. Please, check Listing Channel and Product settings.
+            // Delivery Region is invalid or missed. Please, check Listing Channel and Product Settings.
             $this->addMessage(
-                'Delivery Region is invalid or missed. Please, check Listing Channel and Product settings.'
+                'Delivery Region is invalid or missed. Please, check Listing Channel and Product Settings.'
             );
 
             return false;
@@ -137,9 +137,9 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_General
         if (empty($dispatchFrom)) {
 
             // M2ePro_TRANSLATIONS
-            // Dispatch Country is invalid or missed. Please, check Listing Channel and Product settings.
+            // Dispatch Country is invalid or missed. Please, check Listing Channel and Product Settings.
             $this->addMessage(
-                'Dispatch Country is invalid or missed. Please, check Listing Channel and Product settings.'
+                'Dispatch Country is invalid or missed. Please, check Listing Channel and Product Settings.'
             );
 
             return false;

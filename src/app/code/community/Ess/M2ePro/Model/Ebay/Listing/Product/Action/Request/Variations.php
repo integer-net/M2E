@@ -156,8 +156,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         if (!$this->getEbayMarketplace()->isMultivariationEnabled()) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The Product was listed as a Simple Product as it has limitation for multi-variation Items. '.
-                    'Reason: eBay Site allows to list only simple Items.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: eBay Site allows to list only Simple Items.'
                 )
             );
             return;
@@ -172,8 +172,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         if (!$tempResult) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The Product was listed as a Simple Product as it has limitation for multi-variation Items. '.
-                    'Reason: eBay primary category allows to list only simple Items.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: eBay Primary Category allows to list only Simple Items.'
                 )
             );
             return;
@@ -182,8 +182,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         if ($this->getEbayListingProduct()->getEbaySellingFormatTemplate()->isIgnoreVariationsEnabled()) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The Product was listed as a Simple Product as it has limitation for multi-variation Items. '.
-                    'Reason: ignore variation option is enabled in Price, Quantity and format policy.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: ignore Variation Option is enabled in Price, Quantity and Format Policy.'
                 )
             );
             return;
@@ -192,8 +192,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         if (!$this->getEbayListingProduct()->isListingTypeFixed()) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The Product was listed as a Simple Product as it has limitation for multi-variation Items. '.
-                    'Reason: listing type "auction" does not support multi-variations.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: Listing type "Auction" does not support Multi-Variations.'
                 )
             );
             return;
@@ -361,15 +361,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
     {
         if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_MANAGE_STOCK_NO) {
         // M2ePro_TRANSLATIONS
-        // During the Quantity calculation the settings in the "Manage Stock No" field were taken into consideration.
-            $this->addWarningMessage('During the Quantity calculation the settings in the "Manage Stock No" '.
+        // During the Quantity Calculation the Settings in the "Manage Stock No" field were taken into consideration.
+            $this->addWarningMessage('During the Quantity Calculation the Settings in the "Manage Stock No" '.
                                      'field were taken into consideration.');
         }
 
         if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_BACKORDERS) {
             // M2ePro_TRANSLATIONS
-            // During the Quantity calculation the settings in the "Backorders" field were taken into consideration.
-            $this->addWarningMessage('During the Quantity calculation the settings in the "Backorders" '.
+            // During the Quantity Calculation the Settings in the "Backorders" field were taken into consideration.
+            $this->addWarningMessage('During the Quantity Calculation the Settings in the "Backorders" '.
                                      'field were taken into consideration.');
         }
     }

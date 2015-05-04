@@ -89,7 +89,7 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
         $order = $feedback->getOrder();
 
         if (is_null($order)) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Requested order was not found.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Requested Order was not found.'));
             return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 

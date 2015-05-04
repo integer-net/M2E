@@ -20,7 +20,7 @@ WizardInstallationCommon = Class.create(CommonHandler, {
     {
         this.settingsForm = new varienForm('settings_form');
 
-        Validation.add('M2ePro-require-select-component', M2ePro.translator.translate('You should enable at least one component.'), function(value) {
+        Validation.add('M2ePro-require-select-component', M2ePro.translator.translate('You should enable at least one Component.'), function(value) {
 
             var isComponentSelected = false;
 
@@ -124,7 +124,7 @@ WizardInstallationCommon = Class.create(CommonHandler, {
                 var response = transport.responseText.evalJSON()['result'];
 
                 if (!response) {
-                    MagentoMessageObj.addError(M2ePro.translator.translate('Error create license.'));
+                    MagentoMessageObj.addError(M2ePro.translator.translate('Error create License.'));
                     return CommonHandlerObj.scroll_page_to_top();
                 }
 

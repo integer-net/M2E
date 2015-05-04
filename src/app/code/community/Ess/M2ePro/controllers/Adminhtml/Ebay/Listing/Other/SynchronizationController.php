@@ -228,7 +228,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_Other_SynchronizationController
         //--------------------
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('Synchronization settings was successfully saved.')
+            Mage::helper('M2ePro')->__('Synchronization Settings was successfully saved.')
         );
 
         if ($this->getRequest()->getParam('back')) {

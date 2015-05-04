@@ -485,7 +485,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
-        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to listing'));
+        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to Listing'));
         $iconSrc = $this->getSkinUrl('M2ePro/images/goto_listing.png');
         $url = $this->getUrl('*/adminhtml_common_amazon_listing/view/',array(
             'id' => $row->getData('listing_id'),

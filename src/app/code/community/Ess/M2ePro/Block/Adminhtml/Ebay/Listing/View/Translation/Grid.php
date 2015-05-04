@@ -416,9 +416,9 @@ HTML;
         }
 
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Action was completed with warning(s).'
         );
 
         $icons = array(
@@ -560,25 +560,25 @@ HTML;
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
         $taskCompletedSuccessMessage =
-            $helper->escapeJs($helper->__('"%task_title%" task has successfully completed.'));
+            $helper->escapeJs($helper->__('"%task_title%" Task has successfully completed.'));
 
         // M2ePro_TRANSLATIONS
-        // %task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
-        $tempString = '"%task_title%" task has completed with warnings.'
-                     .' <a target="_blank" href="%url%">View log</a> for details.';
+        // %task_title%" Task has completed with warnings. <a target="_blank" href="%url%">View Log</a> for details.
+        $tempString = '"%task_title%" Task has completed with warnings.'
+                     .' <a target="_blank" href="%url%">View Log</a> for details.';
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__($tempString));
 
         // M2ePro_TRANSLATIONS
-        // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
-        $tempString = '"%task_title%" task has completed with errors.'
-                     .' <a target="_blank" href="%url%">View log</a> for details.';
+        // "%task_title%" Task has completed with errors. <a target="_blank" href="%url%">View Log</a> for details.
+        $tempString = '"%task_title%" Task has completed with errors.'
+                     .' <a target="_blank" href="%url%">View Log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($tempString));
 
         $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% Product(s) data on eBay.'));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = Mage::helper('M2ePro')->escapeJs(
-            Mage::helper('M2ePro')->__('The listing was locked by another process. Please try again later.')
+            Mage::helper('M2ePro')->__('The Listing was locked by another process. Please try again later.')
         );
         $listingEmptyMessage = Mage::helper('M2ePro')->escapeJs(
             Mage::helper('M2ePro')->__('Listing is empty.')
@@ -592,7 +592,7 @@ HTML;
         );
 
         $selectItemsMessage = $helper->escapeJs($helper->__('Please select Items.'));
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -603,14 +603,14 @@ HTML;
         $translations = json_encode(array(
             'Payment for Translation Service' => $helper->__('Payment for Translation Service'),
             'Payment for Translation Service. Help' => $helper->__('Payment for Translation Service'),
-            'Specify a sum to be credited to an account.' =>
+            'Specify a sum to be credited to an Account.' =>
                 $helper->__('Specify a sum to be credited to an Account.'
-                        .' If you are planning to order more Items for translation in future,'
-                        .' you can credit the sum greater than the one needed for current translation.'
+                        .' If you are planning to order more Items for Translation in future,'
+                        .' you can credit the sum greater than the one needed for current Translation.'
                         .' Click <a href="%url%" target="_blank">here</a> to find out more.',
                     'http://docs.m2epro.com/display/eBayMagentoV6/Translation#Translation-Account.1'),
             'Amount to Pay.' => $helper->__('Amount to Pay'),
-            'Insert amount to be credited to an account' => $helper->__('Insert amount to be credited to an account.'),
+            'Insert amount to be credited to an Account' => $helper->__('Insert amount to be credited to an Account.'),
             'Confirm' => $helper->__('Confirm'),
         ));
 

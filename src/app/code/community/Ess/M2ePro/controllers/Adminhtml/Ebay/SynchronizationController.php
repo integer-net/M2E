@@ -83,7 +83,7 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
             ->clearMessages($task);
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The synchronization task log has been successfully cleaned.')
+            Mage::helper('M2ePro')->__('The Synchronization Task Log has been successfully cleaned.')
         );
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('index'));
     }

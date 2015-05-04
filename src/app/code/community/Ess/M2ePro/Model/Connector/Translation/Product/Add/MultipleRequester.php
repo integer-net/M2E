@@ -42,12 +42,12 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleRequester
         }
 
         if (count($listingsProducts) == 0) {
-            throw new Exception('Product connector has received empty array');
+            throw new Exception('Product Connector has received empty array');
         }
 
         foreach($listingsProducts as $listingProduct) {
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
-                throw new Exception('Product connector has received invalid Product data type');
+                throw new Exception('Product Connector has received invalid Product data type');
             }
         }
 
@@ -59,21 +59,21 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleRequester
         $tempListing = $listingsProducts[0]->getListing();
         foreach($listingsProducts as $listingProduct) {
             if ($tempListing->getId() != $listingProduct->getListing()->getId()) {
-                throw new Exception('Product connector has received Products from different listings');
+                throw new Exception('Product Connector has received Products from different Listings');
             }
 
             $translationData = $listingProduct->getSetting('additional_data',array('translation_service'),array());
 
             if ($tempSourceLanguage != $translationData['from']['language']) {
-                throw new Exception('Product connector has received Products from different source languages');
+                throw new Exception('Product Connector has received Products from different source languages');
             }
 
             if ($tempTargetLanguage != $translationData['to']['language']) {
-                throw new Exception('Product connector has received Products from different target languages');
+                throw new Exception('Product Connector has received Products from different target languages');
             }
 
             if ($tempService != $listingProduct->getTranslationService()) {
-                throw new Exception('Product connector has received Products from different translation services');
+                throw new Exception('Product Connector has received Products from different Translation Services');
             }
         }
 
@@ -351,9 +351,9 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleRequester
                 $listingProduct->isLockedObject('translation_action')) {
 
                 // M2ePro_TRANSLATIONS
-                // Another action is being processed. Try again when the action is completed.
+                // Another Action is being processed. Try again when the Action is completed.
                 $this->addListingsProductsLogsMessage(
-                    $listingProduct, 'Another action is being processed. Try again when the action is completed.',
+                    $listingProduct, 'Another Action is being processed. Try again when the Action is completed.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -375,8 +375,8 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleRequester
             if (!$listingProduct->getChildObject()->isTranslatable()) {
 
                 // M2ePro_TRANSLATIONS
-                // 'Product is translated or being translated'
-                $this->addListingsProductsLogsMessage($listingProduct, 'Product is translated or being translated',
+                // 'Product is Translated or being Translated'
+                $this->addListingsProductsLogsMessage($listingProduct, 'Product is Translated or being Translated',
                                                       Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                                                       Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
                 unset($listingProducts[$key]);

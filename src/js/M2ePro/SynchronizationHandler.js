@@ -36,7 +36,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
             parameters: {components: components},
             asynchronous: true,
             onSuccess: function(transport) {
-                MagentoMessageObj.addSuccess(M2ePro.translator.translate('Synchronization settings have been saved.'));
+                MagentoMessageObj.addSuccess(M2ePro.translator.translate('Synchronization Settings have been saved.'));
                 if (runSynch != '') {
                     eval('self.'+runSynch+'(components);');
                 }

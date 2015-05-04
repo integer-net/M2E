@@ -255,7 +255,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
             );
         } else {
             $this->_getSession()->addError(
-                Mage::helper('M2ePro')->__('Policy cannot be deleted as it is used in Listing settings.')
+                Mage::helper('M2ePro')->__('Policy cannot be deleted as it is used in Listing Settings.')
             );
         }
 
@@ -317,7 +317,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
         //------------------------------
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The listing was successfully saved.'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The Listing was successfully saved.'));
 
         $extendedParams = array(
             '*/adminhtml_ebay_template/editListing' => array(

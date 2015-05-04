@@ -7,52 +7,42 @@
 class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Images
     extends Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Abstract
 {
-    /**
-     * @var Ess_M2ePro_Model_Amazon_Template_Description_Definition_Source
-     */
-    private $definitionSource = NULL;
-
     // ########################################
 
     public function getData()
     {
         $data = array();
 
-        if (!$this->getConfigurator()->isImages() ||
-            !$this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
-            return $data;
-        }
-
-        $variationManager = $this->getAmazonListingProduct()->getVariationManager();
-
-        if (($variationManager->isRelationChildType() || $variationManager->isIndividualType()) &&
-            ($this->getMagentoProduct()->isSimpleTypeWithCustomOptions() ||
-             $this->getMagentoProduct()->isBundleType())) {
+        if (!$this->getConfigurator()->isImages()) {
             return $data;
         }
 
         $this->searchNotFoundAttributes();
-        $images = $this->getDefinitionSource()->getImages();
+
+        $images = array(
+            'offer' => $this->getAmazonListingProduct()->getListingSource()->getImages(),
+        );
+
+        if ($this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
+            $amazonDescriptionTemplate = $this->getAmazonListingProduct()->getAmazonDescriptionTemplate();
+            $definitionSource = $amazonDescriptionTemplate->getDefinitionTemplate()->getSource(
+                $this->getAmazonListingProduct()->getActualMagentoProduct()
+            );
+
+            $images['product'] = $definitionSource->getImages();
+        }
+
         $this->processNotFoundAttributes('Images');
 
-        !empty($images) && $data['images_data'] = $images;
+        if (!empty($images['offer'])) {
+            $data['images_data']['offer'] = $images['offer'];
+        }
+
+        if (!empty($images['product'])) {
+            $data['images_data']['product'] = $images['product'];
+        }
 
         return $data;
-    }
-
-    // ########################################
-
-    /**
-     * @return Ess_M2ePro_Model_Amazon_Template_Description_Definition_Source
-     */
-    private function getDefinitionSource()
-    {
-        if (is_null($this->definitionSource)) {
-            $this->definitionSource = $this->getAmazonListingProduct()
-                ->getAmazonDescriptionTemplate()->getDefinitionTemplate()
-                ->getSource($this->getAmazonListingProduct()->getActualMagentoProduct());
-        }
-        return $this->definitionSource;
     }
 
     // ########################################

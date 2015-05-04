@@ -40,7 +40,7 @@
 
                 In case you create New Amazon Parent-Child Product using M2E Pro you will be considered as a Creator of this Product. <br/><br/>
 
-                In case ASIN/ISBN was found using M2E Pro Search Tool, you can specify that you created this Amazon Parent Product earlier by clicking <i class="underline">"I am the Creator"</i> button. You should enter SKU of the Amazon Parent Product from your Amazon Inventory at the next step. <br/><br/>
+                In case ASIN/ISBN was found using M2E Pro Search Tool, you can specify that you created this Amazon Parent Product earlier by clicking <i class="underline">"I am the Creator"</i> Button. You should enter SKU of the Amazon Parent Product from your Amazon Inventory at the next step. <br/><br/>
 
                 What you should know if you are the Creator of the Parent Product:
                 <ul class="list">
@@ -94,11 +94,11 @@
 
 <div id="manage_variation_sku_popup" style="display: none; padding: 10px;">
     <div id="block_notice_amazon_product_manage_settings_new_product_asin_sku" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Amazon Parent Product SKU'); ?>">
-        <?php echo Mage::helper('M2ePro')->__('In order to prove that this is your Product, you need to provide SKU of the respective Product in your Amazon inventory. Please follow the rules below to avoid issues:
+        <?php echo Mage::helper('M2ePro')->__('In order to prove that this is your Product, you need to provide SKU of the respective Product in your Amazon Inventory. Please follow the Rules below to avoid issues:
             <ul class="list">
-                <li>The SKU has to be related to Parent Product in your Amazon inventory;</li>
-                <li>ASIN(s)/ISBN(s) in M2E Pro and in Amazon inventory have to be the same;</li>
-                <li>The Product in the Amazon inventory has to be visible via Amazon API.</li>
+                <li>The SKU has to be related to Parent Product in your Amazon Inventory;</li>
+                <li>ASIN(s)/ISBN(s) in M2E Pro and in Amazon Inventory have to be the same;</li>
+                <li>The Product in the Amazon Inventory has to be visible via Amazon API.</li>
             </ul>
         '); ?>
     </div>
@@ -136,7 +136,7 @@
                 <?php echo Mage::helper('M2ePro')->__('Variation Theme is a combination of Attributes based on which the Parent-Child relation of Amazon Products is realized.<br/><br/>
                  Variation Theme is required to create New Amazon Relation Products (both: Parent and Child).
                  The list of available Variation Themes depends on the Category chosen in the Description Policy. <br/>
-                 Variation Themes are not available for the categories which do not support Amazon Parent/Child Products.<br/>
+                 Variation Themes are not available for the Categories which do not support Amazon Parent/Child Products.<br/>
                  Variation Theme cannot be changed Parent Product receives an ASIN/ISBN. <br/><br/>
                  <b>Note:</b> The list of Variation Themes is provided by Amazon and cannot be changed or added.
                  '); ?>
@@ -202,6 +202,7 @@
                             <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                             <span><?php echo Mage::helper('M2ePro')->__('Some Variation Themes cannot be used because number of Attributes in Variation Theme is not equal to number of Magento Product Attributes.'); ?></span>
                         </span>
+                        &nbsp;&nbsp;
                         <a href="javascript:void(0);" onclick="ListingGridHandlerObj.variationProductManageHandler.cancelVariationTheme(this);"><?php echo Mage::helper('M2ePro')->__('Cancel'); ?></a>&nbsp;&nbsp;
                         <button onclick="ListingGridHandlerObj.variationProductManageHandler.setVariationTheme()"><?php echo Mage::helper('M2ePro')->__('Confirm'); ?></button>
                     </span>
@@ -232,7 +233,7 @@
             <div id="block_notice_amazon_product_manage_settings_attributes" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Variation Attributes'); ?>">
                 <?php echo Mage::helper('M2ePro')->__('To sell Magento Variational Product as Amazon Parent-Child Product it is necessary to set correspondence of Magento and Amazon Variation Attributes. Prerequisite to set correspondence is equal number of Magento Product Attributes and Amazon Parent-Child Product Attributes. <br/><br/>
 
-                You can always change this correspondence manually by clicking <i class="underline">"Change"</i> button. <br/><br/>
+                You can always change this correspondence manually by clicking <i class="underline">"Change"</i> Button. <br/><br/>
 
                 <b>Note:</b> In case correspondence between Amazon and Magento Variation Attributes is not set adding and selling of Amazon Child Products is impossible.'); ?>
             </div>
@@ -266,7 +267,7 @@
                                 <span class="variation_manager_attributes_amazon_value" <?php echo $this->hasMatchedAttributes() ? '' : 'style="color: red;"' ?>>
                                     <?php echo $this->hasMatchedAttributes() ? $amazonAttr : Mage::helper('M2ePro')->__('Not Set') ?>
                                 </span>
-                                <input type="hidden" value="<?php echo $magentoAttr ?>" name="variation_attributes[magento_attributes][]">
+                                <input type="hidden" value="<?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttr) ?>" name="variation_attributes[magento_attributes][]">
                                 <select id="variation_manager_attributes_amazon_<?php echo $attrId ?>"
                                         name="variation_attributes[amazon_attributes][]"
                                         class="required-entry variation_manager_attributes_amazon_select"
@@ -292,7 +293,7 @@
                     ?>
 
                     <tr>
-                        <td class="label" colspan="2" style="text-align: right; <?php echo ($this->hasMatchedAttributes() && count($destinationAttributes) === 1) ? 'display: none;' : '' ?>">
+                        <td class="label" colspan="2" style="text-align: right; <?php echo ($this->isInAction() || ($this->hasMatchedAttributes() && count($destinationAttributes) === 1)) ? 'display: none;' : '' ?>">
                             <button onclick="ListingGridHandlerObj.variationProductManageHandler.changeMatchedAttributes(this)">
                                 <?php echo $this->hasMatchedAttributes() ? Mage::helper('M2ePro')->__('Change') : Mage::helper('M2ePro')->__('Set Attributes'); ?>
                             </button>
@@ -321,9 +322,9 @@
 
             <div id="block_notice_amazon_product_manage_settings_options" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Child Products'); ?>">
                 <?php echo Mage::helper('M2ePro')->__(
-                    'In case of successful setting of correspondence between Variation Attributes of Magento Product and Variation Attributes of Amazon Product you can work with Amazon Child Products. <br/><br/>
+                    'In case of successful Setting of correspondence between Variation Attributes of Magento Product and Variation Attributes of Amazon Product you can work with Amazon Child Products. <br/><br/>
 
-                    To add Child Product to your Amazon Inventory means to set correspondence between available Magento Product Variation and Amazon Parent Product Variation. To do that it is necessary to click <i class="underline">"Add New Child Product"</i> button on the Child Products tab. <br/><br/>
+                    To add Child Product to your Amazon Inventory means to set correspondence between available Magento Product Variation and Amazon Parent Product Variation. To do that it is necessary to click <i class="underline">"Add New Child Product"</i> Button on the Child Products Tab. <br/><br/>
 
                     In case you are the Creator of this Product, you can create New Amazon Child Products for unused Magento Product Variations.',
                     implode(', ', $this->getProductAttributes()), implode(', ', $this->getDestinationAttributes())
@@ -340,7 +341,7 @@
 
     Adding or changing other Amazon Child Products is suspended.  <br/><br/>
 
-    To continue full work with all your Amazon Child Products you should specify Magento Product Variation for that Amazon Child Product on Child Products tab.')?></p>
+    To continue full work with all your Amazon Child Products you should specify Magento Product Variation for that Amazon Child Product on Child Products Tab.')?></p>
 
 <?php } elseif (!$this->isGeneralIdOwner() && !$this->hasUnusedChannelVariations()) { ?>
 
@@ -352,11 +353,11 @@
 
     Adding or changing other Amazon Child Products is suspended. <br/><br/>
 
-    To continue full work with all your Amazon Child Products you should specify Amazon Product Variation for that Amazon Child Product on Child Products tab.')?></p>
+    To continue full work with all your Amazon Child Products you should specify Amazon Product Variation for that Amazon Child Product on Child Products Tab.')?></p>
 
 <?php } else { ?>
 
-    <?php echo Mage::helper('M2ePro')->__('To sell existing Amazon Child Products or to add New Child Products (if you are the Creator) click <i class="underline">"Add New Child Product"</i> button on <a href="%url%" onclick="%onclick%">Child Products tab</a> .', array('url' => 'javascript:void(0);', 'onclick' => 'ListingGridHandlerObj.variationProductManageHandler.openVariationsTab();')); ?>
+    <?php echo Mage::helper('M2ePro')->__('To sell existing Amazon Child Products or to add New Child Products (if you are the Creator) click <i class="underline">"Add New Child Product"</i> Button on <a href="%url%" onclick="%onclick%">Child Products Tab</a> .', array('url' => 'javascript:void(0);', 'onclick' => 'ListingGridHandlerObj.variationProductManageHandler.openVariationsTab('.(int)!$this->hasUnusedChannelVariations().');')); ?>
 
 <?php } ?>
 

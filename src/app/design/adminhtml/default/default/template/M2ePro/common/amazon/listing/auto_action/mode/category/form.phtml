@@ -142,7 +142,7 @@
                         <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                         <span class="tool-tip-message tip-left" style="left: 650px; display: none;">
                             <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
-                            <span><?php echo Mage::helper('M2ePro')->__('Should M2E Pro try to create new ASIN/ISBN in case search settings are not set or contain the incorrect values?'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Should M2E Pro try to create new ASIN/ISBN in case Search Settings are not set or contain the incorrect values?'); ?></span>
                         </span>
                     </td>
                 </tr>
@@ -164,7 +164,7 @@
                         <span class="tool-tip-message tip-left" style="left: 650px; display: none;">
                             <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                             <span><?php echo Mage::helper('M2ePro')->__('Creation of new ASIN/ISBN will be performed based on specified Description Policy. Only the Description Policies set for new ASIN/ISBN creation are available for choosing.
-                                    <br/><br/><b>Note:</b> If chosen Description Policy doesn’t meet all the conditions for new ASIN/ISBN creation, the Products will still be added to M2E Pro Listings but will not be listed on Amazon.'); ?></span>
+                                    <br/><br/><b>Note:</b> If chosen Description Policy doesn’t meet all the Conditions for new ASIN/ISBN creation, the Products will still be added to M2E Pro Listings but will not be Listed on Amazon.'); ?></span>
                         </span>
                         <a href="javascript: void(0);" style="vertical-align: inherit;" onclick="ListingAutoActionHandlerObj.addNewTemplate(M2ePro.url.addNewDescriptionTemplate, ListingAutoActionHandlerObj.reloadDescriptionTemplates);"><?php echo Mage::helper('M2ePro')->__('Add New') ?></a>
                     </td>
@@ -213,6 +213,6 @@
 
 <div id="dialog_confirm_content" style="display: none;">
     <div style="margin: 10px; ">
-        <?php echo Mage::helper('M2ePro')->__('This Category is already used in the rule %s. If you press "Confirm" button, Category will be removed from that rule.') ?>
+        <?php echo Mage::helper('M2ePro')->__('This Category is already used in the Rule %s. If you press "Confirm" Button, Category will be removed from that Rule.') ?>
     </div>
 </div>

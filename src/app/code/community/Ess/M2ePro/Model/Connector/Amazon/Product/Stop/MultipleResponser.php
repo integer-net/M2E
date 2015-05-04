@@ -17,8 +17,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleResponser
     protected function getSuccessfulMessage(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         // M2ePro_TRANSLATIONS
-        // Item was successfully stopped
-        return 'Item was successfully stopped';
+        // Item was successfully Stopped
+        return 'Item was successfully Stopped';
     }
 
     // ########################################
@@ -33,8 +33,18 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleResponser
                 $variationManager = $amazonListingProduct->getVariationManager();
 
                 if ($variationManager->isRelationChildType()) {
-                    $parentListingProduct = $variationManager->getTypeModel()->getParentListingProduct();
+                    $childTypeModel = $variationManager->getTypeModel();
+
+                    $parentListingProduct = $childTypeModel->getParentListingProduct();
                     $this->parentsForProcessing[$parentListingProduct->getId()] = $parentListingProduct;
+
+                    if ($childTypeModel->isVariationProductMatched()) {
+                        $parentAmazonListingProduct = $childTypeModel->getAmazonParentListingProduct();
+
+                        $parentAmazonListingProduct->getVariationManager()->getTypeModel()->addRemovedProductOptions(
+                            $childTypeModel->getProductOptions()
+                        );
+                    }
                 }
 
                 $listingProduct->setData('status', Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);

@@ -44,6 +44,16 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
     const CONDITION_NOTE_MODE_NONE             = 3;
     const CONDITION_NOTE_MODE_CUSTOM_VALUE     = 1;
 
+    const IMAGE_MAIN_MODE_NONE           = 0;
+    const IMAGE_MAIN_MODE_PRODUCT        = 1;
+    const IMAGE_MAIN_MODE_ATTRIBUTE      = 2;
+
+    const GALLERY_IMAGES_MODE_NONE       = 0;
+    const GALLERY_IMAGES_MODE_PRODUCT    = 1;
+    const GALLERY_IMAGES_MODE_ATTRIBUTE  = 2;
+
+    const GALLERY_IMAGES_COUNT_MAX       = 5;
+
     const HANDLING_TIME_MODE_NONE             = 3;
     const HANDLING_TIME_MODE_RECOMMENDED      = 1;
     const HANDLING_TIME_MODE_CUSTOM_ATTRIBUTE = 2;
@@ -420,6 +430,107 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         );
     }
 
+    public function getConditionNoteAttributes()
+    {
+        $attributes = array();
+        $src = $this->getConditionNoteSource();
+
+        if ($src['mode'] == self::CONDITION_NOTE_MODE_CUSTOM_VALUE) {
+            $match = array();
+            preg_match_all('/#([a-zA-Z_]+?)#/', $src['value'], $match);
+            $match && $attributes = $match[1];
+        }
+
+        return $attributes;
+    }
+
+    //----------------------------------------
+
+    public function getImageMainMode()
+    {
+        return (int)$this->getData('image_main_mode');
+    }
+
+    public function isImageMainModeNone()
+    {
+        return $this->getImageMainMode() == self::IMAGE_MAIN_MODE_NONE;
+    }
+
+    public function isImageMainModeProduct()
+    {
+        return $this->getImageMainMode() == self::IMAGE_MAIN_MODE_PRODUCT;
+    }
+
+    public function isImageMainModeAttribute()
+    {
+        return $this->getImageMainMode() == self::IMAGE_MAIN_MODE_ATTRIBUTE;
+    }
+
+    public function getImageMainSource()
+    {
+        return array(
+            'mode'     => $this->getImageMainMode(),
+            'attribute' => $this->getData('image_main_attribute')
+        );
+    }
+
+    public function getImageMainAttributes()
+    {
+        $attributes = array();
+        $src = $this->getImageMainSource();
+
+        if ($src['mode'] == self::IMAGE_MAIN_MODE_PRODUCT) {
+            $attributes[] = 'image';
+        } else if ($src['mode'] == self::IMAGE_MAIN_MODE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
+    //----------------------------------------
+
+    public function getGalleryImagesMode()
+    {
+        return (int)$this->getData('gallery_images_mode');
+    }
+
+    public function isGalleryImagesModeNone()
+    {
+        return $this->getGalleryImagesMode() == self::GALLERY_IMAGES_MODE_NONE;
+    }
+
+    public function isGalleryImagesModeProduct()
+    {
+        return $this->getGalleryImagesMode() == self::GALLERY_IMAGES_MODE_PRODUCT;
+    }
+
+    public function isGalleryImagesModeAttribute()
+    {
+        return $this->getGalleryImagesMode() == self::GALLERY_IMAGES_MODE_ATTRIBUTE;
+    }
+
+    public function getGalleryImagesSource()
+    {
+        return array(
+            'mode'      => $this->getGalleryImagesMode(),
+            'limit'     => $this->getData('gallery_images_limit'),
+            'attribute' => $this->getData('gallery_images_attribute')
+        );
+    }
+
+    public function getGalleryImagesAttributes()
+    {
+        $attributes = array();
+        $src = $this->getGalleryImagesSource();
+
+        if ($src['mode'] == self::GALLERY_IMAGES_MODE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
     //----------------------------------------
 
     public function getHandlingTimeMode()
@@ -549,7 +660,12 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
 
     public function getTrackingAttributes()
     {
-        return $this->getSellingFormatTemplate()->getTrackingAttributes();
+        return array_unique(array_merge(
+            $this->getConditionNoteAttributes(),
+            $this->getImageMainAttributes(),
+            $this->getGalleryImagesAttributes(),
+            $this->getSellingFormatTemplate()->getTrackingAttributes()
+        ));
     }
 
     // ########################################

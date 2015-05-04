@@ -45,7 +45,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
 
         $this->deleteAllSpecifics($marketplace);
 
-        $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
+        $this->getActualOperationHistory()->addText('Starting Marketplace "'.$marketplace->getTitle().'"');
 
         for ($i = 0; $i < 100; $i++) {
             $this->getActualLockItem()->setPercents($this->getPercentsStart());
@@ -171,10 +171,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
 
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        // ->__('The "Specifics" action for Amazon Marketplace: "%mrk%" has been successfully completed.');
+        // ->__('The "Specifics" Action for Amazon Marketplace: "%mrk%" has been successfully completed.');
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Specifics" action for Amazon Marketplace: "%mrk%" has been successfully completed.',
+            'The "Specifics" Action for Amazon Marketplace: "%mrk%" has been successfully completed.',
             array('mrk' => $marketplace->getTitle())
         );
 

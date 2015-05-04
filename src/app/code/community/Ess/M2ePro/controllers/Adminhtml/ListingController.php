@@ -23,7 +23,7 @@ class Ess_M2ePro_Adminhtml_ListingController
             Mage::getModel('M2ePro/Listing_Log')->clearMessages($id);
         }
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The listing(s) log was successfully cleaned.'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The Listing(s) Log was successfully cleaned.'));
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list'));
     }
 

@@ -111,7 +111,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
         // Magento Order is already created for this Amazon Order.
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
             $message = 'Magento Order is already created for this Amazon Order. ' .
-                       'Press Create Order button to create new one.';
+                       'Press Create Order Button to create new one.';
 
             $this->_getSession()->addWarning(
                 Mage::helper('M2ePro')->__($message)
@@ -228,7 +228,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select order(s).'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Order(s).'));
             $this->_redirect('*/*/index');
             return;
         }

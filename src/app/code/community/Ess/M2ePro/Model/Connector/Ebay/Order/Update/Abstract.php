@@ -8,8 +8,8 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Abstract
     extends Ess_M2ePro_Model_Connector_Ebay_Abstract
 {
     // M2ePro_TRANSLATIONS
-    // eBay Order status was not updated. Reason: %msg%
-    // Status of India site orders cannot be updated if the buyer uses PaisaPay payment method.
+    // eBay Order Status was not updated. Reason: %msg%
+    // Status of India Site Orders cannot be updated if the Buyer uses PaisaPay payment method.
 
     // ########################################
 
@@ -71,8 +71,8 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Abstract
         if ($this->order->getMarketplace()->getCode() == 'India'
             && stripos($this->order->getChildObject()->getPaymentMethod(), 'paisa')
         ) {
-            $this->order->addErrorLog('eBay Order status was not updated. Reason: %msg%', array(
-                'msg' => 'Status of India site orders cannot be updated if the buyer uses PaisaPay payment method.'
+            $this->order->addErrorLog('eBay Order Status was not updated. Reason: %msg%', array(
+                'msg' => 'Status of India Site Orders cannot be updated if the Buyer uses PaisaPay payment method.'
             ));
 
             return false;
@@ -83,7 +83,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Abstract
             Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_SHIP,
             Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_SHIP_TRACK
         ))) {
-            throw new LogicException('Invalid action.');
+            throw new LogicException('Invalid Action.');
         }
 
         return true;

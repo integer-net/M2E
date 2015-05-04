@@ -66,7 +66,7 @@ class Ess_M2ePro_Model_Play_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             $customer->load($this->order->getPlayAccount()->getMagentoOrdersCustomerId());
 
             if (is_null($customer->getId())) {
-                throw new Exception('Customer with ID specified in Play account settings does not exist.');
+                throw new Exception('Customer with ID specified in Play Account Settings does not exist.');
             }
         }
 

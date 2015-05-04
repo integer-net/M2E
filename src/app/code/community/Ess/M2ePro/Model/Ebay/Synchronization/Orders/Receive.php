@@ -47,12 +47,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
             /** @var $account Ess_M2ePro_Model_Account **/
 
             // ----------------------------------------------------------
-            $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
-            $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$account->getId(),'Get orders from eBay');
+            $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
+            $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$account->getId(),'Get Orders from eBay');
 
             // M2ePro_TRANSLATIONS
-            // The "Receive" action for eBay account "%account_title%" is in data receiving state...
-            $status = 'The "Receive" action for eBay account "%account_title%" is in data receiving state...';
+            // The "Receive" Action for eBay Account "%account_title%" is in data receiving state...
+            $status = 'The "Receive" Action for eBay Account "%account_title%" is in data receiving state...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 
@@ -66,12 +66,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$account->getId());
             $this->getActualOperationHistory()->addTimePoint(
                 __METHOD__.'create_magento_orders'.$account->getId(),
-                'Create Magento orders'
+                'Create Magento Orders'
             );
 
             // M2ePro_TRANSLATIONS
-            // The "Receive" action for eBay account "%account_title%" is in order creation state...
-            $status = 'The "Receive" action for eBay account "%account_title%" is in order creation state...';
+            // The "Receive" Action for eBay Account "%account_title%" is in Order Creation state...
+            $status = 'The "Receive" Action for eBay Account "%account_title%" is in Order Creation state...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 

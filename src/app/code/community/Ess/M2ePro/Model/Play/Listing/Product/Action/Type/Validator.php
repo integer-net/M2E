@@ -159,7 +159,7 @@ abstract class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Validator
 
     // ########################################
 
-    abstract public function isValid();
+    abstract public function validate();
 
     protected function addMessage($message, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR)
     {
@@ -222,8 +222,8 @@ abstract class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Validator
             $this->getListingProduct()->isLockedObject('in_action')) {
 
             // M2ePro_TRANSLATIONS
-            // Another action is being processed. Try again when the action is completed.
-            $this->addMessage('Another action is being processed. Try again when the action is completed.');
+            // Another Action is being processed. Try again when the Action is completed.
+            $this->addMessage('Another Action is being processed. Try again when the Action is completed.');
 
             return false;
         }
@@ -241,9 +241,9 @@ abstract class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Validator
         if ($qty <= 0) {
 
             // M2ePro_TRANSLATIONS
-            // The Price must be greater than 0. Please, check the Selling Format Policy and Product settings.
+            // The Price must be greater than 0. Please, check the Selling Format Policy and Product Settings.
             $this->addMessage(
-                'The Price must be greater than 0. Please, check the Selling Format Policy and Product settings.'
+                'The Price must be greater than 0. Please, check the Selling Format Policy and Product Settings.'
             );
 
             return false;
@@ -268,10 +268,10 @@ abstract class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Validator
             if ($priceGbr <= 0) {
 
                 // M2ePro_TRANSLATIONS
-                // The Price GBP must be greater than 0. Please, check the Selling Format Policy and Product settings.
+                // The Price GBP must be greater than 0. Please, check the Selling Format Policy and Product Settings.
                 $this->addMessage(
                     'The Price GBP must be greater than 0. '.
-                    'Please, check the Selling Format Policy and Product settings.',
+                    'Please, check the Selling Format Policy and Product Settings.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
                 );
 
@@ -286,10 +286,10 @@ abstract class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Validator
             if ($priceEuro <= 0) {
 
                 // M2ePro_TRANSLATIONS
-                // The Price EUR must be greater than 0. Please, check the Selling Format Policy and Product settings.
+                // The Price EUR must be greater than 0. Please, check the Selling Format Policy and Product Settings.
                 $this->addMessage(
                     'The Price EUR must be greater than 0. '.
-                    'Please, check the Selling Format Policy and Product settings.',
+                    'Please, check the Selling Format Policy and Product Settings.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
                 );
 

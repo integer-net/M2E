@@ -11,15 +11,15 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Genera
 
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         $sku = $this->getSku();
 
         if (empty($sku)) {
 
             // M2ePro_TRANSLATIONS
-            // SKU is not provided. Please, check Listing settings.
-            $this->addMessage('SKU is not provided. Please, check Listing settings.');
+            // SKU is not provided. Please, check Listing Settings.
+            $this->addMessage('SKU is not provided. Please, check Listing Settings.');
 
             return false;
         }

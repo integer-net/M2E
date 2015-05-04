@@ -248,12 +248,12 @@ HTML;
                                              array('tables_info' => json_encode($tablesInfo)));
 
         if (!isset($responseData['diff'])) {
-            echo $this->getEmptyResultsHtml('No tables info for this M2E Pro version on server.');
+            echo $this->getEmptyResultsHtml('No Tables info for this M2E Pro version on Server.');
             return;
         }
 
         if (count($responseData['diff']) <= 0) {
-            echo $this->getEmptyResultsHtml('All tables are valid.');
+            echo $this->getEmptyResultsHtml('All Tables are valid.');
             return;
         }
 

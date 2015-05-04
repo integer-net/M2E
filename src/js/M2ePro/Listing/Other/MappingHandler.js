@@ -102,15 +102,15 @@ ListingOtherMappingHandler.prototype = Object.extend(new CommonHandler(), {
                     self.gridHandler.unselectAllAndReload();
                     self.popUp.close();
                     self.scroll_page_to_top();
-                    MagentoMessageObj.addSuccess(M2ePro.translator.translate('Product(s) was successfully mapped.'));
+                    MagentoMessageObj.addSuccess(M2ePro.translator.translate('Product(s) was successfully Mapped.'));
                 } else if (transport.responseText == 1) {
                     alert(M2ePro.translator.translate('Product does not exist.'));
                 } else if (transport.responseText == 2) {
-                    alert(M2ePro.translator.translate('Current version only supports Simple Products. Please, choose simple product.'));
+                    alert(M2ePro.translator.translate('Current version only supports Simple Products. Please, choose Simple Product.'));
                 } else if (transport.responseText == 3) {
                     self.popUp.close();
                     self.scroll_page_to_top();
-                    MagentoMessageObj.addError(M2ePro.translator.translate('Item was not mapped as the chosen %product_id% Simple Product has Custom Options.', productId));
+                    MagentoMessageObj.addError(M2ePro.translator.translate('Item was not Mapped as the chosen %product_id% Simple Product has Custom Options.', productId));
                 }
             }
         });

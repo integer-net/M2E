@@ -103,7 +103,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit extends Mage_Adminhtml_Block
         if ($template->getId()) {
             $saveConfirmation = Mage::helper('M2ePro')->escapeJs(
                 Mage::helper('M2ePro')->__('<br/>
-<b>Note:</b> All changes you have made will be automatically applied to all M2E Pro listings where this policy is used.'
+<b>Note:</b> All changes you have made will be automatically applied to all M2E Pro Listings where this Policy is used.'
                 )
             );
         }

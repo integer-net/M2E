@@ -83,7 +83,7 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
             return value.length <= 5;
         });
 
-        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one attribute for Product mapping.'), function(value, el) {
+        Validation.add('M2ePro-require-select-attribute', M2ePro.translator.translate('If Yes is chosen, you must select at least one Attribute for Product Mapping.'), function(value, el) {
 
             if ($('other_listings_mapping_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::OTHER_LISTINGS_MAPPING_MODE_NO')) {
                 return true;
@@ -113,7 +113,7 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     delete_click: function()
     {
-        if (!confirm(M2ePro.translator.translate('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'))) {
+        if (!confirm(M2ePro.translator.translate('Be attentive! By Deleting Account you delete all information on it from M2E Pro Server. This will cause inappropriate work of all Accounts\' copies.'))) {
             return;
         }
         setLocation(M2ePro.url.get('deleteAction'));

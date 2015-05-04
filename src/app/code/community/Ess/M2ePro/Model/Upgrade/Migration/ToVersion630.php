@@ -13,6 +13,8 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
     /** @var Ess_M2ePro_Model_Upgrade_MySqlSetup */
     private $installer = NULL;
 
+    private $forceAllSteps = false;
+
     //####################################
 
     public function getInstaller()
@@ -23,6 +25,13 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
     public function setInstaller(Ess_M2ePro_Model_Upgrade_MySqlSetup $installer)
     {
         $this->installer = $installer;
+    }
+
+    // -----------------------------------
+
+    public function setForceAllSteps($value = true)
+    {
+        $this->forceAllSteps = $value;
     }
 
     //####################################
@@ -40,7 +49,11 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
             $this->processListing();
 
         } catch (Exception $e) {
-            echo $e->getMessage();
+
+            echo '<pre>' . $e->getMessage() . '<br>';
+            echo '<pre>' . $e->getFile() . '::' . $e->getLine() . '<br>';
+            echo '<pre>' . $e->getTraceAsString() . '<br>';
+
             die;
         }
     }
@@ -52,6 +65,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
         /** @var Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_General $model */
         $model = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion630_General');
         $model->setInstaller($this->installer);
+        $model->setForceAllSteps($this->forceAllSteps);
         $model->process();
     }
 
@@ -60,6 +74,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
         /** @var Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_Marketplace $model */
         $model = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion630_Marketplace');
         $model->setInstaller($this->installer);
+        $model->setForceAllSteps($this->forceAllSteps);
         $model->process();
     }
 
@@ -68,6 +83,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
         /** @var Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_DescriptionTemplate $model */
         $model = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion630_DescriptionTemplate');
         $model->setInstaller($this->installer);
+        $model->setForceAllSteps($this->forceAllSteps);
         $model->process();
     }
 
@@ -76,6 +92,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
         /** @var Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_ListingProduct $model */
         $model = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion630_ListingProduct');
         $model->setInstaller($this->installer);
+        $model->setForceAllSteps($this->forceAllSteps);
         $model->process();
     }
 
@@ -84,6 +101,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630
         /** @var Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_AutoAction $model */
         $model = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion630_AutoAction');
         $model->setInstaller($this->installer);
+        $model->setForceAllSteps($this->forceAllSteps);
         $model->process();
     }
 

@@ -283,39 +283,39 @@ HTML;
         $translations = json_encode(array(
             'Auto Add/Remove Rules' => $helper->__('Auto Add/Remove Rules'),
             'Based on Magento Categories' => $helper->__('Based on Magento Categories'),
-            'You must select at least 1 category.' => $helper->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => $helper->__('Rule with the same title already exists.'),
+            'You must select at least 1 Category.' => $helper->__('You must select at least 1 Category.'),
+            'Rule with the same Title already exists.' => $helper->__('Rule with the same Title already exists.'),
             'Compatibility Attribute' => $helper->__('Compatibility Attribute'),
             'Sell on Another eBay Site' => $helper->__('Sell on Another eBay Site'),
             'Product' => $helper->__('Product'),
             'Translation Service' => $helper->__('Translation Service'),
-            'You must select at least 1 listing.' => $helper->__('You must select at least 1 listing.'),
+            'You must select at least 1 Listing.' => $helper->__('You must select at least 1 Listing.'),
             'Data migration.' => $helper->__('Data migration...'),
-            'Creating policies in process. Please wait...' =>
-                $helper->__('Creating policies in process. Please wait...'),
-            'Creating translation account in process. Please wait...' =>
-                $helper->__('Creating translation account in process. Please wait...'),
-            'Creating listing in process. Please wait...' =>
-                $helper->__('Creating listing in process. Please wait...'),
+            'Creating Policies in process. Please wait...' =>
+                $helper->__('Creating Policies in process. Please wait...'),
+            'Creating Translation Account in process. Please wait...' =>
+                $helper->__('Creating Translation Account in process. Please wait...'),
+            'Creating Listing in process. Please wait...' =>
+                $helper->__('Creating Listing in process. Please wait...'),
             'Adding Products in process. Please wait...' =>
                 $helper->__('Adding Products in process. Please wait...'),
             'Products failed to add' => $helper->__('Failed Products'),
-            'Migration success.' => $helper->__('The Products have been successfully added into Destination listing.'),
-            'Migration error.' => $helper->__('The Products have not been added into Destination listing'
+            'Migration success.' => $helper->__('The Products have been successfully added into Destination Listing.'),
+            'Migration error.' => $helper->__('The Products have not been added into Destination Listing'
                                            .' because Products with the same Magento Product IDs already exist there.'),
-            'Some Products categories settings are not set or attributes for title or description are empty.' =>
-                $helper->__('Some Products Categories settings are not set'
-                           .' or attributes for Title or Description are empty.'),
+            'Some Products Categories Settings are not set or Attributes for Title or Description are empty.' =>
+                $helper->__('Some Products Categories Settings are not set'
+                           .' or Attributes for Title or Description are empty.'),
             'Another Synchronization Is Already Running.' => $helper->__('Another Synchronization Is Already Running.'),
             'Getting information. Please wait ...' => $helper->__('Getting information. Please wait ...'),
             'Preparing to start. Please wait ...' => $helper->__('Preparing to start. Please wait ...'),
             'Synchronization has successfully ended.' => $helper->__('Synchronization has successfully ended.'),
-            'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.' =>
+            'Synchronization ended with warnings. <a target="_blank" href="%url%">View Log</a> for details.' =>
                 $helper->__(
-                    'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.'),
-            'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' =>
+                    'Synchronization ended with warnings. <a target="_blank" href="%url%">View Log</a> for details.'),
+            'Synchronization ended with errors. <a target="_blank" href="%url%">View Log</a> for details.' =>
                 $helper->__(
-                    'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
+                    'Synchronization ended with errors. <a target="_blank" href="%url%">View Log</a> for details.')
         ));
         //------------------------------
 

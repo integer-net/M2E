@@ -251,7 +251,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
         if (count($magentoVariations) != 1) {
             return $this->getResponse()->setBody(json_encode(array(
                 'type' => 'error',
-                'message' => Mage::helper('M2ePro')->__('Only 1 variation must leave.')
+                'message' => Mage::helper('M2ePro')->__('Only 1 Variation must leave.')
             )));
         }
 
@@ -335,7 +335,7 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             if (count($tempMagentoVariations) != 1) {
                 return $this->getResponse()->setBody(json_encode(array(
                     'type' => 'error',
-                    'message' => Mage::helper('M2ePro')->__('Only 1 variation must leave.')
+                    'message' => Mage::helper('M2ePro')->__('Only 1 Variation must leave.')
                 )));
             }
 

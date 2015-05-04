@@ -219,7 +219,7 @@ HTML;
                 if (count(array_intersect($productAttrCounts, $themeAttrCounts)) !== count($productAttrCounts)) {
                     return '<span style="color: #808080;">' .
                         Mage::helper('M2ePro')->__(
-                            'This number of variation attributes cannot be used in chosen Category'
+                            'This number of Variation Attributes cannot be used in chosen Category'
                         ) . '</span>';
                 }
             }

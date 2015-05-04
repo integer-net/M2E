@@ -75,8 +75,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Mage_Adminhtml_Bl
             'filter_index' => 'main_table.update_date'
         ));
 
-        $confirm = 'Attention! By deleting account you delete all information on it from M2E Pro server. ';
-        $confirm .= 'This will cause inappropriate work of all accounts\' copies.';
+        $confirm = 'Attention! By Deleting Account you delete all information on it from M2E Pro Server. ';
+        $confirm .= 'This will cause inappropriate work of all Accounts\' copies.';
         $confirm = Mage::helper('M2ePro')->__($confirm);
 
         $this->addColumn('actions', array(
@@ -116,8 +116,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Account_Grid extends Mage_Adminhtml_Bl
 
         // Set delete action
         //--------------------------------
-        $confirm = 'Attention! By deleting account you delete all information on it from M2E Pro Server. ';
-        $confirm .= 'This will cause inappropriate work of all accounts\' copies.';
+        $confirm = 'Attention! By deleting Account you delete all information on it from M2E Pro Server. ';
+        $confirm .= 'This will cause inappropriate work of all Accounts\' copies.';
         $confirm  = Mage::helper('M2ePro')->__($confirm);
 
         $this->getMassactionBlock()->addItem('delete', array(

@@ -556,7 +556,7 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
                             M2ePro.translator.translate('Select') + '</a></td></tr>';
                     });
                 } else {
-                    html += '<tr><td colspan="2" style="padding-left: 200px"><strong>' + M2ePro.translator.translate('No recently used categories') + '</strong></td></tr>';
+                    html += '<tr><td colspan="2" style="padding-left: 200px"><strong>' + M2ePro.translator.translate('No recently used Categories') + '</strong></td></tr>';
                 }
 
                 $('chooser_recent_table').innerHTML = html;
@@ -609,9 +609,9 @@ EbayListingCategoryChooserHandler.prototype = Object.extend(new CommonHandler(),
                             if ($('category_type').value == M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN') ||
                                 $('category_type').value == M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_SECONDARY')
                             ) {
-                                refreshMessage = M2ePro.translator.translate('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshEbayCategories()">update eBay sites data</a> and repeate the search.');
+                                refreshMessage = M2ePro.translator.translate('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshEbayCategories()">update eBay Sites Data</a> and repeate the Search.');
                             } else {
-                                refreshMessage = M2ePro.translator.translate('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshStoreCategories()">refresh eBay store data</a> and repeate the search.');
+                                refreshMessage = M2ePro.translator.translate('Try to <a href="javascript:void(0)" onclick="EbayListingCategoryChooserHandlerObj.refreshStoreCategories()">refresh eBay Store Data</a> and repeate the Search.');
                             }
                         }
 

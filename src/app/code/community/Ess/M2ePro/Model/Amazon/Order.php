@@ -324,7 +324,7 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
     public function beforeCreateMagentoOrder()
     {
         if ($this->isPending() || $this->isCanceled()) {
-            throw new Exception('Magento Order creation is not allowed for pending and canceled Amazon Orders.');
+            throw new Exception('Magento Order Creation is not allowed for pending and canceled Amazon Orders.');
         }
     }
 

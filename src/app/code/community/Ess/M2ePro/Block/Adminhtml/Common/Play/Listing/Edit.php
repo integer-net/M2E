@@ -144,8 +144,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Edit extends Mage_Adminhtml
         $translations = json_encode(array(
             'Auto Add/Remove Rules' => $helper->__('Auto Add/Remove Rules'),
             'Based on Magento Categories' => $helper->__('Based on Magento Categories'),
-            'You must select at least 1 category.' => $helper->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => $helper->__('Rule with the same title already exists.')
+            'You must select at least 1 Category.' => $helper->__('You must select at least 1 Category.'),
+            'Rule with the same Title already exists.' => $helper->__('Rule with the same Title already exists.')
         ));
 
         $js = <<<HTML

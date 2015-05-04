@@ -17,7 +17,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     skip: function(url)
     {
-        if (!confirm(M2ePro.translator.translate('Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.'))) {
+        if (!confirm(M2ePro.translator.translate('Note: If you close the Wizard, it never starts again. You will be required to set all Settings manually. Press Cancel to continue working with Wizard.'))) {
             return;
         }
 

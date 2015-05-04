@@ -7,7 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_Tabs_Variations_Grid
     extends Mage_Adminhtml_Block_Widget_Grid
 {
-
     protected $childListingProducts = null;
     protected $currentProductVariations = null;
     protected $usedProductVariations = null;
@@ -157,7 +156,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
             'type' => 'number',
             'index' => 'online_price',
             'filter_index' => 'online_price',
-            'frame_callback' => array($this, 'callbackColumnPrice')
+            'frame_callback' => array($this, 'callbackColumnPrice'),
+            'filter_condition_callback' => array($this, 'callbackFilterPrice')
         ));
 
         $this->addColumn('status', array(
@@ -214,8 +214,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
 
+        $this->getMassactionBlock()->addItem('stopAndRemove', array(
+            'label'    => Mage::helper('M2ePro')->__('Stop on Channel / Remove from Listing'),
+            'url'      => '',
+            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
+        ));
+
         $this->getMassactionBlock()->addItem('deleteAndRemove', array(
-            'label'    => Mage::helper('M2ePro')->__('Reset / Remove Item(s)'),
+            'label'    => Mage::helper('M2ePro')->__('Remove from Channel & Listing'),
             'url'      => '',
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
@@ -235,9 +241,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
         $typeModel = $row->getChildObject()->getVariationManager()->getTypeModel();
 
         $html .= '<div class="product-options-main" style="font-size: 11px; color: grey; margin-left: 7px">';
-        if ($typeModel->isVariationProductMatched()) {
+        $productOptions = $typeModel->getProductOptions();
+        if (!empty($productOptions)) {
             $html .= '<div class="product-options-list">';
-            foreach ($typeModel->getProductOptions() as $attribute => $option) {
+            foreach ($productOptions as $attribute => $option) {
                 !$option && $option = '--';
                 $html .= '<span class="attribute-row"><span class="attribute"><strong>' .
                     Mage::helper('M2ePro')->escapeHtml($attribute) .
@@ -247,13 +254,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
             $html .= '</div>';
         }
 
-        $unusedVariations = $this->getUnusedProductVariations();
-        $hasInActionLock = $this->getLockedData($row);
-        $hasInActionLock = $hasInActionLock['in_action'];
-
-        if (!empty($unusedVariations) && !$hasInActionLock &&
-            (!$typeModel->isVariationProductMatched() || $row->getChildObject()->getGeneralId() !== NULL)
-        ) {
+        if ($this->canChangeProductVariation($row)) {
 
             $listingProductId = $row->getId();
             $attributes = $this->getListingProduct()->getChildObject()
@@ -288,17 +289,17 @@ HTML;
 
         $typeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
 
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $parentAmazonListingProduct */
+        $parentAmazonListingProduct = $typeModel->getParentListingProduct()->getChildObject();
+
+        $matchedAttributes = $parentAmazonListingProduct->getVariationManager()
+            ->getTypeModel()
+            ->getMatchedAttributes();
+
         if (!$typeModel->isVariationChannelMatched()) {
             if (!$typeModel->isVariationProductMatched() || !$amazonListingProduct->isGeneralIdOwner()) {
                 return '';
             }
-
-            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $parentAmazonListingProduct */
-            $parentAmazonListingProduct = $typeModel->getParentListingProduct()->getChildObject();
-
-            $matchedAttributes = $parentAmazonListingProduct->getVariationManager()
-                ->getTypeModel()
-                ->getMatchedAttributes();
 
             if (empty($matchedAttributes)) {
                 return '';
@@ -311,6 +312,17 @@ HTML;
             }
         } else {
             $options = $typeModel->getChannelOptions();
+
+            if (!empty($matchedAttributes)) {
+
+                $sortedOptions = array();
+
+                foreach ($matchedAttributes as $magentoAttr => $amazonAttr) {
+                    $sortedOptions[$amazonAttr] = $options[$amazonAttr];
+                }
+
+                $options = $sortedOptions;
+            }
         }
 
         if (empty($options)) {
@@ -387,21 +399,45 @@ HTML;
             ->getChildObject()
             ->getDefaultCurrency();
 
-        $salePriceValue = $row->getData('online_sale_price');
-        if (is_null($salePriceValue) ||
-            (float)$salePriceValue <= 0) {
-            $salePriceValue = null;
-        } else {
-            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePriceValue);
-        }
-
         if ((float)$value <= 0) {
-            $result = '<span style="color: #f00;">0</span>';
+            $priceValue = '<span style="color: #f00;">0</span>';
         } else {
-            $result = Mage::app()->getLocale()->currency($currency)->toCurrency($value);
+            $priceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($value);
         }
 
-        return $result.($salePriceValue ? ' <br/><span style="color:gray;">'.$salePriceValue.'</span>' : '');
+        $resultHtml = '';
+
+        $salePriceValue = $row->getData('online_sale_price');
+        if ((float)$salePriceValue > 0) {
+            $startDateTimestamp = strtotime($row->getData('online_sale_price_start_date'));
+            $endDateTimestamp   = strtotime($row->getData('online_sale_price_end_date'));
+
+            $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+
+            if ($currentTimestamp >= $startDateTimestamp &&
+                $currentTimestamp <= $endDateTimestamp &&
+                $salePriceValue < (float)$value
+            ) {
+                $resultHtml = '<span style="text-decoration: line-through;">'.$priceValue.'</span>';
+            } else {
+                $resultHtml = $priceValue;
+            }
+
+            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePriceValue);
+
+            $resultHtml .= ' <br/><br/><span style="color:gray;">'.$salePriceValue.'</span><br/>';
+
+            $resultHtml .= '<span style="color:gray; font-size: 10px;">
+                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
+                                    To: '.date('Y-m-d', $endDateTimestamp).'
+                                </span>';
+        }
+
+        if (empty($resultHtml)) {
+            $resultHtml = $priceValue;
+        }
+
+        return $resultHtml;
     }
 
     public function callbackColumnStatus($value, $row, $column, $isExport)
@@ -481,7 +517,11 @@ HTML;
                     break;
 
                 case 'stop_action':
-                    $html .= '<br/><span style="color: #605fff">[Stoping...]</span>';
+                    $html .= '<br/><span style="color: #605fff">[Stopping...]</span>';
+                    break;
+
+                case 'stop_and_remove_action':
+                    $html .= '<br/><span style="color: #605fff">[Stopping...]</span>';
                     break;
 
                 case 'delete_and_remove_action':
@@ -535,6 +575,32 @@ HTML;
                 );
             }
         }
+    }
+
+    protected function callbackFilterPrice($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if (empty($value)) {
+            return;
+        }
+
+        $from = $value['from'];
+        $to   = $value['to'];
+
+        $collection->getSelect()->where(
+            '(online_price >= \''.$from.'\' AND online_price <= \''.$to.'\' AND
+            (
+                online_sale_price IS NULL OR
+                online_sale_price_start_date > NOW() OR
+                online_sale_price_end_date < NOW()
+            )) OR (online_sale_price >= \''.$from.'\' AND online_sale_price <= \''.$to.'\' AND
+            (
+                online_sale_price IS NOT NULL AND
+                online_sale_price_start_date < NOW() AND
+                online_sale_price_end_date > NOW()
+            ))'
+        );
     }
 
     // ####################################
@@ -605,10 +671,23 @@ HTML;
             return '';
         }
 
+        foreach ($actionsRows as &$actionsRow) {
+            usort($actionsRow['items'], function($a, $b)
+            {
+                $sortOrder = array(
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 1,
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 2,
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 3,
+                );
+
+                return $sortOrder[$a["type"]] > $sortOrder[$b["type"]];
+            });
+        }
+
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Action was completed with warning(s).'
         );
 
         $icons = array(
@@ -911,6 +990,7 @@ HTML;
         $runReviseProducts = $this->getUrl('*/adminhtml_common_amazon_listing/runReviseProducts');
         $runRelistProducts = $this->getUrl('*/adminhtml_common_amazon_listing/runRelistProducts');
         $runStopProducts = $this->getUrl('*/adminhtml_common_amazon_listing/runStopProducts');
+        $runStopAndRemoveProducts = $this->getUrl('*/adminhtml_common_amazon_listing/runStopAndRemoveProducts');
         $runDeleteAndRemoveProducts = $this->getUrl('*/adminhtml_common_amazon_listing/runDeleteAndRemoveProducts');
 
         $setChildListingProductOptions = $this->getUrl(
@@ -918,14 +998,14 @@ HTML;
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
         $taskCompletedSuccessMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has successfully submitted to be processed.')
+            $helper->__('"%task_title%" Task has successfully submitted to be processed.')
         );
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__(
-            '"%task_title%" task has completed with warnings.
-            <a target="_blank" href="%url%">View log</a> for details.'
+            '"%task_title%" Task has completed with warnings.
+            <a target="_blank" href="%url%">View Log</a> for details.'
         ));
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__(
-            '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.'
+            '"%task_title%" Task has completed with errors. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
 
         $lockedObjNoticeMessage = $helper->escapeJs($helper->__('Some Amazon request(s) are being processed now.'));
@@ -935,7 +1015,7 @@ HTML;
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = $helper->escapeJs(
-            $helper->__('The listing was locked by another process. Please try again later.')
+            $helper->__('The Listing was locked by another process. Please try again later.')
         );
         $listingEmptyMessage = $helper->escapeJs($helper->__('Listing is empty.'));
 
@@ -954,10 +1034,10 @@ HTML;
                 ->__('Stopping On Amazon And Removing From Listing Selected Items'));
         $deletingAndRemovingSelectedItemsMessage = Mage::helper('M2ePro')
             ->escapeJs(Mage::helper('M2ePro')
-                ->__('Reset / Remove Item(s)'));
+                ->__('Removing From Amazon And Listing Selected Items'));
 
         $selectItemsMessage = $helper->escapeJs($helper->__('Please select Items.'));
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $errorChangingProductOptions = $helper->escapeJs($helper->__('Please Select Product Options.'));
 
@@ -1006,6 +1086,7 @@ HTML;
     M2ePro.url.runReviseProducts = '{$runReviseProducts}';
     M2ePro.url.runRelistProducts = '{$runRelistProducts}';
     M2ePro.url.runStopProducts = '{$runStopProducts}';
+    M2ePro.url.runStopAndRemoveProducts = '{$runStopAndRemoveProducts}';
     M2ePro.url.runDeleteAndRemoveProducts = '{$runDeleteAndRemoveProducts}';
     M2ePro.url.setChildListingProductOptions = '{$setChildListingProductOptions}';
 
@@ -1123,6 +1204,33 @@ CSS;
     }
 
     // ####################################
+
+    private function canChangeProductVariation(Ess_M2ePro_Model_Listing_Product $childListingProduct)
+    {
+        if (!$this->hasUnusedProductVariation()) {
+            return false;
+        }
+
+        $lockData = $this->getLockedData($childListingProduct);
+        if ($lockData['in_action']) {
+            return false;
+        }
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonChildListingProduct */
+        $amazonChildListingProduct = $childListingProduct->getChildObject();
+
+        if (!$amazonChildListingProduct->getGeneralId()) {
+            return false;
+        }
+
+        $childTypeModel = $amazonChildListingProduct->getVariationManager()->getTypeModel();
+
+        if ($childTypeModel->isVariationProductMatched() && $this->hasChildWithEmptyProductOptions()) {
+            return false;
+        }
+
+        return true;
+    }
 
     private function getLockedData($row)
     {

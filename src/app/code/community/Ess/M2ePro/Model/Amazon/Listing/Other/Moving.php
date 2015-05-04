@@ -136,8 +136,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_MOVE_LISTING,
                                      // M2ePro_TRANSLATIONS
-                                     // Item was successfully moved
-                                     'Item was successfully moved',
+                                     // Item was successfully Moved
+                                     'Item was successfully Moved',
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
@@ -150,8 +150,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_FROM_OTHER_LISTING,
                                      // M2ePro_TRANSLATIONS
-                                     // Item was successfully moved
-                                     'Item was successfully moved',
+                                     // Item was successfully Moved
+                                     'Item was successfully Moved',
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 
@@ -333,8 +333,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
 
             'currency' => $this->getMarketplace()->getChildObject()->getDefaultCurrency(),
             'price_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT,
-
             'price_variation_mode' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_VARIATION_MODE_PARENT,
+
+            'map_price_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE,
 
             'sale_price_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE,
             'sale_price_start_date_mode' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::DATE_VALUE,

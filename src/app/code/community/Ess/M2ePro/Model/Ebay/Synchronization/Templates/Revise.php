@@ -127,7 +127,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update title');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Title');
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection()->getItems() as $template) {
@@ -208,7 +208,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeSubTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update subtitle');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Subtitle');
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection()->getItems() as $template) {
@@ -259,7 +259,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeDescriptionChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update description');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Description');
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection()->getItems() as $template) {
@@ -415,7 +415,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeTotal()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute revise all');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute Revise all');
 
         $lastListingProductProcessed = $this->getConfigValue(
             $this->getFullSettingsPath().'total/','last_listing_product_id'

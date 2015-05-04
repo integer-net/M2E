@@ -178,8 +178,8 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
             }
 
             // M2ePro_TRANSLATIONS
-            // 'Product has been successfully translated.',
-            $this->addListingsProductsLogsMessage($listingProduct, 'Product has been successfully translated.',
+            // 'Product has been successfully Translated.',
+            $this->addListingsProductsLogsMessage($listingProduct, 'Product has been successfully Translated.',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
         }

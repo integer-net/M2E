@@ -38,6 +38,31 @@ class Ess_M2ePro_Adminhtml_DevelopmentController
 
     }
 
+    /**
+     * @title "Force run migration 6.3.0 [temporary]"
+     * @description "Force run migration 6.3.0"
+     */
+    public function runMigrationForce630Action()
+    {
+        var_dump('start ...');
+
+        try {
+
+            /** @var Ess_M2ePro_Model_Upgrade_Migration_ToVersion630 $migrationInstance */
+            $migrationInstance = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion630');
+            $migrationInstance->setInstaller(new Ess_M2ePro_Model_Upgrade_MySqlSetup('M2ePro_setup'));
+            $migrationInstance->setForceAllSteps(true);
+            $migrationInstance->migrate();
+
+        } catch (Exception $e) {
+
+            var_dump($e);
+            die;
+        }
+
+        var_dump('success.');
+    }
+
     //#############################################
 
     public function indexAction()

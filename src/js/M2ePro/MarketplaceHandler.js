@@ -104,7 +104,7 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
             }, 1000);
 
         } else {
-            MagentoMessageObj.addError(M2ePro.translator.translate('You must select at least one site you will work with.'));
+            MagentoMessageObj.addError(M2ePro.translator.translate('You must select at least one Site you will work with.'));
         }
     },
 

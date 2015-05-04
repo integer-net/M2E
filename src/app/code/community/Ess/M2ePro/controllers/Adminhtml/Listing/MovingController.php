@@ -165,8 +165,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                     NULL,
                     Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                     // M2ePro_TRANSLATIONS
-                    // Item was not moved because it is in progress state now
-                    'Item was not moved because it is in progress state now',
+                    // Item was not Moved because it is in progress state now
+                    'Item was not Moved because it is in progress state now',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -185,8 +185,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                     NULL,
                     Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                     // M2ePro_TRANSLATIONS
-                    // Item was not moved
-                    'Item was not moved',
+                    // Item was not Moved
+                    'Item was not Moved',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -203,8 +203,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                 // M2ePro_TRANSLATIONS
-                // Item was successfully moved
-                'Item was successfully moved',
+                // Item was successfully Moved
+                'Item was successfully Moved',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -217,8 +217,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                 // M2ePro_TRANSLATIONS
-                // Item was successfully moved
-                'Item was successfully moved',
+                // Item was successfully Moved
+                'Item was successfully Moved',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );

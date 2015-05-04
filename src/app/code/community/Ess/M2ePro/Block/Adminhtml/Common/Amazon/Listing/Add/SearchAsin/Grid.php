@@ -458,7 +458,7 @@ HTML;
         // ---------------------------------
         if ($searchSettingsStatus == Ess_M2ePro_Model_Amazon_Listing_Product::SEARCH_SETTINGS_STATUS_IN_PROGRESS) {
 
-            $tip = Mage::helper('M2ePro')->__('Automatic ASIN/ISBN search in Progress.');
+            $tip = Mage::helper('M2ePro')->__('Automatic ASIN/ISBN Search in Progress.');
             $iconSrc = $iconPath.'processing.gif';
 
             return <<<HTML

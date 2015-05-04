@@ -12,8 +12,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Relist_MultipleResponser
     protected function getSuccessfulMessage(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         // M2ePro_TRANSLATIONS
-        // Item was successfully relisted
-        return 'Item was successfully relisted';
+        // Item was successfully Relisted
+        return 'Item was successfully Relisted';
     }
 
     // ########################################

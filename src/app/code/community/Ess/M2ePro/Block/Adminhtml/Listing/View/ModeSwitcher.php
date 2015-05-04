@@ -22,7 +22,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_ModeSwitcher extends Mage_Adminhtm
     public function getCurrentViewMode()
     {
         if (empty($this->_data['current_view_mode'])) {
-            throw new LogicException('Current view mode is not set.');
+            throw new LogicException('Current View Mode is not set.');
         }
 
         return $this->_data['current_view_mode'];

@@ -71,10 +71,10 @@ final class Ess_M2ePro_Model_Play_Synchronization_Orders_Update
             /** @var Ess_M2ePro_Model_Account $account */
 
             // ----------------------------------------------------------
-            $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
+            $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
             // M2ePro_TRANSLATIONS
-            // The "Update" action for Play.com account: "%account_title%" is started. Please wait...
-            $status = 'The "Update" action for Play.com account: "%account_title%" is started. Please wait...';
+            // The "Update" Action for Play.com Account: "%account_title%" is started. Please wait...
+            $status = 'The "Update" Action for Play.com Account: "%account_title%" is started. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 
@@ -83,7 +83,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Orders_Update
                 // ----------------------------------------------------------
                 $this->getActualOperationHistory()->addTimePoint(
                     __METHOD__.'process'.$account->getId(),
-                    'Process account '.$account->getTitle()
+                    'Process Account '.$account->getTitle()
                 );
                 // ----------------------------------------------------------
 
@@ -96,8 +96,8 @@ final class Ess_M2ePro_Model_Play_Synchronization_Orders_Update
 
             // ----------------------------------------------------------
             // M2ePro_TRANSLATIONS
-            // The "Update" action for Play.com account: "%account_title%" is finished. Please wait...
-            $status = 'The "Update" action for Play.com account: "%account_title%" is finished. Please wait...';
+            // The "Update" Action for Play.com Account: "%account_title%" is finished. Please wait...
+            $status = 'The "Update" Action for Play.com Account: "%account_title%" is finished. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
             $this->getActualLockItem()->activate();

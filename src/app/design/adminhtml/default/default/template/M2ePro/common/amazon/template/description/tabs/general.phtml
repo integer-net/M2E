@@ -1,12 +1,12 @@
 <div id="block_notice_amazon_template_description_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
     <?php echo Mage::helper('M2ePro')->__(
-        'This tab contains main settings of Description Policy such as selection of Amazon Category and preparing Description Policy for New ASIN/ISBN Creation. <br/><br/>
+        'This Tab contains main Settings of Description Policy such as selection of Amazon Category and preparing Description Policy for New ASIN/ISBN Creation. <br/><br/>
 
-        The Description Policy has to be created for a particular Marketplace, so it can be used only for Listings with the same Marketplace. <br/>
+        The Description Policy has to be Created for a particular Marketplace, so it can be used only for Listings with the same Marketplace. <br/>
 
-        You can select Amazon Category, in which Amazon Products should be placed. Category must be selected to create New ASIN/ISBN. <br/>
+        You can select Amazon Category, in which Amazon Products should be placed. Category must be selected to Create New ASIN/ISBN. <br/>
 
-        In case you are planning to use Description Policy for New ASIN/ISBN Creation, you should enable New ASIN/ISBN creation feature.'
+        In case you are planning to use Description Policy for New ASIN/ISBN Creation, you should enable New ASIN/ISBN Creation feature.'
     ); ?>
 </div>
 
@@ -81,7 +81,7 @@
         'Not Selected'    => Mage::helper('M2ePro')->__('Not Selected'),
         'Select'          => Mage::helper('M2ePro')->__('Select'),
 
-        'The specified title is already used for another policy. Policy title must be unique.' => Mage::helper('M2ePro')->__('The specified title is already used for another policy. Policy title must be unique.'),
+        'The specified Title is already used for another Policy. Policy Title must be unique.' => Mage::helper('M2ePro')->__('The specified Title is already used for another Policy. Policy Title must be unique.'),
         'Please enter a valid number value in a specified range.'                              => Mage::helper('M2ePro')->__('Please enter a valid number value in a specified range.'),
 
         'You should select Marketplace first.' => Mage::helper('M2ePro')->__('You should select Marketplace first.'),
@@ -164,7 +164,7 @@
                     <td class="value">
                         <input id="title" name="general[title]" value="<?php echo $this->escapeHtml($formData['general']['title']); ?>" type="text" class="input-text required-entry M2ePro-description-template-title"/>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful policy title for your internal use.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful Policy Title for your internal use.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -238,7 +238,7 @@
 
                 Since Amazon does not have a single structural Categories Tree and there are several of them, a tree that is presented in M2E Pro can be rather different from those you are used earlier on Amazon or in other applications. <br/><br/>
 
-                <b>Note:</b> Possibility to specify Product Specifics on Specifics tab becomes available only when Category is selected. A list of Specifics depends on a particular chosen Category.'); ?>
+                <b>Note:</b> Possibility to specify Product Specifics on Specifics Tab becomes available only when Category is selected. A list of Specifics depends on a particular chosen Category.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -271,11 +271,11 @@
                                 <span id="category_locked_warning_message" class="category-warning-item" style="display: none;"><?php echo Mage::helper('M2ePro')->__(
                                     'You cannot edit existing Category because currently the new ASIN/ISBN is being created based on this Policy or there is possibility of
                                      creating new Child Products based for the Parent Product with this Description Policy. <br/><br/>
-                                     It is done to make sure that Parent and Child Products will be listed to the same Category.'
+                                     It is done to make sure that Parent and Child Products will be Listed to the same Category.'
                                 ); ?></span>
                                 <span class="additional-br" style="display: none;"><br/><br/></span>
                                 <span id="category_is_not_accessible_message" class="category-warning-item" style="display: none;"><?php echo Mage::helper('M2ePro')->__(
-                                    'It is impossible to use the Category, you have chosen before. <br/> You should select new Category which mostly suits to that you used earlier. Also you need to set Specifics Values on Specifics tab.'
+                                    'It is impossible to use the Category, you have chosen before. <br/> You should select new Category which mostly suits to that you used earlier. Also you need to set Specifics Values on Specifics Tab.'
                                 ); ?></span>
                                 <span class="additional-br" style="display: none;"><br/><br/></span>
                                 <span id="category_variation_warning_message" class="category-warning-item" style="display: none;"><?php echo Mage::helper('M2ePro')->__(
@@ -304,7 +304,7 @@
         <div class="hor-scroll">
 
             <div id="block_notice_template_description_new_asin_creation" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('New ASIN/ISBN Creation'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('In case you are planning to create New ASIN/ISBN based on this Description Policy you have to obviously enable this option. <br/><br/>
+                <?php echo Mage::helper('M2ePro')->__('In case you are planning to create New ASIN/ISBN based on this Description Policy you have to obviously enable this Option. <br/><br/>
 
                 To create New ASIN/ISBN it is also necessary to specify some required fields such as Title, Brand, Manufacturer, Main Image, Category and required Specifics. <br/><br/>
 
@@ -337,8 +337,8 @@
                             <span class="tool-tip-message" style="font-size: 12px; display: none; border-color: #ffd967; background-color: #fffbf0;">
                                 <img src="<?php echo $this->getSkinUrl('M2ePro/images/i_notice.gif'); ?>" style="margin-top: -21px;">
                                 <span><?php echo Mage::helper('M2ePro')->__(
-                                    'You cannot turn off this Option because there are Item(s) for which new ASIN(s)/ISBN(s) will be created or being created based on this Policy. <br/>
-                                     Also this Option cannot be turned off in case there is a possibility of creation New Child ASIN(s)/ISBN(s) for your Parent Product based on this Policy.'
+                                    'You cannot turn off this Option because there are Item(s) for which new ASIN(s)/ISBN(s) will be Created or being created based on this Policy. <br/>
+                                     Also this Option cannot be turned off in case there is a possibility of Creation New Child ASIN(s)/ISBN(s) for your Parent Product based on this Policy.'
                                 ); ?></span>
                             </span>
                         </span>
@@ -357,42 +357,30 @@
                         <label for="worldwide_id_mode"><?php echo Mage::helper('M2ePro')->__('UPC / EAN') ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <select name="general[worldwide_id_mode]" id="worldwide_id_mode" class="M2ePro-required-when-visible">
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_NONE ?>" <?php if ($formData['general']['worldwide_id_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($formData['general']['worldwide_id_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute') ?></option>
-                        </select>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__(
-                                'For creating New ASIN/ISBN it is required to provide valid UPC or EAN of the respective Product.<br/><br/>
-                                 UPC/EAN for which ASIN/ISBN has already been created in Amazon Catalog cannot be used for creating New ASIN/ISBN.<br/><br/>
-                                 In this case you need to assign Item to the Existing ASIN/ISBN. In case UPC/EAN doesn’t exist for your Product you can try to use Product ID Override Option.'
-                            ); ?></span>
-                        </p>
-                    </td>
-                </tr>
+                        <input type="hidden" id="worldwide_id_custom_attribute" name="general[worldwide_id_custom_attribute]" value="<?php echo $formData['general']['worldwide_id_custom_attribute']; ?>" />
 
-                <tr class="hide-when-asin-is-disabled entry-edit" id="worldwide_id_custom_attribute_tr" style="display: none;">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('UPC / EAN Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="worldwide_id_attribute_td">
-                            <select id="worldwide_id_custom_attribute" name="general[worldwide_id_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
+                        <select name="general[worldwide_id_mode]" id="worldwide_id_mode" class="M2ePro-required-when-visible" data-current-value="<?php echo $formData['general']['worldwide_id_custom_attribute'];?>" >
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_NONE ?>" <?php if ($formData['general']['worldwide_id_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
+
+                            <optgroup label="Magento Attribute">
                                 <?php if ($formData['general']['worldwide_id_custom_attribute'] != '' && !$magentoAttributeHelper->isExistInAttributesArray($formData['general']['worldwide_id_custom_attribute'], $generalAttributesByInputTypes['text'])) : ?>
-                                    <option value="<?php echo $formData['general']['worldwide_id_custom_attribute']; ?>" selected="selected">
+                                    <option attribute_code="<?php echo $formData['general']['worldwide_id_custom_attribute']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE ?>" selected="selected">
                                         <?php echo $magentoAttributeHelper->getAttributeLabel($formData['general']['worldwide_id_custom_attribute']); ?>
                                     </option>
                                 <?php endif; ?>
                                 <?php foreach($generalAttributesByInputTypes['text'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['general']['worldwide_id_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE ?>" <?php if (!empty($formData['general']['worldwide_id_custom_attribute']) && $attribute['code'] == $formData['general']['worldwide_id_custom_attribute']): ?>selected="selected"<?php endif; ?>>
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                     </option>
                                 <?php endforeach; ?>
-                            </select>
-                        </div>
+                            </optgroup>
+                        </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose the Attribute that contains Products UPC/EAN.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__(
+                                'For Creating New ASIN/ISBN it is required to provide valid UPC or EAN of the respective Product.<br/><br/>
+                                 UPC/EAN for which ASIN/ISBN has already been Created in Amazon Catalog cannot be used for Creating New ASIN/ISBN.<br/><br/>
+                                 In this case you need to assign Item to the Existing ASIN/ISBN. In case UPC/EAN doesn’t exist for your Product you can try to use Product ID Override Option.'
+                            ); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -412,7 +400,7 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__('
-                                In case your Product has no UPC/EAN, you can try to set this Option to one of the values from the dropdown. <br/>
+                                In case your Product has no UPC/EAN, you can try to set this Option to one of the values from the Dropdown. <br/>
                                 You have to be approved by Amazon in order to use it. <br/><br/>
                                 <b>Note:</b> Those approvals can be received only for the specific Categories.
                                 Please, contact Amazon Support to apply for approval. '); ?>
@@ -432,10 +420,24 @@
                         <label for="item_package_quantity_mode"><?php echo Mage::helper('M2ePro')->__('Package Quantity') ?>: </label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="item_package_quantity_custom_attribute" name="general[item_package_quantity_custom_attribute]" value="<?php echo $formData['general']['item_package_quantity_custom_attribute']; ?>" />
+
                         <select name="general[item_package_quantity_mode]" id="item_package_quantity_mode">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_NONE; ?>" <?php if ($formData['general']['item_package_quantity_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['general']['item_package_quantity_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($formData['general']['item_package_quantity_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute') ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php if ($formData['general']['item_package_quantity_custom_attribute'] != '' && !$magentoAttributeHelper->isExistInAttributesArray($formData['general']['item_package_quantity_custom_attribute'], $generalAttributesByInputTypes['text_select'])) : ?>
+                                    <option attribute_code="<?php echo $formData['general']['item_package_quantity_custom_attribute']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_ATTRIBUTE ?>" selected="selected" >
+                                        <?php echo $magentoAttributeHelper->getAttributeLabel($formData['general']['item_package_quantity_custom_attribute']); ?>
+                                    </option>
+                                <?php endif; ?>
+                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($attribute['code'] == $formData['general']['item_package_quantity_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <?php echo Mage::helper('M2ePro')->__(
@@ -454,41 +456,29 @@
                     </td>
                 </tr>
 
-                <tr class="hide-when-asin-is-disabled entry-edit" id="item_package_quantity_custom_attribute_tr">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Package Quantity Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="item_package_quantity_attribute_td">
-                            <select id="item_package_quantity_custom_attribute" name="general[item_package_quantity_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php if ($formData['general']['item_package_quantity_custom_attribute'] != '' && !$magentoAttributeHelper->isExistInAttributesArray($formData['general']['item_package_quantity_custom_attribute'], $generalAttributesByInputTypes['text_select'])) : ?>
-                                    <option value="<?php echo $formData['general']['item_package_quantity_custom_attribute']; ?>" selected="selected" >
-                                        <?php echo $magentoAttributeHelper->getAttributeLabel($formData['general']['item_package_quantity_custom_attribute']); ?>
-                                    </option>
-                                <?php endif; ?>
-                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['general']['item_package_quantity_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Package Quantity.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
-
                 <tr class="hide-when-asin-is-disabled entry-edit" id="number_of_items_mode_tr">
                     <td class="label">
                         <label for="number_of_items_mode"><?php echo Mage::helper('M2ePro')->__('Number of Items') ?>: </label>
                     </td>
                     <td class="value">
+                        <input type="hidden" id="number_of_items_custom_attribute" name="general[number_of_items_custom_attribute]" value="<?php echo $formData['general']['number_of_items_custom_attribute']; ?>" />
+
                         <select name="general[number_of_items_mode]" id="number_of_items_mode" class="M2ePro-required-when-visible">
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_NONE; ?>" <?php if ($formData['general']['number_of_items_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_VALUE; ?>" <?php if ($formData['general']['number_of_items_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($formData['general']['number_of_items_mode'] == Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_ATTRIBUTE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute') ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php if ($formData['general']['number_of_items_custom_attribute'] != '' && !$magentoAttributeHelper->isExistInAttributesArray($formData['general']['number_of_items_custom_attribute'], $generalAttributesByInputTypes['text_select'])) : ?>
+                                    <option attribute_code="<?php echo $formData['general']['number_of_items_custom_attribute']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_ATTRIBUTE ?>" selected="selected" >
+                                        <?php echo $magentoAttributeHelper->getAttributeLabel($formData['general']['number_of_items_custom_attribute']); ?>
+                                    </option>
+                                <?php endif; ?>
+                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($attribute['code'] == $formData['general']['number_of_items_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
                         </select>
                         <p class="note">
                             <?php echo Mage::helper('M2ePro')->__(
@@ -508,32 +498,6 @@
                     </td>
                     <td class="value">
                         <input id="number_of_items_custom_value" name="general[number_of_items_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['general']['number_of_items_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validate-greater-than" min_value="1" />
-                    </td>
-                </tr>
-
-                <tr class="hide-when-asin-is-disabled entry-edit" id="number_of_items_custom_attribute_tr">
-                    <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Number of Items Attribute'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="number_of_items_attribute_td">
-                            <select id="number_of_items_custom_attribute" name="general[number_of_items_custom_attribute]" class="M2ePro-required-when-visible">
-                                <option style="display: none;"></option>
-                                <?php if ($formData['general']['number_of_items_custom_attribute'] != '' && !$magentoAttributeHelper->isExistInAttributesArray($formData['general']['number_of_items_custom_attribute'], $generalAttributesByInputTypes['text_select'])) : ?>
-                                    <option value="<?php echo $formData['general']['number_of_items_custom_attribute']; ?>" selected="selected" >
-                                        <?php echo $magentoAttributeHelper->getAttributeLabel($formData['general']['number_of_items_custom_attribute']); ?>
-                                    </option>
-                                <?php endif; ?>
-                                <?php foreach($generalAttributesByInputTypes['text_select'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['general']['number_of_items_custom_attribute']): ?>selected="selected"<?php endif; ?>>
-                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose the attribute that contains Number Of Items.'); ?></span>
-                        </p>
                     </td>
                 </tr>
 

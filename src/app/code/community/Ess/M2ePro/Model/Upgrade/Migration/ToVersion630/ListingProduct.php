@@ -9,6 +9,8 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_ListingProduct
     /** @var Ess_M2ePro_Model_Upgrade_MySqlSetup */
     private $installer = NULL;
 
+    private $forceAllSteps = false;
+
     //####################################
 
     public function getInstaller()
@@ -19,6 +21,13 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_ListingProduct
     public function setInstaller(Ess_M2ePro_Model_Upgrade_MySqlSetup $installer)
     {
         $this->installer = $installer;
+    }
+
+    // -----------------------------------
+
+    public function setForceAllSteps($value = true)
+    {
+        $this->forceAllSteps = $value;
     }
 
     //####################################
@@ -92,6 +101,10 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_ListingProduct
 
     private function isNeedToSkip()
     {
+        if ($this->forceAllSteps) {
+            return false;
+        }
+
         $connection = $this->installer->getConnection();
 
         $tempTable = $this->installer->getTable('m2epro_amazon_listing_product');
@@ -248,7 +261,12 @@ SQL
 
     private function processSearch()
     {
-        $this->installer->run(<<<SQL
+        $connection = $this->installer->getConnection();
+        $tempTable  = $this->installer->getTable('m2epro_amazon_listing_product');
+
+        if ($connection->tableColumnExists($tempTable, 'general_id_search_status') !== false) {
+
+            $this->installer->run(<<<SQL
 
 UPDATE `m2epro_amazon_listing_product`
 SET general_id_search_status = 0,
@@ -262,11 +280,8 @@ UPDATE `m2epro_play_listing_product`
 SET general_id_search_status = 0,
     general_id_search_suggest_data = NULL;
 SQL
-        );
-
-        $connection = $this->installer->getConnection();
-
-        $tempTable = $this->installer->getTable('m2epro_amazon_listing_product');
+            );
+        }
 
         if ($connection->tableColumnExists($tempTable, 'general_id_search_status') !== false &&
             $connection->tableColumnExists($tempTable, 'search_settings_status') === false) {

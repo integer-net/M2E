@@ -35,7 +35,7 @@ CommonAmazonTemplateDescriptionHandler = Class.create(CommonHandler, {
         var self = this;
 
         self.setValidationCheckRepetitionValue('M2ePro-description-template-title',
-                                                M2ePro.translator.translate('The specified title is already used for another policy. Policy title must be unique.'),
+                                                M2ePro.translator.translate('The specified Title is already used for another Policy. Policy Title must be unique.'),
                                                 'Template_Description', 'title', 'id',
                                                 M2ePro.formData.general.id,
                                                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Amazon::NICK'));
@@ -100,7 +100,7 @@ CommonAmazonTemplateDescriptionHandler = Class.create(CommonHandler, {
     duplicate_click: function($headId)
     {
         this.setValidationCheckRepetitionValue('M2ePro-description-template-title',
-                                                M2ePro.translator.translate('The specified title is already used for another policy. Policy title must be unique.'),
+                                                M2ePro.translator.translate('The specified Title is already used for another Policy. Policy Title must be unique.'),
                                                 'Template_Description', 'title', '','',
                                                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Amazon::NICK'));
 
@@ -184,7 +184,15 @@ CommonAmazonTemplateDescriptionHandler = Class.create(CommonHandler, {
         if (this.value == 1) {
 
             onlyAsinBlocks.invoke('show');
-            $('worldwide_id_mode').simulate('change');
+
+            var worldWideIdMode = $('worldwide_id_mode');
+            worldWideIdMode.simulate('change');
+
+            if ($('registered_parameter').value == '' &&
+                $('worldwide_id_custom_attribute').value == '') {
+                worldWideIdMode.value = -1;
+            }
+
             $('item_package_quantity_mode').simulate('change');
             $('number_of_items_mode').simulate('change');
         }
@@ -218,58 +226,68 @@ CommonAmazonTemplateDescriptionHandler = Class.create(CommonHandler, {
 
     onChangeWorldwideId: function()
     {
-        var target = $('worldwide_id_custom_attribute_tr');
+        var target = $('worldwide_id_custom_attribute');
 
-        target.hide();
+        target.value = '';
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE')) {
-            target.show();
+            AmazonTemplateDescriptionHandlerObj.updateHiddenValue(this, target);
         }
     },
 
     onChangeRegisteredParameter: function()
     {
         var worldwideIdMode = $('worldwide_id_mode'),
-            noneOption      = worldwideIdMode.down('option');
-
-        !this.value ? noneOption.hide() : noneOption.show();
+            noneOption      = worldwideIdMode.down('option'),
+            currentValue    = worldwideIdMode.getAttribute('data-current-value');
 
         if (!this.value) {
-            worldwideIdMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_CUSTOM_ATTRIBUTE');
+            noneOption.hide();
             worldwideIdMode.simulate('change');
+
+            if ($('worldwide_id_custom_attribute').value == '') {
+                worldwideIdMode.selectedIndex = -1;
+            }
+        } else {
+            noneOption.show();
+            if (currentValue == '') {
+                worldwideIdMode.value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description::WORLDWIDE_ID_MODE_NONE');
+            }
+            $('worldwide_id_custom_attribute').value = ''
         }
+        worldwideIdMode.setAttribute('data-current-value', '');
     },
 
     onChangeItemPackageQuantityMode: function()
     {
         var targetCustomValue     = $('item_package_quantity_custom_value_tr'),
-            targetCustomAttribute = $('item_package_quantity_custom_attribute_tr');
+            targetCustomAttribute = $('item_package_quantity_custom_attribute');
 
         targetCustomValue.hide();
-        targetCustomAttribute.hide();
 
+        targetCustomAttribute.value = '';
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_VALUE')) {
             targetCustomValue.show();
         }
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description::ITEM_PACKAGE_QUANTITY_MODE_CUSTOM_ATTRIBUTE')) {
-            targetCustomAttribute.show();
+            AmazonTemplateDescriptionHandlerObj.updateHiddenValue(this, targetCustomAttribute);
         }
     },
 
     onChangeNumberOfItemsMode: function()
     {
         var targetCustomValue     = $('number_of_items_custom_value_tr'),
-            targetCustomAttribute = $('number_of_items_custom_attribute_tr');
+            targetCustomAttribute = $('number_of_items_custom_attribute');
 
         targetCustomValue.hide();
-        targetCustomAttribute.hide();
 
+        targetCustomAttribute.value = '';
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_VALUE')) {
             targetCustomValue.show();
         }
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description::NUMBER_OF_ITEMS_MODE_CUSTOM_ATTRIBUTE')) {
-            targetCustomAttribute.show();
+            AmazonTemplateDescriptionHandlerObj.updateHiddenValue(this, targetCustomAttribute);
         }
     },
 

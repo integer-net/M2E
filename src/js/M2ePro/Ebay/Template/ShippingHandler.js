@@ -26,7 +26,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
             return $('address').value != '' || $('postal_code').value != '';
         });
 
-        Validation.add('M2ePro-validate-international-ship-to-location', M2ePro.translator.translate('Select one or more international ship-to locations.'), function(value, el) {
+        Validation.add('M2ePro-validate-international-ship-to-location', M2ePro.translator.translate('Select one or more international ship-to Locations.'), function(value, el) {
             return $$('input[name="'+el.name+'"]').any(function(o) {
                 return o.checked;
             });
@@ -42,7 +42,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
             return true;
         });
 
-        Validation.add('M2ePro-validate-shipping-methods', M2ePro.translator.translate('You should specify at least one shipping method.'), function(value, el) {
+        Validation.add('M2ePro-validate-shipping-methods', M2ePro.translator.translate('You should specify at least one Shipping Method.'), function(value, el) {
 
             var locationType = /local/.test(el.id) ? 'local' : 'international',
                 shippingModeValue = $(locationType + '_shipping_mode').value;
@@ -84,50 +84,6 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
     simple_mode_disallowed_hide: function()
     {
         $$('#template_shipping_data_container .simple_mode_disallowed').invoke('hide');
-    },
-
-    //----------------------------------
-
-    countryChange: function()
-    {
-        if (EbayTemplateShippingHandlerObj.originCountry === null || $('country').value == '') {
-            return;
-        }
-
-        var isDifferentCountry = !!($('country').value.toLowerCase() != EbayTemplateShippingHandlerObj.originCountry);
-
-        $$("tr[id^='shipping_variant_']").each(function(row) {
-            if (row.id.indexOf('%') >= 0) {
-                return;
-            }
-
-            var shippingService = row.select('.shipping-service');
-            if (shippingService.length) {
-                shippingService[0].select('optgroup').each(function(optGroup) {
-                    if (!optGroup.hasAttribute('ebay_id')) {
-                        return;
-                    }
-                    var otherOrPickupService =
-                        !!(['OTHER'].indexOf(optGroup.getAttribute('ebay_id').toUpperCase()) != -1);
-
-                    if (isDifferentCountry ^ otherOrPickupService) {
-                        optGroup.setAttribute("disabled", "disabled");
-                        optGroup.childElements().each(function(el) {
-                            el.setAttribute("disabled", "disabled");
-                            el.removeAttribute("selected");
-                            el.value == shippingService[0].value && shippingService[0].options[0] &&
-                            shippingService[0].options[0].show().setAttribute('selected', true);
-                        });
-                        shippingService[0].insert({bottom: optGroup});
-                    } else {
-                        optGroup.removeAttribute("disabled");
-                        optGroup.childElements().each(function(el) {
-                            el.removeAttribute("disabled");
-                        });
-                    }
-                });
-            }
-        });
     },
 
     //----------------------------------
@@ -1027,7 +983,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         if (locationType == 'international') {
             html += '<option value="">--</option>';
         } else {
-            html += '<option value="">'+ M2ePro.translator.translate('Select shipping service') +'</option>';
+            html += '<option value="">'+ M2ePro.translator.translate('Select Shipping Service') +'</option>';
         }
 
         if (Object.isArray(EbayTemplateShippingHandlerObj.shippingServices) && EbayTemplateShippingHandlerObj.shippingServices.length == 0) {
@@ -1073,7 +1029,6 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         });
 
         $(el).update(html);
-        EbayTemplateShippingHandlerObj.countryChange();
     },
 
     //----------------------------------
@@ -1410,7 +1365,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
             titleContainer = $('excluded_locations_titles');
 
         title == M2ePro.translator.translate('None')
-            ? titleContainer.innerHTML = M2ePro.translator.translate('No locations are currently excluded.')
+            ? titleContainer.innerHTML = M2ePro.translator.translate('No Locations are currently excluded.')
             : titleContainer.innerHTML = title;
 
         $('excluded_locations_hidden').value = $('excluded_locations_popup_hidden').value;
@@ -1424,7 +1379,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
         if (window == 'general') {
             $('excluded_locations_hidden').value = '[]';
-            $('excluded_locations_titles').innerHTML = M2ePro.translator.translate('No locations are currently excluded.');
+            $('excluded_locations_titles').innerHTML = M2ePro.translator.translate('No Locations are currently excluded.');
             return;
         }
 
@@ -1616,7 +1571,7 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
         var excludedLocations = $(sourse.replace('titles','hidden')).value.evalJSON(),
             title = sourse == 'excluded_locations_popup_titles'
                 ? M2ePro.translator.translate('None')
-                : M2ePro.translator.translate('No locations are currently excluded.');
+                : M2ePro.translator.translate('No Locations are currently excluded.');
 
         if (excludedLocations.length) {
 

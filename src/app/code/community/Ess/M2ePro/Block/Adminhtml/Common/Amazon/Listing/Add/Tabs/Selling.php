@@ -62,6 +62,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_Tabs_Selling
             'condition_note_mode' => Ess_M2ePro_Model_Amazon_Listing::CONDITION_NOTE_MODE_NONE,
             'condition_note_value' => '',
 
+            'image_main_mode' => Ess_M2ePro_Model_Amazon_Listing::IMAGE_MAIN_MODE_NONE,
+            'image_main_attribute' => '',
+            'gallery_images_mode' => Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_MODE_NONE,
+            'gallery_images_limit' => '',
+            'gallery_images_attribute' => '',
+
             'handling_time_mode' => Ess_M2ePro_Model_Amazon_Listing::HANDLING_TIME_MODE_NONE,
             'handling_time_value' => '',
             'handling_time_custom_attribute' => '',

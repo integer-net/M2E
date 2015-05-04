@@ -10,9 +10,9 @@
 class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
     // M2ePro_TRANSLATIONS
-    // Product import is disabled in Amazon Account settings.
-    // Product for Amazon Item "%id%" was created in Magento catalog.
-    // Product for Amazon Item "%title%" was created in Magento catalog.
+    // Product Import is disabled in Amazon Account Settings.
+    // Product for Amazon Item "%id%" was Created in Magento Catalog.
+    // Product for Amazon Item "%title%" was Created in Magento Catalog.
 
     // ########################################
 
@@ -246,13 +246,13 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
 
         if (!is_null($channelItem) && !$this->getAmazonAccount()->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for Items listed by M2E Pro is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($channelItem) && !$this->getAmazonAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for Items listed by 3rd party software is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by 3rd party software is disabled in Account Settings.'
             );
         }
     }
@@ -260,7 +260,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
     private function createProduct()
     {
         if (!$this->getAmazonAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product import is disabled in Amazon Account settings.');
+            throw new Exception('Product Import is disabled in Amazon Account Settings.');
         }
 
         $storeId = $this->getAmazonAccount()->getMagentoOrdersListingsOtherStoreId();
@@ -305,7 +305,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         // ----------------
 
         $this->getParentObject()->getOrder()->addSuccessLog(
-            'Product for Amazon Item "%title%" was created in Magento catalog.', array('!title' => $this->getTitle())
+            'Product for Amazon Item "%title%" was Created in Magento Catalog.', array('!title' => $this->getTitle())
         );
 
         return $productBuilder->getProduct();

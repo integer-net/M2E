@@ -1,5 +1,5 @@
 <div id="block_notice_buy_template_synchronization_relist" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Relist Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('If <strong>Relist Action</strong> is enabled, M2E Pro will relist Items on Rakuten.com if they meet all the conditions you set.<br/>'); ?>
+    <?php echo Mage::helper('M2ePro')->__('If <strong>Relist Action</strong> is enabled, M2E Pro will Relist Items on Rakuten.com if they meet all the Conditions you set.<br/>'); ?>
 </div>
 
 <?php
@@ -69,7 +69,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_MODE_YES; ?>" <?php if ($formData['relist_mode'] == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Enables/Disables the Relist action for the Listings, which use current Synchronization Policy.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Enables/Disables the Relist Action for the Listings, which use current Synchronization Policy.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -84,7 +84,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_FILTER_USER_LOCK_NONE; ?>" <?php if ($formData['relist_filter_user_lock'] == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_FILTER_USER_LOCK_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically relists Item(s) even it has been stopped manually within M2EPro.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically Relists Item(s) even it has been Stopped manually within M2E Pro.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -117,7 +117,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_STATUS_ENABLED_YES; ?>" <?php if ($formData['relist_status_enabled'] == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_STATUS_ENABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Product Status at which the Item(s) have to be relisted.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Product Status at which the Item(s) have to be Relisted.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -132,7 +132,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_IS_IN_STOCK_YES; ?>" <?php if ($formData['relist_is_in_stock'] == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_IS_IN_STOCK_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('In Stock'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Stock Availability at which the Item(s) have to be relisted.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Stock Availability at which the Item(s) have to be Relisted.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -149,7 +149,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_QTY_BETWEEN; ?>" <?php if ($formData['relist_qty_magento'] == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Magento Product(s) Quantity at which the Item(s) have to be relisted.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Magento Product(s) Quantity at which the Item(s) have to be Relisted.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -187,7 +187,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_QTY_BETWEEN; ?>" <?php if ($formData['relist_qty_calculated'] == Ess_M2ePro_Model_Buy_Template_Synchronization::RELIST_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Calculated Quantity according to the selling format policy at which the Item(s) have to be relisted.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Calculated Quantity according to the Selling Format Policy at which the Item(s) have to be Relisted.'); ?></span>
                         </p>
                     </td>
                 </tr>

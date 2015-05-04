@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Stop_Validator
 {
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         $params = $this->getParams();
 
@@ -22,7 +22,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Stop_Validator
             if (empty($params['remove'])) {
 
                 // M2ePro_TRANSLATIONS
-                // Item is not listed or not available
+                // Item is not Listed or not available
                 $this->addMessage('Item is not active or not available');
 
             } else {

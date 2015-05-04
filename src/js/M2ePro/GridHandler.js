@@ -137,7 +137,7 @@ GridHandler = Class.create(CommonHandler, {
         var selectAction = true;
         $$('select#'+this.gridId+'_massaction-select option').each(function(o) {
             if (o.selected && o.value == '') {
-                alert(M2ePro.translator.translate('Please select action.'));
+                alert(M2ePro.translator.translate('Please select Action.'));
                 selectAction = false;
                 return;
             }
@@ -160,7 +160,7 @@ GridHandler = Class.create(CommonHandler, {
             }
 
             if (!o.value || !this.actions[o.value + 'Action']) {
-                return alert(M2ePro.translator.translate('Please select action.'));
+                return alert(M2ePro.translator.translate('Please select Action.'));
             }
 
             this.actions[o.value + 'Action']();
@@ -238,7 +238,7 @@ GridHandler = Class.create(CommonHandler, {
     createSynchNoteHtml: function(synchNote)
     {
 
-        return '<div style="text-align: left"><ul class="messages"><li class="error-msg"><ul>' +
+        return '<div style="text-align: left"><ul class="messages"><li class="warning-msg"><ul>' +
                     '<li>'+synchNote+'</li>' +
         '</ul></li></ul></div>';
     },

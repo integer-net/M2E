@@ -161,7 +161,7 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
         var self = EbayConfigurationCategoryHandlerObj;
 
         var skipConfirmation = getCookie('ebay_configuration_category_skip_save_confirmation');
-        var confirmText = M2ePro.translator.translate('<b>Note:</b> All changes you have made will be automatically applied to all M2E Pro listings where this category is used.');
+        var confirmText = M2ePro.translator.translate('<b>Note:</b> All changes you have made will be automatically applied to all M2E Pro Listings where this Category is used.');
 
         if (skipConfirmation) {
             okCallback(type, isEdit);

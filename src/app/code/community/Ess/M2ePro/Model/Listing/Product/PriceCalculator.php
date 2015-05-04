@@ -250,7 +250,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_PriceCalculator
                 break;
 
             default:
-                throw new LogicException('Unknown mode in database.');
+                throw new LogicException('Unknown Mode in Database.');
         }
 
         $value < 0 && $value = 0;
@@ -294,7 +294,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_PriceCalculator
                 break;
 
             default:
-                throw new LogicException('Unknown mode in database.');
+                throw new LogicException('Unknown Mode in Database.');
         }
 
         $value < 0 && $value = 0;

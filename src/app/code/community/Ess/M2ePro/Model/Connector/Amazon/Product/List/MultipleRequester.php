@@ -113,10 +113,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
 
             $validator = $this->getGeneralValidatorObject($listingProduct);
 
-            if ($validator->isValid()) {
-                $this->addValidatorsData($listingProduct, $validator->getData());
-                continue;
-            }
+            $validationResult = $validator->validate();
 
             foreach ($validator->getMessages() as $message) {
                 $this->getLogger()->logListingProductMessage(
@@ -125,6 +122,11 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
                     $message['type'],
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+            }
+
+            if ($validationResult) {
+                $this->addValidatorsData($listingProduct, $validator->getData());
+                continue;
             }
 
             $this->removeAndUnlockListingProduct($listingProduct->getId());
@@ -137,10 +139,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
 
             $validator = $this->getSkuGeneralValidatorObject($listingProduct);
 
-            if ($validator->isValid()) {
-                $this->addValidatorsData($listingProduct, $validator->getData());
-                continue;
-            }
+            $validationResult = $validator->validate();
 
             foreach ($validator->getMessages() as $message) {
                 $this->getLogger()->logListingProductMessage(
@@ -149,6 +148,11 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
                     $message['type'],
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+            }
+
+            if ($validationResult) {
+                $this->addValidatorsData($listingProduct, $validator->getData());
+                continue;
             }
 
             $this->removeAndUnlockListingProduct($listingProduct->getId());
@@ -166,11 +170,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
             $validator->setRequestSkus($requestSkus);
             $validator->setQueueOfSkus($queueOfSkus);
 
-            if ($validator->isValid()) {
-                $requestSkus[] = $validator->getData('sku');
-                $this->addValidatorsData($listingProduct, $validator->getData());
-                continue;
-            }
+            $validationResult = $validator->validate();
 
             foreach ($validator->getMessages() as $message) {
                 $this->getLogger()->logListingProductMessage(
@@ -181,12 +181,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
                 );
             }
 
+            if ($validationResult) {
+                $requestSkus[] = $validator->getData('sku');
+                $this->addValidatorsData($listingProduct, $validator->getData());
+                continue;
+            }
+
             $this->removeAndUnlockListingProduct($listingProduct->getId());
         }
     }
 
     private function processSkuExistenceValidateAndFilter()
     {
+        /** @var Ess_M2ePro_Model_Listing_Product[][] $listingProductsPacks */
         $listingProductsPacks = array_chunk($this->listingsProducts,20,true);
 
         foreach ($listingProductsPacks as $listingProductsPack) {
@@ -244,10 +251,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
                 $validator = $this->getSkuExistenceValidatorObject($listingProduct);
                 $validator->setExistenceResult($existenceResult);
 
-                if ($validator->isValid()) {
-                    $this->addValidatorsData($listingProduct, $validator->getData());
-                    continue;
-                }
+                $validationResult = $validator->validate();
 
                 foreach ($validator->getMessages() as $message) {
                     $this->getLogger()->logListingProductMessage(
@@ -256,6 +260,11 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
                         $message['type'],
                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                     );
+                }
+
+                if ($validationResult) {
+                    $this->addValidatorsData($listingProduct, $validator->getData());
+                    continue;
                 }
 
                 $this->removeAndUnlockListingProduct($listingProduct->getId());
@@ -272,13 +281,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
             $validator = $this->getListTypeValidatorObject($listingProduct);
             $validator->setChildGeneralIdsForParent($childGeneralIdsForParent);
 
-            if ($validator->isValid()) {
-                $this->addValidatorsData($listingProduct, $validator->getData());
-                $childGeneralIdsForParent = array_merge(
-                    $childGeneralIdsForParent, $validator->getChildGeneralIdsForParent()
-                );
-                continue;
-            }
+            $validationResult = $validator->validate();
 
             foreach ($validator->getMessages() as $message) {
                 $this->getLogger()->logListingProductMessage(
@@ -287,6 +290,14 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
                     $message['type'],
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+            }
+
+            if ($validationResult) {
+                $this->addValidatorsData($listingProduct, $validator->getData());
+                $childGeneralIdsForParent = array_merge(
+                    $childGeneralIdsForParent, $validator->getChildGeneralIdsForParent()
+                );
+                continue;
             }
 
             $this->removeAndUnlockListingProduct($listingProduct->getId());

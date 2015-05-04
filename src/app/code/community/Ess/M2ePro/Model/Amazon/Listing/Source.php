@@ -183,5 +183,107 @@ class Ess_M2ePro_Model_Amazon_Listing_Source
         return trim($result);
     }
 
+    //-----------------------------------------
+
+    public function getMainImageLink()
+    {
+        $imageLink = '';
+
+        if ($this->getAmazonListing()->isImageMainModeProduct()) {
+            $imageLink = $this->getMagentoProduct()->getImageLink('image');
+        }
+
+        if ($this->getAmazonListing()->isImageMainModeAttribute()) {
+            $src = $this->getAmazonListing()->getImageMainSource();
+            $imageLink = $this->getMagentoProduct()->getImageLink($src['attribute']);
+        }
+
+        return $imageLink;
+    }
+
+    public function getImages()
+    {
+        if ($this->getAmazonListing()->isImageMainModeNone()) {
+            return array();
+        }
+
+        $allowedConditionValues = array(
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_USED_LIKE_NEW,
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_USED_VERY_GOOD,
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_USED_GOOD,
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_USED_ACCEPTABLE,
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_COLLECTIBLE_LIKE_NEW,
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_COLLECTIBLE_VERY_GOOD,
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_COLLECTIBLE_GOOD,
+            Ess_M2ePro_Model_Amazon_Listing::CONDITION_COLLECTIBLE_ACCEPTABLE
+        );
+
+        $conditionData = $this->getAmazonListing()->getConditionSource();
+
+        if ($this->getAmazonListing()->isConditionDefaultMode() &&
+            !in_array($conditionData['value'], $allowedConditionValues)) {
+            return array();
+        }
+
+        if ($this->getAmazonListing()->isConditionAttributeMode()) {
+            $tempConditionValue = $this->getMagentoProduct()->getAttributeValue($conditionData['attribute']);
+
+            if (!in_array($tempConditionValue, $allowedConditionValues)) {
+                return array();
+            }
+        }
+
+        $mainImage = $this->getMainImageLink();
+
+        if ($mainImage == '') {
+            return array();
+        }
+
+        $mainImage = array($mainImage);
+
+        if ($this->getAmazonListing()->isGalleryImagesModeNone()) {
+            return $mainImage;
+        }
+
+        $galleryImages = array();
+        $gallerySource = $this->getAmazonListing()->getGalleryImagesSource();
+        $limitGalleryImages = Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_COUNT_MAX;
+
+        if ($this->getAmazonListing()->isGalleryImagesModeProduct()) {
+
+            $limitGalleryImages = (int)$gallerySource['limit'];
+            $galleryImages = $this->getMagentoProduct()->getGalleryImagesLinks($limitGalleryImages + 1);
+        }
+
+        if ($this->getAmazonListing()->isGalleryImagesModeAttribute()) {
+
+            $limitGalleryImages = Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_COUNT_MAX;
+            $galleryImagesTemp = $this->getMagentoProduct()->getAttributeValue($gallerySource['attribute']);
+
+            $galleryImagesTemp = (array)explode(',', $galleryImagesTemp);
+            foreach ($galleryImagesTemp as $tempImageLink) {
+
+                $tempImageLink = trim($tempImageLink);
+                if (!empty($tempImageLink)) {
+                    $galleryImages[] = $tempImageLink;
+                }
+            }
+        }
+
+        $galleryImages = array_unique($galleryImages);
+
+        if (count($galleryImages) <= 0) {
+            return $mainImage;
+        }
+
+        $mainImagePosition = array_search($mainImage[0], $galleryImages);
+        if ($mainImagePosition !== false) {
+            unset($galleryImages[$mainImagePosition]);
+        }
+
+        $galleryImages = array_slice($galleryImages,0,$limitGalleryImages);
+        return array_merge($mainImage, $galleryImages);
+    }
+
     // ########################################
 }

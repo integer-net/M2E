@@ -137,12 +137,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Feedbacks_Response
 
         $feedback->sendResponse($body,Ess_M2ePro_Model_Ebay_Feedback::TYPE_POSITIVE);
 
-        $this->getActualOperationHistory()->appendText('Send feedback for "'.$feedback->getData('buyer_name').'"');
+        $this->getActualOperationHistory()->appendText('Send Feedback for "'.$feedback->getData('buyer_name').'"');
         $this->getActualOperationHistory()->appendText(
             'His feedback "'.$feedback->getData('buyer_feedback_text').
             '" ('.$feedback->getData('buyer_feedback_type').')'
         );
-        $this->getActualOperationHistory()->appendText('Our feedback "'.$body.'"');
+        $this->getActualOperationHistory()->appendText('Our Feedback "'.$body.'"');
 
         $this->getActualOperationHistory()->saveBufferString();
     }

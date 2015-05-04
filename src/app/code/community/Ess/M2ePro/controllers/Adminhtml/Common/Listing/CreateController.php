@@ -237,8 +237,8 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
             NULL,
             Ess_M2ePro_Model_Listing_Log::ACTION_ADD_LISTING,
             // M2ePro_TRANSLATIONS
-            // Listing was successfully added
-            'Listing was successfully added',
+            // Listing was successfully Added
+            'Listing was successfully Added',
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
         );

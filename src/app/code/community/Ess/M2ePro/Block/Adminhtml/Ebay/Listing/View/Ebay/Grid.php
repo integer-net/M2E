@@ -643,9 +643,9 @@ HTML;
         }
 
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Action was completed with warning(s).'
         );
 
         $icons = array(
@@ -828,22 +828,22 @@ HTML;
         ));
 
         // M2ePro_TRANSLATIONS
-        // %task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.
+        // %task_title%" task has completed with warnings. <a target="_blank" href="%url%">View Log</a> for details.
         $tempString = '"%task_title%" task has completed with warnings. ';
-        $tempString .= '<a target="_blank" href="%url%">View log</a> for details.';
+        $tempString .= '<a target="_blank" href="%url%">View Log</a> for details.';
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__($tempString));
 
         // M2ePro_TRANSLATIONS
-        // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.
+        // "%task_title%" task has completed with errors. <a target="_blank" href="%url%">View Log</a> for details.
         $tempString = '"%task_title%" task has completed with errors. ';
-        $tempString .= '<a target="_blank" href="%url%">View log</a> for details.';
+        $tempString .= '<a target="_blank" href="%url%">View Log</a> for details.';
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__($tempString));
 
         $sendingDataToEbayMessage = $helper->escapeJs($helper->__('Sending %product_title% Product(s) data on eBay.'));
         $viewAllProductLogMessage = $helper->escapeJs($helper->__('View All Product Log.'));
 
         $listingLockedMessage = Mage::helper('M2ePro')->escapeJs(
-            Mage::helper('M2ePro')->__('The listing was locked by another process. Please try again later.')
+            Mage::helper('M2ePro')->__('The Listing was locked by another process. Please try again later.')
         );
         $listingEmptyMessage = Mage::helper('M2ePro')->escapeJs(
             Mage::helper('M2ePro')->__('Listing is empty.')
@@ -868,9 +868,9 @@ HTML;
         );
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the Products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
-        $selectActionMessage = $helper->escapeJs($helper->__('Please select action.'));
+        $selectActionMessage = $helper->escapeJs($helper->__('Please select Action.'));
 
         $successWord = $helper->escapeJs($helper->__('Success'));
         $noticeWord = $helper->escapeJs($helper->__('Notice'));
@@ -884,17 +884,17 @@ HTML;
         $tryToMoveToListing = $this->getUrl('*/adminhtml_listing_moving/tryToMoveToListing');
         $moveToListing = $this->getUrl('*/adminhtml_listing_moving/moveToListing');
 
-        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully moved.'));
+        $successfullyMovedMessage = $helper->escapeJs($helper->__('Product(s) was successfully Moved.'));
         $productsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Product(s) was not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
         $someProductsWereNotMovedMessage = $helper->escapeJs(
-            $helper->__('Some Product(s) was not moved. <a target="_blank" href="%url%">View log</a> for details.')
+            $helper->__('Some Product(s) was not Moved. <a target="_blank" href="%url%">View Log</a> for details.')
         );
 
         $popupTitle = $helper->escapeJs($helper->__('Moving eBay Items'));
         $popupTitleSingle = $helper->escapeJs($helper->__('Moving eBay Item'));
-        $failedProductsPopupTitle = $helper->escapeJs($helper->__('Product(s) failed to move'));
+        $failedProductsPopupTitle = $helper->escapeJs($helper->__('Product(s) failed to Move'));
 
         $translations = json_encode(array(
             'eBay Categories' => Mage::helper('M2ePro')->__('eBay Categories'),

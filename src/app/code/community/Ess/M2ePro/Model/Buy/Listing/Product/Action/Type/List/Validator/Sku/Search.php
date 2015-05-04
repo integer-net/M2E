@@ -29,7 +29,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Search
 
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         $sku = $this->getSku();
 
@@ -117,7 +117,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Search
     {
         if ($this->isExistInRequestSkus($sku)) {
 
-            $addMessages && $this->addMessage('Product with the same Reference ID is being listed on Rakuten.com .');
+            $addMessages && $this->addMessage('Product with the same Reference ID is being Listed on Rakuten.com .');
             return true;
         }
 

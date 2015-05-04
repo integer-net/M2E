@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Relist_Validator
 {
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         if (!$this->validateBlocked()) {
             return false;
@@ -38,9 +38,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Relist_Validator
         if (!$this->getListingProduct()->isStopped() || !$this->getListingProduct()->isRelistable()) {
 
             // M2ePro_TRANSLATIONS
-            // The Item either is listed, or not listed yet or not available
+            // The Item either is Listed, or not Listed yet or not available
             $this->addMessage(
-                'The Item either is listed, or not listed yet or not available'
+                'The Item either is Listed, or not Listed yet or not available'
             );
 
             return false;

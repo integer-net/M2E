@@ -9,6 +9,8 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_General
     /** @var Ess_M2ePro_Model_Upgrade_MySqlSetup */
     private $installer = NULL;
 
+    private $forceAllSteps = false;
+
     //####################################
 
     public function getInstaller()
@@ -19,6 +21,13 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_General
     public function setInstaller(Ess_M2ePro_Model_Upgrade_MySqlSetup $installer)
     {
         $this->installer = $installer;
+    }
+
+    // -----------------------------------
+
+    public function setForceAllSteps($value = true)
+    {
+        $this->forceAllSteps = $value;
     }
 
     //####################################
@@ -58,6 +67,10 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_General
 
     private function isNeedToSkip()
     {
+        if ($this->forceAllSteps) {
+            return false;
+        }
+
         $connection = $this->installer->getConnection();
 
         $tempTable = $this->installer->getTable('m2epro_amazon_template_synchronization');
@@ -72,13 +85,7 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_General
 
     private function processAttributeSet()
     {
-        $connection = $this->getInstaller()->getConnection();
-
-        $tempTable = $this->getInstaller()->getTable('m2epro_attribute_set');
-
-        if ($connection->isTableExists($tempTable) !== false) {
-            $connection->dropTable($tempTable);
-        }
+        $this->getInstaller()->run("DROP TABLE IF EXISTS m2epro_attribute_set;");
     }
 
     private function processRegistry()
@@ -107,32 +114,84 @@ SQL
     {
         $connection = $this->installer->getConnection();
 
-        $tempTable = $this->installer->getTable('m2epro_listing_log');
-        $stmt = $connection->query("SELECT count(*) FROM {$tempTable}");
+        $tempNewTable    = $this->installer->getTable('m2epro_listing_log');
+        $tempBackupTable = $this->installer->getTable('m2epro_backup_v630_listing_log');
 
-        if ((int)$stmt->fetchColumn() > 100000) {
-            $this->installer->run("TRUNCATE TABLE `m2epro_listing_log`");
+        if ($connection->tableColumnExists($tempNewTable, 'additional_data') !== false &&
+            $connection->tableColumnExists($tempNewTable, 'parent_listing_product_id') !== false) {
+
+            return;
         }
 
-        if ($connection->tableColumnExists($tempTable, 'additional_data') === false) {
-            $connection->addColumn(
-                $tempTable, 'additional_data',
-                'TEXT DEFAULT NULL AFTER product_title'
-            );
-        }
+        $this->getInstaller()->run(<<<SQL
+RENAME TABLE m2epro_listing_log TO {$tempBackupTable};
 
-        if ($connection->tableColumnExists($tempTable, 'parent_listing_product_id') === false) {
-            $connection->addColumn(
-                $tempTable, 'parent_listing_product_id',
-                'int(11) UNSIGNED DEFAULT NULL AFTER listing_product_id'
-            );
-        }
+CREATE TABLE m2epro_listing_log (
+    id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    listing_id INT(11) UNSIGNED DEFAULT NULL,
+    product_id INT(11) UNSIGNED DEFAULT NULL,
+    listing_product_id INT(11) UNSIGNED DEFAULT NULL,
+    parent_listing_product_id int(11) UNSIGNED DEFAULT NULL,
+    listing_title VARCHAR(255) DEFAULT NULL,
+    product_title VARCHAR(255) DEFAULT NULL,
+    additional_data TEXT DEFAULT NULL,
+    action_id INT(11) UNSIGNED DEFAULT NULL,
+    action TINYINT(2) UNSIGNED NOT NULL DEFAULT 1,
+    initiator TINYINT(2) UNSIGNED NOT NULL DEFAULT 0,
+    creator VARCHAR(255) DEFAULT NULL,
+    type TINYINT(2) UNSIGNED NOT NULL DEFAULT 1,
+    priority TINYINT(2) UNSIGNED NOT NULL DEFAULT 3,
+    description TEXT DEFAULT NULL,
+    component_mode VARCHAR(10) DEFAULT NULL,
+    update_date DATETIME DEFAULT NULL,
+    create_date DATETIME DEFAULT NULL,
+    PRIMARY KEY (id),
+    INDEX action (action),
+    INDEX action_id (action_id),
+    INDEX component_mode (component_mode),
+    INDEX creator (creator),
+    INDEX initiator (initiator),
+    INDEX listing_id (listing_id),
+    INDEX listing_product_id (listing_product_id),
+    INDEX parent_listing_product_id (parent_listing_product_id),
+    INDEX listing_title (listing_title),
+    INDEX priority (priority),
+    INDEX product_id (product_id),
+    INDEX product_title (product_title),
+    INDEX type (type)
+)
+ENGINE = MYISAM
+CHARACTER SET utf8
+COLLATE utf8_general_ci;
 
-        $tempTableIndexList = $connection->getIndexList($tempTable);
+INSERT INTO `m2epro_listing_log`
+SELECT
+    `id`,
+    `listing_id`,
+    `product_id`,
+    `listing_product_id`,
+    NULL,
+    `listing_title`,
+    `product_title`,
+    NULL,
+    `action_id`,
+    `action`,
+    `initiator`,
+    `creator`,
+    `type`,
+    `priority`,
+    `description`,
+    `component_mode`,
+    `update_date`,
+    `create_date`
+FROM {$tempBackupTable} old
+ORDER BY `old`.`id` DESC
+LIMIT 100000;
 
-        if (!isset($tempTableIndexList[strtoupper('parent_listing_product_id')])) {
-            $connection->addKey($tempTable, 'parent_listing_product_id', 'parent_listing_product_id');
-        }
+DROP TABLE {$tempBackupTable};
+
+SQL
+        );
     }
 
     private function processAmazonTemplates()

@@ -9,6 +9,8 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_Marketplace
     /** @var Ess_M2ePro_Model_Upgrade_MySqlSetup */
     private $installer = NULL;
 
+    private $forceAllSteps = false;
+
     //####################################
 
     public function getInstaller()
@@ -19,6 +21,13 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_Marketplace
     public function setInstaller(Ess_M2ePro_Model_Upgrade_MySqlSetup $installer)
     {
         $this->installer = $installer;
+    }
+
+    // -----------------------------------
+
+    public function setForceAllSteps($value = true)
+    {
+        $this->forceAllSteps = $value;
     }
 
     //####################################
@@ -73,6 +82,10 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion630_Marketplace
 
     private function isNeedToSkip()
     {
+        if ($this->forceAllSteps) {
+            return false;
+        }
+
         $connection = $this->installer->getConnection();
 
         $tempTable = $this->installer->getTable('m2epro_amazon_marketplace');

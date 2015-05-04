@@ -387,38 +387,31 @@ class Ess_M2ePro_Model_Amazon_Template_Description extends Ess_M2ePro_Model_Comp
 
     public function getTrackingAttributes()
     {
-        return array_unique(array_merge(
-            $this->getUsedDetailsAttributes(),
-            $this->getUsedImagesAttributes()
-        ));
+        $attributes = $this->getDefinitionTemplate()->getTrackingAttributes();
+
+        $specifics = $this->getSpecifics(true);
+        foreach ($specifics as $specific) {
+            $attributes = array_merge($attributes,$specific->getTrackingAttributes());
+        }
+
+        return array_unique($attributes);
     }
 
     public function getUsedAttributes()
     {
-        return array_unique(array_merge(
-            $this->getUsedDetailsAttributes(),
-            $this->getUsedImagesAttributes(),
-            $this->getWorldwideIdAttributes(),
-            $this->getNumberOfItemsAttributes(),
-            $this->getItemPackageQuantityAttributes()
-        ));
-    }
-
-    public function getUsedDetailsAttributes()
-    {
-        $attributes = $this->getDefinitionTemplate()->getUsedDetailsAttributes();
+        $attributes = $this->getDefinitionTemplate()->getUsedAttributes();
 
         $specifics = $this->getSpecifics(true);
         foreach ($specifics as $specific) {
             $attributes = array_merge($attributes,$specific->getUsedAttributes());
         }
 
-        return array_unique($attributes);
-    }
-
-    public function getUsedImagesAttributes()
-    {
-        return $this->getDefinitionTemplate()->getUsedImagesAttributes();
+        return array_unique(array_merge(
+            $attributes,
+            $this->getWorldwideIdAttributes(),
+            $this->getNumberOfItemsAttributes(),
+            $this->getItemPackageQuantityAttributes()
+        ));
     }
 
     // ----------------------------------------

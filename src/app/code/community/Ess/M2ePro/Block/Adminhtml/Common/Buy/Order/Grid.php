@@ -238,9 +238,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Grid extends Mage_Adminhtml_Bl
         // --------------------------------
 
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last order action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last order action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last order action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Order Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Order Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Order Action was completed with warning(s).'
         );
 
         $icons = array(

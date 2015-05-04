@@ -316,7 +316,7 @@ abstract class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
     public function getNewChildSelectOptions()
     {
         return array(
-            array('value'=>'', 'label'=>Mage::helper('rule')->__('Please choose a condition to add...')),
+            array('value'=>'', 'label'=>Mage::helper('rule')->__('Please choose a Condition to add...')),
         );
     }
 

@@ -229,7 +229,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
         if (is_null($this->getSessionValue('current_category_id'))) {
             $currentNode = $treeBlock->getRoot()->getChildren()->getIterator()->current();
             if (!$currentNode) {
-                throw new Exception('No categories found');
+                throw new Exception('No Categories found');
             }
             $this->setSessionValue('current_category_id', $currentNode->getId());
         }

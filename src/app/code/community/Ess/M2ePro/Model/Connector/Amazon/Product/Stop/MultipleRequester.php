@@ -61,15 +61,16 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleRequester
 
             $validator = $this->getValidatorObject($listingProduct);
 
-            if ($validator->isValid()) {
-                continue;
-            }
+            $validationResult = $validator->validate();
 
-            $this->removeAndUnlockListingProduct($listingProductId);
+            if (!$validationResult && $listingProduct->isDeleted()) {
+                $this->removeAndUnlockListingProduct($listingProductId);
 
-            if ($listingProduct->isDeleted()) {
                 if (!is_null($parentListingProduct)) {
-                    $parentsForProcessing[$parentListingProduct->getId()] = $parentListingProduct;
+                    $parentListingProductId = $parentListingProduct->getId();
+                    $parentsForProcessing[$parentListingProductId] = $parentListingProduct->loadInstance(
+                        $parentListingProductId
+                    );
                 }
 
                 continue;
@@ -84,6 +85,12 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleRequester
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
             }
+
+            if ($validationResult) {
+                continue;
+            }
+
+            $this->removeAndUnlockListingProduct($listingProductId);
         }
 
         foreach ($parentsForProcessing as $parentListingProduct) {
@@ -198,7 +205,9 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleRequester
         $resultListingProducts = array();
 
         foreach ($listingProducts as $id => $childListingProduct) {
-            if (!$childListingProduct->isListed() || !$childListingProduct->isStoppable()) {
+            if ((!$childListingProduct->isListed() || !$childListingProduct->isStoppable()) &&
+                empty($this->params['remove'])
+            ) {
                 continue;
             }
 

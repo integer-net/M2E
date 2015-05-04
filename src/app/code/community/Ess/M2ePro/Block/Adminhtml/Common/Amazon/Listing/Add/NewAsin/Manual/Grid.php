@@ -106,6 +106,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin_Manual_Grid
             'header'    => Mage::helper('M2ePro')->__('Description Policy'),
             'align'     => 'left',
             'width'     => '*',
+            'sortable'  => false,
             'type'      => 'options',
             'index'     => 'description_template_id',
             'filter_index' => 'description_template_id',

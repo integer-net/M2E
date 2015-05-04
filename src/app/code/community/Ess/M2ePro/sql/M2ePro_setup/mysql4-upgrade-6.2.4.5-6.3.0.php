@@ -11,8 +11,8 @@ $connection = $installer->getConnection();
 //#############################################
 
 /*
-  ALTER TABLE m2epro_amazon_dictionary_category
-  DROP COLUMN product_data_required_specifics;
+    ALTER TABLE m2epro_amazon_dictionary_category
+        DROP COLUMN product_data_required_specifics;
 */
 
 //---------------------------------------------

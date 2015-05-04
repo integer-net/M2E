@@ -1,10 +1,10 @@
 <div id="block_notice_play_template_synchronization_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('List Rules'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Synchronization Policy includes rules and conditions which determine Listing behavior on Play.com.<br/>
+    <?php echo Mage::helper('M2ePro')->__('Synchronization Policy includes Rules and Conditions which determine Listing behavior on Play.com.<br/>
     <i class="underline">List</i>, <i class="underline">Revise</i>, <i class="underline">Relist</i> and <i class="underline">Stop Rules</i> have to be specified in this Policy.<br/><br/>
-    <b>List Action</b> - at first this action to be executed for each Item in M2E Pro Listings, which has <i>Not Listed</i> status and its settings meet the List Condition. If an Item was not listed for some reason, autosynchronization will attempt
+    <b>List Action</b> - at first this action to be executed for each Item in M2E Pro Listings, which has <i>Not Listed</i> status and its Settings meet the List Condition. If an Item was not Listed for some reason, autosynchronization will attempt
     to list it again only if Product Status, Stock Availability or Quantity is changed.
     <br/><br/>
-    <b>Note:</b> Inventory Synchronization setting must be enabled in <i class="underline">Synchronization</i> (%menu_path%).
+    <b>Note:</b> Inventory Synchronization Setting must be enabled in <i class="underline">Synchronization</i> (%menu_path%).
     Otherwise, Synchronization Policy Rules will not take effect.', Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/synchronization')); ?>
 </div>
 
@@ -53,7 +53,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
         'Wrong time format string.' => Mage::helper('M2ePro')->__('Wrong time format string.'),
 
         'Must be greater than "Min".' => Mage::helper('M2ePro')->__('Must be greater than "Min".'),
-        'Inconsistent settings in Relist and Stop rules.' => Mage::helper('M2ePro')->__('Inconsistent settings in Relist and Stop rules.')
+        'Inconsistent Settings in Relist and Stop Rules.' => Mage::helper('M2ePro')->__('Inconsistent Settings in Relist and Stop Rules.')
     )); ?>);
 
     M2ePro.formData.id = '<?php echo $this->getRequest()->getParam('id'); ?>';
@@ -103,7 +103,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value" style="width: auto;">
                         <input id="title" name="title" value="<?php echo $this->escapeHtml($formData['title']); ?>" type="text" class="input-text required-entry M2ePro-synchronization-tpl-title" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful policy title for your internal use.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful Policy Title for your internal use.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -136,7 +136,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_YES; ?>" <?php if ($formData['list_mode'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Enables / disables automatic listing of <i>Not Listed</i> Items, when they meet the List Conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Enables / disables automatic Listing of <i>Not Listed</i> Items, when they meet the List Conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -169,7 +169,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_STATUS_ENABLED_YES; ?>" <?php if ($formData['list_status_enabled'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_STATUS_ENABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Product Status at which the Item(s) have to be listed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Product Status at which the Item(s) have to be Listed.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -184,7 +184,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_IS_IN_STOCK_YES; ?>" <?php if ($formData['list_is_in_stock'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_IS_IN_STOCK_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('In Stock'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Stock Availability at which the Item(s) have to be listed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Stock Availability at which the Item(s) have to be Listed.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -201,7 +201,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN; ?>" <?php if ($formData['list_qty_magento'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Magento Product(s) Quantity at which the Item(s) have to be listed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Magento Product(s) Quantity at which the Item(s) have to be Listed.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -239,7 +239,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN; ?>" <?php if ($formData['list_qty_calculated'] == Ess_M2ePro_Model_Play_Template_Synchronization::LIST_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Calculated Quantity according to the selling format policy at which the Item(s) have to be listed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Calculated Quantity according to the Selling Format Policy at which the Item(s) have to be Listed.'); ?></span>
                         </p>
                     </td>
                 </tr>

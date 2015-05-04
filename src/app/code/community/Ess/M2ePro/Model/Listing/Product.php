@@ -90,8 +90,8 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_LISTING,
                                     // M2ePro_TRANSLATIONS
-                                    // Item was successfully deleted
-                                    'Item was successfully deleted',
+                                    // Item was successfully Deleted
+                                    'Item was successfully Deleted',
                                     Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
 

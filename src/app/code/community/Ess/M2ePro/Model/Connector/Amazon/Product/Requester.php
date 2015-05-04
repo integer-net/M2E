@@ -53,11 +53,11 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
     public function __construct(array $params = array(), array $listingsProducts)
     {
         if (!isset($params['logs_action_id']) || !isset($params['status_changer'])) {
-            throw new Exception('Product connector has not received some params');
+            throw new Exception('Product Connector has not received some params');
         }
 
         if (empty($listingsProducts)) {
-            throw new Exception('Product connector has received empty array');
+            throw new Exception('Product Connector has received empty array');
         }
 
         /** @var Ess_M2ePro_Model_Account $account */
@@ -68,11 +68,11 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
             $listingProduct->loadInstance($listingProduct->getId());
 
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
-                throw new Exception('Product connector has received invalid Product data type');
+                throw new Exception('Product Connector has received invalid Product data type');
             }
 
             if ($account->getId() != $listingProduct->getListing()->getAccountId()) {
-                throw new Exception('Product connector has received Products from different accounts');
+                throw new Exception('Product Connector has received Products from different Accounts');
             }
 
             $this->listingsProducts[$listingProduct->getId()] = $listingProduct;
@@ -172,22 +172,6 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
         $this->unlockListingsProducts();
     }
 
-    protected function processResponseInfo($responseInfo)
-    {
-        try {
-            parent::processResponseInfo($responseInfo);
-        } catch (Exception $exception) {
-
-            foreach ($this->listingsProducts as $listingProduct) {
-                $this->getLogger()->logListingProductMessage($listingProduct, $exception->getMessage(),
-                                                             Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                             Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
-            }
-
-            throw $exception;
-        }
-    }
-
     // ########################################
 
     public function isProcessingItems()
@@ -215,9 +199,7 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
 
             $validator = $this->getValidatorObject($listingProduct);
 
-            if ($validator->isValid()) {
-                continue;
-            }
+            $validationResult = $validator->validate();
 
             foreach ($validator->getMessages() as $message) {
 
@@ -227,6 +209,10 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
                     $message['type'],
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
+            }
+
+            if ($validationResult) {
+                continue;
             }
 
             $this->removeAndUnlockListingProduct($listingProduct->getId());
@@ -329,10 +315,10 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
             if ($listingProduct->isLockedObject('in_action') || $lockItem->isExist()) {
 
                 // M2ePro_TRANSLATIONS
-                // Another action is being processed. Try again when the action is completed.
+                // Another Action is being processed. Try again when the Action is completed.
                 $this->getLogger()->logListingProductMessage(
                     $listingProduct,
-                    'Another action is being processed. Try again when the action is completed.',
+                    'Another Action is being processed. Try again when the Action is completed.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -581,7 +567,7 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
                 return 'Delete';
         }
 
-        throw new Exception('Wrong action type');
+        throw new Exception('Wrong Action type');
     }
 
     abstract protected function getActionType();

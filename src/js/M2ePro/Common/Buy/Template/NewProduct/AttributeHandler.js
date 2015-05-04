@@ -195,7 +195,7 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
                         if (isFirstOneOfFollowingAttribute) {
                             var tr = $('buy_attr_container').appendChild(new Element('tr'));
                             var td = tr.appendChild(new Element ('td', {'colspan': '2','style': 'padding: 15px 0'}));
-                            td.appendChild(new Element('label')).insert('<b>'+ M2ePro.translator.translate('At least one of the following attributes must be chosen:')+'</tr></b> <span class="required">*</span>');
+                            td.appendChild(new Element('label')).insert('<b>'+ M2ePro.translator.translate('At least one of the following Attributes must be chosen:')+'</tr></b> <span class="required">*</span>');
                         }
                         isFirstOneOfFollowingAttribute = false;
                     } else {
@@ -274,7 +274,7 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
                 }
 
                 if (requiredGroupId != '') {
-                    Validation.add(requiredGroupId, M2ePro.translator.translate('At least one of these attributes is required.'), function(value, element) {
+                    Validation.add(requiredGroupId, M2ePro.translator.translate('At least one of these Attributes is required.'), function(value, element) {
                         return self['requiredGroupTypeValidator'](value,element,requiredGroupId);
                     });
                 } else {
@@ -298,10 +298,10 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
 
         td = tr.appendChild(new Element('td', {'class': 'value'}));
         var select = td.appendChild(
-            new Element('select',
-                {'name': 'attributes[' + attribute.title + '][mode]',
-                 'id': 'attributes[' + title + '][mode]',
-                 'class': 'select attributes required-entry ' + requiredGroupId}));
+            new Element('select', {
+                'name': 'attributes[' + attribute.title + '][mode]',
+                'id': 'attributes[' + title + '][mode]',
+                'class': 'select attributes required-entry ' + requiredGroupId}));
 
         attribute.is_required == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute::TYPE_IS_REQUIRED')
             ? select.appendChild(new Element('option', {'style': 'display: none; '}))
@@ -329,11 +329,11 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
 
         td = tr.appendChild(new Element('td', {'class': 'value'}));
 
-        var select = td.appendChild(new Element('select',
-            {'name': 'attributes[' + attribute.title + '][recommended_value][]',
-             'id': 'recommended_value_' + title,
-             'class': 'select M2ePro-required-when-visible',
-             'style': 'width: 280px'}));
+        var select = td.appendChild(new Element('select', {
+            'name': 'attributes[' + attribute.title + '][recommended_value][]',
+            'id': 'recommended_value_' + title,
+            'class': 'select M2ePro-required-when-visible',
+            'style': 'width: 280px'}));
 
         if (attribute.type == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute::TYPE_MULTISELECT')) {
             select.setStyle({height: '150px'});
@@ -429,7 +429,7 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
         $('buy_attr_container')
             .appendChild(new Element('tr'))
             .appendChild(new Element('td'))
-            .update(M2ePro.translator.translate('The category does not have attributes.'));
+            .update(M2ePro.translator.translate('The Category does not have Attributes.'));
     },
 
     renderLine: function()

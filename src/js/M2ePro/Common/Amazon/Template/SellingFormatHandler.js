@@ -116,6 +116,16 @@ CommonAmazonTemplateSellingFormatHandler.prototype = Object.extend(new CommonHan
         $('price_note').innerHTML = M2ePro.translator.translate('Product Price for Amazon Listing(s).');
     },
 
+    map_price_mode_change: function()
+    {
+        var self = AmazonTemplateSellingFormatHandlerObj;
+
+        $('map_price_custom_attribute').value = '';
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE')) {
+            self.updateHiddenValue(this, $('map_price_custom_attribute'));
+        }
+    },
+
     //----------------------------------
 
     sale_price_mode_change: function()

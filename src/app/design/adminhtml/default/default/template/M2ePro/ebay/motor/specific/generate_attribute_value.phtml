@@ -5,16 +5,16 @@
 
     $translations = array();
 
-    // ->__('Please specify eBay motors compatibility attribute in %s > Configuration > <a target="_blank" href="%s">General</a>')
-    $text = 'Please specify eBay motors compatibility attribute in %menu_path% > <a target="_blank" href="%s%">General</a>';
+    // ->__('Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>')
+    $text = 'Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>';
     $translations[$text] = Mage::helper('M2ePro')->__(
         $text,
         Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
         $this->getUrl('*/adminhtml_ebay_configuration')
     );
 
-    // ->__('Please edit categories settings for selected Products and select the compatibility attribute.')
-    $text = 'Please edit categories settings for selected Products and select the compatibility attribute.';
+    // ->__('Please edit Categories Settings for selected Products and select the compatibility Attribute.')
+    $text = 'Please edit Categories Settings for selected Products and select the compatibility Attribute.';
     $translations[$text] = Mage::helper('M2ePro')->__($text);
 
     $translations = json_encode($translations);
@@ -96,10 +96,10 @@
     <div id="block_notice_motors_specifics_generate_attribute_value" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Add Compatible Vehicles'); ?>" style="margin-top: 15px;">
 
         <?php echo Mage::helper('M2ePro')->__(
-'Select the Items, compatible with your part and choose one of three actions in the Actions dropdown:
+'Select the Items, compatible with your part and choose one of three Actions in the Actions Dropdown:
 <ul class=list>
     <li><b>Overwrite ePIDs in Compatibility Attribute</b> - replaces Items ePIDs in the Compatibility Attribute chosen in %menu_path% > <a target="_blank" href="%s">General</a> with selected ones.</li>
-    <li><b>Add ePIDs to Compatibility Attribute</b> - adds selected Items ePIDs to existing ones in Compatibility Attribute chosen in the General settings.</li>
+    <li><b>Add ePIDs to Compatibility Attribute</b> - adds selected Items ePIDs to existing ones in Compatibility Attribute chosen in the General Settings.</li>
 </ul>
 <b>Note:</b> Compatibility Items can not be replaced or removed from eBay.',
             Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),

@@ -443,7 +443,7 @@ abstract class Ess_M2ePro_Model_Connector_Play_Product_Responser
                 return 'Delete';
         }
 
-        throw new Exception('Wrong action type');
+        throw new Exception('Wrong Action type');
     }
 
     // ########################################

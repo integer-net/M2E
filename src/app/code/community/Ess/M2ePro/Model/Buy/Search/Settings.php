@@ -302,11 +302,11 @@ class Ess_M2ePro_Model_Buy_Search_Settings
         $searchType = false;
 
         if ($listing->isGeneralIdGeneralIdMode()) {
-            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_Items::SEARCH_TYPE_GENERAL_ID;
+            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_ItemsRequester::SEARCH_TYPE_GENERAL_ID;
         }
 
         if ($listing->isGeneralIdWorldwideMode()) {
-            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_Items::SEARCH_TYPE_UPC;
+            $searchType = Ess_M2ePro_Model_Connector_Buy_Search_ByIdentifier_ItemsRequester::SEARCH_TYPE_UPC;
         }
 
         return $searchType;

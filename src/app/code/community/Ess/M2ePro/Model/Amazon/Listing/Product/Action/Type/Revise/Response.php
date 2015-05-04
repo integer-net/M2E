@@ -36,8 +36,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
     {
         if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
             // M2ePro_TRANSLATIONS
-            // Item was successfully revised
-            return 'Item was successfully revised';
+            // Item was successfully Revised
+            return 'Item was successfully Revised';
         }
 
         $sequenceString = '';
@@ -48,7 +48,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
             $sequenceString .= 'QTY,';
         }
 
-        if ($this->getRequestData()->hasPrice() || $this->getRequestData()->hasSalePrice()) {
+        if ($this->getRequestData()->hasPrice()) {
             // M2ePro_TRANSLATIONS
             // Price
             $sequenceString .= 'Price,';
@@ -56,7 +56,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
 
         if ($this->getRequestData()->hasProductData() ||
             $this->getRequestData()->hasDescriptionData() ||
-            $this->getRequestData()->hasBrowsenodeId()
+            $this->getRequestData()->hasBrowsenodeId() ||
+            $this->getRequestData()->hasCondition()
         ) {
             // M2ePro_TRANSLATIONS
             // details
@@ -71,13 +72,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
 
         if (empty($sequenceString)) {
             // M2ePro_TRANSLATIONS
-            // Item was successfully revised
-            return 'Item was successfully revised';
+            // Item was successfully Revised
+            return 'Item was successfully Revised';
         }
 
         // M2ePro_TRANSLATIONS
-        // was successfully revised
-        return ucfirst(trim($sequenceString,',')).' was successfully revised';
+        // was successfully Revised
+        return ucfirst(trim($sequenceString,',')).' was successfully Revised';
     }
 
     // ########################################

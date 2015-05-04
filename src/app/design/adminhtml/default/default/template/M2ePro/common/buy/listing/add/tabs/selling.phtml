@@ -1,8 +1,9 @@
 <div id="block_notice_buy_listing_add_selling_settings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Selling Settings'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This section allows you to set data related to the future offers of Items in this Listing. <br/><br/>
+    <?php echo Mage::helper('M2ePro')->__('On this Page you can specify main Selling Settings for Rakuten.com Items you are going to sell using this M2E Pro Listing.<br/><br/>
 
-    You need to set the Source for SKU to be taken from and the Item condition. You can also specify additional details for your offers. <br/>
-    You also have to choose Selling Format Policy, which contains Price and Quantity settings for Products in Listings, as well as Synchronization Policy, which specifies the rules and conditions which will be used for automatic data coordination between M2E Pro and respective Marketplace.'); ?>
+    You can set the Source to form SKU of Rakuten.com Item, appropriate Condition, Condition Note.<br/><br/>
+
+    In addition to, in this Section you can select Selling Format Policy that contains Settings connected with forming of Price, Quantity etc. and Synchronization Policy that describes Rules of Automatic Synchronization of Magento Product and Rakuten.com Item.'); ?>
 </div>
 
 <?php
@@ -178,8 +179,8 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('A unique ID, which identify a Product in your Rakuten.com seller inventory.<br/>
-                            <b>Note:</b> If you list a Product and M2E Pro find a Product with the same Reference ID in Rakuten.com inventory, they will be mapped.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('A unique ID, which identify a Product in your Rakuten.com Seller Inventory.<br/><br/>
+                            <b>Note:</b> If you List a Product and M2E Pro find a Product with the same Reference ID in Rakuten.com Inventory, they will be Mapped.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -194,7 +195,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Listing::GENERATE_SKU_MODE_YES ?>" <?php if ($this->getData('generate_sku_mode') == Ess_M2ePro_Model_Buy_Listing::GENERATE_SKU_MODE_YES) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Yes') ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('If <strong>Yes</strong>, then if Merchant SKU of the Product you list is found in the 3rd Party, M2E Pro Listings or among the Products that are currently in process of listing, another SKU will be automatically created and the Product will be listed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('If <strong>Yes</strong>, then if Merchant SKU of the Product you List is found in the 3rd Party, M2E Pro Listings or among the Products that are currently in process of Listing, another SKU will be automatically Created and the Product will be Listed.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -231,7 +232,7 @@
                                     <option value="<?php echo $item['id']; ?>" <?php if ($item['id'] == $this->getData('template_selling_format_id')) echo ' selected="selected"'; ?>><?php echo $item['title']; ?></option>
                                 <?php } ?>
                             </select>
-                            <span id="template_selling_format_label" <?php if (count($this->sellingFormatTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No policies available.'); ?></span>
+                            <span id="template_selling_format_label" <?php if (count($this->sellingFormatTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No Policies available.'); ?></span>
                         <?php else: ?>
                             <input type="text" id="template_selling_format_autocomplete" class="input-text" selected_id="" style="width: 275px; color: gray;"
                                    value="<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>"
@@ -246,15 +247,6 @@
                                 >
                             <input type="hidden" name="template_selling_format_id" id="template_selling_format_id" class="required-entry" value="" />
                         <?php endif; ?>
-                        <p class="note">
-                            <span id="template_selling_format_note" <?php if (!count($this->sellingFormatTemplates)) echo 'style="display: none;"';?>>
-                            <?php if ($this->sellingFormatTemplatesDropDown) { ?>
-                                <span><?php echo Mage::helper('M2ePro')->__('All Selling Format Policies you have created.'); ?></span>
-                            <?php } else {?>
-                                <span><?php echo Mage::helper('M2ePro')->__('Search for Policy you have created.'); ?></span>
-                            <?php } ?>
-                            </span>
-                        </p>
                     </td>
                     <td class="value">
                         <span id="edit_selling_format_template_link">
@@ -284,7 +276,7 @@
                                     <option value="<?php echo $item['id']; ?>" <?php if ($item['id'] == $this->getData('template_synchronization_id')) echo ' selected="selected"'; ?>><?php echo $item['title']; ?></option>
                                 <?php } ?>
                             </select>
-                            <span id="template_synchronization_label" <?php if (count($this->synchronizationsTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No policies available.'); ?></span>
+                            <span id="template_synchronization_label" <?php if (count($this->synchronizationsTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No Policies available.'); ?></span>
                         <?php else:?>
                             <input type="text" id="template_synchronization_autocomplete" class="input-text" selected_id="" style="width: 275px; color: gray;"
                                    value="<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>"
@@ -299,15 +291,6 @@
                                 >
                             <input type="hidden" name="template_synchronization_id" id="template_synchronization_id" class="required-entry" value="" />
                         <?php endif; ?>
-                        <p class="note">
-                            <span id="template_synchronization_note" <?php if (!count($this->synchronizationsTemplates)) echo 'style="display: none;"';?>>
-                            <?php if ($this->synchronizationsTemplatesDropDown) { ?>
-                                <span><?php echo Mage::helper('M2ePro')->__('All Synchronization Policies you have created.'); ?></span>
-                            <?php } else {?>
-                                <span><?php echo Mage::helper('M2ePro')->__('Search for Synchronization Policy you have created.'); ?></span>
-                            <?php } ?>
-                            </span>
-                        </p>
                     </td>
                     <td class="value">
                         <span id="edit_synchronization_template_link">
@@ -334,15 +317,15 @@
         <div class="hor-scroll">
 
             <div id="block_notice_buy_listing_general_shipping" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Shipping'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('This section determines information about how your Products will be shipped.
+                <?php echo Mage::helper('M2ePro')->__('This Section determines information about how your Products will be shipped.
                 <br/><br/>
                 In each method you can choose:
                 <ul class="list">
                 <li><b>Disable</b> - disables Shipping method.</li>
                 <li><b>Free</b> - automatically sets zero value for Shipping Cost.</li>
-                <li><b>Rakuten.com Settings</b> - uses settings, which you have set in your seller Account settings on Rakuten.com.</li>
-                <li><b>Custom Value</b> - allows setting Shipping Cost manually.</li>
-                <li><b>Custom Attribute</b> - allows setting Shipping Cost from the chosen attribute.</li>
+                <li><b>Rakuten.com Settings</b> - uses Settings, which you have set in your Seller Account Settings on Rakuten.com.</li>
+                <li><b>Custom Value</b> - allows Setting Shipping Cost manually.</li>
+                <li><b>Custom Attribute</b> - allows Setting Shipping Cost from the chosen Attribute.</li>
                 </ul>
                 '); ?>
             </div>
@@ -501,14 +484,14 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Condition of the Product(s) you want to list on Rakuten.com.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Condition of the Product(s) you want to List on Rakuten.com.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="condition_note_mode_tr">
                     <td class="label">
-                        <label for="condition_note_mode"><?php echo Mage::helper('M2ePro')->__('Comment') ?>:</label>
+                        <label for="condition_note_mode"><?php echo Mage::helper('M2ePro')->__('Condition Note') ?>:</label>
                     </td>
                     <td class="value">
                         <select name="condition_note_mode" id="condition_note_mode">
@@ -516,8 +499,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE ?>" <?php if ($this->getData('condition_note_mode') == Ess_M2ePro_Model_Buy_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Condition of the Product(s) you want to list on Rakuten.com.<br/>
-                            <b>Note:</b> Condition of Active Items cannot be changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Short Description of Item(s) Condition.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -528,9 +510,6 @@
                     </td>
                     <td class="value">
                         <textarea name="condition_note_value" id="condition_note_value" class="M2ePro-required-when-visible M2ePro-validate-condition-note-length"><?php echo Mage::helper('M2ePro')->escapeHtml($this->getData('condition_note_value')) ?></textarea>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Description of the condition of the Item(s).'); ?></span>
-                        </p>
                     </td>
                     <td class="value">
                         <select name="condition_note_custom_attribute" id="condition_note_custom_attribute" style="width: 150px; margin-top: -4px;">

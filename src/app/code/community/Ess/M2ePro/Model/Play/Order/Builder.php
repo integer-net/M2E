@@ -13,7 +13,7 @@ class Ess_M2ePro_Model_Play_Order_Builder extends Varien_Object
     const UPDATE_STATUS = 0;
 
     // M2ePro_TRANSLATIONS
-    // Duplicated Play.com orders with ID #%id%.
+    // Duplicated Play.com Orders with ID #%id%.
 
     // ########################################
 

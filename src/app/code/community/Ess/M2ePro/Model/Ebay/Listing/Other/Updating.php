@@ -182,8 +182,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
                      NULL,
                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_ADD_LISTING,
                     // M2ePro_TRANSLATIONS
-                    // Item was successfully added
-                     'Item was successfully added',
+                    // Item was successfully Added
+                     'Item was successfully Added',
                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW);
 

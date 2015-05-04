@@ -95,13 +95,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
 
         $taskCompletedMessage = $helper->escapeJs($helper->__('Task completed. Please wait ...'));
         $taskCompletedSuccessMessage = $helper->escapeJs(
-            $helper->__('"%task_title%" task has successfully submitted to be processed.')
+            $helper->__('"%task_title%" Task has successfully submitted to be processed.')
         );
         $taskCompletedWarningMessage = $helper->escapeJs($helper->__(
-            '"%task_title%" task has completed with warnings. <a target="_blank" href="%url%">View log</a> for details.'
+            '"%task_title%" Task has completed with warnings. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
         $taskCompletedErrorMessage = $helper->escapeJs($helper->__(
-            '"%task_title%" task has completed with errors. <a target="_blank" href="%url%">View log</a> for details.'
+            '"%task_title%" Task has completed with errors. <a target="_blank" href="%url%">View Log</a> for details.'
         ));
 
         $sendingDataToAmazonMessage = $helper->escapeJs($helper->__(
@@ -109,7 +109,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
         );
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the Products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
 
         $assignString = Mage::helper('M2ePro')->__('Assign');
@@ -131,7 +131,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
                 'In order to use New ASIN/ISBN functionality, please re-synchronize Marketplace data.'
             ).' '.
             $helper->__(
-                'Press "Save And Update" button after redirect on Marketplace page.'
+                'Press "Save And Update" Button after redirect on Marketplace Page.'
             )
         );
 

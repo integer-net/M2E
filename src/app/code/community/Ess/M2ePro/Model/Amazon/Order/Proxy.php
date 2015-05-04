@@ -27,7 +27,7 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         }
 
         if (count($items) == 0) {
-            throw new Exception('Every Item in order has zero Price.');
+            throw new Exception('Every Item in Order has zero Price.');
         }
 
         return parent::mergeItems($items);
@@ -88,7 +88,7 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             $customer->load($this->order->getAmazonAccount()->getMagentoOrdersCustomerId());
 
             if (is_null($customer->getId())) {
-                throw new Exception('Customer with ID specified in Amazon account settings does not exist.');
+                throw new Exception('Customer with ID specified in Amazon Account Settings does not exist.');
             }
         }
 
@@ -140,7 +140,7 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             'country_id' => '',
             'region'     => '',
             'region_id'  => '',
-            'city'       => 'Amazon does not supply the complete billing buyer information.',
+            'city'       => 'Amazon does not supply the complete billing Buyer information.',
             'postcode'   => '',
             'street'     => array(),
             'company'    => ''

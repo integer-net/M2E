@@ -629,7 +629,7 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler, {
             return $('map_link_' + id).innerHTML = '<span style="color: #808080">' + self.options.text.assign + '</span>';
         }
 
-        optionsData.variations = JSON.parse($('variations_' + id).innerHTML);
+        optionsData.variations = JSON.parse(decodeHtmlentities($('variations_' + id).innerHTML));
         optionsData = addslashes(encodeURIComponent(JSON.stringify(optionsData)));
 
         var mapLinkTemplate = $('template_map_link_' + id).innerHTML;

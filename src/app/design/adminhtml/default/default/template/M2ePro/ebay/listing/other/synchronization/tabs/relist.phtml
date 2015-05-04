@@ -1,5 +1,5 @@
 <div id="block_notice_ebay_listing_other_synchronization_relist" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Relist'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Define the conditions when you want eBay Items relisted.
+    <?php echo Mage::helper('M2ePro')->__('Define the Conditions when you want eBay Items Relisted.
     '); ?>
 </div>
 
@@ -56,7 +56,7 @@ $formData = array_merge($defaults, $formData);
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_MODE_YES; ?>" <?php if ($formData['relist_mode'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_MODE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Activates Relist action.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Activates Relist Action.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -86,7 +86,7 @@ $formData = array_merge($defaults, $formData);
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_SEND_DATA_YES; ?>" <?php if ($formData['relist_send_data'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_SEND_DATA_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Updates title, subtitle, description, Price, Quantity and shipment on eBay Items.'); ?></span>                        </p>
+                            <span><?php echo Mage::helper('M2ePro')->__('Updates Title, Subtitle, Description, Price, Quantity and Shipment on eBay Items.'); ?></span>                        </p>
                     </td>
                 </tr>
 
@@ -118,7 +118,7 @@ $formData = array_merge($defaults, $formData);
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_STATUS_ENABLED_YES; ?>" <?php if ($formData['relist_status_enabled'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_STATUS_ENABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Product status when Item will be relisted.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Product status when Item will be Relisted.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -133,7 +133,7 @@ $formData = array_merge($defaults, $formData);
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_IS_IN_STOCK_YES; ?>" <?php if ($formData['relist_is_in_stock'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_IS_IN_STOCK_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('In Stock'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Stock Availability when Item will be relisted.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Stock Availability when Item will be Relisted.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -150,7 +150,7 @@ $formData = array_merge($defaults, $formData);
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_QTY_BETWEEN; ?>" <?php if ($formData['relist_qty'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Product(s) Quantity when Item will be relisted.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Product(s) Quantity when Item will be Relisted.'); ?></span>
                         </p>
                     </td>
                 </tr>

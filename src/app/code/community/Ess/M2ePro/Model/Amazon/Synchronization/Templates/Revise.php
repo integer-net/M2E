@@ -120,17 +120,34 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
     }
 
+    //####################################
+
     private function executeDetailsChanged()
     {
         $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update details');
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Amazon_Template_Description')->getCollection() as $template) {
-            /** @var Ess_M2ePro_Model_Amazon_Template_Description  $template */
+
+            /** @var Ess_M2ePro_Model_Amazon_Template_Description $template */
+
+            $attributes = $template->getDefinitionTemplate()->getUsedDetailsAttributes();
+
+            $specifics = $template->getSpecifics(true);
+            foreach ($specifics as $specific) {
+                $attributes = array_merge($attributes,$specific->getUsedAttributes());
+            }
+
+            $attributesForProductChange = array_merge($attributesForProductChange,$attributes);
+        }
+
+        foreach (Mage::getModel('M2ePro/Amazon_Listing')->getCollection() as $listing) {
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing $listing */
 
             $attributesForProductChange = array_merge(
                 $attributesForProductChange,
-                $template->getUsedDetailsAttributes()
+                $listing->getConditionNoteAttributes()
             );
         }
 
@@ -139,11 +156,25 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
             $amazonListingProduct = $listingProduct->getChildObject();
 
-            if (!$amazonListingProduct->isExistDescriptionTemplate()) {
-                continue;
-            }
+            $detailsAttributes = $amazonListingProduct->getAmazonListing()->getConditionNoteAttributes();
 
-            $detailsAttributes = $amazonListingProduct->getAmazonDescriptionTemplate()->getUsedDetailsAttributes();
+            if ($amazonListingProduct->isExistDescriptionTemplate()) {
+                $descriptionTemplateDetailsAttributes = $amazonListingProduct->getAmazonDescriptionTemplate()
+                    ->getDefinitionTemplate()
+                    ->getUsedDetailsAttributes();
+
+                $specifics = $amazonListingProduct->getAmazonDescriptionTemplate()->getSpecifics(true);
+                foreach ($specifics as $specific) {
+                    $descriptionTemplateDetailsAttributes = array_merge(
+                        $descriptionTemplateDetailsAttributes, $specific->getUsedAttributes()
+                    );
+                }
+
+                $detailsAttributes = array_merge(
+                    $detailsAttributes,
+                    $descriptionTemplateDetailsAttributes
+                );
+            }
 
             if (!in_array($listingProduct->getData('changed_attribute'), $detailsAttributes)) {
                 continue;
@@ -181,11 +212,23 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Amazon_Template_Description')->getCollection() as $template) {
-            /** @var Ess_M2ePro_Model_Amazon_Template_Description  $template */
+
+            /** @var Ess_M2ePro_Model_Amazon_Template_Description $template */
 
             $attributesForProductChange = array_merge(
                 $attributesForProductChange,
-                $template->getUsedImagesAttributes()
+                $template->getDefinitionTemplate()->getUsedImagesAttributes()
+            );
+        }
+
+        foreach (Mage::getModel('M2ePro/Amazon_Listing')->getCollection() as $listing) {
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing $listing */
+
+            $attributesForProductChange = array_merge(
+                $attributesForProductChange,
+                $listing->getImageMainAttributes(),
+                $listing->getGalleryImagesAttributes()
             );
         }
 
@@ -194,11 +237,20 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
             $amazonListingProduct = $listingProduct->getChildObject();
 
-            if (!$amazonListingProduct->isExistDescriptionTemplate()) {
-                continue;
-            }
+            $amazonListing = $amazonListingProduct->getAmazonListing();
 
-            $imagesAttributes = $amazonListingProduct->getAmazonDescriptionTemplate()->getUsedImagesAttributes();
+            $imagesAttributes = array_merge(
+                $amazonListing->getImageMainAttributes(),
+                $amazonListing->getGalleryImagesAttributes()
+            );
+
+            if ($amazonListingProduct->isExistDescriptionTemplate()) {
+                $amazonDescriptionTemplate = $amazonListingProduct->getAmazonDescriptionTemplate();
+                $imagesAttributes = array_merge(
+                    $imagesAttributes,
+                    $amazonDescriptionTemplate->getDefinitionTemplate()->getUsedImagesAttributes()
+                );
+            }
 
             if (!in_array($listingProduct->getData('changed_attribute'), $imagesAttributes)) {
                 continue;
@@ -346,6 +398,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
     //####################################
 
+    /**
+     * @param array $trackingAttributes
+     * @return Ess_M2ePro_Model_Listing_Product[]
+     */
     private function getChangedListingsProducts(array $trackingAttributes)
     {
         $filteredChangedListingsProducts = array();
@@ -359,7 +415,13 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
             $amazonListingProduct = $changedListingProduct->getChildObject();
 
-            if ($amazonListingProduct->getVariationManager()->isVariationProduct()) {
+            if ($amazonListingProduct->getVariationManager()->isRelationParentType()) {
+                continue;
+            }
+
+            $magentoProduct = $changedListingProduct->getMagentoProduct();
+
+            if ($magentoProduct->isConfigurableType() || $magentoProduct->isGroupedType()) {
                 continue;
             }
 
@@ -372,6 +434,12 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         );
 
         foreach ($changedListingsProducts as $changedListingProduct) {
+            $magentoProduct = $changedListingProduct->getMagentoProduct();
+
+            if ($magentoProduct->isSimpleTypeWithCustomOptions() || $magentoProduct->isBundleType()) {
+                continue;
+            }
+
             $filteredChangedListingsProducts[$changedListingProduct->getId()] = $changedListingProduct;
         }
 

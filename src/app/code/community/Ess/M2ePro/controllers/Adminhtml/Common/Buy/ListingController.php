@@ -330,7 +330,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
 
         $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The listing was successfully saved.'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The Listing was successfully saved.'));
 
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list',array(),array('edit'=>array('id'=>$id))));
     }
@@ -356,11 +356,11 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
             }
         }
 
-        $tempString = Mage::helper('M2ePro')->__('%amount% listing(s) were successfully deleted', $deleted);
+        $tempString = Mage::helper('M2ePro')->__('%amount% Listing(s) were successfully deleted', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
         $tempString = Mage::helper('M2ePro')->__(
-            '%amount% listing(s) have listed Items and can not be deleted', $locked
+            '%amount% Listing(s) have Listed Items and can not be deleted', $locked
         );
         $locked && $this->_getSession()->addError($tempString);
 
@@ -624,7 +624,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
                 $listingProduct->isLockedObject('in_action')) {
                 $type = 'error';
                 $message = Mage::helper('M2ePro')->__(
-                    'Some Rakuten.com SKU(s) were not unassigned as their listing status is other than "Not Listed".'
+                    'Some Rakuten.com SKU(s) were not unassigned as their Listing Status is other than "Not Listed".'
                 );
                 continue;
             }

@@ -28,12 +28,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
     {
         $data = array();
 
-        if ($this->getConfigurator()->isGeneral() && !$this->getVariationManager()->isRelationParentType()) {
-            $data = array_merge($data, $this->getConditionData());
-        }
-
         if (!$this->getConfigurator()->isDetails()) {
             return $data;
+        }
+
+        if (!$this->getVariationManager()->isRelationParentType()) {
+            $data = array_merge($data, $this->getConditionData());
         }
 
         if (!$this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
@@ -69,9 +69,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
 
     private function getConditionData()
     {
+        $this->searchNotFoundAttributes();
+        $conditionNote = $this->getAmazonListingProduct()->getListingSource()->getConditionNote();
+        $this->processNotFoundAttributes('Condition Note');
+
         return array(
             'condition'      => $this->getAmazonListingProduct()->getListingSource()->getCondition(),
-            'condition_note' => $this->getAmazonListingProduct()->getListingSource()->getConditionNote(),
+            'condition_note' => $conditionNote,
         );
     }
 

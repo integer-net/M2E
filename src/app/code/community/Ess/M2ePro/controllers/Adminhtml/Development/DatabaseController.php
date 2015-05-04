@@ -79,7 +79,7 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
             $this->afterTableAction($table);
         }
 
-        $this->_getSession()->addSuccess('Truncate tables was successfully completed.');
+        $this->_getSession()->addSuccess('Truncate Tables was successfully completed.');
 
         if (count($tables) == 1) {
             $this->redirectToTablePage($tables[0]);
@@ -110,7 +110,7 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $ids = explode(',', $this->getRequest()->getParam('ids'));
 
         if (!$modelInstance || empty($ids)) {
-            $this->_getSession()->addError("Failed to get model or any of table rows are not selected.");
+            $this->_getSession()->addError("Failed to get model or any of Table Rows are not selected.");
             $this->redirectToTablePage($table);
         }
 
@@ -150,8 +150,30 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
             $this->redirectToTablePage($table);
         }
 
-        $collection->setDataToAll($cellsValues);
-        $collection->save();
+        $idFieldName = $modelInstance->getIdFieldName();
+        $isAutoIncrement = Mage::helper('M2ePro/Module_Database_Structure')->isIdColumnAutoIncrement($table);
+
+        foreach ($collection->getItems() as $item) {
+            foreach ($cellsValues as $field => $value) {
+
+                if ($field == $idFieldName && $isAutoIncrement) {
+                    continue;
+                }
+
+                if ($field == $idFieldName && !$isAutoIncrement) {
+
+                    Mage::getSingleton('core/resource')->getConnection('core_write')->update(
+                        Mage::getSingleton('core/resource')->getTableName($table),
+                        array($idFieldName => $value),
+                        "`{$idFieldName}` = {$item->getId()}"
+                    );
+                }
+
+                $item->setData($field, $value);
+            }
+
+            $item->save();
+        }
 
         $this->afterTableAction($table);
     }

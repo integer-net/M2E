@@ -94,7 +94,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Option
         }
 
         if (empty($this->destinationOptions)) {
-            throw new Exception('Destination options is empty.');
+            throw new Exception('Destination Options is empty.');
         }
     }
 

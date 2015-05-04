@@ -1,3 +1,21 @@
+* 6.3.1 (r8700) (27/04/2015)
+
+* Added: [Amazon] Ability to set Listings Photos for used and collectible items
+* Added: [Amazon] Ability to set Minimum Advertised Price (MAP) for Amazon Item
+* Added: [Amazon] Notification if data of enabled Marketplaces is de-synchronized
+* Improvement: [Amazon] Condition Note attributes are tracked automatically by Revise -> Details
+* Improvement: [Amazon] Bunch on improvements of Sale Price implementation (From / To dates)
+* Improvement: [Amazon] Warning message was added if List action does not use New ASIN/ISBN feature
+* Improvement: [Amazon] Ignore Magento Variation if Child Product with it was removed manually
+* Improvement: [Amazon] Behaviour of how Magento Attributes are selected in Description Policy
+* Improvement: [Amazon / Rakuten.com] Bunch of Help Blocks and Tips improvements
+* Fix: Critical issues in migration from 6.2.4.2 to 6.2.4.3 version (not quoted MySQL query)
+* Fix: func_get_args(): Can't be used as a function parameter for PHP version less than 5.3.x
+* Fix: [eBay] Wrong disabling of Domestic Shipping Services if Item Location is not equal with Marketplace
+* Fix: [eBay] Status 'Listed' was set for Item instead of 'Listed Hidden' if 'Out Off Stock' feature is enabled
+* Fix: [Amazon] Amazon migration wizard was shown if Amazon integration was disabled
+* Fix: [Rakuten.com] Some major issues of user interface and main features
+
 * 6.3.0 (r8630) (20/04/2015)
 
 * Added: Ability to see why Product was not listed automatically by Synchronization Policy Rules
@@ -66,12 +84,12 @@
 * Improvement: [Amazon / Rakuten.com / Play.com] Ability to insert Magento Attributes to "Condition Note" value
 * Improvement: [Amazon / Rakuten.com / Play.com] Logging system to provide more Details for each record
 * Fix: Magento Products Title are displayed without any reductions in cells of grids
+* Fix: Many different fixes for last versions of Mozilla and Internet Explore browsers
 * Fix: [eBay] Duplicating of Policy Title during Policy Settings Duplicating
 * Fix: [eBay] Filtering and Sorting "Available QTY" column in many places
 * Fix: [eBay] Many fixes for Items with "Out Of Stock" enabled in 3rd party listings
 * Fix: [eBay] SKU could remain in "receiving..." state much time in 3rd party listings
 * Fix: [eBay] "Condition Description" property was renamed to "Seller Notes"
-* Fix: [eBay] Many different fixes for last versions of Mozilla and Internet Explore browsers
 * Removed: Useless "Refresh" button in whole extension
 * Removed: [Amazon / Rakuten.com / Play.com] Necessity of Attributes Sets selection for creating Policies and Listings
 * Removed: [Amazon / Rakuten.com / Play.com] Not Set / Not changeable options for some settings in Policies and Listings
@@ -300,7 +318,7 @@
 * Fix: incorrect view of description that contains html code in all logs grids
 * Fix: "Edit" button on magento order page does not work, if associated products was created by M2ePro
 * Fix: QTY for the same simple products in one Bundle product
-* Fix: fatal error "column not found" in listing search items page in some MySql versions.
+* Fix: fatal error "column not found" in listing search items page in some MySQL versions.
 * Fix: issue with autocomplete results in "Multi-Channels" listings grid
 * Fix: [eBay] watermark image was not updated during list/relist/revise actions if it was changed from policy settings
 * Fix: [eBay] wrong attribute labels for configurable products and images in some cases
@@ -308,7 +326,7 @@
 * Fix: [eBay] Fatal error occurred: "SQLSTATE[42S22]: Column not found: 1054 Unknown column 'state' in 'order clause'".
 * Fix: [eBay] broken sort action for state and price columns on Magento View Mode
 * Fix: [eBay] do not sending tracking numbers for order items separately
-* Fix: [eBay] synchronization fails in some cases, if php version < 5.3
+* Fix: [eBay] synchronization fails in some cases, if PHP version < 5.3
 * Fix: [eBay] skipping confirmation window for saving policy created from duplication
 * Fix: [eBay] disabled option "Listing Duration" from "Listing Type - Attribute" for "Simple Mode" in "Selling Policy"
 * Fix: [eBay] some issues in policies forms, for "Simple" and Advanced "Mode".
@@ -639,7 +657,7 @@
 
 * 5.0.6 (r3745) (11/04/2013)
 
-* Fix: Synchronization critical issue on php < 5.3
+* Fix: Synchronization critical issue on PHP < 5.3
 
 * 5.0.5 (r3721) (10/04/2013)
 

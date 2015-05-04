@@ -425,7 +425,7 @@ td.changed span {
 }
 
 .manage-variations.form-list td.value select {
-    width: 250px;
+    width: 225px;
 }
 
 form select:disabled {

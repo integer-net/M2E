@@ -30,7 +30,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     // Data for current tab
     //-----------------------------
     M2ePro.translator.add(<?php echo json_encode(array(
-        'If Yes is chosen, you must select at least one attribute for Product mapping.' => Mage::helper('M2ePro')->__('If Yes is chosen, you must select at least one attribute for Product mapping.')
+        'If Yes is chosen, you must select at least one Attribute for Product Mapping.' => Mage::helper('M2ePro')->__('If Yes is chosen, you must select at least one Attribute for Product Mapping.')
     )); ?>);
     //-----------------------------
 
@@ -67,20 +67,20 @@ $isEdit = !!$this->getRequest()->getParam('id');
     $menuOtherListingsPath = Mage::helper('M2ePro/View_Common')->getMenuPath('listings/listing_other');
     $menuSynchronizationPath = Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/synchronization');
     echo Mage::helper('M2ePro')->__(
-        'The 3rd Party Listings are the Items, which were listed on Rakuten.com without using M2E Pro Extension. <br/><br/>
+        'The 3rd Party Listings are the Items, which were Listed on Rakuten.com without using M2E Pro Extension. <br/><br/>
 
         To allow importing of these Listings for the current Rakuten.com Account, set <strong>Import 3rd Party Listings</strong> to <i>Yes</i>.<br/>
         Imported Listings can be found in (%menu_other_listings_path%).<br/><br/>
 
         <b>Note:</b> The 3rd Party Listings Synchronization must be enabled in (%menu_synchronization_path%).<br/><br/>
 
-        To Map the Products of the 3rd Party Listings with existing Products in Magento by Reference ID, Rakuten.com Title or Rakuten.com SKU, set <strong>Product Mapping</strong> to <i>Yes</i> and choose appropriate attribute(s).
-        A Magento Product will be mapped if at least one of the chosen attributes meets the same value in Rakuten.com Listing as it has in Magento.
+        To Map the Products of the 3rd Party Listings with existing Products in Magento by Reference ID, Rakuten.com Title or Rakuten.com SKU, set <strong>Product Mapping</strong> to <i>Yes</i> and choose appropriate Attribute(s).
+        A Magento Product will be Mapped if at least one of the chosen Attributes meets the same value in Rakuten.com Listing as it has in Magento.
         <br/>
-        After mapping the Rakuten.com Listing can be automatically Moved from the 3rd Party Listings to M2E Pro Listings for further management.<br/><br/>
+        After Mapping the Rakuten.com Listing can be automatically Moved from the 3rd Party Listings to M2E Pro Listings for further management.<br/><br/>
 
         <b>Note:</b> Auto Mapping and Moving Actions are performed only once during the first 3rd Party Listings Synchronization.
-        Afterwards, it can be performed manually on the 3rd Party Listings page (%menu_other_listings_path%).',
+        Afterwards, it can be performed manually on the 3rd Party Listings Page (%menu_other_listings_path%).',
         $menuOtherListingsPath, $menuSynchronizationPath);
     ?>
 </div>
@@ -127,6 +127,9 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         );
                         echo $tempStoreBlock->toHtml();
                         ?>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Store View, which will be associated with chosen Marketplace of the current Account.'); ?></span>
+                        </p>
                     </td>
                 </tr>
 
@@ -266,7 +269,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
         <div class="hor-scroll">
 
             <div id="block_notice_buy_accounts_other_listings_move_synch" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Moving 3rd Party Listings'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('This section allows you automatically move mapped Rakuten.com Items in default created M2E Pro Listing and synchronize their Prices and Quantities with Magento values at once they have been moved.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('This Section allows you automatically move Mapped Rakuten.com Items in default created M2E Pro Listing and synchronize their Prices and Quantities with Magento values at once they have been Moved.'); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">

@@ -640,7 +640,7 @@ HTML;
         if ($searchSettingsStatus == Ess_M2ePro_Model_Play_Listing_Product::SEARCH_SETTINGS_STATUS_NOT_FOUND) {
 
             $tip = Mage::helper('M2ePro')->__(
-                'There were no Products found on Play.com according to the listing search settings.'
+                'There were no Products found on Play.com according to the Listing Search Settings.'
             );
             $tip = Mage::helper('M2ePro')->escapeJs($tip);
 
@@ -789,9 +789,9 @@ HTML;
         }
 
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Action was completed with warning(s).'
         );
 
         $icons = array(

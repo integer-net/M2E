@@ -157,39 +157,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
                                               array $channelOptions = array(),
                                               $generalId = null)
     {
-        $productVariation = $this->getProductVariation($productOptions);
-        if (empty($productVariation)) {
-            return;
-        }
-
-        $data = array(
-            'listing_id' => $this->getListingProduct()->getListingId(),
-            'product_id' => $this->getListingProduct()->getProductId(),
-            'status'     => Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED,
-            'general_id' => $generalId,
-            'is_general_id_owner' => $this->isGeneralIdOwner(),
-            'status_changer'   => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN,
-            'is_variation_product'    => 1,
-            'is_variation_parent'     => 0,
-            'variation_parent_id'     => $this->getListingProduct()->getId(),
-            'template_description_id' => $this->getAmazonListingProduct()->getTemplateDescriptionId(),
+        $childListingProduct = $this->getTypeModel()->createChildListingProduct(
+            $productOptions, $channelOptions, $generalId
         );
 
-        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
-        $listingProduct = Mage::helper('M2ePro/Component')->getComponentModel(
-            Ess_M2ePro_Helper_Component_Amazon::NICK,'Listing_Product'
-        )->setData($data)->save();
-
-        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
-        $amazonListingProduct = $listingProduct->getChildObject();
-
-        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $typeModel */
-        $typeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
-
-        !empty($productOptions) && $typeModel->setProductVariation($productVariation);
-        !empty($channelOptions) && $typeModel->setChannelVariation($channelOptions);
-
-        $this->childListingProducts[$listingProduct->getId()] = $listingProduct;
+        $this->childListingProducts[$childListingProduct->getId()] = $childListingProduct;
     }
 
     public function tryToDeleteChildListingProduct(Ess_M2ePro_Model_Listing_Product $childListingProduct)

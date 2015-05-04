@@ -84,7 +84,7 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
         grid.massaction.apply = function() {
 
             if (this.getCheckedValues() == '') {
-                alert(M2ePro.translator.translate('Please select the Products you want to perform the action on.'));
+                alert(M2ePro.translator.translate('Please select the Products you want to perform the Action on.'));
                 return;
             }
 
@@ -120,7 +120,7 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
         ebayMotorViewGridJsObject.massaction.apply = function() {
 
             if (this.getCheckedValues() == '') {
-                alert(M2ePro.translator.translate('Please select Items you want to perform the action on.'));
+                alert(M2ePro.translator.translate('Please select Items you want to perform the Action on.'));
                 return;
             }
 
@@ -188,7 +188,7 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
         MagentoMessageObj.clearAll();
 
         if (self.compatibilityType == M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC') && self.isEmptyCompatibilityAttribute) {
-            MagentoMessageObj.addError(M2ePro.translator.translate('Please specify eBay motors compatibility attribute in %s > Configuration > <a target="_blank" href="%s">General</a>'));
+            MagentoMessageObj.addError(M2ePro.translator.translate('Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>'));
             return;
         }
 

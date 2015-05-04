@@ -45,13 +45,13 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
             'Marketplace', (int)$params['marketplace_id']
         );
 
-        $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
+        $this->getActualOperationHistory()->addText('Starting Marketplace "'.$marketplace->getTitle().'"');
 
         for ($i = 0; $i < 100; $i++) {
             $this->getActualLockItem()->setPercents($this->getPercentsStart());
 
             $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
-                'Get categories from Rakuten, part № ' . $partNumber);
+                'Get Categories from Rakuten, part № ' . $partNumber);
             $response = $this->receiveFromRakuten($partNumber);
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 
@@ -60,14 +60,14 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
             }
 
             $this->getActualLockItem()->setStatus(
-                'Processing category data ('.(int)$partNumber.'/'.(int)$response['total_parts'].')'
+                'Processing Category data ('.(int)$partNumber.'/'.(int)$response['total_parts'].')'
             );
 
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
             $this->getActualLockItem()->activate();
 
             $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
-                'Save categories to DB');
+                'Save Categories to DB');
             $this->saveCategoriesToDb($response['data']);
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
 
@@ -98,7 +98,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
         }
 
         $this->getActualOperationHistory()
-             ->addText('Total received categories from Rakuten: '.count($response['data']));
+             ->addText('Total received Categories from Rakuten: '.count($response['data']));
         return $response;
     }
 
@@ -155,10 +155,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         // M2ePro_TRANSLATIONS
-        // The "Categories" action for Rakuten Marketplace: "%mrk%" has been successfully completed.
+        // The "Categories" Action for Rakuten Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Categories" action for Rakuten Marketplace: "%mrk%" has been successfully completed.',
+            'The "Categories" Action for Rakuten Marketplace: "%mrk%" has been successfully completed.',
             array('mrk' => $marketplace->getTitle())
         );
 

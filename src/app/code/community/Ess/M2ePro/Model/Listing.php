@@ -346,8 +346,8 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
                                      NULL,
                                      Ess_M2ePro_Model_Listing_Log::ACTION_ADD_PRODUCT_TO_LISTING,
                                      // M2ePro_TRANSLATIONS
-                                     // Item was successfully added
-                                     'Item was successfully added',
+                                     // Item was successfully Added
+                                     'Item was successfully Added',
                                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW);
         //------------------------------
@@ -429,18 +429,17 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
                                     ->addFieldToFilter('product_id', $productId)
                                     ->getItems();
 
-        $deletedListingsProductsIds = array();
+        $listingsProductsForRemove = array();
 
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($listingsProducts as $listingProduct) {
 
-            if (!in_array($listingProduct->getId(),$deletedListingsProductsIds)) {
+            if (!isset($listingsProductsForRemove[$listingProduct->getId()])) {
                 $listingProduct->deleteProcessingRequests();
                 $listingProduct->deleteObjectLocks();
                 $listingProduct->isStoppable() && Mage::getModel('M2ePro/StopQueue')->add($listingProduct);
                 $listingProduct->setStatus(Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED)->save();
-                $listingProduct->deleteInstance();
-                $deletedListingsProductsIds[] = $listingProduct->getId();
+                $listingsProductsForRemove[$listingProduct->getId()] = $listingProduct;
             }
 
             $listingId = $listingProduct->getListingId();
@@ -505,10 +504,14 @@ class Ess_M2ePro_Model_Listing extends Ess_M2ePro_Model_Component_Parent_Abstrac
                                     NULL,
                                     Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_MAGENTO,
                                     // M2ePro_TRANSLATIONS
-                                    // Variation option was deleted. Item was reset.
-                                    'Variation option was deleted. Item was reset.',
+                                    // Variation Option was deleted. Item was reset.
+                                    'Variation Option was deleted. Item was reset.',
                                     Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING,
                                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
+        }
+
+        foreach ($listingsProductsForRemove as $listingProduct) {
+            $listingProduct->deleteInstance();
         }
 
         //------------------

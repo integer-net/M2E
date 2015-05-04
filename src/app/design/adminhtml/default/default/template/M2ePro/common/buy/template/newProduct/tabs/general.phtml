@@ -1,8 +1,8 @@
 <div id="block_notice_buy_newProduct_template_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This tab contains the main information on Products you want to list: Attribute Set
+    <?php echo Mage::helper('M2ePro')->__('This Tab contains the main information on Products you want to list: Attribute Set
  (it must be the same as M2E Pro Listing has to be assigned), Products Identifiers and
- Category in which the Products have to be listed.<br/><br/>
-The category either can be chosen by <u>Browsing</u> all categories from the list or can be found with <u>Searching
+ Category in which the Products have to be Listed.<br/><br/>
+The Category either can be chosen by <u>Browsing</u> all Categories from the list or can be found with <u>Searching
  tool</u> by entering keywords.'); ?>
 </div>
 
@@ -55,11 +55,11 @@ $isEdit = !!$this->getRequest()->getParam('id');
         'Invalid input data. Decimal value required. Example 12.05' => Mage::helper('M2ePro')->__('Invalid input data. Decimal value required. Example 12.05'),
         'Invalid input data. String value required.' => Mage::helper('M2ePro')->__('Invalid input data. String value required.'),
 
-        'The specified title is already used for another New SKU Policy.' => Mage::helper('M2ePro')->__('The specified title is already used for another New SKU Policy.'),
+        'The specified Title is already used for another New SKU Policy.' => Mage::helper('M2ePro')->__('The specified Title is already used for another New SKU Policy.'),
         'Select Category first.' => Mage::helper('M2ePro')->__('Select Category first.'),
         'Search For Category' => Mage::helper('M2ePro')->__('Search For Category'),
 
-        'All of your Product images should meet the following rules:' => Mage::helper('M2ePro')->__('All of your Product images should meet the following rules:'),
+        'All of your Product Images should meet the following Rules:' => Mage::helper('M2ePro')->__('All of your Product Images should meet the following Rules:'),
 
         'Must be at least 500 pixels in width or height' => Mage::helper('M2ePro')->__('Must be at least 500 pixels in width or height'),
         'No more than 5 megabytes (MB) in size' => Mage::helper('M2ePro')->__('No more than 5 megabytes (MB) in size'),
@@ -164,7 +164,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value">
                         <input id="title" name="category[title]" value="<?php echo $this->escapeHtml($formData['category']['title']); ?>" type="text" class="input-text required-entry M2ePro-new-sku-template-title"/>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful policy title for your internal use.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful Policy Title for your internal use.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -275,7 +275,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             </select>
                         </div>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The GTIN (UPC or EAN) compatible Product identifier must be at least 12 digits in length.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The GTIN (UPC or EAN) compatible Product Identifier must be at least 12 digits in length.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -291,7 +291,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['isbn_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('International book identifier. Use only digits in this field.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('International book Identifier. Use only digits in this field.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -330,7 +330,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['asin_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com Product identifier.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com Product Identifier.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -379,7 +379,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com groups Products together in the same family by this parameter.<br/>
                                 <b>For ex.</b>, a Product "T-shirt" has 4 different colors. As Rakuten.com does not<br/>have parent/child Product relationships each of these Products is treated as totally separate.
-                                <br/>By assigning all 4 T-shirts the same Product Set ID, all of them will be placed on the same<br/>Rakuten.com web page with pull down menu of selecting color.'); ?></span>
+                                <br/>By assigning all 4 T-shirts the same Product Set ID, all of them will be placed on the same<br/>Rakuten.com web Page with pull down menu of selecting color.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -422,7 +422,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
         <div style="height: 450px">
             <div id="block_notice_buy_category_template_browse" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Browse'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('Choose the department your Product belongs to and then choose the category you need.<br/>Press the Confirm button.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('Choose the department your Product belongs to and then choose the Category you need.<br/>Press the Confirm Button.'); ?>
             </div>
 
             <div class="entry-edit-head">
@@ -493,8 +493,8 @@ $isEdit = !!$this->getRequest()->getParam('id');
         </div>
 
         <div id="block_notice_buy_category_template_search" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Search'); ?>">
-            <?php echo Mage::helper('M2ePro')->__('Enter the words, which describe the best your Product and click on the Search button.<br/>
-Founded categories will be displayed for selection. '); ?>
+            <?php echo Mage::helper('M2ePro')->__('Enter the words, which describe the best your Product and click on the Search Button.<br/>
+Founded Categories will be displayed for selection. '); ?>
         </div>
 
         <div style="padding: 10px; border: 1px solid rgb(205, 221, 221) !important; background-image: none !important; background-attachment: scroll !important; background-color: rgb(231, 239, 239) !important; background-position: 0px 0px !important; background-repeat: repeat repeat !important;">

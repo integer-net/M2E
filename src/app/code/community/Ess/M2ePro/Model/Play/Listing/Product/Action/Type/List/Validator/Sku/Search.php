@@ -29,7 +29,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_Sku_Searc
 
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         $sku = $this->getSku();
 
@@ -117,7 +117,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_Sku_Searc
     {
         if ($this->isExistInRequestSkus($sku)) {
 
-            $addMessages && $this->addMessage('Product with the same Reference Code is being listed on Play.com .');
+            $addMessages && $this->addMessage('Product with the same Reference Code is being Listed on Play.com .');
             return true;
         }
 

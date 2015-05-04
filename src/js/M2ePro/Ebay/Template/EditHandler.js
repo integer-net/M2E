@@ -10,7 +10,7 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
 
     initialize: function()
     {
-        Validation.add('validate-title-uniqueness', M2ePro.translator.translate('Policy title is not unique.'), function(value, el) {
+        Validation.add('validate-title-uniqueness', M2ePro.translator.translate('Policy Title is not unique.'), function(value, el) {
 
             var unique = false;
 

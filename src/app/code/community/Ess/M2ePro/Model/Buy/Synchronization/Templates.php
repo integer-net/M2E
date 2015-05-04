@@ -138,7 +138,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates
 
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Task "Inventory Synchronization" has completed with %result%. View %sl%listings log%el% for details.',
+                'Task "Inventory Synchronization" has completed with %result%. View %sl%Listings Log%el% for details.',
                 array(
                     '!sl'=>'<a target="_blank" href="route:*/adminhtml_common_log/listing/;'.
                              'back:*/adminhtml_common_log/synchronization/;'.

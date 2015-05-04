@@ -19,7 +19,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct extends Mage_Adm
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('New SKU Policies For Rakuten.com (Beta)');
+        $this->_headerText = Mage::helper('M2ePro')->__('New SKU Policies For %rakuten%',
+                                                         Mage::helper('M2ePro/Component_Buy')->getTitle());
         //------------------------------
 
         // Set buttons actions

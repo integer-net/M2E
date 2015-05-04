@@ -8,8 +8,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Payment
     extends Ess_M2ePro_Model_Connector_Ebay_Order_Update_Abstract
 {
     // M2ePro_TRANSLATIONS
-    // Payment status for eBay order was not updated. Reason: eBay Failure.
-    // Payment status for eBay order was updated to Paid.
+    // Payment Status for eBay Order was not updated. Reason: eBay Failure.
+    // Payment Status for eBay Order was updated to Paid.
 
     // ########################################
 
@@ -21,13 +21,13 @@ class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Payment
 
         if (!isset($response['result']) || !$response['result']) {
             $this->order->addErrorLog(
-                'Payment status for eBay order was not updated. Reason: eBay Failure.'
+                'Payment Status for eBay Order was not updated. Reason: eBay Failure.'
             );
             return false;
         }
 
 //        $this->order->setData('payment_status', Ess_M2ePro_Model_Ebay_Order::PAYMENT_STATUS_COMPLETED)->save();
-        $this->order->addSuccessLog('Payment status for eBay order was updated to Paid.');
+        $this->order->addSuccessLog('Payment Status for eBay Order was updated to Paid.');
 
         Mage::getResourceModel('M2ePro/Order_Change')
             ->deleteByOrderAction($this->order->getId(), Ess_M2ePro_Model_Order_Change::ACTION_UPDATE_PAYMENT);

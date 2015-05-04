@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Delete_Validator
 {
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         $params = $this->getParams();
 
@@ -34,10 +34,22 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Delete_Validator
             if (empty($params['remove'])) {
 
                 // M2ePro_TRANSLATIONS
-                // Item is not listed or not available
-                $this->addMessage('Item is not listed or not available');
+                // Item is not Listed or not available
+                $this->addMessage('Item is not Listed or not available');
 
             } else {
+                if ($this->getVariationManager()->isRelationChildType() &&
+                    $this->getVariationManager()->getTypeModel()->isVariationProductMatched()
+                ) {
+                    $parentAmazonListingProduct = $this->getVariationManager()
+                        ->getTypeModel()
+                        ->getAmazonParentListingProduct();
+
+                    $parentAmazonListingProduct->getVariationManager()->getTypeModel()->addRemovedProductOptions(
+                        $this->getVariationManager()->getTypeModel()->getProductOptions()
+                    );
+                }
+
                 $this->getListingProduct()->deleteInstance();
                 $this->getListingProduct()->isDeleted(true);
             }

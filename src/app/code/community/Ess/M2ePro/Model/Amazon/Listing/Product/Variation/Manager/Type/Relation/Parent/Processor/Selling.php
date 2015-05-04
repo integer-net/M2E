@@ -26,8 +26,26 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
             $qty = (int)$qty + (int)$amazonListingProduct->getOnlineQty();
 
-            if (is_null($price) || $price > (float)$amazonListingProduct->getOnlinePrice()) {
-                $price = (float)$amazonListingProduct->getOnlinePrice();
+            $actualOnlinePrice = (float)$amazonListingProduct->getOnlinePrice();
+
+            $salePrice = (float)$amazonListingProduct->getOnlineSalePrice();
+
+            if ($salePrice > 0) {
+                $startDateTimestamp = strtotime($amazonListingProduct->getOnlineSalePriceStartDate());
+                $endDateTimestamp   = strtotime($amazonListingProduct->getOnlineSalePriceEndDate());
+
+                $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+
+                if ($currentTimestamp >= $startDateTimestamp &&
+                    $currentTimestamp <= $endDateTimestamp &&
+                    $salePrice < $actualOnlinePrice
+                ) {
+                    $actualOnlinePrice = $salePrice;
+                }
+            }
+
+            if (is_null($price) || $price > $actualOnlinePrice) {
+                $price = $actualOnlinePrice;
             }
         }
 

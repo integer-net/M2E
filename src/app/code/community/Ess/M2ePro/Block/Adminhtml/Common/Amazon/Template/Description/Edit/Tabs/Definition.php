@@ -93,24 +93,18 @@ JS;
 
     // ####################################
 
-    public function getForceAddedAttributeOptionHtml($attributeName, $availableValues)
+    public function getForceAddedAttributeOptionHtml($attributeCode, $availableValues, $value = null)
     {
-        if ($attributeName == '') {
+        if (empty($attributeCode) ||
+            Mage::helper('M2ePro/Magento_Attribute')->isExistInAttributesArray($attributeCode, $availableValues)) {
             return '';
         }
 
-        if (Mage::helper('M2ePro/Magento_Attribute')->isExistInAttributesArray($attributeName, $availableValues)) {
-            return '';
-        }
+        $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeCode);
+        $html = "<option %s selected=\"selected\">{$attributeLabel}</option>";
 
-        $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeName);
-
-        return <<<HTML
-<option value="{$attributeName}" selected="selected">
-    {$attributeLabel}
-</option>
-HTML;
-
+        return is_null($value) ? sprintf($html, "value='{$attributeCode}'")
+                               : sprintf($html, "attribute_code='{$attributeCode}' value='{$value}'");
     }
 
     // ------------------------------------

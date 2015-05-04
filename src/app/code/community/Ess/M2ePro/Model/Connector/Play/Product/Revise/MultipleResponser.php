@@ -12,8 +12,8 @@ class Ess_M2ePro_Model_Connector_Play_Product_Revise_MultipleResponser
     protected function getSuccessfulMessage(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         // M2ePro_TRANSLATIONS
-        // Item was successfully revised
-        return 'Item was successfully revised';
+        // Item was successfully Revised
+        return 'Item was successfully Revised';
     }
 
     // ########################################

@@ -233,7 +233,8 @@ HTML;
                                             width: 170px;">'.
                         ucfirst(strtolower($magentoAttr)).
                         '</span>';
-                    $magentoProductAttributesHtml .= '<input type="hidden" value="'.$magentoAttr.'"
+                    $magentoProductAttributesHtml .= '<input type="hidden" value="' .
+                                       Mage::helper('M2ePro')->escapeHtml($magentoAttr) . '"
                                        id="magento_product_attribute_'.$attributeId.'_'.$id.'">';
                     $magentoProductAttributesHtml .= '<select class="amazon_product_attribute_'.$id.'"
                                        onchange="ListingGridHandlerObj.productSearchHandler.attributesChange(this)"

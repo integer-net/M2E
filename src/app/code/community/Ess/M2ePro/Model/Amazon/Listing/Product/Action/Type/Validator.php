@@ -159,7 +159,7 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
 
     // ########################################
 
-    abstract public function isValid();
+    abstract public function validate();
 
     protected function addMessage($message, $type = Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR)
     {
@@ -223,11 +223,11 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
         if ($this->getListingProduct()->isBlocked()) {
 
 // M2ePro_TRANSLATIONS
-// The action can not be executed as the Item was Closed, Incomplete or Blocked on Amazon. Please, go to Amazon Seller Central and Active the Item. After the next synchronization the Item will be available.
+// The Action can not be executed as the Item was Closed, Incomplete or Blocked on Amazon. Please, go to Amazon Seller Central and Active the Item. After the next Synchronization the Item will be available.
             $this->addMessage(
-                'The action can not be executed as the Item was Closed, Incomplete or Blocked on Amazon.
+                'The Action can not be executed as the Item was Closed, Incomplete or Blocked on Amazon.
                  Please, go to Amazon Seller Central and Active the Item.
-                 After the next synchronization the Item will be available.'
+                 After the next Synchronization the Item will be available.'
             );
 
             return false;
@@ -241,8 +241,8 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
         if ($this->getListingProduct()->isLockedObject('in_action')) {
 
             // M2ePro_TRANSLATIONS
-            // Another action is being processed. Try again when the action is completed.
-            $this->addMessage('Another action is being processed. Try again when the action is completed.');
+            // Another Action is being processed. Try again when the Action is completed.
+            $this->addMessage('Another Action is being processed. Try again when the Action is completed.');
 
             return false;
         }
@@ -262,9 +262,9 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
         if ($qty <= 0) {
 
             // M2ePro_TRANSLATIONS
-            // The Quantity must be greater than 0. Please, check the Selling Format Policy and Product settings.
+            // The Quantity must be greater than 0. Please, check the Selling Format Policy and Product Settings.
             $this->addMessage(
-                'The Quantity must be greater than 0. Please, check the Selling Format Policy and Product settings.'
+                'The Quantity must be greater than 0. Please, check the Selling Format Policy and Product Settings.'
             );
 
             return false;
@@ -285,9 +285,9 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
         if ($price <= 0) {
 
             // M2ePro_TRANSLATIONS
-            // The Price must be greater than 0. Please, check the Selling Format Policy and Product settings.
+            // The Price must be greater than 0. Please, check the Selling Format Policy and Product Settings.
             $this->addMessage(
-                'The Price must be greater than 0. Please, check the Selling Format Policy and Product settings.'
+                'The Price must be greater than 0. Please, check the Selling Format Policy and Product Settings.'
             );
 
             return false;
@@ -320,15 +320,15 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
     {
         if ($this->getListingProduct()->getData('no_child_for_processing')) {
 // M2ePro_TRANSLATIONS
-// This Parent has no Child Products on which the chosen action can be performed.
-            $this->addMessage('This Parent has no Child Products on which the chosen action can be performed.');
+// This Parent has no Child Products on which the chosen Action can be performed.
+            $this->addMessage('This Parent has no Child Products on which the chosen Action can be performed.');
             return false;
         }
 // M2ePro_TRANSLATIONS
-// This action cannot be fully performed because there are different actions in progress on some Child Products
+// This Action cannot be fully performed because there are different actions in progress on some Child Products
         if ($this->getListingProduct()->getData('child_locked')) {
-            $this->addMessage('This action cannot be fully performed because there are
-                                different actions in progress on some Child Products');
+            $this->addMessage('This Action cannot be fully performed because there are
+                                different Actions in progress on some Child Products');
             return false;
         }
 
@@ -372,8 +372,8 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
         if (!$this->getAmazonListingProduct()->isGeneralIdOwner() && !$typeModel->isVariationChannelMatched()) {
 
             // M2ePro_TRANSLATIONS
-            // You have to select channel variation.
-            $this->addMessage('You have to select channel variation.');
+            // You have to select Channel Variation.
+            $this->addMessage('You have to select Channel Variation.');
 
             return false;
         }

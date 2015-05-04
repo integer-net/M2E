@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_Sku_Exist
 
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         if (empty($this->existenceResult['general_id'])) {
             return true;
@@ -58,7 +58,7 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_Sku_Exist
         $linkingObject->link();
 
         $this->addMessage(
-            'Product was successfully found in Play.com inventory by
+            'Product was successfully found in Play.com Inventory by
              Reference Code and linked to your Magento Product.',
             Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS
         );

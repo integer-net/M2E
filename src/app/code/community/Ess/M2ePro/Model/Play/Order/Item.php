@@ -10,9 +10,9 @@
 class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_Play_Abstract
 {
     // M2ePro_TRANSLATIONS
-    // Product import is disabled in Play Account settings.
-    // Product for Play Item "%id%" was created in Magento catalog.
-    // Product for Play Item "%title%" was created in Magento catalog.
+    // Product Import is disabled in Play Account Settings.
+    // Product for Play Item "%id%" was Created in Magento Catalog.
+    // Product for Play Item "%title%" was Created in Magento Catalog.
 
     // ########################################
 
@@ -196,13 +196,13 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
         if (!is_null($channelItem) && !$this->getPlayAccount()->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for Items listed by M2E Pro is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($channelItem) && !$this->getPlayAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for Items listed by 3rd party software is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by 3rd party Software is disabled in Account Settings.'
             );
         }
     }
@@ -210,7 +210,7 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
     private function createProduct()
     {
         if (!$this->getPlayAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product import is disabled in Play Account settings.');
+            throw new Exception('Product Import is disabled in Play Account Settings.');
         }
 
         $storeId = $this->getPlayAccount()->getMagentoOrdersListingsOtherStoreId();
@@ -255,7 +255,7 @@ class Ess_M2ePro_Model_Play_Order_Item extends Ess_M2ePro_Model_Component_Child_
         // ----------------
 
         $this->getParentObject()->getOrder()->addSuccessLog(
-            'Product for Play Item "%title%" was created in Magento catalog.', array('!title' => $this->getTitle())
+            'Product for Play Item "%title%" was Created in Magento Catalog.', array('!title' => $this->getTitle())
         );
 
         return $productBuilder->getProduct();

@@ -59,16 +59,16 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
             /** @var $account Ess_M2ePro_Model_Account **/
 
-            $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
+            $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
             // M2ePro_TRANSLATIONS
-            // The "Update Listings Products" action for eBay account: "%account_title%" is started. Please wait...
-            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is started. ';
+            // The "Update Listings Products" Action for eBay Account: "%account_title%" is started. Please wait...
+            $status = 'The "Update Listings Products" Action for eBay Account: "%account_title%" is started. ';
             $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             $this->getActualOperationHistory()->addTimePoint(
                 __METHOD__.'process'.$account->getId(),
-                'Process account '.$account->getTitle()
+                'Process Account '.$account->getTitle()
             );
 
             $this->processAccount($account);
@@ -76,8 +76,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
 
             // M2ePro_TRANSLATIONS
-            // The "Update Listings Products" action for eBay account: "%account_title%" is finished. Please wait...
-            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is finished.'.
+            // The "Update Listings Products" Action for eBay Account: "%account_title%" is finished. Please wait...
+            $status = 'The "Update Listings Products" Action for eBay Account: "%account_title%" is finished.'.
                 ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
@@ -338,7 +338,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
             $data['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED;
 
         } else if ($change['listingStatus'] == self::EBAY_STATUS_ACTIVE &&
-                   $change['quantity'] <= 0) {
+                   $qty - $qtySold <= 0) {
 
             $data['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN;
 

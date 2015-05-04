@@ -1,20 +1,20 @@
 <div id="block_notice_buy_template_selling_format" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Selling Format Policy'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('Selling Format Policy contains Price-Related data and Quantity for the Items, which will be listed on Rakuten.com.<br/><br/>
-    Next to each Price options dropdown there is a box for Price Change. Price Change is a value you want the Magento Price to be modified while listing on Rakuten.com.<br/><br/>
+    <?php echo Mage::helper('M2ePro')->__('Selling Format Policy contains Price-Related data and Quantity for the Items, which will be Listed on Rakuten.com.<br/><br/>
+    Next to each Price Options Dropdown there is a box for Price Change. Price Change is a value you want the Magento Price to be modified while Listing on Rakuten.com.<br/><br/>
     <b>Examples:</b><br/>
 
     <ul class="list">
         <li>If you want the Price on Rakuten.com to be greater by 15% than the Price in Magento, you should set +15% in the Price Change field.<br/>
         <i>Rakuten.com Price = Magento Price + Magento Price * 0.15</i></li>
-        <li>If you want the Price on Rakuten.com to be less by 10 currency units than the Price in Magento, you should set -10 in the Price Change field.<br/>
+        <li>If you want the Price on Rakuten.com to be less by 10 Currency units than the Price in Magento, you should set -10 in the Price Change field.<br/>
         <i>Rakuten.com Price = Magento Price - 10</i></li>
         <li>If you want the Price on Rakuten.com to be multiplied by coefficient 1.2, you should set 1.2 in the Price Change field.<br/>
         <i>Rakuten.com Price = Magento Price * 1.2.</i></li>
     </ul>
 
-    <b>Note:</b> If the Special Price is chosen in the <i class="underline">Price</i> option, but it is not set in Magento Product settings or it is set but it has already expired, the Product Price is used instead.
+    <b>Note:</b> If the Special Price is chosen in the <i class="underline">Price</i> Option, but it is not set in Magento Product Settings or it is set but it has already expired, the Product Price is used instead.
     <br/><br/>
-    <b>Note:</b> Attributes must contain only numeric values.
+    <b>Note:</b> Attributes must contain only Numeric Values.
 '); ?>
 </div>
 
@@ -87,11 +87,11 @@ $isEdit = !!$this->getRequest()->getParam('id');
         'QTY' => Mage::helper('M2ePro')->__('QTY'),
 
         'Product Price for Rakuten.com Listing(s).' => Mage::helper('M2ePro')->__('Product Price for Rakuten.com Listing(s).'),
-        'The Price of Products in Rakuten.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.' => Mage::helper('M2ePro')->__('The Price of Products in Rakuten.com listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.'),
+        'The Price of Products in Rakuten.com Listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.' => Mage::helper('M2ePro')->__('The Price of Products in Rakuten.com Listing(s).<br/><b>Note:</b> The Final Price is only used for Simple Products.'),
 
         'Add Selling Format Policy.' => Mage::helper('M2ePro')->__('Add Selling Format Policy.'),
         'The specified Title is already used for other Policy. Policy Title must be unique.' => Mage::helper('M2ePro')->__('The specified Title is already used for other Policy. Policy Title must be unique.'),
-        'You should select Attribute Sets first and press Confirm button.' => Mage::helper('M2ePro')->__('You should select Attribute Sets first and press Confirm button.'),
+        'You should select Attribute Sets first and press Confirm Button.' => Mage::helper('M2ePro')->__('You should select Attribute Sets first and press Confirm Button.'),
         'Coefficient is not valid.' => Mage::helper('M2ePro')->__('Coefficient is not valid.'),
 
         'Wrong value. Only integer numbers.' => Mage::helper('M2ePro')->__('Wrong value. Only integer numbers.')
@@ -175,7 +175,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value">
                         <input id="title" name="title" value="<?php echo $this->escapeHtml($formData['title']); ?>" type="text" class="input-text required-entry M2ePro-price-tpl-title"/>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful policy title for your internal use.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful Policy Title for your internal use.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -244,9 +244,9 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <?php endfor; ?>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of Items number to be listed on Rakuten.com basing on Product Quantity or Magento attribute.
-E.g., if QTY percentage is set to 10% and Product Quantity is 100, the Quantity to be listed on Rakuten.com will be calculated as <br/>100 *10%  = 10.
-'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of Items number to be Listed on Rakuten.com basing on Product Quantity or Magento Attribute. <br/><br/>
+                            E.g., if QTY percentage is set to 10% and Product Quantity is 100, the Quantity to be Listed on Rakuten.com will be calculated as 100 * 10%  = 10.
+                        '); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -262,7 +262,7 @@ E.g., if QTY percentage is set to 10% and Product Quantity is 100, the Quantity 
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODIFICATION_MODE_ON; ?>" <?php if ($formData['qty_modification_mode'] == Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODIFICATION_MODE_ON): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                         </select>
                            <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('<i>Enables</i> to set the Quantity that will be sent on Rakuten.com.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('<b>Enables</b> to set the Quantity that will be sent on Rakuten.com.'); ?></span>
                            </p>
                     </td>
                 </tr>
@@ -274,8 +274,9 @@ E.g., if QTY percentage is set to 10% and Product Quantity is 100, the Quantity 
                     <td id="qty_min_posted_value_td" class="value" style="width: auto;">
                         <input id="qty_min_posted_value" name="qty_min_posted_value" value="<?php echo $this->escapeHtml($formData['qty_min_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in stock but set a min QTY to be listed of 5, Item will not be listed on Rakuten.com.
-Otherwise, the Item will be listed with Quantity according to the settings in the Selling Format Policy.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in Stock but set a Minimum Quantity to Be Listed of 5, Item will not be Listed on Rakuten.com.
+                            Otherwise, the Item will be Listed with Quantity according to the Settings in the Selling Format Policy.
+                            '); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -287,8 +288,9 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                     <td id="qty_max_posted_value_td" class="value" style="width: auto;">
                         <input id="qty_max_posted_value" name="qty_max_posted_value" value="<?php echo $this->escapeHtml($formData['qty_max_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('If you have 5 pieces in stock but set a max QTY of 2 to be listed, a QTY of 2 will be listed on Rakuten.com.
-                                                                            <br/>If you have 1 piece in stock but max QTY is set to 3, only 1 will be listed on Rakuten.com.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('If you have 5 pieces in Stock but set a Maximum Quantity of 2 to be Listed, a QTY of 2 will be Listed on Rakuten.com.
+                            If you have 1 piece in Stock but Maximum Quantity is set to 3, only 1 will be Listed on Rakuten.com.
+                            '); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -337,7 +339,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                     <td id="price_coefficient_td" class="coef">
                         <div style="font-size: 11px; float: right; padding-left: 10px;">
                             <img src="<?php echo $this->getSkinUrl('M2ePro/images/note_cell_bg.gif'); ?>" />
-                            <span style="padding-left: 5px;"><?php echo Mage::helper('M2ePro')->__('Absolute figure (+8,-3), percentage (+15%, -20%) or currency rate (1.44)'); ?>.</span>
+                            <span style="padding-left: 5px;"><?php echo Mage::helper('M2ePro')->__('Absolute figure (+8,-3), percentage (+15%, -20%) or Currency rate (1.44)'); ?>.</span>
                         </div>
                         <input id="price_coefficient" name="price_coefficient" value="<?php echo $this->escapeHtml($formData['price_coefficient']); ?>" type="text" class="M2ePro-validate-price-coefficient input-text" />
                     </td>
@@ -353,7 +355,7 @@ Otherwise, the Item will be listed with Quantity according to the settings in th
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_VARIATION_MODE_CHILDREN; ?>" <?php if (Ess_M2ePro_Model_Buy_Template_SellingFormat::PRICE_VARIATION_MODE_CHILDREN == $formData['price_variation_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Associated Products'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Determines where the Price for Configurable and Bundle Products options should be taken from.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Determines where the Price for Configurable and Bundle Products Options should be taken from.'); ?></span>
                         </p>
                     </td>
                 </tr>

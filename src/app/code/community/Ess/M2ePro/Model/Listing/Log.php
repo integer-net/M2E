@@ -10,14 +10,14 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
     const _ACTION_UNKNOWN = 'System';
 
     const ACTION_ADD_LISTING = 2;
-    const _ACTION_ADD_LISTING = 'Add new listing';
+    const _ACTION_ADD_LISTING = 'Add new Listing';
     const ACTION_DELETE_LISTING = 3;
-    const _ACTION_DELETE_LISTING = 'Delete existing listing';
+    const _ACTION_DELETE_LISTING = 'Delete existing Listing';
 
     const ACTION_ADD_PRODUCT_TO_LISTING = 4;
-    const _ACTION_ADD_PRODUCT_TO_LISTING = 'Add Product to listing';
+    const _ACTION_ADD_PRODUCT_TO_LISTING = 'Add Product to Listing';
     const ACTION_DELETE_PRODUCT_FROM_LISTING = 5;
-    const _ACTION_DELETE_PRODUCT_FROM_LISTING = 'Delete Item from listing';
+    const _ACTION_DELETE_PRODUCT_FROM_LISTING = 'Delete Item from Listing';
 
     const ACTION_ADD_PRODUCT_TO_MAGENTO = 6;
     const _ACTION_ADD_PRODUCT_TO_MAGENTO = 'Add new Product to Magento Store';
@@ -31,7 +31,7 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
     const ACTION_CHANGE_PRODUCT_QTY = 10;
     const _ACTION_CHANGE_PRODUCT_QTY = 'Change of Product QTY in Magento Store';
     const ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY = 11;
-    const _ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY = 'Change of Product stock availability in Magento Store';
+    const _ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY = 'Change of Product Stock availability in Magento Store';
     const ACTION_CHANGE_PRODUCT_STATUS = 12;
     const _ACTION_CHANGE_PRODUCT_STATUS = 'Change of Product status in Magento Store';
 
@@ -59,16 +59,16 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
     const _ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE = 'Change of Product Special Price to date in Magento Store';
 
     const ACTION_CHANGE_CUSTOM_ATTRIBUTE = 18;
-    const _ACTION_CHANGE_CUSTOM_ATTRIBUTE = 'Change of Product custom attribute in Magento Store';
+    const _ACTION_CHANGE_CUSTOM_ATTRIBUTE = 'Change of Product Custom Attribute in Magento Store';
 
     const ACTION_MOVE_TO_LISTING = 21;
-    const _ACTION_MOVE_TO_LISTING = 'Move to another listing';
+    const _ACTION_MOVE_TO_LISTING = 'Move to another Listing';
 
     const ACTION_MOVE_FROM_OTHER_LISTING = 22;
-    const _ACTION_MOVE_FROM_OTHER_LISTING = 'Move from other listing';
+    const _ACTION_MOVE_FROM_OTHER_LISTING = 'Move from other Listing';
 
     const ACTION_CHANGE_STATUS_ON_CHANNEL = 25;
-    const _ACTION_CHANGE_STATUS_ON_CHANNEL = 'Change Item status on Channel';
+    const _ACTION_CHANGE_STATUS_ON_CHANNEL = 'Change Item Status on Channel';
 
     const ACTION_TRANSLATE_PRODUCT = 28;
     const _ACTION_TRANSLATE_PRODUCT = 'Translation';

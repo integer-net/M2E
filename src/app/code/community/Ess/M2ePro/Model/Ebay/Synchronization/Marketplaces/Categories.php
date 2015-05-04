@@ -48,10 +48,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
         $marketplace = Mage::helper('M2ePro/Component_Ebay')
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
-        $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
+        $this->getActualOperationHistory()->addText('Starting Marketplace "'.$marketplace->getTitle().'"');
 
         $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
-                                                         'Get categories from eBay');
+                                                         'Get Categories from eBay');
         $categories = $this->receiveFromEbay($marketplace);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 
@@ -59,7 +59,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
         $this->getActualLockItem()->activate();
 
         $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
-                                                         'Save categories to DB');
+                                                         'Save Categories to DB');
         $this->saveCategoriesToDb($marketplace,$categories);
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
 
@@ -80,7 +80,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
             $categories = $categories['categories'];
         }
 
-        $this->getActualOperationHistory()->addText('Total received categories from eBay: '.count($categories));
+        $this->getActualOperationHistory()->addText('Total received Categories from eBay: '.count($categories));
 
         return $categories;
     }
@@ -123,10 +123,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         // M2ePro_TRANSLATIONS
-        // The "Categories" action for eBay Site: "%mrk%" has been successfully completed.
+        // The "Categories" Action for eBay Site: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Categories" action for eBay Site: "%mrk%" has been successfully completed.',
+            'The "Categories" Action for eBay Site: "%mrk%" has been successfully completed.',
             array('mrk'=>$marketplace->getTitle())
         );
 

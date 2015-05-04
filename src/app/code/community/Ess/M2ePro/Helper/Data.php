@@ -283,7 +283,8 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function arrayReplaceRecursive($base, $replacements)
     {
-        foreach (array_slice(func_get_args(), 1) as $replacements) {
+        $args = func_get_args();
+        foreach (array_slice($args, 1) as $replacements) {
 
             $bref_stack = array(&$base);
             $head_stack = array($replacements);

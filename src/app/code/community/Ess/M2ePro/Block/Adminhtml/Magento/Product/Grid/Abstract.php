@@ -266,9 +266,9 @@ HTML;
         $helper = Mage::helper('M2ePro');
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the Products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
-        $createEmptyListingMessage = $helper->escapeJs($helper->__('Are you sure you want to create empty listing?'));
+        $createEmptyListingMessage = $helper->escapeJs($helper->__('Are you sure you want to create empty Listing?'));
 
         $showAdvancedFilterButtonText = $helper->escapeJs($helper->__('Show Advanced Filter'));
         $hideAdvancedFilterButtonText = $helper->escapeJs($helper->__('Hide Advanced Filter'));

@@ -28,7 +28,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         $generalId = $this->recognizeByListingProductGeneralId();
         if (!empty($generalId)) {
@@ -42,8 +42,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 // M2ePro_TRANSLATIONS
 // You cannot list this Product because for selling Bundle or Simple with custom options Magento Products on Amazon the ASIN has to be found manually. Please use manual search to find the required ASIN and try again.
             $this->addMessage('You cannot list this Product because for selling Bundle or Simple
-                               with custom options Magento Products on Amazon the ASIN/ISBN has to be found manually.
-                               Please use manual search to find the required ASIN/ISBN and try again.');
+                               With Custom Options Magento Products on Amazon the ASIN/ISBN has to be found manually.
+                               Please use Manual Search to find the required ASIN/ISBN and try again.');
             return false;
         }
 
@@ -59,17 +59,18 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
                 $linkingObject = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Type_List_Linking');
                 $linkingObject->setListingProduct($this->getListingProduct());
                 $linkingObject->setGeneralId($generalId);
-                $linkingObject->setAdditionalData($this->cachedData['amazon_data']);
+                $linkingObject->setSku($this->data['sku']);
+                $linkingObject->setAdditionalData(reset($this->cachedData['amazon_data'][$generalId]));
 
                 $generalIdType = Mage::helper('M2ePro')->isISBN($generalId) ? 'ISBN' : 'ASIN';
 
                 if ($linkingObject->link()) {
 // M2ePro_TRANSLATIONS
-// Magento Parent Product was successfully linked to Amazon Parent Product by %general_id_type% "%general_id%" via search settings.
+// Magento Parent Product was successfully linked to Amazon Parent Product by %general_id_type% "%general_id%" via Search Settings.
                     $this->addMessage(
                         Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                             'Magento Parent Product was successfully linked
-                             to Amazon Parent Product by %general_id_type% "%general_id%" via search settings.',
+                             to Amazon Parent Product by %general_id_type% "%general_id%" via Search Settings.',
                             array('!general_id_type' => $generalIdType, '!general_id' => $generalId)
                         ),
                         Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS
@@ -150,6 +151,18 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
             return null;
         }
 
+        if ($this->getAmazonListingProduct()->isGeneralIdOwner()) {
+            $this->addMessage(
+                Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                    'M2E Pro did not use New ASIN/ISBN Creation feature assigned because settings
+                    for ASIN/ISBN Search were specified in Listing Search Settings and a value
+                    %general_id% were set in Magento Attribute for that Product.',
+                    array('!general_id' => $generalId)
+                ),
+                Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING
+            );
+        }
+
         if (!Mage::helper('M2ePro/Component_Amazon')->isASIN($generalId) &&
             !Mage::helper('M2ePro')->isISBN($generalId)
         ) {
@@ -188,10 +201,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (count($amazonData) > 1) {
 // M2ePro_TRANSLATIONS
-// There is more than one Product found on Amazon using search by %general_id_type% %general_id%. This situation is not supported by M2E PRO.
+// There is more than one Product found on Amazon using Search by %general_id_type% %general_id%. This situation is not supported by M2E PRO.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'There is more than one Product found on Amazon using search
+                    'There is more than one Product found on Amazon using Search
                      by %general_id_type% %general_id%.
                      This situation is not supported by M2E Pro.',
                     array('!general_id_type' => $generalIdType, '!general_id' => $generalId)
@@ -206,10 +219,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
         if (!empty($amazonData['parentage']) && $amazonData['parentage'] == 'parent') {
             if (!$this->getVariationManager()->isRelationParentType()) {
 // M2ePro_TRANSLATIONS
-// Amazon Parent Product was found using search by %general_id_type% %general_id% while Simple or Child Product ASIN/ISBN is required.
+// Amazon Parent Product was found using Search by %general_id_type% %general_id% while Simple or Child Product ASIN/ISBN is required.
                 $this->addMessage(
                     Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Amazon Parent Product was found using search by %general_id_type% %general_id%
+                        'Amazon Parent Product was found using Search by %general_id_type% %general_id%
                          while Simple or Child Product ASIN/ISBN is required.',
                         array('!general_id_type' => $generalIdType, '!general_id' => $generalId)
                     )
@@ -220,10 +233,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
             if (!empty($amazonData['bad_parent'])) {
 // M2ePro_TRANSLATIONS
-// Working with Amazon Parent Product found using search by %general_id_type% %general_id% is limited due to Amazon API restrictions.
+// Working with Amazon Parent Product found using Search by %general_id_type% %general_id% is limited due to Amazon API restrictions.
                 $this->addMessage(
                     Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Working with Amazon Parent Product found using search by %general_id_type% %general_id%
+                        'Working with Amazon Parent Product found using Search by %general_id_type% %general_id%
                          is limited due to Amazon API restrictions.',
                         array('!general_id_type' => $generalIdType, '!general_id' => $generalId)
                     )
@@ -233,16 +246,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
             }
 
             $magentoAttributes = $this->getVariationManager()->getTypeModel()->getProductAttributes();
-            $amazonDataAttributes = array_keys($amazonData['variation']['set']);
+            $amazonDataAttributes = array_keys($amazonData['variations']['set']);
 
             if (count($magentoAttributes) != count($amazonDataAttributes)) {
 // M2ePro_TRANSLATIONS
-// The number of variation attributes of the Amazon Parent Product found using search by %general_id_type% %general_id% does not match the number of variation attributes of the Magento Parent Product.
+// The number of Variation Attributes of the Amazon Parent Product found using Search by %general_id_type% %general_id% does not match the number of Variation Attributes of the Magento Parent Product.
                 $this->addMessage(
                     Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'The number of variation attributes of the Amazon Parent Product found
-                         using search by %general_id_type% %general_id% does not match the number
-                         of variation attributes of the Magento Parent Product.',
+                        'The number of Variation Attributes of the Amazon Parent Product found
+                         using Search by %general_id_type% %general_id% does not match the number
+                         of Variation Attributes of the Magento Parent Product.',
                         array('!general_id_type' => $generalIdType, '!general_id' => $generalId)
                     )
                 );
@@ -255,10 +268,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if ($this->getVariationManager()->isRelationParentType()) {
 // M2ePro_TRANSLATIONS
-// Amazon Simple or Child Product was found using search by %general_id_type% %general_id% while Parent Product ASIN/ISBN is required.
+// Amazon Simple or Child Product was found using Search by %general_id_type% %general_id% while Parent Product ASIN/ISBN is required.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'Amazon Simple or Child Product was found using search by %general_id_type% %general_id%
+                    'Amazon Simple or Child Product was found using Search by %general_id_type% %general_id%
                      while Parent Product ASIN/ISBN is required.',
                     array('!general_id_type' => $generalIdType, '!general_id' => $generalId)
                 )
@@ -281,7 +294,18 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
             return null;
         }
 
+        $changingListTypeMessage = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+            'M2E Pro did not use New ASIN/ISBN Creation feature assigned because settings
+            for UPC/EAN Search were specified in Listing Search Settings and a value
+            %worldwide_id% were set in Magento Attribute for that Product.',
+            array('!worldwide_id' => $worldwideId)
+        );
+
         if (!Mage::helper('M2ePro')->isUPC($worldwideId) && !Mage::helper('M2ePro')->isEAN($worldwideId)) {
+            if ($this->getAmazonListingProduct()->isGeneralIdOwner()) {
+                $this->addMessage($changingListTypeMessage, Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING);
+            }
+
 // M2ePro_TRANSLATIONS
 // The value "%worldwide_id%" provided for UPC/EAN in Listing Search Settings is invalid. Please set the correct value and try again.
             $this->addMessage(
@@ -316,12 +340,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
             return false;
         }
 
+        if ($this->getAmazonListingProduct()->isGeneralIdOwner()) {
+            $this->addMessage($changingListTypeMessage, Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING);
+        }
+
         if (count($amazonData) > 1) {
 // M2ePro_TRANSLATIONS
-// There is more than one Product found on Amazon using search by %worldwide_id_type% %worldwide_id%. This situation is not supported by M2E Pro.
+// There is more than one Product found on Amazon using Search by %worldwide_id_type% %worldwide_id%. This situation is not supported by M2E Pro.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'There is more than one Product found on Amazon using search by %worldwide_id_type% %worldwide_id%.
+                    'There is more than one Product found on Amazon using Search by %worldwide_id_type% %worldwide_id%.
                      This situation is not supported by M2E Pro.',
                     array('!worldwide_id_type' => $worldwideIdType, '!worldwide_id' => $worldwideId)
                 )
@@ -337,10 +365,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
             empty($amazonData['requested_child_id'])
         ) {
 // M2ePro_TRANSLATIONS
-// Amazon Parent Product was found using search by %worldwide_id_type% %worldwide_id% while Simple or Child Product ASIN/ISBN is required.
+// Amazon Parent Product was found using Search by %worldwide_id_type% %worldwide_id% while Simple or Child Product ASIN/ISBN is required.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'Amazon Parent Product was found using search by %worldwide_id_type% %worldwide_id%
+                    'Amazon Parent Product was found using Search by %worldwide_id_type% %worldwide_id%
                      while Simple or Child Product ASIN/ISBN is required.',
                     array('!worldwide_id_type' => $worldwideIdType, '!worldwide_id' => $worldwideId)
                 )
@@ -507,12 +535,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (!isset($parentChannelVariations[$generalId])) {
 // M2ePro_TRANSLATIONS
-// The Product was found on Amazon using %worldwide_id_type% %worldwide_id% provided in Description Policy. Linking was failed because the respective Parent has no Child Product with required combination of the variation attributes values. Please provide the correct value and try again.
+// The Product was found on Amazon using %worldwide_id_type% %worldwide_id% provided in Description Policy. Linking was failed because the respective Parent has no Child Product with required combination of the Variation Attributes values. Please provide the correct value and try again.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                     'The Product was found on Amazon using %worldwide_id_type% %worldwide_id%
                      provided in Description Policy. Linking was failed because the respective Parent has no
-                     Child Product with required combination of the variation attributes values.
+                     Child Product with required combination of the Variation Attributes values.
                      Please provide the correct value and try again.',
                     array('!worldwide_id_type' => $worldwideIdType, '!worldwide_id' => $worldwideId)
                 )
@@ -528,12 +556,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (in_array($generalId, $existedChildGeneralIds)) {
 // M2ePro_TRANSLATIONS
-// The Product was found on Amazon using %worldwide_id_type% %worldwide_id% provided in Description Policy. The Child Product with required combination of the attributes values has already been added to your Parent Product. Please provide the correct value and try again.
+// The Product was found on Amazon using %worldwide_id_type% %worldwide_id% provided in Description Policy. The Child Product with required combination of the Attributes values has already been added to your Parent Product. Please provide the correct value and try again.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                     'The Product was found on Amazon using %worldwide_id_type% %worldwide_id%
                      provided in Description Policy. The Child Product with required combination
-                     of the attributes values has already been added to your Parent Product.
+                     of the Attributes values has already been added to your Parent Product.
                      Please provide the correct value and try again.',
                     array('!worldwide_id_type' => $worldwideIdType, '!worldwide_id' => $worldwideId)
                 )
@@ -551,11 +579,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
     {
         if (!$this->getAmazonListingProduct()->isGeneralIdOwner()) {
 // M2ePro_TRANSLATIONS
-// Product cannot be listed because ASIN/ISBN is not assigned, UPC/EAN value is not provided and the search settings are invalid. Please set the required settings and try again.
+// Product cannot be Listed because ASIN/ISBN is not assigned, UPC/EAN value is not provided and the Search Settings are invalid. Please set the required Settings and try again.
             $this->addMessage(
-                'Product cannot be listed because ASIN/ISBN is not assigned, UPC/EAN value
-                 is not provided and the search settings are invalid. Please set the required
-                 settings and try again.'
+                'Product cannot be Listed because ASIN/ISBN is not assigned, UPC/EAN value
+                 is not provided and the Search Settings are invalid. Please set the required
+                 Settings and try again.'
             );
 
             return false;
@@ -564,9 +592,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
         $descriptionTemplate = $this->getAmazonListingProduct()->getAmazonDescriptionTemplate();
         if (empty($descriptionTemplate)) {
 // M2ePro_TRANSLATIONS
-// Product cannot be listed because the process of new ASIN/ISBN creation has started but Description Policy is missing. Please assign the Description Policy and try again.
+// Product cannot be Listed because the process of new ASIN/ISBN creation has started but Description Policy is missing. Please assign the Description Policy and try again.
             $this->addMessage(
-                'Product cannot be listed because the process of new ASIN/ISBN creation has started
+                'Product cannot be Listed because the process of new ASIN/ISBN creation has started
                  but Description Policy is missing. Please assign the Description Policy and try again.'
             );
 
@@ -575,9 +603,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (!$descriptionTemplate->isNewAsinAccepted()) {
 // M2ePro_TRANSLATIONS
-// Product cannot be listed because new ASIN/ISBN creation is disabled in the Description Policy assigned to this Product. Please enable new ASIN creation and try again.
+// Product cannot be Listed because new ASIN/ISBN creation is disabled in the Description Policy assigned to this Product. Please enable new ASIN creation and try again.
             $this->addMessage(
-                'Product cannot be listed because new ASIN/ISBN creation is disabled in the Description
+                'Product cannot be Listed because new ASIN/ISBN creation is disabled in the Description
                  Policy assigned to this Product. Please enable new ASIN/ISBN creation and try again.'
             );
 
@@ -589,9 +617,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
             if (empty($channelTheme)) {
 // M2ePro_TRANSLATIONS
-// Product is not listed. The process of New ASIN/ISBN creation has been started, but the Variation Theme was not set. Please, set the Variation Theme to list this Product.
+// Product is not Listed. The process of New ASIN/ISBN creation has been started, but the Variation Theme was not set. Please, set the Variation Theme to list this Product.
                 $this->addMessage(
-                    'Product is not listed. The process of New ASIN/ISBN creation has been started,
+                    'Product is not Listed. The process of New ASIN/ISBN creation has been started,
                      but the Variation Theme was not set.
                      Please, set the Variation Theme to list this Product.'
                 );
@@ -611,10 +639,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (empty($worldwideId) && empty($registeredParameter)) {
 // M2ePro_TRANSLATIONS
-// Product cannot be listed because no UPC/EAN value or Register Parameter is set in the Description Policy. Please set the required settings and try again.
+// Product cannot be Listed because no UPC/EAN value or Register Parameter is set in the Description Policy. Please set the required Settings and try again.
             $this->addMessage(
-                'Product cannot be listed because no UPC/EAN value or Register Parameter
-                 is set in the Description Policy. Please set the required settings and try again.'
+                'Product cannot be Listed because no UPC/EAN value or Register Parameter
+                 is set in the Description Policy. Please set the required Settings and try again.'
             );
 
             return false;
@@ -626,9 +654,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (!Mage::helper('M2ePro')->isUPC($worldwideId) && !Mage::helper('M2ePro')->isEAN($worldwideId)) {
 // M2ePro_TRANSLATIONS
-// Product cannot be listed because the value provided for UPC/EAN in the Description Policy has an invalid format. Please provide the correct value and try again.
+// Product cannot be Listed because the value provided for UPC/EAN in the Description Policy has an invalid format. Please provide the correct value and try again.
             $this->addMessage(
-                'Product cannot be listed because the value provided for UPC/EAN in the
+                'Product cannot be Listed because the value provided for UPC/EAN in the
                  Description Policy has an invalid format. Please provide the correct value and try again.'
             );
 
@@ -640,10 +668,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
         $amazonData = $this->getDataFromAmazon($worldwideId);
         if (!empty($amazonData)) {
 // M2ePro_TRANSLATIONS
-// Product cannot be listed. New ASIN/ISBN cannot be created because %worldwide_id_type% %worldwide_id% provided in the Description Policy has been found on Amazon. Please provide the correct value and try again.
+// Product cannot be Listed. New ASIN/ISBN cannot be created because %worldwide_id_type% %worldwide_id% provided in the Description Policy has been found on Amazon. Please provide the correct value and try again.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'Product cannot be listed. New ASIN/ISBN cannot be created because %worldwide_id_type%
+                    'Product cannot be Listed. New ASIN/ISBN cannot be created because %worldwide_id_type%
                      %worldwide_id% provided in the Description Policy has been found on Amazon.
                      Please provide the correct value and try again.',
                     array('!worldwide_id_type' => $worldwideIdType, '!worldwide_id' => $worldwideId)

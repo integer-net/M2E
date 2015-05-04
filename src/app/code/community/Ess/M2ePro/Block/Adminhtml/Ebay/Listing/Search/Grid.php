@@ -517,7 +517,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
-        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to listing'));
+        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to Listing'));
         $iconSrc = $this->getSkinUrl('M2ePro/images/goto_listing.png');
 
         if ($row->getData('is_m2epro_listing')) {

@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Revise_Validator
 {
     // ########################################
 
-    public function isValid()
+    public function validate()
     {
         if (!$this->validateLockedObject()) {
             return false;
@@ -22,8 +22,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Revise_Validator
         if (!$this->getListingProduct()->isRevisable()) {
 
             // M2ePro_TRANSLATIONS
-            // Item is not listed or not available
-            $this->addMessage('Item is not listed or not available');
+            // Item is not Listed or not available
+            $this->addMessage('Item is not Listed or not available');
 
             return false;
         }

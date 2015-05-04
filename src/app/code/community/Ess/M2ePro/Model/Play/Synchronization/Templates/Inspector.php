@@ -53,7 +53,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
                 $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                    'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                      Status of Magento Product is Disabled (%date%) though in Synchronization Rules “Product Status”
                      is set to Enabled.',
                     array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -72,7 +72,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
 
                 if (!is_null($temp) && $temp) {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Status of Magento Product Variation is Disabled though in Synchronization Rules
                          “Product Status“ is set to Enabled.',
                         array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -90,7 +90,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
                 $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                    'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                      Stock Availability of Magento Product is Out of Stock though in
                      Synchronization Rules “Stock Availability” is set to In Stock.',
                     array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -109,7 +109,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
 
                 if (!is_null($temp) && $temp) {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Stock Availability of Magento Product Variation is Out of Stock though
                          in Synchronization Rules “Stock Availability” is set to In Stock.',
                         array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -139,7 +139,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Magento Quantity“ is set to less then  %template_min_qty%.',
                         array(
@@ -156,7 +156,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Magento Quantity” is set to more then  %template_min_qty%.',
                         array(
@@ -173,7 +173,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Magento Quantity” is set between  %template_min_qty% and %template_max_qty%',
                         array(
@@ -212,7 +212,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Calculated Quantity” is set to less then %template_min_qty%',
                         array(
@@ -229,7 +229,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Calculated Quantity” is set to more then  %template_min_qty%.',
                         array(
@@ -246,7 +246,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Calculated Quantity” is set between  %template_min_qty% and %template_max_qty%.',
                         array(

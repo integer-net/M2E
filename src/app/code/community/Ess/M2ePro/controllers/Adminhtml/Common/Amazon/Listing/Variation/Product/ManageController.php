@@ -383,99 +383,57 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
             return $this->getResponse()->setBody('You should provide correct parameters.');
         }
 
-        /** @var Ess_M2ePro_Model_Listing_Product $parent */
-        $parent = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$productId);
+        /** @var Ess_M2ePro_Model_Listing_Product $parentListingProduct */
+        $parentListingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product', $productId);
 
-        $data = array(
-            'listing_id' => $parent->getListingId(),
-            'product_id' => $parent->getProductId(),
-            'status'     => Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED,
-            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN,
-            'is_general_id_owner'  => (int)$parent->getChildObject()->getData('is_general_id_owner'),
-            'is_variation_product' => 1,
-            'is_variation_product_matched' => 1,
-            'is_variation_parent'  => 0,
-            'variation_parent_id'  => $parent->getId(),
-        );
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $parentAmazonListingProduct */
+        $parentAmazonListingProduct = $parentListingProduct->getChildObject();
 
-        /** @var Ess_M2ePro_Model_Listing_Product $child */
-        $child = Mage::helper('M2ePro/Component')->getComponentModel(
-            Ess_M2ePro_Helper_Component_Amazon::NICK,'Listing_Product'
-        )->setData($data)->save();
-
-        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
-        $amazonListingProduct = $child->getChildObject();
-
-        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $typeModel */
-        $typeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
+        $parentTypeModel = $parentAmazonListingProduct->getVariationManager()->getTypeModel();
 
         $productOptions = array_combine(
             $newChildProductData['product']['attributes'],
             $newChildProductData['product']['options']
         );
 
-        $magentoVariations = $amazonListingProduct->getMagentoProduct()
-            ->getVariationInstance()
-            ->getVariationsTypeStandard();
-        foreach ($magentoVariations['variations'] as $variation) {
-            $tempOption = array();
-            foreach ($variation as $variationOption) {
-                $tempOption[$variationOption['attribute']] = $variationOption['option'];
-            }
-
-            if (count(array_diff($productOptions, $tempOption)) <= 0) {
-                $productOptions = $variation;
-                break;
-            }
+        if ($parentTypeModel->isProductsOptionsRemoved($productOptions)) {
+            $parentTypeModel->restoreRemovedProductOptions($productOptions);
         }
 
-        $sortedOptions = array();
-        foreach ($newChildProductData['product']['attributes'] as $attr) {
-            foreach ($productOptions as $productOption) {
-                if ($productOption['attribute'] == $attr) {
-                    $sortedOptions[] = $productOption;
-                    break;
-                }
-            }
-        }
-
-        $typeModel->setProductVariation($sortedOptions);
+        $channelOptions = array();
+        $generalId = null;
 
         if (!$createNewAsin) {
             $channelOptions = array_combine(
                 $newChildProductData['channel']['attributes'],
                 $newChildProductData['channel']['options']
             );
-            $typeModel->setChannelVariation($channelOptions);
 
-            $variations = $parent->getChildObject()->getVariationManager()->getTypeModel()->getChannelVariations();
-            $generalId = $this->getAsinByOptions($variations, $channelOptions);
-            $child->setData('general_id', $generalId);
+            $generalId = $parentTypeModel->getChannelVariationGeneralId($channelOptions);
         }
 
-        $child->save();
+        $parentTypeModel->createChildListingProduct(
+            $productOptions, $channelOptions, $generalId
+        );
+
+        $parentTypeModel->getProcessor()->process();
 
         if (!$createNewAsin) {
-            $productOptions = $typeModel->getProductOptions();
-            $channelOptions = $typeModel->getChannelOptions();
-            $matchedAttributes = $parent->getChildObject()->getVariationManager()
-                                                          ->getTypeModel()->getMatchedAttributes();
+            $matchedAttributes = $parentTypeModel->getMatchedAttributes();
 
-            foreach ($matchedAttributes as $magentoAttr => $amazonAttr) {
+            foreach ($matchedAttributes as $productAttribute => $channelAttribute) {
                 Mage::helper('M2ePro/Component_Amazon_Vocabulary')->addOptions(
-                    $parent->getMarketplace()->getId(),
-                    $productOptions[$magentoAttr],
-                    $channelOptions[$amazonAttr],
-                    $amazonAttr
+                    $parentListingProduct->getMarketplace()->getId(),
+                    $productOptions[$productAttribute],
+                    $channelOptions[$channelAttribute],
+                    $channelAttribute
                 );
             }
         }
 
-        $parent->getChildObject()->getVariationManager()->getTypeModel()->getProcessor()->process();
-
         $this->getResponse()->setBody(json_encode(array(
             'type' => 'success',
-            'msg' => Mage::helper('M2ePro')->__('New Amazon Child Product was successfully created.')
+            'msg'  => Mage::helper('M2ePro')->__('New Amazon Child Product was successfully created.')
         )));
     }
 
@@ -612,17 +570,6 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
         $amazonListingProduct->getVariationManager()->getTypeModel()->getProcessor()->process();
 
         return $data;
-    }
-
-    private function getAsinByOptions($variations, $options)
-    {
-        foreach ($variations as $asin => $variation) {
-            if ($options == $variation) {
-                return $asin;
-            }
-        }
-
-        return null;
     }
 
     //#############################################

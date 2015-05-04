@@ -335,10 +335,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
             'Specifics' => Mage::helper('M2ePro')->__('Specifics'),
             'Auto Add/Remove Rules' => Mage::helper('M2ePro')->__('Auto Add/Remove Rules'),
             'Based on Magento Categories' => Mage::helper('M2ePro')->__('Based on Magento Categories'),
-            'You must select at least 1 category.' =>
-                Mage::helper('M2ePro')->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' =>
-                Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
+            'You must select at least 1 Category.' =>
+                Mage::helper('M2ePro')->__('You must select at least 1 Category.'),
+            'Rule with the same Title already exists.' =>
+                Mage::helper('M2ePro')->__('Rule with the same Title already exists.'),
             'Listing Settings Customization' => Mage::helper('M2ePro')->__('Listing Settings Customization'),
         ));
         //------------------------------

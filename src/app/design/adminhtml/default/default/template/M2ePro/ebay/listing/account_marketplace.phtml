@@ -38,7 +38,7 @@
 
         <div id="block_notice_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General Settings'); ?>">
             <?php echo Mage::helper('M2ePro')->__(
-                'This page sets the eBay details and Magento Store View you want to use for this M2E Pro Listing.'
+                'This Page sets the eBay details and Magento Store View you want to use for this M2E Pro Listing.'
             ); ?>
         </div>
 
@@ -173,7 +173,7 @@
                         <td class="value" style="vertical-align: middle">
                             <?php echo $this->getChildHtml('store_switcher'); ?>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento store view you want to use for this M2E Pro listing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento Store View you want to use for this M2E Pro Listing.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -323,7 +323,7 @@
 
         $$('.next_step_button').each(function(btn) { btn.observe('click',function() {
             if (marketplaceSynchProgressHandlerObj.runningNow) {
-                return alert('<?php echo Mage::helper('M2ePro')->__('Please wait while synchronization is finished.'); ?>');
+                return alert('<?php echo Mage::helper('M2ePro')->__('Please wait while Synchronization is finished.'); ?>');
             }
             editForm.validate() && synchronizeMarketplace($('marketplace_id').value);
         }) });
@@ -345,7 +345,7 @@
 
         CommonHandlerObj.setValidationCheckRepetitionValue(
             'M2ePro-listing-title',
-            '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified title is already used for other listing. Listing title must be unique.')); ?>',
+            '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified Title is already used for other Listing. Listing Title must be unique.')); ?>',
             'Listing', 'title', 'id', null, '<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK ?>'
         );
 

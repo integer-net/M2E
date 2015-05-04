@@ -25,7 +25,7 @@ abstract class Ess_M2ePro_Model_Listing_Auto_Actions_Listing
     protected function getListing()
     {
         if (!($this->listing instanceof Ess_M2ePro_Model_Listing)) {
-            throw new LogicException('Property "listing" should be set first.');
+            throw new LogicException('Property "Listing" should be set first.');
         }
 
         return $this->listing;

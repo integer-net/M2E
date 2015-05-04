@@ -104,6 +104,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Sellercentral_Grid
                 'online_qty'                    => 'online_qty',
                 'online_price'                  => 'online_price',
                 'online_sale_price'             => 'online_sale_price',
+                'online_sale_price_start_date'  => 'online_sale_price_start_date',
+                'online_sale_price_end_date'    => 'online_sale_price_end_date',
                 'is_afn_channel'                => 'is_afn_channel',
                 'is_general_id_owner'           => 'is_general_id_owner',
                 'variation_child_statuses'      => 'variation_child_statuses',
@@ -182,7 +184,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Sellercentral_Grid
             'type' => 'number',
             'index' => 'online_price',
             'filter_index' => 'online_price',
-            'frame_callback' => array($this, 'callbackColumnPrice')
+            'frame_callback' => array($this, 'callbackColumnPrice'),
+            'filter_condition_callback' => array($this, 'callbackFilterPrice')
         ));
 
         $this->addColumn('is_afn_channel', array(
@@ -335,8 +338,28 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Sellercentral_Grid
         }
 
         if ($variationManager->isRelationChildType()) {
-            $productOptions = $variationManager->getTypeModel()->getProductOptions();
-            $channelOptions = $variationManager->getTypeModel()->getChannelOptions();
+            $typeModel = $variationManager->getTypeModel();
+
+            $productOptions = $typeModel->getProductOptions();
+            $channelOptions = $typeModel->getChannelOptions();
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $parentAmazonListingProduct */
+            $parentAmazonListingProduct = $typeModel->getParentListingProduct()->getChildObject();
+
+            $matchedAttributes = $parentAmazonListingProduct->getVariationManager()
+                ->getTypeModel()
+                ->getMatchedAttributes();
+
+            if (!empty($matchedAttributes)) {
+
+                $sortedOptions = array();
+
+                foreach ($matchedAttributes as $magentoAttr => $amazonAttr) {
+                    $sortedOptions[$amazonAttr] = $channelOptions[$amazonAttr];
+                }
+
+                $channelOptions = $sortedOptions;
+            }
 
             $value .= '<div style="font-weight:bold;font-size: 11px;color: grey;margin-left: 7px;margin-top: 5px;">'.
                 Mage::helper('M2ePro')->__('Magento Variation') . '</div>';
@@ -394,14 +417,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Sellercentral_Grid
         $parentAsinHtml = '';
         $variationParentId = $row->getData('variation_parent_id');
         if(!empty($variationParentId)){
-            $parentAsinHtml = '<br><span style="font-size: 10px; color: grey; line-height: 1;">'.
+            $parentAsinHtml = '<br><span style="display: block;
+                                                margin-bottom: 5px;
+                                                font-size: 10px;
+                                                color: grey;">'.
                 Mage::helper('M2ePro')->__('child ASIN/ISBN</br>of parent %parent_asin%',
                     $this->getParentAsin($row->getData('id'))) . '</span>';
         }
 
         $generalIdOwnerHtml = '';
         if($row->getData('is_general_id_owner') == 1){
-            $generalIdOwnerHtml = '<br/><span style="font-size: 10px; color: grey; margin-top: 10px; display: block;">'.
+            $generalIdOwnerHtml = '<span style="font-size: 10px; color: grey; display: block;">'.
                                    Mage::helper('M2ePro')->__('creator of ASIN/ISBN').
                                   '</span>';
         }
@@ -444,12 +470,10 @@ HTML;
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        if ((int)$row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
-            if (is_null($value) || $value === '') {
+        if (is_null($value) || $value === '') {
+            if ($row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
                 return Mage::helper('M2ePro')->__('N/A');
-            }
-        } else {
-            if (is_null($value) || $value === '') {
+            } else {
                 return '<i style="color:gray;">receiving...</i>';
             }
         }
@@ -460,21 +484,45 @@ HTML;
             ->getChildObject()
             ->getDefaultCurrency();
 
-        $salePriceValue = $row->getData('online_sale_price');
-        if (is_null($salePriceValue) ||
-            (float)$salePriceValue <= 0) {
-            $salePriceValue = null;
-        } else {
-            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePriceValue);
-        }
-
         if ((float)$value <= 0) {
-            $result = '<span style="color: #f00;">0</span>';
+            $priceValue = '<span style="color: #f00;">0</span>';
         } else {
-            $result = Mage::app()->getLocale()->currency($currency)->toCurrency($value);
+            $priceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($value);
         }
 
-        return $result.($salePriceValue ? ' <br/><span style="color:gray;">'.$salePriceValue.'</span>' : '');
+        $resultHtml = '';
+
+        $salePriceValue = $row->getData('online_sale_price');
+        if ((float)$salePriceValue > 0) {
+            $startDateTimestamp = strtotime($row->getData('online_sale_price_start_date'));
+            $endDateTimestamp   = strtotime($row->getData('online_sale_price_end_date'));
+
+            $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+
+            if ($currentTimestamp >= $startDateTimestamp &&
+                $currentTimestamp <= $endDateTimestamp &&
+                $salePriceValue < (float)$value
+            ) {
+                $resultHtml = '<span style="text-decoration: line-through;">'.$priceValue.'</span>';
+            } else {
+                $resultHtml = $priceValue;
+            }
+
+            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePriceValue);
+
+            $resultHtml .= ' <br/><br/><span style="color:gray;">'.$salePriceValue.'</span><br/>';
+
+            $resultHtml .= '<span style="color:gray; font-size: 10px;">
+                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
+                                    To: '.date('Y-m-d', $endDateTimestamp).'
+                                </span>';
+        }
+
+        if (empty($resultHtml)) {
+            $resultHtml = $priceValue;
+        }
+
+        return $resultHtml;
     }
 
     public function callbackColumnAfnChannel($value, $row, $column, $isExport)
@@ -578,6 +626,32 @@ HTML;
         );
     }
 
+    protected function callbackFilterPrice($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if (empty($value)) {
+            return;
+        }
+
+        $from = $value['from'];
+        $to   = $value['to'];
+
+        $collection->getSelect()->where(
+            '(alp.online_price >= \''.$from.'\' AND alp.online_price <= \''.$to.'\' AND
+            (
+                alp.online_sale_price IS NULL OR
+                alp.online_sale_price_start_date > NOW() OR
+                alp.online_sale_price_end_date < NOW()
+            )) OR (alp.online_sale_price >= \''.$from.'\' AND alp.online_sale_price <= \''.$to.'\' AND
+            (
+                alp.online_sale_price IS NOT NULL AND
+                alp.online_sale_price_start_date < NOW() AND
+                alp.online_sale_price_end_date > NOW()
+            ))'
+        );
+    }
+
     //----------------------------------------
 
     public function getViewLogIconHtml($listingProductId)
@@ -642,10 +716,23 @@ HTML;
             return '';
         }
 
+        foreach ($actionsRows as &$actionsRow) {
+            usort($actionsRow['items'], function($a, $b)
+            {
+                $sortOrder = array(
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 1,
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 2,
+                    Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 3,
+                );
+
+                return $sortOrder[$a["type"]] > $sortOrder[$b["type"]];
+            });
+        }
+
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Action was completed with warning(s).'
         );
 
         $icons = array(

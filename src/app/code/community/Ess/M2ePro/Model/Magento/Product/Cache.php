@@ -142,14 +142,16 @@ class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Pr
 
     public function getQty($lifeMode = false)
     {
-        return $this->getMethodData(__FUNCTION__, func_get_args());
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     // ########################################
 
     public function getAttributeValue($attributeCode)
     {
-        return $this->getMethodData(__FUNCTION__, func_get_args());
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     // ########################################
@@ -161,12 +163,14 @@ class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Pr
 
     public function getImageLink($attribute = 'image')
     {
-        return $this->getMethodData(__FUNCTION__, func_get_args());
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     public function getGalleryImagesLinks($limitImages = 0)
     {
-        return $this->getMethodData(__FUNCTION__, func_get_args());
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     // ########################################

@@ -1,8 +1,8 @@
 <div id="block_notice_amazon_listing_add_selling_settings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Selling Settings'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('On this page you can specify main Selling Settings for Amazon Items you are going to sell using this M2E Pro Listing. <br/><br/>
+    <?php echo Mage::helper('M2ePro')->__('On this Page you can specify main Selling Settings for Amazon Items you are going to sell using this M2E Pro Listing. <br/><br/>
 
     You can set the Source to form SKU of Amazon Item, appropriate Condition, Condition Note and also specify Additional Settings - Handling Time and Restock Date. <br/><br/>
-    In addition to, in this section you can select Selling Format Policy that contains settings connected with forming of Price, Quantity etc. and Synchronization Policy that describes Rules of Automatic Synchronization of Magento Product and Amazon Item.'); ?>
+    In addition to, in this Section you can select Selling Format Policy that contains Settings connected with forming of Price, Quantity etc. and Synchronization Policy that describes Rules of Automatic Synchronization of Magento Product and Amazon Item.'); ?>
 </div>
 
 <?php
@@ -28,6 +28,10 @@
         'text_select' => $magentoAttributeHelper->filterByInputTypes(
             $this->getData('general_attributes'), array('text', 'select')
         ),
+        'text_images' => $magentoAttributeHelper->filterByInputTypes(
+            $this->getData('general_attributes'),
+            array('text', 'image', 'media_image', 'gallery', 'multiline', 'textarea', 'select', 'multiselect')
+        )
     );
 
 ?>
@@ -54,6 +58,10 @@
     M2ePro.php.setConstants(
         <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Amazon'); ?>,
         'Ess_M2ePro_Helper_Component'
+    );
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Amazon_Listing'); ?>,
+        'Ess_M2ePro_Model_Amazon_Listing'
     );
 
     M2ePro.url.addNewSellingFormatTemplate = '<?php echo $this->getUrl('*/adminhtml_common_amazon_template_sellingFormat/new'); ?>';
@@ -139,6 +147,14 @@
 
         $('condition_note_mode').observe('change', AmazonListingChannelSettingsHandlerObj.condition_note_mode_change);
 
+        $('image_main_mode')
+            .observe('change', AmazonListingChannelSettingsHandlerObj.image_main_mode_change)
+            .simulate('change');
+
+        $('gallery_images_mode')
+            .observe('change', AmazonListingChannelSettingsHandlerObj.gallery_images_mode_change)
+            .simulate('change');
+
         $('handling_time_mode')
             .observe('change', AmazonListingChannelSettingsHandlerObj.handling_time_mode_change)
             .simulate('change');
@@ -180,8 +196,8 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Is used to identify Amazon Items, which you list, in Amazon Seller Central inventory.
-                            <br/><br/><b>Note:</b> If you list a Magento Product and M2E Pro find an Amazon Item with the same <i>Merchant SKU</i> in Amazon inventory, they will be mapped.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Is used to identify Amazon Items, which you list, in Amazon Seller Central Inventory.
+                            <br/><br/><b>Note:</b> If you list a Magento Product and M2E Pro find an Amazon Item with the same <i>Merchant SKU</i> in Amazon Inventory, they will be Mapped.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -196,8 +212,8 @@
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Listing::GENERATE_SKU_MODE_YES ?>" <?php if ($this->getData('generate_sku_mode') == Ess_M2ePro_Model_Amazon_Listing::GENERATE_SKU_MODE_YES) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Yes') ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('If <strong>Yes</strong>, then if Merchant SKU of the Amazon Item you list is found in the 3rd Party Listings, M2E Pro Listings or among the Amazon Items that are currently in process of listing,
-                            another SKU will be automatically created and the Amazon Item will be listed.  <br/><br/>
+                            <span><?php echo Mage::helper('M2ePro')->__('If <strong>Yes</strong>, then if Merchant SKU of the Amazon Item you list is found in the 3rd Party Listings, M2E Pro Listings or among the Amazon Items that are currently in process of Listing,
+                            another SKU will be automatically created and the Amazon Item will be Listed.  <br/><br/>
                             Has to be set to <strong>Yes</strong> if you are going to use the same Magento Product under different ASIN(s)/ISBN(s)'); ?></span>
                         </p>
                     </td>
@@ -235,7 +251,7 @@
                                     <option value="<?php echo $item['id']; ?>" <?php if ($item['id'] == $this->getData('template_selling_format_id')) echo ' selected="selected"'; ?>><?php echo $item['title']; ?></option>
                                 <?php } ?>
                             </select>
-                            <span id="template_selling_format_label" <?php if (count($this->sellingFormatTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No policies available.'); ?></span>
+                            <span id="template_selling_format_label" <?php if (count($this->sellingFormatTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No Policies available.'); ?></span>
                         <?php else: ?>
                             <input type="text" id="template_selling_format_autocomplete" class="input-text" selected_id="" style="width: 275px; color: gray;"
                                    value="<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>"
@@ -366,7 +382,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Amazon_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE ?>" <?php if ($this->getData('condition_note_mode') == Ess_M2ePro_Model_Amazon_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Short Description of Item(s) condition.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Short Description of Item(s) Condition.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -386,6 +402,80 @@
                         </select>
 
                         <?php echo $this->getChildHtml('condition_note_value_insert_button');?>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_amazon_listing_add_images" style="display: none;">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Listing Photos'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input type="hidden" id="image_main_attribute" name="image_main_attribute" value="<?php echo $this->getData('image_main_attribute'); ?>" />
+
+                        <select id="image_main_mode" name="image_main_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Listing::IMAGE_MAIN_MODE_NONE; ?>" <?php if ($this->getData('image_main_mode') == Ess_M2ePro_Model_Amazon_Listing::IMAGE_MAIN_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Listing::IMAGE_MAIN_MODE_PRODUCT; ?>" <?php if ($this->getData('image_main_mode') == Ess_M2ePro_Model_Amazon_Listing::IMAGE_MAIN_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php foreach($generalAttributesByInputTypes['text_images'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Listing::IMAGE_MAIN_MODE_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $this->getData('image_main_attribute')): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('You have an ability to add Photos for your Items to be displayed on the More Buying Choices Page. <br/>It is available only for Items with Used or Collectible Condition.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="gallery_images_mode_tr">
+                    <td class="label">
+                        <label for="gallery_images_mode"><?php echo Mage::helper('M2ePro')->__('Additional Images'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input type="hidden" id="gallery_images_limit" name="gallery_images_limit" value="<?php echo $this->getData('gallery_images_limit'); ?>" />
+                        <input type="hidden" id="gallery_images_attribute" name="gallery_images_attribute" value="<?php echo $this->getData('gallery_images_attribute'); ?>" />
+
+                        <select id="gallery_images_mode" name="gallery_images_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_MODE_NONE; ?>" <?php if ($this->getData('gallery_images_mode') == Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+
+                            <optgroup label="Product Images Quantity">
+                                <option attribute_code="1" <?php if ($this->getData('gallery_images_limit') == 1 && ($this->getData('gallery_images_mode') != Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_MODE_NONE)): echo ' selected="selected"'; endif; ?>>1</option>
+                                <?php for ($i = 2; $i <= Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_COUNT_MAX; $i++): ?>
+                                    <option attribute_code="<?php echo $i; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_MODE_PRODUCT; ?>" <?php if ($this->getData('gallery_images_limit') == $i): echo ' selected="selected"'; endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->__('Up to').' '.$i; ?>
+                                    </option>
+                                <?php endfor ?>
+                            </optgroup>
+
+                            <optgroup label="Magento Attribute">
+                                <?php foreach($generalAttributesByInputTypes['text_images'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_MODE_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $this->getData('gallery_images_attribute')): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
                     </td>
                 </tr>
 
@@ -454,7 +544,7 @@
                             </optgroup>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The date you will be able to ship any back-ordered Items to a customer.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The date you will be able to ship any back-ordered Items to a Customer.'); ?></span>
                         </p>
                     </td>
                 </tr>

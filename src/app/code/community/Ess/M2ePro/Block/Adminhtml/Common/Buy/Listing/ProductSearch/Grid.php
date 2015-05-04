@@ -183,7 +183,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_ProductSearch_Grid extends M
     {
         $assignText = Mage::helper('M2ePro')->__('Assign Rakuten.com SKU');
         //->__('There is no such variation on Rakuten.com. Please, choose another variation.');
-        $naMessage = 'There is no such variation on Rakuten.com. Please, choose another variation.';
+        $naMessage = 'There is no such Variation on Rakuten.com. Please, choose another Variation.';
         $naMessage = Mage::helper('M2ePro')->__($naMessage);
 
         if (!is_null($row->getData('variations'))) {

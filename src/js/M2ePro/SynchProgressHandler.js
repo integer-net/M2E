@@ -206,13 +206,13 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
             MagentoMessageObj.addError(str_replace(
                 '%url%',
                 M2ePro.url.get('logViewUrl'),
-                M2ePro.translator.translate('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
+                M2ePro.translator.translate('Synchronization ended with errors. <a target="_blank" href="%url%">View Log</a> for details.')
             ));
         } else if (resultType == self.resultTypeWarning) {
             MagentoMessageObj.addWarning(str_replace(
                 '%url%',
                 M2ePro.url.get('logViewUrl'),
-                M2ePro.translator.translate('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.')
+                M2ePro.translator.translate('Synchronization ended with warnings. <a target="_blank" href="%url%">View Log</a> for details.')
             ));
         } else {
             MagentoMessageObj.addSuccess(M2ePro.translator.translate('Synchronization has successfully ended.'));

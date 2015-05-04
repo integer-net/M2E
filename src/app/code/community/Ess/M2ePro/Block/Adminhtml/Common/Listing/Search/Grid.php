@@ -332,7 +332,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
-        $altTitle = Mage::helper('M2ePro')->__('Go to listing');
+        $altTitle = Mage::helper('M2ePro')->__('Go to Listing');
         $iconSrc = $this->getSkinUrl('M2ePro/images/goto_listing.png');
         $url = $this->getUrl('*/adminhtml_common_'.$row->getData('component_mode').'_listing/view/',array(
             'id' => $row->getData('listing_id'),

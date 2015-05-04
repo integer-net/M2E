@@ -19,7 +19,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
             // check rewrite menu
             if (count($this->getCustomViewComponentHelper()->getActiveComponents()) < 1) {
-                throw new Exception('At least 1 channel of current view should be enabled.');
+                throw new Exception('At least 1 channel of current View should be enabled.');
             }
 
             // update client data
@@ -155,7 +155,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
     {
         if (Mage::helper('M2ePro/Module')->isLockedByServer()) {
             $this->_getSession()->addError(
-                Mage::helper('M2ePro')->__('M2E Pro module is locked because of security reason. Please contact us.')
+                Mage::helper('M2ePro')->__('M2E Pro Module is locked because of security reason. Please contact us.')
             );
             return true;
         }
@@ -178,9 +178,9 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
         }
 
         $this->_getSession()->addError(Mage::helper('M2ePro')->__(
-            'M2E Pro is working in maintenance mode at the moment. Developers are investigating your issue.'
+            'M2E Pro is working in Maintenance Mode at the moment. Developers are investigating your issue.'
         ).'<br/>'.Mage::helper('M2ePro')->__(
-            'You will be able to see a content of this page soon. Please wait and then refresh a browser page later.'
+            'You will be able to see a content of this Page soon. Please wait and then refresh a browser Page later.'
         ));
 
         return true;
@@ -241,7 +241,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
             $url = Mage::helper('M2ePro/View_Configuration')->getLicenseUrl();
 
             $message = Mage::helper('M2ePro')->__(
-                'M2E Pro module requires activation. Go to the <a href="%url%" target ="_blank">license page</a>.',
+                'M2E Pro Module requires activation. Go to the <a href="%url%" target ="_blank">License Page</a>.',
                 $url
             );
 

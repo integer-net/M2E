@@ -575,14 +575,14 @@ EbayListingTransferringActionHandler.prototype = {
         var self = this;
 
         if (this.isNeedCreateTemplates()) {
-            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating policies in process. Please wait...'));
+            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating Policies in process. Please wait...'));
             this.createTemplates(function() {
                 self.progressBarObj.setPercents(self.progressBarObj.getPercents() + 10, 1);
                 self.confirm(callback);
             });
 
         } else if (!this.hasTargetListing()) {
-            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating listing in process. Please wait...'));
+            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating Listing in process. Please wait...'));
             this.createListing(function() {
                 self.progressBarObj.setPercents(self.progressBarObj.getPercents() + 10, 1);
                 self.confirm(callback);
@@ -835,7 +835,7 @@ EbayListingTransferringActionHandler.prototype = {
 
                 if (response['failed_products'].length) {
                     MagentoMessageObj.addError(M2ePro.translator.translate(
-                        'Some Products categories settings are not set or attributes for title or description are empty.'
+                        'Some Products Categories Settings are not set or Attributes for Title or Description are empty.'
                     ));
 
                     if (response['success_products'].length == 0) {

@@ -16,11 +16,11 @@
             <div id="block_notice_amazon_product_manage_new_child" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Add New Child Product'); ?>">
                 <?php echo Mage::helper('M2ePro')->__('To sell Amazon Child Products it is necessary to set correspondence between Magento Variations and Amazon Variations. <br/><br/>
 
-                For that you should select available unused options of Attributes of Magento Product and available unused options of Amazon Parent Product. After clicking of <i class="underline">"Confirm"</i> button, Child Product will be added to the grid and ready for List action. <br/><br/>
+                For that you should select available unused Options of Attributes of Magento Product and available unused Options of Amazon Parent Product. After clicking of <i class="underline">"Confirm"</i> Button, Child Product will be added to the Grid and ready for List Action. <br/><br/>
 
-                In case you are the Creator of Amazon Parent Product, you will be able to create New Child ASIN/ISBN for this Parent Product. To do this it is just enough to select available options of Magento Product Attributes, New Child ASIN/ISBN will be created for. <br/><br/>
+                In case you are the Creator of Amazon Parent Product, you will be able to create New Child ASIN/ISBN for this Parent Product. To do this it is just enough to select available Options of Magento Product Attributes, New Child ASIN/ISBN will be created for. <br/><br/>
 
-                <b>Note:</b> You can set matching of Magento Product Attributes and Amazon Parent Product Attributes in Settings tab\'s block Variation Attributes.'); ?>
+                <b>Note:</b> You can set matching of Magento Product Attributes and Amazon Parent Product Attributes in Settings Tab\'s Block Variation Attributes.'); ?>
             </div>
 
 <form id="variation_manager_product_options_form" action="javascript:void(0);">
@@ -39,11 +39,11 @@
             ?>
 
             <tr>
-                <td class="label" style="width: auto; min-width: 75px;">
-                    <label style="width: auto; max-width: 100px;"><?php echo $magentoAttr ?>: <span class="required">*</span></label>
+                <td class="label" style="width: auto; min-width: 148px;">
+                    <label style="width: auto; max-width: 148px;"><?php echo $magentoAttr ?>: <span class="required">*</span></label>
                 </td>
                 <td class="value">
-                    <input type="hidden" value="<?php echo $magentoAttr ?>" name="new_child_product[product][attributes][]" class="new-child-product-attribute">
+                    <input type="hidden" value="<?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttr) ?>" name="new_child_product[product][attributes][]" class="new-child-product-attribute">
                     <select name="new_child_product[product][options][]"
                             class="new-child-product-option"
                             disabled="disabled"
@@ -78,7 +78,7 @@
 
             <?php if ($this->isGeneralIdOwner() && $this->hasChannelTheme()) { ?>
 
-                <td style="padding: 5px; width: 200px; text-align: center; vertical-align: middle;" rowspan="6">
+                <td style="padding-left: 5px; width: 160px; text-align: center; vertical-align: middle;" rowspan="6">
 
                     <?php if ($this->hasUnusedChannelVariations()) { ?>
 
@@ -108,11 +108,11 @@
         foreach ($matchedAttributes as $magentoAttr => $amazonAttr) { ?>
 
             <tr class="manage-variations-new-child-channel-options">
-                <td class="label" style="width: auto; min-width: 75px;">
-                    <label style="width: auto; max-width: 100px;"><?php echo $amazonAttr ?>: <span class="required">*</span></label>
+                <td class="label" style="width: auto; min-width: 148px;">
+                    <label style="width: auto; max-width: 148px;"><?php echo $amazonAttr ?>: <span class="required">*</span></label>
                 </td>
                 <td class="value">
-                    <input type="hidden" value="<?php echo $amazonAttr ?>" name="new_child_product[channel][attributes][]" class="new-child-channel-attribute">
+                    <input type="hidden" value="<?php echo Mage::helper('M2ePro')->escapeHtml($amazonAttr) ?>" name="new_child_product[channel][attributes][]" class="new-child-channel-attribute">
                     <select id="new_child_product_channel_option_<?php echo $i ?>"
                             name="new_child_product[channel][options][]"
                             class="new-child-channel-option"

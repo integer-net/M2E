@@ -72,7 +72,7 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
         }
 
         if (!$tempMode) {
-            throw new LogicException('Component mode is not defined.');
+            throw new LogicException('Component Mode is not defined.');
         }
 
         $modelName = str_replace('M2ePro/',ucwords($tempMode).'_',$this->_resourceName);

@@ -147,7 +147,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
                 break;
 
             default:
-                throw new LogicException('Unknown mode in database.');
+                throw new LogicException('Unknown Mode in Database.');
         }
 
         $value = $this->applySellingFormatTemplateModifications($value);
@@ -218,7 +218,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
                 break;
 
             default:
-                throw new LogicException('Unknown mode in database.');
+                throw new LogicException('Unknown Mode in Database.');
         }
 
         return $value;

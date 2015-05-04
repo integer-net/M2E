@@ -173,7 +173,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Templates_Revise
 
     private function executeTotal()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute revise all');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute Revise all');
 
         $lastListingProductProcessed = $this->getConfigValue(
             $this->getFullSettingsPath().'total/','last_listing_product_id'

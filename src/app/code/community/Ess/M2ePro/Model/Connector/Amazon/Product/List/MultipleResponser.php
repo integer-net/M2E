@@ -16,8 +16,8 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleResponser
     protected function getSuccessfulMessage(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         // M2ePro_TRANSLATIONS
-        // Item was successfully listed
-        return 'Item was successfully listed';
+        // Item was successfully Listed
+        return 'Item was successfully Listed';
     }
 
     // ########################################

@@ -117,7 +117,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
 
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Task "Update 3rd Party Listings" has completed with %result%. View %sl%listings log%el% for details.',
+                'Task "Update 3rd Party Listings" has completed with %result%. View %sl%Listings Log%el% for details.',
                 array(
                     '!sl'=>'<a target="_blank" href="route:*/adminhtml_ebay_log/listingOther/;'.
                         'back:*/adminhtml_ebay_log/synchronization/;">',

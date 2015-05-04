@@ -196,13 +196,13 @@ class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_B
 
         if (!is_null($channelItem) && !$buyAccount->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for Items listed by M2E Pro is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($channelItem) && !$buyAccount->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for Items listed by 3rd party software is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by 3rd party software is disabled in Account Settings.'
             );
         }
     }
@@ -210,7 +210,7 @@ class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_B
     private function createProduct()
     {
         if (!$this->getBuyOrder()->getBuyAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product import is disabled in Rakuten.com Account settings.');
+            throw new Exception('Product Import is disabled in Rakuten.com Account Settings.');
         }
 
         $storeId = $this->getBuyOrder()->getBuyAccount()->getMagentoOrdersListingsOtherStoreId();
@@ -255,7 +255,7 @@ class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_B
         // ----------------
 
         $this->getParentObject()->getOrder()->addSuccessLog(
-        'Product for Rakuten.com Item "%title%" was created in Magento catalog.', array('!title' => $this->getTitle())
+        'Product for Rakuten.com Item "%title%" was Created in Magento Catalog.', array('!title' => $this->getTitle())
         );
 
         return $productBuilder->getProduct();

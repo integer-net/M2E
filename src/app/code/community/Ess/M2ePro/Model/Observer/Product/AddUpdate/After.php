@@ -15,7 +15,7 @@ class Ess_M2ePro_Model_Observer_Product_AddUpdate_After extends Ess_M2ePro_Model
         parent::beforeProcess();
 
         if (!$this->isProxyExist()) {
-            throw new LogicException('Before proxy should be defined earlier than after action is performed.');
+            throw new LogicException('Before proxy should be defined earlier than after Action is performed.');
         }
 
         if ($this->getProductId() <= 0) {
@@ -491,7 +491,7 @@ class Ess_M2ePro_Model_Observer_Product_AddUpdate_After extends Ess_M2ePro_Model
     private function getProxy()
     {
         if (!$this->isProxyExist()) {
-            throw new LogicException('Before proxy should be defined earlier than after action is performed.');
+            throw new LogicException('Before proxy should be defined earlier than after Action is performed.');
         }
 
         $key = $this->getProductId().'_'.$this->getStoreId();

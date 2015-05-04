@@ -47,12 +47,12 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
 
                 if (searchResult.failed > 0) {
                     MagentoMessageObj.addError(
-                        M2ePro.translator.translate('eBay could not assign categories for %product_title% Products.')
+                        M2ePro.translator.translate('eBay could not assign Categories for %product_title% Products.')
                             .replace('%product_title%', searchResult.failed)
                     );
                 } else if (searchResult.succeeded > 0) {
                     MagentoMessageObj.addSuccess(
-                        M2ePro.translator.translate('Suggested Categories were successfully received for %product_title% product(s).')
+                        M2ePro.translator.translate('Suggested Categories were successfully Received for %product_title% Product(s).')
                             .replace('%product_title%', searchResult.succeeded)
                     );
                 }

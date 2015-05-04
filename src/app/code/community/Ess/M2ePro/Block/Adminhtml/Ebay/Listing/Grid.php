@@ -324,7 +324,7 @@ HTML;
         ));
 
         $uniqueTitleTxt = Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')
-            ->__('The specified title is already used for other listing. Listing title must be unique.'));
+            ->__('The specified Title is already used for other Listing. Listing Title must be unique.'));
 
         $constants = Mage::helper('M2ePro')
             ->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Ebay');

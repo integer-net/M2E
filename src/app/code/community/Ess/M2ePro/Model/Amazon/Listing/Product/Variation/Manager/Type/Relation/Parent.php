@@ -23,6 +23,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         return $this->processor;
     }
 
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product[]
+     */
     public function getChildListingsProducts()
     {
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
@@ -135,10 +138,85 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
                $additionalData['variation_channel_variations'] : NULL;
     }
 
+    public function getChannelVariationGeneralId(array $options)
+    {
+        foreach ($this->getChannelVariations() as $asin => $variation) {
+            if ($options == $variation) {
+                return $asin;
+            }
+        }
+
+        return null;
+    }
+
     public function setChannelVariations(array $channelVariations, $save = true)
     {
         $additionalData = $this->getListingProduct()->getAdditionalData();
         $additionalData['variation_channel_variations'] = $channelVariations;
+
+        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $save && $this->getListingProduct()->save();
+    }
+
+    // ----------------------------------------
+
+    public function getRemovedProductOptions()
+    {
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+        return !empty($additionalData['variation_removed_product_variations']) ?
+               $additionalData['variation_removed_product_variations'] : array();
+    }
+
+    public function isProductsOptionsRemoved(array $productOptions)
+    {
+        foreach ($this->getRemovedProductOptions() as $removedProductOptions) {
+            if ($productOptions != $removedProductOptions) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function addRemovedProductOptions(array $productOptions, $save = true)
+    {
+        if ($this->isProductsOptionsRemoved($productOptions)) {
+            return;
+        }
+
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+
+        if (!isset($additionalData['variation_removed_product_variations'])) {
+            $additionalData['variation_removed_product_variations'] = array();
+        }
+
+        $additionalData['variation_removed_product_variations'][] = $productOptions;
+
+        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $save && $this->getListingProduct()->save();
+    }
+
+    public function restoreRemovedProductOptions(array $productOptions, $save = true)
+    {
+        if (!$this->isProductsOptionsRemoved($productOptions)) {
+            return;
+        }
+
+        $removedProductOptions = $this->getRemovedProductOptions();
+
+        foreach ($removedProductOptions as $key => $removedOptions) {
+            if ($productOptions != $removedOptions) {
+                continue;
+            }
+
+            unset($removedProductOptions[$key]);
+            break;
+        }
+
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+        $additionalData['variation_removed_product_variations'] = $removedProductOptions;
 
         $this->getListingProduct()->setSettings('additional_data', $additionalData);
         $save && $this->getListingProduct()->save();
@@ -211,6 +289,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         return $this->getUnusedOptions($this->getCurrentProductOptions(), $this->getUsedProductOptions());
     }
 
+    public function getNotRemovedUnusedProductOptions()
+    {
+        return $this->getUnusedOptions($this->getUnusedProductOptions(), $this->getRemovedProductOptions());
+    }
+
     public function getUnusedChannelOptions()
     {
         return $this->getUnusedOptions($this->getChannelVariations(), $this->getUsedChannelOptions());
@@ -273,6 +356,54 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     // ########################################
 
+    public function createChildListingProduct(array $productOptions = array(),
+                                              array $channelOptions = array(),
+                                              $generalId = null)
+    {
+        $data = array(
+            'listing_id' => $this->getListingProduct()->getListingId(),
+            'product_id' => $this->getListingProduct()->getProductId(),
+            'status'     => Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED,
+            'general_id' => $generalId,
+            'is_general_id_owner' => $this->getAmazonListingProduct()->isGeneralIdOwner(),
+            'status_changer'   => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN,
+            'is_variation_product'    => 1,
+            'is_variation_parent'     => 0,
+            'variation_parent_id'     => $this->getListingProduct()->getId(),
+            'template_description_id' => $this->getAmazonListingProduct()->getTemplateDescriptionId(),
+        );
+
+        /** @var Ess_M2ePro_Model_Listing_Product $childListingProduct */
+        $childListingProduct = Mage::helper('M2ePro/Component_Amazon')->getModel('Listing_Product')->setData($data);
+        $childListingProduct->save();
+
+        if (empty($productOptions) && empty($channelOptions)) {
+            return $childListingProduct;
+        }
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonChildListingProduct */
+        $amazonChildListingProduct = $childListingProduct->getChildObject();
+
+        $childTypeModel = $amazonChildListingProduct->getVariationManager()->getTypeModel();
+
+        if (!empty($productOptions)) {
+            $productVariation = $this->getListingProduct()
+                ->getMagentoProduct()
+                ->getVariationInstance()
+                ->getVariationTypeStandard($productOptions);
+
+            $childTypeModel->setProductVariation($productVariation);
+        }
+
+        if (!empty($channelOptions)) {
+            $childTypeModel->setChannelVariation($channelOptions);
+        }
+
+        return $childListingProduct;
+    }
+
+    // ########################################
+
     public function clearTypeData()
     {
         parent::clearTypeData();
@@ -285,6 +416,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         unset($additionalData['variation_matched_attributes']);
         unset($additionalData['variation_channel_attributes_sets']);
         unset($additionalData['variation_channel_variations']);
+        unset($additionalData['variation_removed_product_variations']);
 
         $this->getListingProduct()->setSettings('additional_data', $additionalData);
         $this->getListingProduct()->save();

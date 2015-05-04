@@ -26,7 +26,7 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
         var self = EbayListingCategoryChooserBrowseHandlerObj;
 
         if (self.marketplaceId === null) {
-            alert('You must set site');
+            alert('You must set Site');
         }
 
         return self.marketplaceId;

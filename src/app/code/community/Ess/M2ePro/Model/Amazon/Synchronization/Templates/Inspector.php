@@ -85,7 +85,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
                 $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                    'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                      Status of Magento Product is Disabled (%date%) though in Synchronization Rules “Product Status”
                      is set to Enabled.',
                     array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -105,7 +105,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
                 if (!is_null($temp) && $temp) {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Status of Magento Product Variation is Disabled (%date%) though in Synchronization Rules
                          “Product Status“ is set to Enabled.',
                         array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -123,7 +123,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
                 $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                    'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                    'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                      Stock Availability of Magento Product is Out of Stock though in
                      Synchronization Rules “Stock Availability” is set to In Stock.',
                     array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -143,7 +143,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
                 if (!is_null($temp) && $temp) {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Stock Availability of Magento Product Variation is Out of Stock though
                          in Synchronization Rules “Stock Availability” is set to In Stock.',
                         array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -178,7 +178,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Magento Quantity“ is set to less then  %template_min_qty%.',
                         array(
@@ -195,7 +195,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Magento Quantity” is set to more then  %template_min_qty%.',
                         array(
@@ -212,7 +212,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Magento Quantity” is set between  %template_min_qty% and %template_max_qty%',
                         array(
@@ -253,7 +253,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Calculated Quantity” is set to less then %template_min_qty%',
                         array(
@@ -270,7 +270,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Calculated Quantity” is set to more then  %template_min_qty%.',
                         array(
@@ -287,7 +287,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                     $result = true;
                 } else {
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                        'Product was not automatically listed according to the List Rules in Synchronization Policy.
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
                          “Calculated Quantity” is set between  %template_min_qty% and %template_max_qty%.',
                         array(
@@ -667,9 +667,21 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         }
 
         $currentSalePriceInfo = $amazonListingProduct->getSalePriceInfo();
+        if ($currentSalePriceInfo !== false) {
+            $currentSalePrice          = $currentSalePriceInfo['price'];
+            $currentSalePriceStartDate = $currentSalePriceInfo['start_date'];
+            $currentSalePriceEndDate   = $currentSalePriceInfo['end_date'];
+        } else {
+            $currentSalePrice          = 0;
+            $currentSalePriceStartDate = null;
+            $currentSalePriceEndDate   = null;
+        }
 
-        $currentSalePrice = $currentSalePriceInfo['price'];
-        $onlineSalePrice  = $amazonListingProduct->getOnlineSalePrice();
+        $onlineSalePrice = $amazonListingProduct->getOnlineSalePrice();
+
+        if (!$currentSalePrice && !$onlineSalePrice) {
+            return false;
+        }
 
         if ((is_null($currentSalePrice) && !is_null($onlineSalePrice)) ||
             (!is_null($currentSalePrice) && is_null($onlineSalePrice)) ||
@@ -678,11 +690,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             return true;
         }
 
-        $currentSalePriceStartDate = $currentSalePriceInfo['start_date'];
         $onlineSalePriceStartDate  = $amazonListingProduct->getOnlineSalePriceStartDate();
-
-        $currentSalePriceEndDate = $currentSalePriceInfo['end_date'];
-        $onlineSalePriceEndDate  = $amazonListingProduct->getOnlineSalePriceEndDate();
+        $onlineSalePriceEndDate    = $amazonListingProduct->getOnlineSalePriceEndDate();
 
         if ($currentSalePriceStartDate != $onlineSalePriceStartDate ||
             $currentSalePriceEndDate   != $onlineSalePriceEndDate
@@ -704,19 +713,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
         $amazonListingProduct = $listingProduct->getChildObject();
 
-        $descriptionTemplate = $amazonListingProduct->getDescriptionTemplate();
-        if (is_null($descriptionTemplate)) {
-            return false;
-        }
-
-        $magentoProduct = $listingProduct->getMagentoProduct();
-
-        if ($magentoProduct->isBundleType() || $magentoProduct->isSimpleTypeWithCustomOptions()) {
-            return false;
-        }
-
         $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
-
         if (!$amazonSynchronizationTemplate->isReviseWhenChangeDetails()) {
             return false;
         }
@@ -732,16 +729,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
         /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
         $amazonListingProduct = $listingProduct->getChildObject();
-
-        $descriptionTemplate = $amazonListingProduct->getDescriptionTemplate();
-        if (is_null($descriptionTemplate)) {
-            return false;
-        }
-
-        $magentoProduct = $listingProduct->getMagentoProduct();
-        if ($magentoProduct->isBundleType() || $magentoProduct->isSimpleTypeWithCustomOptions()) {
-            return false;
-        }
 
         $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
         if (!$amazonSynchronizationTemplate->isReviseWhenChangeImages()) {

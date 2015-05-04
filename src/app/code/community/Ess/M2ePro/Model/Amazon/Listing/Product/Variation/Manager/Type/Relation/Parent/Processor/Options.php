@@ -143,7 +143,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
                 continue;
             }
 
-            if ($this->getProcessor()->getListingProduct()->getChildObject()->isGeneralIdOwner()) {
+            if ($this->getProcessor()->isGeneralIdOwner()) {
                 continue;
             }
 
@@ -154,7 +154,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
     private function matchNewChildren()
     {
         $channelOptions = $this->getProcessor()->getTypeModel()->getUnusedChannelOptions();
-        $productOptions = $this->getProcessor()->getTypeModel()->getUnusedProductOptions();
+        $productOptions = $this->getProcessor()->getTypeModel()->getNotRemovedUnusedProductOptions();
 
         if (empty($channelOptions) || empty($productOptions)) {
             return;
@@ -175,10 +175,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     private function canCreateNewProductChildren()
     {
-        if (!$this->getProcessor()->getListingProduct()->getChildObject()->isGeneralIdOwner()
-            || count($this->getProcessor()->getTypeModel()->getUnusedChannelOptions()) > 0
-            || count($this->getProcessor()->getTypeModel()->getUnusedProductOptions()) <= 0
-        ) {
+        $channelOptions = $this->getProcessor()->getTypeModel()->getUnusedChannelOptions();
+        $productOptions = $this->getProcessor()->getTypeModel()->getNotRemovedUnusedProductOptions();
+
+        if (!$this->getProcessor()->isGeneralIdOwner() || count($channelOptions) > 0 || count($productOptions) <= 0) {
             return false;
         }
 
@@ -198,7 +198,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     private function createNewProductChildren()
     {
-        foreach ($this->getProcessor()->getTypeModel()->getUnusedProductOptions() as $productOption) {
+        $productOptions = $this->getProcessor()->getTypeModel()->getNotRemovedUnusedProductOptions();
+
+        foreach ($productOptions as $productOption) {
             $this->getProcessor()->createChildListingProduct($productOption);
         }
     }
@@ -207,17 +209,20 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     private function matchEmptyProductOptionsChild(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
         /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $typeModel */
-        $typeModel = $listingProduct->getChildObject()->getVariationManager()->getTypeModel();
+        $typeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
 
         $channelOptions = $typeModel->getChannelOptions();
         $productOptions = array_merge(
-            $this->getProcessor()->getTypeModel()->getUnusedProductOptions(),
+            $this->getProcessor()->getTypeModel()->getNotRemovedUnusedProductOptions(),
             $this->getProcessor()->getTypeModel()->getUsedProductOptions(true)
         );
 
         $matcher = $this->getOptionMatcher();
-        $matcher->setDestinationOptions(array($channelOptions));
+        $matcher->setDestinationOptions(array($amazonListingProduct->getGeneralId() => $channelOptions));
 
         foreach ($productOptions as $productOption) {
             $generalId = $matcher->getMatchedOptionGeneralId($productOption);

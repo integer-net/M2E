@@ -198,7 +198,7 @@ HTML;
 
     public function isInAction()
     {
-        $lockedObjects = $this->getListingProduct()->getObjectLocks('in_action');
+        $lockedObjects = $this->getListingProduct()->getObjectLocks();
         return !empty($lockedObjects);
     }
 

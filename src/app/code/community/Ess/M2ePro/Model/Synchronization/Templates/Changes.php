@@ -66,7 +66,8 @@ class Ess_M2ePro_Model_Synchronization_Templates_Changes
 
     private function getListingProducts(array $attributes, $withStoreFilter = false, $fetchFunction)
     {
-        $cacheKey = md5(json_encode(func_get_args()));
+        $args = func_get_args();
+        $cacheKey = md5(json_encode($args));
 
         if (isset($this->cache['listings_products_by_params'][$cacheKey])) {
             return $this->cache['listings_products_by_params'][$cacheKey];

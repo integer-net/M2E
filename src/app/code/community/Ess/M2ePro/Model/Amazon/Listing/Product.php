@@ -386,7 +386,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
 
     // ########################################
 
-    public function getPrice($salePrice = false)
+    public function getPrice()
     {
         if ($this->getVariationManager()->isPhysicalUnit() &&
             $this->getVariationManager()->getTypeModel()->isVariationProductMatched()) {
@@ -395,26 +395,72 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
             /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
             $variation = reset($variations);
 
-            return $variation->getChildObject()->getPrice($salePrice);
+            return $variation->getChildObject()->getPrice();
         }
 
-        if ($salePrice) {
-            $src = $this->getAmazonSellingFormatTemplate()->getSalePriceSource();
-        } else {
-            $src = $this->getAmazonSellingFormatTemplate()->getPriceSource();
-        }
+        $src = $this->getAmazonSellingFormatTemplate()->getPriceSource();
 
         /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
         $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
         $calculator->setSource($src)->setProduct($this->getParentObject());
-        $calculator->setIsSalePrice($salePrice)->setModifyByCoefficient(true);
+        $calculator->setModifyByCoefficient(true);
+
+        return $calculator->getProductValue();
+    }
+
+    public function getMapPrice()
+    {
+        if ($this->getVariationManager()->isPhysicalUnit() &&
+            $this->getVariationManager()->getTypeModel()->isVariationProductMatched()) {
+
+            $variations = $this->getVariations(true);
+            /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
+            $variation = reset($variations);
+
+            return $variation->getChildObject()->getMapPrice();
+        }
+
+        $src = $this->getAmazonSellingFormatTemplate()->getMapPriceSource();
+
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getParentObject());
+
+        return $calculator->getProductValue();
+    }
+
+    // ----------------------------------------
+
+    public function getSalePrice()
+    {
+        if ($this->getVariationManager()->isPhysicalUnit() &&
+            $this->getVariationManager()->getTypeModel()->isVariationProductMatched()) {
+
+            $variations = $this->getVariations(true);
+            /* @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
+            $variation = reset($variations);
+
+            return $variation->getChildObject()->getSalePrice();
+        }
+
+        $src = $this->getAmazonSellingFormatTemplate()->getSalePriceSource();
+
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getParentObject());
+        $calculator->setIsSalePrice(true)->setModifyByCoefficient(true);
 
         return $calculator->getProductValue();
     }
 
     public function getSalePriceInfo()
     {
-        $salePrice = $this->getPrice(true);
+        $price = $this->getPrice();
+        $salePrice = $this->getSalePrice();
+
+        if ($salePrice >= $price) {
+            return false;
+        }
 
         $startDate = $this->getSalePriceStartDate();
         $endDate = $this->getSalePriceEndDate();
@@ -425,23 +471,20 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
         $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
 
         if ($salePrice <= 0 || !$startDate || !$endDate ||
-            $currentTimestamp > $endDateTimestamp || $currentTimestamp < $startDateTimestamp ||
-            $startDateTimestamp >= $endDateTimestamp) {
-            return array(
-                'price' => 0,
-                'start_date' => null,
-                'end_date' => null
-            );
+            $currentTimestamp > $endDateTimestamp ||
+            $startDateTimestamp >= $endDateTimestamp
+        ) {
+            return false;
         }
 
         return array(
-            'price' => $salePrice,
+            'price'      => $salePrice,
             'start_date' => $startDate,
-            'end_date' => $endDate
+            'end_date'   => $endDate
         );
     }
 
-    //-----------------------------------------
+    // ----------------------------------------
 
     private function getSalePriceStartDate()
     {
