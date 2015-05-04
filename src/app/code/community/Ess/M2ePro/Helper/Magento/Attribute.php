@@ -386,8 +386,7 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
                            $isGlobal = 1,
                            array $additionalParams = array())
     {
-        $validatorAttrCode = new Zend_Validate_Regex(array('pattern' => '/^[a-z][a-z_0-9]{1,254}$/'));
-        if (!$validatorAttrCode->isValid($attributeCode)) {
+        if (!preg_match('/^[a-z][a-z_0-9]{1,254}$/', $attributeCode)) {
             return false;
         }
 
@@ -413,8 +412,8 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
         $data['frontend_label'] = $frontendLabel;
         $data['is_global']      = (int)$isGlobal;
 
-        $data['source_model']   = Mage::helper('catalog/product')->getAttributeSourceModelByInputType($frontendInput);
-        $data['backend_model']  = Mage::helper('catalog/product')->getAttributeBackendModelByInputType($frontendInput);
+        $data['source_model']  = NULL;
+        $data['backend_model'] = NULL;
 
         !isset($data['is_configurable'])         && $data['is_configurable'] = 0;
         !isset($data['is_filterable'])           && $data['is_filterable'] = 0;

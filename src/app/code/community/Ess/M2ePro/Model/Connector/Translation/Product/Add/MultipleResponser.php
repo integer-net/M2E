@@ -190,21 +190,6 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
             trim($descriptionTemplate->getData('subtitle_template'))    != '#ebay_translated_subtitle#' ||
             trim($descriptionTemplate->getData('description_template')) != '#ebay_translated_description#')) {
 
-            $this->checkAndCreateMagentoAttributes(array(
-                'ebay_translated_title'    => 'Ebay Translated Title',
-                'ebay_translated_subtitle' => 'Ebay Translated Subtitle',
-            ), 'text');
-
-            $this->checkAndCreateMagentoAttributes(array(
-                'ebay_translated_description' => 'Ebay Translated Description',
-            ), 'textarea');
-
-            $this->checkAndCreateMagentoProductAttributes($listingProduct->getMagentoProduct(), array(
-                'ebay_translated_title',
-                'ebay_translated_subtitle',
-                'ebay_translated_description'
-            ));
-
             $data = $descriptionTemplate->getDataSnapshot();
             unset($data['id'], $data['update_date'], $data['create_date']);
 
@@ -229,6 +214,21 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
             $productData['template_description_custom_id'] = $this->descriptionTemplatesIds[$oldDescriptionTemplateId];
             $productData['template_description_mode']      = Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM;
         }
+
+        $this->checkAndCreateMagentoAttributes(array(
+            'ebay_translated_title'    => 'Ebay Translated Title',
+            'ebay_translated_subtitle' => 'Ebay Translated Subtitle',
+        ), 'text');
+
+        $this->checkAndCreateMagentoAttributes(array(
+            'ebay_translated_description' => 'Ebay Translated Description',
+        ), 'textarea');
+
+        $this->checkAndCreateMagentoProductAttributes($listingProduct->getMagentoProduct(), array(
+            'ebay_translated_title',
+            'ebay_translated_subtitle',
+            'ebay_translated_description'
+        ));
 
         $listingProduct->getMagentoProduct()
                        ->setAttributeValue('ebay_translated_title',       $response['title'])
@@ -354,19 +354,26 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
 
     // ########################################
 
-    private function checkAndCreateMagentoAttributes($attributes, $frontendInput = 'text')
+    private function checkAndCreateMagentoAttributes(array $attributes, $frontendInput = 'text')
     {
+        /** @var $helpAttribute Ess_M2ePro_Helper_Magento_Attribute */
+        $helpAttribute = Mage::helper('M2ePro/Magento_Attribute');
+
         foreach ($attributes as $code => $label) {
-            if (!Mage::helper('M2ePro/Magento_Attribute')->getByCode($code)) {
-                Mage::helper('M2ePro/Magento_Attribute')->create($code, array($label), $frontendInput, 0);
+            if (!$helpAttribute->getByCode($code)) {
+                $helpAttribute->create($code, array($label), $frontendInput, 0);
             }
         }
+
         return true;
     }
 
-    private function checkAndCreateMagentoProductAttributes($magentoProduct, $attributes)
+    private function checkAndCreateMagentoProductAttributes($magentoProduct, array $attributes)
     {
-        $helpAttribute    = Mage::helper('M2ePro/Magento_Attribute');
+        /** @var $helpAttribute Ess_M2ePro_Helper_Magento_Attribute */
+        $helpAttribute = Mage::helper('M2ePro/Magento_Attribute');
+
+        /** @var $helpAttributeSet Ess_M2ePro_Helper_Magento_AttributeSet */
         $helpAttributeSet = Mage::helper('M2ePro/Magento_AttributeSet');
 
         $attributeSetId = $magentoProduct->getProduct()->getAttributeSetId();
@@ -390,6 +397,7 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
 
     private function getAttributeGroupId($attributeSetId, $groupName = 'Ebay')
     {
+        /** @var $attributeGroupModel Mage_Eav_Model_Entity_Attribute_Group */
         $attributeGroupModel = Mage::getModel('eav/entity_attribute_group')
             ->setAttributeGroupName($groupName)
             ->setAttributeSetId($attributeSetId);

@@ -217,7 +217,7 @@ $tempTableIndexList = $connection->getIndexList($tempTable);
 
 if ($connection->tableColumnExists($tempTable, 'customer_group_id') === false) {
     $connection->addColumn($tempTable, 'customer_group_id',
-        'INT(11) UNSIGNED NOT NULL AFTER `best_offer_reject_attribute');
+        'INT(11) UNSIGNED NOT NULL AFTER `best_offer_reject_attribute`');
 }
 
 if (!isset($tempTableIndexList[strtoupper('customer_group_id')])) {
@@ -231,7 +231,7 @@ $tempTableIndexList = $connection->getIndexList($tempTable);
 
 if ($connection->tableColumnExists($tempTable, 'customer_group_id') === false) {
     $connection->addColumn($tempTable, 'customer_group_id',
-        'INT(11) UNSIGNED NOT NULL AFTER `sale_price_end_date_custom_attribute');
+        'INT(11) UNSIGNED NOT NULL AFTER `sale_price_end_date_custom_attribute`');
 }
 
 if (!isset($tempTableIndexList[strtoupper('customer_group_id')])) {

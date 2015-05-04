@@ -1,4 +1,10 @@
-* 6.2.4.1 (r7782) (26/01/2015) [Custom Release]
+* 6.2.4.2 (r7990) (01/03/2015)
+
+* Improvement: [eBay] Ability to use translation service for products with different attribute sets (attributes level)
+* Fix: [eBay] Some fixes for Magento with version less than 1.5.x.x (attributes / attributes sets compatibility)
+* Fix: [Amazon] The same Merchant SKU is being listed now. Merchant SKU must be unique for each Amazon item
+
+* 6.2.4.1 (r7782) (26/01/2015)
 
 * Added: [eBay] Ability to set "Minimum QTY to be listed" into Selling Format Template
 * Fix: [eBay] "Notice: Undefined index: marketplace_id" during setup of categories

@@ -199,9 +199,22 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple
         }
 
         $this->checkQtyWarnings();
-        $this->addSkusToQueue($tempSkus);
 
         return $requestData;
+    }
+
+    protected function setLocks($hash)
+    {
+        $skus = array();
+
+        foreach ($this->listingsProducts as $listingProduct) {
+             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            $skus[] = $listingProduct->getData('sku');
+        }
+
+        $this->addSkusToQueue($skus);
+
+        parent::setLocks($hash);
     }
 
     // ########################################

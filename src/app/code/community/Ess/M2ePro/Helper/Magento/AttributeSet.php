@@ -181,8 +181,15 @@ class Ess_M2ePro_Helper_Magento_AttributeSet extends Ess_M2ePro_Helper_Magento_A
             $attributeGroupId = $attributeSet->getDefaultGroupId();
         }
 
-        $attribute->setAttributeSetId($attributeSet->getId())->loadEntityAttributeIdBySet();
-        if ($attribute->getEntityAttributeId()) {
+        $attribute->setAttributeSetId($attributeSet->getId());
+
+        $filteredAttributes = Mage::getModel('eav/entity_attribute')->getResourceCollection()
+            ->setAttributeSetFilter($attributeSet->getId())
+            ->addFieldToFilter('entity_attribute.attribute_id', $attributeId)
+            ->load();
+
+        // attribute is already in set
+        if (count($filteredAttributes) > 0) {
             return false;
         }
 
