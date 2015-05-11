@@ -174,8 +174,25 @@ HTML;
 
     public function callbackColumnTitle($value, $row, $column, $isExport)
     {
-        $value = '<div style="margin-left: 3px; margin-bottom: 10px;">'.
+        $value = '<div style="margin-left: 3px; margin-bottom: 3px;">'.
                         Mage::helper('M2ePro')->escapeHtml($value)."</div>";
+
+        $id = $row->getId();
+        $generalId = $row->getData('general_id');
+        $categoryLinkTitle = Mage::helper('M2ePro')->escapeHtml('Show Categories');
+        $notFoundText = Mage::helper('M2ePro')->__('Categories Not Found');
+
+        $value .= <<<HTML
+<div style="margin-left: 3px; margin-bottom: 10px; font-size:10px; line-height: 1.1em">
+    <a href="javascript:void(0)"
+        onclick="ListingGridHandlerObj.productSearchHandler.showAsinCategories(
+            this, {$id}, '{$generalId}', {$this->productId})">
+        {$categoryLinkTitle}
+    </a>
+    <div id="asin_categories_{$id}"></div>
+    <div id="asin_categories_not_found_{$id}" style="display: none; font-style: italic">{$notFoundText}</div>
+</div>
+HTML;
 
         if(!$this->listingProduct->getChildObject()->getVariationManager()->isVariationProduct()
             || $this->listingProduct->getChildObject()->getVariationManager()->isIndividualType()) {
@@ -192,7 +209,6 @@ HTML;
             return $value;
         }
 
-        $id = $row->getId();
         $variations = $row->getData('variations');
 
         if($this->listingProduct->getChildObject()->getVariationManager()->isRelationParentType()) {
@@ -271,7 +287,7 @@ JS;
                     json_encode($variations).
                     '</div>';
             } else {
-                $value .= '<div style="font-size: 11px; font-weight: bold; color: grey; margin-left: 7px"><br/>';
+                $value .= '<div style="font-size:11px;font-weight: bold;color: grey;margin-left: 7px;margin-top: 5px">';
                 $value .= implode(', ', $destinationAttributes);
                 $value .= '</div>';
             }
@@ -317,6 +333,8 @@ JS;
             $selectedOptions = $variations['asins'][$requestedChildAsin]['specifics'];
         }
 
+        $specificsHtml .= '<form action="javascript:void(0);">';
+
         $attributesNames = '<span style="margin-left: 10px;
                                 min-width: 100px;
                                 max-width: 170px;
@@ -328,21 +346,27 @@ JS;
             $attributesNames .= '<span style="margin-bottom: 5px; display: inline-block;">'.
                                     ucfirst(strtolower($specificName)).
                               '</span><br/>';
+            $attributeValues .= '<input type="hidden" value="' . Mage::helper('M2ePro')->escapeHtml($specificName) .
+                                '" class="specifics_name_'.$id.'">';
             $attributeValues .= '<select class="specifics_'.$id.'"
                                        onchange="ListingGridHandlerObj.productSearchHandler.specificsChange(this)"
                                        style="width: 170px; margin-bottom: 5px; font-size: 10px;"
                                        id="specific_'.$specificName.'_'.$id.'">';
             $attributeValues .= '<option class="empty" value=""></option>';
-            foreach ($specific as $option) {
 
-                $selected = '';
-                if ($requestedChildAsin && $selectedOptions[$specificName] == $option) {
-                    $selected = 'selected';
+            if (!empty($requestedChildAsin)) {
+                foreach ($specific as $option) {
+
+                    $selected = '';
+                    if ($selectedOptions[$specificName] == $option) {
+                        $selected = 'selected';
+                    }
+
+                    $option = Mage::helper('M2ePro')->escapeHtml($option);
+                    $attributeValues .= '<option value="'.$option.'" '.$selected.'>'.$option.'</option>';
                 }
-
-                $option = Mage::helper('M2ePro')->escapeHtml($option);
-                $attributeValues .= '<option value="'.$option.'" '.$selected.'>'.$option.'</option>';
             }
+
             $attributeValues .= '</select><br/>';
 
             $specificsJs .= <<<JS
@@ -352,15 +376,18 @@ JS;
 
         $specificsHtml .= $attributesNames . '</span>';
         $specificsHtml .= $attributeValues . '</span>';
+        $specificsHtml .= '</form>';
 
         $specificsJs .= '</script>';
 
-        $specificsJsonContainer = '<div id="parent_asin_'.$row->getId().'" style="display: none">'.
-                                  $row->getData('general_id').
-                                  '</div>'.
-                                  '<div id="asins_'.$id.'" style="display: none;">'.
-                                  json_encode($variations['asins']).
-                                  '</div>';
+        $variationAsins = json_encode($variations['asins']);
+        $variationTree = json_encode($this->getChannelVariationsTree($variations));
+
+        $specificsJsonContainer = <<<HTML
+<div id="parent_asin_{$id}" style="display: none">{$generalId}</div>
+<div id="asins_{$id}" style="display: none;">{$variationAsins}</div>
+<div id="channel_variations_tree_{$id}" style="display: none;">{$variationTree}</div>
+HTML;
 
         return $value . $specificsHtml . $specificsJsonContainer . $specificsJs;
     }
@@ -523,6 +550,103 @@ HTML;
     public function getRowUrl($row)
     {
         return false;
+    }
+
+    // ####################################
+
+    private function getChannelVariationsTree($variations)
+    {
+        $channelVariations = array();
+        foreach($variations['asins'] as $asin => $asinAttributes) {
+            $channelVariations[$asin] = $asinAttributes['specifics'];
+        }
+
+        if (empty($channelVariations)) {
+            return new stdClass();
+        }
+
+        $firstAttribute = key($variations['set']);
+
+        return $this->prepareVariations(
+            $firstAttribute, $channelVariations, $variations['set']
+        );
+    }
+
+    private function prepareVariations($currentAttribute, $variations, $variationsSets,$filters = array())
+    {
+        $return = false;
+
+        $temp = array_flip(array_keys($variationsSets));
+
+        $lastAttributePosition = count($variationsSets) - 1;
+        $currentAttributePosition = $temp[$currentAttribute];
+
+        if ($currentAttributePosition != $lastAttributePosition) {
+
+            $temp = array_keys($variationsSets);
+            $nextAttribute = $temp[$currentAttributePosition + 1];
+
+            foreach ($variationsSets[$currentAttribute] as $option) {
+
+                $filters[$currentAttribute] = $option;
+
+                $result = $this->prepareVariations(
+                    $nextAttribute,$variations,$variationsSets,$filters
+                );
+
+                if (!$result) {
+                    continue;
+                }
+
+                $return[$currentAttribute][$option] = $result;
+            }
+
+            ksort($return[$currentAttribute]);
+
+            return $return;
+        }
+
+        $return = false;
+        foreach ($variations as $key => $magentoVariation) {
+            foreach ($magentoVariation as $attribute => $option) {
+
+                if ($attribute == $currentAttribute) {
+
+                    if (count($variationsSets) != 1) {
+                        continue;
+                    }
+
+                    $values = array_flip($variationsSets[$currentAttribute]);
+                    $return = array($currentAttribute => $values);
+
+                    foreach ($return[$currentAttribute] as &$option) {
+                        $option = true;
+                    }
+
+                    return $return;
+                }
+
+                if ($option != $filters[$attribute]) {
+                    unset($variations[$key]);
+                    continue;
+                }
+
+                foreach ($magentoVariation as $tempAttribute => $tempOption) {
+                    if ($tempAttribute == $currentAttribute) {
+                        $option = $tempOption;
+                        $return[$currentAttribute][$option] = true;
+                    }
+                }
+            }
+        }
+
+        if (count($variations) < 1) {
+            return false;
+        }
+
+        ksort($return[$currentAttribute]);
+
+        return $return;
     }
 
     // ####################################

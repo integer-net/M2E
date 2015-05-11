@@ -34,6 +34,10 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_General
 
         $this->data['general_id'] = $generalId;
 
+        if ($this->getVariationManager()->isVariationProduct() && !$this->validateVariationProductMatching()) {
+            return false;
+        }
+
         if (!$this->validateQty()) {
             return false;
         }

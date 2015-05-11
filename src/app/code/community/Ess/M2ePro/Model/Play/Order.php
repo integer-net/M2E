@@ -229,7 +229,11 @@ class Ess_M2ePro_Model_Play_Order extends Ess_M2ePro_Model_Component_Child_Play_
     public function afterCreateMagentoOrder()
     {
         if ($this->getPlayAccount()->isMagentoOrdersCustomerNewNotifyWhenOrderCreated()) {
-            $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            if (method_exists($this->getParentObject()->getMagentoOrder(), 'queueNewOrderEmail')) {
+                $this->getParentObject()->getMagentoOrder()->queueNewOrderEmail(false);
+            } else {
+                $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            }
         }
     }
 

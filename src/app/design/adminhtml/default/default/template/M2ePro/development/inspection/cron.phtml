@@ -40,6 +40,28 @@
         </td>
     </tr>
 
+    <?php if (!$this->getData('is_support_mode') && $this->isServiceCronDisabled) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Service Cron State'); ?>: </label>
+            </td>
+            <td class="value" style="color: red;">
+                <?php echo Mage::helper('M2ePro')->__('Disabled by Developer'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+
+    <?php if (!$this->getData('is_support_mode') && $this->isMagentoCronDisabled) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Magento Cron State'); ?>: </label>
+            </td>
+            <td class="value" style="color: red;">
+                <?php echo Mage::helper('M2ePro')->__('Disabled by Developer'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+
     <?php if ($this->isShownRecommendationsMessage()) : ?>
         <tr>
             <td class="label" colspan="2" style="width: 600px">

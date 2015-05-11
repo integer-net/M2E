@@ -130,18 +130,18 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_DescriptionController
 
         $dataForAdd['title'] = strip_tags($dataForAdd['title']);
 
-        /** @var Ess_M2ePro_Model_Template_Description $descriptionModel */
-        $descriptionModel = Mage::helper('M2ePro/Component_Amazon')->getModel('Template_Description')->load($id);
+        /** @var Ess_M2ePro_Model_Template_Description $descriptionTemplate */
+        $descriptionTemplate = Mage::helper('M2ePro/Component_Amazon')->getModel('Template_Description')->load($id);
 
         $oldData = array();
-        if ($descriptionModel->getId()) {
-            $oldData = $descriptionModel->getChildObject()->getDataSnapshot();
+        if ($descriptionTemplate->getId()) {
+            $oldData = $descriptionTemplate->getChildObject()->getDataSnapshot();
         }
 
-        $descriptionModel->addData($dataForAdd)->save();
+        $descriptionTemplate->addData($dataForAdd)->save();
         //----------------------------
 
-        $id = $descriptionModel->getId();
+        $id = $descriptionTemplate->getId();
 
         // Saving definition info
         //----------------------------
@@ -235,18 +235,18 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_DescriptionController
         $dataForAdd['search_terms']    = json_encode(array_filter($dataForAdd['search_terms']));
         $dataForAdd['bullet_points']   = json_encode(array_filter($dataForAdd['bullet_points']));
 
-        /* @var $definitionModel Ess_M2ePro_Model_Amazon_Template_Description_Definition */
-        $definitionModel = Mage::getModel('M2ePro/Amazon_Template_Description_Definition');
-        $definitionModel->load($id);
-        $definitionModel->addData($dataForAdd)->save();
+        /* @var $descriptionDefinition Ess_M2ePro_Model_Amazon_Template_Description_Definition */
+        $descriptionDefinition = Mage::getModel('M2ePro/Amazon_Template_Description_Definition');
+        $descriptionDefinition->load($id);
+        $descriptionDefinition->addData($dataForAdd)->save();
         //----------------------------
 
-        /** @var Ess_M2ePro_Model_Amazon_Template_Description $childDescriptionModel */
-        $childDescriptionModel = $descriptionModel->getChildObject();
+        /** @var Ess_M2ePro_Model_Amazon_Template_Description $amazonDescriptionTemplate */
+        $amazonDescriptionTemplate = $descriptionTemplate->getChildObject();
 
         // Saving specifics info
         //----------------------------
-        foreach ($childDescriptionModel->getSpecifics(true) as $specific) {
+        foreach ($amazonDescriptionTemplate->getSpecifics(true) as $specific) {
             $specific->deleteInstance();
         }
 
@@ -291,26 +291,31 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_DescriptionController
 
         // Is Need Synchronize
         //----------------------------
-        $newData = $childDescriptionModel->getDataSnapshot();
-        $childDescriptionModel->setSynchStatusNeed($newData, $oldData);
+        $newData = $amazonDescriptionTemplate->getDataSnapshot();
+        $amazonDescriptionTemplate->setSynchStatusNeed($newData, $oldData);
         //----------------------------
 
-        // Run Processor for Variation Relation Parent
+        // Run Processor for Variation Relation Parents
         //----------------------------
-        if ($childDescriptionModel->getResource()->isDifferent($newData, $oldData)) {
+        if ($amazonDescriptionTemplate->getResource()->isDifferent($newData, $oldData)) {
 
-            $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product')
-              ->addFieldToFilter('template_description_id', $id)
-              ->addFieldToFilter('is_general_id_owner',Ess_M2ePro_Model_Amazon_Listing_Product::IS_GENERAL_ID_OWNER_YES)
-              ->addFieldToFilter('general_id', array('null' => true))
-              ->addFieldToFilter('is_variation_product', 1)
-              ->addFieldToFilter('is_variation_parent', 1);
+            /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
+            $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product')
+                 ->addFieldToFilter('template_description_id', $id)
+                 ->addFieldToFilter(
+                     'is_general_id_owner', Ess_M2ePro_Model_Amazon_Listing_Product::IS_GENERAL_ID_OWNER_YES
+                 )
+                 ->addFieldToFilter('general_id', array('null' => true))
+                 ->addFieldToFilter('is_variation_product', 1)
+                 ->addFieldToFilter('is_variation_parent', 1);
 
-            foreach ($collection->getItems() as $listingProduct) {
-                /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
-                $variationManager = $listingProduct->getChildObject()->getVariationManager();
-                $variationManager->getTypeModel()->getProcessor()->process();
-            }
+            $massProcessor = Mage::getModel(
+                'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Mass'
+            );
+            $massProcessor->setListingsProducts($listingProductCollection->getItems());
+            $massProcessor->setForceExecuting(false);
+
+            $massProcessor->execute();
         }
         //----------------------------
 

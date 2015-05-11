@@ -40,6 +40,10 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Revise_Validator
         }
         $this->data['condition'] = $condition;
 
+        if ($this->getVariationManager()->isVariationProduct() && !$this->validateVariationProductMatching()) {
+            return false;
+        }
+
         if (!$this->validateQty()) {
             return false;
         }

@@ -35,6 +35,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     // ########################################
 
+    public function isNeedProcessor()
+    {
+        return (bool)$this->getAmazonListingProduct()->getData('variation_parent_need_processor');
+    }
+
+    // ########################################
+
     public function hasChannelTheme()
     {
         return (bool)$this->getChannelTheme();
@@ -419,6 +426,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         unset($additionalData['variation_removed_product_variations']);
 
         $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setData('variation_parent_need_processor', 0);
         $this->getListingProduct()->save();
 
         foreach ($this->getChildListingsProducts() as $child) {

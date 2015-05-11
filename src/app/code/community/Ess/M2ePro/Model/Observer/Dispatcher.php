@@ -68,6 +68,11 @@ class Ess_M2ePro_Model_Observer_Dispatcher
         $this->process('Shipment', $eventObserver);
     }
 
+    public function salesOrderCreditmemoRefund(Varien_Event_Observer $eventObserver)
+    {
+        $this->process('CreditMemo', $eventObserver);
+    }
+
     public function salesOrderSaveAfter(Varien_Event_Observer $eventObserver)
     {
         $this->process('Order', $eventObserver);

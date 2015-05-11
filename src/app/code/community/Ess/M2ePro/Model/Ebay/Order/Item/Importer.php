@@ -48,9 +48,27 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         $description = isset($rawData['description']) ? $rawData['description'] : $preparedData['title'];
         $preparedData['description'] = Mage::helper('M2ePro')->stripInvisibleTags($description);
 
-        $sku = $rawData['sku'] ? $rawData['sku'] : Mage::helper('M2ePro')->convertStringToSku($rawData['title']);
-        if (strlen($sku) > 64) {
-            $sku = substr($sku, strlen($sku) - 64, 64);
+        if (!empty($rawData['sku'])) {
+            $sku = $rawData['sku'];
+        } else {
+            $sku = Mage::helper('M2ePro')->convertStringToSku($rawData['title']);
+        }
+
+        if (strlen($sku) > Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH) {
+
+            $hashLength = 10;
+            $savedSkuLength = Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH - $hashLength - 1;
+            $hash = Mage::helper('M2ePro')->generateUniqueHash($sku, $hashLength);
+
+            $isSaveStart = (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+                '/order/magento/settings/', 'save_start_of_long_sku_for_new_product'
+            );
+
+            if ($isSaveStart) {
+                $sku = substr($sku, 0, $savedSkuLength).'-'.$hash;
+            } else {
+                $sku = $hash.'-'.substr($sku, strlen($sku) - $savedSkuLength, $savedSkuLength);
+            }
         }
 
         $preparedData['sku'] = trim(strip_tags($sku));

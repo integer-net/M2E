@@ -465,4 +465,21 @@ a.custom-button:hover {
     background: url("../../images/btn_over_bg.gif") repeat-x scroll 0px 0px #F77C16;
 }
 
+a.hover-underline {
+    text-decoration: none;
+}
+
+a.hover-underline:hover {
+    text-decoration: underline;
+}
+
+/* ================================================ */
+
+/* second lvl tabs */
+/* ================================================ */
+
+.m2epro-link-tabs a.active{
+    color: grey;
+}
+
 /* ================================================ */

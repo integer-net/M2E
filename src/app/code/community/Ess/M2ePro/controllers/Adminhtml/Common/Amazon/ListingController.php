@@ -533,7 +533,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
     public function searchAsinManualAction()
     {
         $productId = $this->getRequest()->getParam('product_id');
-        $query = $this->getRequest()->getParam('query');
+        $query = trim($this->getRequest()->getParam('query'));
 
         if (empty($productId)) {
             return $this->getResponse()->setBody('No product_id!');
@@ -620,6 +620,37 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
 
     //--------------------------------------------
 
+    public function getCategoriesByAsinAction()
+    {
+        $asin = $this->getRequest()->getParam('asin');
+        $productId = $this->getRequest()->getParam('product_id');
+
+        if (empty($asin)) {
+            return $this->getResponse()->setBody('You should select one or more Products');
+        }
+
+        $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product', $productId);
+
+        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+
+        $categoriesData = $dispatcherObject->processVirtual(
+            'product','search','categoryByAsin',
+            array(
+                'item' => $asin,
+                'only_realtime' => true
+            ),
+            null,
+            $listingProduct->getAccount()->getId()
+        );
+
+        return $this->getResponse()->setBody(json_encode(array(
+            'data' => empty($categoriesData['categories']) ? '' : $categoriesData['categories']
+        )));
+    }
+
+    //--------------------------------------------
+
     public function getProductsSearchStatusAction()
     {
         $productsIds = $this->getRequest()->getParam('products_ids');
@@ -699,7 +730,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             $messages[] = array(
                 'type' => 'success',
                 'text' => Mage::helper('M2ePro')->__(
-                    'ASIN(s)/ISBN(s) were found and assigned for %count selected Items.',
+                    'ASIN(s)/ISBN(s) were found and assigned for %count% selected Items.',
                     count($data)
                 )
             );

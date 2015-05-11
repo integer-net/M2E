@@ -572,10 +572,12 @@ HTML;
         // ---------------------------------
         $lpId = $row->getData('id');
 
-        $productTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('value'));
+        $productTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('name'));
         if (strlen($productTitle) > 60) {
             $productTitle = substr($productTitle, 0, 60) . '...';
         }
+        $productTitle = Mage::helper('M2ePro')->__('Assign Rakuten.com SKU For &quot;%product_title%&quot;',
+                                                   $productTitle);
         $productTitle = Mage::helper('M2ePro')->escapeJs($productTitle);
         // ---------------------------------
 

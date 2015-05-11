@@ -20,6 +20,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log_Grid extends Ess_M2ePro_Bloc
             $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_NEW_SKU_PRODUCT_ON_COMPONENT] = '';
         }
 
+        if ($this->getChannel() != Ess_M2ePro_Helper_Component_Amazon::NICK) {
+            $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_COMPONENT] = '';
+            $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_AND_REMOVE_PRODUCT] = '';
+        }
+
         return array_diff_key($allActions, $excludeActions);
     }
 

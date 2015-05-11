@@ -63,18 +63,24 @@
             'qty_reservation' => array(
                 'days' => 0
             ),
+            'refund_and_cancellation' => array(
+                'refund_mode' => 1,
+            ),
             'fba' => array(
                 'mode' => Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_MODE_YES,
-                'stock_mode' => Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_STOCK_MODE_YES
+                'stock_mode' => Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_STOCK_MODE_NO
             ),
             'invoice_mode' => Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_INVOICE_MODE_YES,
             'shipment_mode' => Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_SHIPMENT_MODE_YES
         )
     );
 
+    $isEdit = !!$this->getRequest()->getParam('id');
+
+    $isEdit && $defaults['magento_orders_settings']['refund_and_cancellation']['refund_mode'] = 0;
+
     $formData = Mage::helper('M2ePro')->arrayReplaceRecursive($defaults, $formData);
 
-    $isEdit = !!$this->getRequest()->getParam('id');
 ?>
 
 <script type="text/javascript">
@@ -414,6 +420,44 @@
                             <p class="note">
                                 <?php echo Mage::helper('M2ePro')->__('For how many days reserve Quantity has to be kept while Magento Order is not created.') ?>
                         </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_amazon_accounts_magento_orders_refund_and_cancellation" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Amazon_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Refund & Cancellation'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+            <div id="block_notice_amazon_accounts_magento_orders_refund" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Refund & Cancellation'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('
+                Enable an option Cancellation & Refund if Credit Memo is Created to run automatic Cancellation of Amazon Orders or automatic Refund of Items associated to Amazon Orders at the moment of Credit Memos creation in Magento Orders that were created by M2E Pro. <br/><br/>
+
+                In case Amazon Order has Status Unshipped and you created a Credit Memo for associated Magento Order which include all bought Items, Amazon Order Cancellation will be run automatically. <br/><br/>
+
+                Automatic Refund of bought Items associated to Amazon Order is available in case Amazon Order has Status Shipped. Refund action will be run only for those Items for which Credit Memos were created.'); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr id="magento_orders_refund_container">
+                    <td class="label">
+                        <label for="magento_orders_refund"><?php echo Mage::helper('M2ePro')->__('Cancel or Refund if Credit Memo is Created') ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <select name="magento_orders_settings[refund_and_cancellation][refund_mode]" id="magento_orders_refund">
+                            <option value="0" <?php if (!$formData['magento_orders_settings']['refund_and_cancellation']['refund_mode']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('No') ?></option>
+                            <option value="1" <?php if ($formData['magento_orders_settings']['refund_and_cancellation']['refund_mode']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes') ?></option>
+                        </select>
                     </td>
                 </tr>
 

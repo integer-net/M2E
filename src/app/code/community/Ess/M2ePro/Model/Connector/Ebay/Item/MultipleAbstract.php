@@ -45,9 +45,9 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
         /** @var Ess_M2ePro_Model_Marketplace $marketplace */
         $marketplace = reset($listingsProducts)->getMarketplace();
 
-        foreach($listingsProducts as $listingProduct) {
+        $listingProductIds = array();
 
-            $listingProduct->loadInstance($listingProduct->getId());
+        foreach($listingsProducts as $listingProduct) {
 
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
                 throw new Exception('Multiple Item Connector has received invalid Product data type');
@@ -61,8 +61,20 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
                 throw new Exception('Multiple Item Connector has received Products from different Marketplaces');
             }
 
-            $this->listingsProducts[$listingProduct->getId()] = $listingProduct;
+            $listingProductIds[] = $listingProduct->getId();
         }
+
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
+        $listingProductCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('id', array('in' => array_unique($listingProductIds)));
+
+        $actualListingsProducts = $listingProductCollection->getItems();
+
+        if (empty($actualListingsProducts)) {
+            throw new Exception('All products were removed before connector processing');
+        }
+
+        $this->listingsProducts = $actualListingsProducts;
 
         parent::__construct($params,$marketplace,$account);
     }

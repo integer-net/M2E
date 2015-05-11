@@ -183,10 +183,28 @@
                             </td>
                         </tr>
 
+                        <?php if ($this->licenseData['info']['email'] != '') { ?>
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Associated Email'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <span><?php echo $this->licenseData['info']['email']; ?></span>
+                                <p class="note">
+                                    <span>
+                                        <?php echo Mage::helper('M2ePro')->__('This e-mail address associated to your License. <br/>
+                                        Also you can use this e-mail to enter a <a href="%url%">clients portal</a>',
+                                        Mage::helper('M2ePro/Module_Support')->getClientsPortalBaseUrl()); ?>
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                        <?php } ?>
+
                         <tr>
                             <td class="label"></td>
                             <td class="value">
-                                <a href="<?php echo Mage::helper('M2ePro/Module_Support')->getClientsPortalUrl();?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Manage License'); ?></a>
+                                <a href="<?php echo Mage::helper('M2ePro/Module_Support')->getClientsPortalBaseUrl();?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Manage License'); ?></a>
                             </td>
                         </tr>
 

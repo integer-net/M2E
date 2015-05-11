@@ -159,7 +159,7 @@ AmazonListingTemplateDescriptionHandler = Class.create(ActionHandler, {
 
         $('modal_dialog_message').insert(contentData);
 
-        self.loadTemplateDescriptionGrid(templateDescriptionPopup.productsIds);
+        self.loadTemplateDescriptionGrid();
 
         setTimeout(function() {
             Windows.getFocusedWindow().content.style.height = '';

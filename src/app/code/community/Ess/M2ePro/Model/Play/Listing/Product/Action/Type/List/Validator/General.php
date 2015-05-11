@@ -24,6 +24,10 @@ class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_List_Validator_General
             return false;
         }
 
+        if ($this->getVariationManager()->isVariationProduct() && !$this->validateVariationProductMatching()) {
+            return false;
+        }
+
         if (!$this->validateCondition()) {
             return false;
         }

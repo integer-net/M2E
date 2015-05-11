@@ -207,7 +207,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         // 3rd party Item
         // ----------------
         $sku = $this->getSku();
-        if ($sku != '' && strlen($sku) <= 64) {
+        if ($sku != '' && strlen($sku) <= Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH) {
             $product = Mage::getModel('catalog/product')
                 ->setStoreId($this->getAmazonOrder()->getAssociatedStoreId())
                 ->getCollection()
@@ -269,21 +269,20 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         }
 
         $sku = $this->getSku();
-        if (strlen($sku) > 64) {
-            $sku = substr($sku, strlen($sku) - 64, 64);
+        if (strlen($sku) > Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH) {
+            $hashLength = 10;
+            $savedSkuLength = Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH - $hashLength - 1;
+            $hash = Mage::helper('M2ePro')->generateUniqueHash($sku, $hashLength);
 
-            // Try to find exist product with truncated sku
-            // ----------------
-            $product = Mage::getModel('catalog/product')
-                ->getCollection()
-                    ->addAttributeToSelect('sku')
-                    ->addAttributeToFilter('sku', $sku)
-                    ->getFirstItem();
+            $isSaveStart = (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+                '/order/magento/settings/', 'save_start_of_long_sku_for_new_product'
+            );
 
-            if ($product->getId()) {
-                return $product;
+            if ($isSaveStart) {
+                $sku = substr($sku, 0, $savedSkuLength).'-'.$hash;
+            } else {
+                $sku = $hash.'-'.substr($sku, strlen($sku) - $savedSkuLength, $savedSkuLength);
             }
-            // ----------------
         }
 
         $productData = array(

@@ -6,6 +6,10 @@
 
 class Ess_M2ePro_Helper_Magento_Product extends Mage_Core_Helper_Abstract
 {
+    const SKU_MAX_LENGTH = 64;
+
+    // ########################################
+
     private $cacheLoadedProducts = array();
 
     // ########################################

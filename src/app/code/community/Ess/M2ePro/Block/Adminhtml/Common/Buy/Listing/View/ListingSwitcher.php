@@ -13,6 +13,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View_ListingSwitcher
 
         // Initialization block
 
-        $this->setAddListingUrl('*/adminhtml_common_buy_listing/add/step/1/');
+        $this->setAddListingUrl('*/adminhtml_common_listing_create/index/step/1/component/buy/');
     }
 }

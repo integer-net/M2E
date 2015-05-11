@@ -18,5 +18,10 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Orders_Get_ItemsResponser
         return true;
     }
 
+    protected function prepareResponseData($response)
+    {
+        return $response['orders'];
+    }
+
     // ########################################
 }

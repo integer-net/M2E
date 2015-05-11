@@ -72,7 +72,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '8700';
+        $revision = '8740';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -256,8 +256,8 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
             $fullDirPath = Mage::getBaseDir().DS.$item;
 
-            if (preg_match('/\*$/',$item)) {
-                $fullDirPath = preg_replace('/\*$/', '', $fullDirPath);
+            if (preg_match('/\*.*$/',$item)) {
+                $fullDirPath = preg_replace('/\*.*$/', '', $fullDirPath);
                 $directoriesForCheck = array_merge($directoriesForCheck, $this->getDirectories($fullDirPath));
             }
 

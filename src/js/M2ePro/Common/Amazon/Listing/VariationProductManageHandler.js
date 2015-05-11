@@ -44,7 +44,7 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
 
     //----------------------------------
 
-    openPopUp: function(productId, title)
+    openPopUp: function(productId, title, filter)
     {
         var self = this;
 
@@ -53,7 +53,8 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
         new Ajax.Request(self.options.url.variationProductManage, {
             method: 'post',
             parameters: {
-                product_id : productId
+                product_id : productId,
+                filter: filter
             },
             onSuccess: function (transport) {
 
@@ -109,7 +110,7 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
 
                 var response = self.parseResponse(transport);
                 if(response.success) {
-                    self.loadVariationsGrid();
+                    self.reloadVariationsGrid();
                     return self.reloadSettings();
                 }
 
@@ -388,7 +389,7 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
                 var response = self.parseResponse(transport);
                 if(response.success) {
                     self.reloadSettings();
-                    self.loadVariationsGrid();
+                    self.reloadVariationsGrid();
                 }
             }
         });
@@ -471,6 +472,16 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
         Event.observe($('amazonVariationsProductManageVariationsGridIframe'), 'load', function() {
             $('loading-mask').hide();
         });
+    },
+
+    reloadVariationsGrid: function()
+    {
+        var gridIframe = $('amazonVariationsProductManageVariationsGridIframe');
+
+        if(!gridIframe) {
+            return;
+        }
+        gridIframe.contentWindow.ListingGridHandlerObj.actionHandler.gridHandler.unselectAllAndReload();
     },
 
     //---------------------------------

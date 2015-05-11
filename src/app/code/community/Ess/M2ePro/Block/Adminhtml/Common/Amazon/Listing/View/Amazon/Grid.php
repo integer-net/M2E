@@ -208,7 +208,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
 
         $this->addColumn('status', array(
             'header' => Mage::helper('M2ePro')->__('Status'),
-            'width' => '145px',
+            'width' => '155px',
             'index' => 'amazon_status',
             'filter_index' => 'amazon_status',
             'type' => 'options',
@@ -630,30 +630,39 @@ HTML;
 
         $resultHtml = '';
 
-        $salePriceValue = $row->getData('online_sale_price');
-        if ((float)$salePriceValue > 0) {
+        $salePrice = $row->getData('online_sale_price');
+        if ((float)$salePrice > 0) {
             $startDateTimestamp = strtotime($row->getData('online_sale_price_start_date'));
             $endDateTimestamp   = strtotime($row->getData('online_sale_price_end_date'));
 
+            $iconHelpPath = $this->getSkinUrl('M2ePro/images/help.png');
+            $toolTipIconPath = $this->getSkinUrl('M2ePro/images/tool-tip-icon.png');
+
+            $intervalHtml = '<img class="tool-tip-image"
+                                 style="vertical-align: middle;"
+                                 src="'.$toolTipIconPath.'">
+                            <span class="tool-tip-message tip-left" style="display:none;">
+                                <img src="'.$iconHelpPath.'">
+                                <span style="color:gray; font-size: 10px;">
+                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
+                                    To: '.date('Y-m-d', $endDateTimestamp).'
+                                </span>
+                            </span>';
+
             $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+
+            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePrice);
 
             if ($currentTimestamp >= $startDateTimestamp &&
                 $currentTimestamp <= $endDateTimestamp &&
-                $salePriceValue < (float)$value
+                $salePrice < (float)$value
             ) {
-                $resultHtml = '<span style="text-decoration: line-through;">'.$priceValue.'</span>';
+                $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>';
+                $resultHtml .= '<br/>'.$intervalHtml.$salePriceValue;
             } else {
-                $resultHtml = $priceValue;
+                $resultHtml .= $priceValue;
+                $resultHtml .= '<br/>'.$intervalHtml.'<span style="color:gray;">'.$salePriceValue.'</span>';
             }
-
-            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePriceValue);
-
-            $resultHtml .= ' <br/><br/><span style="color:gray;">'.$salePriceValue.'</span><br/>';
-
-            $resultHtml .= '<span style="color:gray; font-size: 10px;">
-                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
-                                    To: '.date('Y-m-d', $endDateTimestamp).'
-                                </span>';
         }
 
         if (empty($resultHtml)) {
@@ -739,11 +748,32 @@ HTML;
                     $variationChildStatuses[Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED]
             );
 
+            $linkTitle = Mage::helper('M2ePro')->__('Show all Child Products with such Status');
+
             foreach ($variationChildStatuses as $status => $productsCount) {
                 if (empty($productsCount)) {
                     continue;
                 }
-                $html .= '' . $this->getProductStatus($status) . ' ('. $productsCount . ')<br/>';
+
+                $filter = base64_encode('status=' . $status);
+
+                $productTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('name'));
+                $vpmt = Mage::helper('M2ePro')->__('Manage Variations of &quot;%s&quot; ', $productTitle);
+                $vpmt = addslashes($vpmt);
+
+                $generalId = $row->getData('general_id');
+                if (!empty($generalId)) {
+                    $vpmt .= '('. $generalId .')';
+                }
+
+                $productsCount = <<<HTML
+<a onclick="ListingGridHandlerObj.variationProductManageHandler.openPopUp({$listingProductId}, '{$vpmt}', '{$filter}')"
+   class="hover-underline"
+   title="{$linkTitle}"
+   href="javascript:void(0)">[{$productsCount}]</a>
+HTML;
+
+                $html .= '' . $this->getProductStatus($status) . '&nbsp;'. $productsCount . '<br/>';
             }
 
             $html .= $this->getLockedTag($row);
@@ -822,7 +852,7 @@ HTML;
         }
 
         if ($childCount > 0) {
-            $html .= '<br/><span style="color: #605fff">[Children in Action...]</span>';
+            $html .= '<br/><span style="color: #605fff">[Child(s) in Action...]</span>';
         }
 
         return $html;

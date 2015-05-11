@@ -86,10 +86,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
 
         $channelAttributesSets = $parentType->getChannelAttributesSets();
 
-        if (!empty($channelAttributesSets)) {
-            $channelAttributes = array_keys($channelAttributesSets);
-        } else if ($parentType->hasMatchedAttributes()) {
+        if ($parentType->hasMatchedAttributes()) {
             $channelAttributes = array_values($parentType->getMatchedAttributes());
+        } else if (!empty($channelAttributesSets)) {
+            $channelAttributes = array_keys($channelAttributesSets);
         } else {
             $channelAttributes = array();
         }
@@ -407,30 +407,39 @@ HTML;
 
         $resultHtml = '';
 
-        $salePriceValue = $row->getData('online_sale_price');
-        if ((float)$salePriceValue > 0) {
+        $salePrice = $row->getData('online_sale_price');
+        if ((float)$salePrice > 0) {
             $startDateTimestamp = strtotime($row->getData('online_sale_price_start_date'));
             $endDateTimestamp   = strtotime($row->getData('online_sale_price_end_date'));
 
+            $iconHelpPath = $this->getSkinUrl('M2ePro/images/help.png');
+            $toolTipIconPath = $this->getSkinUrl('M2ePro/images/tool-tip-icon.png');
+
+            $intervalHtml = '<img class="tool-tip-image"
+                                 style="vertical-align: middle;"
+                                 src="'.$toolTipIconPath.'">
+                            <span class="tool-tip-message tip-left" style="display:none;">
+                                <img src="'.$iconHelpPath.'">
+                                <span style="color:gray; font-size: 10px;">
+                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
+                                    To: '.date('Y-m-d', $endDateTimestamp).'
+                                </span>
+                            </span>';
+
             $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+
+            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePrice);
 
             if ($currentTimestamp >= $startDateTimestamp &&
                 $currentTimestamp <= $endDateTimestamp &&
-                $salePriceValue < (float)$value
+                $salePrice < (float)$value
             ) {
-                $resultHtml = '<span style="text-decoration: line-through;">'.$priceValue.'</span>';
+                $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>';
+                $resultHtml .= '<br/>'.$intervalHtml.$salePriceValue;
             } else {
-                $resultHtml = $priceValue;
+                $resultHtml .= $priceValue;
+                $resultHtml .= '<br/>'.$intervalHtml.'<span style="color:gray;">'.$salePriceValue.'</span>';
             }
-
-            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePriceValue);
-
-            $resultHtml .= ' <br/><br/><span style="color:gray;">'.$salePriceValue.'</span><br/>';
-
-            $resultHtml .= '<span style="color:gray; font-size: 10px;">
-                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
-                                    To: '.date('Y-m-d', $endDateTimestamp).'
-                                </span>';
         }
 
         if (empty($resultHtml)) {

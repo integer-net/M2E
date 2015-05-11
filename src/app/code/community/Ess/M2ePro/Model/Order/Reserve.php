@@ -186,6 +186,10 @@ class Ess_M2ePro_Model_Order_Reserve
                 $magentoStockItem->setStockItem($stockItem);
 
                 if (!$this->changeProductQty($magentoProduct, $magentoStockItem, $action, $qty)) {
+                    if ($action == self::ACTION_SUB) {
+                        unset($products[$key]);
+                    }
+
                     continue;
                 }
 

@@ -212,8 +212,11 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
                 $data[$key] = $post[$key];
             }
         }
+        $oldShippingAddress = $order->getSettings('shipping_address');
+        $data['recipient_name'] = !empty($oldShippingAddress['recipient_name'])
+            ? $oldShippingAddress['recipient_name'] : null;
 
-        $order->setData('shipping_address', json_encode($data));
+        $order->setSettings('shipping_address', $data);
         $order->save();
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Order address has been updated.'));

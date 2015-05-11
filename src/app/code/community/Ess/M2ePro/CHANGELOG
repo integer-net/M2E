@@ -1,3 +1,20 @@
+* 6.3.2 (r8740) (07/05/2015)
+
+* Added: [Amazon] Orders Cancellation and Refund Orders Items features
+* Added: [Amazon] Ability to see Amazon Categories for particular Product in Search ASIN/ISBN Tool
+* Improvement: Associated Email of used License has been added to the License page
+* Improvement: [Amazon] Bunch of "Sale Price" User Interface and Synchronization improvements
+* Improvement: [Amazon] Fast navigation to the "Child Products" Grid with particular status filter enabled
+* Improvement: [Amazon] Performance was increased for Description Policy editing and List actions
+* Improvement: [Amazon] Correct configuring of Amazon Child Products if Matched Attributes were changed
+* Fix: Emails for new Orders were sent multiple times if Magento version more than 1.9.0.0
+* Fix: "Auto Add/Remove Rules" did not work under "Track direct database changes" if "Category" mode is selected
+* Fix: Magento Quantity is released in some cases even if it was not reserved for Orders
+* Fix: "Call to a member function setProduct() on a non-object" error during saving category product list in magento
+* Fix: [Amazon] Fatal error in some cases during Description Policy assigning to the Magento Products
+* Fix: [Rakuten.com] Orders synchronization did not work in some cases
+* Fix: [Rakuten.com / Play.com] Many major fixes of Listings management and List/Relist/Revise/Stop actions
+
 * 6.3.1 (r8700) (27/04/2015)
 
 * Added: [Amazon] Ability to set Listings Photos for used and collectible items

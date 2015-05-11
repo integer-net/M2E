@@ -356,7 +356,9 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             return true;
         }
 
-        if ($this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED) {
+        if ($this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED ||
+            $this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_INACTIVE
+        ) {
             return false;
         }
 

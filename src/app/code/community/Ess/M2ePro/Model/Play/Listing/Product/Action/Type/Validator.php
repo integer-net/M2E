@@ -231,6 +231,19 @@ abstract class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Validator
         return true;
     }
 
+    protected function validateVariationProductMatching()
+    {
+        if (!$this->getVariationManager()->isVariationProductMatched()) {
+            // M2ePro_TRANSLATIONS
+            // You have to select Magento Variation.
+            $this->addMessage('You have to select Magento Variation.');
+
+            return false;
+        }
+
+        return true;
+    }
+
     protected function validateQty()
     {
         if (!$this->getConfigurator()->isSelling()) {
@@ -241,9 +254,9 @@ abstract class Ess_M2ePro_Model_Play_Listing_Product_Action_Type_Validator
         if ($qty <= 0) {
 
             // M2ePro_TRANSLATIONS
-            // The Price must be greater than 0. Please, check the Selling Format Policy and Product Settings.
+            // The Quantity must be greater than 0. Please, check the Selling Format Policy and Product Settings.
             $this->addMessage(
-                'The Price must be greater than 0. Please, check the Selling Format Policy and Product Settings.'
+                'The Quantity must be greater than 0. Please, check the Selling Format Policy and Product Settings.'
             );
 
             return false;

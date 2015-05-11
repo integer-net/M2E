@@ -259,6 +259,22 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
         }
         //--------------------
 
+        // refund & cancellation
+        //--------------------
+        $tempKey = 'refund_and_cancellation';
+        $tempSettings = !empty($post['magento_orders_settings'][$tempKey])
+            ? $post['magento_orders_settings'][$tempKey] : array();
+
+        $keys = array(
+            'refund_mode',
+        );
+        foreach ($keys as $key) {
+            if (isset($tempSettings[$key])) {
+                $data['magento_orders_settings'][$tempKey][$key] = $tempSettings[$key];
+            }
+        }
+        //--------------------
+
         // fba
         //--------------------
         $tempKey = 'fba';

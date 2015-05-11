@@ -60,6 +60,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             $this->getProcessorModel($processor)->process();
         }
 
+        $this->listingProduct->setData('variation_parent_need_processor', 0);
+
         $this->listingProduct->save();
     }
 
@@ -79,12 +81,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
     }
 
     /**
-     * @return Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Abstract
+     * @return Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Sub_Abstract
      */
     private function getProcessorModel($processorName)
     {
         $model = Mage::getModel(
-            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_'.$processorName
+            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Sub_'.$processorName
         );
         $model->setProcessor($this);
 

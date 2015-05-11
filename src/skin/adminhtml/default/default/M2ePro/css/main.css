@@ -465,4 +465,21 @@ a.custom-button span {
     line-height: 1.35em
 }
 
+a.hover-underline {
+    text-decoration: none;
+}
+
+a.hover-underline:hover {
+    text-decoration: underline;
+}
+
+/* ================================================ */
+
+/* second lvl tabs */
+/* ================================================ */
+
+.m2epro-link-tabs a.active{
+    color: grey;
+}
+
 /* ================================================ */

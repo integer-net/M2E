@@ -186,31 +186,73 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
 
     protected function prepareProducts($products)
     {
-        $productsTemp = array();
-
         if (!is_array($products)) {
             $products = array($products);
         }
 
-        $productsIdsTemp = array();
-        foreach ($products as $product) {
+        $preparedProducts     = array();
+        $parentsForProcessing = array();
 
-            $tempProduct = NULL;
-            if ($product instanceof Ess_M2ePro_Model_Listing_Product) {
-                $tempProduct = $product;
-            } else {
-                $tempProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',(int)$product);
+        foreach ($products as $listingProduct) {
+
+            if (is_numeric($listingProduct)) {
+                if (isset($preparedProducts[(int)$listingProduct])) {
+                    continue;
+                }
+
+                $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject(
+                    'Listing_Product', (int)$listingProduct
+                );
             }
 
-            if (in_array((int)$tempProduct->getId(),$productsIdsTemp)) {
+            /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+
+            if (isset($preparedProducts[(int)$listingProduct->getId()])) {
                 continue;
             }
 
-            $productsIdsTemp[] = (int)$tempProduct->getId();
-            $productsTemp[] = $tempProduct;
+            $preparedProducts[(int)$listingProduct->getId()] = $listingProduct;
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
+            $variationManager = $amazonListingProduct->getVariationManager();
+
+            if (!$variationManager->isRelationMode()) {
+                continue;
+            }
+
+            if ($variationManager->isRelationParentType()) {
+                $parentListingProduct = $listingProduct;
+            } else {
+                $parentListingProduct = $variationManager->getTypeModel()->getParentListingProduct();
+            }
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $parentAmazonListingProduct */
+            $parentAmazonListingProduct = $parentListingProduct->getChildObject();
+
+            if (!$parentAmazonListingProduct->getVariationManager()->getTypeModel()->isNeedProcessor()) {
+                continue;
+            }
+
+            $parentsForProcessing[$parentListingProduct->getId()] = $parentListingProduct;
         }
 
-        return $productsTemp;
+        if (empty($parentsForProcessing)) {
+            return $preparedProducts;
+        }
+
+        $massProcessor = Mage::getModel(
+            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Mass'
+        );
+        $massProcessor->setListingsProducts($parentsForProcessing);
+
+        $massProcessor->execute();
+
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
+        $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('id', array('in' => array_keys($preparedProducts)));
+
+        return $listingProductCollection->getItems();
     }
 
     protected function sortProductsByAccount($products)

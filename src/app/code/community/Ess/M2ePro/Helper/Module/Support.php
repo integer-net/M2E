@@ -72,11 +72,6 @@ class Ess_M2ePro_Helper_Module_Support extends Mage_Core_Helper_Abstract
         return Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/support/', 'clients_portal_url');
     }
 
-    public function getClientsPortalUrl()
-    {
-        return $this->getClientsPortalBaseUrl().'?version='.Mage::helper('M2ePro/Module')->getVersion();
-    }
-
     //----------------------------------
 
     public function getMainWebsiteUrl()

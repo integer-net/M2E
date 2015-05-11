@@ -366,7 +366,7 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
                 continue;
             }
 
-            $directoryIterator = new RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS);
+            $directoryIterator = new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS);
             $iterator = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::SELF_FIRST);
 
             /** @var SplFileInfo $splFileObj */

@@ -25,11 +25,12 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_Cron
 
     protected function _beforeToHtml()
     {
+        $moduleConfig = Mage::helper('M2ePro/Module')->getConfig();
+
         $this->cronLastRunTime = 'N/A';
         $this->cronIsNotWorking = false;
         $this->cronCurrentType = ucfirst(Mage::helper('M2ePro/Module_Cron')->getType());
-        $this->cronServiceAuthKey = Mage::helper('M2ePro/Module')->getConfig()
-                                                                 ->getGroupValue('/cron/service/', 'auth_key');
+        $this->cronServiceAuthKey = $moduleConfig->getGroupValue('/cron/service/', 'auth_key');
 
         $baseDir = Mage::helper('M2ePro/Client')->getBaseDirectory();
         $this->cronPhp = 'php -q '.$baseDir.DIRECTORY_SEPARATOR.'cron.php -mdefault 1';
@@ -43,8 +44,11 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_Cron
             $this->cronIsNotWorking = Mage::helper('M2ePro/Module_Cron')->isLastRunMoreThan(12,true);
         }
 
-        $serviceHostName = Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/cron/service/', 'hostname');
+        $serviceHostName = $moduleConfig->getGroupValue('/cron/service/', 'hostname');
         $this->cronServiceIp = gethostbyname($serviceHostName);
+
+        $this->isMagentoCronDisabled = (bool)(int)$moduleConfig->getGroupValue('/cron/magento/','disabled');
+        $this->isServiceCronDisabled = (bool)(int)$moduleConfig->getGroupValue('/cron/service/','disabled');
 
         return parent::_beforeToHtml();
     }

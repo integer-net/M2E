@@ -271,6 +271,8 @@ HTML;
 
     protected function _toHtml()
     {
+        $productsIdsStr = implode(',', $this->getProductsIds());
+
         $javascriptsMain = <<<JAVASCRIPT
 <script type="text/javascript">
 
@@ -281,6 +283,9 @@ HTML;
     $$('#amazonTemplateDescriptionGrid div.grid td').each(function(el){
         el.style.padding = '5px 5px';
     });
+
+    {$this->getJsObjectName()}.reloadParams = {$this->getJsObjectName()}.reloadParams || {};
+    {$this->getJsObjectName()}.reloadParams['products_ids'] = '{$productsIdsStr}';
 
 </script>
 JAVASCRIPT;
@@ -311,7 +316,6 @@ JAVASCRIPT;
         return $this->getUrl('*/*/viewTemplateDescriptionsGrid', array(
             '_current' => true,
             '_query' => array(
-                'products_ids' => $this->getProductsIds(),
                 'check_is_new_asin_accepted' => $this->getCheckNewAsinAccepted()
             )
         ));

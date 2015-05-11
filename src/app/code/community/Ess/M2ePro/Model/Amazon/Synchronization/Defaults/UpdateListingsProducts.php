@@ -26,7 +26,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProdu
 
     protected function getPercentsStart()
     {
-        return 0;
+        return 10;
     }
 
     protected function getPercentsEnd()

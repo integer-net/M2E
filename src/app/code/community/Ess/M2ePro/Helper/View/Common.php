@@ -40,6 +40,7 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         return implode(' / ', $componentsLabels);
     }
 
+    // todo change for support tabs when common view will be like ebay
     public function getMenuPath($pathNick)
     {
         $rootMenuNode = Mage::getConfig()->getNode('adminhtml/menu/m2epro_common');

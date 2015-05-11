@@ -511,6 +511,15 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
 
     //-----------------------------------------
 
+    public function isRefundEnabled()
+    {
+        $setting = $this->getSetting('magento_orders_settings', array('refund_and_cancellation', 'refund_mode'));
+
+        return (bool)$setting;
+    }
+
+    //-----------------------------------------
+
     public function isMagentoOrdersTaxModeNone()
     {
         $setting = $this->getSetting('magento_orders_settings', array('tax', 'mode'));

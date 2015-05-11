@@ -81,8 +81,10 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_AutoActions
         $autoActionsCategory = Mage::getModel('M2ePro/Listing_Auto_Actions_Mode_Category');
         $autoActionsCategory->setProduct($product);
 
-        foreach ($product->getWebsiteIds() as $websiteId) {
-            $autoActionsCategory->synchWithAddedCategoryId($product, $websiteId);
+        foreach ($categoriesByWebsite as $websiteId => $categoryIds) {
+            foreach ($categoryIds as $categoryId) {
+                $autoActionsCategory->synchWithAddedCategoryId($categoryId, $websiteId);
+            }
         }
     }
 

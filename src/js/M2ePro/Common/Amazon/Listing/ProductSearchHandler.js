@@ -544,7 +544,9 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler, {
 
         $(select.id) && self.hideEmptyOption($(select.id));
 
-        var asins = JSON.parse($('asins_' + id).innerHTML);
+        self.validateSpecifics(id);
+
+        var asins = JSON.parse(decodeHtmlentities($('asins_' + id).innerHTML));
 
         $('parent_asin_text_'+id).hide();
         $('map_link_error_icon_'+id).hide();
@@ -592,6 +594,44 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler, {
         $('map_link_' + id).innerHTML = mapLinkTemplate;
     },
 
+    validateSpecifics: function(id, variations, i)
+    {
+        var variation = $H(variations || decodeHtmlentities($('channel_variations_tree_' + id).innerHTML).evalJSON()),
+            attributes = $$('.specifics_name_' + id),
+            options = $$('.specifics_' + id),
+            index = i || 0;
+
+        if (index === 0) {
+            options.each(function(el) {
+                el.disable();
+            });
+        }
+
+        if (!attributes[index] || !options[index]) {
+            return;
+        }
+
+        var attr = variation.keys()[0];
+
+        var oldValue = decodeHtmlentities(options[index].value);
+        options[index].update();
+        options[index].enable();
+        options[index].appendChild(new Element('option', {style: 'display: none'}));
+
+        $H(variation.get(attr)).each(function(option) {
+            options[index].appendChild(new Element('option', {value: option[0]})).insert(option[0]);
+
+            if (option[0] == oldValue) {
+                options[index].value = oldValue;
+            }
+        });
+
+        if (oldValue) {
+            index++;
+            this.validateSpecifics(id, variation.get(attr)[oldValue], index);
+        }
+    },
+
     //----------------------------------
 
     attributesChange: function(select)
@@ -635,7 +675,59 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler, {
         var mapLinkTemplate = $('template_map_link_' + id).innerHTML;
         mapLinkTemplate = mapLinkTemplate.replace('%options_data%', optionsData);
         $('map_link_' + id).innerHTML = mapLinkTemplate;
-    }
+    },
 
     //----------------------------------
+
+    showAsinCategories: function (link, rowId, asin, productId)
+    {
+        var self = this;
+
+        new Ajax.Request(self.options.url.getCategoriesByAsin, {
+            method: 'post',
+            parameters: {
+                asin: asin,
+                product_id: productId
+            },
+            onSuccess: function(transport) {
+
+                link.hide();
+
+                if (!transport.responseText.isJSON()) {
+                    alert(transport.responseText);
+                    return;
+                }
+
+                var response = transport.responseText.evalJSON();
+
+                var categoriesRow = $('asin_categories_' + rowId);
+
+                if (response.data == '') {
+                    $('asin_categories_not_found_' + rowId).show();
+                } else {
+                    var i = 3;
+                    response.data.each(function(item) {
+                        var str = item.title;
+                        if (item.path) {
+                            str = item.path + ' > ' + str;
+                        }
+
+                        str = str + ' (' + item.id + ')';
+
+                        var row = new Element('p');
+                        row.setStyle({
+                            'color'     : 'grey'
+                        });
+
+                        categoriesRow.appendChild(row).insert(str);
+
+                        i--;
+                        if (i <= 0) {
+                            throw $break;
+                        }
+                    });
+                }
+            }
+        });
+    }
 });

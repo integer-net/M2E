@@ -4,8 +4,8 @@
  * @copyright  Copyright (c) 2014 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Options
-    extends Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Abstract
+class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Sub_Options
+    extends Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Sub_Abstract
 {
     // ##########################################################
 
@@ -46,6 +46,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             $typeModel = $variationManager->getTypeModel();
 
             if (!$typeModel->isActualProductAttributes() ||
+                !$typeModel->isActualMatchedAttributes() ||
                 ($typeModel->isVariationProductMatched() &&
                 !$typeModel->isActualProductVariation())
             ) {
@@ -82,6 +83,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         if ($this->canCreateNewProductChildren()) {
             $this->createNewProductChildren();
         }
+
+        $this->setMatchedAttributesToChildren();
     }
 
     // ##########################################################
@@ -202,6 +205,23 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
         foreach ($productOptions as $productOption) {
             $this->getProcessor()->createChildListingProduct($productOption);
+        }
+    }
+
+    private function setMatchedAttributesToChildren()
+    {
+        foreach ($this->getProcessor()->getChildListingProducts() as $childListingProduct) {
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonChildListingProduct */
+            $amazonChildListingProduct = $childListingProduct->getChildObject();
+            $childTypeModel = $amazonChildListingProduct->getVariationManager()->getTypeModel();
+
+            if ($childTypeModel->isActualMatchedAttributes()) {
+                continue;
+            }
+
+            $childTypeModel->setCorrectMatchedAttributes(
+                $this->getProcessor()->getTypeModel()->getMatchedAttributes()
+            );
         }
     }
 

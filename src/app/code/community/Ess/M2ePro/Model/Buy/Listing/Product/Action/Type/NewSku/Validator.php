@@ -32,6 +32,10 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_NewSku_Validator
             return false;
         }
 
+        if ($this->getVariationManager()->isVariationProduct() && !$this->validateVariationProductMatching()) {
+            return false;
+        }
+
         $newProductTemplateId = $this->getBuyListingProduct()->getTemplateNewProductId();
         if (empty($newProductTemplateId)) {
 

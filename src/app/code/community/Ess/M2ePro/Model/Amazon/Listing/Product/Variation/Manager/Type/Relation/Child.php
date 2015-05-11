@@ -95,6 +95,43 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Ch
 
     // ########################################
 
+    public function setCorrectMatchedAttributes(array $matchedAttributes, $save = true)
+    {
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+        $additionalData['variation_correct_matched_attributes'] = $matchedAttributes;
+
+        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $save && $this->getListingProduct()->save();
+    }
+
+    public function getCorrectMatchedAttributes()
+    {
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+
+        if (empty($additionalData['variation_correct_matched_attributes'])) {
+            return NULL;
+        }
+
+        return $additionalData['variation_correct_matched_attributes'];
+    }
+
+    // -----------------------------------------
+
+    public function isActualMatchedAttributes()
+    {
+        $correctMatchedAttributes = $this->getCorrectMatchedAttributes();
+        if (empty($correctMatchedAttributes)) {
+            return true;
+        }
+
+        $parentTypeModel = $this->getAmazonParentListingProduct()->getVariationManager()->getTypeModel();
+        $currentMatchedAttributes = $parentTypeModel->getMatchedAttributes();
+
+        return count(array_diff_assoc($correctMatchedAttributes, $currentMatchedAttributes)) <= 0;
+    }
+
+    // ########################################
+
     public function clearTypeData()
     {
         parent::clearTypeData();
@@ -103,6 +140,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Ch
 
         $additionalData = $this->getListingProduct()->getAdditionalData();
         unset($additionalData['variation_channel_options']);
+        unset($additionalData['variation_correct_matched_attributes']);
         $this->getListingProduct()->setSettings('additional_data', $additionalData);
 
         $this->getListingProduct()->save();

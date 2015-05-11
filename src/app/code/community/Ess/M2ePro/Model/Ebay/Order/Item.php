@@ -246,7 +246,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
             $sku = $this->getVariationSku();
         }
 
-        if ($sku != '' && strlen($sku) <= 64) {
+        if ($sku != '' && strlen($sku) <= Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH) {
             $product = Mage::getModel('catalog/product')
                 ->setStoreId($this->getEbayOrder()->getAssociatedStoreId())
                 ->getCollection()

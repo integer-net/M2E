@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2014 by  ESS-UA.
  */
 
-abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Abstract
+abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Sub_Abstract
 {
     // ##########################################################
 

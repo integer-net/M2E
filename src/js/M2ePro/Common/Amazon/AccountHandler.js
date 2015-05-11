@@ -370,7 +370,7 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
     {
         if ($('magento_orders_fba_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_MODE_NO')) {
             $('magento_orders_fba_stock_mode_container').hide();
-            $('magento_orders_fba_stock_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_STOCK_MODE_YES');
+            $('magento_orders_fba_stock_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_STOCK_MODE_NO');
         } else {
             $('magento_orders_fba_stock_mode_container').show();
         }
@@ -433,6 +433,9 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
             $('magento_orders_fba_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_MODE_YES');
             $('magento_orders_fba_stock_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_FBA_STOCK_MODE_YES');
 
+            $('magento_block_amazon_accounts_magento_orders_refund_and_cancellation').hide();
+            $('magento_orders_refund').value = 1;
+
             $('magento_block_amazon_accounts_magento_orders_customer').hide();
             $('magento_orders_customer_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_CUSTOMER_MODE_GUEST');
             self.magentoOrdersCustomerModeChange();
@@ -451,6 +454,7 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
         } else {
             $('magento_block_amazon_accounts_magento_orders_number').show();
             $('magento_block_amazon_accounts_magento_orders_fba').show();
+            $('magento_block_amazon_accounts_magento_orders_refund_and_cancellation').show();
             $('magento_block_amazon_accounts_magento_orders_customer').show();
             $('magento_block_amazon_accounts_magento_orders_status_mapping').show();
             $('magento_block_amazon_accounts_magento_orders_tax').show();
