@@ -25,67 +25,67 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_RequestData
 
     // ########################################
 
-    public function hasQtyData()
+    public function hasQty()
     {
         return isset($this->data['qty']);
     }
 
-    public function hasPriceData()
+    public function hasPrice()
     {
-        return $this->hasPriceFixedData();
+        return $this->hasPriceFixed();
     }
 
     // ----------------------------------------
 
-    public function hasPriceFixedData()
+    public function hasPriceFixed()
     {
         return isset($this->data['price_fixed']);
     }
 
     // ----------------------------------------
 
-    public function hasTitleData()
+    public function hasTitle()
     {
         return isset($this->data['title']);
     }
 
-    public function hasSubtitleData()
+    public function hasSubtitle()
     {
         return isset($this->data['subtitle']);
     }
 
-    public function hasDescriptionData()
+    public function hasDescription()
     {
         return isset($this->data['description']);
     }
 
     // ########################################
 
-    public function getQtyData()
+    public function getQty()
     {
-        return $this->hasQtyData() ? $this->data['qty'] : NULL;
+        return $this->hasQty() ? $this->data['qty'] : NULL;
     }
 
-    public function getPriceFixedData()
+    public function getPriceFixed()
     {
-        return $this->hasPriceFixedData() ? $this->data['price_fixed'] : NULL;
+        return $this->hasPriceFixed() ? $this->data['price_fixed'] : NULL;
     }
 
     // ----------------------------------------
 
-    public function getTitleData()
+    public function getTitle()
     {
-        return $this->hasTitleData() ? $this->data['title'] : NULL;
+        return $this->hasTitle() ? $this->data['title'] : NULL;
     }
 
-    public function getSubtitleData()
+    public function getSubtitle()
     {
-        return $this->hasSubtitleData() ? $this->data['subtitle'] : NULL;
+        return $this->hasSubtitle() ? $this->data['subtitle'] : NULL;
     }
 
-    public function getDescriptionData()
+    public function getDescription()
     {
-        return $this->hasDescriptionData() ? $this->data['description'] : NULL;
+        return $this->hasDescription() ? $this->data['description'] : NULL;
     }
 
     // ########################################

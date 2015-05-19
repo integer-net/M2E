@@ -72,7 +72,7 @@ class Ess_M2ePro_Model_Listing_Product_Variation_Option extends Ess_M2ePro_Model
                                                     ->setStatisticId($this->getListingProduct()->getId());
         }
 
-        $this->getListingProduct()->isCacheEnabled
+        $this->getListingProduct()->getMagentoProduct()->isCacheEnabled()
             ? $this->magentoProductModel->enableCache() : $this->magentoProductModel->disableCache();
 
         return $this->magentoProductModel;

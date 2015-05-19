@@ -1,5 +1,7 @@
 EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
 
+    //----------------------------------
+
     storeId: null,
     marketplaceId: null,
     checkAttributesAvailability: false,
@@ -9,13 +11,15 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
 
     initialize: function()
     {
-        Validation.add('M2ePro-validate-ebay-template-title', M2ePro.translator.translate('Policy with the same title already exists.'), function(value, element) {
+        Validation.add('M2ePro-validate-ebay-template-title', M2ePro.translator.translate('Policy with the same Title already exists.'), function(value, element) {
+
             var templateNick = element.name.substr(0, element.name.indexOf('['));
 
             return EbayListingTemplateSwitcherHandlerObj.isTemplateTitleUnique(templateNick, value);
         });
 
         Validation.add('M2ePro-validate-ebay-template-switcher', M2ePro.translator.translate('This is a required field.'), function(value, element) {
+
             var mode = base64_decode(value).evalJSON().mode;
 
             return mode !== null;
@@ -177,17 +181,16 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
                 }
             }.bind(this);
 
-        TemplateHandlerObj
-            .checkMessages(
-                id,
-                nick,
-                data,
-                storeId,
-                marketplaceId,
-                checkAttributesAvailability,
-                container,
-                callback
-            );
+        TemplateHandlerObj.checkMessages(
+            id,
+            nick,
+            data,
+            storeId,
+            marketplaceId,
+            checkAttributesAvailability,
+            container,
+            callback
+        );
     },
 
     //----------------------------------
@@ -283,6 +286,7 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
             asynchronous: true,
             parameters: {},
             onSuccess: function(transport) {
+
                 var response = transport.responseText.evalJSON();
 
                 response.each(function(template) {
@@ -313,16 +317,14 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
     {
         var unique = true;
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_template/isTitleUnique') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_template/isTitleUnique'), {
             method: 'get',
-            asynchronous : false,
-            parameters : {
-                nick : templateNick,
-                title : templateTitle
+            asynchronous: false,
+            parameters: {
+                nick: templateNick,
+                title: templateTitle
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
                 unique = transport.responseText.evalJSON()['unique'];
             }
         });
@@ -360,7 +362,7 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
                 'name="'+templateNick+'[template_title]" ' +
                 'id="template_title" ' +
                 'style="width: 375px;" ' +
-                'placeholder="' + M2ePro.translator.translate('Please specify policy title') + '" ' +
+                'placeholder="' + M2ePro.translator.translate('Please specify Policy Title') + '" ' +
             '/>' +
             '</div>';
 
@@ -376,7 +378,6 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
                 width: 400,
                 height: 80,
                 zIndex: 2100,
-                recenterAuto: false,
                 destroyOnClose: true,
                 hideEffect: Element.hide,
                 showEffect: Element.show,
@@ -394,9 +395,10 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
                         method: 'post',
                         asynchronous: true,
                         parameters: {
-                            nick : templateNick
+                            nick: templateNick
                         },
                         onSuccess: function(transport) {
+
                             var response = transport.responseText.evalJSON();
 
                             response.each(function(template) {
@@ -471,16 +473,15 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
     {
         var id = this.getSwitcherValueId(templateNick);
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_template/getTemplateHtml') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_template/getTemplateHtml'), {
             method: 'get',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 id   : id,
                 nick : templateNick
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
                 this.getTemplateDataContainer(templateNick).replace(transport.responseText);
                 this.getTemplateDataContainer(templateNick).show();
 
@@ -538,5 +539,4 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
     }
 
     //----------------------------------
-
 });

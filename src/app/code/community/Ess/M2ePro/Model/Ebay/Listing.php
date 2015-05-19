@@ -9,18 +9,7 @@
  */
 class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
-    const AUTO_MODE_NONE     = 0;
-    const AUTO_MODE_GLOBAL   = 1;
-    const AUTO_MODE_WEBSITE  = 2;
-    const AUTO_MODE_CATEGORY = 3;
-
-    const ADDING_MODE_NONE                    = 0;
-    const ADDING_MODE_ADD                     = 1;
     const ADDING_MODE_ADD_AND_ASSIGN_CATEGORY = 2;
-
-    const DELETING_MODE_NONE        = 0;
-    const DELETING_MODE_STOP        = 1;
-    const DELETING_MODE_STOP_REMOVE = 2;
 
     // ########################################
 
@@ -62,7 +51,7 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
     private $synchronizationTemplateModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Template_Description
+     * @var Ess_M2ePro_Model_Template_Description
      */
     private $descriptionTemplateModel = NULL;
 
@@ -95,11 +84,6 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
     {
         if ($this->isLocked()) {
             return false;
-        }
-
-        $categories = $this->getAutoCategories(true);
-        foreach ($categories as $category) {
-            $category->deleteInstance();
         }
 
         $this->templateManagers = array();
@@ -340,7 +324,7 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     * @return Ess_M2ePro_Model_Template_Description
      */
     public function getDescriptionTemplate()
     {
@@ -353,9 +337,9 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
     }
 
     /**
-     * @param Ess_M2ePro_Model_Ebay_Template_Description $instance
+     * @param Ess_M2ePro_Model_Template_Description $instance
      */
-    public function setDescriptionTemplate(Ess_M2ePro_Model_Ebay_Template_Description $instance)
+    public function setDescriptionTemplate(Ess_M2ePro_Model_Template_Description $instance)
     {
          $this->descriptionTemplateModel = $instance;
     }
@@ -447,6 +431,14 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
         return $this->getSynchronizationTemplate()->getChildObject();
     }
 
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     */
+    public function getEbayDescriptionTemplate()
+    {
+        return $this->getDescriptionTemplate()->getChildObject();
+    }
+
     // ########################################
 
     public function getProducts($asObjects = false, array $filters = array())
@@ -454,53 +446,7 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
         return $this->getParentObject()->getProducts($asObjects,$filters);
     }
 
-    //-----------------------------------------
-
-    public function getAutoCategoriesGroups($asObjects = false, array $filters = array())
-    {
-        return $this->getRelatedSimpleItems('Ebay_Listing_Auto_Category_Group','listing_id',
-                                            $asObjects, $filters);
-    }
-
-    public function getAutoCategories($asObjects = false, array $filters = array())
-    {
-        return $this->getRelatedSimpleItems('Ebay_Listing_Auto_Category','listing_id',
-                                            $asObjects, $filters);
-    }
-
     // ########################################
-
-    public function getAutoMode()
-    {
-        return (int)$this->getData('auto_mode');
-    }
-
-    public function isAutoModeNone()
-    {
-        return $this->getAutoMode() == self::AUTO_MODE_NONE;
-    }
-
-    public function isAutoModeGlobal()
-    {
-        return $this->getAutoMode() == self::AUTO_MODE_GLOBAL;
-    }
-
-    public function isAutoModeWebsite()
-    {
-        return $this->getAutoMode() == self::AUTO_MODE_WEBSITE;
-    }
-
-    public function isAutoModeCategory()
-    {
-        return $this->getAutoMode() == self::AUTO_MODE_CATEGORY;
-    }
-
-    // ########################################
-
-    public function getAutoGlobalAddingMode()
-    {
-        return (int)$this->getData('auto_global_adding_mode');
-    }
 
     public function getAutoGlobalAddingTemplateCategoryId()
     {
@@ -514,27 +460,12 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
     //----------------------------------------
 
-    public function isAutoGlobalAddingModeNone()
-    {
-        return $this->getAutoGlobalAddingMode() == self::ADDING_MODE_NONE;
-    }
-
-    public function isAutoGlobalAddingModeAdd()
-    {
-        return $this->getAutoGlobalAddingMode() == self::ADDING_MODE_ADD;
-    }
-
     public function isAutoGlobalAddingModeAddAndAssignCategory()
     {
-        return $this->getAutoGlobalAddingMode() == self::ADDING_MODE_ADD_AND_ASSIGN_CATEGORY;
+        return $this->getParentObject()->getAutoGlobalAddingMode() == self::ADDING_MODE_ADD_AND_ASSIGN_CATEGORY;
     }
 
     // #######################################
-
-    public function getAutoWebsiteAddingMode()
-    {
-        return (int)$this->getData('auto_website_adding_mode');
-    }
 
     public function getAutoWebsiteAddingTemplateCategoryId()
     {
@@ -548,43 +479,9 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
     //----------------------------------------
 
-    public function isAutoWebsiteAddingModeNone()
-    {
-        return $this->getAutoWebsiteAddingMode() == self::ADDING_MODE_NONE;
-    }
-
-    public function isAutoWebsiteAddingModeAdd()
-    {
-        return $this->getAutoWebsiteAddingMode() == self::ADDING_MODE_ADD;
-    }
-
     public function isAutoWebsiteAddingModeAddAndAssignCategory()
     {
-        return $this->getAutoWebsiteAddingMode() == self::ADDING_MODE_ADD_AND_ASSIGN_CATEGORY;
-    }
-
-    // #######################################
-
-    public function getAutoWebsiteDeletingMode()
-    {
-        return (int)$this->getData('auto_website_deleting_mode');
-    }
-
-    //----------------------------------------
-
-    public function isAutoWebsiteDeletingModeNone()
-    {
-        return $this->getAutoWebsiteDeletingMode() == self::DELETING_MODE_NONE;
-    }
-
-    public function isAutoWebsiteDeletingModeStop()
-    {
-        return $this->getAutoWebsiteDeletingMode() == self::DELETING_MODE_STOP;
-    }
-
-    public function isAutoWebsiteDeletingModeStopRemove()
-    {
-        return $this->getAutoWebsiteDeletingMode() == self::DELETING_MODE_STOP_REMOVE;
+        return $this->getParentObject()->getAutoWebsiteAddingMode() == self::ADDING_MODE_ADD_AND_ASSIGN_CATEGORY;
     }
 
     // #######################################
@@ -642,6 +539,16 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
             'status' => $listingOtherProduct->getStatus(),
             'status_changer' => $listingOtherProduct->getStatusChanger()
         );
+
+        $listingOtherAdditionalData = $listingOtherProduct->getAdditionalData();
+
+        if (!empty($listingOtherAdditionalData['out_of_stock_control'])) {
+            $listingProductAdditionalData = $listingProduct->getAdditionalData();
+            $additionalDataForUpdate = array_merge(
+                $listingProductAdditionalData, array('out_of_stock_control' => true)
+            );
+            $dataForUpdate['additional_data'] = json_encode($additionalDataForUpdate);
+        }
 
         $listingProduct->addData($dataForUpdate)->save();
 
@@ -823,13 +730,13 @@ class Ess_M2ePro_Model_Ebay_Listing extends Ess_M2ePro_Model_Component_Child_Eba
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('listing');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('listing');
         return parent::delete();
     }
 

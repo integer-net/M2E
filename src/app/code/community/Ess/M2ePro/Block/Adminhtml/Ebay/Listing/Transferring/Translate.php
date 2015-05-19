@@ -77,7 +77,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Transferring_Translate extends Mag
         if (count($mixedServices) > 1) {
             $translationServices = array_merge(array('default_mixed' => array(
                 'name'     => 'default_mixed',
-                'title'    => Mage::helper('M2ePro')->__("Use current Translation Plan for each item"),
+                'title'    => Mage::helper('M2ePro')->__("Use current Translation Plan for each Item"),
                 'avg_cost' => $this->_getMixedAvgCost($mixedServices, $translationServices),
             )), $translationServices);
         }

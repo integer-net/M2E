@@ -172,10 +172,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid extends Mage_Adminhtml_Blo
     <span id="note_view_{$row['id']}">{$value}</span>
     <div id="note_edit_{$row['id']}_container" style="display: none">
         <textarea id="note_edit_{$row['id']}"></textarea>
-        <br />
+        <br/>
     </div>
     <span id="note_edit_link_{$row['id']}"{$editStyle}>
-        <br />
+        <br/>
         <a href="javascript:void(0)"
            onclick="EbayMotorCompatibilityHandlerObj.switchNoteEditMode('{$row['id']}')">{$editLabel}</a>
     </span>
@@ -389,8 +389,8 @@ HTML;
         ));
 
         $translations = json_encode(array(
-            'Please select items you want to perform the action on.'
-                => Mage::helper('M2ePro')->__('Please select items you want to perform the action on.'),
+            'Please select Items you want to perform the Action on.'
+                => Mage::helper('M2ePro')->__('Please select Items you want to perform the Action on.'),
             'Set Note' => Mage::helper('M2ePro')->__('Set Note'),
         ));
 

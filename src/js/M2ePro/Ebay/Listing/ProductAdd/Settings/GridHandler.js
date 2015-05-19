@@ -6,7 +6,7 @@ EbayListingProductAddSettingsGridHandler = Class.create(EbayListingSettingsGridH
     {
         $super();
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
             removeItemAction: function(id) {
                 var ids = id ? [id] : this.getSelectedProductsArray();
                 this.removeItems(ids);
@@ -29,8 +29,7 @@ EbayListingProductAddSettingsGridHandler = Class.create(EbayListingSettingsGridH
             parameters: {
                 ids: ids.join(',')
             },
-            onSuccess: function()
-            {
+            onSuccess: function() {
                 this.unselectAllAndReload();
             }.bind(this)
         });
@@ -45,8 +44,8 @@ EbayListingProductAddSettingsGridHandler = Class.create(EbayListingSettingsGridH
         var url = M2ePro.url.get('adminhtml_ebay_listing_productAdd/validate');
         new Ajax.Request(url, {
             method: 'get',
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 var response = transport.responseText.evalJSON();
                 if (response['validation'] == true) {
                     setLocation(M2ePro.url.get('adminhtml_ebay_listing_categorySettings'));
@@ -59,5 +58,4 @@ EbayListingProductAddSettingsGridHandler = Class.create(EbayListingSettingsGridH
     }
 
     //----------------------------------
-
 });

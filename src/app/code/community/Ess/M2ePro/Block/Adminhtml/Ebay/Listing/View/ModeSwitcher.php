@@ -4,9 +4,11 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher extends Mage_Adminhtml_Block_Widget
+class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher
+    extends Ess_M2ePro_Block_Adminhtml_Listing_View_ModeSwitcher_Abstract
 {
-   public function __construct()
+
+    public function __construct()
     {
         parent::__construct();
 
@@ -14,6 +16,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher extends Mage_Adm
         //------------------------------
         $this->setId('ebayListingViewModeSwitcher');
         //------------------------------
+
+        $this->setData('component_nick', 'ebay');
+        $this->setData('component_label', 'eBay');
     }
 
     protected function _toHtml()
@@ -22,52 +27,40 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher extends Mage_Adm
             return '';
         }
 
+        return parent::_toHtml();
+    }
+
+    protected function getMenuItems()
+    {
         $data = array(
-            'current_view_mode' => $this->getCurrentViewMode(),
-            'route' => '*/*/view',
-            'items' => array(
-                array(
-                    'value' => 'ebay',
-                    'label' => Mage::helper('M2ePro')->__('eBay')
-                ),
-                array(
-                    'value' => 'settings',
-                    'label' => Mage::helper('M2ePro')->__('Settings')
-                ),
-                array(
-                    'value' => 'magento',
-                    'label' => Mage::helper('M2ePro')->__('Magento')
-                )
+            array(
+                'value' => $this->getComponentNick(),
+                'label' => Mage::helper('M2ePro')->__($this->getComponentLabel())
+            ),
+            array(
+                'value' => 'settings',
+                'label' => Mage::helper('M2ePro')->__('Settings')
+            ),
+            array(
+                'value' => 'magento',
+                'label' => Mage::helper('M2ePro')->__('Magento')
             )
         );
 
+        /** @var  $collection Mage_Core_Model_Mysql4_Collection_Abstract */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $collection->addFieldToFilter('translation_status', array('neq' =>
             Ess_M2ePro_Model_Ebay_Listing_Product::TRANSLATION_STATUS_NONE
         ));
 
         if ($collection->getSize()) {
-            $data['items'][] = array(
+            $data[] = array(
                 'value' => 'translation',
                 'label' => Mage::helper('M2ePro')->__('Translation')
             );
         }
 
-        $modeChangeBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_listing_view_modeSwitcher');
-        $modeChangeBlock->setData($data);
-        $modeChangeLabel = Mage::helper('M2ePro')->__('View Mode');
-
-        return <<<HTML
-<div style="display: inline; float: left;"><b>{$modeChangeLabel}: </b>{$modeChangeBlock->toHtml()}</div>
-HTML;
+        return $data;
     }
 
-    private function getCurrentViewMode()
-    {
-        if (!isset($this->_data['current_view_mode'])) {
-            throw new LogicException('View mode is not set.');
-        }
-
-        return $this->_data['current_view_mode'];
-    }
 }

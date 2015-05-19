@@ -41,7 +41,7 @@ Would you like to watch the video?'
 if (!isTutorialFinished && confirm('{$confirmMessage}')) {
     return $('tutorial_image_container').simulate('click');
 }
-WizardHandlerObj.setStatus('{$status}', {$callback})
+WizardHandlerObj.setStatus('{$status}', {$callback});
 JS;
 
         $buttonBlock = $this->getLayout()

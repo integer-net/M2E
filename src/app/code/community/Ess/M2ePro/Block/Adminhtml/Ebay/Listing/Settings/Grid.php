@@ -43,14 +43,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
 
     // ####################################
 
-    protected function _prepareMassaction()
+    protected function _prepareMassactionItems()
     {
-        parent::_prepareMassaction();
+        parent::_prepareMassactionItems();
 
         $this->getMassactionBlock()->addItem('removeItem', array(
-             'label'    => Mage::helper('M2ePro')->__('Remove Item(s)'),
-             'url'      => '',
-        ));
+            'label'    => Mage::helper('M2ePro')->__('Remove Item(s)'),
+            'url'      => '',
+        ), 'other');
 
         return $this;
     }
@@ -121,7 +121,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         $this->addColumns();
 
         $this->addColumnAfter('name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title / SKU'),
+            'header'    => Mage::helper('M2ePro')->__('Product Title / Product SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -136,16 +136,25 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
 
     // ####################################
 
-    protected function getActionColumnOptions()
+    protected function getGroupOrder()
     {
-        $options = parent::getActionColumnOptions();
+        return array(
+            'edit_general_settings' => Mage::helper('M2ePro')->__('Edit Settings'),
+            'other'                 => Mage::helper('M2ePro')->__('Other')
+        );
+    }
 
-        array_push($options,array(
-            'label' => Mage::helper('M2ePro')->__('Remove Item'),
-            'value' => 'removeItem'
-        ));
+    protected function getColumnActionsItems()
+    {
+        $actions = parent::getColumnActionsItems();
+        $actions['removeItem'] = array(
+            'caption' => Mage::helper('M2ePro')->__('Remove Item'),
+            'group'   => 'other',
+            'field'   => 'id',
+            'onclick_action' => 'EbayListingSettingsGridHandlerObj.actions[\'removeItemAction\']'
+        );
 
-        return $options;
+        return $actions;
     }
 
     // ####################################
@@ -189,10 +198,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
         $helper = Mage::helper('M2ePro');
         //------------------------------
         $translations = json_encode(array(
-            'Automatic Actions'                        => $helper->__('Automatic Actions'),
+            'Auto Add/Remove Rules'                    => $helper->__('Auto Add/Remove Rules'),
             'Based on Magento Categories'              => $helper->__('Based on Magento Categories'),
-            'You must select at least 1 category.'     => $helper->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' => $helper->__('Rule with the same title already exists.'),
+            'You must select at least 1 Category.'     => $helper->__('You must select at least 1 Category.'),
+            'Rule with the same Title already exists.' => $helper->__('Rule with the same Title already exists.'),
         ));
         //------------------------------
 
@@ -201,7 +210,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid
     M2ePro.url.add({$urls});
     M2ePro.translator.add({$translations});
 
-    EbayListingAutoActionHandlerObj = new EbayListingAutoActionHandler();
+    ListingAutoActionHandlerObj = new EbayListingAutoActionHandler();
 </script>
 HTML;
 

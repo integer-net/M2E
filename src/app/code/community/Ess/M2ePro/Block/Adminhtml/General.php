@@ -30,7 +30,6 @@ class Ess_M2ePro_Block_Adminhtml_General extends Mage_Adminhtml_Block_Widget
         //----------------------------
 
         $this->initM2eProInfo();
-        $this->initAnalyticData();
 
         return parent::_beforeToHtml();
     }
@@ -58,54 +57,6 @@ class Ess_M2ePro_Block_Adminhtml_General extends Mage_Adminhtml_Block_Widget
             ),
             'locale' => Mage::helper('M2ePro/Magento')->getLocale()
         );
-    }
-
-    protected function initAnalyticData()
-    {
-        $this->analytic = array(
-            'mode' => false
-        );
-
-        if (Mage::helper('M2ePro/Module_Analytic')->isNavigationModeDisabled() &&
-            Mage::helper('M2ePro/Module_Analytic')->isActionModeDisabled()) {
-            return;
-        }
-
-        if (!Mage::helper('M2ePro/Module_Analytic')->isViewBoth() &&
-            Mage::helper('M2ePro/Module_Analytic')->getView() != Mage::helper('M2ePro/View')->getCurrentView()) {
-            return;
-        }
-
-        $analytic = array(
-            'mode' => true,
-            'url' => Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/view/analytic/', 'url'),
-            'navigation_mode' => Mage::helper('M2ePro/Module_Analytic')->getNavigationMode(),
-            'action_mode' => Mage::helper('M2ePro/Module_Analytic')->getActionMode()
-        );
-
-        $mageParamsString = '';
-        foreach ($this->getRequest()->getUserParams() as $paramKey => $paramValue) {
-            $mageParamsString .= '/'.$paramKey.'/'.$paramValue;
-        }
-
-        $analytic['data'] = array(
-            'identifier' => Mage::helper('M2ePro')->generateUniqueHash(Mage::helper('M2ePro/Client')->getIp()),
-            'session_id' => Mage::getSingleton('core/session')->getSessionId(),
-            'controller' => $this->getRequest()->getControllerName(),
-            'action' => $this->getRequest()->getActionName(),
-            'mage_params' => !empty($mageParamsString) ? $mageParamsString.'/' : '',
-        );
-
-        if (Mage::helper('M2ePro/Module_Analytic')->isNavigationModeAdvanced()) {
-            $analytic['additional_data'] = array(
-                'get_params' => (isset($_GET) && is_array($_GET)) ? http_build_query($_GET,'','&') : '',
-                'post_params' => (isset($_POST) && is_array($_POST)) ? http_build_query($_POST,'','&') : '',
-                //'cookies' => $this->getRequest()->getCookie(),
-                //'session' => Mage::getSingleton('core/session')->getData()
-            );
-        }
-
-        $this->analytic = $analytic;
     }
 
     // ########################################

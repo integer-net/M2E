@@ -50,50 +50,51 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Revise_Response
     {
         if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
             // M2ePro_TRANSLATIONS
-            // Item was successfully revised
-            return 'Item was successfully revised';
+            // Item was successfully Revised
+            return 'Item was successfully Revised';
         }
 
         $sequenceString = '';
 
-        if ($this->getRequestData()->hasQtyData()) {
+        if ($this->getRequestData()->hasQty()) {
             // M2ePro_TRANSLATIONS
-            // qty
-            $sequenceString .= 'qty,';
+            // QTY
+            $sequenceString .= 'QTY,';
         }
 
-        if ($this->getRequestData()->hasPriceData()) {
+        if ($this->getRequestData()->hasPrice()) {
             // M2ePro_TRANSLATIONS
-            // price
-            $sequenceString .= 'price,';
+            // Price
+            $sequenceString .= 'Price,';
         }
 
-        if ($this->getRequestData()->hasTitleData()) {
+        if ($this->getRequestData()->hasTitle()) {
             // M2ePro_TRANSLATIONS
-            // title
-            $sequenceString .= 'title,';
+            // Title
+            $sequenceString .= 'Title,';
         }
 
-        if ($this->getRequestData()->hasSubtitleData()) {
+        if ($this->getRequestData()->hasSubtitle()) {
             // M2ePro_TRANSLATIONS
-            // subtitle
-            $sequenceString .= 'subtitle,';
+            // Subtitle
+            $sequenceString .= 'Subtitle,';
         }
 
-        if ($this->getRequestData()->hasDescriptionData()) {
+        if ($this->getRequestData()->hasDescription()) {
             // M2ePro_TRANSLATIONS
-            // description
-            $sequenceString .= 'description,';
+            // Description
+            $sequenceString .= 'Description,';
         }
 
         if (empty($sequenceString)) {
             // M2ePro_TRANSLATIONS
-            // Item was successfully revised
-            return 'Item was successfully revised';
+            // Item was Successfully Revised
+            return 'Item was Successfully Revised';
         }
+
         // M2ePro_TRANSLATIONS
-        // was successfully revised
-        return ucfirst(trim($sequenceString,',')).' was successfully revised';
+        // was Successfully Revised
+        return ucfirst(trim($sequenceString,',')).' was Successfully Revised';
     }
 
     // ########################################

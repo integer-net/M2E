@@ -3,7 +3,7 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    initialize : function(progressBarObj, wrapperObj)
+    initialize: function(progressBarObj, wrapperObj)
     {
         this.stateExecuting = 'executing';
         this.stateInactive = 'inactive';
@@ -19,7 +19,7 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    start : function(title, status)
+    start: function(title, status)
     {
         title = title || '';
         status = status || '';
@@ -41,7 +41,7 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
         self.loadingMask.setStyle({visibility: 'hidden'});
     },
 
-    end : function()
+    end: function()
     {
         var self = this;
 
@@ -54,17 +54,16 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    initPageCheckState : function(callBackWhenEnd)
+    initPageCheckState: function(callBackWhenEnd)
     {
         callBackWhenEnd = callBackWhenEnd || '';
 
         var self = this;
-        new Ajax.Request( M2ePro.url.get('adminhtml_general/synchCheckState') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_general/synchCheckState'), {
             method: 'get',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 if (transport.responseText == self.stateExecuting) {
 
                     self.start(
@@ -91,7 +90,7 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    runTask : function(title, url, components, callBackWhenEnd)
+    runTask: function(title, url, components, callBackWhenEnd)
     {
         title = title || '';
         url = url || '';
@@ -103,12 +102,11 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
         }
 
         var self = this;
-        new Ajax.Request( M2ePro.url.get('adminhtml_general/synchCheckState') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_general/synchCheckState'), {
             method: 'get',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 if (transport.responseText == self.stateExecuting) {
 
                     self.start(
@@ -124,8 +122,7 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
                     self.start(title, M2ePro.translator.translate('Preparing to start. Please wait ...'));
 
-                    new Ajax.Request( url ,
-                    {
+                    new Ajax.Request(url, {
                         parameters: {components: components},
                         method: 'get',
                         asynchronous: true
@@ -134,7 +131,6 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
                     setTimeout(function() {
                         self.startGetExecutingInfo(callBackWhenEnd);
                     },2000);
-
                 }
             }
         });
@@ -142,17 +138,16 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    startGetExecutingInfo : function(callBackWhenEnd)
+    startGetExecutingInfo: function(callBackWhenEnd)
     {
         callBackWhenEnd = callBackWhenEnd || '';
 
         var self = this;
-        new Ajax.Request( M2ePro.url.get('adminhtml_general/synchGetExecutingInfo') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_general/synchGetExecutingInfo'), {
             method:'get',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 var data = transport.responseText.evalJSON(true);
 
                 if (data.mode == self.stateExecuting) {
@@ -185,8 +180,7 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
                             eval(callBackWhenEnd);
                         } else {
 
-                            new Ajax.Request( M2ePro.url.get('adminhtml_general/synchGetLastResult') ,
-                            {
+                            new Ajax.Request(M2ePro.url.get('adminhtml_general/synchGetLastResult'), {
                                 method: 'get',
                                 asynchronous: true,
                                 onSuccess: function(transport) {
@@ -195,9 +189,7 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
                                     self.addProcessingNowWarning();
                                 }
                             });
-
                         }
-
                     },1500);
                     //-----------------
                 }
@@ -207,20 +199,20 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    printFinalMessage : function(resultType)
+    printFinalMessage: function(resultType)
     {
         var self = this;
         if (resultType == self.resultTypeError) {
             MagentoMessageObj.addError(str_replace(
                 '%url%',
                 M2ePro.url.get('logViewUrl'),
-                M2ePro.translator.translate('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.')
+                M2ePro.translator.translate('Synchronization ended with errors. <a target="_blank" href="%url%">View Log</a> for details.')
             ));
         } else if (resultType == self.resultTypeWarning) {
             MagentoMessageObj.addWarning(str_replace(
                 '%url%',
                 M2ePro.url.get('logViewUrl'),
-                M2ePro.translator.translate('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.')
+                M2ePro.translator.translate('Synchronization ended with warnings. <a target="_blank" href="%url%">View Log</a> for details.')
             ));
         } else {
             MagentoMessageObj.addSuccess(M2ePro.translator.translate('Synchronization has successfully ended.'));
@@ -231,12 +223,11 @@ SynchProgressHandler.prototype = Object.extend(new CommonHandler(), {
 
     addProcessingNowWarning: function()
     {
-        new Ajax.Request( M2ePro.url.get('synchCheckProcessingNow'),
-        {
+        new Ajax.Request(M2ePro.url.get('synchCheckProcessingNow'), {
             method: 'get',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 var messages = transport.responseText.evalJSON().messages;
 
                 if (messages.length < 1) {

@@ -56,7 +56,7 @@ class Ess_M2ePro_Adminhtml_Configuration_ComponentsController
         Mage::helper('M2ePro/Magento')->clearMenuCache();
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The global settings have been successfully saved.')
+            Mage::helper('M2ePro')->__('The global Settings have been successfully saved.')
         );
 
         $this->_redirectUrl($this->_getRefererUrl());

@@ -8,7 +8,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Wizard_Abstract extends Mage_Adminhtml
 {
     // ########################################
 
-    protected function prepareButtons()
+    protected function removeButtons()
     {
         $this->removeButton('back');
         $this->removeButton('reset');
@@ -16,39 +16,31 @@ abstract class Ess_M2ePro_Block_Adminhtml_Wizard_Abstract extends Mage_Adminhtml
         $this->removeButton('add');
         $this->removeButton('save');
         $this->removeButton('edit');
+    }
 
-        $this->_addButton('goto_support', array(
-            'label'     => Mage::helper('M2ePro')->__('Support'),
-            'onclick'   => 'setLocation(\''.$this->getUrl('*/adminhtml_support/index').'\')',
-            'class'     => 'button_link'
-        ));
+    protected function appendButtons() {}
 
-        // --------------------------------
+    protected function appendWizardCompleteButton()
+    {
+        $buttonBlock = $this->getLayout()
+                            ->createBlock('adminhtml/widget_button')
+                            ->setData( array(
+                                           'id'      => 'wizard_complete',
+                                           'label'   => Mage::helper('M2ePro')->__('Complete Configuration'),
+                                           'onclick' => 'setLocation(\''.$this->getUrl('*/*/complete').'\');',
+                                           'class'   => 'end_button',
+                                           'style'   => 'display: none'
+                                       ) );
+        $this->setChild('end_button', $buttonBlock);
+    }
 
-        $videoLink = Mage::helper('M2ePro/View_Ebay')->getVideoTutorialsUrl();
-
-        if (Mage::helper('M2ePro/Module_Wizard')->getView($this->nick) == 'common') {
-            $videoLink = Mage::helper('M2ePro/View_Common')->getVideoTutorialsUrl();
-        }
-
-        $this->_addButton('goto_video_tutorials', array(
-            'label'     => Mage::helper('M2ePro')->__('Video Tutorials'),
-            'onclick'   => 'window.open(\''.$videoLink.'\', \'_blank\'); return false;',
-            'class'     => 'button_link'
-        ));
-
-        // --------------------------------
-
-        $docsLink =  Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl();
-
-        if (Mage::helper('M2ePro/Module_Wizard')->getView($this->nick) == 'common') {
-            $docsLink =  Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
-        }
-
-        $this->_addButton('goto_docs', array(
-            'label'     => Mage::helper('M2ePro')->__('Documentation'),
-            'onclick'   => 'window.open(\''.$docsLink.'\', \'_blank\'); return false;',
-            'class'     => 'button_link'
+    protected function appendWizardSkipButton()
+    {
+        $url = $this->getUrl('*/*/skip');
+        $this->_addButton('skip', array(
+            'label'     => Mage::helper('M2ePro')->__('Skip Wizard'),
+            'onclick'   => 'WizardHandlerObj.skip(\''.$url.'\')',
+            'class'     => 'skip'
         ));
     }
 

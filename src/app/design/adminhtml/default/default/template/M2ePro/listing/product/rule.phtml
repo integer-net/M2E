@@ -23,25 +23,30 @@
                     <?php echo $this->getChildHtml('rule_block') ?>
                 </div>
                 <?php if ($this->isShowHideProductsOption()): ?>
-                    <div style="float: right; width: 315px">
+                    <div style="float: right; width: auto" align="right">
                         <table>
                             <tr>
                                 <td>
-                                    <label for="hide_products_others_listings"><?php echo Mage::helper('M2ePro')->__('Products already in M2E Pro listings'); ?>:&nbsp;</label>
+                                    <label for="hide_products_others_listings"><?php echo Mage::helper('M2ePro')->__('Hide Products presented in other M2E Pro Listings'); ?>:&nbsp;</label>
                                 </td>
                                 <td>
                                     <select id="hide_products_others_listings" name="hide_products_others_listings" style="width: 80px">
-                                        <option value="0" <?php if ($hideParam == 0): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Show');  ?></option>
-                                        <option value="1" <?php if ($hideParam == 1): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Hide'); ?></option>
+                                        <option value="0" <?php if ($hideParam == 0): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('No');  ?></option>
+                                        <option value="1" <?php if ($hideParam == 1): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                                     </select>
-                                    <?php if (Mage::helper('M2ePro/View')->isCurrentViewEbay()) : ?>
-                                        <p class="note show-left">
+                                </td>
+                                <td>
+                                    <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>"
+                                         class="tool-tip-image"
+                                         style="display: block; margin: 2px 0 0 6px;">
+                                    <span class="tool-tip-message tip-left" style="left: 650px; display: none; width: 200px;">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
+                                        <span>
                                             <?php echo Mage::helper('M2ePro')->__(
-                                                '<b>Show</b> - show all products<br/>
-                                                <b>Hide</b> - show only products that have not already been added to an M2E Pro listing'
+                                                '<b>Note:</b> the Products from current Listing are not shown also.'
                                             ); ?>
-                                        </p>
-                                    <?php endif; ?>
+                                        </span>
+                                    </span>
                                 </td>
                             </tr>
                         </table>

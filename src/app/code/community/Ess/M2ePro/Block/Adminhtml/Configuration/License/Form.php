@@ -62,6 +62,9 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_License_Form extends Ess_M2ePro_B
             'domain' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getDomain()),
             'ip' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getIp()),
             'directory' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getDirectory()),
+            'info' => array(
+                'email' => Mage::helper('M2ePro')->escapeHtml($licenseHelper->getEmail()),
+            ),
             'valid' => array(
                 'domain' => $licenseHelper->isValidDomain(),
                 'ip' => $licenseHelper->isValidIp(),

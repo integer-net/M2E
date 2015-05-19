@@ -192,7 +192,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('product_name', array(
-            'header'    => $helper->__('Product Title / Listing / SKU'),
+            'header'    => $helper->__('Product Title / Listing / Product SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -345,23 +345,17 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         $onlineTitle = $row->getData('online_title');
         !empty($onlineTitle) && $value = $onlineTitle;
 
-        $html = $value;
-
-        if (strlen($html) > 60) {
-            $html = substr($html, 0, 60) . '...';
-        }
-
-        $html = '<span>' . Mage::helper('M2ePro')->escapeHtml($html) . '</span>';
+        $value = '<span>' . Mage::helper('M2ePro')->escapeHtml($value) . '</span>';
 
         $additional = $this->getListingHtml($row);
         $additional .= $this->getSkuHtml($row);
 
         if ($additional) {
-            $html .= '<br/><hr style="border: none; border-top: 1px solid silver; margin: 2px 0px;"/>'
+            $value .= '<br/><hr style="border: none; border-top: 1px solid silver; margin: 2px 0px;"/>'
                 . $additional;
         }
 
-        return $html;
+        return $value;
     }
 
     private function getListingHtml($row)
@@ -372,10 +366,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
         $listingUrl = $this->getUrl('*/adminhtml_ebay_listing/view', array('id' => $row->getData('listing_id')));
         $listingTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('listing_title'));
-
-        if (strlen($listingTitle) > 50) {
-            $listingTitle = substr($listingTitle, 0, 50) . '...';
-        }
 
         return '<strong>' . Mage::helper('M2ePro')->__('Listing') . ':</strong>'
             . '&nbsp;<a href="'.$listingUrl.'" target="_blank">'.$listingTitle.'</a><br/>';
@@ -527,8 +517,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
-        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to listing'));
-        $iconSrc = $this->getSkinUrl('M2ePro').'/images/goto_listing.png';
+        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to Listing'));
+        $iconSrc = $this->getSkinUrl('M2ePro/images/goto_listing.png');
 
         if ($row->getData('is_m2epro_listing')) {
             $url = $this->getUrl('*/adminhtml_ebay_listing/view/', array(

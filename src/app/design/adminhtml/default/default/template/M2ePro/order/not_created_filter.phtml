@@ -1,18 +1,18 @@
 <p class="switcher">
     <label>
         <input type="checkbox" name="" <?php if ($this->isChecked()): ?>checked="checked"<?php endif; ?> onclick="setLocation('<?php echo $this->getFilterUrl(); ?>');">
-        &nbsp;<?php echo Mage::helper('M2ePro')->__('Show orders without Magento orders'); ?>
+        &nbsp;<?php echo Mage::helper('M2ePro')->__('Show Orders without Magento Orders'); ?>
     </label>
     <span>
-        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
         <span class="tool-tip-message" style="font-size: 12px; display: none;">
-        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+        <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
             <span>
                 <?php echo Mage::helper('M2ePro')->__(
-                    'Check this box to filter for orders that don\'t have a matching Magento order.<br/>
-                    Magento orders might not be created for eBay orders for a number of reasons, including incomplete information or
-                    further action being required to complete the order.<br/><br/>
-                    <b>View Order Details</b> for detailed information on individual orders and the action needed to create the matching Magento order.'
+                    'Check this box to filter for Orders that don\'t have a matching Magento Order.<br/>
+                    Magento Orders might not be created for Channel Orders for a number of reasons, including incomplete information or
+                    further Action being required to complete the Order.<br/><br/>
+                    <b>View Order Details</b> for detailed information on individual Orders and the Action needed to create the matching Magento Order.'
                 ); ?>
         </span>
     </span>

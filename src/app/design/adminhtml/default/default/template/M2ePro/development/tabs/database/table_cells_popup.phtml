@@ -30,10 +30,22 @@
         <table>
             <?php foreach($this->getTableColumns() as $column) : ?>
 
-                <tr id="tr_column_id_<?php echo $column['Field']; ?>">
-                    <td style="min-width: 250px; height: 23px;" title="<?php echo $column['Type']; ?>"><?php echo $column['Field']; ?></td>
-                    <td style="width: 25px;"><input id="switcher_column_id_<?php echo $column['Field']; ?>" class="input_switcher" type="checkbox" name="cells[]" value="<?php echo $column['Field']; ?>" /></td>
-                    <td><input id="input_column_id_<?php echo $column['Field']; ?>" name="value_<?php echo $column['Field']; ?>" type="text" size="47" disabled="disabled" /></td>
+                <?php if (strpos($column['extra'], 'increment') !== false) {
+                    continue;
+                } ?>
+
+                <tr id="tr_column_id_<?php echo $column['name']; ?>">
+                    <td style="min-width: 220px; height: 23px;" title="<?php echo $column['type']; ?>">
+                        <?php if (isset($column['is_parent']) && $column['is_parent']) : ?><span style="color: orangered;">p:&nbsp;</span><?php endif; ?>
+                        <?php if (isset($column['is_parent']) && !$column['is_parent']) : ?><span style="color: forestgreen;">ch:&nbsp;</span><?php endif; ?>
+                        <?php echo $column['name']; ?>
+                    </td>
+                    <td style="width: 25px;">
+                        <input id="switcher_column_id_<?php echo $column['name']; ?>" class="input_switcher" type="checkbox" name="cells[]" value="<?php echo $column['name']; ?>" />
+                    </td>
+                    <td>
+                        <input id="input_column_id_<?php echo $column['name']; ?>" name="value_<?php echo $column['name']; ?>" type="text" size="47" disabled="disabled" />
+                    </td>
                 </tr>
 
             <?php endforeach; ?>

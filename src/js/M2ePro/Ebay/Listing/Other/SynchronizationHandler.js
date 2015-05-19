@@ -1,13 +1,13 @@
 EbayListingOtherSynchronizationHandler = Class.create();
 EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
 
-//----------------------------------
+    //----------------------------------
 
     initialize: function()
     {
         //-----------------
-        Validation.add('M2ePro-validate-conditions-between', M2ePro.translator.translate('Must be greater than "Min".'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-conditions-between', M2ePro.translator.translate('Must be greater than "Min".'), function(value, el) {
+
             var minValue = $(el.id.replace('_max','')).value;
 
             if (!el.up('tr').visible()) {
@@ -18,8 +18,8 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
         });
 
         //-----------------
-        Validation.add('M2ePro-validate-stop-relist-conditions-product-status', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-stop-relist-conditions-product-status', M2ePro.translator.translate('Inconsistent Settings in Relist and Stop Rules.'), function(value, el) {
+
             if (EbayListingOtherSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
             }
@@ -31,8 +31,8 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
             return true;
         });
 
-        Validation.add('M2ePro-validate-stop-relist-conditions-stock-availability', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-stop-relist-conditions-stock-availability', M2ePro.translator.translate('Inconsistent Settings in Relist and Stop Rules.'), function(value, el) {
+
             if (EbayListingOtherSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
             }
@@ -44,8 +44,8 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
             return true;
         });
 
-        Validation.add('M2ePro-validate-stop-relist-conditions-item-qty', M2ePro.translator.translate('Inconsistent settings in Revise and Stop rules.'), function(value, el)
-        {
+        Validation.add('M2ePro-validate-stop-relist-conditions-item-qty', M2ePro.translator.translate('Inconsistent Settings in Relist and Stop Rules.'), function(value, el) {
+
             if (EbayListingOtherSynchronizationHandlerObj.isRelistModeDisabled()) {
                 return true;
             }
@@ -91,7 +91,7 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
 
     //-----------------------------------
 
-    isRelistModeDisabled : function()
+    isRelistModeDisabled: function()
     {
         return $('relist_mode').value == 0;
     },
@@ -108,8 +108,20 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
     {
         var params = 'tab=' + $$('#' + tabsId + ' a.active')[0].name + '&back=' + back;
 
-        var url = M2ePro.url.get('formSubmit',{'back': base64_encode('edit|' + params)});
+        var url = M2ePro.url.get('formSubmit', {'back': base64_encode('edit|' + params)});
         this.submitForm(url);
+    },
+
+    check_synchronization_mode: function()
+    {
+        var elem = $('synchronization_mode');
+        var value = elem.options[elem.selectedIndex].value;
+
+        if (value == 0) {
+            alert(M2ePro.translator.translate('Please enable Synchronization first!'));
+            ebayListingOtherSynchronizationEditTabsJsTabs.showTabContent(
+                $('ebayListingOtherSynchronizationEditTabs_general'));
+        }
     },
 
     source_change: function()
@@ -215,18 +227,17 @@ EbayListingOtherSynchronizationHandler.prototype = Object.extend(new CommonHandl
         }
     },
 
-    completeStep : function()
+    completeStep: function()
     {
-        new Ajax.Request( M2ePro.url.formSubmit + '?' + $('edit_form').serialize() ,
-        {
+        new Ajax.Request(M2ePro.url.formSubmit + '?' + $('edit_form').serialize(), {
             method: 'get',
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
                 window.opener.completeStep = 1;
                 window.close();
             }
         });
     }
 
+    //----------------------------------
 });

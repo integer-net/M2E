@@ -67,7 +67,7 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             $customer->load($this->order->getEbayAccount()->getMagentoOrdersCustomerId());
 
             if (is_null($customer->getId())) {
-                throw new Exception('Customer with ID specified in eBay account settings does not exist.');
+                throw new Exception('Customer with ID specified in eBay Account Settings does not exist.');
             }
         }
 
@@ -253,14 +253,14 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 
         if ($this->order->isUseGlobalShippingProgram()) {
             $comments[] = '<b>'.
-                          Mage::helper('M2ePro')->__('Global Shipping Program is used for this order').
-                          '</b><br />';
+                          Mage::helper('M2ePro')->__('Global Shipping Program is used for this Order').
+                          '</b><br/>';
         }
 
         $buyerMessage = $this->order->getBuyerMessage();
         if (!empty($buyerMessage)) {
             $comment = '<b>' . Mage::helper('M2ePro')->__('Checkout Message From Buyer') . ': </b>';
-            $comment .= $buyerMessage . '<br />';
+            $comment .= $buyerMessage . '<br/>';
 
             $comments[] = $comment;
         }

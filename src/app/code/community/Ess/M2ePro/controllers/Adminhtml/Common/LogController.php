@@ -42,15 +42,15 @@ class Ess_M2ePro_Adminhtml_Common_LogController
             return $this->_forward('denied');
         }
 
-        $id = $this->getRequest()->getParam('id');
-        $model = Mage::getModel('M2ePro/Listing')->load($id);
+        $id = $this->getRequest()->getParam('id', false);
+        if ($id) {
+            $listing = Mage::helper('M2ePro/Component')->getCachedUnknownObject('Listing', $id);
 
-        if (!$model->getId() && $id) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Listing does not exist.'));
-            return $this->_redirect('*/*/index');
+            if (!$listing->getId()) {
+                $this->_getSession()->addError(Mage::helper('M2ePro')->__('Listing does not exist.'));
+                return $this->_redirect('*/*/index');
+            }
         }
-
-        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model->getData());
 
         $this->_initAction()
              ->_title(Mage::helper('M2ePro')->__('Listings Log'))
@@ -60,20 +60,61 @@ class Ess_M2ePro_Adminhtml_Common_LogController
 
     public function listingGridAction()
     {
-        $id = $this->getRequest()->getParam('id');
-        $model = Mage::getModel('M2ePro/Listing')->load($id);
+        $id = $this->getRequest()->getParam('id', false);
+        if ($id) {
+            $listing = Mage::helper('M2ePro/Component')->getCachedUnknownObject('Listing', $id);
 
-        if (!$model->getId() && $id) {
-            return;
+            if (!$listing->getId()) {
+                return;
+            }
         }
 
-        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model->getData());
+        $response = $this->loadLayout()->getLayout()
+            ->createBlock('M2ePro/adminhtml_common_listing_log_grid', '', array(
+                'channel' => $this->getRequest()->getParam('channel')
+            ))->toHtml();
+        $this->getResponse()->setBody($response);
+    }
+
+    // -------------------------------
+
+    public function listingProductAction()
+    {
+        $listingProductId = $this->getRequest()->getParam('listing_product_id', false);
+        if ($listingProductId) {
+            $listingProduct = Mage::helper('M2ePro/Component')
+                ->getUnknownObject('Listing_Product', $listingProductId);
+
+            if (!$listingProduct->getId()) {
+                $this->_getSession()->addError(Mage::helper('M2ePro')->__('Listing Product does not exist.'));
+                return $this->_redirect('*/*/index');
+            }
+        }
+
+        $this->_initAction();
+
+        $logBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_log');
+
+        $this->_addContent($logBlock)->renderLayout();
+    }
+
+    public function listingProductGridAction()
+    {
+        $listingProductId = $this->getRequest()->getParam('listing_product_id', false);
+        if ($listingProductId) {
+            $listingProduct = Mage::helper('M2ePro/Component')
+                ->getUnknownObject('Listing_Product', $listingProductId);
+
+            if (!$listingProduct->getId()) {
+                return;
+            }
+        }
 
         $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_listing_log_grid')->toHtml();
         $this->getResponse()->setBody($response);
     }
 
-    //---------------------------------------------
+    // -------------------------------
 
     public function listingOtherAction()
     {
@@ -109,7 +150,9 @@ class Ess_M2ePro_Adminhtml_Common_LogController
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model->getData());
 
         $response = $this->loadLayout()->getLayout()
-            ->createBlock('M2ePro/adminhtml_common_listing_other_log_grid')->toHtml();
+            ->createBlock('M2ePro/adminhtml_common_listing_other_log_grid', '', array(
+                'channel' => $this->getRequest()->getParam('channel')
+            ))->toHtml();
         $this->getResponse()->setBody($response);
     }
 
@@ -131,7 +174,9 @@ class Ess_M2ePro_Adminhtml_Common_LogController
     public function synchronizationGridAction()
     {
         $response = $this->loadLayout()->getLayout()
-                         ->createBlock('M2ePro/adminhtml_common_synchronization_log_grid')->toHtml();
+             ->createBlock('M2ePro/adminhtml_common_synchronization_log_grid', '', array(
+                 'channel' => $this->getRequest()->getParam('channel')
+             ))->toHtml();
         $this->getResponse()->setBody($response);
     }
 
@@ -152,7 +197,9 @@ class Ess_M2ePro_Adminhtml_Common_LogController
 
     public function orderGridAction()
     {
-        $grid = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_order_log_grid');
+        $grid = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_order_log_grid', '', array(
+            'channel' => $this->getRequest()->getParam('channel')
+        ));
         $this->getResponse()->setBody($grid->toHtml());
     }
 

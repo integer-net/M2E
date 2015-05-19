@@ -10,24 +10,24 @@
         $ebayText = Mage::helper('M2ePro')->__(
             'The <span style="text-decoration: underline;">eBay component</span>, its upgrades and support are free according to eBay / Magento Partner Agreement. And they will stay free until the partner agreement is active.<br/>'
         );
-        $components[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
+        $components[] = Mage::helper('M2ePro/Component_Ebay')->getTitle();
     }
 
     $betaText = '';
 
     if (isset($this->components[Ess_M2ePro_Helper_Component_Amazon::NICK])) {
-        $betaComponents[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
-        $components[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
+        $betaComponents[] = Mage::helper('M2ePro/Component_Amazon')->getTitle();
+        $components[] = Mage::helper('M2ePro/Component_Amazon')->getTitle();
     }
 
     if (isset($this->components[Ess_M2ePro_Helper_Component_Buy::NICK])) {
-        $betaComponents[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
-        $components[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE);
+        $betaComponents[] = Mage::helper('M2ePro/Component_Buy')->getTitle();
+        $components[] = Mage::helper('M2ePro/Component_Buy')->getTitle();
     }
 
     if (isset($this->components[Ess_M2ePro_Helper_Component_Play::NICK])) {
-        $betaComponents[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
-        $components[] = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+        $betaComponents[] = Mage::helper('M2ePro/Component_Play')->getTitle();
+        $components[] = Mage::helper('M2ePro/Component_Play')->getTitle();
     }
 
     $componentsString = '';
@@ -66,7 +66,7 @@
         if ($betaComponentsCount > 1) $componentString = ' ' . Mage::helper('M2ePro')->__('components');
 
         $betaText = Mage::helper('M2ePro')->__(
-            'Current %component_name% %version_title% are in <span style="text-decoration: underline;">Beta</span> state and are provided free of charge. However, please be advised that upon the live version of the product release some monthly subscription fee will be introduced.</br>',
+            'Current %component_name% %version_title% are in <span style="text-decoration: underline;">Beta</span> state and are provided free of charge. However, please be advised that upon the live version of the Product release some monthly subscription fee will be introduced.<br/>',
             $betaComponentsString, $componentString
         );
     }
@@ -76,9 +76,9 @@
     %beta_text%
     <br/>
     <hr style="color:#D6D6D6"/><br/>
-    M2E Pro extension requires activation for its work.<br/><br/>
+    M2E Pro Extension requires activation for its work.<br/><br/>
     To get the License Key click the <span style="text-decoration: underline;">Manage License</span> link and follow the instructions.<br/>
-    When you receive your License Key, press the Enter button, enter your License Key in appeared text field and press Confirm.
+    When you receive your License Key, press the Enter Button, enter your License Key in appeared text field and press Confirm.
     <br/><br/>
     <b>Note:</b> If you have not received the License Key, please contact us %email%.',
     $componentsString, $ebayText, $betaText, $email);
@@ -101,7 +101,7 @@
     ))?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'You must get valid Trial or Live license key.' => Mage::helper('M2ePro')->__('You must get valid Trial or Live license key.')
+        'You must get valid Trial or Live License Key.' => Mage::helper('M2ePro')->__('You must get valid Trial or Live License Key.')
     )); ?>);
 
     Event.observe(window, 'load', function() {
@@ -129,7 +129,7 @@
             <li class="error-msg">
                 <ul>
                     <li>
-                        <?php echo Mage::helper('M2ePro')->__('You are trying to use invalid license key.'); ?>
+                        <?php echo Mage::helper('M2ePro')->__('You are trying to use the unknown License Key.'); ?>
                     </li>
                 </ul>
             </li>
@@ -183,10 +183,28 @@
                             </td>
                         </tr>
 
+                        <?php if ($this->licenseData['info']['email'] != '') { ?>
+                        <tr>
+                            <td class="label">
+                                <label><?php echo Mage::helper('M2ePro')->__('Associated Email'); ?>: </label>
+                            </td>
+                            <td class="value">
+                                <span><?php echo $this->licenseData['info']['email']; ?></span>
+                                <p class="note">
+                                    <span>
+                                        <?php echo Mage::helper('M2ePro')->__('This e-mail address associated to your License. <br/>
+                                        Also you can use this e-mail to enter a <a href="%url%">clients portal</a>',
+                                        Mage::helper('M2ePro/Module_Support')->getClientsPortalBaseUrl()); ?>
+                                    </span>
+                                </p>
+                            </td>
+                        </tr>
+                        <?php } ?>
+
                         <tr>
                             <td class="label"></td>
                             <td class="value">
-                                <a href="<?php echo Mage::helper('M2ePro/Module_Support')->getClientsPortalUrl();?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Manage License'); ?></a>
+                                <a href="<?php echo Mage::helper('M2ePro/Module_Support')->getClientsPortalBaseUrl();?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Manage License'); ?></a>
                             </td>
                         </tr>
 
@@ -323,16 +341,16 @@
                         $componentTitle = '';
                         switch ($componentName) {
                             case Ess_M2ePro_Helper_Component_Ebay::NICK:
-                                $componentTitle = Ess_M2ePro_Helper_Component_Ebay::TITLE;
+                                $componentTitle = Mage::helper('M2ePro/Component_Ebay')->getTitle();
                                 break;
                             case Ess_M2ePro_Helper_Component_Amazon::NICK:
-                                $componentTitle = Ess_M2ePro_Helper_Component_Amazon::TITLE;
+                                $componentTitle = Mage::helper('M2ePro/Component_Amazon')->getTitle();
                                 break;
                             case Ess_M2ePro_Helper_Component_Buy::NICK:
-                                $componentTitle = Ess_M2ePro_Helper_Component_Buy::TITLE;
+                                $componentTitle = Mage::helper('M2ePro/Component_Buy')->getTitle();
                                 break;
                             case Ess_M2ePro_Helper_Component_Play::NICK:
-                                $componentTitle = Ess_M2ePro_Helper_Component_Play::TITLE;
+                                $componentTitle = Mage::helper('M2ePro/Component_Play')->getTitle();
                                 break;
                         }
                     ?>
@@ -353,21 +371,21 @@
                         <?php if ($componentName == Ess_M2ePro_Helper_Component_Amazon::NICK) { ?>
                             <div id="block_notice_license_amazon" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
                                 <?php echo Mage::helper('M2ePro')->__('<b>Note:</b> The current Beta version of the Amazon module is provided free of charge.
-                                However, please be advised that upon the live version of the product release some monthly subscription fee will be introduced.'); ?>
+                                However, please be advised that upon the live version of the Product release some monthly subscription fee will be introduced.'); ?>
                             </div>
                         <?php } ?>
 
                         <?php if ($componentName == Ess_M2ePro_Helper_Component_Buy::NICK) { ?>
                             <div id="block_notice_license_buy" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
                                 <?php echo Mage::helper('M2ePro')->__('<b>Note:</b> The current Beta version of the Rakuten.com module is provided free of charge.
-                                However, please be advised that upon the live version of the product release some monthly subscription fee will introduced.'); ?>
+                                However, please be advised that upon the live version of the Product release some monthly subscription fee will introduced.'); ?>
                             </div>
                         <?php } ?>
 
                         <?php if ($componentName == Ess_M2ePro_Helper_Component_Play::NICK) { ?>
                             <div id="block_notice_license_buy" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
                                 <?php echo Mage::helper('M2ePro')->__('<b>Note:</b> The current Beta version of the Play.com module is provided free of charge.
-                                However, please be advised that upon the live version of the product release some monthly subscription fee will introduced.'); ?>
+                                However, please be advised that upon the live version of the Product release some monthly subscription fee will introduced.'); ?>
                             </div>
                         <?php } ?>
 

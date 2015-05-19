@@ -23,19 +23,19 @@ class Ess_M2ePro_Model_Synchronization_LockItem extends Ess_M2ePro_Model_LockIte
 
     public function setTitle($title)
     {
-        $this->setContentData('info_title',$title);
+        $this->addContentData('info_title',$title);
     }
 
     public function setPercents($percents)
     {
         (int)$percents < 0 && $percents = 0;
         (int)$percents > 100 && $percents = 100;
-        $this->setContentData('info_percents',floor($percents));
+        $this->addContentData('info_percents',floor($percents));
     }
 
     public function setStatus($status)
     {
-        $this->setContentData('info_status',$status);
+        $this->addContentData('info_status',$status);
     }
 
     //-----------------------------------

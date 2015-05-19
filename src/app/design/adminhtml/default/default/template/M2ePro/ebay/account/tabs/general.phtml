@@ -30,19 +30,19 @@
 <?php if (!$isEdit) { ?>
 
     <?php echo Mage::helper('M2ePro')->__(
-        'Add an eBay account to M2E Pro by choosing the eBay environment and granting access to your eBay account.<br/><br/>
-        First choose the <b>Environment</b> of the eBay account you want to work in. If you want to add an eBay account to list for real on eBay sites,
-        choose <b>Production (Live)</b>. If you want to add an eBay Sandbox account that\'s been set up for test or development purposes,
-        choose <b>Sandbox (Test)</b>. Then click <b>Get Token</b> to sign in to eBay and <b>Agree</b> to allow your eBay account to connect to M2E Pro.<br/><br/>
-        Once you\'ve successfully authorised M2E Pro to access your account, the <b>Activated</b> status will change to \'Yes\' and you can click <b>Save and Continue Edit</b>.<br/><br/>
-        <b>Note:</b> A Production (Live) eBay account only works on a live eBay site. A Sandbox (Test) account only works on the eBay Sandbox test environment.
-        To register for a Sandbox account, register at <a href="https://developer.ebay.com/join/" target="_blank">developer.ebay.com/join</a>.'
+        'Add an eBay Account to M2E Pro by choosing the eBay Environment and granting access to your eBay Account.<br/><br/>
+        First choose the <b>Environment</b> of the eBay Account you want to work in. If you want to add an eBay Account to list for real on eBay Sites,
+        choose <b>Production (Live)</b>. If you want to add an eBay Sandbox Account that\'s been set up for test or development purposes,
+        choose <b>Sandbox (Test)</b>. Then click <b>Get Token</b> to sign in to eBay and <b>Agree</b> to allow your eBay Account to connect to M2E Pro.<br/><br/>
+        Once you\'ve successfully authorised M2E Pro to access your Account, the <b>Activated</b> status will change to \'Yes\' and you can click <b>Save and Continue Edit</b>.<br/><br/>
+        <b>Note:</b> A Production (Live) eBay Account only works on a live eBay Site. A Sandbox (Test) Account only works on the eBay Sandbox test Environment.
+        To register for a Sandbox Account, register at <a href="https://developer.ebay.com/join/" target="_blank">developer.ebay.com/join</a>.'
     ); ?>
 
 <?php } else { ?>
 
     <?php echo Mage::helper('M2ePro')->__(
-        'This page shows the environment for your eBay account and details of the authorisation for M2E Pro to connect to your eBay account.<br/><br/>
+        'This Page shows the Environment for your eBay Account and details of the authorisation for M2E Pro to connect to your eBay Account.<br/><br/>
         If your token has expired or is not activated, click <b>Get Token</b>.'
     ); ?>
 
@@ -67,10 +67,10 @@
     M2ePro.url.set('adminhtml_ebay_account/update_account_title','<?php echo $this->getUrl('*/adminhtml_ebay_account/updateTitle'); ?>');
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => Mage::helper('M2ePro')->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'),
+        'Be attentive! By Deleting Account you delete all information on it from M2E Pro Server. This will cause inappropriate work of all Accounts\' copies.' => Mage::helper('M2ePro')->__('Be attentive! By Deleting Account you delete all information on it from M2E Pro Server. This will cause inappropriate work of all Accounts\' copies.'),
         'No Customer entry is found for specified ID.' => Mage::helper('M2ePro')->__('No Customer entry is found for specified ID.'),
-        'If Yes is chosen, you must select at least one attribute for product mapping.' => Mage::helper('M2ePro')->__('If Yes is chosen, you must select at least one attribute for product mapping.'),
-        'You should create at least one response template.' => Mage::helper('M2ePro')->__('You should create at least one response template.'),
+        'If Yes is chosen, you must select at least one Attribute for Product Mapping.' => Mage::helper('M2ePro')->__('If Yes is chosen, you must select at least one Attribute for Product Mapping.'),
+        'You should create at least one Response Template.' => Mage::helper('M2ePro')->__('You should create at least one Response Template.'),
         'Prefix length should not be greater than 5 characters.' => Mage::helper('M2ePro')->__('Prefix length should not be greater than 5 characters.')
     )); ?>);
 
@@ -113,7 +113,7 @@
 <div class="entry-edit" id="magento_block_ebay_accounts_general_general">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php if (!$isEdit) { echo $helper->__('Choose Environment'); } else { echo $helper->__('Environment of eBay account'); } ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php if (!$isEdit) { echo $helper->__('Choose Environment'); } else { echo $helper->__('Environment of eBay Account'); } ?></h4>
     </div>
 
     <div class="fieldset">
@@ -153,11 +153,11 @@
                         <?php endif; ?>
                         <p class="note"><span>
                             <?php if (!$isEdit) {
-                                echo $helper->__('Choose \'Production (Live)\' to use an eBay account to list for real on eBay sites.<br/>
-                                                  Choose \'Sandbox (Test)\' to use an eBay Sandbox account for testing purposes.');
+                                echo $helper->__('Choose \'Production (Live)\' to use an eBay Account to list for real on eBay Sites.<br/>
+                                                  Choose \'Sandbox (Test)\' to use an eBay Sandbox Account for testing purposes.');
                             } else {
-                                echo $helper->__('<b>Production (Live):</b> an eBay account listing for real on eBay sites.<br/>
-                                                  <b>Sandbox (Test):</b> an eBay Sandbox account for testing purposes.');
+                                echo $helper->__('<b>Production (Live):</b> an eBay Account Listing for real on eBay Sites.<br/>
+                                                  <b>Sandbox (Test):</b> an eBay Sandbox Account for testing purposes.');
                             } ?>
                         </span></p>
                     </td>

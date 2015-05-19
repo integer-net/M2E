@@ -60,11 +60,21 @@ class Ess_M2ePro_Adminhtml_Common_AccountController
             return;
         }
 
+        /** @var Ess_M2ePro_Model_Mysql4_Account_Collection $accountCollection */
+        $accountCollection = Mage::getModel('M2ePro/Account')->getCollection();
+        $accountCollection->addFieldToFilter('id', array('in' => $ids));
+
+        $accounts = $accountCollection->getItems();
+
+        if (empty($accounts)) {
+            $this->_redirect('*/*/index');
+            return;
+        }
+
         $deleted = $locked = 0;
-        foreach ($ids as $id) {
+        foreach ($accounts as $account) {
 
             /** @var $account Ess_M2ePro_Model_Account */
-            $account = Mage::getModel('M2ePro/Account')->loadInstance($id);
 
             if ($account->isLocked(true)) {
                 $locked++;
@@ -75,17 +85,17 @@ class Ess_M2ePro_Adminhtml_Common_AccountController
                     if ($account->isComponentModeAmazon()) {
 
                         $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-                        $dispatcherObject->processConnector('account', 'delete' ,'entity', array(), $account);
+                        $dispatcherObject->processConnector('account', 'delete' ,'entityRequester', array(), $account);
 
                     } else if ($account->isComponentModeBuy()) {
 
                         $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
-                        $dispatcherObject->processConnector('account', 'delete' ,'entity', array(), $account);
+                        $dispatcherObject->processConnector('account', 'delete' ,'entityRequester', array(), $account);
 
                     } else if ($account->isComponentModePlay()) {
 
                         $dispatcherObject = Mage::getModel('M2ePro/Connector_Play_Dispatcher');
-                        $dispatcherObject->processConnector('account', 'delete' ,'entity', array(), $account);
+                        $dispatcherObject->processConnector('account', 'delete' ,'entityRequester', array(), $account);
                     }
 
                 } catch (Exception $e) {
@@ -108,7 +118,7 @@ class Ess_M2ePro_Adminhtml_Common_AccountController
         $tempString = Mage::helper('M2ePro')->__('%amount% record(s) were successfully deleted.', $deleted);
         $deleted && $this->_getSession()->addSuccess($tempString);
 
-        $tempString  = Mage::helper('M2ePro')->__('%amount% record(s) are used in M2E Listing(s).', $locked) . ' ';
+        $tempString  = Mage::helper('M2ePro')->__('%amount% record(s) are used in M2E Pro Listing(s).', $locked) . ' ';
         $tempString .= Mage::helper('M2ePro')->__('Account must not be in use to be deleted.');
         $locked && $this->_getSession()->addError($tempString);
 

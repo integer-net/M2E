@@ -7,7 +7,7 @@
 abstract class Ess_M2ePro_Model_Connector_Amazon_Requester extends Ess_M2ePro_Model_Connector_Requester
 {
     const COMPONENT = 'Amazon';
-    const COMPONENT_VERSION = 4;
+    const COMPONENT_VERSION = 5;
 
     /**
      * @var Ess_M2ePro_Model_Account|null
@@ -43,7 +43,7 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Requester extends Ess_M2ePro_Mo
             $this->requestExtraData['account'] = $this->account->getChildObject()->getServerHash();
         }
 
-        parent::process();
+        return parent::process();
     }
 
     // ########################################

@@ -76,7 +76,7 @@ BlockNotice.prototype = {
         }
 
         $$('#'+id+' div.block_notices_content').each(function(object) {
-            Effect.SlideDown(object,{duration:0.7});
+            Effect.SlideDown(object, {duration:0.7});
         });
         $$('#'+id+' div.block_notices_header div.block_notices_header_left span.arrow').each(function(object) {
             object.innerHTML = '&uarr;';
@@ -85,9 +85,7 @@ BlockNotice.prototype = {
             object.writeAttribute("onclick",self.type+'NoticeObj.hideContent(\'' + id + '\')');
         });
 
-        if (!IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) {
-            this.deleteHashedCookie(id+'_closed_content');
-        }
+        this.deleteHashedCookie(id+'_closed_content');
 
         return true;
     },
@@ -102,7 +100,7 @@ BlockNotice.prototype = {
         }
 
         $$('#'+id+' div.block_notices_content').each(function(object) {
-            Effect.SlideUp(object,{duration:0.7});
+            Effect.SlideUp(object, {duration:0.7});
         });
         $$('#'+id+' div.block_notices_header div.block_notices_header_left span.arrow').each(function(object) {
             object.innerHTML = '&darr;';
@@ -111,7 +109,7 @@ BlockNotice.prototype = {
             object.writeAttribute("onclick",self.type+'NoticeObj.showContent(\'' + id + '\')');
         });
 
-        this.setHashedCookie( id+'_closed_content');
+        this.setHashedCookie(id+'_closed_content');
 
         return true;
     },
@@ -503,7 +501,7 @@ BlockNotice.prototype = {
             return;
         }
 
-        if ((IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) && !BLOCK_NOTICES_DISABLE_COLLAPSE
+        if ((IS_VIEW_EBAY || IS_VIEW_COMMON || IS_VIEW_CONFIGURATION) && !BLOCK_NOTICES_DISABLE_COLLAPSE
             && !alwaysShow && this.collapseHelpBlockIntoIcon(object)) {
 
             object.remove();
@@ -517,8 +515,9 @@ BlockNotice.prototype = {
         object.removeClassName('block_notices_module');
         object.addClassName('block_notices');
 
-        if (IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) {
+        if (this.getHashedCookie(id+'_was_shown') != 1) {
             this.setCookiesForHide(object);
+            this.setHashedCookie(id+'_was_shown');
         }
     }
 

@@ -110,7 +110,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Synchronization_Form extends Mage
             '*/adminhtml_common_log/synchronization',
             array(
                 'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_TEMPLATES,
-                'component' => $this->component
+                'channel' => $this->component
             )
         );
         $data = array(
@@ -155,7 +155,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Synchronization_Form extends Mage
             '*/adminhtml_common_log/synchronization',
             array(
                 'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_ORDERS,
-                'component'  => $this->component,
+                'channel'  => $this->component,
             )
         );
         $data = array(
@@ -200,7 +200,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Synchronization_Form extends Mage
             '*/adminhtml_common_log/synchronization',
             array(
                 'task' => Ess_M2ePro_Model_Synchronization_Log::TASK_OTHER_LISTINGS,
-                'component'  => $this->component,
+                'channel'  => $this->component,
             )
         );
         $data = array(

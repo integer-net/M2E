@@ -27,11 +27,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     private $marketplaceModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Magento_Product
-     */
-    private $magentoProductModel = NULL;
-
-    /**
      * @var Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated
      */
     private $calculatedShippingModel = NULL;
@@ -88,7 +83,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
         }
 
         $this->marketplaceModel = NULL;
-        $this->magentoProductModel = NULL;
         $this->calculatedShippingModel = NULL;
 
         $this->delete();
@@ -122,24 +116,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     //---------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
-     */
-    public function getMagentoProduct()
-    {
-        return $this->magentoProductModel;
-    }
-
-    /**
-     * @param Ess_M2ePro_Model_Magento_Product $instance
-     */
-    public function setMagentoProduct(Ess_M2ePro_Model_Magento_Product $instance)
-    {
-        $this->magentoProductModel = $instance;
-    }
-
-    //---------------------------------------
-
-    /**
      * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated
      */
     public function getCalculatedShipping()
@@ -150,12 +126,11 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
                 $this->calculatedShippingModel = Mage::helper('M2ePro')->getCachedObject(
                     'Ebay_Template_Shipping_Calculated', $this->getId(), NULL, array('template')
                 );
+
+                $this->calculatedShippingModel->setShippingTemplate($this);
+
             } catch (Exception $exception) {
                 return $this->calculatedShippingModel;
-            }
-
-            if (!is_null($this->getMagentoProduct())) {
-                $this->calculatedShippingModel->setMagentoProduct($this->getMagentoProduct());
             }
         }
 
@@ -179,11 +154,9 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
                                                  $asObjects, $filters, $sort);
 
         if ($asObjects) {
+            /** @var $service Ess_M2ePro_Model_Ebay_Template_Shipping_Service */
             foreach ($services as $service) {
-                /** @var $service Ess_M2ePro_Model_Ebay_Template_Shipping_Service */
-                if (!is_null($this->getMagentoProduct())) {
-                    $service->setMagentoProduct($this->getMagentoProduct());
-                }
+                $service->setShippingTemplate($this);
             }
         }
 
@@ -603,13 +576,13 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_shipping');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_shipping');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_shipping');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_shipping');
         return parent::delete();
     }
 

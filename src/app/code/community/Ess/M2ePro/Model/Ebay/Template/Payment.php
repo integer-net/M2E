@@ -247,13 +247,13 @@ class Ess_M2ePro_Model_Ebay_Template_Payment extends Ess_M2ePro_Model_Component_
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_payment');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_payment');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_payment');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_payment');
         return parent::delete();
     }
 

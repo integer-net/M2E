@@ -17,9 +17,4 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Help extends Mag
 
         $this->setTemplate('M2ePro/common/buy/template/newProduct/help.phtml');
     }
-
-    public function getContainerId()
-    {
-        return 'block_notice_buy_template_newProduct';
-    }
 }

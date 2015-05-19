@@ -20,7 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_Account
     {
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('M2E Registration Complete');
+        $this->_headerText = Mage::helper('M2ePro')->__('M2E Pro Registration Complete');
         //------------------------------
 
         //------------------------------

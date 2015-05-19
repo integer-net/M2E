@@ -18,7 +18,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
 
     protected function getTitle()
     {
-        return 'Remove Unused Templates';
+        return 'Remove Unused Policies';
     }
 
     // -----------------------------------
@@ -60,7 +60,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
     private function removeUnusedTemplates($templateNick)
     {
         $this->getActualOperationHistory()->addTimePoint(__METHOD__.$templateNick,
-                                                         'Remove Unused "'.$templateNick.'" Templates');
+                                                         'Remove Unused "'.$templateNick.'" Policies');
 
         /** @var Ess_M2ePro_Model_Ebay_Template_Manager $templateManager */
         $templateManager = Mage::getModel('M2ePro/Ebay_Template_Manager')->setTemplate($templateNick);
@@ -111,14 +111,15 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
 
     private function removeCategoriesTemplates()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Remove Unused "Category" Templates');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Remove Unused "Category" Policies');
 
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
-        $listingAutoCategoryTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category')->getMainTable();
+        $listingAutoCategoryGroupTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category_Group')
+                                            ->getMainTable();
 
         $minCreateDate = Mage::helper('M2ePro')->getCurrentGmtDate(true) - self::SAFE_CREATE_DATE_INTERVAL;
         $minCreateDate = Mage::helper('M2ePro')->getDate($minCreateDate);
@@ -130,7 +131,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
                     ->from($listingTable,array('result_field'=>'auto_website_adding_template_category_id'))
                     ->where('auto_website_adding_template_category_id IS NOT NULL');
         $unionListingAutoCategorySelect = $connRead->select()
-                    ->from($listingAutoCategoryTable,array('result_field'=>'adding_template_category_id'))
+                    ->from($listingAutoCategoryGroupTable,array('result_field'=>'adding_template_category_id'))
                     ->where('adding_template_category_id IS NOT NULL');
         $unionSelectListingProductTemplate = $connRead->select()
                     ->from($listingProductTable,array('result_field'=>'template_category_id'))
@@ -157,14 +158,15 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
 
     private function removeOtherCategoriesTemplates()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Remove Unused "Other Category" Templates');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Remove Unused "Other Category" Policies');
 
         /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         $listingTable = Mage::getResourceModel('M2ePro/Ebay_Listing')->getMainTable();
         $listingProductTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Product')->getMainTable();
-        $listingAutoCategoryTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category')->getMainTable();
+        $listingAutoCategoryGroupTable = Mage::getResourceModel('M2ePro/Ebay_Listing_Auto_Category_Group')
+                                            ->getMainTable();
 
         $minCreateDate = Mage::helper('M2ePro')->getCurrentGmtDate(true) - self::SAFE_CREATE_DATE_INTERVAL;
         $minCreateDate = Mage::helper('M2ePro')->getDate($minCreateDate);
@@ -176,7 +178,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveUnusedTemplates
                     ->from($listingTable,array('result_field'=>'auto_website_adding_template_other_category_id'))
                     ->where('auto_website_adding_template_other_category_id IS NOT NULL');
         $unionListingAutoCategorySelect = $connRead->select()
-                    ->from($listingAutoCategoryTable,array('result_field'=>'adding_template_other_category_id'))
+                    ->from($listingAutoCategoryGroupTable,array('result_field'=>'adding_template_other_category_id'))
                     ->where('adding_template_other_category_id IS NOT NULL');
         $unionSelectListingProductTemplate = $connRead->select()
                     ->from($listingProductTable,array('result_field'=>'template_other_category_id'))

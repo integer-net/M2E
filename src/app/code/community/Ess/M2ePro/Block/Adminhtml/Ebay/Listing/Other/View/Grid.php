@@ -62,6 +62,27 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
             $collection->addFieldToFilter('main_table.marketplace_id', $marketplaceId);
         }
 
+        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
+        $collection->getSelect()->columns(
+            array(
+                'id'                    => 'main_table.id',
+                'account_id'            => 'main_table.account_id',
+                'marketplace_id'        => 'main_table.marketplace_id',
+                'product_id'            => 'main_table.product_id',
+                'title'                 => 'second_table.title',
+                'sku'                   => 'second_table.sku',
+                'item_id'               => 'second_table.item_id',
+                'online_qty'            => new Zend_Db_Expr('(second_table.online_qty - second_table.online_qty_sold)'),
+                'online_qty_sold'       => 'second_table.online_qty_sold',
+                'online_price'          => 'second_table.online_price',
+                'status'                => 'main_table.status',
+                'start_date'            => 'second_table.start_date',
+                'end_date'              => 'second_table.end_date',
+                'currency'              => 'second_table.currency',
+                'account_mode'          => 'mea.mode'
+            )
+        );
+
         //exit($collection->getSelect()->__toString());
 
         $this->setCollection($collection);
@@ -82,7 +103,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         ));
 
         $this->addColumn('title', array(
-            'header' => Mage::helper('M2ePro')->__('Product Title / SKU'),
+            'header' => Mage::helper('M2ePro')->__('Title / SKU'),
             'align' => 'left',
             //'width'     => '300px',
             'type' => 'text',
@@ -108,7 +129,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
             'width' => '50px',
             'type' => 'number',
             'index' => 'online_qty',
-            'filter_index' => 'second_table.online_qty',
+            'filter_index' => new Zend_Db_Expr('(second_table.online_qty - second_table.online_qty_sold)'),
             'frame_callback' => array($this, 'callbackColumnOnlineAvailableQty')
         ));
 
@@ -214,47 +235,53 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         $this->getMassactionBlock()->setFormFieldName('ids');
         //--------------------------------
 
+        $this->getMassactionBlock()->setGroups(array(
+            'actions'            => Mage::helper('M2ePro')->__('Actions'),
+            'mapping' => Mage::helper('M2ePro')->__('Mapping'),
+            'other'                    => Mage::helper('M2ePro')->__('Other')
+        ));
+
         // Set mass-action
         //--------------------------------
         $this->getMassactionBlock()->addItem('revise', array(
             'label'   => Mage::helper('M2ePro')->__('Revise Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'actions');
 
         $this->getMassactionBlock()->addItem('relist', array(
             'label'   => Mage::helper('M2ePro')->__('Relist Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'actions');
 
         $this->getMassactionBlock()->addItem('stop', array(
             'label'   => Mage::helper('M2ePro')->__('Stop Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'actions');
 
         $this->getMassactionBlock()->addItem('autoMapping', array(
             'label'   => Mage::helper('M2ePro')->__('Map Item(s) Automatically'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'mapping');
 
         $this->getMassactionBlock()->addItem('moving', array(
             'label'   => Mage::helper('M2ePro')->__('Move Item(s) to Listing'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'other');
         $this->getMassactionBlock()->addItem('removing', array(
             'label'   => Mage::helper('M2ePro')->__('Remove Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'other');
         $this->getMassactionBlock()->addItem('unmapping', array(
             'label'   => Mage::helper('M2ePro')->__('Unmap Item(s)'),
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
-        ));
+        ), 'mapping');
         //--------------------------------
 
         return parent::_prepareMassaction();
@@ -279,7 +306,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
                                     ');">' . Mage::helper('M2ePro')->__('Map') . '</a>';
 
             if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
-                $htmlValue .= '<br>' . $row->getId();
+                $htmlValue .= '<br/>' . $row->getId();
             }
             return $htmlValue;
         }
@@ -299,7 +326,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
             .'</a>';
 
         if (Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
-            $htmlValue .= '<br>' . $row->getId();
+            $htmlValue .= '<br/>' . $row->getId();
         }
 
         return $htmlValue;
@@ -307,10 +334,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
         $value = '<span>' . Mage::helper('M2ePro')->escapeHtml($value) . '</span>';
 
         $tempSku = $row->getData('sku');
@@ -350,8 +373,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
-
-        $value = $row->getData('online_qty') - $row->getData('online_qty_sold');
 
         if ($value <= 0) {
             return '<span style="color: red;">0</span>';
@@ -516,9 +537,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         }
 
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Action was completed with warning(s).'
         );
 
         $icons = array(

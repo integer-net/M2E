@@ -87,30 +87,30 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Policies_Receive
 
             /** @var $marketplace Ess_M2ePro_Model_Marketplace **/
 
-            $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
+            $this->getActualOperationHistory()->addText('Starting Site "'.$marketplace->getTitle().'"');
 
             foreach ($accounts as $account) {
 
                 /** @var $account Ess_M2ePro_Model_Account **/
 
                 // M2ePro_TRANSLATIONS
-                // The "Business Policies Receive" action for eBay Site: "%marketplace%" and Account: "%account_title%" is finished. Please wait...
-                $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
-                $status = 'The "Business Policies Receive" action for eBay Site: "%marketplace%" and Account: ';
+                // The "Business Policies Receive" Action for eBay Site: "%marketplace%" and Account: "%account_title%" is finished. Please wait...
+                $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
+                $status = 'The "Business Policies Receive" Action for eBay Site: "%marketplace%" and Account: ';
                 $status .= '"%account_title%" is started. Please wait...';
                 $this->getActualLockItem()
                      ->setStatus(Mage::helper('M2ePro')->__($status, $marketplace->getTitle(), $account->getTitle()));
 
                 $this->getActualOperationHistory()
-                     ->addTimePoint(__METHOD__.'get'.$marketplace->getId().$account->getId(), 'Get policies from eBay');
+                     ->addTimePoint(__METHOD__.'get'.$marketplace->getId().$account->getId(), 'Get Policies from eBay');
 
                 $this->processMarketplaceAccount($marketplace, $account);
 
                 $this->getActualOperationHistory()
                      ->saveTimePoint(__METHOD__.'get'.$marketplace->getId().$account->getId());
                 // M2ePro_TRANSLATIONS
-                // The "Business Policies Receive" action for eBay Site: "%marketplace%" and Account: "%account_title%" is finished. Please wait...
-                $status = 'The "Business Policies Receive" action for eBay Site: "%marketplace%" and Account: ';
+                // The "Business Policies Receive" Action for eBay Site: "%marketplace%" and Account: "%account_title%" is finished. Please wait...
+                $status = 'The "Business Policies Receive" Action for eBay Site: "%marketplace%" and Account: ';
                 $status .= '"%account_title%" is finished. Please wait...';
                 $this->getActualLockItem()
                      ->setStatus(Mage::helper('M2ePro')->__($status, $marketplace->getTitle(), $account->getTitle()));
@@ -207,7 +207,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Policies_Receive
                                              $marketplace->getId(),$account->getId(),NULL);
         is_null($policies) && $policies = array();
 
-        $this->getActualOperationHistory()->addText('Total received policies from eBay: '.count($policies));
+        $this->getActualOperationHistory()->addText('Total received Policies from eBay: '.count($policies));
 
         return $policies;
     }

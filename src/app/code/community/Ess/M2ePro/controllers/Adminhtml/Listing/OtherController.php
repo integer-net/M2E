@@ -14,7 +14,7 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select item(s) to clear.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Item(s) to clear.'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -24,7 +24,7 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
         }
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The 3rd party listing(s) log has been successfully cleaned.')
+            Mage::helper('M2ePro')->__('The 3rd party listing(s) Log has been successfully cleaned.')
         );
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list'));
     }

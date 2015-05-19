@@ -1,22 +1,22 @@
 <?php
 
+/*
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
+ */
+
 abstract class Ess_M2ePro_Model_Ebay_Template_Builder_Abstract
 {
+    // ########################################
+
     abstract public function build(array $data);
+
+    // ########################################
 
     protected function validate(array $data)
     {
-        //------------------------------
         if (!isset($data['is_custom_template'])) {
-            throw new LogicException('Template mode is empty.');
+            throw new LogicException('Policy mode is empty.');
         }
-        //------------------------------
-
-//        //------------------------------
-//        if (empty($data['title'])) {
-//            throw new LogicException('Title is empty.');
-//        }
-//        //------------------------------
     }
 
     protected function prepareData(array &$data)
@@ -40,4 +40,6 @@ abstract class Ess_M2ePro_Model_Ebay_Template_Builder_Abstract
 
         return $prepared;
     }
+
+    // ########################################
 }

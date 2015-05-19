@@ -66,12 +66,12 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
 
     //####################################
 
-    public function addMessage($description = NULL , $type = NULL , $priority = NULL)
+    public function addMessage($description = NULL, $type = NULL, $priority = NULL)
     {
-        $dataForAdd = $this->makeDataForAdd( $this->makeCreator() ,
-                                             $description ,
-                                             $type ,
-                                             $priority );
+        $dataForAdd = $this->makeDataForAdd($this->makeAndGetCreator(),
+                                            $description,
+                                            $type,
+                                            $priority);
 
         $this->createMessage($dataForAdd);
     }
@@ -88,15 +88,22 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
         return $this->getActionsTitlesByClass(__CLASS__,'TASK_');
     }
 
+    //------------------------------------
+
     public function clearMessages($task = NULL)
     {
         $columnName = !is_null($task) ? 'task' : NULL;
         $this->clearMessagesByTable('M2ePro/Synchronization_Log',$columnName,$task);
     }
 
+    public function getLastActionIdConfigKey()
+    {
+        return 'synchronization';
+    }
+
     //####################################
 
-    private function createMessage($dataForAdd)
+    protected function createMessage($dataForAdd)
     {
         $dataForAdd['operation_history_id'] = $this->operationHistoryId;
         $dataForAdd['task'] = $this->task;
@@ -109,7 +116,7 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
                  ->getId();
     }
 
-    private function makeDataForAdd($creator , $description = NULL , $type = NULL , $priority = NULL)
+    protected function makeDataForAdd($creator, $description = NULL, $type = NULL, $priority = NULL)
     {
         $dataForAdd = array();
 

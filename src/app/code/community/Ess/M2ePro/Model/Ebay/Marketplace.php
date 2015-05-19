@@ -23,31 +23,9 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     // ########################################
 
-    public function deleteInstance()
+    public function getEbayItems($asObjects = false, array $filters = array())
     {
-        if ($this->isLocked()) {
-            return false;
-        }
-
-        $categoriesTable  = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_category');
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($categoriesTable,array('marketplace_id = ?'=>$this->getId()));
-
-        $marketplacesTable  = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_marketplace');
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($marketplacesTable,array('marketplace_id = ?'=>$this->getId()));
-
-        $shippingsTable  = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_shipping');
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($shippingsTable,array('marketplace_id = ?'=>$this->getId()));
-
-        $shippingsCategoriesTable  = Mage::getSingleton('core/resource')
-            ->getTableName('m2epro_ebay_dictionary_shipping_category');
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($shippingsCategoriesTable,array('marketplace_id = ?'=>$this->getId()));
-
-        $this->delete();
-        return true;
+        return $this->getRelatedSimpleItems('Ebay_Item','marketplace_id',$asObjects,$filters);
     }
 
     // ########################################
@@ -385,13 +363,13 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
         return parent::delete();
     }
 

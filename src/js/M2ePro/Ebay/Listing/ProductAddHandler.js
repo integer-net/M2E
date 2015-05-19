@@ -10,18 +10,21 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
         get_selected_products: function(callback) {}
     },
 
-    initialize: function(options) {
+    //----------------------------------
+
+    initialize: function(options)
+    {
         this.options = Object.extend(this.options,options);
     },
 
     //----------------------------------
 
-    continue: function() {
-
+    continue: function()
+    {
         this.options.get_selected_products((function(selectedProducts) {
 
             if (!selectedProducts) {
-                return alert(M2ePro.translator.translate('Please select the products you want to perform the action on.'));
+                return alert(M2ePro.translator.translate('Please select the Products you want to perform the Action on.'));
             }
 
             if (this.options.show_autoaction_popup) {
@@ -48,7 +51,7 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
         var parts = self.makeProductsParts();
 
         ProgressBarObj.reset();
-        ProgressBarObj.setTitle('Adding products to listing');
+        ProgressBarObj.setTitle('Adding Products to Listing');
         ProgressBarObj.setStatus('Adding in process. Please wait...');
         ProgressBarObj.show();
         self.scroll_page_to_top();
@@ -106,6 +109,7 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
                 products: partString
             },
             onSuccess: function(transport) {
+
                 var percents = (100/partsCount)*(partsCount-parts.length);
 
                 if (percents <= 0) {
@@ -116,9 +120,9 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
 
                     var url;
                     if (self.options.show_settings_step) {
-                        url = M2ePro.url.get('adminhtml_ebay_listing_productAdd',{step: 2});
+                        url = M2ePro.url.get('adminhtml_ebay_listing_productAdd', {step: 2});
                     } else {
-                        url = M2ePro.url.get('adminhtml_ebay_listing_categorySettings',{step: 1});
+                        url = M2ePro.url.get('adminhtml_ebay_listing_categorySettings', {step: 1});
                     }
 
                     setLocation(url);
@@ -140,7 +144,7 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
         var url = M2ePro.url.get('adminhtml_ebay_listing_productAdd/setAutoActionPopupShown');
         new Ajax.Request(url, {
             method:'get',
-            onSuccess: function () {
+            onSuccess: function() {
                 this.options.show_autoaction_popup = false;
                 this.autoactionPopup = Dialog.info(null, {
                     draggable: true,
@@ -148,11 +152,10 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
                     closable: true,
                     className: "magento",
                     windowClassName: "popup-window",
-                    title: M2ePro.translator.translate('Automatic Actions'),
+                    title: M2ePro.translator.translate('Auto Add/Remove Rules'),
                     width: 430,
                     height: 200,
                     zIndex: 100,
-                    recenterAuto: false,
                     hideEffect: Element.hide,
                     showEffect: Element.show
                 });
@@ -185,7 +188,6 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
             width: 430,
             height: 200,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -221,15 +223,14 @@ EbayListingProductAddHandler = Class.create(CommonHandler, {
         this.settingsPopup.hide();
         this.options.show_settings_step = showSettingsStep;
 
-        var url = M2ePro.url.get('adminhtml_ebay_listing_productAdd/setShowSettingsStep',{});
+        var url = M2ePro.url.get('adminhtml_ebay_listing_productAdd/setShowSettingsStep', {});
         new Ajax.Request(url, {
             method: 'post',
             parameters: {
                 show_settings_step: +showSettingsStep,
                 remember: +$('remember_checkbox').checked
             },
-            onSuccess: function()
-            {
+            onSuccess: function() {
                 callback && callback()
             }
         });

@@ -14,9 +14,7 @@ EbayListingCategoryCategoryGridHandler = Class.create(EbayListingCategoryGridHan
                 ids: this.getSelectedProductsString()
             },
             onSuccess: function(transport) {
-
                 this.openPopUp(M2ePro.translator.translate('Set eBay Categories'), transport.responseText);
-
             }.bind(this)
         });
     },
@@ -65,6 +63,7 @@ EbayListingCategoryCategoryGridHandler = Class.create(EbayListingCategoryGridHan
         $('modal_dialog_message').innerHTML.evalScripts();
 
         $('done_button').observe('click', function() {
+
             if (!EbayListingCategoryChooserHandlerObj.validate()) {
                 return;
             }
@@ -88,6 +87,7 @@ EbayListingCategoryCategoryGridHandler = Class.create(EbayListingCategoryGridHan
         new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_categorySettings/stepTwoModeCategoryValidate'), {
             method: 'post',
             onSuccess: function(transport) {
+
                 var response = transport.responseText.evalJSON();
 
                 if (response.validation == true) {

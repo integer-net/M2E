@@ -43,21 +43,30 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
 
     private function immediatelyChangedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was changed');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was changed');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            $runnerData = $this->getRunnerData($listingProduct);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                $runnerData['action'],
+                $runnerData['params']
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
 
             if (!$this->getInspector()->isMeetRelistRequirements($listingProduct)) {
                 continue;
             }
-
-            $runnerData = $this->getInspector()->getRunnerRelistDataByListingProduct($listingProduct);
 
             $this->getRunner()->addProduct(
                 $listingProduct,
@@ -75,11 +84,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
     {
         $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute scheduled');
 
-        $synchTemplates = Mage::helper('M2ePro/Component_Ebay')
-                                        ->getCollection('Template_Synchronization')
-                                        ->getItems();
+        /** @var Ess_M2ePro_Model_Template_Synchronization $synchTemplateCollection */
+        $synchTemplateCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Template_Synchronization');;
 
-        foreach ($synchTemplates as $synchTemplate) {
+        foreach ($synchTemplateCollection as $synchTemplate) {
 
             /* @var $ebaySynchTemplate Ess_M2ePro_Model_Ebay_Template_Synchronization */
             $ebaySynchTemplate = $synchTemplate->getChildObject();
@@ -134,13 +142,23 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
             foreach ($listingsProducts as $listingProduct) {
 
                 /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-                $listingProduct->enableCache();
+                $listingProduct->getMagentoProduct()->enableCache();
+
+                $runnerData = $this->getRunnerData($listingProduct);
+
+                $isExistInRunner = $this->getRunner()->isExistProduct(
+                    $listingProduct,
+                    $runnerData['action'],
+                    $runnerData['params']
+                );
+
+                if ($isExistInRunner) {
+                    continue;
+                }
 
                 if (!$this->getInspector()->isMeetRelistRequirements($listingProduct)) {
                     continue;
                 }
-
-                $runnerData = $this->getInspector()->getRunnerRelistDataByListingProduct($listingProduct);
 
                 $this->getRunner()->addProduct(
                     $listingProduct,
@@ -191,6 +209,41 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
         $cacheConfig->setGroupValue($cacheConfigGroup,'last_listing_product_id',json_encode($configData));
 
         return $collection->getItems();
+    }
+
+    //####################################
+
+    public function getRunnerData(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $data = array();
+
+        /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+        $ebayListingProduct = $listingProduct->getChildObject();
+
+        if ($listingProduct->isHidden()) {
+
+            $data['action'] = Ess_M2ePro_Model_Listing_Product::ACTION_REVISE;
+
+            if ($ebayListingProduct->getEbaySynchronizationTemplate()->isRelistSendData()) {
+                $data['params'] = array('all_data'=>true);
+            } else {
+                $data['params'] = array('only_data'=>array('qty'=>true,'variations'=>true));
+            }
+
+            $data['params']['replaced_action'] = Ess_M2ePro_Model_Listing_Product::ACTION_RELIST;
+
+        } else {
+
+            $data['action'] = Ess_M2ePro_Model_Listing_Product::ACTION_RELIST;
+
+            if ($ebayListingProduct->getEbaySynchronizationTemplate()->isRelistSendData()) {
+                $data['params'] = array('all_data'=>true);
+            } else {
+                $data['params'] = array('only_data'=>array('base'=>true));
+            }
+        }
+
+        return $data;
     }
 
     //####################################

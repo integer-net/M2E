@@ -5,13 +5,16 @@
  */
 
 class Ess_M2ePro_Model_Mysql4_Ebay_Template_Description
-    extends Ess_M2ePro_Model_Mysql4_Abstract
+    extends Ess_M2ePro_Model_Mysql4_Component_Child_Abstract
 {
+    protected $_isPkAutoIncrement = false;
+
     // ########################################
 
     public function _construct()
     {
-        $this->_init('M2ePro/Ebay_Template_Description', 'id');
+        $this->_init('M2ePro/Ebay_Template_Description', 'template_description_id');
+        $this->_isPkAutoIncrement = false;
     }
 
     // ########################################
@@ -54,8 +57,8 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Template_Description
     {
         $ignoreFields = array(
             $this->getIdFieldName(),
-            'title', 'is_custom_template',
-            'create_date', 'update_date',
+            'id', 'title', 'component_mode',
+            'is_custom_template', 'create_date', 'update_date',
             'watermark_position', 'watermark_scale', 'watermark_transparent'
         );
 

@@ -4,6 +4,9 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * @method Ess_M2ePro_Model_Ebay_Listing_Product_Action_Configurator getConfigurator()
+ */
 class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
     extends Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Abstract
 {
@@ -57,8 +60,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
                 'specifics' => array()
             );
 
-            if (($qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
-                $qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) && !$item['delete']) {
+            if (($qtyMode == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+                $qtyMode == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT) && !$item['delete']) {
 
                 $options = $variation->getOptions();
                 foreach ($options as $option) {
@@ -132,7 +135,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         }
 
         if ($this->getMagentoProduct()->isGroupedType()) {
-            $attributeLabels = array(Ess_M2ePro_Model_Magento_Product::GROUPED_PRODUCT_ATTRIBUTE_LABEL);
+            $attributeLabels = array(Ess_M2ePro_Model_Magento_Product_Variation::GROUPED_PRODUCT_ATTRIBUTE_LABEL);
         }
 
         if (count($attributeLabels) <= 0) {
@@ -153,8 +156,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         if (!$this->getEbayMarketplace()->isMultivariationEnabled()) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                    'Reason: eBay site allows to list only simple items.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: eBay Site allows to list only Simple Items.'
                 )
             );
             return;
@@ -162,15 +165,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
         $tempResult = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
                                     ->isVariationEnabled(
-                                        (int)$this->getEbayListingProduct()->getCategoryTemplate()->getMainCategory(),
+                                        (int)$this->getCategorySource()->getMainCategory(),
                                         $this->getMarketplace()->getId()
                                     );
 
         if (!$tempResult) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                    'Reason: eBay primary category allows to list only simple items.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: eBay Primary Category allows to list only Simple Items.'
                 )
             );
             return;
@@ -179,8 +182,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         if ($this->getEbayListingProduct()->getEbaySellingFormatTemplate()->isIgnoreVariationsEnabled()) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                    'Reason: ignore variation option is enabled in selling format policy.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: ignore Variation Option is enabled in Price, Quantity and Format Policy.'
                 )
             );
             return;
@@ -189,8 +192,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         if (!$this->getEbayListingProduct()->isListingTypeFixed()) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                    'Reason: listing type "auction" does not support multi-variations.'
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: Listing type "Auction" does not support Multi-Variations.'
                 )
             );
             return;
@@ -201,7 +204,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
     private function getConfigurableImagesAttributeLabels()
     {
-        $descriptionTemplate = $this->getEbayListingProduct()->getDescriptionTemplate();
+        $descriptionTemplate = $this->getEbayListingProduct()->getEbayDescriptionTemplate();
 
         if (!$descriptionTemplate->isVariationConfigurableImages()) {
             return array();
@@ -312,11 +315,21 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
     // ########################################
 
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Category_Source
+     */
+    private function getCategorySource()
+    {
+        return $this->getEbayListingProduct()->getCategoryTemplateSource();
+    }
+
+    // ########################################
+
     public function checkQtyWarnings($productsIds)
     {
         $qtyMode = $this->getEbayListingProduct()->getEbaySellingFormatTemplate()->getQtyMode();
-        if ($qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
-            $qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) {
+        if ($qtyMode == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+            $qtyMode == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT) {
 
             $productsIds = array_unique($productsIds);
             $qtyWarnings = array();
@@ -348,15 +361,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
     {
         if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_MANAGE_STOCK_NO) {
         // M2ePro_TRANSLATIONS
-        // During the quantity calculation the settings in the "Manage Stock No" field were taken into consideration.
-            $this->addWarningMessage('During the quantity calculation the settings in the "Manage Stock No" '.
+        // During the Quantity Calculation the Settings in the "Manage Stock No" field were taken into consideration.
+            $this->addWarningMessage('During the Quantity Calculation the Settings in the "Manage Stock No" '.
                                      'field were taken into consideration.');
         }
 
         if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_BACKORDERS) {
             // M2ePro_TRANSLATIONS
-            // During the quantity calculation the settings in the "Backorders" field were taken into consideration.
-            $this->addWarningMessage('During the quantity calculation the settings in the "Backorders" '.
+            // During the Quantity Calculation the Settings in the "Backorders" field were taken into consideration.
+            $this->addWarningMessage('During the Quantity Calculation the Settings in the "Backorders" '.
                                      'field were taken into consideration.');
         }
     }

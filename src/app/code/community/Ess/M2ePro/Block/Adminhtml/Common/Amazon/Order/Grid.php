@@ -321,9 +321,9 @@ HTML;
         // --------------------------------
 
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last order action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last order action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last order action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last Order Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last Order Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last Order Action was completed with warning(s).'
         );
 
         $icons = array(
@@ -375,7 +375,7 @@ HTML;
 
         foreach ($items as $item) {
             if ($html != '') {
-                $html .= '<br />';
+                $html .= '<br/>';
             }
 
             $isShowEditLink = false;
@@ -415,7 +415,7 @@ HTML;
                 $sku = Mage::helper('M2ePro')->escapeHtml($item->getSku());
 
                 $skuHtml = <<<STRING
-<span style="padding-left: 10px;"><b>{$skuLabel}:</b>&nbsp;{$sku}</span><br />
+<span style="padding-left: 10px;"><b>{$skuLabel}:</b>&nbsp;{$sku}</span><br/>
 STRING;
             }
 
@@ -428,7 +428,7 @@ STRING;
             $itemLink = '<a href="'.$itemUrl.'" target="_blank">'.$generalId.'</a>';
 
             $generalIdHtml = <<<STRING
-<span style="padding-left: 10px;"><b>{$generalIdLabel}:</b>&nbsp;{$itemLink}</span><br />
+<span style="padding-left: 10px;"><b>{$generalIdLabel}:</b>&nbsp;{$itemLink}</span><br/>
 STRING;
 
             $itemTitle = Mage::helper('M2ePro')->escapeHtml($item->getTitle());
@@ -438,7 +438,7 @@ STRING;
 HTML;
 
             $html .= <<<HTML
-{$itemTitle}&nbsp;{$editItemHtml}<br />
+{$itemTitle}&nbsp;{$editItemHtml}<br/>
 <small>{$generalIdHtml}{$skuHtml}{$qtyHtml}</small>
 HTML;
         }
@@ -455,7 +455,7 @@ HTML;
         $html = Mage::helper('M2ePro')->escapeHtml($row->getData('buyer_name'));
 
         if ($row->getData('buyer_email') != '') {
-            $html .= '<br />';
+            $html .= '<br/>';
             $html .= '&lt;' . Mage::helper('M2ePro')->escapeHtml($row->getData('buyer_email')) . '&gt;';
         }
 
@@ -497,7 +497,7 @@ HTML;
         $value = '<span style="color: '.$color.';">'.$value.'</span>';
 
         if ($row->isLockedObject('update_order_status')) {
-            $value .= '<br />';
+            $value .= '<br/>';
             $value .= '<span style="color: gray;">['
                       .Mage::helper('M2ePro')->__('Status Update in Progress...').']</span>';
         }

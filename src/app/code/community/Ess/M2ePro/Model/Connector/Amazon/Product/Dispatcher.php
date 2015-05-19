@@ -23,46 +23,60 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
             'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN
         ), $params);
 
-        $this->logsActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
-        $params['logs_action_id'] = $this->logsActionId;
+        if (empty($params['logs_action_id'])) {
+            $this->logsActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
+            $params['logs_action_id'] = $this->logsActionId;
+        } else {
+            $this->logsActionId = $params['logs_action_id'];
+        }
 
         $products = $this->prepareProducts($products);
-        $sortedProductsData = $this->sortProductsByAccount($products);
+        $sortedProducts = $this->sortProductsByAccount($products);
 
         switch ($action) {
             case Ess_M2ePro_Model_Listing_Product::ACTION_LIST:
-                $result = $this->processGroupedProducts($sortedProductsData,
-                                                        1000,
-                                                        'Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple',
-                                                        $params);
+                $result = $this->processGroupedProducts(
+                    $sortedProducts,
+                    100,
+                    'Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester',
+                    $params
+                );
                 break;
 
             case Ess_M2ePro_Model_Listing_Product::ACTION_RELIST:
-                $result = $this->processGroupedProducts($sortedProductsData,
-                                                        1000,
-                                                        'Ess_M2ePro_Model_Connector_Amazon_Product_Relist_Multiple',
-                                                        $params);
+                $result = $this->processGroupedProducts(
+                    $sortedProducts,
+                    100,
+                    'Ess_M2ePro_Model_Connector_Amazon_Product_Relist_MultipleRequester',
+                    $params
+                );
                 break;
 
             case Ess_M2ePro_Model_Listing_Product::ACTION_REVISE:
-                $result = $this->processGroupedProducts($sortedProductsData,
-                                                        1000,
-                                                        'Ess_M2ePro_Model_Connector_Amazon_Product_Revise_Multiple',
-                                                        $params);
+                $result = $this->processGroupedProducts(
+                    $sortedProducts,
+                    100,
+                    'Ess_M2ePro_Model_Connector_Amazon_Product_Revise_MultipleRequester',
+                    $params
+                );
                 break;
 
             case Ess_M2ePro_Model_Listing_Product::ACTION_STOP:
-                $result = $this->processGroupedProducts($sortedProductsData,
-                                                        1000,
-                                                        'Ess_M2ePro_Model_Connector_Amazon_Product_Stop_Multiple',
-                                                        $params);
+                $result = $this->processGroupedProducts(
+                    $sortedProducts,
+                    100,
+                    'Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleRequester',
+                    $params
+                );
                 break;
 
             case Ess_M2ePro_Model_Listing_Product::ACTION_DELETE:
-                $result = $this->processGroupedProducts($sortedProductsData,
-                                                        1000,
-                                                        'Ess_M2ePro_Model_Connector_Amazon_Product_Delete_Multiple',
-                                                        $params);
+                $result = $this->processGroupedProducts(
+                    $sortedProducts,
+                    100,
+                    'Ess_M2ePro_Model_Connector_Amazon_Product_Delete_MultipleRequester',
+                    $params
+                );
                 break;
 
             default;
@@ -142,8 +156,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
 
-            $logModel = Mage::getModel('M2ePro/Listing_Log');
-            $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Amazon::NICK);
+            $logModel = Mage::getModel('M2ePro/Amazon_Listing_Log');
 
             $action = $this->recognizeActionForLogging($connectorName,$params);
             $initiator = $this->recognizeInitiatorForLogging($params);
@@ -173,31 +186,73 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
 
     protected function prepareProducts($products)
     {
-        $productsTemp = array();
-
         if (!is_array($products)) {
             $products = array($products);
         }
 
-        $productsIdsTemp = array();
-        foreach ($products as $product) {
+        $preparedProducts     = array();
+        $parentsForProcessing = array();
 
-            $tempProduct = NULL;
-            if ($product instanceof Ess_M2ePro_Model_Listing_Product) {
-                $tempProduct = $product;
-            } else {
-                $tempProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',(int)$product);
+        foreach ($products as $listingProduct) {
+
+            if (is_numeric($listingProduct)) {
+                if (isset($preparedProducts[(int)$listingProduct])) {
+                    continue;
+                }
+
+                $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject(
+                    'Listing_Product', (int)$listingProduct
+                );
             }
 
-            if (in_array((int)$tempProduct->getId(),$productsIdsTemp)) {
+            /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+
+            if (isset($preparedProducts[(int)$listingProduct->getId()])) {
                 continue;
             }
 
-            $productsIdsTemp[] = (int)$tempProduct->getId();
-            $productsTemp[] = $tempProduct;
+            $preparedProducts[(int)$listingProduct->getId()] = $listingProduct;
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
+            $variationManager = $amazonListingProduct->getVariationManager();
+
+            if (!$variationManager->isRelationMode()) {
+                continue;
+            }
+
+            if ($variationManager->isRelationParentType()) {
+                $parentListingProduct = $listingProduct;
+            } else {
+                $parentListingProduct = $variationManager->getTypeModel()->getParentListingProduct();
+            }
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $parentAmazonListingProduct */
+            $parentAmazonListingProduct = $parentListingProduct->getChildObject();
+
+            if (!$parentAmazonListingProduct->getVariationManager()->getTypeModel()->isNeedProcessor()) {
+                continue;
+            }
+
+            $parentsForProcessing[$parentListingProduct->getId()] = $parentListingProduct;
         }
 
-        return $productsTemp;
+        if (empty($parentsForProcessing)) {
+            return $preparedProducts;
+        }
+
+        $massProcessor = Mage::getModel(
+            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Mass'
+        );
+        $massProcessor->setListingsProducts($parentsForProcessing);
+
+        $massProcessor->execute();
+
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
+        $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('id', array('in' => array_keys($preparedProducts)));
+
+        return $listingProductCollection->getItems();
     }
 
     protected function sortProductsByAccount($products)
@@ -239,23 +294,23 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Dispatcher
 
         switch ($connectorName)
         {
-            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Delete_Multiple':
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Delete_MultipleRequester':
                 if (isset($params['remove']) && (bool)$params['remove']) {
                     $action = Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_AND_REMOVE_PRODUCT;
                 } else {
                     $action = Ess_M2ePro_Model_Listing_Log::_ACTION_DELETE_PRODUCT_FROM_COMPONENT;
                 }
                 break;
-            case 'Ess_M2ePro_Model_Connector_Amazon_Product_List_Multiple':
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester':
                 $action = Ess_M2ePro_Model_Listing_Log::ACTION_LIST_PRODUCT_ON_COMPONENT;
                 break;
-            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Relist_Multiple':
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Relist_MultipleRequester':
                 $action = Ess_M2ePro_Model_Listing_Log::ACTION_RELIST_PRODUCT_ON_COMPONENT;
                 break;
-            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Revise_Multiple':
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Revise_MultipleRequester':
                 $action = Ess_M2ePro_Model_Listing_Log::ACTION_REVISE_PRODUCT_ON_COMPONENT;
                 break;
-            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Stop_Multiple':
+            case 'Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleRequester':
                 if (isset($params['remove']) && (bool)$params['remove']) {
                     $action = Ess_M2ePro_Model_Listing_Log::ACTION_STOP_AND_REMOVE_PRODUCT;
                 } else {

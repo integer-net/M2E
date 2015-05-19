@@ -47,8 +47,6 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Components_Form extends Ess_M2ePr
     {
         // Set data for form
         //----------------------------
-        $this->isWizard = (bool)$this->getRequest()->getParam('wizard',false);
-
         $this->component_ebay_mode = Mage::helper('M2ePro/Component_Ebay')->isActive();
         $this->component_amazon_mode = Mage::helper('M2ePro/Component_Amazon')->isActive();
         $this->component_buy_mode = Mage::helper('M2ePro/Component_Buy')->isActive();

@@ -29,7 +29,6 @@ ListingOtherMappingHandler.prototype = Object.extend(new CommonHandler(), {
             width: 750,
             height: 500,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -46,7 +45,7 @@ ListingOtherMappingHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = this;
 
-        $('mapping_submit_button').stopObserving('click').observe('click',function(event){
+        $('mapping_submit_button').stopObserving('click').observe('click',function(event) {
             self.map();
         });
         $('product_id').stopObserving('keypress').observe('keypress',function(event) {
@@ -68,17 +67,17 @@ ListingOtherMappingHandler.prototype = Object.extend(new CommonHandler(), {
 
         MagentoMessageObj.clearAll();
 
-        if (otherProductId == '' || (/^\s*(\d)*\s*$/i).test(otherProductId) == false){
+        if (otherProductId == '' || (/^\s*(\d)*\s*$/i).test(otherProductId) == false) {
             return;
         }
 
         if ((sku == '' && productId == '')) {
             $('product_id').focus();
-            alert(M2ePro.translator.translate('Please enter correct product ID or SKU'));
+            alert(M2ePro.translator.translate('Please enter correct Product ID or SKU'));
             return;
         }
         if (((/^\s*(\d)*\s*$/i).test(productId) == false)) {
-            alert(M2ePro.translator.translate('Please enter correct product ID.'));
+            alert(M2ePro.translator.translate('Please enter correct Product ID.'));
             $('product_id').focus();
             $('product_id').value = '';
             $('sku').value = '';
@@ -89,30 +88,29 @@ ListingOtherMappingHandler.prototype = Object.extend(new CommonHandler(), {
             return;
         }
 
-        $('help_grid').hide();
-
-        new Ajax.Request(M2ePro.url.get('adminhtml_listing_other_mapping/map',{}), {
+        new Ajax.Request(M2ePro.url.get('adminhtml_listing_other_mapping/map', {}), {
             method: 'post',
             parameters: {
-                componentMode : self.component,
-                productId : productId,
-                sku : sku,
-                otherProductId : otherProductId
+                componentMode: self.component,
+                productId: productId,
+                sku: sku,
+                otherProductId: otherProductId
             },
-            onSuccess: function (transport) {
+            onSuccess: function(transport) {
+
                 if (transport.responseText == 0) {
                     self.gridHandler.unselectAllAndReload();
                     self.popUp.close();
                     self.scroll_page_to_top();
-                    MagentoMessageObj.addSuccess(M2ePro.translator.translate('Product(s) was successfully mapped.'));
+                    MagentoMessageObj.addSuccess(M2ePro.translator.translate('Product(s) was successfully Mapped.'));
                 } else if (transport.responseText == 1) {
                     alert(M2ePro.translator.translate('Product does not exist.'));
                 } else if (transport.responseText == 2) {
-                    alert(M2ePro.translator.translate('Current version only supports simple products. Please, choose simple product.'));
+                    alert(M2ePro.translator.translate('Current version only supports Simple Products. Please, choose Simple Product.'));
                 } else if (transport.responseText == 3) {
                     self.popUp.close();
                     self.scroll_page_to_top();
-                    MagentoMessageObj.addError( M2ePro.translator.translate('Item was not mapped as the chosen %product_id% Simple Product has Custom Options.', productId));
+                    MagentoMessageObj.addError(M2ePro.translator.translate('Item was not Mapped as the chosen %product_id% Simple Product has Custom Options.', productId));
                 }
             }
         });

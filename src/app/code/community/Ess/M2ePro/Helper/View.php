@@ -9,6 +9,9 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
     const LAYOUT_NICK = 'm2epro';
     const GENERAL_BLOCK_PATH = 'M2ePro/adminhtml_general';
 
+    const LISTING_CREATION_MODE_FULL = 0;
+    const LISTING_CREATION_MODE_LISTING_ONLY = 1;
+
     // ########################################
 
     public function isBaseControllerLoaded()
@@ -179,6 +182,63 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
         }
 
         return $logMessage;
+    }
+
+    // ########################################
+
+    public function getMenuPath(SimpleXMLElement $parentNode, $pathNick, $rootMenuLabel = '')
+    {
+        $paths = $this->getMenuPaths($parentNode, $rootMenuLabel);
+
+        $preparedPath = preg_quote(trim($pathNick, '/'), '/');
+
+        $resultLabels = array();
+        foreach ($paths as $pathNick => $label) {
+            if (preg_match('/'.$preparedPath.'\/?$/', $pathNick)) {
+                $resultLabels[] = $label;
+            }
+        }
+
+        if (empty($resultLabels)) {
+            return '';
+        }
+
+        if (count($resultLabels) > 1) {
+            throw new Exception('More than one menu path found');
+        }
+
+        return array_shift($resultLabels);
+    }
+
+    public function getMenuPaths(SimpleXMLElement $parentNode, $parentLabel = '', $parentPath = '')
+    {
+        if (empty($parentNode->children)) {
+            return '';
+        }
+
+        $paths = array();
+
+        foreach ($parentNode->children->children() as $key => $child) {
+            $path  = '/'.$key.'/';
+            if (!empty($parentPath)) {
+                $path = '/'.trim($parentPath, '/').$path;
+            }
+
+            $label = Mage::helper('M2ePro')->__((string)$child->title);
+            if (!empty($parentLabel)) {
+                $label = $parentLabel.' > '.$label;
+            }
+
+            $paths[$path] = $label;
+
+            if (empty($child->children)) {
+                continue;
+            }
+
+            $paths = array_merge($paths, $this->getMenuPaths($child, $label, $path));
+        }
+
+        return $paths;
     }
 
     // ########################################

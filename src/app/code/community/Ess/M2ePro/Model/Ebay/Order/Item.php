@@ -20,9 +20,9 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
     // ##########################################################
 
     // M2ePro_TRANSLATIONS
-    // Product import is disabled in eBay Account settings.
+    // Product Import is disabled in eBay Account Settings.
     // Data obtaining for eBay Item failed. Please try again later.
-    // Product for eBay Item #%id% was created in Magento catalog.
+    // Product for eBay Item #%id% was created in Magento Catalog.
 
     // ########################################
 
@@ -246,7 +246,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
             $sku = $this->getVariationSku();
         }
 
-        if ($sku != '' && strlen($sku) <= 64) {
+        if ($sku != '' && strlen($sku) <= Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH) {
             $product = Mage::getModel('catalog/product')
                 ->setStoreId($this->getEbayOrder()->getAssociatedStoreId())
                 ->getCollection()
@@ -278,13 +278,13 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
 
         if (!is_null($ebayItem) && !$this->getEbayAccount()->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by M2E Pro is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($ebayItem) && !$this->getEbayAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by 3rd party software is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by 3rd party Software is disabled in Account Settings.'
             );
         }
     }
@@ -292,7 +292,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
     private function createProduct()
     {
         if (!$this->getEbayAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product import is disabled in Account settings.');
+            throw new Exception('Product Import is disabled in Account Settings.');
         }
 
         $order = $this->getParentObject()->getOrder();
@@ -338,7 +338,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
         // ----------------
 
         $order->addSuccessLog(
-            'Product for eBay Item #%id% was created in Magento catalog.', array('!id' => $this->getItemId())
+            'Product for eBay Item #%id% was created in Magento Catalog.', array('!id' => $this->getItemId())
         );
 
         return $productBuilder->getProduct();

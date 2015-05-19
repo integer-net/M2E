@@ -25,8 +25,8 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
     const OTHER_LISTINGS_MAPPING_TITLE_MODE_CUSTOM_ATTRIBUTE = 2;
 
     const OTHER_LISTINGS_MAPPING_SKU_DEFAULT_PRIORITY        = 1;
-    const OTHER_LISTINGS_MAPPING_TITLE_DEFAULT_PRIORITY      = 2;
-    const OTHER_LISTINGS_MAPPING_GENERAL_ID_DEFAULT_PRIORITY = 3;
+    const OTHER_LISTINGS_MAPPING_GENERAL_ID_DEFAULT_PRIORITY = 2;
+    const OTHER_LISTINGS_MAPPING_TITLE_DEFAULT_PRIORITY      = 3;
 
     const OTHER_LISTINGS_MOVE_TO_LISTINGS_DISABLED = 0;
     const OTHER_LISTINGS_MOVE_TO_LISTINGS_ENABLED  = 1;
@@ -114,7 +114,7 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
             return false;
         }
 
-        $items = $this->getRelatedSimpleItems('Amazon_Item','account_id',true);
+        $items = $this->getAmazonItems(true);
         foreach ($items as $item) {
             $item->deleteInstance();
         }
@@ -124,6 +124,13 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
         $this->delete();
 
         return true;
+    }
+
+    // ########################################
+
+    public function getAmazonItems($asObjects = false, array $filters = array())
+    {
+        return $this->getRelatedSimpleItems('Amazon_Item','account_id',$asObjects,$filters);
     }
 
     // ########################################
@@ -504,6 +511,15 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
 
     //-----------------------------------------
 
+    public function isRefundEnabled()
+    {
+        $setting = $this->getSetting('magento_orders_settings', array('refund_and_cancellation', 'refund_mode'));
+
+        return (bool)$setting;
+    }
+
+    //-----------------------------------------
+
     public function isMagentoOrdersTaxModeNone()
     {
         $setting = $this->getSetting('magento_orders_settings', array('tax', 'mode'));
@@ -686,13 +702,13 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('account');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('account');
         return parent::delete();
     }
 

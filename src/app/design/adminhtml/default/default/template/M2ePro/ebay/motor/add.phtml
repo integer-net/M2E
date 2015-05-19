@@ -6,18 +6,18 @@
 
     $translations = array();
     // M2ePro_TRANSLATIONS
-    // Please specify eBay motors compatibility attribute in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>
-    $text = 'Please specify eBay motors compatibility attribute in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>';
+    // Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>
+    $text = 'Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>';
     $translations[$text] = Mage::helper('M2ePro')->__(
         $text,
-        Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+        Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
         $this->getUrl('*/adminhtml_ebay_configuration')
     );
 
     $translations['Set Note'] = Mage::helper('M2ePro')->__('Set Note');
 
-    // ->__('Please edit categories settings for selected products and select the compatibility attribute.')
-    $text = 'Please edit categories settings for selected products and select the compatibility attribute.';
+    // ->__('Please edit Categories Settings for selected Products and select the compatibility attribute.')
+    $text = 'Please edit Categories Settings for selected Products and select the compatibility Attribute.';
     $translations[$text] = Mage::helper('M2ePro')->__($text);
 
     $translations = json_encode($translations);
@@ -110,12 +110,12 @@
         ?>
 
         <?php echo Mage::helper('M2ePro')->__(
-'Select the items, compatible with your part and choose one of three actions in the Actions dropdown:
+'Select the Items, compatible with your part and choose one of three Actions in the Actions Dropdown:
 <ul class=list>
-    <li><b>Overwrite %identifier_title% in Compatibility Attribute</b> - replaces items %identifier_title% in the Compatibility Attribute chosen in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a> with selected ones.</li>
-    <li><b>Add %identifier_title% to Compatibility Attribute</b> - adds selected items %identifier_title% to existing ones in Compatibility Attribute chosen in the General settings.</li>
+    <li><b>Overwrite %identifier_title% in Compatibility Attribute</b> - replaces Items %identifier_title% in the Compatibility Attribute chosen in %menu_label% > Configuration > <a target="_blank" href="%url%">General</a> with selected ones.</li>
+    <li><b>Add %identifier_title% to Compatibility Attribute</b> - adds selected Items %identifier_title% to existing ones in Compatibility Attribute chosen in the General Settings.</li>
 </ul>
-<b>Note:</b> Compatibility items can not be replaced or removed from eBay.',
+<b>Note:</b> Compatibility Items can not be replaced or removed from eBay.',
             array(
                 'menu_label' => Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
                 'url' => $this->getUrl('*/adminhtml_ebay_configuration'),

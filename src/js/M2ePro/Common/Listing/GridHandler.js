@@ -4,18 +4,8 @@ CommonListingGridHandler = Class.create(ListingGridHandler, {
 
     getLogViewUrl: function(rowId)
     {
-        var temp = this.getProductIdByRowId(rowId);
-
-        var regExpImg= new RegExp('<img[^><]*>','gi');
-        var regExpHr= new RegExp('<hr>','gi');
-
-        temp = temp.replace(regExpImg,'');
-        temp = temp.replace(regExpHr,'');
-
-        var productId = strip_tags(temp);
-
-        return M2ePro.url.get('adminhtml_common_log/listing',{
-            filter: base64_encode('product_id[from]='+productId+'&product_id[to]='+productId)
+        return M2ePro.url.get('adminhtml_common_log/listingProduct', {
+            listing_product_id: rowId
         });
     },
 
@@ -25,10 +15,9 @@ CommonListingGridHandler = Class.create(ListingGridHandler, {
     {
         $super();
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
             duplicateAction: this.duplicateProducts.bind(this)
         });
-
     },
 
     //----------------------------------
@@ -45,6 +34,7 @@ CommonListingGridHandler = Class.create(ListingGridHandler, {
                 ids: this.getSelectedProductsString()
             },
             onSuccess: (function(transport) {
+
                 try {
                     var response = transport.responseText.evalJSON();
 
@@ -62,5 +52,4 @@ CommonListingGridHandler = Class.create(ListingGridHandler, {
     }
 
     //----------------------------------
-
 });

@@ -20,16 +20,14 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Search_ByAsin_ItemsResponser
 
     // ########################################
 
-    protected function processResponseData($response)
+    protected function prepareResponseData($response)
     {
         if (!empty($response['unavailable'])) {
-            $this->processParsedResult(false);
-            return;
+            return false;
         }
 
         if (empty($response['item'])) {
-            $this->processParsedResult(NULL);
-            return;
+            return null;
         }
 
         $responseItem = $response['item'];
@@ -43,10 +41,15 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Search_ByAsin_ItemsResponser
         );
 
         if ($product['is_variation_product']) {
-            $product += array(
-                'parentage' => $responseItem['parentage'],
-                'variations' => $responseItem['variations']
-            );
+            if(empty($responseItem['bad_parent'])) {
+                $product += array(
+                    'parentage' => $responseItem['parentage'],
+                    'variations' => $responseItem['variations'],
+                    'bad_parent' => false
+                );
+            } else {
+                $product['bad_parent'] = (bool)$responseItem['bad_parent'];
+            }
         }
 
         if (!empty($responseItem['list_price'])) {
@@ -60,12 +63,8 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Search_ByAsin_ItemsResponser
             $product['requested_child_id'] = $responseItem['requested_child_id'];
         }
 
-        $this->processParsedResult($product);
+        return $product;
     }
-
-    // ########################################
-
-    abstract protected function processParsedResult($result);
 
     // ########################################
 }

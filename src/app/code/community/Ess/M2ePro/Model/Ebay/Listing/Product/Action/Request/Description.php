@@ -8,7 +8,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     extends Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Abstract
 {
     /**
-     * @var Ess_M2ePro_Model_Ebay_Template_Description
+     * @var Ess_M2ePro_Model_Template_Description
      */
     private $descriptionTemplate = NULL;
 
@@ -22,10 +22,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
 
             $data = array_merge(
                 array(
-                    'hit_counter' => $this->getDescriptionTemplate()->getHitCounterType(),
-                    'listing_enhancements' => $this->getDescriptionTemplate()->getEnhancements(),
-                    'item_condition_note' => $this->getConditionNoteData(),
-                    'product_details' => $this->getProductDetailsData()
+                    'hit_counter'          => $this->getEbayDescriptionTemplate()->getHitCounterType(),
+                    'listing_enhancements' => $this->getEbayDescriptionTemplate()->getEnhancements(),
+                    'item_condition_note'  => $this->getConditionNoteData(),
+                    'product_details'      => $this->getProductDetailsData()
                 ),
                 $this->getConditionData()
             );
@@ -49,7 +49,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
         }
 
         $this->searchNotFoundAttributes();
-        $data = $this->getDescriptionTemplate()->getTitleResultValue();
+        $data = $this->getDescriptionSource()->getTitle();
         $this->processNotFoundAttributes('Title');
 
         return array(
@@ -64,7 +64,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
         }
 
         $this->searchNotFoundAttributes();
-        $data = $this->getDescriptionTemplate()->getSubTitleResultValue();
+        $data = $this->getDescriptionSource()->getSubTitle();
         $this->processNotFoundAttributes('Subtitle');
 
         return array(
@@ -79,7 +79,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
         }
 
         $this->searchNotFoundAttributes();
-        $data = $this->getEbayListingProduct()->getDescription();
+
+        $data = $this->getDescriptionSource()->getDescription();
+        $data = $this->getEbayListingProduct()->getDescriptionRenderer()->parseTemplate($data);
+
         $this->processNotFoundAttributes('Description');
 
         return array(
@@ -98,9 +101,9 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
         $this->searchNotFoundAttributes();
 
         $data = array(
-            'gallery_type' => $this->getDescriptionTemplate()->getGalleryType(),
-            'images' => $this->getDescriptionTemplate()->getImagesForEbay(),
-            'supersize' => $this->getDescriptionTemplate()->isUseSupersizeImagesEnabled()
+            'gallery_type' => $this->getEbayDescriptionTemplate()->getGalleryType(),
+            'images'       => $this->getDescriptionSource()->getImagesForEbay(),
+            'supersize'    => $this->getEbayDescriptionTemplate()->isUseSupersizeImagesEnabled()
         );
 
         $this->processNotFoundAttributes('Main Image / Gallery Images');
@@ -119,7 +122,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
         foreach (array('isbn','epid','upc','ean','gtin','brand','mpn') as $tempType) {
 
             $this->searchNotFoundAttributes();
-            $tempValue = $this->getDescriptionTemplate()->getProductDetail($tempType);
+            $tempValue = $this->getDescriptionSource()->getProductDetail($tempType);
 
             if (!$this->processNotFoundAttributes(strtoupper($tempType))) {
                 continue;
@@ -136,10 +139,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
             return $data;
         }
 
-        $data['include_description'] = $this->getDescriptionTemplate()->isProductDetailsIncludeDescription();
-        $data['include_image'] = $this->getDescriptionTemplate()->isProductDetailsIncludeImage();
+        $data['include_description'] = $this->getEbayDescriptionTemplate()->isProductDetailsIncludeDescription();
+        $data['include_image'] = $this->getEbayDescriptionTemplate()->isProductDetailsIncludeImage();
 
-        $data['list_if_no_product'] = $this->getDescriptionTemplate()->isProductDetailsListIfNoProduct();
+        $data['list_if_no_product'] = $this->getEbayDescriptionTemplate()->isProductDetailsListIfNoProduct();
 
         return $data;
     }
@@ -149,7 +152,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     public function getConditionData()
     {
         $this->searchNotFoundAttributes();
-        $data = $this->getDescriptionTemplate()->getCondition();
+        $data = $this->getDescriptionSource()->getCondition();
 
         if (!$this->processNotFoundAttributes('Condition')) {
             return array();
@@ -163,8 +166,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     public function getConditionNoteData()
     {
         $this->searchNotFoundAttributes();
-        $data = $this->getDescriptionTemplate()->getConditionNote();
-        $this->processNotFoundAttributes('Condition Description');
+        $data = $this->getDescriptionSource()->getConditionNote();
+        $this->processNotFoundAttributes('Seller Notes');
 
         return $data;
     }
@@ -172,7 +175,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     // ########################################
 
     /**
-     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     * @return Ess_M2ePro_Model_Template_Description
      */
     private function getDescriptionTemplate()
     {
@@ -182,6 +185,22 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
                                               ->getDescriptionTemplate();
         }
         return $this->descriptionTemplate;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     */
+    private function getEbayDescriptionTemplate()
+    {
+        return $this->getDescriptionTemplate()->getChildObject();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Description_Source
+     */
+    private function getDescriptionSource()
+    {
+        return $this->getEbayListingProduct()->getDescriptionTemplateSource();
     }
 
     // ########################################

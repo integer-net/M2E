@@ -18,8 +18,8 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addCss('M2ePro/css/Plugin/DropDown.css')
-            ->addJs('M2ePro/AttributeSetHandler.js')
             ->addJs('M2ePro/TemplateHandler.js')
+            ->addJs('M2ePro/AttributeHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Template/SwitcherHandler.js')
             ->addJs('M2ePro/Ebay/Template/EditHandler.js')
             ->addJs('M2ePro/Ebay/Template/PaymentHandler.js')
@@ -255,7 +255,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
             );
         } else {
             $this->_getSession()->addError(
-                Mage::helper('M2ePro')->__('Policy cannot be deleted as it is used in Listing settings.')
+                Mage::helper('M2ePro')->__('Policy cannot be deleted as it is used in Listing Settings.')
             );
         }
 
@@ -317,7 +317,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
         //------------------------------
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The listing was successfully saved.'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('The Listing was successfully saved.'));
 
         $extendedParams = array(
             '*/adminhtml_ebay_template/editListing' => array(
@@ -462,7 +462,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
 
     public function isTitleUniqueAction()
     {
-        $id = $this->getRequest()->getParam('id');
+        $id = $this->getRequest()->getParam('id_value');
         $nick = $this->getRequest()->getParam('nick');
         $title = $this->getRequest()->getParam('title');
 

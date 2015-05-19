@@ -18,22 +18,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Edit_Form extends Mage_Admin
 
     protected function _prepareForm()
     {
-        // Prepare action
-        // -------------------
-        $step = $this->getRequest()->getParam('step');
-
-        if (is_null($step)) {
-            // Edit listing mode
-            $action = $this->getUrl('*/adminhtml_common_buy_listing/save');
-        } else {
-            // Add listing mode
-            $action = $this->getUrl('*/adminhtml_common_buy_listing/add', array('step' => (int)$step));
-        }
-        // -------------------
-
         $form = new Varien_Data_Form(array(
             'id'      => 'edit_form',
-            'action'  => $action,
+            'action'  => $this->getUrl('*/adminhtml_common_buy_listing/save'),
             'method'  => 'post',
             'enctype' => 'multipart/form-data'
         ));
@@ -44,29 +31,5 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Edit_Form extends Mage_Admin
         return parent::_prepareForm();
     }
 
-    protected function _beforeToHtml()
-    {
-        // Add listing mode
-        // -------------------
-        $child = NULL;
-        $step = $this->getRequest()->getParam('step');
-
-        if ($step == 1) {
-            $child = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_edit_tabs_settings');
-        } else if ($step == 2) {
-            $child = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_edit_tabs_channelSettings');
-        } elseif ($step == 3) {
-            $child = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_edit_tabs_productsFilter');
-        }
-
-        if (!is_null($child)) {
-            $this->setTemplate('M2ePro/common/buy/listing/add.phtml');
-            $this->setChild('general',
-                $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_edit_tabs_general'));
-            $this->setChild('content', $child);
-        }
-        // -------------------
-
-        return parent::_beforeToHtml();
-    }
+    // ####################################
 }

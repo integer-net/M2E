@@ -7,38 +7,10 @@
 class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
     extends Ess_M2ePro_Model_Synchronization_Templates_Inspector
 {
-    private $_checkedListListingsProductsIds = array();
-    private $_checkedRelistListingsProductsIds = array();
-    private $_checkedStopListingsProductsIds = array();
-
-    private $_checkedQtyListingsProductsIds = array();
-    private $_checkedPriceListingsProductsIds = array();
-
-    //####################################
-
-    public function makeRunner()
-    {
-        $runner = Mage::getModel('M2ePro/Synchronization_Templates_Runner');
-        $runner->setConnectorModel('Connector_Amazon_Product_Dispatcher');
-        $runner->setMaxProductsPerStep(1000);
-        return $runner;
-    }
-
     //####################################
 
     public function isMeetListRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedListListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedListListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Amazon available status
-        //--------------------
         if (!$listingProduct->isNotListed() || $listingProduct->isBlocked()) {
             return false;
         }
@@ -47,147 +19,309 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                                               array())
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+        $variationManager = $amazonListingProduct->getVariationManager();
+
+        $searchGeneralId   = $amazonListingProduct->getListingSource()->getSearchGeneralId();
+        $searchWorldwideId = $amazonListingProduct->getListingSource()->getSearchWorldwideId();
+
+        if ($variationManager->isVariationProduct()) {
+
+            if ($variationManager->isPhysicalUnit() &&
+                !$variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
+                return false;
+            }
+
+            if ($variationManager->isRelationParentType() && $amazonListingProduct->getGeneralId()) {
+                return false;
+            }
+
+            if ($variationManager->isRelationChildType()) {
+                if (!$amazonListingProduct->getGeneralId() && !$amazonListingProduct->isGeneralIdOwner()) {
+                    return false;
+                }
+            }
+
+            if ($variationManager->isIndividualType()) {
+                if (!$amazonListingProduct->getGeneralId() &&
+                    ($listingProduct->getMagentoProduct()->isSimpleTypeWithCustomOptions() ||
+                        $listingProduct->getMagentoProduct()->isBundleType())
+                ) {
+                    return false;
+                }
+            }
+
+            if ($variationManager->isRelationParentType() &&
+                empty($searchGeneralId) &&
+                !$amazonListingProduct->isGeneralIdOwner()
+            ) {
+                return false;
+            }
+        }
+
+        if (!$amazonListingProduct->getGeneralId() && !$amazonListingProduct->isGeneralIdOwner() &&
+            empty($searchGeneralId) && empty($searchWorldwideId)
         ) {
             return false;
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-            return false;
-        }
-        //--------------------
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
 
-        /* @var $amazonSynchronizationTemplate Ess_M2ePro_Model_Amazon_Template_Synchronization */
-        $amazonSynchronizationTemplate = $listingProduct->getChildObject()->getAmazonSynchronizationTemplate();
-
-        // Correct synchronization
-        //--------------------
-        if(!$amazonSynchronizationTemplate->isListMode()) {
+        if (!$amazonSynchronizationTemplate->isListMode()) {
             return false;
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
-        //--------------------
 
         $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
-        // Check filters
-        //--------------------
-        if($amazonSynchronizationTemplate->isListStatusEnabled()) {
+        $additionalData = $listingProduct->getAdditionalData();
+
+        if ($amazonSynchronizationTemplate->isListStatusEnabled()) {
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
-                return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+                $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                    'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                     Status of Magento Product is Disabled (%date%) though in Synchronization Rules “Product Status”
+                     is set to Enabled.',
+                    array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                );
+                $additionalData['synch_template_list_rules_note'] = $note;
 
+                $listingProduct->setSettings('additional_data', $additionalData)->save();
+
+                return false;
+            } else if ($variationManager->isPhysicalUnit() &&
+                       $variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
                 $temp = $variationResource->isAllStatusesDisabled(
                     $listingProduct->getId(),
                     $listingProduct->getListing()->getStoreId()
                 );
 
                 if (!is_null($temp) && $temp) {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Status of Magento Product Variation is Disabled (%date%) though in Synchronization Rules
+                         “Product Status“ is set to Enabled.',
+                        array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                    );
+                    $additionalData['synch_template_list_rules_note'] = $note;
+
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+
                     return false;
                 }
             }
         }
 
-        if($amazonSynchronizationTemplate->isListIsInStock()) {
+        if ($amazonSynchronizationTemplate->isListIsInStock()) {
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
-                return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
+                $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                    'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                     Stock Availability of Magento Product is Out of Stock though in
+                     Synchronization Rules “Stock Availability” is set to In Stock.',
+                    array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                );
+                $additionalData['synch_template_list_rules_note'] = $note;
 
+                $listingProduct->setSettings('additional_data', $additionalData)->save();
+
+                return false;
+            } else if ($variationManager->isPhysicalUnit() &&
+                       $variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
                 $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
                     $listingProduct->getId(),
                     $listingProduct->getListing()->getStoreId()
                 );
 
                 if (!is_null($temp) && $temp) {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Stock Availability of Magento Product Variation is Out of Stock though
+                         in Synchronization Rules “Stock Availability” is set to In Stock.',
+                        array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
+                    );
+                    $additionalData['synch_template_list_rules_note'] = $note;
+
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+
                     return false;
                 }
             }
         }
 
-        if($amazonSynchronizationTemplate->isListWhenQtyMagentoHasValue()) {
+        if ($amazonSynchronizationTemplate->isListWhenQtyMagentoHasValue()) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(true);
+
+            if ($variationManager->isRelationParentType()) {
+                $productQty = (int)$listingProduct->getMagentoProduct()->getQty(true);
+            } else {
+                $productQty = (int)$amazonListingProduct->getQty(true);
+            }
 
             $typeQty = (int)$amazonSynchronizationTemplate->getListWhenQtyMagentoHasValueType();
             $minQty = (int)$amazonSynchronizationTemplate->getListWhenQtyMagentoHasValueMin();
             $maxQty = (int)$amazonSynchronizationTemplate->getListWhenQtyMagentoHasValueMax();
 
-            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_LESS &&
-                $productQty <= $minQty) {
-                $result = true;
+            $note = '';
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_LESS) {
+                if ($productQty <= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Magento Quantity“ is set to less then  %template_min_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_MORE &&
-                $productQty >= $minQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_MORE) {
+                if ($productQty >= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Magento Quantity” is set to more then  %template_min_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN &&
-                $productQty >= $minQty && $productQty <= $maxQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN) {
+                if ($productQty >= $minQty && $productQty <= $maxQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Magento Quantity” is set between  %template_min_qty% and %template_max_qty%',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!template_max_qty' => $maxQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
             if (!$result) {
+                if (!empty($note)) {
+                    $additionalData['synch_template_list_rules_note'] = $note;
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+                }
+
                 return false;
             }
         }
 
-        if($amazonSynchronizationTemplate->isListWhenQtyCalculatedHasValue()) {
+        if ($amazonSynchronizationTemplate->isListWhenQtyCalculatedHasValue() &&
+            !$variationManager->isRelationParentType()
+        ) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+            $productQty = (int)$amazonListingProduct->getQty(false);
 
             $typeQty = (int)$amazonSynchronizationTemplate->getListWhenQtyCalculatedHasValueType();
             $minQty = (int)$amazonSynchronizationTemplate->getListWhenQtyCalculatedHasValueMin();
             $maxQty = (int)$amazonSynchronizationTemplate->getListWhenQtyCalculatedHasValueMax();
 
-            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_LESS &&
-                $productQty <= $minQty) {
-                $result = true;
+            $note = '';
+
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_LESS) {
+                if ($productQty <= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Calculated Quantity” is set to less then %template_min_qty%',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_MORE &&
-                $productQty >= $minQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_MORE) {
+                if ($productQty >= $minQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Calculated Quantity” is set to more then  %template_min_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
-            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN &&
-                $productQty >= $minQty && $productQty <= $maxQty) {
-                $result = true;
+            if ($typeQty == Ess_M2ePro_Model_Amazon_Template_Synchronization::LIST_QTY_BETWEEN) {
+                if ($productQty >= $minQty && $productQty <= $maxQty) {
+                    $result = true;
+                } else {
+                    $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
+                        'Product was not automatically Listed according to the List Rules in Synchronization Policy.
+                         Quantity of Magento Product is %product_qty% though in Synchronization Rules
+                         “Calculated Quantity” is set between  %template_min_qty% and %template_max_qty%.',
+                        array(
+                            '!template_min_qty' => $minQty,
+                            '!template_max_qty' => $maxQty,
+                            '!product_qty' => $productQty,
+                            '!date' => Mage::helper('M2ePro')->getCurrentGmtDate()
+                        )
+                    );
+                }
             }
 
             if (!$result) {
+                if (!empty($note)) {
+                    $additionalData['synch_template_list_rules_note'] = $note;
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+                }
+
                 return false;
             }
         }
-        //--------------------
+
+        if ($listingProduct->getSynchStatus() != Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED &&
+            $this->isTriedToList($listingProduct) &&
+            $this->isChangeInitiatorOnlyInspector($listingProduct)
+        ) {
+            return false;
+        }
 
         return true;
     }
 
     public function isMeetRelistRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedRelistListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedRelistListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Amazon available status
-        //--------------------
         if (!$listingProduct->isStopped() || $listingProduct->isBlocked()) {
             return false;
         }
@@ -196,25 +330,24 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,
-                                               array())
-        ) {
-            return false;
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+        $variationManager = $amazonListingProduct->getVariationManager();
+
+        if ($variationManager->isVariationProduct()) {
+
+            if ($variationManager->isRelationParentType()) {
+                return false;
+            }
+
+            if (!$variationManager->getTypeModel()->isVariationProductMatched()) {
+                return false;
+            }
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-            return false;
-        }
-        //--------------------
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
 
-        /* @var $amazonSynchronizationTemplate Ess_M2ePro_Model_Amazon_Template_Synchronization */
-        $amazonSynchronizationTemplate = $listingProduct->getChildObject()->getAmazonSynchronizationTemplate();
-
-        // Correct synchronization
-        //--------------------
-        if(!$amazonSynchronizationTemplate->isRelistMode()) {
+        if (!$amazonSynchronizationTemplate->isRelistMode()) {
             return false;
         }
 
@@ -223,22 +356,19 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             return false;
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
-        //--------------------
 
         $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
-        // Check filters
-        //--------------------
-        if($amazonSynchronizationTemplate->isRelistStatusEnabled()) {
+        if ($amazonSynchronizationTemplate->isRelistStatusEnabled()) {
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
                 return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
-
+            } else if ($variationManager->isPhysicalUnit() &&
+                       $variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
                 $temp = $variationResource->isAllStatusesDisabled(
                     $listingProduct->getId(),
                     $listingProduct->getListing()->getStoreId()
@@ -250,12 +380,13 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             }
         }
 
-        if($amazonSynchronizationTemplate->isRelistIsInStock()) {
+        if ($amazonSynchronizationTemplate->isRelistIsInStock()) {
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
                 return false;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
-
+            } else if ($variationManager->isPhysicalUnit() &&
+                       $variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
                 $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
                     $listingProduct->getId(),
                     $listingProduct->getListing()->getStoreId()
@@ -267,10 +398,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             }
         }
 
-        if($amazonSynchronizationTemplate->isRelistWhenQtyMagentoHasValue()) {
+        if ($amazonSynchronizationTemplate->isRelistWhenQtyMagentoHasValue()) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(true);
+            $productQty = (int)$amazonListingProduct->getQty(true);
 
             $typeQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyMagentoHasValueType();
             $minQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyMagentoHasValueMin();
@@ -296,10 +427,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             }
         }
 
-        if($amazonSynchronizationTemplate->isRelistWhenQtyCalculatedHasValue()) {
+        if ($amazonSynchronizationTemplate->isRelistWhenQtyCalculatedHasValue()) {
 
             $result = false;
-            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+            $productQty = (int)$amazonListingProduct->getQty(false);
 
             $typeQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueType();
             $minQty = (int)$amazonSynchronizationTemplate->getRelistWhenQtyCalculatedHasValueMin();
@@ -324,24 +455,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                 return false;
             }
         }
-        //--------------------
 
         return true;
     }
 
     public function isMeetStopRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedStopListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedStopListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Amazon available status
-        //--------------------
         if (!$listingProduct->isListed() || $listingProduct->isBlocked()) {
             return false;
         }
@@ -350,40 +469,31 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
-                                               array())
-        ) {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+        $variationManager = $amazonListingProduct->getVariationManager();
+
+        if ($variationManager->isVariationProduct()) {
+
+            if ($variationManager->isRelationParentType()) {
+                return false;
+            }
+        }
+
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-            return false;
-        }
-        //--------------------
-
-        /* @var $amazonSynchronizationTemplate Ess_M2ePro_Model_Amazon_Template_Synchronization */
-        $amazonSynchronizationTemplate = $listingProduct->getChildObject()->getAmazonSynchronizationTemplate();
-
-        // Correct synchronization
-        //--------------------
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
-            return false;
-        }
-        //--------------------
-
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
         $variationResource = Mage::getResourceModel('M2ePro/Listing_Product_Variation');
 
-        // Check filters
-        //--------------------
         if ($amazonSynchronizationTemplate->isStopStatusDisabled()) {
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
                 return true;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
-
+            } else if ($variationManager->isPhysicalUnit() &&
+                       $variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
                 $temp = $variationResource->isAllStatusesDisabled(
                     $listingProduct->getId(),
                     $listingProduct->getListing()->getStoreId()
@@ -399,8 +509,9 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
                 return true;
-            } else if ($listingProduct->getChildObject()->isVariationsReady()) {
-
+            } else if ($variationManager->isPhysicalUnit() &&
+                       $variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
                 $temp = $variationResource->isAllDoNotHaveStockAvailabilities(
                     $listingProduct->getId(),
                     $listingProduct->getListing()->getStoreId()
@@ -414,7 +525,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
         if ($amazonSynchronizationTemplate->isStopWhenQtyMagentoHasValue()) {
 
-            $productQty = (int)$listingProduct->getChildObject()->getQty(true);
+            $productQty = (int)$amazonListingProduct->getQty(true);
 
             $typeQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyMagentoHasValueType();
             $minQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyMagentoHasValueMin();
@@ -438,7 +549,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
 
         if ($amazonSynchronizationTemplate->isStopWhenQtyCalculatedHasValue()) {
 
-            $productQty = (int)$listingProduct->getChildObject()->getQty(false);
+            $productQty = (int)$amazonListingProduct->getQty(false);
 
             $typeQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyCalculatedHasValueType();
             $minQty = (int)$amazonSynchronizationTemplate->getStopWhenQtyCalculatedHasValueMin();
@@ -459,31 +570,14 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
                 return true;
             }
         }
-        //--------------------
 
         return false;
     }
 
-    //------------------------------------
+    // -----------------------------------
 
-    public function inspectReviseQtyRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    public function isMeetReviseGeneralRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedQtyListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedQtyListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Prepare actions params
-        //--------------------
-        $actionParams = array('only_data'=>array('qty'=>true));
-        //--------------------
-
-        // Amazon available status
-        //--------------------
         if (!$listingProduct->isListed() || $listingProduct->isBlocked()) {
             return false;
         }
@@ -492,156 +586,197 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
             return false;
         }
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                               $actionParams)
-        ) {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+        $variationManager = $amazonListingProduct->getVariationManager();
+
+        if ($variationManager->isVariationProduct()) {
+
+            if ($variationManager->isRelationParentType()) {
+                return false;
+            }
+
+            if ($variationManager->isPhysicalUnit() &&
+                !$variationManager->getTypeModel()->isVariationProductMatched()
+            ) {
+                return false;
+            }
+        }
+
+        if ($listingProduct->isLockedObject('in_action')) {
             return false;
         }
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-           return false;
+        return true;
+    }
+
+    // -----------------------------------
+
+    public function isMeetReviseQtyRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
+            return false;
         }
-        //--------------------
 
-        /* @var $amazonSynchronizationTemplate Ess_M2ePro_Model_Amazon_Template_Synchronization */
-        $amazonSynchronizationTemplate = $listingProduct->getChildObject()->getAmazonSynchronizationTemplate();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
 
-        // Correct synchronization
-        //--------------------
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
+
         if (!$amazonSynchronizationTemplate->isReviseWhenChangeQty()) {
             return false;
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
-            return false;
-        }
-        //--------------------
-
-        // Check filters
-        //--------------------
         $isMaxAppliedValueModeOn = $amazonSynchronizationTemplate->isReviseUpdateQtyMaxAppliedValueModeOn();
         $maxAppliedValue = $amazonSynchronizationTemplate->getReviseUpdateQtyMaxAppliedValue();
 
-        $productQty = $listingProduct->getChildObject()->getQty();
-        $channelQty = $listingProduct->getChildObject()->getOnlineQty();
+        $productQty = $amazonListingProduct->getQty();
+        $channelQty = $amazonListingProduct->getOnlineQty();
 
-        //-- Check ReviseUpdateQtyMaxAppliedValue
         if ($isMaxAppliedValueModeOn && $productQty > $maxAppliedValue && $channelQty > $maxAppliedValue) {
             return false;
         }
 
         if ($productQty > 0 && $productQty != $channelQty) {
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           $actionParams);
             return true;
         }
-        //--------------------
 
         return false;
     }
 
-    public function inspectRevisePriceRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    public function isMeetRevisePriceRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // Is checked before?
-        //--------------------
-        if (in_array($listingProduct->getId(),$this->_checkedPriceListingsProductsIds)) {
-            return false;
-        } else {
-            $this->_checkedPriceListingsProductsIds[] = $listingProduct->getId();
-        }
-        //--------------------
-
-        // Prepare actions params
-        //--------------------
-        $actionParams = array('only_data'=>array('price'=>true));
-        //--------------------
-
-        // Amazon available status
-        //--------------------
-        if (!$listingProduct->isListed() || $listingProduct->isBlocked()) {
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
             return false;
         }
 
-        if (!$listingProduct->isRevisable()) {
-            return false;
-        }
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
 
-        if ($this->getRunner()->isExistProduct($listingProduct,
-                                               Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                               $actionParams)
-        ) {
-            return false;
-        }
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
 
-        if ($listingProduct->isLockedObject(NULL) ||
-            $listingProduct->isLockedObject('in_action')) {
-           return false;
-        }
-        //--------------------
-
-        /* @var $amazonSynchronizationTemplate Ess_M2ePro_Model_Amazon_Template_Synchronization */
-        $amazonSynchronizationTemplate = $listingProduct->getChildObject()->getAmazonSynchronizationTemplate();
-
-        // Correct synchronization
-        //--------------------
         if (!$amazonSynchronizationTemplate->isReviseWhenChangePrice()) {
             return false;
         }
 
-        if($listingProduct->getChildObject()->isVariationProduct() &&
-           !$listingProduct->getChildObject()->isVariationMatched()) {
-            return false;
-        }
-        //--------------------
-
-        // Check filters
-        //--------------------
-        $currentPrice = $listingProduct->getChildObject()->getPrice();
-        $onlinePrice = $listingProduct->getChildObject()->getOnlinePrice();
+        $currentPrice = $amazonListingProduct->getPrice();
+        $onlinePrice = $amazonListingProduct->getOnlinePrice();
 
         if ($currentPrice != $onlinePrice) {
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           $actionParams);
             return true;
         }
 
-        $currentSalePriceInfo = $listingProduct->getChildObject()->getSalePriceInfo();
+        $currentSalePriceInfo = $amazonListingProduct->getSalePriceInfo();
+        if ($currentSalePriceInfo !== false) {
+            $currentSalePrice          = $currentSalePriceInfo['price'];
+            $currentSalePriceStartDate = $currentSalePriceInfo['start_date'];
+            $currentSalePriceEndDate   = $currentSalePriceInfo['end_date'];
+        } else {
+            $currentSalePrice          = 0;
+            $currentSalePriceStartDate = null;
+            $currentSalePriceEndDate   = null;
+        }
 
-        $currentSalePrice = $currentSalePriceInfo['price'];
-        $onlineSalePrice = $listingProduct->getChildObject()->getOnlineSalePrice();
+        $onlineSalePrice = $amazonListingProduct->getOnlineSalePrice();
+
+        if (!$currentSalePrice && !$onlineSalePrice) {
+            return false;
+        }
 
         if ((is_null($currentSalePrice) && !is_null($onlineSalePrice)) ||
             (!is_null($currentSalePrice) && is_null($onlineSalePrice)) ||
-            (float)$currentSalePrice != (float)$onlineSalePrice) {
-
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           $actionParams);
+            (float)$currentSalePrice != (float)$onlineSalePrice
+        ) {
             return true;
         }
-        //--------------------
 
-        //--------------------
-        $currentSalePriceStartDate = $currentSalePriceInfo['start_date'];
-        $onlineSalePriceStartDate = $listingProduct->getChildObject()->getOnlineSalePriceStartDate();
-
-        $currentSalePriceEndDate = $currentSalePriceInfo['end_date'];
-        $onlineSalePriceEndDate = $listingProduct->getChildObject()->getOnlineSalePriceEndDate();
+        $onlineSalePriceStartDate  = $amazonListingProduct->getOnlineSalePriceStartDate();
+        $onlineSalePriceEndDate    = $amazonListingProduct->getOnlineSalePriceEndDate();
 
         if ($currentSalePriceStartDate != $onlineSalePriceStartDate ||
-            $currentSalePriceEndDate   != $onlineSalePriceEndDate) {
-
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           $actionParams);
+            $currentSalePriceEndDate   != $onlineSalePriceEndDate
+        ) {
             return true;
         }
-        //--------------------
+
+        return false;
+    }
+
+    // -----------------------------------
+
+    public function isMeetReviseDetailsRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
+            return false;
+        }
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
+        if (!$amazonSynchronizationTemplate->isReviseWhenChangeDetails()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isMeetReviseImagesRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
+            return false;
+        }
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
+        if (!$amazonSynchronizationTemplate->isReviseWhenChangeImages()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // -----------------------------------
+
+    public function isMeetReviseSynchReasonsRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $reasons = $listingProduct->getSynchReasons();
+        if (empty($reasons)) {
+            return false;
+        }
+
+        if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
+            return false;
+        }
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        $synchronizationTemplate = $amazonListingProduct->getSynchronizationTemplate();
+        $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
+
+        foreach ($reasons as $reason) {
+
+            $method = 'isRevise'.ucfirst($reason);
+
+            if (method_exists($synchronizationTemplate, $method)) {
+                if ($synchronizationTemplate->$method()) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (method_exists($amazonSynchronizationTemplate, $method)) {
+                if ($amazonSynchronizationTemplate->$method()) {
+                    return true;
+                }
+
+                continue;
+            }
+        }
 
         return false;
     }

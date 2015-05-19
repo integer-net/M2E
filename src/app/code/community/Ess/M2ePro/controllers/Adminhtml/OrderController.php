@@ -67,7 +67,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select order(s).'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Order(s).'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -118,7 +118,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select order(s).'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Order(s).'));
             $this->_redirect('*/*/index');
             return;
         }
@@ -171,7 +171,7 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         if (is_null($item->getId())) {
             $this->getResponse()->setBody(json_encode(array(
-                'error' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Order item does not exist.'))
+                'error' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Order Item does not exist.'))
             )));
 
             return;
@@ -213,7 +213,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         }
 
         $this->getResponse()->setBody(json_encode(array(
-            'error' => Mage::helper('M2ePro')->__('Product does not have required options.')
+            'error' => Mage::helper('M2ePro')->__('Product does not have Required Options.')
         )));
     }
 
@@ -232,7 +232,7 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         if ((!$productId && !$sku) || !$orderItem->getId()) {
             $this->getResponse()->setBody(json_encode(array(
-                'error' => Mage::helper('M2ePro')->__('Please specify required options.')
+                'error' => Mage::helper('M2ePro')->__('Please specify Required Options.')
             )));
             return;
         }
@@ -261,12 +261,12 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         $orderItem->assignProduct($productData['entity_id']);
 
-        $orderItem->getOrder()->addSuccessLog('Order item "%title%" was successfully mapped.', array(
+        $orderItem->getOrder()->addSuccessLog('Order Item "%title%" was successfully Mapped.', array(
             'title' => $orderItem->getChildObject()->getTitle()
         ));
 
         $this->getResponse()->setBody(json_encode(array(
-            'success'  => Mage::helper('M2ePro')->__('Order item was successfully mapped.'),
+            'success'  => Mage::helper('M2ePro')->__('Order Item was successfully Mapped.'),
             'continue' => $orderItem->getMagentoProduct()->hasRequiredOptions()
         )));
     }
@@ -294,7 +294,7 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         if (count($optionsData) == 0 || !$orderItem->getId()) {
             $this->getResponse()->setBody(json_encode(array(
-                'error' => Mage::helper('M2ePro')->__('Please specify required options.')
+                'error' => Mage::helper('M2ePro')->__('Please specify Required Options.')
             )));
             return;
         }
@@ -336,12 +336,12 @@ class Ess_M2ePro_Adminhtml_OrderController
             );
         }
 
-        $orderItem->getOrder()->addSuccessLog('Order item "%title%" options were successfully configured.', array(
+        $orderItem->getOrder()->addSuccessLog('Order Item "%title%" Options were Successfully configured.', array(
             'title' => $orderItem->getChildObject()->getTitle()
         ));
 
         $this->getResponse()->setBody(json_encode(array(
-            'success' => Mage::helper('M2ePro')->__('Order item options were successfully configured.')
+            'success' => Mage::helper('M2ePro')->__('Order Item Options were Successfully configured.')
         )));
     }
 
@@ -358,7 +358,7 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         if (!$orderItem->getId()) {
             $this->getResponse()->setBody(json_encode(array(
-                'error' => Mage::helper('M2ePro')->__('Please specify required options.')
+                'error' => Mage::helper('M2ePro')->__('Please specify Required Options.')
             )));
             return;
         }
@@ -381,12 +381,12 @@ class Ess_M2ePro_Adminhtml_OrderController
 
         $orderItem->unassignProduct();
 
-        $orderItem->getOrder()->addSuccessLog('Item "%title%" was successfully unmapped.', array(
+        $orderItem->getOrder()->addSuccessLog('Item "%title%" was successfully Unmapped.', array(
             'title' => $orderItem->getChildObject()->getTitle()
         ));
 
         $this->getResponse()->setBody(json_encode(array(
-            'success' => Mage::helper('M2ePro')->__('Item was successfully unmapped.')
+            'success' => Mage::helper('M2ePro')->__('Item was successfully Unmapped.')
         )));
     }
 
@@ -491,7 +491,7 @@ class Ess_M2ePro_Adminhtml_OrderController
         if ($isFail) {
             $errorMessage = Mage::helper('M2ePro')->__('Shipping Information was not resend.');
             if (count($ids) > 1) {
-                $errorMessage = Mage::helper('M2ePro')->__('Shipping Information was not resend for some orders.');
+                $errorMessage = Mage::helper('M2ePro')->__('Shipping Information was not resend for some Orders.');
             }
 
             $this->_getSession()->addError($errorMessage);

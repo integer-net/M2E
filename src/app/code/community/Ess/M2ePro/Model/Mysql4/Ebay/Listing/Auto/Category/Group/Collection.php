@@ -5,7 +5,7 @@
  */
 
 class Ess_M2ePro_Model_Mysql4_Ebay_Listing_Auto_Category_Group_Collection
-    extends Ess_M2ePro_Model_Mysql4_Collection_Abstract
+    extends Ess_M2ePro_Model_Mysql4_Collection_Component_Child_Abstract
 {
     // ########################################
 

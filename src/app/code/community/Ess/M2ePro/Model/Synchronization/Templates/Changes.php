@@ -66,7 +66,8 @@ class Ess_M2ePro_Model_Synchronization_Templates_Changes
 
     private function getListingProducts(array $attributes, $withStoreFilter = false, $fetchFunction)
     {
-        $cacheKey = md5(json_encode(func_get_args()));
+        $args = func_get_args();
+        $cacheKey = md5(json_encode($args));
 
         if (isset($this->cache['listings_products_by_params'][$cacheKey])) {
             return $this->cache['listings_products_by_params'][$cacheKey];
@@ -94,7 +95,7 @@ class Ess_M2ePro_Model_Synchronization_Templates_Changes
 
             $resultListingProducts[$lpId] = $this->cache['listings_products'][$lpId];
             $resultListingProducts[$lpId]->addData($listingProductData);
-            $resultListingProducts[$lpId]->enableCache();
+            $resultListingProducts[$lpId]->getMagentoProduct()->enableCache();
 
             $this->cache['listings_products_by_params'][$cacheKey][$lpId] = $resultListingProducts[$lpId];
 
@@ -113,7 +114,7 @@ class Ess_M2ePro_Model_Synchronization_Templates_Changes
 
         foreach ($listingProductsIds as $key => $lpId) {
             $listingProducts[$lpId]->addData($changedListingsProducts[$key]);
-            $listingProducts[$lpId]->enableCache();
+            $listingProducts[$lpId]->getMagentoProduct()->enableCache();
 
             $this->cache['listings_products'][$lpId] = $listingProducts[$lpId];
             $this->cache['listings_products_by_params'][$cacheKey][$lpId] = $listingProducts[$lpId];

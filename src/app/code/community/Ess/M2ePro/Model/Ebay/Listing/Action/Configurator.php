@@ -25,10 +25,6 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     // ########################################
 
-    abstract public function isAllPermitted();
-
-    // ########################################
-
     public function setParams(array $params = array())
     {
         $this->params = $params;
@@ -53,6 +49,10 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
                is_array($this->params[self::ONLY_DATA_KEY]) &&
                count($this->params[self::ONLY_DATA_KEY]) > 0;
     }
+
+    // ----------------------------------------
+
+    abstract public function isAllPermitted();
 
     // ########################################
 
@@ -92,7 +92,7 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     // ########################################
 
-    protected function isAllowed($type)
+    public function isAllowed($type)
     {
         if ($this->isAll()) {
             return true;

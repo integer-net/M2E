@@ -172,7 +172,11 @@ class Ess_M2ePro_Model_Buy_Order extends Ess_M2ePro_Model_Component_Child_Buy_Ab
     public function afterCreateMagentoOrder()
     {
         if ($this->getBuyAccount()->isMagentoOrdersCustomerNewNotifyWhenOrderCreated()) {
-            $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            if (method_exists($this->getParentObject()->getMagentoOrder(), 'queueNewOrderEmail')) {
+                $this->getParentObject()->getMagentoOrder()->queueNewOrderEmail(false);
+            } else {
+                $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            }
         }
     }
 
@@ -239,7 +243,7 @@ class Ess_M2ePro_Model_Buy_Order extends Ess_M2ePro_Model_Component_Child_Buy_Ab
     {
         if (empty($trackingDetails['tracking_number'])) {
             $this->getParentObject()->addErrorLog(
-                'Shipping status for Rakuten.com order cannot be updated. Reason: Tracking Information is Required.'
+                'Shipping status for Rakuten.com Order cannot be updated. Reason: Tracking Information is Required.'
             );
             return false;
         }

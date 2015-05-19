@@ -82,10 +82,15 @@ class Ess_M2ePro_Model_StopQueue extends Ess_M2ePro_Model_Abstract
     {
         $connectorClassName = 'Ess_M2ePro_Model_Connector_'.ucfirst($listingProduct->getComponentMode()).'_';
         $connectorClassName .= $listingProduct->isComponentModeEbay() ? 'Item' : 'Product';
-        $connectorClassName .= '_Stop_Multiple';
+        $connectorClassName .= '_Stop_Multiple'.($listingProduct->isComponentModeEbay() ? '' : 'Requester');
+
+        $connectorParams = array(
+            'logs_action_id' => 0,
+            'status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN,
+        );
 
         try {
-            $connector = new $connectorClassName(array(),array($listingProduct));
+            $connector = new $connectorClassName($connectorParams, array($listingProduct));
             $itemData = $connector->getRequestDataPackage();
         } catch (Exception $exception) {
             return NULL;

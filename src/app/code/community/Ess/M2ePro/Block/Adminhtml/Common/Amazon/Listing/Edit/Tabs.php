@@ -15,37 +15,29 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Edit_Tabs extends Mage_Ad
         $this->setId('amazonListingEditTabs');
         //------------------------------
 
-        $this->setTitle(Mage::helper('M2ePro')->__('Configuration'));
+        $this->setTemplate('widget/tabshoriz.phtml');
         $this->setDestElementId('edit_form');
     }
 
     protected function _beforeToHtml()
     {
-        $this->addTab('settings', array(
-            'label'   => Mage::helper('M2ePro')->__('Settings'),
-            'title'   => Mage::helper('M2ePro')->__('Settings'),
+        $this->addTab('selling', array(
+            'label'   => Mage::helper('M2ePro')->__('Selling Settings'),
+            'title'   => Mage::helper('M2ePro')->__('Selling Settings'),
             'content' => $this->getLayout()
-                              ->createBlock('M2ePro/adminhtml_common_amazon_listing_edit_tabs_settings')
+                              ->createBlock('M2ePro/adminhtml_common_amazon_listing_add_tabs_selling')
                               ->toHtml(),
         ));
 
-        $this->addTab('channel', array(
-            'label'   => Mage::helper('M2ePro')->__('Channel Settings'),
-            'title'   => Mage::helper('M2ePro')->__('Channel Settings'),
+        $this->addTab('search', array(
+            'label'   => Mage::helper('M2ePro')->__('Search Settings'),
+            'title'   => Mage::helper('M2ePro')->__('Search Settings'),
             'content' => $this->getLayout()
-                              ->createBlock('M2ePro/adminhtml_common_amazon_listing_edit_tabs_channelSettings')
+                              ->createBlock('M2ePro/adminhtml_common_amazon_listing_add_tabs_search')
                               ->toHtml(),
         ));
 
-        $this->addTab('products_filter', array(
-            'label'   => Mage::helper('M2ePro')->__('Products Filter'),
-            'title'   => Mage::helper('M2ePro')->__('Products Filter'),
-            'content' => $this->getLayout()
-                              ->createBlock('M2ePro/adminhtml_common_amazon_listing_edit_tabs_ProductsFilter')
-                              ->toHtml(),
-        ));
-
-        $this->setActiveTab($this->getRequest()->getParam('tab', 'general'));
+        $this->setActiveTab($this->getRequest()->getParam('tab', 'selling'));
 
         return parent::_beforeToHtml();
     }

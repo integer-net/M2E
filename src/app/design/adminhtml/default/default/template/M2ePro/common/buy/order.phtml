@@ -138,27 +138,27 @@
                                     <?php if (!empty($this->shippingAddress)): ?>
 
                                         <?php if (!empty($this->shippingAddress['company'])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['company']); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['company']); ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['street'][0])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][0]); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][0]); ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['street'][1])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][1]); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][1]); ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['street'][2])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][1]); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][1]); ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['city'])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml(implode(', ', array($this->shippingAddress['city'], $this->shippingAddress['state'], $this->shippingAddress['postal_code']))) ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml(implode(', ', array($this->shippingAddress['city'], $this->shippingAddress['state'], $this->shippingAddress['postal_code']))) ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['country_name'])): ?>
-                                            <br />
+                                            <br/>
                                             <?php
                                                 if (!empty($this->shippingAddress['country_name'])) {
                                                     echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['country_name']);
@@ -169,7 +169,7 @@
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['phone'])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->__('T') . ': ' . Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['phone']); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->__('T') . ': ' . Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['phone']); ?>
                                         <?php endif; ?>
 
                                     <?php endif; ?>
@@ -211,9 +211,9 @@
 
                                 <?php
                                     if (!$this->isCurrencyAllowed()) {
-                                        echo '<br /><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('Order currency is not enabled in Magento. Please, enable it in System -> Configuration -> Currency Setup.');
+                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('Order Currency is not enabled in Magento. Please, enable it in System > Configuration > Currency Setup.');
                                     } elseif (!$this->hasCurrencyConversionRate()) {
-                                        echo '<br /><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('There\'s no rate for Order currency in Magento. Please, add currency convert rate in System -> Manage Currency -> Rates.');
+                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('There\'s no rate for Order Currency in Magento. Please, add Currency convert rate in System > Manage Currency > Rates.');
                                     }
                                 ?>
                             </td>

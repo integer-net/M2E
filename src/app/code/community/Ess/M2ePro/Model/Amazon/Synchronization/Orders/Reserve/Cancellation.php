@@ -51,11 +51,11 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Reserve_Cancellation
             /** @var $account Ess_M2ePro_Model_Account **/
 
             // ----------------------------------------------------------
-            $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
+            $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
 
             // M2ePro_TRANSLATIONS
-            // The "Reserve Cancellation" action for Amazon account: "%account_title%" is started. Please wait...
-            $status = 'The "Reserve Cancellation" action for Amazon account: "%account_title%" is started.'.
+            // The "Reserve Cancellation" Action for Amazon Account: "%account_title%" is started. Please wait...
+            $status = 'The "Reserve Cancellation" Action for Amazon Account: "%account_title%" is started.'.
                 ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
@@ -64,9 +64,9 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Reserve_Cancellation
 
             // ----------------------------------------------------------
             // M2ePro_TRANSLATIONS
-            // The "Reserve Cancellation" action for Amazon account: "%account_title%" is finished. Please wait...
+            // The "Reserve Cancellation" Action for Amazon Account: "%account_title%" is finished. Please wait...
 
-            $status = 'The "Reserve Cancellation" action for Amazon account: "%account_title%" is finished.'.
+            $status = 'The "Reserve Cancellation" Action for Amazon Account: "%account_title%" is finished.'.
                 ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);

@@ -16,11 +16,22 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
 
     // ########################################
 
-    protected function unsetLocks($fail = false, $message = NULL)
+    private $orders = array();
+
+    // ########################################
+
+    public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
-        if (!$fail) {
-            return;
+        parent::unsetProcessingLocks($processingRequest);
+
+        foreach ($this->getOrders() as $order) {
+            $order->deleteObjectLocks('update_shipping_status', $processingRequest->getHash());
         }
+    }
+
+    public function eventFailedExecuting($message)
+    {
+        parent::eventFailedExecuting($message);
 
         $logs = array();
         $currentDate = Mage::helper('M2ePro')->getCurrentGmtDate();
@@ -157,6 +168,35 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
 
     // ########################################
 
+    /**
+     * @throws LogicException
+     * @return Ess_M2ePro_Model_Order[]
+     */
+    private function getOrders()
+    {
+        if (!is_null($this->orders)) {
+            return $this->orders;
+        }
+
+        $ordersIds = array();
+
+        foreach ($this->params as $update) {
+            if (!isset($update['order_id'])) {
+                throw new LogicException('Order ID is not defined.');
+            }
+
+            $ordersIds[] = (int)$update['order_id'];
+        }
+
+        $this->orders = Mage::getModel('M2ePro/Order')
+            ->getCollection()
+            ->addFieldToFilter('component_mode', Ess_M2ePro_Helper_Component_Buy::NICK)
+            ->addFieldToFilter('id', array('in' => $ordersIds))
+            ->getItems();
+
+        return $this->orders;
+    }
+
     private function getOrderIdByOrderItemId($orderItemId)
     {
         foreach ($this->params as $requestOrderItemId => $requestData) {
@@ -183,8 +223,8 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
 
     private function createLogEntries(array $data)
     {
-        if (count($data) == 0) {
-            throw new InvalidArgumentException('Number of log entries cannot be zero.');
+        if (empty($data)) {
+            return;
         }
 
         /** @var $writeConnection Varien_Db_Adapter_Interface */

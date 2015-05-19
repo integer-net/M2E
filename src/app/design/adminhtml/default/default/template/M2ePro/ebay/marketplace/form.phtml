@@ -12,17 +12,17 @@
     M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_ebay_category')) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Marketplaces settings have been saved.' => Mage::helper('M2ePro')->__('Marketplaces settings have been saved.'),
-        'You must select at least one marketplace you will work with.' => Mage::helper('M2ePro')->__('You must select at least one marketplace you will work with.'),
+        'Settings have been saved.' => Mage::helper('M2ePro')->__('Settings have been saved.'),
+        'You must select at least one Site you will work with.' => Mage::helper('M2ePro')->__('You must select at least one Site you will work with.'),
 
         'Another Synchronization Is Already Running.' => Mage::helper('M2ePro')->__('Another Synchronization Is Already Running.'),
         'Getting information. Please wait ...' => Mage::helper('M2ePro')->__('Getting information. Please wait ...'),
         'Preparing to start. Please wait ...' => Mage::helper('M2ePro')->__('Preparing to start. Please wait ...'),
 
         'Synchronization has successfully ended.' => Mage::helper('M2ePro')->__('Synchronization has successfully ended.'),
-        'Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.' => Mage::helper('M2ePro')->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View log</a> for details.'),
-        'Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.' => Mage::helper('M2ePro')->__('Synchronization ended with errors. <a target="_blank" href="%url%">View log</a> for details.'),
-        'Some eBay categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.' => Mage::helper('M2ePro')->__('Some eBay categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.')
+        'Synchronization ended with warnings. <a target="_blank" href="%url%">View Log</a> for details.' => Mage::helper('M2ePro')->__('Synchronization ended with warnings. <a target="_blank" href="%url%">View Log</a> for details.'),
+        'Synchronization ended with errors. <a target="_blank" href="%url%">View Log</a> for details.' => Mage::helper('M2ePro')->__('Synchronization ended with errors. <a target="_blank" href="%url%">View Log</a> for details.'),
+        'Some eBay Categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.' => Mage::helper('M2ePro')->__('Some eBay Categories were deleted from eBay. Click <a target="_blank" href="%url%">here</a> to check.')
     )); ?>);
 
     Event.observe(window, 'load', function() {
@@ -68,7 +68,7 @@
                     <?php
                         $componentName = '';
                         if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-                            $componentName = Ess_M2ePro_Helper_Component_Ebay::TITLE;
+                            $componentName = Mage::helper('M2ePro/Component_Ebay')->getTitle();
                         }
                         $isFirst = true;
                     ?>

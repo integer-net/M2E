@@ -11,7 +11,7 @@ class Ess_M2ePro_Adminhtml_Ebay_MarketplaceController extends Ess_M2ePro_Control
     protected function _initAction()
     {
         $this->loadLayout()
-            ->_title(Mage::helper('M2ePro')->__('Marketplaces'));
+            ->_title(Mage::helper('M2ePro')->__('Sites'));
 
         $this->getLayout()->getBlock('head')
             ->addJs('M2ePro/Plugin/ProgressBar.js')

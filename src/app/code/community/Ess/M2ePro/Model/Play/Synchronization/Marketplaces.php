@@ -67,7 +67,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Marketplaces
 
         $componentName = '';
         if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Play::TITLE.' ';
+            $componentName = Mage::helper('M2ePro/Component_Play')->getTitle() . ' ';
         }
 
         $params = $this->getParams();
@@ -76,7 +76,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Marketplaces
         $marketplace = Mage::helper('M2ePro/Component_Play')
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
-        $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($componentName.$marketplace->getTitle()));
+        $this->getActualLockItem()->setTitle($componentName.Mage::helper('M2ePro')->__($marketplace->getTitle()));
     }
 
     public function performActions()
@@ -95,10 +95,10 @@ final class Ess_M2ePro_Model_Play_Synchronization_Marketplaces
             'Marketplace', (int)$params['marketplace_id']
         );
         // M2ePro_TRANSLATIONS
-        // The "Categories" action for Play Marketplace: "%mrk%" has been successfully completed.
+        // The "Categories" Action for Play Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Categories" action for Play Marketplace: "%mrk%" has been successfully completed.',
+            'The "Categories" Action for Play Marketplace: "%mrk%" has been successfully completed.',
             array('mrk' => $marketplace->getTitle())
         );
 

@@ -47,7 +47,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executeQtyChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update quantity');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Quantity');
 
         $changedListingsOthers = $this->getChangedInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
@@ -63,7 +63,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executePriceChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update price');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Price');
 
         $changedListingsOthers = $this->getChangedInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
@@ -79,7 +79,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executeTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update title');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Title');
 
         /** @var $tempModel Ess_M2ePro_Model_Ebay_Listing_Other_Source */
         $tempModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Source');
@@ -98,6 +98,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
         /** @var $listingOther Ess_M2ePro_Model_Listing_Other */
         foreach ($changedListingsOthers as $listingOther) {
 
+            /* @var $ebaySynchronizationTemplate Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization */
+            $ebaySynchronizationTemplate = $listingOther->getChildObject()->getSynchronizationModel();
+
             if (!$listingOther->isListed()) {
                 return false;
             }
@@ -113,10 +116,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
                 return false;
             }
 
-            if (!$listingOther->getAccount()->getChildObject()->isOtherListingsMappedSynchronizationEnabled()) {
+            if (!$ebaySynchronizationTemplate->isMode()) {
                 return false;
             }
-            if (!$listingOther->getChildObject()->getSynchronizationModel()->isReviseWhenChangeTitle()) {
+            if (!$ebaySynchronizationTemplate->isReviseWhenChangeTitle()) {
                 return false;
             }
 
@@ -134,7 +137,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executeSubTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update subtitle');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Subtitle');
 
         /** @var $tempModel Ess_M2ePro_Model_Ebay_Listing_Other_Source */
         $tempModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Source');
@@ -151,6 +154,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
         /** @var $listingOther Ess_M2ePro_Model_Listing_Other */
         foreach ($changedListingsOthers as $listingOther) {
 
+            /* @var $ebaySynchronizationTemplate Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization */
+            $ebaySynchronizationTemplate = $listingOther->getChildObject()->getSynchronizationModel();
+
             if (!$listingOther->isListed()) {
                 return false;
             }
@@ -166,11 +172,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
                 return false;
             }
 
-            if (!$listingOther->getAccount()->getChildObject()->isOtherListingsMappedSynchronizationEnabled()) {
+            if (!$ebaySynchronizationTemplate->isMode()) {
                 return false;
             }
 
-            if (!$listingOther->getChildObject()->getSynchronizationModel()->isReviseWhenChangeSubTitle()) {
+            if (!$ebaySynchronizationTemplate->isReviseWhenChangeSubTitle()) {
                 return false;
             }
 
@@ -188,7 +194,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
 
     private function executeDescriptionChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update description');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Description');
 
         /** @var $tempModel Ess_M2ePro_Model_Ebay_Listing_Other_Source */
         $tempModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Source');
@@ -209,6 +215,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
         /** @var $listingOther Ess_M2ePro_Model_Listing_Other */
         foreach ($changedListingsOthers as $listingOther) {
 
+            /* @var $ebaySynchronizationTemplate Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization */
+            $ebaySynchronizationTemplate = $listingOther->getChildObject()->getSynchronizationModel();
+
             if (!$listingOther->isListed()) {
                 return false;
             }
@@ -224,11 +233,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
                 return false;
             }
 
-            if (!$listingOther->getAccount()->getChildObject()->isOtherListingsMappedSynchronizationEnabled()) {
+            if (!$ebaySynchronizationTemplate->isMode()) {
                 return false;
             }
 
-            if (!$listingOther->getChildObject()->getSynchronizationModel()->isReviseWhenChangeDescription()) {
+            if (!$ebaySynchronizationTemplate->isReviseWhenChangeDescription()) {
                 return false;
             }
 
@@ -275,13 +284,16 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
         }
         //--------------------
 
+        /* @var $ebaySynchronizationTemplate Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization */
+        $ebaySynchronizationTemplate = $listingOther->getChildObject()->getSynchronizationModel();
+
         // Correct synchronization
         //--------------------
-        if (!$listingOther->getAccount()->getChildObject()->isOtherListingsMappedSynchronizationEnabled()) {
+        if (!$ebaySynchronizationTemplate->isMode()) {
             return false;
         }
 
-        if (!$listingOther->getChildObject()->getSynchronizationModel()->isReviseWhenChangeQty()) {
+        if (!$ebaySynchronizationTemplate->isReviseWhenChangeQty()) {
             return false;
         }
         //--------------------
@@ -339,13 +351,16 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Revise
         }
         //--------------------
 
+        /* @var $ebaySynchronizationTemplate Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization */
+        $ebaySynchronizationTemplate = $listingOther->getChildObject()->getSynchronizationModel();
+
         // Correct synchronization
         //--------------------
-        if (!$listingOther->getAccount()->getChildObject()->isOtherListingsMappedSynchronizationEnabled()) {
+        if (!$ebaySynchronizationTemplate->isMode()) {
             return false;
         }
 
-        if (!$listingOther->getChildObject()->getSynchronizationModel()->isReviseWhenChangePrice()) {
+        if (!$ebaySynchronizationTemplate->isReviseWhenChangePrice()) {
             return false;
         }
         //--------------------

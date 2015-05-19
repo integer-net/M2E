@@ -137,7 +137,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
         }
 
         if ($this->getSourceModel()->isPriceSourceSpecial()) {
-            $price = $this->getMagentoProduct()->getSpecialPrice();
+            $price = (float)$this->getMagentoProduct()->getSpecialPrice();
             $price <= 0 && $price = $this->getMagentoProduct()->getPrice();
             $price = $this->convertPriceFromStoreToMarketplace($price);
         }

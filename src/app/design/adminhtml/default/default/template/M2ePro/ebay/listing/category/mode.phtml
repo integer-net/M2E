@@ -9,12 +9,12 @@
 
 <?php echo $this->getChildHtml('view_header'); ?>
 
-<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('You need to choose eBay categories for products in order to list them on eBay.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
+<div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('You need to choose eBay Categories for Products in order to list them on eBay.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
     <div style="padding: 2px"></div>
 
     <span>
-        <?php echo Mage::helper('M2ePro')->__('Choose one of the options below.');?>
+        <?php echo Mage::helper('M2ePro')->__('Choose one of the Options below.');?>
     </span>
 
     <form id="categories_mode_form" method="post" action="<?php echo $this->getUrl('*/*/*',array('step' => 1, '_current' => true)); ?>">
@@ -24,11 +24,11 @@
         <div style="margin:15px 0 0 10px">
 
             <input id="same" name="mode" type="radio" value="same">&nbsp;&nbsp;
-            <label style="font-weight: bold" for="same"><?php echo Mage::helper('M2ePro')->__('All products same category'); ?></label>
+            <label style="font-weight: bold" for="same"><?php echo Mage::helper('M2ePro')->__('All Products same Category'); ?></label>
 
             <div style="margin-left: 22px">
                 <div style="margin: 7px 0">
-                    <?php echo Mage::helper('M2ePro')->__('Products will be listed using the same eBay category.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Products will be Listed using the same eBay Category.'); ?>
                 </div>
                 <div style="margin-left: 0px; margin-bottom: 10px;">
                     <input name="mode_same_remember_checkbox" type="checkbox" id="mode_same_remember_checkbox">&nbsp;
@@ -40,28 +40,28 @@
             <?php if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) { ?>
 
                 <input id="category" name="mode" type="radio" value="category">&nbsp;&nbsp;
-                <label style="font-weight: bold" for="category"><?php echo Mage::helper('M2ePro')->__('Based on Magento categories'); ?></label>
+                <label style="font-weight: bold" for="category"><?php echo Mage::helper('M2ePro')->__('Based on Magento Categories'); ?></label>
 
                 <div style="margin: 10px 22px">
-                    <?php echo Mage::helper('M2ePro')->__('Products will have eBay categories set according to the Magento categories.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Products will have eBay Categories set according to the Magento Categories.'); ?>
                 </div>
 
             <?php } ?>
 
             <input id="product" name="mode" type="radio" value="product">&nbsp;&nbsp;
-            <label style="font-weight: bold" for="product"><?php echo Mage::helper('M2ePro')->__('Get suggested categories'); ?></label>
+            <label style="font-weight: bold" for="product"><?php echo Mage::helper('M2ePro')->__('Get suggested Categories'); ?></label>
 
             <div style="margin: 10px 22px">
-                <?php echo Mage::helper('M2ePro')->__('Get eBay to suggest categories for your products based on the title and Magento attribute set.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('Get eBay to suggest Categories for your Products based on the Title and Magento Attribute set.'); ?>
             </div>
 
             <?php if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) { ?>
 
                 <input id="manually" name="mode" type="radio" value="manually">&nbsp;&nbsp;
-                <label style="font-weight: bold" for="manually"><?php echo Mage::helper('M2ePro')->__('Set manually for each product'); ?></label>
+                <label style="font-weight: bold" for="manually"><?php echo Mage::helper('M2ePro')->__('Set Manually for each Product'); ?></label>
 
                 <div style="margin: 10px 22px">
-                    <?php echo Mage::helper('M2ePro')->__('Set eBay categories for each product (or a group of products) manually.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Set eBay Categories for each Product (or a group of Products) manually.'); ?>
                 </div>
 
             <?php } ?>
@@ -73,7 +73,7 @@
 
 <div id="mode_same_remember_pop_up_content" style="display: none; margin: 15px 5px">
     <div>
-        <?php echo Mage::helper('M2ePro')->__('If you continue the settings you will choose next will be applied to the current M2E Listing and automatically assigned to all products added later.<br><br>'); ?>
+        <?php echo Mage::helper('M2ePro')->__('If you continue the Settings you will choose next will be applied to the current M2E Pro Listing and automatically assigned to all Products added later.<br/><br/>'); ?>
     </div>
     <div class="clear"></div>
     <div class="right">

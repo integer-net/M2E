@@ -14,20 +14,20 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
     protected function _initAction()
     {
         $this->loadLayout()
-             ->_title(Mage::helper('M2ePro')->__('Creating A New M2E Listing'));
+             ->_title(Mage::helper('M2ePro')->__('Creating A New M2E Pro Listing'));
 
         $this->getLayout()->getBlock('head')
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addCss('M2ePro/css/Plugin/DropDown.css')
             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
             ->addCss('M2ePro/css/Plugin/ProgressBar.css')
+            ->addJs('M2ePro/AttributeHandler.js')
             ->addJs('M2ePro/Plugin/AreaWrapper.js')
             ->addJs('M2ePro/Plugin/ProgressBar.js')
             ->addJs('M2ePro/SynchProgressHandler.js')
             ->addJs('M2ePro/Ebay/Listing/MarketplaceSynchProgressHandler.js')
             ->addJs('M2ePro/TemplateHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Template/SwitcherHandler.js')
-            ->addJs('M2ePro/AttributeSetHandler.js')
             ->addJs('M2ePro/Ebay/Template/PaymentHandler.js')
             ->addJs('M2ePro/Ebay/Template/ReturnHandler.js')
             ->addJs('M2ePro/Ebay/Template/ShippingHandler.js')
@@ -113,7 +113,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
             return;
         }
         //------------------------------
-        $listingOnlyMode = Ess_M2ePro_Helper_Component_Ebay::LISTING_CREATION_MODE_LISTING_ONLY;
+        $listingOnlyMode = Ess_M2ePro_Helper_View::LISTING_CREATION_MODE_LISTING_ONLY;
         if($this->getRequest()->getParam('creation_mode') == $listingOnlyMode) {
             $this->setSessionValue('creation_mode', $listingOnlyMode);
         }
@@ -476,7 +476,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
     private function isCreationModeListingOnly()
     {
         return $this->getSessionValue('creation_mode') ===
-            Ess_M2ePro_Helper_Component_Ebay::LISTING_CREATION_MODE_LISTING_ONLY;
+        Ess_M2ePro_Helper_View::LISTING_CREATION_MODE_LISTING_ONLY;
     }
 
     //#############################################

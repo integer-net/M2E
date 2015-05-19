@@ -1,8 +1,8 @@
 <div id="block_notice_buy_template_new_product_template_core" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Description'); ?>">
     <?php echo Mage::helper('M2ePro')->__(
-        ' Description is used to design your items\' description on Rakuten.com. The more information you provide the easier it is for buyers to make a choice.
-        <br>
-        <br>
+        ' Description is used to design your Items\' Description on Rakuten.com. The more information you provide the easier it is for Buyers to make a choice.
+        <br/>
+        <br/>
         It is possible to choose a Product Description or Product Short Description, which will be taken from Magento. Or you can create a Custom Description by adding necessary information.
     '); ?>
 </div>
@@ -49,6 +49,20 @@ $default = array(
 );
 
 $formData = array_merge($default, $formData);
+
+/** @var Ess_M2ePro_Helper_Magento_Attribute $magentoAttributeHelper */
+$magentoAttributeHelper = Mage::helper('M2ePro/Magento_Attribute');
+
+$attributesByInputTypes = array(
+    'text' => $magentoAttributeHelper->filterByInputTypes($this->attributes, array('text')),
+    'text_select' => $magentoAttributeHelper->filterByInputTypes($this->attributes, array('text', 'select')),
+    'text_images' => $magentoAttributeHelper->filterByInputTypes(
+        $this->attributes,
+        array('text', 'image', 'media_image', 'gallery', 'multiline', 'textarea', 'select', 'multiselect')
+    ),
+    'text_weight' => $magentoAttributeHelper->filterByInputTypes($this->attributes, array('text', 'weight')),
+);
+
 $isEdit = !!$this->getRequest()->getParam('id');
 ?>
 
@@ -161,24 +175,32 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         <select id="title_mode" name="category[title_mode]" class="select required-entry">
                             <option style="display: none;"></option>
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_PRODUCT_NAME; ?>" <?php if ($formData['category']['title_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_PRODUCT_NAME): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Name'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_CUSTOM_TEMPLATE; ?>" <?php if ($formData['category']['title_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_CUSTOM_TEMPLATE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Title'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_CUSTOM_TEMPLATE; ?>" <?php if ($formData['category']['title_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::TITLE_MODE_CUSTOM_TEMPLATE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Item\'s title that buyers will see on Rakuten.com listing.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Item\'s Title that Buyers will see on Rakuten.com Listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="custom_title_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Title'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Title Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <input id="title_template" name="category[title_template]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['title_template']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
-                        <span id="select_attributes_for_title_span" class="select-wrapper"></span>
+                        <span id="select_attributes_for_title_span" class="select-wrapper">
+                            <select id="select_attributes_for_title">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>">
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </span>
                         <?php echo $this->getChildHtml('select_attributes_for_title_button'); ?>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your product.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your Product.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -197,10 +219,18 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     </td>
                     <td class="value">
                         <input id="manufacturer_template" name="category[mfg_name_template]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['mfg_name_template']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
-                        <span id="select_attributes_for_manufacturer_span" class="select-wrapper"></span>
+                        <span id="select_attributes_for_manufacturer_span" class="select-wrapper">
+                            <select id="select_attributes_for_manufacturer">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>">
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </span>
                         <?php echo $this->getChildHtml('select_attributes_for_mfg_name_template_button'); ?>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your product.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your Product.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -217,7 +247,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::MFG_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['mfg_part_number_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::MFG_PART_NUMBER_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('The unique part number assigned to the product by the manufacturer.
+                                <span><?php echo Mage::helper('M2ePro')->__('The unique part number assigned to the Product by the manufacturer.
                                 <br/>Use only numbers and letters without spaces.'); ?></span>
                         </p>
                     </td>
@@ -225,7 +255,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="mfg_part_number_custom_value_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Part No Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <input id="mfg_part_number_template" name="category[mfg_part_number_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['mfg_part_number_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
@@ -234,10 +264,18 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="mfg_part_number_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Part No Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="mfg_part_number_custom_attribute_td"></div>
+                        <div id="mfg_part_number_custom_attribute_td">
+                            <select id="mfg_part_number_custom_attribute" name="category[mfg_part_number_custom_attribute]">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['category']['mfg_part_number_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </td>
                 </tr>
 
@@ -259,14 +297,14 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::WEIGHT_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['weight_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::WEIGHT_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The shipping weight in pounds for product(s). Only numeric value.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The shipping weight in pounds for Product(s). Only numeric value.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="weight_custom_value_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Weight Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <input id="weight_custom_value" name="category[weight_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['weight_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible M2ePro-validation-float" />
@@ -275,10 +313,18 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="weight_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Weight Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="weight_custom_attribute_td"></div>
+                        <div id="weight_custom_attribute_td">
+                            <select id="weight_custom_attribute" name="category[weight_custom_attribute]">
+                                <?php foreach($attributesByInputTypes['text_weight'] as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['category']['weight_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </td>
                 </tr>
 
@@ -307,17 +353,25 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::IMAGE_MAIN_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['main_image_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::IMAGE_MAIN_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Image you will see on your Rakuten.com listing.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Image you will see on your Rakuten.com Listing.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="main_image_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Main Image Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <div id="main_image_attribute_td"></div>
+                        <div id="main_image_attribute_td">
+                            <select id="main_image_attribute" name="category[main_image_attribute]">
+                                <?php foreach($attributesByInputTypes['text_images'] as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['category']['main_image_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Choose Media Image Attribute or Attribute, that contains absolute url.
                                                                         <br/>i.e. http://mymagentostore.com/images/baseimage.jpg'); ?></span>
@@ -341,12 +395,20 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="additional_images_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Additional Images Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <div id="additional_images_attribute_td"></div>
+                        <div id="additional_images_attribute_td">
+                            <select id="additional_images_attribute" name="category[additional_images_attribute]">
+                                <?php foreach($attributesByInputTypes['text_images'] as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['category']['additional_images_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Choose Text, Multiple Select or Dropdown type attribute. In Text type attribute urls must be separated with comma.
+                            <span><?php echo Mage::helper('M2ePro')->__('Choose Text, Multiple Select or Dropdown type Attribute. In Text type Attribute urls must be separated with comma.
                                   <br/>e.g.  http://mymagentostore.com/images/baseimage1.jpg,  http://mymagentostore.com/images/baseimage2.jpg'); ?></span>
                         </p>
                     </td>
@@ -366,7 +428,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                         </select>
 
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The number of Additional Images. The images will be taken from Magento Product settings.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The number of Additional Images. The images will be taken from Magento Product Settings.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -397,14 +459,14 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::KEYWORDS_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['keywords_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::KEYWORDS_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Search keywords that will help customers to find your product. Separated by comma.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Search keywords that will help Customers to find your Product. Separated by comma.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="keywords_custom_value_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Keywords Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <input id="keywords_custom_value" name="category[keywords_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['keywords_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
@@ -413,10 +475,18 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="keywords_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Keywords Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="keywords_custom_attribute_td"></div>
+                        <div id="keywords_custom_attribute_td">
+                            <select id="keywords_custom_attribute" name="category[keywords_custom_attribute]">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['category']['keywords_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </td>
                 </tr>
 
@@ -431,7 +501,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::FEATURES_MODE_CUSTOM_TEMPLATE; ?>" <?php if ($formData['category']['features_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::FEATURES_MODE_CUSTOM_TEMPLATE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Features'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Allows highlighting some of the product\'s most important qualities.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Allows highlighting some of the Product\'s most important qualities.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -475,20 +545,20 @@ $isEdit = !!$this->getRequest()->getParam('id');
         <div class="hor-scroll">
             <table class="form-list" cellspacing="0" cellpadding="0">
 
-                <!-- description -->
+                <!-- Description -->
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Description Source'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <select id="description_mode" name="category[description_mode]" class="select required-entry">
                             <option style="display: none;"></option>
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_PRODUCT_FULL; ?>" <?php if ($formData['category']['description_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_PRODUCT_FULL): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Description'); ?></option>
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_PRODUCT_SHORT; ?>" <?php if ($formData['category']['description_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_PRODUCT_SHORT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Short Description'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_CUSTOM_TEMPLATE; ?>" <?php if ($formData['category']['description_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_CUSTOM_TEMPLATE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Description'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_CUSTOM_TEMPLATE; ?>" <?php if ($formData['category']['description_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_CUSTOM_TEMPLATE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Should be one block of text or a single paragraph. Do not use special characters and html tags.</br>
+                            <span><?php echo Mage::helper('M2ePro')->__('Should be one block of text or a single paragraph. Do not use special characters and html tags.<br/>
                                                                         Limited to 8\'000 characters.'); ?></span>
                         </p>
                     </td>
@@ -516,7 +586,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value">
 
                         <div class="entry-edit-head" style="background: #D6D6D6;">
-                            <h4 class="icon-head head-edit-form fieldset-legend" style="color: #EA7601;"><?php echo Mage::helper('M2ePro')->__('Custom Description Inserts'); ?></h4>
+                            <h4 class="icon-head head-edit-form fieldset-legend" style="color: #EA7601;"><?php echo Mage::helper('M2ePro')->__('Custom Inserts'); ?></h4>
                         </div>
 
                         <div class="fieldset">
@@ -527,7 +597,15 @@ $isEdit = !!$this->getRequest()->getParam('id');
                                             <label for="select_attributes_span"><?php echo Mage::helper('M2ePro')->__('Product Attribute');?>:</label>
                                         </td>
                                         <td class="value">
-                                            <span id="select_attributes_span"></span>
+                                            <span id="select_attributes_span">
+                                                 <select id="select_attributes">
+                                                     <?php foreach($this->attributes as $attribute) : ?>
+                                                         <option value="<?php echo $attribute['code']; ?>">
+                                                             <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                                         </option>
+                                                     <?php endforeach; ?>
+                                                 </select>
+                                            </span>
                                             &nbsp;
                                             <?php echo $this->getChildHtml('add_product_attribute_button'); ?>
                                             <p class="note">

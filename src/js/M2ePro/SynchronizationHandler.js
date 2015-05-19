@@ -17,7 +17,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         window.close();
     },
 
-    saveSettings : function(runSynch, components)
+    saveSettings: function(runSynch, components)
     {
         MagentoMessageObj.clearAll();
         runSynch  = runSynch  || '';
@@ -31,14 +31,12 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         CommonHandlerObj.scroll_page_to_top();
 
         var self = this;
-        new Ajax.Request( M2ePro.url.get('formSubmit', $('edit_form').serialize(true)) ,
-        {
+        new Ajax.Request(M2ePro.url.get('formSubmit', $('edit_form').serialize(true)), {
             method: 'get',
             parameters: {components: components},
             asynchronous: true,
-            onSuccess: function(transport)
-            {
-                MagentoMessageObj.addSuccess(M2ePro.translator.translate('Synchronization settings have been saved.'));
+            onSuccess: function(transport) {
+                MagentoMessageObj.addSuccess(M2ePro.translator.translate('Synchronization Settings have been saved.'));
                 if (runSynch != '') {
                     eval('self.'+runSynch+'(components);');
                 }
@@ -48,7 +46,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    runAllEnabledNow : function(components)
+    runAllEnabledNow: function(components)
     {
         this.synchProgressObj.runTask(
             M2ePro.translator.translate('Running All Enabled Tasks'),
@@ -59,7 +57,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    runNowTemplates : function(components)
+    runNowTemplates: function(components)
     {
         this.synchProgressObj.runTask(
             M2ePro.translator.translate('Inventory Synchronization'),
@@ -68,7 +66,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         );
     },
 
-    runNowOrders : function(components)
+    runNowOrders: function(components)
     {
         this.synchProgressObj.runTask(
             M2ePro.translator.translate('Orders Synchronization'),
@@ -77,7 +75,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         );
     },
 
-    runNowFeedbacks : function(components)
+    runNowFeedbacks: function(components)
     {
         this.synchProgressObj.runTask(
             M2ePro.translator.translate('Feedback Synchronization'),
@@ -86,7 +84,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         );
     },
 
-    runNowOtherListings : function(components)
+    runNowOtherListings: function(components)
     {
         this.synchProgressObj.runTask(
             M2ePro.translator.translate('3rd Party Listings Synchronization'),
@@ -97,7 +95,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    changeTemplatesMode : function(component)
+    changeTemplatesMode: function(component)
     {
         var value = $(component + '_templates_mode').value;
 
@@ -112,7 +110,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    changeOrdersMode : function(component)
+    changeOrdersMode: function(component)
     {
         var value = $(component + '_orders_mode').value;
 
@@ -123,7 +121,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    changeFeedbacksMode : function(component)
+    changeFeedbacksMode: function(component)
     {
         var value = $(component + '_feedbacks_mode').value;
 
@@ -134,7 +132,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    changeOtherListingsMode : function(component)
+    changeOtherListingsMode: function(component)
     {
         var value = $(component + '_other_listings_mode').value;
 
@@ -179,7 +177,6 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
             height: 80,
             width: 650,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -192,8 +189,7 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
     {
         new Ajax.Request(M2ePro.url.get('runReviseAll'), {
             parameters: {component: component},
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
                 this.initReviseAllInfo(
                     true, transport.responseText.evalJSON()['start_date'],
                     null, component
@@ -218,5 +214,4 @@ SynchronizationHandler.prototype = Object.extend(new CommonHandler(), {
     }
 
     //----------------------------------
-
 });

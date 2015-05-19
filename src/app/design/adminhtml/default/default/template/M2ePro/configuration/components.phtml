@@ -6,15 +6,8 @@
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Buy'); ?>,'Ess_M2ePro_Helper_Component_Buy');
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Play'); ?>,'Ess_M2ePro_Helper_Component_Play');
 
-    M2ePro.url.add(<?php echo json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_configuration_components')) ?>);
-
-    M2ePro.url.add(<?php echo json_encode(array(
-        'formSubmit' => $this->getUrl('M2ePro/adminhtml_configuration_components/save')
-    )); ?>);
-
     M2ePro.translator.add(<?php echo json_encode(array(
-        'You should enable at least one component.' => Mage::helper('M2ePro')->__('You should enable at least one component.'),
-        'Default component should be enabled.' => Mage::helper('M2ePro')->__('Default component should be enabled.')
+        'Default Component should be enabled.' => Mage::helper('M2ePro')->__('Default Component should be enabled.')
     )); ?>);
 
     Event.observe(window, 'load', function() {
@@ -27,12 +20,6 @@
         $('component_play_mode').observe('change', ComponentsHandlerObj.component_mode_change);
 
         ComponentsHandlerObj.component_mode_change();
-
-        <?php if ($this->isWizard) : ?>
-            $('magento_block_configuration_ebay_channel').hide();
-        <?php endif; ?>
-
-        configEditForm = new varienForm('config_edit_form', '<?php echo $this->getValidationUrl(); ?>');
     });
     //-----------------------------
 
@@ -51,7 +38,7 @@
     <div id="magento_block_configuration_ebay_channel">
 
         <div id="block_notice_configuration_ebay_channel" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Channels'); ?>">
-            <p><?php echo Mage::helper('M2ePro')->__('<b>Enable</b> the channels you want to sell on, then click <b>Save Config</b>.'); ?></p>
+            <p><?php echo Mage::helper('M2ePro')->__('<b>Enable</b> the Channels you want to sell on, then click <b>Save Config</b>.'); ?></p>
         </div>
 
         <div class="entry-edit" id="magento_block_configuration_channel_status">
@@ -81,7 +68,7 @@
                                         <option value="1" <?php if ($this->component_ebay_mode) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled') ?></option>
                                     </select>
                                     <p class="note">
-                                        <span><?php echo Mage::helper('M2ePro')->__('eBay channel status.') ?></span>
+                                        <span><?php echo Mage::helper('M2ePro')->__('eBay Channel Status.') ?></span>
                                     </p>
                                 </td>
                             </tr>
@@ -117,7 +104,7 @@
                     <?php if ($this->component_amazon_allowed) { ?>
                         <tr>
                             <td class="label">
-                                <label><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE); ?>: </label>
+                                <label><?php echo Mage::helper('M2ePro/Component_Amazon')->getTitle(); ?>: </label>
                             </td>
                             <td class="value">
                                 <select id="component_amazon_mode" name="component_amazon_mode" class="M2ePro-component-other">
@@ -125,7 +112,7 @@
                                     <option value="1" <?php if ($this->component_amazon_mode) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled') ?></option>
                                 </select>
                                 <p class="note">
-                                    <span><?php echo Mage::helper('M2ePro')->__('Amazon channel status.') ?></span>
+                                    <span><?php echo Mage::helper('M2ePro')->__('Amazon Channel Status.') ?></span>
                                 </p>
                             </td>
                         </tr>
@@ -165,7 +152,7 @@
                                 <?php if ($this->component_buy_allowed) { ?>
                                     <tr>
                                         <td class="label">
-                                            <label><?php echo  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE); ?>: </label>
+                                            <label><?php echo Mage::helper('M2ePro/Component_Buy')->getTitle(); ?>: </label>
                                         </td>
                                         <td class="value">
                                             <select id="component_buy_mode" name="component_buy_mode" class="M2ePro-component-other">
@@ -173,7 +160,7 @@
                                                 <option value="1" <?php if ($this->component_buy_mode) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled') ?></option>
                                             </select>
                                             <p class="note">
-                                                <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com channel status.') ?></span>
+                                                <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com Channel Status.') ?></span>
                                             </p>
                                         </td>
                                     </tr>
@@ -182,7 +169,7 @@
                                 <?php if ($this->component_play_allowed) { ?>
                                     <tr>
                                         <td class="label">
-                                            <label><?php echo  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE); ?>: </label>
+                                            <label><?php echo Mage::helper('M2ePro/Component_Play')->getTitle(); ?>: </label>
                                         </td>
                                         <td class="value">
                                             <select id="component_play_mode" name="component_play_mode" class="M2ePro-component-other">
@@ -190,7 +177,7 @@
                                                 <option value="1" <?php if ($this->component_play_mode) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled') ?></option>
                                             </select>
                                             <p class="note">
-                                                <span><?php echo Mage::helper('M2ePro')->__('Play.com channel status.') ?></span>
+                                                <span><?php echo Mage::helper('M2ePro')->__('Play.com Channel Status.') ?></span>
                                             </p>
                                         </td>
                                     </tr>
@@ -205,7 +192,7 @@
                                             <option value="0"><?php echo Mage::helper('M2ePro')->__('Disabled - Coming Soon...') ?></option>
                                         </select>
                                         <p class="note">
-                                            <span><?php echo Mage::helper('M2ePro')->__('Rakuten.de channel status.') ?></span>
+                                            <span><?php echo Mage::helper('M2ePro')->__('Rakuten.de Channel Status.') ?></span>
                                         </p>
                                     </td>
                                 </tr>
@@ -233,12 +220,12 @@
                         </td>
                         <td class="value">
                             <select id="view_common_component_default" name="view_common_component_default">
-                                <option value="<?php echo Ess_M2ePro_Helper_Component_Amazon::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Amazon::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE); ?></option>
-                                <option value="<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Buy::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE); ?></option>
-                                <option value="<?php echo Ess_M2ePro_Helper_Component_Play::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Play::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Helper_Component_Amazon::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Amazon::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro/Component_Amazon')->getTitle(); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Buy::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro/Component_Buy')->getTitle(); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Helper_Component_Play::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Play::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro/Component_Play')->getTitle(); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Open tab by default.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Open Tab by default.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -247,9 +234,6 @@
 
                 </table>
 
-                <?php if ($this->isWizard) : ?>
-                    <input type="hidden" name="validate_selected_components" value="" class="M2ePro-require-select-component" />
-                <?php endif; ?>
                 <input type="hidden" name="validate_default_component" value="" class="M2ePro-check-default-component" />
 
             </div>

@@ -10,9 +10,9 @@
 class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Child_Amazon_Abstract
 {
     // M2ePro_TRANSLATIONS
-    // Product import is disabled in Amazon Account settings.
-    // Product for Amazon Item "%id%" was created in Magento catalog.
-    // Product for Amazon Item "%title%" was created in Magento catalog.
+    // Product Import is disabled in Amazon Account Settings.
+    // Product for Amazon Item "%id%" was Created in Magento Catalog.
+    // Product for Amazon Item "%title%" was Created in Magento Catalog.
 
     // ########################################
 
@@ -207,7 +207,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         // 3rd party Item
         // ----------------
         $sku = $this->getSku();
-        if ($sku != '' && strlen($sku) <= 64) {
+        if ($sku != '' && strlen($sku) <= Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH) {
             $product = Mage::getModel('catalog/product')
                 ->setStoreId($this->getAmazonOrder()->getAssociatedStoreId())
                 ->getCollection()
@@ -246,13 +246,13 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
 
         if (!is_null($channelItem) && !$this->getAmazonAccount()->isMagentoOrdersListingsModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by M2E Pro is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($channelItem) && !$this->getAmazonAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
             throw new Exception(
-                'Magento Order creation for items listed by 3rd party software is disabled in Account settings.'
+                'Magento Order Creation for Items Listed by 3rd party software is disabled in Account Settings.'
             );
         }
     }
@@ -260,7 +260,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
     private function createProduct()
     {
         if (!$this->getAmazonAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product import is disabled in Amazon Account settings.');
+            throw new Exception('Product Import is disabled in Amazon Account Settings.');
         }
 
         $storeId = $this->getAmazonAccount()->getMagentoOrdersListingsOtherStoreId();
@@ -269,21 +269,20 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         }
 
         $sku = $this->getSku();
-        if (strlen($sku) > 64) {
-            $sku = substr($sku, strlen($sku) - 64, 64);
+        if (strlen($sku) > Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH) {
+            $hashLength = 10;
+            $savedSkuLength = Ess_M2ePro_Helper_Magento_Product::SKU_MAX_LENGTH - $hashLength - 1;
+            $hash = Mage::helper('M2ePro')->generateUniqueHash($sku, $hashLength);
 
-            // Try to find exist product with truncated sku
-            // ----------------
-            $product = Mage::getModel('catalog/product')
-                ->getCollection()
-                    ->addAttributeToSelect('sku')
-                    ->addAttributeToFilter('sku', $sku)
-                    ->getFirstItem();
+            $isSaveStart = (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+                '/order/magento/settings/', 'save_start_of_long_sku_for_new_product'
+            );
 
-            if ($product->getId()) {
-                return $product;
+            if ($isSaveStart) {
+                $sku = substr($sku, 0, $savedSkuLength).'-'.$hash;
+            } else {
+                $sku = $hash.'-'.substr($sku, strlen($sku) - $savedSkuLength, $savedSkuLength);
             }
-            // ----------------
         }
 
         $productData = array(
@@ -305,7 +304,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         // ----------------
 
         $this->getParentObject()->getOrder()->addSuccessLog(
-            'Product for Amazon Item "%title%" was created in Magento catalog.', array('!title' => $this->getTitle())
+            'Product for Amazon Item "%title%" was Created in Magento Catalog.', array('!title' => $this->getTitle())
         );
 
         return $productBuilder->getProduct();

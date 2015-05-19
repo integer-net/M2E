@@ -89,7 +89,7 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
         foreach ($collection->getItems() as $processingRequest) {
             /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
             //->__('Request was deleted during object deleting.')
-            $processingRequest->executeAsFailed('Request was deleted during object deleting.');
+            $processingRequest->getResponserRunner()->complete('Request was deleted during object deleting.');
         }
     }
 
@@ -253,7 +253,7 @@ abstract class Ess_M2ePro_Model_Abstract extends Mage_Core_Model_Abstract
         }
 
         if ($encodeType == self::SETTING_FIELD_TYPE_JSON) {
-            $settings = json_decode($settings, true);
+            $settings = @json_decode($settings, true);
         } else if ($encodeType == self::SETTING_FIELD_TYPE_SERIALIZATION) {
             $settings = @unserialize($settings);
         } else {

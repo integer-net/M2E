@@ -140,7 +140,7 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
 
     //-----------------------------------
 
-    public function setContentData($key, $value)
+    public function addContentData($key, $value)
     {
         /** @var $lockModel Ess_M2ePro_Model_LockItem **/
         $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
@@ -149,18 +149,38 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
             return false;
         }
 
-        $data = array();
-        if ($lockModel->getData('data') != '') {
-            $data = json_decode($lockModel->getData('data'),true);
+        $data = $lockModel->getData('data');
+        if (!empty($data)) {
+            $data = json_decode($data, true);
+        } else {
+            $data = array();
         }
 
         $data[$key] = $value;
+
+        $lockModel->setData('data', json_encode($data));
+        $lockModel->save();
+
+        return true;
+    }
+
+    public function setContentData(array $data)
+    {
+        /** @var $lockModel Ess_M2ePro_Model_LockItem **/
+        $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
+
+        if (!$lockModel->getId()) {
+            return false;
+        }
+
         $lockModel->setData('data',json_encode($data))->save();
 
         return true;
     }
 
-    public function getContentData($key)
+    //-----------------------------------
+
+    public function getContentData($key = NULL)
     {
         /** @var $lockModel Ess_M2ePro_Model_LockItem **/
         $lockModel = Mage::getModel('M2ePro/LockItem')->load($this->nick,'nick');
@@ -174,6 +194,10 @@ class Ess_M2ePro_Model_LockItem extends Ess_M2ePro_Model_Abstract
         }
 
         $data = json_decode($lockModel->getData('data'),true);
+
+        if (is_null($key)) {
+            return $data;
+        }
 
         if (isset($data[$key])) {
             return $data[$key];

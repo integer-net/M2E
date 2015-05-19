@@ -154,7 +154,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
     protected function _prepareColumns()
     {
         $this->addColumn('product_id', array(
-            'header'    => Mage::helper('M2ePro')->__('Product ID'),
+            'header'    => Mage::helper('M2ePro')->__('ID'),
             'align'     => 'right',
             'width'     => '100px',
             'type'      => 'number',
@@ -164,7 +164,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
         ));
 
         $this->addColumn('name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title'),
+            'header'    => Mage::helper('M2ePro')->__('Title'),
             'align'     => 'left',
             //'width'     => '100px',
             'type'      => 'text',
@@ -225,7 +225,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
         ));
 
         $this->addColumn('qty', array(
-            'header'    => Mage::helper('M2ePro')->__('Qty'),
+            'header'    => Mage::helper('M2ePro')->__('QTY'),
             'align'     => 'right',
             'width'     => '100px',
             'type'      => 'number',
@@ -331,13 +331,14 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
         //------------------------------
         $translations = json_encode(array(
             'eBay Categories' => Mage::helper('M2ePro')->__('eBay Categories'),
+            'of Product' => Mage::helper('M2ePro')->__('of Product'),
             'Specifics' => Mage::helper('M2ePro')->__('Specifics'),
-            'Automatic Actions' => Mage::helper('M2ePro')->__('Automatic Actions'),
+            'Auto Add/Remove Rules' => Mage::helper('M2ePro')->__('Auto Add/Remove Rules'),
             'Based on Magento Categories' => Mage::helper('M2ePro')->__('Based on Magento Categories'),
-            'You must select at least 1 category.' =>
-                Mage::helper('M2ePro')->__('You must select at least 1 category.'),
-            'Rule with the same title already exists.' =>
-                Mage::helper('M2ePro')->__('Rule with the same title already exists.'),
+            'You must select at least 1 Category.' =>
+                Mage::helper('M2ePro')->__('You must select at least 1 Category.'),
+            'Rule with the same Title already exists.' =>
+                Mage::helper('M2ePro')->__('Rule with the same Title already exists.'),
             'Listing Settings Customization' => Mage::helper('M2ePro')->__('Listing Settings Customization'),
         ));
         //------------------------------
@@ -387,7 +388,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
             get_selected_products: {$this->getSelectedProductsCallback()}
         });
 
-        EbayListingAutoActionHandlerObj = new EbayListingAutoActionHandler();
+        ListingAutoActionHandlerObj = new EbayListingAutoActionHandler();
 
         VideoTutorialHandlerObj = new VideoTutorialHandler(
             'video_tutorial_pop_up',

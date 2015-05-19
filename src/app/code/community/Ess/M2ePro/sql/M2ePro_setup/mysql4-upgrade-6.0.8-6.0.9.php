@@ -1038,7 +1038,8 @@ SQL
 
     private function arrayReplaceRecursive($base, $replacements)
     {
-        foreach (array_slice(func_get_args(), 1) as $replacements) {
+        $args = func_get_args();
+        foreach (array_slice($args, 1) as $replacements) {
 
             $bref_stack = array(&$base);
             $head_stack = array($replacements);

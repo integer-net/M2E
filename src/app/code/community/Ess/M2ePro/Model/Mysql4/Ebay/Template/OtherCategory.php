@@ -33,7 +33,7 @@ class Ess_M2ePro_Model_Mysql4_Ebay_Template_OtherCategory
 
         $templates = array('otherCategoryTemplate');
 
-        Mage::getSingleton('core/resource')->getConnection('core_read')->update(
+        Mage::getSingleton('core/resource')->getConnection('core_write')->update(
             Mage::getSingleton('core/resource')->getTableName('M2ePro/Listing_Product'),
             array(
                 'synch_status' => Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED,

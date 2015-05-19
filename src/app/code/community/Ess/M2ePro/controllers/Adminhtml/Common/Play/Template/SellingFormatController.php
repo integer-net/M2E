@@ -12,11 +12,10 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SellingFormatController
     protected function _initAction()
     {
         $this->loadLayout()
-            ->_title(Mage::helper('M2ePro')->__('Templates'))
-            ->_title(Mage::helper('M2ePro')->__('Selling Format Templates'));
+            ->_title(Mage::helper('M2ePro')->__('Policies'))
+            ->_title(Mage::helper('M2ePro')->__('Selling Format Policies'));
 
         $this->getLayout()->getBlock('head')
-            ->addJs('M2ePro/AttributeSetHandler.js')
             ->addJs('M2ePro/Common/Play/Template/SellingFormatHandler.js');
 
         return $this;
@@ -47,19 +46,9 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SellingFormatController
         $model = Mage::helper('M2ePro/Component_Play')->getModel('Template_SellingFormat')->load($id);
 
         if (!$model->getId() && $id) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Template does not exist'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Policy does not exist'));
             return $this->_redirect('*/*/index');
         }
-
-        $temp = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT;
-        $templateAttributeSetsCollection = Mage::getModel('M2ePro/AttributeSet')->getCollection();
-        $templateAttributeSetsCollection->addFieldToFilter('object_id', $id)
-            ->addFieldToFilter('object_type', $temp);
-
-        $templateAttributeSetsCollection->getSelect()->reset(Zend_Db_Select::COLUMNS)
-            ->columns('attribute_set_id');
-
-        $model->setData('attribute_sets', $templateAttributeSetsCollection->getColumnValues('attribute_set_id'));
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
 
@@ -114,10 +103,10 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SellingFormatController
                             ::QTY_MODE_PRODUCT_FIXED_VIRTUAL_ATTRIBUTE_VALUE;
 
         // virtual attribute for QTY_FIXED replacement
-        if ($data['qty_mode'] == Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_ATTRIBUTE &&
+        if ($data['qty_mode'] == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE &&
             $data['qty_custom_attribute'] == $tempConstant) {
 
-            $data['qty_mode'] = Ess_M2ePro_Model_Play_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED;
+            $data['qty_mode'] = Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED;
             $data['qty_custom_attribute'] = '';
         }
 
@@ -135,34 +124,8 @@ class Ess_M2ePro_Adminhtml_Common_Play_Template_SellingFormatController
         $model->getChildObject()->setSynchStatusNeed($newData,$oldData);
 
         $id = $model->getId();
-        //--------------------
 
-        // Attribute sets
-        //--------------------
-        $temp = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT;
-        $oldAttributeSets = Mage::getModel('M2ePro/AttributeSet')
-            ->getCollection()
-            ->addFieldToFilter('object_type',$temp)
-            ->addFieldToFilter('object_id',(int)$id);
-        foreach ($oldAttributeSets as $oldAttributeSet) {
-            /** @var $oldAttributeSet Ess_M2ePro_Model_AttributeSet */
-            $oldAttributeSet->deleteInstance();
-        }
-
-        if (!is_array($post['attribute_sets'])) {
-            $post['attribute_sets'] = explode(',', $post['attribute_sets']);
-        }
-        foreach ($post['attribute_sets'] as $newAttributeSet) {
-            $dataForAdd = array(
-                'object_type' => Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT,
-                'object_id' => (int)$id,
-                'attribute_set_id' => (int)$newAttributeSet
-            );
-            Mage::getModel('M2ePro/AttributeSet')->setData($dataForAdd)->save();
-        }
-        //--------------------
-
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Template was successfully saved'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Policy was successfully saved'));
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list',array(),array('edit'=>array('id'=>$id))));
     }
 

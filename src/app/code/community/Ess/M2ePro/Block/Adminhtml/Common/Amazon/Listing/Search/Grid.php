@@ -43,6 +43,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                                 array('template_selling_format_id'));
         //--------------------------------
 
+        // only parents and individuals
+        $collection->getSelect()->where('second_table.variation_parent_id IS NULL');
+
         // Communicate with magento product table
         //--------------------------------
         $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
@@ -95,7 +98,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         ));
 
         $this->addColumn('name', array(
-            'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / SKU'),
+            'header'    => Mage::helper('M2ePro')->__('Product Title / Listing / Product SKU'),
             'align'     => 'left',
             //'width'     => '300px',
             'type'      => 'text',
@@ -121,7 +124,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         ));
 
         $this->addColumn('sku', array(
-            'header' => Mage::helper('M2ePro')->__('Amazon SKU'),
+            'header' => Mage::helper('M2ePro')->__('SKU'),
             'align' => 'left',
             'width' => '150px',
             'type' => 'text',
@@ -141,7 +144,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         ));
 
         $this->addColumn('online_qty', array(
-            'header' => Mage::helper('M2ePro')->__('Amazon QTY'),
+            'header' => Mage::helper('M2ePro')->__('QTY'),
             'align' => 'right',
             'width' => '70px',
             'type' => 'number',
@@ -151,7 +154,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         ));
 
         $this->addColumn('online_price', array(
-            'header' => Mage::helper('M2ePro')->__('Amazon Price'),
+            'header' => Mage::helper('M2ePro')->__('Price'),
             'align' => 'right',
             'width' => '70px',
             'type' => 'number',
@@ -243,10 +246,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
         $value = '<span>'.Mage::helper('M2ePro')->escapeHtml($value).'</span>';
 
         $urlParams = array();
@@ -277,6 +276,31 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                   .Mage::helper('M2ePro')->__('SKU')
                   .':</strong> '
                   .Mage::helper('M2ePro')->escapeHtml($tempSku);
+
+        if ($row->getChildObject()->getVariationManager()->isVariationParent()) {
+            $productOptions = $row->getChildObject()->getVariationManager()
+                ->getTypeModel()->getProductAttributes();
+
+            $value .= '<div style="font-size: 11px; font-weight: bold; color: grey;"><br/>';
+            $value .= implode(', ', $productOptions);
+            $value .= '</div>';
+        }
+
+        if ($row->getChildObject()->getVariationManager()->isIndividualType() &&
+            $row->getChildObject()->getVariationManager()->getTypeModel()->isVariationProductMatched()
+        ) {
+            $productOptions = $row->getChildObject()->getVariationManager()->getTypeModel()->getProductOptions();
+
+            $value .= '<br/>';
+            $value .= '<div style="font-size: 11px; color: grey;"><br/>';
+            foreach ($productOptions as $attribute => $option) {
+                !$option && $option = '--';
+                $value .= '<strong>' . Mage::helper('M2ePro')->escapeHtml($attribute) .
+                    '</strong>:&nbsp;' . Mage::helper('M2ePro')->escapeHtml($option) . '<br/>';
+            }
+            $value .= '</div>';
+            $value .= '<br/>';
+        }
 
         return $value;
     }
@@ -427,27 +451,27 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
             switch ($lock->getTag()) {
 
                 case 'list_action':
-                    $value .= '<br><span style="color: #605fff">[List In Progress...]</span>';
+                    $value .= '<br/><span style="color: #605fff">[List in Progress...]</span>';
                     break;
 
                 case 'relist_action':
-                    $value .= '<br><span style="color: #605fff">[Relist In Progress...]</span>';
+                    $value .= '<br/><span style="color: #605fff">[Relist in Progress...]</span>';
                     break;
 
                 case 'revise_action':
-                    $value .= '<br><span style="color: #605fff">[Revise In Progress...]</span>';
+                    $value .= '<br/><span style="color: #605fff">[Revise in Progress...]</span>';
                     break;
 
                 case 'stop_action':
-                    $value .= '<br><span style="color: #605fff">[Stop In Progress...]</span>';
+                    $value .= '<br/><span style="color: #605fff">[Stop in Progress...]</span>';
                     break;
 
                 case 'stop_and_remove_action':
-                    $value .= '<br><span style="color: #605fff">[Stop And Remove In Progress...]</span>';
+                    $value .= '<br/><span style="color: #605fff">[Stop And Remove in Progress...]</span>';
                     break;
 
                 case 'delete_and_remove_action':
-                    $value .= '<br><span style="color: #605fff">[Remove In Progress...]</span>';
+                    $value .= '<br/><span style="color: #605fff">[Remove in Progress...]</span>';
                     break;
 
                 default:
@@ -461,8 +485,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
-        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to listing'));
-        $iconSrc = $this->getSkinUrl('M2ePro').'/images/goto_listing.png';
+        $altTitle = Mage::helper('M2ePro')->escapeHtml(Mage::helper('M2ePro')->__('Go to Listing'));
+        $iconSrc = $this->getSkinUrl('M2ePro/images/goto_listing.png');
         $url = $this->getUrl('*/adminhtml_common_amazon_listing/view/',array(
             'id' => $row->getData('listing_id'),
             'filter' => base64_encode(

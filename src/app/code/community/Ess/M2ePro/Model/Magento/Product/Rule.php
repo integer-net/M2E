@@ -135,6 +135,13 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
 
     // ------------------------------------
 
+    public function getCustomOptionsFlag()
+    {
+        return $this->getData('use_custom_options');
+    }
+
+    // ------------------------------------
+
     public function getForm()
     {
         if (!$this->_form) {
@@ -174,6 +181,22 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
 
     // ####################################
 
+    public function isEmpty()
+    {
+        if (is_null($this->_conditions)) {
+            return true;
+        }
+
+        $conditionProductsCount = 0;
+        foreach ($this->_conditions->getConditionModels() as $model) {
+            if ($model instanceof Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product) {
+                ++$conditionProductsCount;
+            }
+        }
+
+        return $conditionProductsCount == 0;
+    }
+
     /**
      * Validate magento product with rule
      *
@@ -200,17 +223,23 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
         $this->_productIds = array();
         $this->getConditions()->collectValidatedAttributes($collection);
 
+        $idFieldName = $collection->getIdFieldName();
+        if(empty($idFieldName)) {
+            $idFieldName = Mage::getModel('catalog/product')->getIdFieldName();
+        }
+
         Mage::getSingleton('core/resource_iterator')->walk(
             $collection->getSelect(),
             array(array($this, 'callbackValidateProduct')),
             array(
                 'attributes' => $this->getCollectedAttributes(),
                 'product' => Mage::getModel('catalog/product'),
-                'store_id' => $collection->getStoreId()
+                'store_id' => $collection->getStoreId(),
+                'id_field_name' => $idFieldName
             )
         );
 
-        $collection->addFieldToFilter('entity_id', array('in' => $this->_productIds));
+        $collection->addFieldToFilter($idFieldName, array('in' => $this->_productIds));
     }
 
     // ####################################
@@ -222,18 +251,27 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
         $product->setData($args['row']);
 
         if ($this->validate($product)) {
-            $this->_productIds[] = $product->getId();
+            $this->_productIds[] = $product->getData($args['id_field_name']);
         }
+    }
+
+    public function getConditionClassName()
+    {
+        return 'M2ePro/Magento_Product_Rule_Condition_Combine';
     }
 
     protected function getConditionInstance($prefix)
     {
-        $conditionInstance = Mage::getModel('M2ePro/Magento_Product_Rule_Condition_Combine')
+        $conditionInstance = Mage::getModel($this->getConditionClassName())
             ->setRule($this)
             ->setPrefix($prefix)
             ->setValue(true)
             ->setId(1)
             ->setData($prefix, array());
+
+        if (!is_null($this->getCustomOptionsFlag())) {
+            $conditionInstance->setCustomOptionsFlag($this->getCustomOptionsFlag());
+        }
 
         return $conditionInstance;
     }

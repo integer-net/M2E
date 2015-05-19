@@ -21,8 +21,8 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
     // Magento Order #%order_id% was canceled.
     // Magento Order #%order_id% was not canceled. Reason: %msg%
     // Store does not exist.
-    // Payment method "M2E Pro Payment" is disabled in magento configuration.
-    // Shipping method "M2E Pro Shipping" is disabled in magento configuration.
+    // Payment method "M2E Pro Payment" is disabled in Magento Configuration.
+    // Shipping method "M2E Pro Shipping" is disabled in Magento Configuration.
 
     // ########################################
 
@@ -374,11 +374,11 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         }
 
         if (!Mage::getStoreConfig('payment/m2epropayment/active', $store) && $strict) {
-            throw new Exception('Payment method "M2E Pro Payment" is disabled in magento configuration.');
+            throw new Exception('Payment method "M2E Pro Payment" is disabled in Magento Configuration.');
         }
 
         if (!Mage::getStoreConfig('carriers/m2eproshipping/active', $store) && $strict) {
-            throw new Exception('Shipping method "M2E Pro Shipping" is disabled in magento configuration.');
+            throw new Exception('Shipping method "M2E Pro Shipping" is disabled in Magento Configuration.');
         }
     }
 

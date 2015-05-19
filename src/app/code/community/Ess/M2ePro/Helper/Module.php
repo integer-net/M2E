@@ -60,11 +60,11 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
         $version = (string)Mage::getConfig()->getNode('modules/Ess_M2ePro/version');
         $version = strtolower($version);
 
-        if (Mage::helper('M2ePro/Data_Cache')->getValue('MODULE_VERSION_UPDATER') === false) {
+        if (Mage::helper('M2ePro/Data_Cache_Permanent')->getValue('MODULE_VERSION_UPDATER') === false) {
             Mage::helper('M2ePro/Primary')->getConfig()->setGroupValue(
                 '/modules/',$this->getName(),$version.'.r'.$this->getRevision()
             );
-            Mage::helper('M2ePro/Data_Cache')->setValue('MODULE_VERSION_UPDATER',array(),array(),60*60*24);
+            Mage::helper('M2ePro/Data_Cache_Permanent')->setValue('MODULE_VERSION_UPDATER',array(),array(),60*60*24);
         }
 
         return $version;
@@ -72,7 +72,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function getRevision()
     {
-        $revision = '7990';
+        $revision = '8740';
 
         if ($revision == str_replace('|','#','|REVISION|')) {
             $revision = (int)exec('svnversion');
@@ -222,7 +222,8 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
                     'value' => '360 sec'
                 ),
                 'current' => array(
-                    'value' => (int)$clientPhpData['max_execution_time'] . ' sec',
+                    'value' => is_null($clientPhpData['max_execution_time'])
+                               ? 'unknown' : $clientPhpData['max_execution_time'] . ' sec',
                     'status' => true
                 )
             )
@@ -230,8 +231,9 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
         foreach ($requirements as $key => &$requirement) {
 
-            // max execution time is unlimited
-            if ($key == 'max_execution_time' && $clientPhpData['max_execution_time'] == 0) {
+            // max execution time is unlimited or fcgi handler
+            if ($key == 'max_execution_time' &&
+                ($clientPhpData['max_execution_time'] == 0 || is_null($clientPhpData['max_execution_time']))) {
                 continue;
             }
 
@@ -254,8 +256,8 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
             $fullDirPath = Mage::getBaseDir().DS.$item;
 
-            if (preg_match('/\*$/',$item)) {
-                $fullDirPath = preg_replace('/\*$/', '', $fullDirPath);
+            if (preg_match('/\*.*$/',$item)) {
+                $fullDirPath = preg_replace('/\*.*$/', '', $fullDirPath);
                 $directoriesForCheck = array_merge($directoriesForCheck, $this->getDirectories($fullDirPath));
             }
 
@@ -330,7 +332,7 @@ class Ess_M2ePro_Helper_Module extends Mage_Core_Helper_Abstract
 
     public function clearCache()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeAllValues();
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeAllValues();
     }
 
     // ########################################

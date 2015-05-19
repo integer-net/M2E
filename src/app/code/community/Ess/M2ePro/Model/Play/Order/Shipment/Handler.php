@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Play_Order_Shipment_Handler extends Ess_M2ePro_Model_Orde
     public function handle(Ess_M2ePro_Model_Order $order, Mage_Sales_Model_Order_Shipment $shipment)
     {
         if (!$order->isComponentModePlay()) {
-            throw new InvalidArgumentException('Invalid component mode.');
+            throw new InvalidArgumentException('Invalid Component Mode.');
         }
 
         $trackingDetails = $this->getTrackingDetails($shipment);

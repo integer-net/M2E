@@ -27,7 +27,7 @@ abstract class Ess_M2ePro_Model_Connector_Command extends Ess_M2ePro_Model_Conne
         }
 
         if (!$this->validateResponseData($responseData)) {
-            throw new Exception('Validation Failed. The server response data is not valid.');
+            throw new Exception('Validation Failed. The Server response data is not valid.');
         }
 
         $parsedResponseData = $this->prepareResponseData($responseData);

@@ -27,8 +27,7 @@ class Ess_M2ePro_Model_Mysql4_Buy_Listing_Product
         return Mage::getResourceModel('M2ePro/Listing_Product')->getChangedItems(
             $attributes,
             Ess_M2ePro_Helper_Component_Buy::NICK,
-            $withStoreFilter,
-            array($this,'changedItemsSelectModifier')
+            $withStoreFilter
         );
     }
 
@@ -38,8 +37,7 @@ class Ess_M2ePro_Model_Mysql4_Buy_Listing_Product
         return Mage::getResourceModel('M2ePro/Listing_Product')->getChangedItemsByListingProduct(
             $attributes,
             Ess_M2ePro_Helper_Component_Buy::NICK,
-            $withStoreFilter,
-            array($this,'changedItemsSelectModifier')
+            $withStoreFilter
         );
     }
 
@@ -49,29 +47,7 @@ class Ess_M2ePro_Model_Mysql4_Buy_Listing_Product
         return Mage::getResourceModel('M2ePro/Listing_Product')->getChangedItemsByVariationOption(
             $attributes,
             Ess_M2ePro_Helper_Component_Buy::NICK,
-            $withStoreFilter,
-            array($this,'changedItemsSelectModifier')
-        );
-    }
-
-    // --------------------------------------------------
-
-    public function changedItemsSelectModifier(Varien_Db_Select $select) {
-
-        $select->join(
-            array('blp' => $this->getMainTable()),
-            '`lp`.`id` = `blp`.`listing_product_id`',
-            array()
-        );
-
-        $select->where(
-            '`blp`.`is_variation_product` = 0
-             OR
-             (
-                `blp`.`is_variation_product` = 1
-                 AND
-                 `blp`.`is_variation_matched` = 1
-             )'
+            $withStoreFilter
         );
     }
 

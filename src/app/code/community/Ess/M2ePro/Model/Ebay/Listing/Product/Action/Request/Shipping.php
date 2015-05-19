@@ -39,7 +39,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         if ($this->getShippingTemplate()->isLocalShippingFlatEnabled() ||
             $this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
 
-            $data['dispatch_time'] = $this->getShippingTemplate()->getDispatchTime();
+            $data['dispatch_time'] = $this->getEbayListingProduct()->getShippingTemplate()->getDispatchTime();
 
             // there are permissions by marketplace (interface management)
             $data['cash_on_delivery_cost'] = $this->getShippingTemplate()->getCashOnDeliveryCost();
@@ -127,19 +127,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             return $this->calculatedShippingData;
         }
 
-        $calculated = $this->getShippingTemplate()->getCalculatedShipping();
-
-        if (is_null($calculated)) {
+        if (is_null($this->getCalculatedShippingTemplate())) {
             return array();
         }
 
         $data = array(
-            'package_size' => $calculated->getPackageSize(),
-            'dimensions' => $calculated->getDimension(),
-            'weight' => $calculated->getWeight()
+            'package_size' => $this->getShippingCalculatedSource()->getPackageSize(),
+            'dimensions'   => $this->getShippingCalculatedSource()->getDimension(),
+            'weight'       => $this->getShippingCalculatedSource()->getWeight()
         );
 
-        switch ($calculated->getMeasurementSystem()) {
+        switch ($this->getCalculatedShippingTemplate()->getMeasurementSystem()) {
             case Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated::MEASUREMENT_SYSTEM_ENGLISH:
                 $data['measurement_system'] = self::MEASUREMENT_SYSTEM_ENGLISH;
                 break;
@@ -164,7 +162,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             return $data;
         }
 
-        $data['discount_enabled'] = $this->getShippingTemplate()->isLocalShippingDiscountEnabled();
+        $data['discount_enabled']    = $this->getShippingTemplate()->isLocalShippingDiscountEnabled();
         $data['discount_profile_id'] = $this->getShippingTemplate()
                                             ->getLocalShippingDiscountProfileId(
                                                 $this->getListingProduct()->getListing()->getAccountId()
@@ -181,7 +179,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         }
 
         if ($this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
-            $data['handing_cost'] = $this->getShippingTemplate()->getCalculatedShipping()->getLocalHandlingCost();
+            $data['handing_cost'] = $this->getCalculatedShippingTemplate()->getLocalHandlingCost();
         }
 
         $data['methods'] = $this->getLocalServices();
@@ -205,6 +203,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         if ($this->getShippingTemplate()->isLocalShippingCalculatedEnabled()) {
             return self::SHIPPING_TYPE_CALCULATED;
         }
+
+        throw new LogicException('Unknown local shipping type.');
     }
 
     private function getLocalServices()
@@ -225,8 +225,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
 
             if ($this->getShippingTemplate()->isLocalShippingFlatEnabled()) {
 
-                $tempDataMethod['cost'] = $service->getCost();
-                $tempDataMethod['cost_additional'] = $service->getCostAdditional();
+                $tempDataMethod['cost'] = $service->getSource($this->getMagentoProduct())
+                                                  ->getCost();
+
+                $tempDataMethod['cost_additional'] = $service->getSource($this->getMagentoProduct())
+                                                             ->getCostAdditional();
 
                 if (!$this->getShippingTemplate()->isLocalShippingRateTableEnabled() &&
                     in_array($this->getShippingTemplate()->getMarketplaceId(), array(
@@ -234,7 +237,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
                         Ess_M2ePro_Helper_Component_Ebay::MARKETPLACE_MOTORS,
                     )) && preg_match('/(FedEx|UPS)/', $service->getShippingValue())) {
 
-                    $tempDataMethod['cost_surcharge'] = $service->getCostSurcharge();
+                    $tempDataMethod['cost_surcharge'] = $service->getSource($this->getMagentoProduct())
+                                                                ->getCostSurcharge();
                 }
             }
 
@@ -268,8 +272,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         }
 
         if ($this->getShippingTemplate()->isInternationalShippingCalculatedEnabled()) {
-            $data['handing_cost'] = $this->getShippingTemplate()->getCalculatedShipping()
-                                            ->getInternationalHandlingCost();
+            $data['handing_cost'] = $this->getCalculatedShippingTemplate()->getInternationalHandlingCost();
         }
 
         $data['methods'] = $this->getInternationalServices();
@@ -288,6 +291,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
         if ($this->getShippingTemplate()->isInternationalShippingCalculatedEnabled()) {
             return self::SHIPPING_TYPE_CALCULATED;
         }
+
+        throw new LogicException('Unknown international shipping type.');
     }
 
     private function getInternationalServices()
@@ -308,8 +313,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             );
 
             if ($this->getShippingTemplate()->isInternationalShippingFlatEnabled()) {
-                $tempDataMethod['cost'] = $service->getCost();
-                $tempDataMethod['cost_additional'] = $service->getCostAdditional();
+
+                $tempDataMethod['cost'] = $service->getSource($this->getMagentoProduct())
+                                                  ->getCost();
+
+                $tempDataMethod['cost_additional'] = $service->getSource($this->getMagentoProduct())
+                                                             ->getCostAdditional();
             }
 
             $services[] = $tempDataMethod;
@@ -347,11 +356,30 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
     private function getShippingTemplate()
     {
         if (is_null($this->shippingTemplate)) {
-            $this->shippingTemplate = $this->getListingProduct()
-                                           ->getChildObject()
-                                           ->getShippingTemplate();
+            $this->shippingTemplate = $this->getEbayListingProduct()->getShippingTemplate();
         }
+
         return $this->shippingTemplate;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated | null
+     */
+    private function getCalculatedShippingTemplate()
+    {
+        return $this->getShippingTemplate()->getCalculatedShipping();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated_Source | null
+     */
+    private function getShippingCalculatedSource()
+    {
+        if (!is_null($calculatedShipping = $this->getCalculatedShippingTemplate())) {
+            return $calculatedShipping->getSource($this->getMagentoProduct());
+        }
+
+        return null;
     }
 
     // ########################################

@@ -60,6 +60,7 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
 
         var redirectUrl = M2ePro.url.get('adminhtml_ebay_category/index');
         if (isEdit && saveParams.category_mode && saveParams.category_value) {
+
             var activeTabId = null;
             if (type == 'primary') {
                 var activeTab = ebayConfigurationCategoryEditPrimaryTabsJsTabs.activeTab;
@@ -76,12 +77,10 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
             })
         }
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/save'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/save'), {
             method: 'post',
             parameters: saveParams,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
                 setLocation(redirectUrl);
             }
         });
@@ -107,8 +106,7 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
         var categoryData = EbayListingCategoryChooserHandlerObj.getInternalData();
         var marketplaceId = EbayListingCategoryChooserHandlerObj.marketplaceId;
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/getConfigurationCategorySpecificHtml'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/getConfigurationCategorySpecificHtml'), {
             method: 'post',
             parameters: {
                 category_mode: categoryData.mode,
@@ -116,8 +114,7 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
                 marketplace: marketplaceId,
                 templates: self.templates
             },
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
                 $('ebayConfigurationCategoryEditPrimaryTabs_specific_content').innerHTML = transport.responseText;
                 $('ebayConfigurationCategoryEditPrimaryTabs_specific_content').innerHTML.extractScripts()
                     .map(function(script) {
@@ -164,7 +161,7 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
         var self = EbayConfigurationCategoryHandlerObj;
 
         var skipConfirmation = getCookie('ebay_configuration_category_skip_save_confirmation');
-        var confirmText = M2ePro.translator.translate('<b>Note:</b> All changes you have made will be automatically applied to all M2E listings where this category is used.');
+        var confirmText = M2ePro.translator.translate('<b>Note:</b> All changes you have made will be automatically applied to all M2E Pro Listings where this Category is used.');
 
         if (skipConfirmation) {
             okCallback(type, isEdit);
@@ -174,7 +171,7 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
         self.saveConfirm = false;
         var template = $('dialog_confirm_container');
 
-        template.down('.dialog_confirm_content').innerHTML = '<div class="magento-message"><br>'+confirmText+'</div>' +
+        template.down('.dialog_confirm_content').innerHTML = '<div class="magento-message"><br/>'+confirmText+'</div>' +
             '<div style="position: absolute; bottom: 0; left: 0; padding: 10px;">' +
             '<input type="checkbox" id="do_not_show_again" name="do_not_show_again">&nbsp;' +
                 M2ePro.translator.translate('Do not show any more') +
@@ -192,7 +189,6 @@ EbayConfigurationCategoryHandler.prototype = Object.extend(new CommonHandler(), 
                 height: 80,
                 width: 650,
                 zIndex: 2100,
-                recenterAuto: false,
                 destroyOnClose: true,
                 hideEffect: Element.hide,
                 showEffect: Element.show,

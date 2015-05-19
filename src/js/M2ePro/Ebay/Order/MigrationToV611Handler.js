@@ -56,13 +56,12 @@ EbayOrderMigrationToV611Handler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = EbayOrderMigrationToV611HandlerObj;
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_order/migrateOrdersPackToV611') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_order/migrateOrdersPackToV611'), {
             parameters: {
                 orders_count: self.orderCountPerAjaxRequest
             },
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 var percents = (100/requestsCount)*currentRequest;
 
                 if (percents <= 0) {
@@ -87,5 +86,4 @@ EbayOrderMigrationToV611Handler.prototype = Object.extend(new CommonHandler(), {
     }
 
     //----------------------------------
-
 });

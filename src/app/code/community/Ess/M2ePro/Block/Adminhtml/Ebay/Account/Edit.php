@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit extends Mage_Adminhtml_Block_
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Ebay_Component')->isSingleActiveComponent()) {
-            $componentName = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
+            $componentName = Mage::helper('M2ePro/Component_Ebay')->getTitle();
             $headerTextEdit = Mage::helper('M2ePro')->__("Edit %component_name% Account", $componentName);
             $headerTextAdd = Mage::helper('M2ePro')->__("Add %component_name% Account", $componentName);
         } else {
@@ -70,12 +70,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit extends Mage_Adminhtml_Block_
             'label'     => Mage::helper('M2ePro')->__('Back'),
             'onclick'   => 'EbayAccountHandlerObj.back_click(\'' .Mage::helper('M2ePro')->getBackUrl('list').'\')',
             'class'     => 'back'
-        ));
-
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'EbayAccountHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data') &&

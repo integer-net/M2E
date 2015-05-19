@@ -33,7 +33,8 @@ abstract class Ess_M2ePro_Controller_Adminhtml_Development_MainController
 
     private function addDevelopmentNotification()
     {
-        if (!Mage::helper('M2ePro/Magento')->isDeveloper() && Mage::helper('M2ePro/Module')->isProductionMode()) {
+        if (!Mage::helper('M2ePro/Magento')->isDeveloper() &&
+            !Mage::helper('M2ePro/Module')->isDevelopmentMode()) {
             return false;
         }
 
@@ -41,7 +42,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_Development_MainController
         Mage::helper('M2ePro/Magento')->isDeveloper() && $enabledMods[] = 'Magento';
         Mage::helper('M2ePro/Module')->isDevelopmentMode() && $enabledMods[] = 'M2ePro';
 
-        $this->_getSession()->addWarning(implode(', ', $enabledMods).' development mode is Active.');
+        $this->_getSession()->addWarning(implode(', ', $enabledMods).' Development Mode is Enabled.');
 
         return true;
     }

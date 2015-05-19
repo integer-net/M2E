@@ -3,16 +3,16 @@ DropDown.prototype = {
 
     // --------------------------------
 
-    initialize : function()
+    initialize: function()
     {
-        $$('.tab-item-link').each(function(el){
+        $$('.tab-item-link').each(function(el) {
             el.observe('click', this.hideItems);
         }.bind(this));
     },
 
     // --------------------------------
 
-    observe : function()
+    observe: function()
     {
         var self = this;
         $$('.drop_down').each(function(node) {
@@ -22,7 +22,7 @@ DropDown.prototype = {
 
     // --------------------------------
 
-    prepare : function(node)
+    prepare: function(node)
     {
         // we can't use just $(node) here, as we can have multiple elements with the same ID on the page because of floating toolbar
         // and we have to put the drop down only for that element, which is under the #anchor-content element
@@ -60,7 +60,7 @@ DropDown.prototype = {
 
     // --------------------------------
 
-    toggleItems : function(event)
+    toggleItems: function(event)
     {
         var tempId = this.id + '_drop_down';
         if ($(tempId).getStyle('display') == 'none') {
@@ -79,7 +79,7 @@ DropDown.prototype = {
 
             if (dropDownWidth < relatedObjectWidth) {
                 $(tempId).setStyle({
-                    width : relatedObjectWidth + 'px'
+                    width: relatedObjectWidth + 'px'
                 });
             }
 
@@ -94,7 +94,7 @@ DropDown.prototype = {
         }
     },
 
-    hideItems : function()
+    hideItems: function()
     {
         $$('.drop_down_menu').each(Element.hide);
 

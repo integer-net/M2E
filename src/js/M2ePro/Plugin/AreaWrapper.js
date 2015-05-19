@@ -3,7 +3,7 @@ AreaWrapper.prototype = {
 
     //----------------------------------
 
-    initialize : function(containerId)
+    initialize: function(containerId)
     {
         if (typeof containerId == 'undefined') {
             containerId = '';
@@ -19,26 +19,26 @@ AreaWrapper.prototype = {
 
     //----------------------------------
 
-    makeWrapperHtml : function()
+    makeWrapperHtml: function()
     {
         var html = '<div id="' + this.wrapperId + '" class="area_wrapper" style="display: none;">&nbsp;</div>';
-        $(this.containerId).insert ({'top':html} );
+        $(this.containerId).insert ({'top':html});
     },
 
-    addDivClearBothToContainer : function()
+    addDivClearBothToContainer: function()
     {
         $(this.containerId).innerHTML += '<div style="clear: both;"></div>';
     },
 
     //----------------------------------
 
-    lock : function()
+    lock: function()
     {
         $(this.containerId).setStyle({position: 'relative'});
         $(this.wrapperId).show();
     },
 
-    unlock : function()
+    unlock: function()
     {
         $(this.wrapperId).hide();
         $(this.containerId).setStyle({position: this.containerPosition});

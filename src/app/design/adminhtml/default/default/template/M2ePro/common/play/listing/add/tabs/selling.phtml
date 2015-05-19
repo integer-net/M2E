@@ -1,0 +1,584 @@
+<div id="block_notice_play_listing_add_selling_settings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Selling Settings'); ?>">
+    <?php echo Mage::helper('M2ePro')->__('This Section allows you to set data related to the future offers of Items in this Listing.<br/><br/>
+
+    You need to set the Source for SKU to be taken from and the Item Condition. You can also specify Additional Details for your offers.<br/>
+    You also have to choose Selling Format Policy, which contains Price and Quantity Settings for Products in Listings, as well as Synchronization Policy, which specifies the Rules and Conditions which will be used for automatic data coordination between M2E Pro and respective Marketplace.'); ?>
+</div>
+
+<?php
+    /** @var Ess_M2ePro_Helper_Magento_Attribute $magentoAttributeHelper */
+    $magentoAttributeHelper = Mage::helper('M2ePro/Magento_Attribute');
+
+    $attributesByInputTypes = array(
+        'text_textarea' => $magentoAttributeHelper->filterByInputTypes(
+            $this->getData('all_attributes'), array('text', 'textarea')
+        ),
+    );
+
+    $generalAttributesByInputTypes = array(
+        'text' => $magentoAttributeHelper->filterByInputTypes($this->getData('general_attributes'), array('text')),
+        'text_price' => $magentoAttributeHelper->filterByInputTypes($this->getData('general_attributes'), array('text', 'price')),
+        'text_select' => $magentoAttributeHelper->filterByInputTypes(
+            $this->getData('general_attributes'), array('text', 'select')
+        ),
+    );
+
+    $isEdit = !!$this->getRequest()->getParam('id');
+?>
+
+<script type="text/javascript">
+
+    // ie bug fix
+    // ---------
+    if (Prototype && Prototype.Browser.IE && varienLoaderHandler) {
+        var loaderOnCompleteFunction = varienLoaderHandler.handler.onComplete;
+        varienLoaderHandler.handler.onComplete = function() {
+
+            loaderOnCompleteFunction();
+            $$('select').each(function (el) {
+                $(el).style.visibility = 'visible';
+            });
+        }
+    }
+    // ---------
+
+    // Data for current tab
+    //-----------------------------
+    M2ePro.text.condition_note_length_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Must be not more than 2000 characters long.')); ?>';
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Play'); ?>,
+        'Ess_M2ePro_Helper_Component'
+    );
+
+    M2ePro.url.addNewSellingFormatTemplate = '<?php echo $this->getUrl('*/adminhtml_common_play_template_sellingFormat/new'); ?>';
+    M2ePro.url.addNewSynchronizationTemplate = '<?php echo $this->getUrl('*/adminhtml_common_play_template_synchronization/new'); ?>';
+    M2ePro.url.editSellingFormatTemplate = '<?php echo $this->getUrl('*/adminhtml_common_play_template_sellingFormat/edit'); ?>' + 'id/';
+    M2ePro.url.getSellingFormatTemplates = '<?php echo $this->getUrl('*/adminhtml_general/modelGetAll',array('model'=>'Template_SellingFormat','id_field'=>'id','data_field'=>'title','sort_field'=>'title','sort_dir'=>'ASC','component_mode'=>Ess_M2ePro_Helper_Component_Play::NICK)); ?>';
+    M2ePro.url.editSynchronizationTemplate = '<?php echo $this->getUrl('*/adminhtml_common_play_template_synchronization/edit'); ?>' + 'id/';
+    M2ePro.url.getSynchronizationTemplates = '<?php echo $this->getUrl('*/adminhtml_general/modelGetAll',array('model'=>'Template_Synchronization','id_field'=>'id','data_field'=>'title','component_mode'=>Ess_M2ePro_Helper_Component_Play::NICK)); ?>';
+
+    M2ePro.autoCompleteData = {
+        url : {}
+    };
+    M2ePro.autoCompleteData.flags = {
+        sellingFormatTemplatesDropDown    : <?php echo $this->sellingFormatTemplatesDropDown    ? 'true' : 'false'; ?>,
+        synchronizationsTemplatesDropDown : <?php echo $this->synchronizationsTemplatesDropDown ? 'true' : 'false'; ?>
+    };
+    M2ePro.autoCompleteData.url.getSynchronizationTemplates    = '<?php echo $this->getUrl('*/adminhtml_common_general/searchAutocomplete', array('model' => 'Template_Synchronization', 'component' => Ess_M2ePro_Helper_Component_Play::NICK)); ?>';
+
+    Event.observe(window, 'load', function() {
+
+        CommonListingSettingsHandlerObj = new CommonListingSettingsHandler();
+        CommonListingSettingsHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Listing'); ?>');
+
+        PlayListingChannelSettingsHandlerObj = new PlayListingChannelSettingsHandler();
+        PlayListingChannelSettingsHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Play_Listing'); ?>');
+
+        $('template_selling_format_id').observe('change', function() {
+            if ($('template_selling_format_id').value) {
+                $('edit_selling_format_template_link').show();
+            } else {
+                $('edit_selling_format_template_link').hide();
+            }
+        });
+        $('template_selling_format_id').simulate('change');
+
+        $('template_synchronization_id').observe('change', function() {
+            if ($('template_synchronization_id').value) {
+                $('edit_synchronization_template_link').show();
+            } else {
+                $('edit_synchronization_template_link').hide();
+            }
+        });
+        $('template_synchronization_id').simulate('change');
+
+        AutoCompleteHandler = new AutoComplete();
+
+        if (M2ePro.autoCompleteData.flags.sellingFormatTemplatesDropDown) {
+            $('template_selling_format_id').observe('change', CommonListingSettingsHandlerObj.selling_format_template_id_change)
+            if ($('template_selling_format_id').value) {
+                $('template_selling_format_id').simulate('change');
+            }
+        } else {
+            AutoCompleteHandler.bind('template_selling_format_autocomplete',
+                M2ePro.autoCompleteData.url.getSellingFormatTemplates,
+                M2ePro.formData.template_selling_format_id > 0 ? M2ePro.formData.template_selling_format_id : '',
+                M2ePro.formData.template_selling_format_title,
+                function (id) { $('template_selling_format_id').value = id; $('template_selling_format_id').simulate('change'); }
+            );
+            $('template_selling_format_id').value = $('template_selling_format_autocomplete').readAttribute('selected_id');
+            M2ePro.formData.template_selling_format_id > 0 && $('template_selling_format_autocomplete').setStyle({color: 'initial'});
+        }
+
+        if (M2ePro.autoCompleteData.flags.synchronizationsTemplatesDropDown) {
+            $('template_synchronization_id').observe('change', CommonListingSettingsHandlerObj.synchronization_template_id_change)
+            if ($('template_synchronization_id').value) {
+                $('template_synchronization_id').simulate('change');
+            }
+        } else {
+            AutoCompleteHandler.bind('template_synchronization_autocomplete',
+                M2ePro.autoCompleteData.url.getSynchronizationTemplates,
+                M2ePro.formData.template_synchronization_id > 0 ? M2ePro.formData.template_synchronization_id : '',
+                M2ePro.formData.template_synchronization_title,
+                function (id) { $('template_synchronization_id').value = id; $('template_synchronization_id').simulate('change'); }
+            );
+            $('template_synchronization_id').value = $('template_synchronization_autocomplete').readAttribute('selected_id');
+            M2ePro.formData.template_synchronization_id > 0 && $('template_synchronization_autocomplete').setStyle({color: 'initial'});
+        }
+
+        $('sku_mode').observe('change', PlayListingChannelSettingsHandlerObj.sku_mode_change);
+
+        $('dispatch_to_mode').observe('change', PlayListingChannelSettingsHandlerObj.dispatch_to_mode_change);
+        $('dispatch_to_mode').simulate('change');
+
+        $('dispatch_from_mode').observe('change', PlayListingChannelSettingsHandlerObj.dispatch_from_mode_change);
+        $('dispatch_from_mode').simulate('change');
+
+        $('shipping_price_gbr_mode').observe('change', PlayListingChannelSettingsHandlerObj.price_gbr_mode_change);
+        $('shipping_price_gbr_mode').simulate('change');
+
+        $('shipping_price_euro_mode').observe('change', PlayListingChannelSettingsHandlerObj.price_euro_mode_change);
+        $('shipping_price_euro_mode').simulate('change');
+
+        $('condition_mode').observe('change', PlayListingChannelSettingsHandlerObj.condition_mode_change);
+        $('condition_mode').simulate('change');
+
+        $('condition_note_mode').observe('change', PlayListingChannelSettingsHandlerObj.condition_note_mode_change);
+    });
+    //-----------------------------
+
+</script>
+
+<div class="entry-edit" id="magento_block_play_listing_sku_settings">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Reference Code Settings'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="sku_mode"><?php echo Mage::helper('M2ePro')->__('Source') ?>:</label>
+                    </td>
+                    <td class="value">
+                        <input type="hidden" id="sku_custom_attribute" name="sku_custom_attribute" value="<?php echo $this->getData('sku_custom_attribute'); ?>" />
+
+                        <select name="sku_mode" id="sku_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::SKU_MODE_PRODUCT_ID ?>" <?php if ($this->getData('sku_mode') == Ess_M2ePro_Model_Play_Listing::SKU_MODE_PRODUCT_ID) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Product ID') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::SKU_MODE_DEFAULT ?>" <?php if ($this->getData('sku_mode') == Ess_M2ePro_Model_Play_Listing::SKU_MODE_DEFAULT) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Product SKU') ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php foreach ($generalAttributesByInputTypes['text'] as $attribute): ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Play_Listing::SKU_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($this->getData('sku_custom_attribute') == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
+                                <?php endforeach ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('A unique ID, which identify a Product in your Play.com Seller Inventory.<br/>
+                            <b>Note:</b> If you list a Product and M2E Pro find a Product with the same Reference Code in Play.com Inventory, they will be Mapped.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="generate_sku_mode"><?php echo Mage::helper('M2ePro')->__('Generate') ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select name="generate_sku_mode" id="generate_sku_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::GENERATE_SKU_MODE_NO; ?>" <?php if ($this->getData('generate_sku_mode') == Ess_M2ePro_Model_Play_Listing::GENERATE_SKU_MODE_NO) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('No') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::GENERATE_SKU_MODE_YES ?>" <?php if ($this->getData('generate_sku_mode') == Ess_M2ePro_Model_Play_Listing::GENERATE_SKU_MODE_YES) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Yes') ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('If <strong>Yes</strong>, then if Merchant SKU of the Product you list is found in the 3rd Party, M2E Pro Listings or among the Products that are currently in process of Listing, another SKU will be automatically created and the Product will be Listed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_listing_add_templates">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Policies'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="template_selling_format_id"><?php echo Mage::helper('M2ePro')->__('Selling Format Policy'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td id="template_selling_format_cell" class="value">
+                        <?php if ($this->sellingFormatTemplatesDropDown): ?>
+                            <select id="template_selling_format_id" name="template_selling_format_id" <?php if (!count($this->sellingFormatTemplates)) echo 'style="display: none;"';?> class="required-entry">
+                                <?php if (!$this->getData('template_selling_format_id')): ?>
+                                    <option class="empty"></option>
+                                <?php endif ?>
+                                <?php foreach ($this->sellingFormatTemplates as $item) { ?>
+                                    <option value="<?php echo $item['id']; ?>" <?php if ($item['id'] == $this->getData('template_selling_format_id')) echo ' selected="selected"'; ?>><?php echo $item['title']; ?></option>
+                                <?php } ?>
+                            </select>
+                            <span id="template_selling_format_label" <?php if (count($this->sellingFormatTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No Policies available.'); ?></span>
+                        <?php else: ?>
+                            <input type="text" id="template_selling_format_autocomplete" class="input-text" selected_id="" style="width: 275px; color: gray;"
+                                   value="<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>"
+                                   onblur="if (this.value.trim().length == 0) {
+                                       this.value = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>';
+                                       this.style.color = 'gray';
+                                       }"
+                                   onfocus="if (this.value == '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>') {
+                                       this.value = '';
+                                       this.style.color = '';
+                                       }"
+                                >
+                            <input type="hidden" name="template_selling_format_id" id="template_selling_format_id" class="required-entry" value="" />
+                        <?php endif; ?>
+                        <p class="note">
+                            <span id="template_selling_format_note" <?php if (!count($this->sellingFormatTemplates)) echo 'style="display: none;"';?>>
+                            <?php if ($this->sellingFormatTemplatesDropDown) { ?>
+                                <span><?php echo Mage::helper('M2ePro')->__('All Selling Format Policies you have created.'); ?></span>
+                            <?php } else {?>
+                                <span><?php echo Mage::helper('M2ePro')->__('Search for Policy you have created.'); ?></span>
+                            <?php } ?>
+                            </span>
+                        </p>
+                    </td>
+                    <td class="value">
+                        <span id="edit_selling_format_template_link">
+                            <a href="javascript: void(0);" onclick="CommonListingSettingsHandlerObj.openWindow(M2ePro.url.editSellingFormatTemplate+$('template_selling_format_id').value);"><?php echo Mage::helper('M2ePro')->__('View') ?>&nbsp;/&nbsp;<?php echo Mage::helper('M2ePro')->__('Edit') ?></a>
+                            <?php echo Mage::helper('M2ePro')->__('or') ?>
+                        </span>
+                        <a href="javascript: void(0);" onclick="CommonListingSettingsHandlerObj.addNewTemplate(M2ePro.url.addNewSellingFormatTemplate, CommonListingSettingsHandlerObj.newSellingFormatTemplateCallback);"><?php echo Mage::helper('M2ePro')->__('Add New') ?></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td id="template_selling_format_messages"></td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="template_synchronization_id"><?php echo Mage::helper('M2ePro')->__('Synchronization Policy'); ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <?php if ($this->synchronizationsTemplatesDropDown): ?>
+                            <select id="template_synchronization_id" name="template_synchronization_id" <?php if (!count($this->synchronizationsTemplates)) echo 'style="display: none;"';?> class="required-entry">
+                                <?php if (!$this->getData('template_synchronization_id')): ?>
+                                    <option class="empty"></option>
+                                <?php endif ?>
+                                <?php foreach ($this->synchronizationsTemplates as $item){ ?>
+                                    <option value="<?php echo $item['id']; ?>" <?php if ($item['id'] == $this->getData('template_synchronization_id')) echo ' selected="selected"'; ?>><?php echo $item['title']; ?></option>
+                                <?php } ?>
+                            </select>
+                            <span id="template_synchronization_label" <?php if (count($this->synchronizationsTemplates)) echo 'style="display: none;"';?>><?php echo Mage::helper('M2ePro')->__('No Policies available.'); ?></span>
+                        <?php else:?>
+                            <input type="text" id="template_synchronization_autocomplete" class="input-text" selected_id="" style="width: 275px; color: gray;"
+                                   value="<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>"
+                                   onblur="if (this.value.trim().length == 0) {
+                                       this.value = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>';
+                                       this.style.color = 'gray';
+                                       }"
+                                   onfocus="if (this.value == '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Type Policy Name Here...')); ?>') {
+                                       this.value = '';
+                                       this.style.color = '';
+                                       }"
+                                >
+                            <input type="hidden" name="template_synchronization_id" id="template_synchronization_id" class="required-entry" value="" />
+                        <?php endif; ?>
+                        <p class="note">
+                            <span id="template_synchronization_note" <?php if (!count($this->synchronizationsTemplates)) echo 'style="display: none;"';?>>
+                            <?php if ($this->synchronizationsTemplatesDropDown) { ?>
+                                <span><?php echo Mage::helper('M2ePro')->__('All Synchronization Policies you have created.'); ?></span>
+                            <?php } else {?>
+                                <span><?php echo Mage::helper('M2ePro')->__('Search for Synchronization Policy you have created.'); ?></span>
+                            <?php } ?>
+                            </span>
+                        </p>
+                    </td>
+                    <td class="value">
+                        <span id="edit_synchronization_template_link">
+                            <a href="javascript: void(0);" onclick="CommonListingSettingsHandlerObj.openWindow(M2ePro.url.editSynchronizationTemplate+$('template_synchronization_id').value);"><?php echo Mage::helper('M2ePro')->__('View') ?>&nbsp;/&nbsp;<?php echo Mage::helper('M2ePro')->__('Edit') ?></a>
+                            <?php echo Mage::helper('M2ePro')->__('or') ?>
+                        </span>
+                        <a href="javascript: void(0);" onclick="CommonListingSettingsHandlerObj.addNewTemplate(M2ePro.url.addNewSynchronizationTemplate, CommonListingSettingsHandlerObj.newSynchronizationTemplateCallback);"><?php echo Mage::helper('M2ePro')->__('Add New') ?></a>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<div class="entry-edit" id="magento_block_play_listing_channel_settings_shipping">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Shipping Settings'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <div id="block_notice_play_listing_general_shipping" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Shipping'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('
+                            This Section determines information about how your Products will be Shipped.
+                            <br/><br/>
+                            <b>Note:</b> <i>Not Set / Not Changeable</i> is used for the 3rd Party Listings mainly. If this Option is chosen, Play.com will be used as a Master Record.
+                            '); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="dispatch_to_mode"><?php echo Mage::helper('M2ePro')->__('Delivery Region') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <input type="hidden" id="dispatch_to_custom_attribute" name="dispatch_to_custom_attribute" value="<?php echo $this->getData('dispatch_to_custom_attribute'); ?>" />
+                        <input type="hidden" id="dispatch_to_value" name="dispatch_to_value" value="<?php echo $this->getData('dispatch_to_value'); ?>" />
+
+                        <select name="dispatch_to_mode" id="dispatch_to_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_MODE_NOT_SET ?>" <?php if ($this->getData('dispatch_to_mode') == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_MODE_NOT_SET) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Not Set / Not Changeable') ?></option>
+
+                            <optgroup label="Recommended Value">
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK ?>" <?php if ($this->getData('dispatch_to_value') == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_UK) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('UK Only') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA ?>" <?php if ($this->getData('dispatch_to_value') == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_EUROPA) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Europe Only') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH ?>" <?php if ($this->getData('dispatch_to_value') == Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_BOTH) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('UK & Europe') ?></option>
+                            </optgroup>
+
+                            <optgroup label="Magento Attribute">
+                                <?php foreach ($generalAttributesByInputTypes['text_select'] as $attribute): ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_TO_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($this->getData('dispatch_to_custom_attribute') == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
+                                <?php endforeach ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Region to which you are willing to deliver.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
+                        <label for="dispatch_from_mode"><?php echo Mage::helper('M2ePro')->__('Dispatch Country') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <input type="hidden" name="dispatch_from_value" id="dispatch_from_value" value="<?php echo $this->getData('dispatch_from_value'); ?>" />
+
+                        <select name="dispatch_from_mode" id="dispatch_from_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_NOT_SET ?>" <?php if ($this->getData('dispatch_from_mode') == Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_NOT_SET) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Not Set / Not Changeable') ?></option>
+
+                            <optgroup label="Recommended Value">
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="UK" <?php if ($this->getData('dispatch_from_value') == 'UK') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('UK') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Andorra" <?php if ($this->getData('dispatch_from_value') == 'Andorra') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Andorra') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Austria" <?php if ($this->getData('dispatch_from_value') == 'Austria') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Austria') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Belgium" <?php if ($this->getData('dispatch_from_value') == 'Belgium') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Belgium') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Cyprus" <?php if ($this->getData('dispatch_from_value') == 'Cyprus') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Cyprus') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Denmark" <?php if ($this->getData('dispatch_from_value') == 'Denmark') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Denmark') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Finland" <?php if ($this->getData('dispatch_from_value') == 'Finland') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Finland') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="France" <?php if ($this->getData('dispatch_from_value') == 'France') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('France') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Germany" <?php if ($this->getData('dispatch_from_value') == 'Germany') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Germany') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Gibraltar" <?php if ($this->getData('dispatch_from_value') == 'Gibraltar') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Gibraltar') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Greece" <?php if ($this->getData('dispatch_from_value') == 'Greece') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Greece') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Greenland" <?php if ($this->getData('dispatch_from_value') == 'Greenland') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Greenland') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Iceland" <?php if ($this->getData('dispatch_from_value') == 'Iceland') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Iceland') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Ireland" <?php if ($this->getData('dispatch_from_value') == 'Ireland') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Ireland') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Italy" <?php if ($this->getData('dispatch_from_value') == 'Italy') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Italy') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Liechtenstein" <?php if ($this->getData('dispatch_from_value') == 'Liechtenstein') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Liechtenstein') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Luxembourg" <?php if ($this->getData('dispatch_from_value') == 'Luxembourg') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Luxembourg') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Malta" <?php if ($this->getData('dispatch_from_value') == 'Malta') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Malta') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Monaco" <?php if ($this->getData('dispatch_from_value') == 'Monaco') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Monaco') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Netherlands" <?php if ($this->getData('dispatch_from_value') == 'Netherlands') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Netherlands') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Norway" <?php if ($this->getData('dispatch_from_value') == 'Norway') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Norway') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="San Marino" <?php if ($this->getData('dispatch_from_value') == 'San Marino') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('San Marino') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Spain" <?php if ($this->getData('dispatch_from_value') == 'Spain') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Spain') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Sweden" <?php if ($this->getData('dispatch_from_value') == 'Sweden') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Sweden') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Switzerland" <?php if ($this->getData('dispatch_from_value') == 'Switzerland') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Switzerland') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Vatican" <?php if ($this->getData('dispatch_from_value') == 'Vatican') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Vatican') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="USA" <?php if ($this->getData('dispatch_from_value') == 'USA') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('USA') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::DISPATCH_FROM_MODE_DEFAULT ?>" attribute_code="Canada" <?php if ($this->getData('dispatch_from_value') == 'Canada') echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Canada') ?></option>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Country you will be dispatching your Item from.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="shipping_price_hr" ">
+                <td class="value" colspan="2" style="width: auto;">
+                    <hr style="border: 1px solid silver; border-bottom: none;"/>
+                </td>
+                </tr>
+
+                <tr id="shipping_price_gbr_mode_tr">
+                    <td class="label">
+                        <label for="shipping_price_gbr_mode"><?php echo Mage::helper('M2ePro')->__('Shipping Cost per Item, GBP') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <input type="hidden" id="shipping_price_gbr_custom_attribute" name="shipping_price_gbr_custom_attribute" value="<?php echo $this->getData('shipping_price_gbr_custom_attribute'); ?>" />
+
+                        <select name="shipping_price_gbr_mode" id="shipping_price_gbr_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_GBR_MODE_NONE ?>" <?php if ($this->getData('shipping_price_gbr_mode') == Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_GBR_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Free') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_GBR_MODE_CUSTOM_VALUE ?>" <?php if ($this->getData('shipping_price_gbr_mode') == Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_GBR_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php foreach ($generalAttributesByInputTypes['text_price'] as $attribute): ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_GBR_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($this->getData('shipping_price_gbr_custom_attribute') == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
+                                <?php endforeach ?>
+                            </optgroup>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="shipping_price_gbr_value_tr">
+                    <td class="label">
+                        <label for="shipping_price_gbr_value"><?php echo Mage::helper('M2ePro')->__('Cost Value, GBP') ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input type="text" name="shipping_price_gbr_value" id="shipping_price_gbr_value" class="input-text M2ePro-validation-float M2ePro-validate-shipping-value-positive" value="<?php echo $this->getData('shipping_price_gbr_value'); ?>">
+                    </td>
+                </tr>
+
+                <tr id="shipping_price_euro_mode_tr">
+                    <td class="label">
+                        <label for="shipping_price_euro_mode"><?php echo Mage::helper('M2ePro')->__('Shipping Cost per Item, EUR') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <input type="hidden" id="shipping_price_euro_custom_attribute" name="shipping_price_euro_custom_attribute" value="<?php echo $this->getData('shipping_price_euro_custom_attribute'); ?>" />
+
+                        <select name="shipping_price_euro_mode" id="shipping_price_euro_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_EURO_MODE_NONE ?>" <?php if ($this->getData('shipping_price_euro_mode') == Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_EURO_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Free') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_EURO_MODE_CUSTOM_VALUE ?>" <?php if ($this->getData('shipping_price_euro_mode') == Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_EURO_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php foreach ($generalAttributesByInputTypes['text_price'] as $attribute): ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Play_Listing::SHIPPING_PRICE_EURO_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($this->getData('shipping_price_euro_custom_attribute') == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
+                                <?php endforeach ?>
+                            </optgroup>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="shipping_price_euro_value_tr">
+                    <td class="label">
+                        <label for="shipping_price_euro_value"><?php echo Mage::helper('M2ePro')->__('Cost Value, EUR') ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <input type="text" name="shipping_price_euro_value" id="shipping_price_euro_value" class="input-text M2ePro-validation-float M2ePro-validate-shipping-value-positive" value="<?php echo $this->getData('shipping_price_euro_value'); ?>">
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="entry-edit" id="magento_block_play_listing_channel_settings_condition">
+
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Condition Settings'); ?></h4>
+    </div>
+
+    <div class="fieldset">
+        <div class="hor-scroll">
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
+
+                <tr>
+                    <td class="label">
+                        <label for="condition_mode"><?php echo Mage::helper('M2ePro')->__('Condition') ?>: </label>
+                    </td>
+                    <td class="value">
+                        <input type="hidden" id="condition_custom_attribute" name="condition_custom_attribute" value="<?php echo $this->getData('condition_custom_attribute');?>" />
+                        <input type="hidden" id="condition_value" name="condition_value" value="<?php echo $this->getData('condition_value'); ?>" />
+
+                        <select name="condition_mode" id="condition_mode">
+
+                            <optgroup label="Recommended Value">
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_NEW ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_NEW) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('New') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_USED_LIKE_NEW ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_USED_LIKE_NEW) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Used - Like New') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_USED_VERY_GOOD ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_USED_VERY_GOOD) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Used - Very Good') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_USED_GOOD ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_USED_GOOD) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Used - Good') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_USED_AVERAGE ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_USED_AVERAGE) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Used - Average') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_LIKE_NEW ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_LIKE_NEW) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Collectable - Like New') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_VERY_GOOD ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_VERY_GOOD) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Collectable - Very Good') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_GOOD ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_GOOD) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Collectable - Good') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_AVERAGE ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_COLLECTABLE_AVERAGE) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Collectable - Average') ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_DEFAULT ?>" attribute_code="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_REFURBISHED ?>" <?php if ($this->getData('condition_value') == Ess_M2ePro_Model_Play_Listing::CONDITION_REFURBISHED) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Refurbished') ?></option>
+                            </optgroup>
+
+                            <optgroup label="Magento Attribute">
+                                <?php foreach ($generalAttributesByInputTypes['text_select'] as $attribute): ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_MODE_CUSTOM_ATTRIBUTE ?>" <?php if ($this->getData('condition_custom_attribute') == $attribute['code']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
+                                <?php endforeach ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <?php if (!$isEdit) { ?>
+                                <span><?php echo Mage::helper('M2ePro')->__('Condition of the Product(s) you want to list on Play.com.'); ?></span>
+                            <?php } else { ?>
+                                <span><?php echo Mage::helper('M2ePro')->__('Condition of the Product(s) you want to list on Play.com.<br/>
+                                <b>Note:</b> Condition of Active Items cannot be changed.'); ?></span>
+                            <?php } ?>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="condition_note_mode_tr">
+                    <td class="label">
+                        <label for="condition_note_mode"><?php echo Mage::helper('M2ePro')->__('Comment') ?>:</label>
+                    </td>
+                    <td class="value">
+                        <select name="condition_note_mode" id="condition_note_mode">
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_NOTE_MODE_NONE ?>" <?php if ($this->getData('condition_note_mode') == Ess_M2ePro_Model_Play_Listing::CONDITION_NOTE_MODE_NONE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('None') ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Play_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE ?>" <?php if ($this->getData('condition_note_mode') == Ess_M2ePro_Model_Play_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Custom Value') ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Short Description of Item(s) Condition.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr id="condition_note_value_tr" <?php if ($this->getData('condition_note_mode') != Ess_M2ePro_Model_Play_Listing::CONDITION_NOTE_MODE_CUSTOM_VALUE): ?>style="display: none;"<?php endif; ?>>
+                    <td class="label">
+                        <label for="condition_note_value"><?php echo Mage::helper('M2ePro')->__('Comment Value') ?>: <span class="required">*</span></label>
+                    </td>
+                    <td class="value">
+                        <textarea name="condition_note_value" id="condition_note_value" class="M2ePro-required-when-visible M2ePro-validate-condition-note-length"><?php echo Mage::helper('M2ePro')->escapeHtml($this->getData('condition_note_value')) ?></textarea>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Description of the Condition of the Item(s).'); ?></span>
+                        </p>
+                    </td>
+                    <td class="value">
+                        <select name="condition_note_custom_attribute" id="condition_note_custom_attribute" style="width: 150px; margin-top: -4px;">
+                            <?php foreach ($attributesByInputTypes['text_textarea'] as $attribute): ?>
+                                <option value="<?php echo $attribute['code']; ?>"><?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?></option>
+                            <?php endforeach ?>
+                        </select>
+                        <?php echo $this->getChildHtml('condition_note_value_insert_button');?>
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>

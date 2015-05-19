@@ -100,9 +100,6 @@ class Ess_M2ePro_Model_Play_Listing_Other_Mapping
                 continue;
             }
 
-            $logModel = Mage::getModel('M2ePro/Listing_Other_Log');
-            $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Play::NICK);
-
             $otherListing->mapProduct($magentoProductId, Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
 
             return true;

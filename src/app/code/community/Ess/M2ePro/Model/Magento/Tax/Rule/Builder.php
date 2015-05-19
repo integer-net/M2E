@@ -6,11 +6,11 @@
 
 class Ess_M2ePro_Model_Magento_Tax_Rule_Builder
 {
-    const TAX_CLASS_NAME_PRODUCT  = 'M2E Product Tax Class';
-    const TAX_CLASS_NAME_CUSTOMER = 'M2E Customer Tax Class';
+    const TAX_CLASS_NAME_PRODUCT  = 'M2E Pro Product Tax Class';
+    const TAX_CLASS_NAME_CUSTOMER = 'M2E Pro Customer Tax Class';
 
-    const TAX_RATE_CODE = 'M2E Tax Rate';
-    const TAX_RULE_CODE = 'M2E Tax Rule';
+    const TAX_RATE_CODE = 'M2E Pro Tax Rate';
+    const TAX_RULE_CODE = 'M2E Pro Tax Rule';
 
     // ########################################
 

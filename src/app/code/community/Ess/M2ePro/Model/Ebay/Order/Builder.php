@@ -25,10 +25,10 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
     // Payment status was updated to Paid on eBay.
     // Shipping status was updated to Shipped on eBay.
     // Buyer has changed the shipping address of this order at the time of completing payment on eBay.
-    // Duplicated eBay orders with ID #%id%.
-    // Order Creation Rules were not met. Press Create Order button at Order view page to create it anyway.
-    // Magento Order #%order_id% should be canceled as new combined eBay order #%new_id% was created.
-    // eBay Order #%old_id% was deleted as new combined order #%new_id% was created.
+    // Duplicated eBay Orders with ID #%id%.
+    // Order Creation Rules were not met. Press Create Order Button at Order View Page to create it anyway.
+    // Magento Order #%order_id% should be canceled as new combined eBay Order #%new_id% was created.
+    // eBay Order #%old_id% was deleted as new combined Order #%new_id% was created.
 
     // ########################################
 
@@ -356,7 +356,9 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
             return true;
         }
 
-        if ($this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED) {
+        if ($this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED ||
+            $this->getData('order_status') == Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_INACTIVE
+        ) {
             return false;
         }
 
@@ -439,9 +441,9 @@ class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
         }
 
         if (!$this->order->getChildObject()->canCreateMagentoOrder()) {
-            $this->order->addWarningLog('Magento order was not created. Reason: %msg%', array(
+            $this->order->addWarningLog('Magento Order was not created. Reason: %msg%', array(
                 'msg' => 'Order Creation Rules were not met. ' .
-                         'Press Create Order button at Order view page to create it anyway.'
+                         'Press Create Order Button at Order View Page to create it anyway.'
             ));
             return;
         }

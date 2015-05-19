@@ -17,12 +17,12 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
         $this->viewComponentHelper = Mage::helper('M2ePro/View')->getComponentHelper();
 
         $task = $this->getRequest()->getParam('task');
-        $component = $this->getRequest()->getParam('component');
+        $channel = $this->getRequest()->getParam('channel');
 
         // Initialization block
         //------------------------------
         $this->setId(
-            'synchronizationLogGrid'.(!is_null($task) ? $task : '').(!is_null($component) ? $component : '')
+            'synchronizationLogGrid' . (!is_null($task) ? $task : '') . ucfirst($channel)
         );
         //------------------------------
 
@@ -35,7 +35,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
 
         $filters = array();
         !is_null($task) && $filters['task'] = $task;
-        !is_null($task) && $filters['component_mode'] = $component;
+        !is_null($task) && $filters['component_mode'] = $channel;
         $this->setDefaultFilter($filters);
         //------------------------------
     }
@@ -49,11 +49,16 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
         $collection = Mage::getModel('M2ePro/Synchronization_Log')->getCollection();
         //--------------------------------
 
-        $components = $this->viewComponentHelper->getActiveComponents();
-        $collection->getSelect()
-            ->where('component_mode IN(\''.implode('\',\'',$components).'\') OR component_mode IS NULL');
+        $channel = $this->getData('channel');
+        if (!empty($channel)) {
+            $collection->getSelect()->where('component_mode = ?', $channel);
+        } else {
+            $components = $this->viewComponentHelper->getActiveComponents();
+            $collection->getSelect()
+                ->where('component_mode IN(\'' . implode('\',\'', $components) . '\') OR component_mode IS NULL');
+        }
 
-        if (in_array(Ess_M2ePro_Helper_Component_Ebay::NICK, $components)
+        if (isset($components) && in_array(Ess_M2ePro_Helper_Component_Ebay::NICK, $components)
             && Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) {
 
             $excludeTasks = array(
@@ -86,19 +91,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             'width'     => '150px',
             'index'     => 'create_date'
         ));
-
-        if (!$this->viewComponentHelper->isSingleActiveComponent()) {
-            $this->addColumn('component_mode', array(
-                'header'         => Mage::helper('M2ePro')->__('Channel'),
-                'align'          => 'left',
-                'width'          => '120px',
-                'type'           => 'options',
-                'index'          => 'component_mode',
-                'filter_index'   => 'main_table.component_mode',
-                'sortable'       => false,
-                'options'        => Mage::helper('M2ePro/View_Common_Component')->getActiveComponentsTitles()
-            ));
-        }
 
         $this->addColumn('task', array(
             'header'    => Mage::helper('M2ePro')->__('Synchronization'),
@@ -133,17 +125,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             'frame_callback' => array($this, 'callbackColumnType')
         ));
 
-        $this->addColumn('priority', array(
-            'header'=> Mage::helper('M2ePro')->__('Priority'),
-            'width' => '80px',
-            'index' => 'priority',
-            'align'     => 'right',
-            'type'  => 'options',
-            'sortable'  => false,
-            'options' => $this->_getLogPriorityList(),
-            'frame_callback' => array($this, 'callbackColumnPriority')
-        ));
-
         return parent::_prepareColumns();
     }
 
@@ -176,6 +157,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             preg_match_all('/route:([^;]*)/', $href, $routeMatch);
             preg_match_all('/back:([^;]*)/', $href, $backMatch);
             preg_match_all('/filter:([^;]*)/', $href, $filterMatch);
+            preg_match_all('/channel:([^;]*)/', $href, $channelMatch);
 
             if (count($routeMatch[1]) == 0) {
                 $fullDescription = str_replace($matches[0][$key], '', $fullDescription);
@@ -190,6 +172,9 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
             }
             if (count($filterMatch[1]) > 0) {
                 $params['filter'] = base64_encode($filterMatch[1][$key]);
+            }
+            if (count($channelMatch[1]) > 0) {
+                $params['channel'] = $channelMatch[1][$key];
             }
 
             $url = $routeMatch[1][$key];
@@ -207,7 +192,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
         }
 
         $renderedText .= '&nbsp;(<a href="javascript:void(0)" onclick="LogHandlerObj.showFullText(this);">more</a>)
-                          <div style="display: none;"><br />'.$fullText.'<br /><br /></div>';
+                          <div style="display: none;"><br/>'.$fullText.'<br/><br/></div>';
 
         return $renderedText;
     }
@@ -216,7 +201,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
 
     public function getGridUrl()
     {
-        return $this->getUrl('*/*/synchronizationGrid', array('_current'=>true));
+        return $this->getUrl('*/*/synchronizationGrid', array(
+            '_current'=>true,
+            'channel' => $this->getData('channel')
+        ));
     }
 
     public function getRowUrl($row)

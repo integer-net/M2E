@@ -143,7 +143,7 @@ HTML;
         $templateMode = Mage::helper('M2ePro/Data_Global')->getValue('ebay_template_mode_' . $this->getTemplateNick());
 
         if (is_null($templateMode)) {
-            throw new LogicException('Template mode is not initialized.');
+            throw new LogicException('Template Mode is not initialized.');
         }
 
         return $templateMode;
@@ -230,7 +230,7 @@ HTML;
 
         if (is_null($blockName)) {
             throw new LogicException(
-                sprintf('Form data block for template nick "%s" is unknown.', $this->getTemplateNick())
+                sprintf('Form data Block for Template nick "%s" is unknown.', $this->getTemplateNick())
             );
         }
 
@@ -304,7 +304,8 @@ HTML;
 
         $collection = $manager->getTemplateModel()
             ->getCollection()
-                ->addFieldToFilter('is_custom_template', 0);
+            ->addFieldToFilter('is_custom_template', 0)
+            ->setOrder('title', 'ASC');
 
         if ($manager->isMarketplaceDependentTemplate()) {
             $marketplace = Mage::helper('M2ePro/Data_Global')->getValue('ebay_marketplace');

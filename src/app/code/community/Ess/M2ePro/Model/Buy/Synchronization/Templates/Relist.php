@@ -42,14 +42,26 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Relist
 
     private function immediatelyChangedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was changed');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was changed');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($changedListingsProducts as $listingProduct) {
+
+            $actionParams = array('only_data'=>array('selling'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
 
             if (!$this->getInspector()->isMeetRelistRequirements($listingProduct)) {
                 continue;
@@ -58,7 +70,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Relist
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,
-                array()
+                $actionParams
             );
         }
 

@@ -82,7 +82,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
             $motorsSpecificsAttribute == $motorsKtypesAttribute
         ) {
             $this->_getSession()->addError(
-                Mage::helper('M2ePro')->__('ePIDs and KTypes attributes can not be the same.')
+                Mage::helper('M2ePro')->__('ePIDs and KTypes Attributes can not be the same.')
             );
             $this->_redirectUrl($this->_getRefererUrl());
             return;

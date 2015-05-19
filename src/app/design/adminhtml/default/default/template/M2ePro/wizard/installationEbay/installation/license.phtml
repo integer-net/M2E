@@ -74,10 +74,10 @@
 
     </div>
 
-    <div style="padding: 20px 25px 20px 35px; height: 100px; width: 450px; margin-left: 50px; float: left; background: url('<?php echo $this->getSkinUrl('M2ePro').'/images/note_background.png'; ?>') no-repeat;">
+    <div style="padding: 20px 25px 20px 35px; height: 100px; width: 450px; margin-left: 50px; float: left; background: url('<?php echo $this->getSkinUrl('M2ePro/images/note_background.png'); ?>') no-repeat;">
         <?php echo Mage::helper('M2ePro')->__(
             'This information will be sent to M2E Pro for approval.
-            <br/>Read more in our <a href="http://www.m2epro.com/privacy" target="_blank">Privacy Policy</a>.'
+            <br/>Read more in our <a href="http://m2epro.com/privacy" target="_blank">Privacy Policy</a>.'
         ); ?>
     </div>
 
@@ -85,7 +85,7 @@
 
     <div style="margin-top: 40px">
         <h4>
-            <?php echo Mage::helper('M2ePro')->__('Please sign into eBay to link M2E to your eBay account and proceed to the next step.'); ?>
+            <?php echo Mage::helper('M2ePro')->__('Please sign into eBay to link M2E Pro to your eBay Account and proceed to the next step.'); ?>
         </h4>
 
         <div style="margin-top: 15px">
@@ -98,7 +98,7 @@
 
     <div style="margin-top: 30px">
         <h4>
-            <?php echo Mage::helper('M2ePro')->__('If you don\'t have an eBay account, please create one. It\'s easy, fast and free.'); ?>
+            <?php echo Mage::helper('M2ePro')->__('If you don\'t have an eBay Account, please create one. It\'s easy, fast and free.'); ?>
         </h4>
 
         <div style="margin-top: 15px">
@@ -109,8 +109,8 @@
 </div>
 
 <div id="license_popup_content" style="display: none;">
-    <div style="padding: 10px; height: 335px">
-        <div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Please verify the below information is valid before we register you with M2E.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes"></div>
+    <div style="padding: 10px; height: 250px">
+        <div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Please verify the information is valid before we register you with M2E Pro.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes"></div>
 
         <form id="license_form">
             <div class="fieldset">
@@ -150,7 +150,7 @@
                                 </td>
                                 <td class="value">
                                     <select name="country" class="required-entry">
-                                    <?php foreach($this->getData('countries') as $country) {?>
+                                    <?php foreach($this->getData('available_countries') as $country) {?>
                                         <option value="<?php echo $country['label']; ?>"><?php echo Mage::helper('M2ePro')->escapeHtml($country['label']); ?></option>
                                     <?php } ?>
                                     </select>
@@ -212,9 +212,9 @@
                 closable: true,
                 className: "magento",
                 windowClassName: "popup-window",
-                title: '<?php echo Mage::helper('M2ePro')->__('Register Your Free M2E Extension'); ?>',
+                title: '<?php echo Mage::helper('M2ePro')->__('Register Your Free M2E Pro Extension'); ?>',
                 width: 640,
-                height: 400,
+                height: 315,
                 zIndex: 100,
                 recenterAuto: false,
                 hideEffect: Element.hide,
@@ -228,6 +228,10 @@
                 element.setValue($(element.name).innerHTML.trim())
             });
         });
+
+        <?php if ($this->getData('isLicenseStepFinished')) : ?>
+            $('edit_license').hide();
+        <?php endif; ?>
 
         $('license_popup_cancel_link').observe('click',function() {
             licensePopUp.close();

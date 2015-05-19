@@ -18,16 +18,25 @@ final class Ess_M2ePro_Model_Cron_Type_Magento extends Ess_M2ePro_Model_Cron_Typ
 
     //####################################
 
+    protected function isDisabledByDeveloper()
+    {
+        return (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                              ->getGroupValue('/cron/magento/','disabled');
+    }
+
     protected function initialize()
     {
-        parent::initialize();
-
         usleep(rand(0,2000000));
+
+        parent::initialize();
 
         $helper = Mage::helper('M2ePro/Module_Cron');
         $maxServiceInactiveTime = Ess_M2ePro_Model_Cron_Type_Service::MAX_INACTIVE_TIME;
 
-        if (!$helper->isTypeMagento() && $helper->isLastRunMoreThan($maxServiceInactiveTime)) {
+        if (!$helper->isTypeMagento() &&
+            $helper->isLastRunMoreThan($maxServiceInactiveTime) &&
+            !$this->getLockItem()->isExist()) {
+
             $helper->setType(Ess_M2ePro_Helper_Module_Cron::TYPE_MAGENTO);
             $helper->setLastTypeChange(Mage::helper('M2ePro')->getCurrentGmtDate());
         }

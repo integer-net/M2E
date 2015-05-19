@@ -16,14 +16,14 @@ ListingGridHandler = Class.create(GridHandler, {
 
     //----------------------------------
 
-    getProductIdByRowId : function(rowId)
+    getProductIdByRowId: function(rowId)
     {
         return this.getCellContent(rowId,this.productIdCellIndex);
     },
 
     //----------------------------------
 
-    getSelectedItemsParts : function(maxProductsInPart)
+    getSelectedItemsParts: function(maxProductsInPart)
     {
         var selectedProductsArray = this.getSelectedProductsArray();
 
@@ -69,5 +69,4 @@ ListingGridHandler = Class.create(GridHandler, {
     }
 
     //----------------------------------
-
 });

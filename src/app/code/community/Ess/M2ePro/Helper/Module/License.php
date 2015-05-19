@@ -58,6 +58,16 @@ class Ess_M2ePro_Helper_Module_License extends Mage_Core_Helper_Abstract
 
     // ----------------------------------------
 
+    public function getEmail()
+    {
+        $email = Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue(
+            '/'.Mage::helper('M2ePro/Module')->getName().'/license/info/','email'
+        );
+        return !is_null($email) ? (string)$email : '';
+    }
+
+    // ----------------------------------------
+
     public function isValidDomain()
     {
         $isValid = Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue(

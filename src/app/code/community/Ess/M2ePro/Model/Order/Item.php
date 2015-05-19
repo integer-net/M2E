@@ -231,7 +231,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         if (!in_array($this->getMagentoProduct()->getTypeId(), self::$supportedProductTypes)) {
             $message = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                'Order Import does not support product type: %type%.', array(
+                'Order Import does not support Product type: %type%.', array(
                     'type' => $this->getMagentoProduct()->getTypeId()
                 )
             );
@@ -279,7 +279,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             return;
         }
 
-        $magentoOptions = $this->prepareMagentoOptions($magentoProduct->getProductVariationsForOrder());
+        $magentoOptions = $this->prepareMagentoOptions($magentoProduct->getVariationInstance()->getVariationsTypeRaw());
 
         /** @var $optionsFinder Ess_M2ePro_Model_Order_Item_OptionsFinder */
         $optionsFinder = Mage::getModel('M2ePro/Order_Item_OptionsFinder');
@@ -307,7 +307,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
             if ($optionsFinder->hasFailedOptions()) {
                 throw new LogicException(
-                    sprintf('Product option(s) "%s" not found.', implode(', ', $optionsFinder->getFailedOptions()))
+                    sprintf('Product Option(s) "%s" not found.', implode(', ', $optionsFinder->getFailedOptions()))
                 );
             }
 
@@ -318,7 +318,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         if (count(array_diff($foundOptionsIds, $existOptionsIds)) > 0) {
             // options were already mapped, but not all of them
-            throw new LogicException('Selected options do not match the product options.');
+            throw new LogicException('Selected Options do not match the Product Options.');
         }
     }
 
@@ -395,7 +395,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         if (count($associatedProducts) == 0
             || (!$magentoProduct->isGroupedType() && count($associatedOptions) == 0)
         ) {
-            throw new InvalidArgumentException('Required options were not selected.');
+            throw new InvalidArgumentException('Required Options were not selected.');
         }
 
         if ($magentoProduct->isGroupedType()) {
@@ -403,7 +403,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             $associatedProducts = reset($associatedProducts);
         }
 
-        $magentoOptions = $this->prepareMagentoOptions($magentoProduct->getProductVariationsForOrder());
+        $magentoOptions = $this->prepareMagentoOptions($magentoProduct->getVariationInstance()->getVariationsTypeRaw());
 
         /** @var $optionsFinder Ess_M2ePro_Model_Order_Item_OptionsFinder */
         $optionsFinder = Mage::getModel('M2ePro/Order_Item_OptionsFinder');

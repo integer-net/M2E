@@ -17,14 +17,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_Messages
             return NULL;
         }
 
-        $toolTipIconSrc = $this->getSkinUrl('M2ePro') . '/images/tool-tip-icon.png';
-        $helpIconSrc = $this->getSkinUrl('M2ePro') . '/images/help.png';
+        $toolTipIconSrc = $this->getSkinUrl('M2ePro/images/tool-tip-icon.png');
+        $helpIconSrc = $this->getSkinUrl('M2ePro/images/help.png');
 
         $docUrl = 'http://www.magentocommerce.com/wiki/modules_reference/English/Mage_Adminhtml/system_currency/index';
 
         // M2ePro_TRANSLATIONS
-        // More about currency rate set-up can be found in the <a href="%url%" target="_blank">Magento documentation</a>
-        $helpText = 'More about currency rate set-up can be found in the ';
+        // More about Currency rate set-up can be found in the <a href="%url%" target="_blank">Magento documentation</a>
+        $helpText = 'More about Currency rate set-up can be found in the ';
         $helpText .= '<a href="%url%" target="_blank">Magento documentation</a>';
         $helpText = Mage::helper('M2ePro')->__($helpText, $docUrl);
 

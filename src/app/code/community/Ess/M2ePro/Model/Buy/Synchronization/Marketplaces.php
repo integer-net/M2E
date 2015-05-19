@@ -62,7 +62,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces
 
         $componentName = '';
         if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-            $componentName = Ess_M2ePro_Helper_Component_Buy::TITLE.' ';
+            $componentName = Mage::helper('M2ePro/Component_Buy')->getTitle() . ' ';
         }
 
         $params = $this->getParams();
@@ -71,13 +71,13 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces
         $marketplace = Mage::helper('M2ePro/Component_Buy')
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
-        $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($componentName.$marketplace->getTitle()));
+        $this->getActualLockItem()->setTitle($componentName.Mage::helper('M2ePro')->__($marketplace->getTitle()));
     }
 
     public function performActions()
     {
         $result = $this->processTask('Marketplaces_Categories');
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('marketplace');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');
         return $result;
     }
 

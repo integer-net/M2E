@@ -20,6 +20,42 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
     // ########################################
 
     /**
+     * @return Ess_M2ePro_Model_Account
+     */
+    public function getAccount()
+    {
+        return $this->getParentObject()->getAccount();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Account
+     */
+    public function getAmazonAccount()
+    {
+        return $this->getAccount()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Marketplace
+     */
+    public function getMarketplace()
+    {
+        return $this->getParentObject()->getMarketplace();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Marketplace
+     */
+    public function getAmazonMarketplace()
+    {
+        return $this->getMarketplace()->getChildObject();
+    }
+
+    // ########################################
+
+    /**
      * @return Ess_M2ePro_Model_Listing
      */
     public function getListing()
@@ -56,42 +92,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Account
-     */
-    public function getAccount()
-    {
-        return $this->getParentObject()->getAccount();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Amazon_Account
-     */
-    public function getAmazonAccount()
-    {
-        return $this->getAccount()->getChildObject();
-    }
-
-    //-----------------------------------------
-
-    /**
-     * @return Ess_M2ePro_Model_Marketplace
-     */
-    public function getMarketplace()
-    {
-        return $this->getParentObject()->getMarketplace();
-    }
-
-    /**
-     * @return Ess_M2ePro_Model_Amazon_Marketplace
-     */
-    public function getAmazonMarketplace()
-    {
-        return $this->getMarketplace()->getChildObject();
-    }
-
-    //-----------------------------------------
-
-    /**
      * @return Ess_M2ePro_Model_Template_SellingFormat
      */
     public function getSellingFormatTemplate()
@@ -123,6 +123,28 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
     public function getAmazonSynchronizationTemplate()
     {
         return $this->getSynchronizationTemplate()->getChildObject();
+    }
+
+    //-----------------------------------------
+
+    /**
+     * @return Ess_M2ePro_Model_Template_Description
+     */
+    public function getDescriptionTemplate()
+    {
+        return $this->getAmazonListingProduct()->getDescriptionTemplate();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Template_Description
+     */
+    public function getAmazonDescriptionTemplate()
+    {
+        if (!$templateModel = $this->getDescriptionTemplate()) {
+            return null;
+        }
+
+        return $templateModel->getChildObject();
     }
 
     // ########################################
@@ -175,159 +197,54 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
             }
         }
 
-        if (strlen($sku) <= Ess_M2ePro_Model_Amazon_Listing_Product::SKU_MAX_LENGTH) {
-            return $sku;
-        }
-
-        $parentSku = $this->getListingProduct()->getChildObject()->getAddingBaseSku();
-
-        if (strlen($parentSku) < (Ess_M2ePro_Model_Amazon_Listing_Product::SKU_MAX_LENGTH - 5)) {
-            return $this->getListingProduct()->getChildObject()->createRandomSku($parentSku);
-        }
-
-        return $this->getListingProduct()->getChildObject()->createRandomSku(
-            'SKU_' . $this->getListingProduct()->getProductId() . '_' . $this->getListingProduct()->getId()
-        );
+        return $sku;
     }
+
+    // ########################################
 
     public function getQty($magentoMode = false)
     {
-        $qty = 0;
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_QtyCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_QtyCalculator');
+        $calculator->setProduct($this->getListingProduct());
+        $calculator->setIsMagentoMode($magentoMode);
 
-        // Options Models
-        $options = $this->getOptions(true);
-
-        // Configurable, Grouped, Simple with options product
-        if ($this->getListingProduct()->getMagentoProduct()->isConfigurableType() ||
-            $this->getListingProduct()->getMagentoProduct()->isGroupedType() ||
-            $this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-
-            foreach ($options as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $qty = $option->getChildObject()->getQty($magentoMode);
-                break;
-            }
-
-        // Bundle product
-        } else {
-
-            $optionsQtyList = array();
-            foreach ($options as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $optionsQtyList[] = $option->getChildObject()->getQty($magentoMode);
-            }
-
-            $qty = min($optionsQtyList);
-        }
-
-        if (!$magentoMode) {
-
-            $src = $this->getAmazonSellingFormatTemplate()->getQtySource();
-
-            if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_ATTRIBUTE ||
-                $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
-                $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODE_PRODUCT) {
-
-                if ($qty > 0 && $src['qty_percentage'] > 0 && $src['qty_percentage'] < 100) {
-
-                    $roundingFunction = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-                            ->getGroupValue('/qty/percentage/','rounding_greater') ? 'ceil' : 'floor';
-
-                    $qty = (int)$roundingFunction(($qty/100)*$src['qty_percentage']);
-                }
-
-                if ($src['qty_modification_mode'] && $qty < $src['qty_min_posted_value']) {
-                    $qty = 0;
-                }
-
-                if ($src['qty_modification_mode'] && $qty > $src['qty_max_posted_value']) {
-                    $qty = $src['qty_max_posted_value'];
-                }
-            }
-        }
-
-        $qty < 0 && $qty = 0;
-
-        return (int)floor($qty);
+        return $calculator->getVariationValue($this->getParentObject());
     }
 
-    public function getPrice($returnSalePrice = false)
+    public function getPrice()
     {
-        $price = 0;
+        $src = $this->getAmazonSellingFormatTemplate()->getPriceSource();
 
-        // Options Models
-        $options = $this->getOptions(true);
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getListingProduct());
+        $calculator->setModifyByCoefficient(true);
 
-        if ($returnSalePrice) {
-            $src = $this->getAmazonSellingFormatTemplate()->getSalePriceSource();
-        } else {
-            $src = $this->getAmazonSellingFormatTemplate()->getPriceSource();
-        }
+        return $calculator->getVariationValue($this->getParentObject());
+    }
 
-        // Configurable, Bundle, Simple with options product
-        if ($this->getListingProduct()->getMagentoProduct()->isConfigurableType() ||
-            $this->getListingProduct()->getMagentoProduct()->isBundleType() ||
-            $this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
+    public function getMapPrice()
+    {
+        $src = $this->getAmazonSellingFormatTemplate()->getMapPriceSource();
 
-            if ($this->getAmazonSellingFormatTemplate()->isPriceVariationModeParent() ||
-                $this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getListingProduct());
 
-                // Base Price of Main product.
-                $price = $this->getAmazonListingProduct()->getBaseProductPrice(
-                    $src['mode'],$src['attribute'],$returnSalePrice
-                );
+        return $calculator->getVariationValue($this->getParentObject());
+    }
 
-                if ($price <= 0 && $returnSalePrice &&
-                    $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_SPECIAL) {
-                    $price = 0;
-                } else {
+    public function getSalePrice()
+    {
+        $src = $this->getAmazonSellingFormatTemplate()->getSalePriceSource();
 
-                    foreach ($options as $option) {
-                        /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                        $price += $option->getChildObject()->getPrice($returnSalePrice);
-                    }
+        /** @var $calculator Ess_M2ePro_Model_Amazon_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Amazon_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getListingProduct());
+        $calculator->setIsSalePrice(true)->setModifyByCoefficient(true);
 
-                }
-
-            } else {
-
-                $isBundle = $this->getListingProduct()->getMagentoProduct()->isBundleType();
-
-                foreach ($options as $option) {
-
-                    /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-
-                    $tempPrice = $option->getChildObject()->getPrice($returnSalePrice);
-
-                    if ($tempPrice <= 0 && $returnSalePrice &&
-                        $src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::PRICE_SPECIAL) {
-                        $price = 0;
-                        break;
-                    }
-
-                    if ($isBundle) {
-                        $price += $tempPrice;
-                        continue;
-                    }
-
-                    $price = $tempPrice;
-                    break;
-                }
-            }
-
-        // Grouped product
-        } else if ($this->getListingProduct()->getMagentoProduct()->isGroupedType()) {
-
-            foreach ($options as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $price = $option->getChildObject()->getPrice($returnSalePrice);
-                break;
-            }
-        }
-
-        $price < 0 && $price = 0;
-
-        return Mage::helper('M2ePro')->parsePrice($price, $src['coefficient']);
+        return $calculator->getVariationValue($this->getParentObject());
     }
 
     // ########################################

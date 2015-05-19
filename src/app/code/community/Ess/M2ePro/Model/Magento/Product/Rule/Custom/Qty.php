@@ -16,7 +16,7 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Custom_Qty
 
     public function getLabel()
     {
-        return Mage::helper('M2ePro')->__('Qty');
+        return Mage::helper('M2ePro')->__('QTY');
     }
 
     public function getValueByProductInstance(Mage_Catalog_Model_Product $product)

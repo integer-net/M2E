@@ -21,8 +21,12 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 
     const MAX_LENGTH_FOR_OPTION_VALUE = 50;
 
-    const LISTING_CREATION_MODE_FULL = 0;
-    const LISTING_CREATION_MODE_LISTING_ONLY = 1;
+    // ########################################
+
+    public function getTitle()
+    {
+        return Mage::helper('M2ePro')->__(self::TITLE);
+    }
 
     // ########################################
 
@@ -271,7 +275,7 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 
     public function clearCache()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues(self::NICK);
     }
 
     // ########################################

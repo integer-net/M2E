@@ -66,7 +66,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_OtherController extends Ess_M2ePro_Contr
     protected function processConnector($action, array $params = array())
     {
         if (!$ebayProductsIds = $this->getRequest()->getParam('selected_products')) {
-            return $this->getResponse()->setBody('You should select products');
+            return $this->getResponse()->setBody('You should select Products');
         }
 
         $params['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER;

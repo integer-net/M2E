@@ -44,12 +44,12 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $response = '';
         foreach ($tables as $table) {
 
-            if (is_null($model = Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($table))) {
+            if (is_null(Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($table))) {
                 continue;
             }
 
             $url = Mage::helper('adminhtml')->getUrl('*/adminhtml_development_database/manageTable',
-                                                     array('table' => $table, 'model' => $model));
+                                                     array('table' => $table));
 
             $response .= "window.open('{$url}');";
         }
@@ -64,113 +64,146 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         $this->getResponse()->setBody($response);
     }
 
-    //---------------------------------------------
-
-    public function deleteTableRowsAction()
-    {
-        $table = $this->getRequest()->getParam('table');
-        $model = $this->getRequest()->getParam('model');
-
-        $ids = $this->getRequest()->getParam('ids');
-        $ids = explode(',', $ids);
-
-        if (is_null($table) || is_null($model)) {
-            $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
-            return;
-        }
-
-        if (empty($ids)) {
-            $this->redirectToTablePage($table, $model);
-        }
-
-        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
-            $this->_getSession()->addError("Failed to get model {$model}.");
-            $this->redirectToTablePage($table, $model);
-        }
-
-        $collection = $modelInstance->getCollection();
-        $idFieldName = $modelInstance->getIdFieldName();
-
-        $collection->addFieldToFilter($idFieldName, array('in' => $ids));
-
-        if ($collection->getSize() == 0) {
-            $this->redirectToTablePage($table, $model);
-        }
-
-        foreach ($collection as $item) {
-            $item->delete();
-        }
-
-        $this->afterTableAction($model);
-        $this->redirectToTablePage($table, $model);
-    }
-
     public function truncateTablesAction()
     {
-        $tables = $this->getRequest()->getParam('tables',array());
+        $tables = $this->getRequest()->getParam('tables', array());
         !is_array($tables) && $tables = array($tables);
+
+        $writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
 
         foreach ($tables as $table) {
 
-            $model = Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($table);
-            $tableName  = Mage::getSingleton('core/resource')->getTableName($table);
+            $tableName = Mage::getSingleton('core/resource')->getTableName($table);
+            $writeConnection->delete($tableName);
 
-            Mage::getSingleton('core/resource')->getConnection('core_write')->delete($tableName);
-            $this->afterTableAction($model);
+            $this->afterTableAction($table);
         }
 
-        $this->_getSession()->addSuccess('Truncate tables was successfully completed.');
+        $this->_getSession()->addSuccess('Truncate Tables was successfully completed.');
 
         if (count($tables) == 1) {
-            $tableName = array_shift($tables);
-            $this->redirectToTablePage($tableName,
-                                       Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($tableName));
+            $this->redirectToTablePage($tables[0]);
         }
-
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageDatabaseTabUrl());
     }
 
-    public function updateTableCellsAction()
-    {
-        $ids = explode(',', $this->getRequest()->getParam('ids'));
-
-        $table = $this->getRequest()->getParam('table');
-        $model = $this->getRequest()->getParam('model');
-
-        $cellsValues = $this->prepareCellsValuesArray();
-
-        if (is_null($table) || is_null($model) || empty($ids) || empty($cellsValues)) {
-            return;
-        }
-
-        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
-            return;
-        }
-
-        Mage::getSingleton('core/resource')->getConnection('core_write')->update(
-            Mage::getSingleton('core/resource')->getTableName($table),
-            $cellsValues,
-            "`{$modelInstance->getIdFieldName()}` IN (".implode(',', $ids).")"
-        );
-
-        $this->afterTableAction($model);
-    }
+    //---------------------------------------------
 
     public function addTableRowAction()
     {
-        $table = $this->getRequest()->getParam('table');
-        $model = $this->getRequest()->getParam('model');
+        $table         = $this->getRequest()->getParam('table');
+        $modelInstance = $this->getModel();
+        $cellsValues   = $this->prepareCellsValuesArray();
 
-        $cellsValues = $this->prepareCellsValuesArray();
-
-        if (is_null($table) || is_null($model) || empty($cellsValues)) {
-            return;
-        }
-        if (!$modelInstance = Mage::getModel('M2ePro/'.$model)) {
+        if (!$modelInstance || empty($cellsValues)) {
             return;
         }
 
         $modelInstance->setData($cellsValues)->save();
+        $this->afterTableAction($table);
+    }
+
+    public function deleteTableRowsAction()
+    {
+        $table = $this->getRequest()->getParam('table');
+        $modelInstance = $this->getModel();
+        $ids = explode(',', $this->getRequest()->getParam('ids'));
+
+        if (!$modelInstance || empty($ids)) {
+            $this->_getSession()->addError("Failed to get model or any of Table Rows are not selected.");
+            $this->redirectToTablePage($table);
+        }
+
+        $collection = $modelInstance->getCollection();
+        $collection->addFieldToFilter($modelInstance->getIdFieldName(), array('in' => $ids));
+
+        if ($collection->getSize() == 0) {
+            $this->redirectToTablePage($table);
+        }
+
+        foreach ($collection as $item) {
+
+            $item->delete();
+            $this->isMergeModeEnabled($table) && $item->getChildObject()->delete();
+        }
+
+        $this->afterTableAction($table);
+        $this->redirectToTablePage($table);
+    }
+
+    public function updateTableCellsAction()
+    {
+        $table = $this->getRequest()->getParam('table');
+        $modelInstance = $this->getModel();
+
+        $cellsValues = $this->prepareCellsValuesArray();
+        $ids = explode(',', $this->getRequest()->getParam('ids'));
+
+        if (!$modelInstance || empty($ids) || empty($cellsValues)) {
+            return;
+        }
+
+        $collection = $modelInstance->getCollection();
+        $collection->addFieldToFilter($modelInstance->getIdFieldName(), array('in' => $ids));
+
+        if ($collection->getSize() == 0) {
+            $this->redirectToTablePage($table);
+        }
+
+        $idFieldName = $modelInstance->getIdFieldName();
+        $isAutoIncrement = Mage::helper('M2ePro/Module_Database_Structure')->isIdColumnAutoIncrement($table);
+
+        foreach ($collection->getItems() as $item) {
+            foreach ($cellsValues as $field => $value) {
+
+                if ($field == $idFieldName && $isAutoIncrement) {
+                    continue;
+                }
+
+                if ($field == $idFieldName && !$isAutoIncrement) {
+
+                    Mage::getSingleton('core/resource')->getConnection('core_write')->update(
+                        Mage::getSingleton('core/resource')->getTableName($table),
+                        array($idFieldName => $value),
+                        "`{$idFieldName}` = {$item->getId()}"
+                    );
+                }
+
+                $item->setData($field, $value);
+            }
+
+            $item->save();
+        }
+
+        $this->afterTableAction($table);
+    }
+
+    private function afterTableAction($tableName)
+    {
+        if (strpos($tableName, 'config') !== false || strpos($tableName, 'wizard') !== false) {
+            Mage::helper('M2ePro/Module')->clearCache();
+        }
+    }
+
+    //#############################################
+
+    private function getModel()
+    {
+        $table     = $this->getRequest()->getParam('table');
+        $modelName = $this->getRequest()->getParam('model');
+        $component = $this->getRequest()->getParam('component');
+
+        if (!$this->isMergeModeEnabled($table)) {
+            return Mage::getModel('M2ePro/' . $modelName);
+        }
+
+        return Mage::helper('M2ePro/Component')->getComponentModel($component, $modelName);
+    }
+
+    private function isMergeModeEnabled($table)
+    {
+        return (bool)$this->getRequest()->getParam('merge') &&
+                Mage::helper('M2ePro/Module_Database_Structure')->isTableHorizontal($table);
     }
 
     private function prepareCellsValuesArray()
@@ -190,19 +223,6 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
         }
 
         return $bindArray;
-    }
-
-    private function afterTableAction($model)
-    {
-        if (is_null($model)) {
-            return;
-        }
-
-        if (strpos($model, 'Config_') !== 0 && strpos($model, 'Wizard') !== 0) {
-            return;
-        }
-
-        Mage::helper('M2ePro/Module')->clearCache();
     }
 
     //#############################################
@@ -236,9 +256,9 @@ class Ess_M2ePro_Adminhtml_Development_DatabaseController
 
     //#############################################
 
-    public function redirectToTablePage($tableName, $modelName)
+    public function redirectToTablePage($tableName)
     {
-        $this->_redirect('*/*/manageTable', array('table' => $tableName, 'model' => $modelName));
+        $this->_redirect('*/*/manageTable', array('table' => $tableName));
     }
 
     //#############################################

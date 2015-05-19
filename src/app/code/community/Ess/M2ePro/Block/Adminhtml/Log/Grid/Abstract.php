@@ -7,17 +7,90 @@
 abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
     extends Mage_Adminhtml_Block_Widget_Grid
 {
+    const LISTING_ID_FIELD = 'listing_id';
+    const LISTING_PRODUCT_ID_FIELD = 'listing_product_id';
+    const LISTING_PARENT_PRODUCT_ID_FIELD = 'parent_listing_product_id';
+
     //####################################
 
     protected function getEntityId()
     {
-        $entityData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
+        if ($this->isListingLog()) {
+            return $this->getRequest()->getParam('id');
+        }
 
-        if (isset($entityData['id'])) {
-            return $entityData['id'];
+        if ($this->isListingProductLog()) {
+            return $this->getRequest()->getParam('listing_product_id');
         }
 
         return NULL;
+    }
+
+    protected function getEntityField()
+    {
+        if ($this->isListingLog()) {
+            return self::LISTING_ID_FIELD;
+        }
+
+        if ($this->isListingProductLog()) {
+            return self::LISTING_PRODUCT_ID_FIELD;
+        }
+
+        return NULL;
+    }
+
+    protected function getActionName()
+    {
+        switch ($this->getEntityField()) {
+            case self::LISTING_ID_FIELD:
+                return 'listingGrid';
+                break;
+
+            case self::LISTING_PRODUCT_ID_FIELD:
+                return 'listingProductGrid';
+                break;
+
+        }
+        return 'listingGrid';
+    }
+
+    //####################################
+
+    public function isListingLog()
+    {
+        $id = $this->getRequest()->getParam('id');
+        return !empty($id);
+    }
+
+    public function isListingProductLog()
+    {
+        $listingProductId = $this->getRequest()->getParam('listing_product_id');
+        return !empty($listingProductId);
+    }
+
+    //####################################
+
+    public function getListingProductId()
+    {
+        return $this->getRequest()->getParam('listing_product_id', false);
+    }
+
+    // ----------------------------------------
+
+    /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+    protected $listingProduct = NULL;
+
+    /**
+     * @return Ess_M2ePro_Model_Listing_Product|null
+     */
+    public function getListingProduct()
+    {
+        if (is_null($this->listingProduct)) {
+            $this->listingProduct = Mage::helper('M2ePro/Component')
+                ->getUnknownObject('Listing_Product', $this->getListingProductId());
+        }
+
+        return $this->listingProduct;
     }
 
     //####################################
@@ -77,28 +150,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
         return $value;
     }
 
-    public function callbackColumnPriority($value, $row, $column, $isExport)
-    {
-         switch ($row->getData('priority')) {
-
-            case Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH:
-                $value = '<span style="font-weight: bold;">'.$value.'</span>';
-                break;
-
-            case Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM:
-                $value = '<span style="font-style: italic;">'.$value.'</span>';
-                break;
-
-            case Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW:
-                break;
-
-            default:
-                break;
-        }
-
-        return $value;
-    }
-
     public function callbackColumnInitiator($value, $row, $column, $isExport)
     {
         switch ($row->getData('initiator')) {
@@ -134,7 +185,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
         $fullText = Mage::helper('M2ePro/View')->appendLinksToLogMessage($fullText);
 
         $renderedText .= '&nbsp;(<a href="javascript:void(0)" onclick="LogHandlerObj.showFullText(this);">more</a>)
-                          <div style="display: none;"><br />'.$fullText.'<br /><br /></div>';
+                          <div style="display: none;"><br/>'.$fullText.'<br/><br/></div>';
 
         return $renderedText;
     }

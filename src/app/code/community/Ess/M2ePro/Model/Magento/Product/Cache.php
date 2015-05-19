@@ -6,35 +6,41 @@
 
 class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Product
 {
-    private $cache = NULL;
+    // ########################################
+
     private $isCacheEnabled = false;
 
     // ########################################
 
-    /**
-     * @return Ess_M2ePro_Model_Cache_Session_Object
-     * */
-    private function getCache()
+    public function getCacheValue($key)
     {
-        if (is_null($this->cache)) {
-            $this->cache = Mage::getSingleton('M2ePro/Cache_Session_Dispatcher')->getCache(array(
-                'class' => __CLASS__,
-                'store_id' => $this->getStoreId(),
-                'product_id' => $this->getProductId()
-            ));
-        }
+        $key = sha1('magento_product_'.$this->getProductId().'_'.$this->getStoreId().'_'.json_encode($key));
+        return Mage::helper('M2ePro/Data_Cache_Session')->getValue($key);
+    }
 
-        return $this->cache;
+    public function setCacheValue($key, $value)
+    {
+        $key = sha1('magento_product_'.$this->getProductId().'_'.$this->getStoreId().'_'.json_encode($key));
+        $tags = array(
+            'magento_product',
+            'magento_product_'.$this->getProductId().'_'.$this->getStoreId()
+        );
+
+        return Mage::helper('M2ePro/Data_Cache_Session')->setValue($key, $value, $tags);
+    }
+
+    public function clearCache()
+    {
+        return Mage::helper('M2ePro/Data_Cache_Session')->removeTagValues(
+            'magento_product_'.$this->getProductId().'_'.$this->getStoreId()
+        );
     }
 
     // ########################################
 
-    public function clearCache()
+    public function isCacheEnabled()
     {
-        Mage::getSingleton('M2ePro/Cache_Session_Dispatcher')->clearCache(array(
-            'class' => __CLASS__
-        ));
-        return $this;
+        return $this->isCacheEnabled;
     }
 
     public function enableCache()
@@ -51,67 +57,9 @@ class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Pr
 
     // ########################################
 
-    /**
-     * @param int|null $productId
-     * @param int|null $storeId
-     * @throws Exception
-     * @return Ess_M2ePro_Model_Magento_Product
-     */
-    public function loadProduct($productId = NULL, $storeId = NULL)
-    {
-        $this->cache = NULL;
-        return parent::loadProduct($productId,$storeId);
-    }
-
-    // ########################################
-
-    /**
-     * @param int $productId
-     * @return Ess_M2ePro_Model_Magento_Product
-     */
-    public function setProductId($productId)
-    {
-        $this->cache = NULL;
-        return parent::setProductId($productId);
-    }
-
-    // ########################################
-
-    /**
-     * @param int $storeId
-     * @return Ess_M2ePro_Model_Magento_Product
-     */
-    public function setStoreId($storeId)
-    {
-        $this->cache = NULL;
-        return parent::setStoreId($storeId);
-    }
-
-    // ########################################
-
-    /**
-     * @param Mage_Catalog_Model_Product $productModel
-     * @return Ess_M2ePro_Model_Magento_Product
-     */
-    public function setProduct(Mage_Catalog_Model_Product $productModel)
-    {
-        $this->cache = NULL;
-        return parent::setProduct($productModel);
-    }
-
-    // ########################################
-
     public function exists()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::exists());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
@@ -122,15 +70,7 @@ class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Pr
      */
     public function getTypeInstance()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getTypeInstance());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     /**
@@ -139,356 +79,149 @@ class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Pr
      */
     public function getStockItem()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getStockItem());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function getTypeId()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getTypeId());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function isSimpleTypeWithCustomOptions()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::isSimpleTypeWithCustomOptions());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function getSku()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getSku());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function getName()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getName());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function isStatusEnabled()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::isStatusEnabled());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function isStockAvailability()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::isStockAvailability());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function getPrice()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        $parent = parent::getPrice();
-
-        return $this->getCache()->setData($cacheKey,$parent);
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function getSpecialPrice()
     {
-        $cacheKey = array(
-            __METHOD__
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getSpecialPrice());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     // ########################################
 
     public function getQty($lifeMode = false)
     {
-        $cacheKey = array(
-            __METHOD__,
-            func_get_args()
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getQty($lifeMode));
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     // ########################################
 
     public function getAttributeValue($attributeCode)
     {
-        $cacheKey = array(
-            __METHOD__,
-            func_get_args()
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getAttributeValue($attributeCode));
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     // ########################################
 
     public function getThumbnailImageLink()
     {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getThumbnailImageLink());
+        return $this->getMethodData(__FUNCTION__);
     }
 
     public function getImageLink($attribute = 'image')
     {
-        $cacheKey = array(
-            __METHOD__,
-            func_get_args()
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getImageLink($attribute));
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     public function getGalleryImagesLinks($limitImages = 0)
     {
-        $cacheKey = array(
-            __METHOD__,
-            func_get_args()
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::getGalleryImagesLinks($limitImages));
+        $args = func_get_args();
+        return $this->getMethodData(__FUNCTION__, $args);
     }
 
     // ########################################
 
     public function hasRequiredOptions()
     {
-        $cacheKey = array(
-            __METHOD__,
-        );
+        return $this->getMethodData(__FUNCTION__);
+    }
 
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
+    // ----------------------------------------
+
+    public function getVariationInstance()
+    {
+        if (!is_null($this->_variationInstance)) {
+            return $this->_variationInstance;
         }
 
-        return $this->getCache()->setData($cacheKey,parent::hasRequiredOptions());
+        $this->_variationInstance = Mage::getModel('M2ePro/Magento_Product_Variation_Cache')->setMagentoProduct($this);
+        return $this->_variationInstance;
     }
 
     // ########################################
 
-    public function getProductVariations()
+    protected function getMethodData($methodName, $params = null)
     {
         $cacheKey = array(
-            __METHOD__,
+            __CLASS__,
+            $methodName,
         );
 
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
+        if (!is_null($params)) {
+            $cacheKey[] = $params;
+        }
+
+        $cacheResult = $this->getCacheValue($cacheKey);
+
+        if ($this->isCacheEnabled() && !is_null($cacheResult)) {
             return $cacheResult;
         }
 
-        return $this->getCache()->setData($cacheKey,parent::getProductVariations());
-    }
-
-    // ----------------------------------------
-
-    protected function _getCustomOptionsForVariation()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
+        if (!is_null($params)) {
+            $data = call_user_func_array(array('parent', $methodName), $params);
+        } else {
+            $data = call_user_func(array('parent', $methodName));
         }
 
-        return $this->getCache()->setData($cacheKey,parent::_getCustomOptionsForVariation());
-    }
-
-    // ----------------------------------------
-
-    protected function _getBundleOptionsForVariation()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
+        if (!$this->isCacheEnabled()) {
+            return $data;
         }
 
-        return $this->getCache()->setData($cacheKey,parent::_getBundleOptionsForVariation());
-    }
-
-    // ----------------------------------------
-
-    protected function _getGroupedOptionsForVariation()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::_getGroupedOptionsForVariation());
-    }
-
-    // ----------------------------------------
-
-    protected function _getConfigurableOptionsForVariation()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::_getConfigurableOptionsForVariation());
-    }
-
-    // ########################################
-
-    protected function _getCustomOptionsForOrder()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::_getCustomOptionsForOrder());
-    }
-
-    protected function _getBundleOptionsForOrder()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::_getBundleOptionsForOrder());
-    }
-
-    protected function _getGroupedOptionsForOrder()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::_getGroupedOptionsForOrder());
-    }
-
-    protected function _getConfigurableOptionsForOrder()
-    {
-        $cacheKey = array(
-            __METHOD__,
-        );
-
-        if ($this->isCacheEnabled && !is_null($cacheResult = $this->getCache()->getData($cacheKey))) {
-            return $cacheResult;
-        }
-
-        return $this->getCache()->setData($cacheKey,parent::_getConfigurableOptionsForOrder());
+        return $this->setCacheValue($cacheKey, $data);
     }
 
     // ########################################

@@ -332,7 +332,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Chooser extends Mage_Admi
     {
         $attributeLabel = Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel($attributeCode);
 
-        return Mage::helper('M2ePro')->__('Magento Attribute') . ' -> ' . $attributeLabel;
+        return Mage::helper('M2ePro')->__('Magento Attribute') . ' > ' . $attributeLabel;
     }
 
     // ########################################

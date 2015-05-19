@@ -44,15 +44,26 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
 
     private function immediatelyChangedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was changed');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was changed');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            $actionParams = array('all_data'=>true);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
 
             if (!$this->getInspector()->isMeetListRequirements($listingProduct)) {
                 continue;
@@ -61,8 +72,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                array()
+                $actionParams
             );
+
+            $this->setListAttemptData($listingProduct);
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -70,7 +83,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
 
     private function immediatelyNotCheckedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was not checked');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was not checked');
 
         /** @var $collection Varien_Data_Collection_Db */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
@@ -83,8 +96,20 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
 
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
-            $listingProduct->enableCache();
+            $listingProduct->getMagentoProduct()->enableCache();
             $listingProduct->setData('tried_to_list',1)->save();
+
+            $actionParams = array('all_data'=>true);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
 
             if (!$this->getInspector()->isMeetListRequirements($listingProduct)) {
                 continue;
@@ -93,8 +118,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                array()
+                $actionParams
             );
+
+            $this->setListAttemptData($listingProduct);
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -106,11 +133,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
     {
         $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute scheduled');
 
-        $synchTemplates = Mage::helper('M2ePro/Component_Ebay')
-                                        ->getCollection('Template_Synchronization')
-                                        ->getItems();
+        /** @var Ess_M2ePro_Model_Template_Synchronization $synchTemplateCollection */
+        $synchTemplateCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Template_Synchronization');
 
-        foreach ($synchTemplates as $synchTemplate) {
+        foreach ($synchTemplateCollection as $synchTemplate) {
 
             /* @var $ebaySynchTemplate Ess_M2ePro_Model_Ebay_Template_Synchronization */
             $ebaySynchTemplate = $synchTemplate->getChildObject();
@@ -165,7 +191,19 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
             foreach ($listingsProducts as $listingProduct) {
 
                 /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-                $listingProduct->enableCache();
+                $listingProduct->getMagentoProduct()->enableCache();
+
+                $actionParams = array('all_data'=>true);
+
+                $isExistInRunner = $this->getRunner()->isExistProduct(
+                    $listingProduct,
+                    Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
+                    $actionParams
+                );
+
+                if ($isExistInRunner) {
+                    continue;
+                }
 
                 if (!$this->getInspector()->isMeetListRequirements($listingProduct)) {
                     continue;
@@ -174,8 +212,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
                 $this->getRunner()->addProduct(
                     $listingProduct,
                     Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                    array()
+                    $actionParams
                 );
+
+                $this->setListAttemptData($listingProduct);
             }
         }
 
@@ -217,6 +257,17 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_List
         $cacheConfig->setGroupValue($cacheConfigGroup,'last_listing_product_id',json_encode($configData));
 
         return $collection->getItems();
+    }
+
+    //####################################
+
+    private function setListAttemptData(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        $additionalData = $listingProduct->getAdditionalData();
+        $additionalData['last_list_attempt_date'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+        $listingProduct->setSettings('additional_data', $additionalData);
+
+        $listingProduct->save();
     }
 
     //####################################

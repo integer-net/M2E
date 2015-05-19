@@ -19,6 +19,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
         $this->getLayout()->getBlock('head')
             ->addJs('M2ePro/GridHandler.js')
+            ->addJs('M2ePro/Plugin/ActionColumn.js')
             ->addJs('M2ePro/Ebay/Listing/Category/ChooserHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Category/SpecificHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Category/Chooser/BrowseHandler.js')
@@ -273,7 +274,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
         if (empty($categoriesIds) && !$this->getRequest()->isAjax()) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__(
-                'Magento Categories are not specified on products you are adding.')
+                'Magento Categories are not specified on Products you are adding.')
             );
         }
 
@@ -484,7 +485,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             $listingProductData = $sessionData['mode_product'][$listingProductId];
             $listingProductData['category_main_mode'] = Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_EBAY;
             $listingProductData['category_main_id'] = $suggestedCategory['category_id'];
-            $listingProductData['category_main_path'] = implode(' -> ', $suggestedCategory['category_path']);
+            $listingProductData['category_main_path'] = implode(' > ', $suggestedCategory['category_path']);
 
             $sessionData['mode_product'][$listingProductId] = $listingProductData;
 
@@ -554,7 +555,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             return $this->getResponse()->setBody(json_encode(array(
                 'validation' => false,
                 'message' => Mage::helper('M2ePro')->__(
-                    'There are no items to continue. Please, go back and select the item(s).'
+                    'There are no Items to continue. Please, go back and select the Item(s).'
                 )
             )));
         }
@@ -593,7 +594,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             return $this->getResponse()->setBody(json_encode(array(
                 'validation' => false,
                 'message' => Mage::helper('M2ePro')->__(
-                    'Magento Categories are not specified on products you are adding.'
+                    'Magento Categories are not specified on Products you are adding.'
                 )
             )));
         }
@@ -973,11 +974,12 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
     //#############################################
 
-    private function endListingCreation($listingProductsWithCategoryTemplate)
+    private function endListingCreation()
     {
         $listing = $this->getListingFromRequest();
 
-        Mage::helper('M2ePro/Data_Session')->setValue('added_products_ids', $listingProductsWithCategoryTemplate);
+        Mage::helper('M2ePro/Data_Session')->setValue('added_products_ids',
+            $this->getListingFromRequest()->getAddedListingProductsIds());
 
         $sessionData = $this->getSessionValue($this->getSessionDataKey());
 
@@ -1121,7 +1123,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             $resultData['category_main_mode'] = Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE;
             $resultData['category_main_attribute'] = NULL;
             $resultData['category_main_message'] = Mage::helper('M2ePro')->__(
-                'Please, specify a value suitable for all chosen products.'
+                'Please, specify a value suitable for all chosen Products.'
             );
         }
 
@@ -1142,7 +1144,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             $resultData['category_secondary_mode'] = Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE;
             $resultData['category_secondary_attribute'] = NULL;
             $resultData['category_secondary_message'] = Mage::helper('M2ePro')->__(
-                'Please, specify a value suitable for all chosen products.'
+                'Please, specify a value suitable for all chosen Products.'
             );
         }
 
@@ -1163,7 +1165,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             $resultData['store_category_main_mode'] = Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE;
             $resultData['store_category_main_attribute'] = NULL;
             $resultData['store_category_main_message'] = Mage::helper('M2ePro')->__(
-                'Please, specify a value suitable for all chosen products.'
+                'Please, specify a value suitable for all chosen Products.'
             );
         }
 
@@ -1185,7 +1187,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
                 Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_NONE;
             $resultData['store_category_secondary_attribute'] = NULL;
             $resultData['store_category_secondary_message'] = Mage::helper('M2ePro')->__(
-                'Please, specify a value suitable for all chosen products.'
+                'Please, specify a value suitable for all chosen Products.'
             );
         }
 
@@ -1337,7 +1339,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
         }
 
         $this->endWizard();
-        $this->endListingCreation($this->getListingFromRequest()->getAddedListingProductsIds());
+        $this->endListingCreation();
     }
 
     private function save($sessionData)
@@ -1357,8 +1359,6 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
         }
 
         $specificsData = $this->getSessionValue('specifics');
-
-        $listingProductsWithCategoryTemplate = array();
 
         foreach ($this->getUniqueTemplatesData($sessionData) as $templateData) {
 
@@ -1383,10 +1383,6 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
                 $categoryTemplateId = Mage::getModel('M2ePro/Ebay_Template_Category_Builder')->build($builderData)
                                                                                              ->getId();
-
-                $listingProductsWithCategoryTemplate = array_merge(
-                    $listingProductsWithCategoryTemplate, $listingProductsIds
-                );
             }
 
             $otherCategoryTemplate = Mage::getModel('M2ePro/Ebay_Template_OtherCategory_Builder')->build($builderData);
@@ -1400,7 +1396,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
         }
 
         $this->endWizard();
-        $this->endListingCreation($listingProductsWithCategoryTemplate);
+        $this->endListingCreation();
     }
 
     private function getUniqueTemplatesData($templatesData)

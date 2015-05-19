@@ -28,7 +28,7 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
             );
 
             $this->_getSession()->addSuccess(
-                Mage::helper('M2ePro')->__('The license key has been successfully updated.')
+                Mage::helper('M2ePro')->__('The License Key has been successfully updated.')
             );
         }
 
@@ -42,7 +42,7 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
         );
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The license status has been successfully refreshed.')
+            Mage::helper('M2ePro')->__('The License Status has been successfully refreshed.')
         );
 
         $this->_redirectUrl($this->_getRefererUrl());
@@ -78,7 +78,7 @@ class Ess_M2ePro_Adminhtml_Configuration_LicenseController
                 $expirationDate = Mage::helper('M2ePro/Module_License')->getTextExpirationDate($component);
                 $this->_getSession()->addSuccess(
                      Mage::helper('M2ePro')->__(
-                         'Trial license key was successfully obtained. It will be valid until %date%.',
+                         'Trial License Key was successfully obtained. It will be valid until %date%.',
                          $expirationDate
                      )
                 );

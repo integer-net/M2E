@@ -249,6 +249,7 @@ td.help_line .hl_messages_text {
 td.help_line .hl_footer {
     float: right !important;
 }
+
 /* ================================================ */
 
 /* Wizard Notification */
@@ -336,6 +337,26 @@ a.wizard-close:hover {
     float: left;
 }
 
+.columns .form-list td.value {
+    width: auto !important;
+}
+
+td div.validation-advice {
+    max-width: 255px;
+}
+
+.tool-tip-warning {
+    min-width: 230px;
+    font-size: 12px;
+    vertical-align: middle;
+    border-color: #ffd967;
+    background-color: #fffbf0;
+}
+
+p.note:not(.note-no-tool-tip) {
+    display: none;
+}
+
 /* ================================================ */
 
 /* Description preview */
@@ -379,6 +400,86 @@ td.changed span {
     margin-top: 5px;
     margin-left: 5px;
     background-image: url('../../images/fam_bullet_disk.gif');
+}
+
+/* ================================================ */
+
+/* Variation product manage variations */
+/* ================================================ */
+
+.attributes-options-filter img {
+    cursor: pointer;
+}
+
+.attributes-options-filter-values .filter-param-remove {
+    padding-left: 5px;
+}
+
+.attributes-options-filter-values input {
+    width: 87%;
+    margin-top: 3px;
+}
+
+.product-options-main select {
+    width: 185px;
+}
+
+.manage-variations.form-list td.value select {
+    width: 225px;
+}
+
+form select:disabled {
+    background: rgba(0,0,0,0.1);
+}
+
+/* ================================================ */
+
+/* Helpers styles */
+/* ================================================ */
+
+.underline {
+    font-style: normal;
+    text-decoration: underline;
+}
+
+a.custom-button {
+    color: #fff;
+    text-decoration: none;
+    display: inline-block;
+    background: url("../../images/btn_bg.gif") repeat-x scroll 0 100% #ffac47;
+    border-color: #ed6502 #a04300 #a04300 #ed6502;
+    border-style: solid;
+    border-width: 1px;
+    cursor: pointer;
+    font: bold 12px arial,helvetica,sans-serif;
+    padding: 1px 7px 2px;
+    text-align: center !important;
+    white-space: nowrap;
+}
+
+a.custom-button span {
+    line-height: 1.35em
+}
+
+a.custom-button:hover {
+    background: url("../../images/btn_over_bg.gif") repeat-x scroll 0px 0px #F77C16;
+}
+
+a.hover-underline {
+    text-decoration: none;
+}
+
+a.hover-underline:hover {
+    text-decoration: underline;
+}
+
+/* ================================================ */
+
+/* second lvl tabs */
+/* ================================================ */
+
+.m2epro-link-tabs a.active{
+    color: grey;
 }
 
 /* ================================================ */

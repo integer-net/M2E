@@ -24,7 +24,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Product extends Mage_Adminht
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
             $headerText = Mage::helper('M2ePro')->__(
                 'Add Products To %component_name% Listing "%listing_title%"',
-                Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE),
+                Mage::helper('M2ePro/Component_Buy')->getTitle(),
                 $this->escapeHtml($listingData['title'])
             );
         } else {
@@ -68,14 +68,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Product extends Mage_Adminht
             'label'     => Mage::helper('M2ePro')->__('Back'),
             'onclick'   => 'ProductGridHandlerObj.back_click(\''.$url.'\')',
             'class'     => 'back'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'ProductGridHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
 

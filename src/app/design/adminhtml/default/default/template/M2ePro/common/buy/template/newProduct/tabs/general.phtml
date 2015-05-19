@@ -1,8 +1,8 @@
 <div id="block_notice_buy_newProduct_template_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('This tab contains the main information on products you want to list: Attribute Set
- (it must be the same as M2E Listing has to be assigned), Products Identifiers and
- Category in which the products have to be listed.<br><br>
-The category either can be chosen by <u>Browsing</u> all categories from the list or can be found with <u>Searching
+    <?php echo Mage::helper('M2ePro')->__('This Tab contains the main information on Products you want to list: Attribute Set
+ (it must be the same as M2E Pro Listing has to be assigned), Products Identifiers and
+ Category in which the Products have to be Listed.<br/><br/>
+The Category either can be chosen by <u>Browsing</u> all Categories from the list or can be found with <u>Searching
  tool</u> by entering keywords.'); ?>
 </div>
 
@@ -11,7 +11,6 @@ $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::he
 $default = array(
     'category' => array(
         'id' => '',
-        'attribute_sets' => array(),
         'path' => '',
         'node_id' => '',
         'node_title' => '',
@@ -40,9 +39,6 @@ $default = array(
 $formData = array_merge($default, $formData);
 $isEdit = !!$this->getRequest()->getParam('id');
 
-if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
-    $formData['category']['attribute_sets'] = $this->listingAttributeSetsIds;
-}
 ?>
 
 <script type="text/javascript">
@@ -59,20 +55,20 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
         'Invalid input data. Decimal value required. Example 12.05' => Mage::helper('M2ePro')->__('Invalid input data. Decimal value required. Example 12.05'),
         'Invalid input data. String value required.' => Mage::helper('M2ePro')->__('Invalid input data. String value required.'),
 
-        'The specified title is already used for another New SKU Template.' => Mage::helper('M2ePro')->__('The specified title is already used for another New SKU Template.'),
+        'The specified Title is already used for another New SKU Policy.' => Mage::helper('M2ePro')->__('The specified Title is already used for another New SKU Policy.'),
         'Select Category first.' => Mage::helper('M2ePro')->__('Select Category first.'),
         'Search For Category' => Mage::helper('M2ePro')->__('Search For Category'),
 
-        'All of your product images should meet the following rules:' => Mage::helper('M2ePro')->__('All of your product images should meet the following rules:'),
+        'All of your Product Images should meet the following Rules:' => Mage::helper('M2ePro')->__('All of your Product Images should meet the following Rules:'),
 
         'Must be at least 500 pixels in width or height' => Mage::helper('M2ePro')->__('Must be at least 500 pixels in width or height'),
         'No more than 5 megabytes (MB) in size' => Mage::helper('M2ePro')->__('No more than 5 megabytes (MB) in size'),
         'In the JPG/JPEG format' => Mage::helper('M2ePro')->__('In the JPG/JPEG format'),
-        'Only contain the product being sold' => Mage::helper('M2ePro')->__('Only contain the product being sold'),
+        'Only contain the Product being sold' => Mage::helper('M2ePro')->__('Only contain the Product being sold'),
         'Be in focus with realistic color with a pure white background' => Mage::helper('M2ePro')->__('Be in focus with realistic color with a pure white background'),
         'Cannot contain additional text, graphics or inset images' => Mage::helper('M2ePro')->__('Cannot contain additional text, graphics or inset images'),
 
-        'Text to describe the product. Should be one block of text or a single paragraph. Do not use special characters and html tags' => Mage::helper('M2ePro')->__('Text to describe the product. Should be one block of text or a single paragraph. Do not use special characters and html tags'),
+        'Text to describe the Product. Should be one block of text or a single paragraph. Do not use special characters and html tags' => Mage::helper('M2ePro')->__('Text to describe the Product. Should be one block of text or a single paragraph. Do not use special characters and html tags'),
         'Internal Error. Please try again later.' => Mage::helper('M2ePro')->__('Internal Error. Please try again later.'),
 
         'Notes:'        => Mage::helper('M2ePro')->__('Notes:'),
@@ -87,19 +83,8 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
 
     Event.observe(window, 'load', function() {
 
-        AttributeSetHandlerObj = new AttributeSetHandler();
-        BuyTemplateNewProductHandlerObj = new CommonBuyTemplateNewProductHandler(new CommonBuyTemplateNewProductAttributeHandler,AttributeSetHandlerObj);
-
-        var attribute_sets = $('attribute_sets');
-        attribute_sets.observe('change', AttributeSetHandlerObj.changeAttributeSets);
-        if (attribute_sets.value) {
-            AttributeSetHandlerObj.confirmAttributeSets();
-            BuyTemplateNewProductHandlerObj.attribute_sets_confirm();
-        }
-
-        $('attribute_sets_confirm_button')
-            .observe('click',BuyTemplateNewProductHandlerObj.attribute_sets_confirm.bind(BuyTemplateNewProductHandlerObj))
-            .observe('click',BuyTemplateNewProductHandlerObj.confirmAttributeSets);
+        AttributeHandlerObj = new AttributeHandler();
+        BuyTemplateNewProductHandlerObj = new CommonBuyTemplateNewProductHandler(new CommonBuyTemplateNewProductAttributeHandler,AttributeHandlerObj);
 
         $('rakuten_native_id')
             .observe('change', BuyTemplateNewProductHandlerObj.rakuten_category_change)
@@ -179,41 +164,7 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                     <td class="value">
                         <input id="title" name="category[title]" value="<?php echo $this->escapeHtml($formData['category']['title']); ?>" type="text" class="input-text required-entry M2ePro-new-sku-template-title"/>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful template title for your internal use.'); ?></span>
-                        </p>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td class="label">
-                        <label for="attribute_sets"><?php echo Mage::helper('M2ePro')->__('Product Attribute Set'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value">
-                        <div id="attribute_sets_container" <?php if ($this->attribute_set_locked): ?>style="display: none;"<?php endif; ?>>
-                            <?php $this->attribute_set_locked ? $attributeSetPostfix = '_fake' : $attributeSetPostfix = ''; ?>
-                            <select id="attribute_sets<?php echo $attributeSetPostfix; ?>" name="category[attribute_sets<?php echo $attributeSetPostfix; ?>][]" multiple="multiple" class="<?php if (!$this->attribute_set_locked): ?>M2ePro-validate-attribute-sets<?php endif; ?>">
-                                <?php foreach ($this->getData('attributes_sets') as $set): ?>
-                                <option value="<?php echo $set['attribute_set_id']; ?>"<?php if (in_array($set['attribute_set_id'], $formData['category']['attribute_sets'])): echo ' selected="selected"'; endif;?>><?php echo $set['attribute_set_name'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <?php if ($this->attribute_set_locked): ?>
-                        <div id="attribute_sets_breadcrumb" style="width: 280px;">
-                            <?php $breadcrumb = array(); foreach ($this->getData('attributes_sets') as $set): ?>
-                            <?php if (in_array($set['attribute_set_id'], $formData['category']['attribute_sets'])): $breadcrumb[] = $set['attribute_set_name']; endif; ?>
-                            <?php endforeach; ?>
-                            <strong><?php echo implode(', ', $breadcrumb); ?></strong>
-                        </div>
-                        <input id="attribute_sets" name="category[attribute_sets]" value="<?php echo $this->escapeHtml(implode(',', $formData['category']['attribute_sets'])); ?>" type="hidden" />
-                        <?php endif; ?>
-
-                        <div id="attribute_sets_buttons_container" style="padding-top: 5px; <?php if ($this->attribute_set_locked): ?>display: none;<?php endif; ?>">
-                            <?php echo $this->getChildHtml('attribute_sets_select_all_button'); ?>
-                            <?php echo $this->getChildHtml('attribute_sets_confirm_button'); ?>
-                        </div>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Attribute Sets of products which will be listed on Rakuten using this template.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Short meaningful Policy Title for your internal use.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -277,9 +228,17 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                         <label><?php echo Mage::helper('M2ePro')->__('Seller SKU'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="seller_sku_custom_attribute_td"></div>
+                        <div id="seller_sku_custom_attribute_td">
+                            <select id="seller_sku_custom_attribute" name="seller_sku_custom_attribute">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['category']['seller_sku_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Seller defined alpha-numeric string uniquely identifying the product. Needs to be unique across all products and manufacturers.<br />
+                            <span><?php echo Mage::helper('M2ePro')->__('Seller defined alpha-numeric string uniquely identifying the Product. Needs to be unique across all Products and manufacturers.<br/>
                                                                          Example: KDK6490CAM'); ?></span>
                         </p>
                     </td>
@@ -306,9 +265,17 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                         <label><?php echo Mage::helper('M2ePro')->__($labelText); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="gtin_custom_attribute_td"></div>
+                        <div id="gtin_custom_attribute_td">
+                            <select id="gtin_custom_attribute" name="gtin_custom_attribute">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['category']['gtin_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The GTIN (UPC or EAN) compatible product identifier must be at least 12 digits in length.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The GTIN (UPC or EAN) compatible Product Identifier must be at least 12 digits in length.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -324,17 +291,25 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['isbn_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('International book identifier. Use only digits in this field.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('International book Identifier. Use only digits in this field.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="isbn_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('ISBN Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="isbn_custom_attribute_td"></div>
+                        <div id="isbn_custom_attribute_td">
+                            <select id="isbn_custom_attribute" name="isbn_custom_attribute">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['category']['isbn_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ISBN_MODE_CUSTOM_ATTRIBUTE && $attribute['code'] == $formData['category']['isbn_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </td>
                 </tr>
 
@@ -347,7 +322,7 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                 <!-- ASIN -->
                 <tr>
                     <td class="label">
-                        <label for="asin_mode"><?php echo Mage::helper('M2ePro')->__('ASIN'); ?>:</label>
+                        <label for="asin_mode"><?php echo Mage::helper('M2ePro')->__('ASIN / ISBN'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="asin_mode" name="category[asin_mode]" class="select">
@@ -355,17 +330,25 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['asin_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com product identifier.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com Product Identifier.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="asin_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('ASIN / ISBN Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="asin_custom_attribute_td"></div>
+                        <div id="asin_custom_attribute_td">
+                            <select id="asin_custom_attribute" name="asin_custom_attribute">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['category']['asin_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::ASIN_MODE_CUSTOM_ATTRIBUTE && $attribute['code'] == $formData['category']['asin_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </td>
                 </tr>
 
@@ -394,16 +377,16 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
                             <option value="<?php echo Ess_M2ePro_Model_Buy_Template_NewProduct_Core::PRODUCT_SET_ID_MODE_CUSTOM_ATTRIBUTE; ?>" <?php if ($formData['category']['product_set_id_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::PRODUCT_SET_ID_MODE_CUSTOM_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?></option>
                         </select>
                         <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com groups products together in the same family by this parameter.<br/>
-                                <b>For ex.</b>, a product "T-shirt" has 4 different colors. As Rakuten.com does not<br/>have parent/child product relationships each of these products is treated as totally separate.
-                                <br/>By assigning all 4 T-shirts the same Product Set ID, all of them will be placed on the same<br/>Rakuten.com web page with pull down menu of selecting color.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Rakuten.com groups Products together in the same family by this parameter.<br/>
+                                <b>For ex.</b>, a Product "T-shirt" has 4 different colors. As Rakuten.com does not<br/>have parent/child Product relationships each of these Products is treated as totally separate.
+                                <br/>By assigning all 4 T-shirts the same Product Set ID, all of them will be placed on the same<br/>Rakuten.com web Page with pull down menu of selecting color.'); ?></span>
                         </p>
                     </td>
                 </tr>
 
                 <tr id="product_set_id_custom_value_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Product Set ID Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <input id="product_set_id_custom_value_td" name="category[product_set_id_custom_value]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['product_set_id_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
@@ -412,10 +395,18 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
 
                 <tr id="product_set_id_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Custom Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Product Set ID Attribute'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <div id="product_set_id_custom_attribute_td"></div>
+                        <div id="product_set_id_custom_attribute_td">
+                            <select id="product_set_id_custom_attribute" name="product_set_id_custom_attribute">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['category']['product_set_id_mode'] == Ess_M2ePro_Model_Buy_Template_NewProduct_Core::PRODUCT_SET_ID_MODE_CUSTOM_ATTRIBUTE && $attribute['code'] == $formData['category']['product_set_id_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </td>
                 </tr>
 
@@ -431,7 +422,7 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
 
         <div style="height: 450px">
             <div id="block_notice_buy_category_template_browse" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Browse'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('Choose the department your product belongs to and then choose the category you need.<br/>Press the Confirm button.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('Choose the department your Product belongs to and then choose the Category you need.<br/>Press the Confirm Button.'); ?>
             </div>
 
             <div class="entry-edit-head">
@@ -502,8 +493,8 @@ if (!$isEdit && count((array)$this->listingAttributeSetsIds) > 0) {
         </div>
 
         <div id="block_notice_buy_category_template_search" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Search'); ?>">
-            <?php echo Mage::helper('M2ePro')->__('Enter the words, which describe the best your product and click on the Search button.<br/>
-Founded categories will be displayed for selection. '); ?>
+            <?php echo Mage::helper('M2ePro')->__('Enter the words, which describe the best your Product and click on the Search Button.<br/>
+Founded Categories will be displayed for selection. '); ?>
         </div>
 
         <div style="padding: 10px; border: 1px solid rgb(205, 221, 221) !important; background-image: none !important; background-attachment: scroll !important; background-color: rgb(231, 239, 239) !important; background-position: 0px 0px !important; background-repeat: repeat repeat !important;">
@@ -525,7 +516,7 @@ Founded categories will be displayed for selection. '); ?>
 
             <?php echo $this->getChildHtml('search_category_popup_button'); ?>
             &nbsp;
-            <?php echo $this->getChildHtml('reset_category_popup_button'); ?>
+            <a href="javascript:void(0)" id="reset_category_popup_button" onclick="BuyTemplateNewProductHandlerObj.resetSearchClick()" style="display: none"><?php echo Mage::helper('M2ePro')->__('Reset'); ?></a>
 
         </div>
 

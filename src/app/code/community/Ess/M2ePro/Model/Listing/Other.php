@@ -8,10 +8,6 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
 {
     // ########################################
 
-    public $isCacheEnabled = false;
-
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Account
      */
@@ -276,8 +272,8 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
             NULL,
             Ess_M2ePro_Model_Listing_Other_Log::ACTION_MAP_LISTING,
             // M2ePro_TRANSLATIONS
-            // Item was successfully mapped
-            'Item was successfully mapped',
+            // Item was successfully Mapped
+            'Item was successfully Mapped',
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
     }
@@ -294,32 +290,10 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
             NULL,
             Ess_M2ePro_Model_Listing_Other_Log::ACTION_UNMAP_LISTING,
             // M2ePro_TRANSLATIONS
-            // Item was successfully unmapped
-            'Item was successfully unmapped',
+            // Item was successfully Unmapped
+            'Item was successfully Unmapped',
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
             Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-    }
-
-    // ########################################
-
-    public function clearCache()
-    {
-        $this->getMagentoProduct()->clearCache();
-        return $this;
-    }
-
-    public function enableCache()
-    {
-        $this->isCacheEnabled = true;
-        $this->getMagentoProduct()->enableCache();
-        return $this;
-    }
-
-    public function disableCache()
-    {
-        $this->isCacheEnabled = false;
-        $this->getMagentoProduct()->disableCache();
-        return $this;
     }
 
     // ########################################

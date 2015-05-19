@@ -40,16 +40,38 @@
         </td>
     </tr>
 
+    <?php if (!$this->getData('is_support_mode') && $this->isServiceCronDisabled) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Service Cron State'); ?>: </label>
+            </td>
+            <td class="value" style="color: red;">
+                <?php echo Mage::helper('M2ePro')->__('Disabled by Developer'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+
+    <?php if (!$this->getData('is_support_mode') && $this->isMagentoCronDisabled) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Magento Cron State'); ?>: </label>
+            </td>
+            <td class="value" style="color: red;">
+                <?php echo Mage::helper('M2ePro')->__('Disabled by Developer'); ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+
     <?php if ($this->isShownRecommendationsMessage()) : ?>
         <tr>
             <td class="label" colspan="2" style="width: 600px">
-                <strong><?php echo Mage::helper('M2ePro')->__('We recommend to set up your cron job to be run every 1 minute (e.g. * * * * *).'); ?></strong>
+                <strong><?php echo Mage::helper('M2ePro')->__('We recommend to set up your Cron Job to be run every 1 minute (e.g. * * * * *).'); ?></strong>
             </td>
         </tr>
 
         <tr>
             <td class="label">
-                <label><?php echo Mage::helper('M2ePro')->__('PHP command'); ?>: </label>
+                <label><?php echo Mage::helper('M2ePro')->__('PHP Command'); ?>: </label>
             </td>
             <td class="value">
                 <?php echo $this->cronPhp; ?>
@@ -58,7 +80,7 @@
 
         <tr>
             <td class="label">
-                <label><?php echo Mage::helper('M2ePro')->__('GET command'); ?>: </label>
+                <label><?php echo Mage::helper('M2ePro')->__('GET Command'); ?>: </label>
             </td>
             <td class="value">
                 <?php echo $this->cronGet; ?>
@@ -69,14 +91,14 @@
     <?php if ($this->isShownServiceDescriptionMessage()) : ?>
         <tr>
             <td class="label" colspan="2" style="width: 600px">
-                <strong><?php echo Mage::helper('M2ePro')->__('What is the cron type Service?'); ?></strong>
+                <strong><?php echo Mage::helper('M2ePro')->__('What is the Cron Type Service?'); ?></strong>
             </td>
         </tr>
         <tr>
             <td class="label" colspan="2" style="width: 600px">
                 <?php echo Mage::helper('M2ePro')->__(
-                    'It is M2E Pro cron system where you were registered automatically during the extension installation.
-                    No additional settings are required. Our service does HTTP calls to your Magento from IP address: <b>%server_ip%</b>.',
+                    'It is M2E Pro Cron System where you were registered automatically during the Extension Installation.
+                    No additional Settings are required. Our Service does HTTP calls to your Magento from IP address: <b>%server_ip%</b>.',
                     $this->cronServiceIp
                 ); ?>
             </td>

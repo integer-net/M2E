@@ -27,7 +27,7 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         }
 
         if (count($items) == 0) {
-            throw new Exception('Every item in order has zero price.');
+            throw new Exception('Every Item in Order has zero Price.');
         }
 
         return parent::mergeItems($items);
@@ -88,7 +88,7 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             $customer->load($this->order->getAmazonAccount()->getMagentoOrdersCustomerId());
 
             if (is_null($customer->getId())) {
-                throw new Exception('Customer with ID specified in Amazon account settings does not exist.');
+                throw new Exception('Customer with ID specified in Amazon Account Settings does not exist.');
             }
         }
 
@@ -140,7 +140,7 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             'country_id' => '',
             'region'     => '',
             'region_id'  => '',
-            'city'       => 'The Amazon does not supply the complete billing buyer information.',
+            'city'       => 'Amazon does not supply the complete billing Buyer information.',
             'postcode'   => '',
             'street'     => array(),
             'company'    => ''
@@ -216,10 +216,10 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
                 ->formatPrice($this->getCurrency(), $this->order->getPromotionDiscountAmount());
 
             $comment = Mage::helper('M2ePro')->__(
-                '%value% promotion discount amount were subtracted from the Total Amount.',
+                '%value% promotion discount amount was subtracted from the total amount.',
                 $discount
             );
-            $comment .= '<br />';
+            $comment .= '<br/>';
 
             $comments[] = $comment;
         }
@@ -229,10 +229,10 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
                 ->formatPrice($this->getCurrency(), $this->order->getShippingDiscountAmount());
 
             $comment = Mage::helper('M2ePro')->__(
-                '%value% discount amount were subtracted from the shipping price.',
+                '%value% discount amount was subtracted from the shipping Price.',
                 $discount
             );
-            $comment .= '<br />';
+            $comment .= '<br/>';
 
             $comments[] = $comment;
         }
@@ -259,15 +259,15 @@ class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
         if (!empty($itemsGiftPrices)) {
 
             $comment = '<u>'.
-                Mage::helper('M2ePro')->__('The following items are purchased with gift wraps') .
-                ':</u><br />';
+                Mage::helper('M2ePro')->__('The following Items are purchased with gift wraps') .
+                ':</u><br/>';
 
             foreach ($itemsGiftPrices as $productInfo) {
                 $formattedCurrency = Mage::getSingleton('M2ePro/Currency')->formatPrice(
                     $this->getCurrency(), $productInfo['price']
                 );
 
-                $comment .= '<b>'.$productInfo['name'].'</b> -> '
+                $comment .= '<b>'.$productInfo['name'].'</b> > '
                     .$productInfo['type'].' ('.$formattedCurrency.')';
             }
 

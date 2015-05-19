@@ -25,8 +25,8 @@ class Ess_M2ePro_Model_Buy_Account extends Ess_M2ePro_Model_Component_Child_Buy_
     const OTHER_LISTINGS_MAPPING_TITLE_MODE_CUSTOM_ATTRIBUTE = 2;
 
     const OTHER_LISTINGS_MAPPING_SKU_DEFAULT_PRIORITY        = 1;
-    const OTHER_LISTINGS_MAPPING_TITLE_DEFAULT_PRIORITY      = 2;
-    const OTHER_LISTINGS_MAPPING_GENERAL_ID_DEFAULT_PRIORITY = 3;
+    const OTHER_LISTINGS_MAPPING_GENERAL_ID_DEFAULT_PRIORITY = 2;
+    const OTHER_LISTINGS_MAPPING_TITLE_DEFAULT_PRIORITY      = 3;
 
     const OTHER_LISTINGS_MOVE_TO_LISTINGS_DISABLED = 0;
     const OTHER_LISTINGS_MOVE_TO_LISTINGS_ENABLED  = 1;
@@ -107,7 +107,7 @@ class Ess_M2ePro_Model_Buy_Account extends Ess_M2ePro_Model_Component_Child_Buy_
             return false;
         }
 
-        $items = $this->getRelatedSimpleItems('Buy_Item','account_id',true);
+        $items = $this->getBuyItems(true);
         foreach ($items as $item) {
             $item->deleteInstance();
         }
@@ -115,6 +115,13 @@ class Ess_M2ePro_Model_Buy_Account extends Ess_M2ePro_Model_Component_Child_Buy_
         $this->delete();
 
         return true;
+    }
+
+    // ########################################
+
+    public function getBuyItems($asObjects = false, array $filters = array())
+    {
+        return $this->getRelatedSimpleItems('Buy_Item','account_id',$asObjects,$filters);
     }
 
     // ########################################
@@ -685,13 +692,13 @@ class Ess_M2ePro_Model_Buy_Account extends Ess_M2ePro_Model_Component_Child_Buy_
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('account');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('account');
         return parent::delete();
     }
 

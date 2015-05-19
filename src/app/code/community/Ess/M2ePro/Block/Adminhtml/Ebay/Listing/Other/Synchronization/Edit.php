@@ -24,7 +24,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Ebay_Component')->isSingleActiveComponent()) {
-            $componentName =Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE);
+            $componentName = Mage::helper('M2ePro/Component_Ebay')->getTitle();
             $headerText = Mage::helper('M2ePro')->__("Edit %component_name% 3rd Party Synchronization Settings",
                 $componentName);
         } else {
@@ -42,14 +42,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
         $this->removeButton('add');
         $this->removeButton('save');
         $this->removeButton('edit');
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'EbayListingOtherSynchronizationHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-        //------------------------------
 
         //------------------------------
         $url = $this->getRequest()->getParam('back');
@@ -75,7 +67,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Synchronization_Edit
     {
         $translations = array();
 
-        $text = 'Inconsistent settings in Revise and Stop rules.';
+        $text = 'Inconsistent Settings in Relist and Stop Rules.';
         $translations[$text] = Mage::helper('M2ePro')->__($text);
 
         $text = 'Must be greater than "Min".';

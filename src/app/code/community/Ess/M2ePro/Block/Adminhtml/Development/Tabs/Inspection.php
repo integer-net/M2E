@@ -49,6 +49,9 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Inspection extends Mage_Adminh
         $this->setChild('installation', $this->getLayout()->createBlock(
             'M2ePro/adminhtml_development_inspection_installation'
         ));
+        $this->setChild('other_issues', $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_development_inspection_otherIssues'
+        ));
         //----------------------------
 
         return parent::_beforeToHtml();

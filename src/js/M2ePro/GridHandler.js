@@ -36,7 +36,7 @@ GridHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    getCellContent : function(rowId,cellIndex)
+    getCellContent: function(rowId,cellIndex)
     {
         var rows = this.getGridObj().rows;
 
@@ -68,17 +68,17 @@ GridHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    selectAll : function()
+    selectAll: function()
     {
         this.getGridMassActionObj().selectAll();
     },
 
-    unselectAll : function()
+    unselectAll: function()
     {
         this.getGridMassActionObj().unselectAll();
     },
 
-    unselectAllAndReload : function()
+    unselectAllAndReload: function()
     {
         this.unselectAll();
         this.getGridObj().reload();
@@ -86,7 +86,7 @@ GridHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    selectByRowId : function(rowId)
+    selectByRowId: function(rowId)
     {
         this.unselectAll();
 
@@ -127,17 +127,17 @@ GridHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    massActionSubmitClick : function()
+    massActionSubmitClick: function()
     {
         if (this.getSelectedProductsString() == '' || this.getSelectedProductsArray().length == 0) {
-            alert(M2ePro.translator.translate('Please select items.'));
+            alert(M2ePro.translator.translate('Please select Items.'));
             return;
         }
 
         var selectAction = true;
         $$('select#'+this.gridId+'_massaction-select option').each(function(o) {
             if (o.selected && o.value == '') {
-                alert(M2ePro.translator.translate('Please select action.'));
+                alert(M2ePro.translator.translate('Please select Action.'));
                 selectAction = false;
                 return;
             }
@@ -160,7 +160,7 @@ GridHandler = Class.create(CommonHandler, {
             }
 
             if (!o.value || !this.actions[o.value + 'Action']) {
-                return alert(M2ePro.translator.translate('Please select action.'));
+                return alert(M2ePro.translator.translate('Please select Action.'));
             }
 
             this.actions[o.value + 'Action']();
@@ -170,7 +170,7 @@ GridHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    viewItemHelp : function(rowId, data)
+    viewItemHelp: function(rowId, data, hideViewLog)
     {
         $('grid_help_icon_open_'+rowId).hide();
         $('grid_help_icon_close_'+rowId).show();
@@ -182,12 +182,19 @@ GridHandler = Class.create(CommonHandler, {
 
         var html = this.createHelpTitleHtml(rowId);
 
+        var synchNote = $('synch_template_list_rules_note_'+rowId);
+        if (synchNote) {
+            html += this.createSynchNoteHtml(synchNote.innerHTML)
+        }
+
         data = eval(base64_decode(data));
         for (var i=0;i<data.length;i++) {
             html += this.createHelpActionHtml(data[i]);
         }
 
-        html += this.createHelpViewAllLogHtml(rowId);
+        if (!hideViewLog) {
+            html += this.createHelpViewAllLogHtml(rowId);
+        }
 
         var rows = this.getGridObj().rows;
         for(var i=0;i<rows.length;i++) {
@@ -209,7 +216,7 @@ GridHandler = Class.create(CommonHandler, {
         });
     },
 
-    hideItemHelp : function(rowId)
+    hideItemHelp: function(rowId)
     {
         if ($('grid_help_content_'+rowId) != null) {
             $('grid_help_content_'+rowId).hide();
@@ -221,14 +228,22 @@ GridHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    createHelpTitleHtml : function(rowId)
+    createHelpTitleHtml: function(rowId)
     {
         var productTitle = this.getProductNameByRowId(rowId);
         var closeHtml = '<a href="javascript:void(0);" id="hide_item_help_' + rowId + '" title="'+M2ePro.translator.translate('Close')+'"><span class="hl_close">&times;</span></a>';
         return '<div class="hl_header"><span class="hl_title">'+productTitle+'</span>'+closeHtml+'</div>';
     },
 
-    createHelpActionHtml : function(action)
+    createSynchNoteHtml: function(synchNote)
+    {
+
+        return '<div style="text-align: left"><ul class="messages"><li class="warning-msg"><ul>' +
+                    '<li>'+synchNote+'</li>' +
+        '</ul></li></ul></div>';
+    },
+
+    createHelpActionHtml: function(action)
     {
         var self = this;
         var classContainer = 'hl_container';
@@ -249,20 +264,50 @@ GridHandler = Class.create(CommonHandler, {
             html += '<strong style="color: gray;">'+action.initiator+'</strong>&nbsp;&nbsp;';
         }
 
-        html += '<strong>'+action.action+'</strong></div>' +
-                    '<div style="clear: both"></div>' +
-                        '<div style="padding-top: 3px;">';
+        html += '<strong>'+action.action+'</strong>';
+
+        if(action.action_in_progress) {
+            html += '<span style="color: gray"> (' + M2ePro.translator.translate('In Progress') + ')</span>';
+        }
+
+        html += '</div>' +
+            '<div style="clear: both"></div>' +
+            '<div style="padding-top: 3px;">';
 
         for (var i=0;i<action.items.length;i++) {
 
             var type = M2ePro.translator.translate('Notice');
 
             if (action.items[i].type == 2) {
-                type = '<span style="color: green;">'+M2ePro.translator.translate('Success')+'</span>';
+                if (action.items[i].count) {
+                    type = '<span style="color: green;"> ' + action.items[i].count + ' ' +
+                        M2ePro.translator.translate('Product(s)') +
+                    '</span>';
+                } else {
+                    type = '<span style="color: green;">' +
+                        M2ePro.translator.translate('Success') +
+                    '</span>';
+                }
             } else if (action.items[i].type == 3) {
-                type = '<span style="color: orange;">'+M2ePro.translator.translate('Warning')+'</span>';
+                if (action.items[i].count) {
+                    type = '<span style="color: orange;"> ' + action.items[i].count + ' ' +
+                        M2ePro.translator.translate('Product(s)') +
+                    '</span>';
+                } else {
+                    type = '<span style="color: orange;">' +
+                        M2ePro.translator.translate('Warning') +
+                    '</span>';
+                }
             } else if (action.items[i].type == 4) {
-                type = '<span style="color: red;">'+M2ePro.translator.translate('Error')+'</span>';
+                if (action.items[i].count) {
+                    type = '<span style="color: red;"> ' + action.items[i].count + ' ' +
+                        M2ePro.translator.translate('Product(s)') +
+                    '</span>';
+                } else {
+                    type = '<span style="color: red;">' +
+                        M2ePro.translator.translate('Error') +
+                    '</span>';
+                }
             }
 
             var description = action.items[i].description;
@@ -284,7 +329,7 @@ GridHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    createHelpViewAllLogHtml : function(rowId)
+    createHelpViewAllLogHtml: function(rowId)
     {
         return '<div class="hl_footer"><a target="_blank" href="'+this.getLogViewUrl(rowId)+'">'+
                M2ePro.translator.translate('View All Product Log')+

@@ -23,8 +23,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit extends Mag
         $templateId = $this->getRequest()->getParam('id');
 
         $this->_headerText = $templateId
-            ? Mage::helper('M2ePro')->__('Edit New SKU Template For Rakuten.com (Beta)')
-            : Mage::helper('M2ePro')->__('Add New SKU Template For Rakuten.com (Beta)');
+            ? Mage::helper('M2ePro')->__('Edit New SKU Policy For %rakuten%',
+                                          Mage::helper('M2ePro/Component_Buy')->getTitle())
+            : Mage::helper('M2ePro')->__('Add New SKU Policy For %rakuten%',
+                                          Mage::helper('M2ePro/Component_Buy')->getTitle());
         //------------------------------
 
         // Set buttons actions
@@ -50,14 +52,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit extends Mag
             ));
             //------------------------------
         }
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-        //------------------------------
 
         //------------------------------
         $params = array();

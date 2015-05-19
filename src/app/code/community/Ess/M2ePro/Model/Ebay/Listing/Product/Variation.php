@@ -128,12 +128,22 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     //-----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     * @return Ess_M2ePro_Model_Template_Description
      */
     public function getDescriptionTemplate()
     {
         return $this->getEbayListingProduct()->getDescriptionTemplate();
     }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Description
+     */
+    public function getEbayDescriptionTemplate()
+    {
+        return $this->getDescriptionTemplate()->getChildObject();
+    }
+
+    //-----------------------------------------
 
     /**
      * @return Ess_M2ePro_Model_Ebay_Template_Payment
@@ -302,71 +312,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
 
     public function getQty()
     {
-        $qty = 0;
-
-        if ($this->isDelete()) {
-            return $qty;
-        }
-
-        // Options Models
-        $options = $this->getOptions(true);
-
-        // Configurable, Grouped, Simple with options product
-        if ($this->getListingProduct()->getMagentoProduct()->isConfigurableType() ||
-            $this->getListingProduct()->getMagentoProduct()->isGroupedType() ||
-            $this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-
-            foreach ($options as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $qty = $option->getChildObject()->getQty();
-                break;
-            }
-
-        // Bundle product
-        } else {
-
-            $optionsQtyList = array();
-            $optionsQtyArray = array();
-
-            // grouping qty by product id
-            foreach ($options as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $optionsQtyArray[$option->getProductId()][] = $option->getChildObject()->getQty();
-            }
-
-            foreach ($optionsQtyArray as $optionQty) {
-                $optionsQtyList[] = floor($optionQty[0]/count($optionQty));
-            }
-
-            $qty = min($optionsQtyList);
-        }
-
-        $src = $this->getEbaySellingFormatTemplate()->getQtySource();
-
-        if ($src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE ||
-            $src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
-            $src['mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) {
-
-            if ($qty > 0 && $src['qty_percentage'] > 0 && $src['qty_percentage'] < 100) {
-
-                $roundingFunction = (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-                        ->getGroupValue('/qty/percentage/','rounding_greater') ? 'ceil' : 'floor';
-
-                $qty = (int)$roundingFunction(($qty/100)*$src['qty_percentage']);
-            }
-
-            if ($src['qty_modification_mode'] && $qty < $src['qty_min_posted_value']) {
-                $qty = 0;
-            }
-
-            if ($src['qty_modification_mode'] && $qty > $src['qty_max_posted_value']) {
-                $qty = $src['qty_max_posted_value'];
-            }
-        }
-
-        $qty < 0 && $qty = 0;
-
-        return (int)floor($qty);
+        /** @var $calculator Ess_M2ePro_Model_Ebay_Listing_Product_QtyCalculator */
+        $calculator = Mage::getModel('M2ePro/Ebay_Listing_Product_QtyCalculator');
+        $calculator->setProduct($this->getListingProduct());
+        return $calculator->getVariationValue($this->getParentObject());
     }
 
     // ########################################
@@ -374,88 +323,34 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
     public function getPrice()
     {
         $src = $this->getEbaySellingFormatTemplate()->getBuyItNowPriceSource();
-        $price = $this->getBaseProductPrice($src);
-
-        $price = $this->getEbayListingProduct()->increasePriceByVatPercent($price);
-        return Mage::helper('M2ePro')->parsePrice($price, $src['coefficient']);
+        return $this->getCalculatedPrice($src, true, true);
     }
+
+    // ----------------------------------------
 
     public function getPriceDiscountStp()
     {
         $src = $this->getEbaySellingFormatTemplate()->getPriceDiscountStpSource();
-        $price = $this->getBaseProductPrice($src);
-
-        return $this->getEbayListingProduct()->increasePriceByVatPercent($price);
+        return $this->getCalculatedPrice($src, true, false);
     }
 
     public function getPriceDiscountMap()
     {
         $src = $this->getEbaySellingFormatTemplate()->getPriceDiscountMapSource();
-        $price = $this->getBaseProductPrice($src);
-
-        return $this->getEbayListingProduct()->increasePriceByVatPercent($price);
+        return $this->getCalculatedPrice($src, true, false);
     }
 
     // ----------------------------------------
 
-    public function getBaseProductPrice($src)
+    private function getCalculatedPrice($src, $increaseByVatPercent = false, $modifyByCoefficient = false)
     {
-        $price = 0;
+        /** @var $calculator Ess_M2ePro_Model_Ebay_Listing_Product_PriceCalculator */
+        $calculator = Mage::getModel('M2ePro/Ebay_Listing_Product_PriceCalculator');
+        $calculator->setSource($src)->setProduct($this->getListingProduct());
+        $calculator->setIsIncreaseByVatPercent($increaseByVatPercent);
+        $calculator->setModifyByCoefficient($modifyByCoefficient);
 
-        if ($this->isDelete()) {
-            return $price;
-        }
-
-        // Options Models
-        $options = $this->getOptions(true);
-
-        // Configurable, Bundle, Simple with options product
-        if ($this->getListingProduct()->getMagentoProduct()->isConfigurableType() ||
-            $this->getListingProduct()->getMagentoProduct()->isBundleType() ||
-            $this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-
-            if ($this->getEbaySellingFormatTemplate()->isPriceVariationModeParent() ||
-                $this->getListingProduct()->getMagentoProduct()->isSimpleTypeWithCustomOptions()) {
-
-                // Base Price of Main product.
-                $price = $this->getEbayListingProduct()->getBaseProductPrice($src);
-
-                foreach ($options as $option) {
-                    /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                    $price += $option->getChildObject()->getPrice($src);
-                }
-
-            } else {
-
-                $isBundle = $this->getListingProduct()->getMagentoProduct()->isBundleType();
-
-                foreach ($options as $option) {
-
-                    /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-
-                    if ($isBundle) {
-                        $price += $option->getChildObject()->getPrice($src);
-                        continue;
-                    }
-
-                    $price = $option->getChildObject()->getPrice($src);
-                    break;
-                }
-            }
-
-            // Grouped product
-        } else if ($this->getListingProduct()->getMagentoProduct()->isGroupedType()) {
-
-            foreach ($options as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
-                $price = $option->getChildObject()->getPrice($src);
-                break;
-            }
-        }
-
-        $price < 0 && $price = 0;
-
-        return $price;
+        return $calculator->getVariationValue($this->getParentObject());
     }
 
     // ########################################

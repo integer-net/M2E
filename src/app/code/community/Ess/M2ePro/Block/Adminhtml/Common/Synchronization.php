@@ -40,28 +40,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Synchronization
 
         if (!(bool)$this->getRequest()->getParam('wizard',false)) {
             //------------------------------
-            $url = $this->getUrl('*/adminhtml_common_account/index');
-            $this->_addButton('goto_accounts', array(
-                'label'     => Mage::helper('M2ePro')->__('Accounts'),
-                'onclick'   => 'setLocation(\''. $url .'\')',
-                'class'     => 'button_link'
-            ));
-            //------------------------------
-
-            //------------------------------
             $url = $this->getUrl('*/adminhtml_common_log/synchronization');
             $this->_addButton('view_log', array(
                 'label'     => Mage::helper('M2ePro')->__('View Log'),
                 'onclick'   => 'window.open(\'' . $url . '\')',
                 'class'     => 'button_link'
-            ));
-            //------------------------------
-
-            //------------------------------
-            $this->_addButton('reset', array(
-                'label'     => Mage::helper('M2ePro')->__('Refresh'),
-                'onclick'   => 'SynchronizationHandlerObj.reset_click()',
-                'class'     => 'reset'
             ));
             //------------------------------
 
@@ -141,13 +124,6 @@ JAVASCRIPT;
         return $this->getChild('amazon_tab');
     }
 
-    public function getAmazonTabHtml()
-    {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_synchronization_help');
-
-        return $helpBlock->toHtml() . parent::getAmazonTabHtml();
-    }
-
     // ########################################
 
     protected function getBuyTabBlock()
@@ -159,13 +135,6 @@ JAVASCRIPT;
             );
         }
         return $this->getChild('buy_tab');
-    }
-
-    public function getBuyTabHtml()
-    {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_synchronization_help');
-
-        return $helpBlock->toHtml() . parent::getBuyTabHtml();
     }
 
     // ########################################
@@ -181,21 +150,17 @@ JAVASCRIPT;
         return $this->getChild('play_tab');
     }
 
-    public function getPlayTabHtml()
-    {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_synchronization_help');
-
-        return $helpBlock->toHtml() . parent::getPlayTabHtml();
-    }
-
     // ########################################
 
     protected function _componentsToHtml()
     {
+        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization_help');
         $formBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization_form');
         count($this->tabs) == 1 && $formBlock->setChildBlockId($this->getSingleBlock()->getContainerId());
 
-        return parent::_componentsToHtml() . $formBlock->toHtml();
+        return $helpBlock->toHtml()
+               . parent::_componentsToHtml()
+               . $formBlock->toHtml();
     }
 
     protected function getTabsContainerDestinationHtml()

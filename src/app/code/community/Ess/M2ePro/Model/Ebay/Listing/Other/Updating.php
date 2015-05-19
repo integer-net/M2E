@@ -15,7 +15,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
      */
     protected $account = NULL;
 
-    protected $logActionId = NULL;
+    protected $logsActionId = NULL;
 
     // ########################################
 
@@ -101,9 +101,27 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
 
                 $newData['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED;
 
+            } else if ($receivedItem['listingStatus'] == self::EBAY_STATUS_ACTIVE &&
+                       $receivedItem['quantity'] <= 0) {
+
+                $newData['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN;
+
             } else if ($receivedItem['listingStatus'] == self::EBAY_STATUS_ACTIVE) {
 
                 $newData['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_LISTED;
+            }
+
+            if ($newData['status'] == Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN ||
+                !empty($receivedItem['out_of_stock'])) {
+
+                if ($existsId) {
+                    $additionalData = $existObject->getAdditionalData();
+                    empty($additionalData['out_of_stock_control']) && $additionalData['out_of_stock_control'] = true;
+                } else {
+                    $additionalData = array('out_of_stock_control' => true);
+                }
+
+                $newData['additional_data'] = json_encode($additionalData);
             }
 
             if ($existsId) {
@@ -117,6 +135,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
                             // M2ePro_TRANSLATIONS
                             // Item status was successfully changed to "Listed".
                             $tempLogMessage = 'Item status was successfully changed to "Listed".';
+                            break;
+                        case Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN:
+                            // M2ePro_TRANSLATIONS
+                            // Item status was successfully changed to "Listed(Hidden)".
+                            $message = 'Item status was successfully changed to "Listed(Hidden)".';
                             break;
                         case Ess_M2ePro_Model_Listing_Product::STATUS_SOLD:
                             // M2ePro_TRANSLATIONS
@@ -138,7 +161,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
                     $logModel->addProductMessage(
                         (int)$newData['id'],
                         Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
-                        $this->getLogActionId(),
+                        $this->getLogsActionId(),
                         Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_STATUS_ON_CHANNEL,
                         $tempLogMessage,
                         Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
@@ -159,8 +182,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
                      NULL,
                      Ess_M2ePro_Model_Listing_Other_Log::ACTION_ADD_LISTING,
                     // M2ePro_TRANSLATIONS
-                    // Item was successfully added
-                     'Item was successfully added',
+                    // Item was successfully Added
+                     'Item was successfully Added',
                      Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                      Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW);
 
@@ -295,13 +318,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Updating
         return $this->account;
     }
 
-    protected function getLogActionId()
+    protected function getLogsActionId()
     {
-        if (!is_null($this->logActionId)) {
-            return $this->logActionId;
+        if (!is_null($this->logsActionId)) {
+            return $this->logsActionId;
         }
 
-        return $this->logActionId = Mage::getModel('M2ePro/Listing_Other_Log')->getNextActionId();
+        return $this->logsActionId = Mage::getModel('M2ePro/Listing_Other_Log')->getNextActionId();
     }
 
     // ########################################

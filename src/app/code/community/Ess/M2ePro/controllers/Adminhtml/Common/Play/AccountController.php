@@ -382,7 +382,7 @@ class Ess_M2ePro_Adminhtml_Common_Play_AccountController
                         'password' => $post['password'],
                         'panel_mode' => $post['panel_mode']
                     );
-                    $dispatcherObject->processConnector('account', 'add' ,'entity', $params, $id);
+                    $dispatcherObject->processConnector('account', 'add' ,'entityRequester', $params, $id);
                 } else {
                     $newData = array(
                         'title' => $post['title'],
@@ -397,7 +397,7 @@ class Ess_M2ePro_Adminhtml_Common_Play_AccountController
                     $params = array_diff_assoc($newData, $oldData);
 
                     if (!empty($params)) {
-                        $dispatcherObject->processConnector('account', 'update' ,'entity', $params, $id);
+                        $dispatcherObject->processConnector('account', 'update' ,'entityRequester', $params, $id);
                     }
                 }
             }
@@ -408,8 +408,8 @@ class Ess_M2ePro_Adminhtml_Common_Play_AccountController
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
             // M2ePro_TRANSLATIONS
-            // The Play.com access obtaining is currently unavailable.<br />Reason: %error_message%
-            $error = 'The Play.com access obtaining is currently unavailable.<br />Reason: %error_message%';
+            // The Play.com access obtaining is currently unavailable.<br/>Reason: %error_message%
+            $error = 'The Play.com access obtaining is currently unavailable.<br/>Reason: %error_message%';
             $error = Mage::helper('M2ePro')->__($error, Mage::helper('M2ePro')->__($exception->getMessage()));
 
             $this->_getSession()->addError($error);

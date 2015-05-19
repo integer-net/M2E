@@ -23,9 +23,6 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_Other_MovingController
             'marketplaceId', $this->getRequest()->getParam('marketplaceId')
         );
         Mage::helper('M2ePro/Data_Global')->setValue(
-            'attrSetId', json_decode($this->getRequest()->getParam('attrSetId'))
-        );
-        Mage::helper('M2ePro/Data_Global')->setValue(
             'ignoreListings', json_decode($this->getRequest()->getParam('ignoreListings'))
         );
 
@@ -38,7 +35,6 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_Other_MovingController
                 'moving_handler_js' => 'EbayListingOtherGridHandlerObj.movingHandler',
             )
         );
-        $block->setShowCreateListingBtn(true);
         $this->getResponse()->setBody($block->toHtml());
     }
 

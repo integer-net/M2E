@@ -272,20 +272,20 @@ abstract class Ess_M2ePro_Model_Order_Proxy
         if (!$currencyHelper->isAllowed($this->getCurrency(), $store)) {
             $comments[] = <<<COMMENT
 <b>Attention!</b> The Order Prices are incorrect.
-Conversion was not performed as "{$this->getCurrency()}" currency is not enabled.
-Default currency "{$store->getBaseCurrencyCode()}" was used instead.
-Please, enable currency in System -> Configuration -> Currency Setup.
+Conversion was not performed as "{$this->getCurrency()}" Currency is not enabled.
+Default Currency "{$store->getBaseCurrencyCode()}" was used instead.
+Please, enable Currency in System > Configuration > Currency Setup.
 COMMENT;
         } elseif ($currencyConvertRate == 0) {
             $comments[] = <<<COMMENT
 <b>Attention!</b> The Order Prices are incorrect.
 Conversion was not performed as there's no rate for "{$this->getCurrency()}".
-Default currency "{$store->getBaseCurrencyCode()}" was used instead.
-Please, add currency convert rate in System -> Manage Currency -> Rates.
+Default Currency "{$store->getBaseCurrencyCode()}" was used instead.
+Please, add Currency convert rate in System > Manage Currency > Rates.
 COMMENT;
         } else {
             $comments[] = <<<COMMENT
-Because the Order currency is different from the Store currency,
+Because the Order Currency is different from the Store Currency,
 the conversion from <b>"{$this->getCurrency()}" to "{$store->getBaseCurrencyCode()}"</b> was performed
 using <b>{$currencyConvertRate}</b> as a rate.
 COMMENT;

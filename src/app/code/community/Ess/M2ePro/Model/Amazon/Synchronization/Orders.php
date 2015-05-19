@@ -39,6 +39,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders
 
         $result = !$this->processTask('Orders_Reserve_Cancellation') ? false : $result;
         $result = !$this->processTask('Orders_Receive') ? false : $result;
+        $result = !$this->processTask('Orders_Refund') ? false : $result;
+        $result = !$this->processTask('Orders_Cancel') ? false : $result;
         $result = !$this->processTask('Orders_Update') ? false : $result;
 
         return $result;

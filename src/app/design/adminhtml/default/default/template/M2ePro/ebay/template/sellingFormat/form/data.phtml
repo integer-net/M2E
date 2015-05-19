@@ -56,6 +56,7 @@
 
 <script type="text/javascript">
 
+    M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Template_SellingFormat'); ?>,'Ess_M2ePro_Model_Template_SellingFormat');
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Ebay_Template_SellingFormat'); ?>,'Ess_M2ePro_Model_Ebay_Template_SellingFormat');
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Ebay_Template_Manager'); ?>,'Ess_M2ePro_Model_Ebay_Template_Manager');
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Ebay'); ?>,'Ess_M2ePro_Helper_Component_Ebay');
@@ -82,7 +83,7 @@
     )) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'If you do not see the organization you were looking for, try to enter another keywords and run the search again.' => Mage::helper('M2ePro')->__('If you do not see the organization you were looking for, try to enter another keywords and run the search again.')
+        'If you do not see the organization you were looking for, try to enter another keywords and run the Search again.' => Mage::helper('M2ePro')->__('If you do not see the organization you were looking for, try to enter another keywords and run the Search again.')
     )) ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
@@ -98,8 +99,8 @@
         'Price' => Mage::helper('M2ePro')->__('Price'),
         '"Buy It Now" Price' => Mage::helper('M2ePro')->__('"Buy It Now" Price'),
 
-        'The fixed price for immediate purchase.' => Mage::helper('M2ePro')->__('The fixed price for immediate purchase.'),
-        'The fixed price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now price</a> to your listing.' => Mage::helper('M2ePro')->__('The fixed price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now price</a> to your listing.'),
+        'The Fixed Price for immediate purchase.' => Mage::helper('M2ePro')->__('The Fixed Price for immediate purchase.'),
+        'The Fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your Listing.' => Mage::helper('M2ePro')->__('The Fixed Price for immediate purchase.<br/>Find out more about <a href="http://sellercentre.ebay.co.uk/add-buy-it-now-price-auction" target="_blank">adding a Buy It Now Price</a> to your Listing.'),
 
         '% of Price' => Mage::helper('M2ePro')->__('% of Price'),
         '% of "Buy It Now" Price' => Mage::helper('M2ePro')->__('% of "Buy It Now" Price')
@@ -262,7 +263,12 @@
 <input type="hidden" name="selling_format[is_custom_template]" value="<?php echo $this->isCustom() ? 1 : 0; ?>" />
 
 <?php if($showBlockedAdvancedMode): ?>
-    <p style="font-size: 15px; font-weight: bolder; color: red;">This set of options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (Sell On eBay -> Configuration -> General -> Mode -> Advanced).</p>
+    <p style="font-size: 15px; font-weight: bolder; color: red;">
+        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration');
+            echo Mage::helper('M2ePro')->__(
+            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
+        ?>
+    </p>
 <?php endif; ?>
 
 <div class="entry-edit simple_mode_disallowed" id="magento_block_ebay_template_selling_format_edit_form_general">
@@ -304,12 +310,12 @@
 
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose whether products listed with this policy on eBay auction-style or fixed price.<br/>
-                                Auction-style listings are best if you are unsure of the value of your item, eg because it is unique. Fixed price listings are good if you know the price you want to get for your item.'
+                                'Choose whether Products Listed with this Policy on eBay Auction-style or Fixed Price.<br/>
+                                Auction-style Listings are best if you are unsure of the value of your Item, eg because it is unique. Fixed Price Listings are good if you know the Price you want to get for your Item.'
                             ); ?></span>
                             <span class="simple_mode_disallowed"><?php echo Mage::helper('M2ePro')->__(
-                                '<br/><br/>Alternatively, you can specify a Magento attribute to set the listing type depending on the attribute value set for each product.<br/>
-                                For fixed price listings, set the attribute value to <b>FixedPriceItem</b>; for auction-style listings, set the attribute value to <b>Chinese</b>.'
+                                '<br/><br/>Alternatively, you can specify a Magento Attribute to set the Listing type depending on the Attribute Value set for each Product.<br/>
+                                For Fixed Price Listings, set the Attribute Value to <b>FixedPriceItem</b>; for Auction-style Listings, set the Attribute Value to <b>Chinese</b>.'
                             ); ?></span>
                         </p>
 
@@ -329,9 +335,9 @@
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Making your listing private means that the details of the listing won\'t be shown on the Feedback Profile page for you or the buyer.<br/><br/>
-                                This can be useful in cases where you or the buyer might want to be discreet about the item and/or the final price - such as the sale of high-priced items or approved pharmaceutical products.
-                                You should only make your listing private for a specific reason.'
+                                'Making your Listing Private means that the details of the Listing won\'t be shown on the Feedback Profile Page for you or the Buyer.<br/><br/>
+                                This can be useful in cases where you or the Buyer might want to be discreet about the Item and/or the final Price - such as the sale of high-priced Items or approved pharmaceutical Products.
+                                You should only make your Listing Private for a specific reason.'
                             ); ?></span>
                         </p>
                     </td>
@@ -349,7 +355,10 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'If Yes, this indicates that you elect to offer the item exclusively to business users. If No, this indicates that you elect to offer the item to all users. Applicable only to business sellers residing in Germany, Austria, or Switzerland who are listing in a B2B VAT-enabled category on the eBay Germany (DE), Austria (AT), or Switzerland (CH) sites. If this argument is Yes, you must have a valid VAT-ID registered with eBay, and BusinessSeller must also be true.'
+                                    'If <strong>Yes</strong>, this indicates that you elect to offer the Item exclusively to business users. <br/>
+                                     If <strong>No</strong>, this indicates that you elect to offer the Item to all users. <br/><br/>
+                                     Applicable only to business Sellers residing in Germany, Austria, or Switzerland who are Listing in a B2B VAT-enabled Category on the eBay Germany (DE), Austria (AT), or Switzerland (CH) Sites. <br/>
+                                     If this argument is <strong>Yes</strong>, you must have a valid VAT-ID registered with eBay, and <i>BusinessSeller</i> must also be true.'
                                 ); ?>
                             </span>
                         </p>
@@ -410,9 +419,9 @@
                             </select>
                         </span>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The length of time your eBay listing will be active. You can have it last 1, 3, 5, 7, 10, 30 days or Good \'Til Cancelled.
-                                                                        <br />Good \'Til Cancelled listings renew automatically every 30 days unless all of the items sell, you end the listing, or the listing breaches an eBay policy.'); ?></span>
-                            <span id="duration_attribute_note" style="display: none;"><?php echo Mage::helper('M2ePro')->__('</br>Attribute must contain a whole number. If you choose "Good Till Cancelled" the attribute must contain 100.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('The length of time your eBay Listing will be active. You can have it last 1, 3, 5, 7, 10, 30 days or Good \'Til Cancelled.
+                                                                        <br/>Good \'Til Cancelled Listings renew automatically every 30 days unless all of the Items sell, you end the Listing, or the Listing breaches an eBay Policy.'); ?></span>
+                            <span id="duration_attribute_note" style="display: none;"><?php echo Mage::helper('M2ePro')->__('<br/>Attribute must contain a whole number. If you choose "Good Till Cancelled" the Attribute must contain 100.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -432,10 +441,10 @@
 
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'This is useful if you have run out of stock of an item that you have listed on eBay.
-                                If you choose <b>Yes</b>, the eBay listing is hidden temporarily instead of being ended completely.
-                                When new stock for the item arrives, you can use automatic or manual Revise rules to update the inventory and the eBay listing will appear again.<br/><br/>
-                                <b>Note:</b> Once you list a product with this option it cannot be changed. To cancel it you should end the eBay listing before listing the item again.'
+                                'This is useful if you have run Out Of Stock of an Item that you have Listed on eBay.
+                                If you choose <b>Yes</b>, the eBay Listing is hidden temporarily instead of being ended completely.
+                                When new Stock for the Item arrives, you can use automatic or manual Revise Rules to update the Inventory and the eBay Listing will appear again.<br/><br/>
+                                <b>Note:</b> Once you list a Product with this option it cannot be changed. To cancel it you should end the eBay Listing before Listing the Item again.'
                             ); ?></span>
                         </p>
 
@@ -449,19 +458,19 @@
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="qty_mode" name="selling_format[qty_mode]">
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product QTY'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_SINGLE; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_SINGLE == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Single Item'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_NUMBER; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_NUMBER == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom QTY Number'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Quantity'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_SINGLE; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_SINGLE == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Single Item'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_NUMBER; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_NUMBER == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Custom Value'); ?></option>
 
                             <optgroup class="simple_mode_disallowed" label="Magento Attribute">
-                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('QTY'); ?></option>
-                                <?php if ($formData['qty_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['qty_custom_attribute'], $this->attributes) && $formData['qty_custom_attribute'] != ''): ?>
-                                    <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['qty_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE; ?>">
+                                <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED == $formData['qty_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('QTY'); ?></option>
+                                <?php if ($formData['qty_mode'] == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['qty_custom_attribute'], $this->attributes) && $formData['qty_custom_attribute'] != ''): ?>
+                                    <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['qty_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE; ?>">
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttributeHelper->getAttributeLabel($formData['qty_custom_attribute'])) ?>
                                     </option>
                                 <?php endif; ?>
                                 <?php foreach($attributesByInputTypes['text'] as $attribute) : ?>
-                                    <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE; ?>" <?php if ($formData['qty_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_ATTRIBUTE && $attribute['code'] == $formData['qty_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                    <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE; ?>" <?php if ($formData['qty_mode'] == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE && $attribute['code'] == $formData['qty_custom_attribute']): ?>selected="selected"<?php endif; ?>>
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -470,11 +479,11 @@
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'The number of items you want to sell on eBay.<br/><br/>
-                                <b>Product QTY:</b> the number of items on eBay will be the same as in Magento.<br/>
-                                <b>Single Item:</b> only one item will be available on eBay.<br/>
-                                <b>Custom QTY Number:</b> set a quantity in the policy here.<br/>
-                                <b>Magento Attribute:</b> takes the number from the attribute you specify.'
+                                'The number of Items you want to sell on eBay.<br/><br/>
+                                <b>Product Quantity:</b> the number of Items on eBay will be the same as in Magento.<br/>
+                                <b>Single Item:</b> only one Item will be available on eBay.<br/>
+                                <b>Custom Value:</b> set a Quantity in the Policy here.<br/>
+                                <b>Magento Attribute:</b> takes the number from the Attribute you specify.'
                             ); ?></span>
                         </p>
 
@@ -485,7 +494,7 @@
 
                 <tr id="qty_mode_cv_tr" style="display: none;">
                     <td class="label">
-                        <label for="qty_custom_value"><?php echo Mage::helper('M2ePro')->__('Custom QTY Number'); ?>: </label>
+                        <label for="qty_custom_value"><?php echo Mage::helper('M2ePro')->__('Quantity Value'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <input id="qty_custom_value" name="selling_format[qty_custom_value]" value="<?php echo $this->escapeHtml($formData['qty_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible validate-digits" />
@@ -494,7 +503,7 @@
 
                 <tr id="qty_percentage_tr" class="simple_mode_disallowed">
                     <td class="label">
-                        <label for="qty_percentage"><?php echo Mage::helper('M2ePro')->__('QTY Percentage'); ?>: </label>
+                        <label for="qty_percentage"><?php echo Mage::helper('M2ePro')->__('Quantity Percentage'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="qty_percentage" name="selling_format[qty_percentage]" class="required-entry">
@@ -503,7 +512,7 @@
                             <?php endfor; ?>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of items number to be listed on eBay basing on product quantity or magento attribute. E.g., if qty percentage is set to 10% and product quantity is 100, the quantity to be listed on eBay will be calculated as <br>100 *10%  = 10.</br>'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Sets the percentage for calculation of Items number to be Listed on eBay basing on Product Quantity or Magento Attribute. E.g., if Quantity Percentage is set to 10% and Product Quantity is 100, the Quantity to be Listed on eBay will be calculated as <br/>100 *10%  = 10.<br/>'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -520,9 +529,9 @@
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose whether to limit the amount of stock you list on eBay, eg because you want to set some stock aside for sales off eBay.<br/><br/>
-                                If this setting is <b>Enabled</b> you can specify the maximum quantity to be listed.
-                                If this setting is <b>Disabled</b> all stock for the product will be listed as available on eBay.'
+                                'Choose whether to limit the amount of Stock you list on eBay, eg because you want to set some Stock aside for sales off eBay.<br/><br/>
+                                If this Setting is <b>Enabled</b> you can specify the maximum Quantity to be Listed.
+                                If this Setting is <b>Disabled</b> all Stock for the Product will be Listed as available on eBay.'
                             ); ?></span>
                         </p>
                     </td>
@@ -535,8 +544,8 @@
                     <td id="qty_min_posted_value_td" class="value" style="width: auto;">
                         <input id="qty_min_posted_value" name="selling_format[qty_min_posted_value]" value="<?php echo $this->escapeHtml($formData['qty_min_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in stock but set a min qty to be listed of 5, item will not be listed on eBay.</br>
-Otherwise, the item will be listed with quantity according to the settings in the Price, Quantity and Format Policy'); ?>
+                            <span><?php echo Mage::helper('M2ePro')->__('If you have 2 pieces in Stock but set a Minimum Quantity to Be Listed of 5, Item will not be Listed on eBay.<br/>
+Otherwise, the Item will be Listed with Quantity according to the Settings in the Price, Quantity and Format Policy'); ?>
                             </span>
                         </p>
                     </td>
@@ -549,7 +558,7 @@ Otherwise, the item will be listed with quantity according to the settings in th
                     <td id="qty_max_posted_value_td" class="value" style="width: auto;">
                         <input id="qty_max_posted_value" name="selling_format[qty_max_posted_value]" value="<?php echo $this->escapeHtml($formData['qty_max_posted_value']); ?>" type="text" class="input-text validate-qty M2ePro-required-when-visible" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Set a maximum number to sell on eBay, e.g. if you have 10 items in stock but want to keep 2 items back, set a maximum quantity of 8.'); ?>
+                            <span><?php echo Mage::helper('M2ePro')->__('Set a maximum number to sell on eBay, e.g. if you have 10 Items in Stock but want to keep 2 Items back, set a Maximum Quantity of 8.'); ?>
                             </span>
                         </p>
                     </td>
@@ -566,8 +575,8 @@ Otherwise, the item will be listed with quantity according to the settings in th
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose how you want to list Configurable, Grouped, Bundle and Simple With Custom Options products.<br/>
-                                Choosing <b>Yes</b> will list these types of products as if they are Simple products without variations.'
+                                'Choose how you want to list Configurable, Grouped, Bundle and Simple With Custom Options Products.
+                                Choosing <b>Yes</b> will list these types of Products as if they are Simple Products without Variations.'
                             ); ?></span>
                         </p>
                     </td>
@@ -601,8 +610,8 @@ Otherwise, the item will be listed with quantity according to the settings in th
                         <input name="selling_format[vat_percent]" value="<?php echo $formData['vat_percent']; ?>" type="text" class="M2ePro-validate-vat input-text" />
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'To specify a VAT rate, you must have an eBay business account and list the item on a VAT-enabled site: Ireland, India, Switzerland, Spain, Holland, Belgium, Italy, Germany, France, Austria or United Kingdom.
-                                The item\'s VAT information appears on the item\'s listing page.'
+                                'To specify a VAT Rate, you must have an eBay business Account and list the Item on a VAT-enabled Site: Ireland, India, Switzerland, Spain, Holland, Belgium, Italy, Germany, France, Austria or United Kingdom.
+                                The Item\'s VAT information appears on the Item\'s Listing Page.'
                             ); ?></span>
                         </p>
                     </td>
@@ -619,8 +628,8 @@ Otherwise, the item will be listed with quantity according to the settings in th
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose if you want to use the tax table for your eBay account to charge sales tax.
-                                Tax tables are set up directly on eBay, not in M2E Pro. To set up or edit tax tables, log in to your seller account on eBay.
+                                'Choose if you want to use the Tax Table for your eBay Account to charge Sales Tax.
+                                Tax Tables are set up directly on eBay, not in M2E Pro. To set up or edit Tax Tables, Log in to your Seller Account on eBay.
                                 They are available only for Canada, Canada (Fr), USA and eBay Motors.'
                             ); ?></span>
                         </p>
@@ -708,10 +717,10 @@ Otherwise, the item will be listed with quantity according to the settings in th
                     <li class="notice-msg">
                         <span>
                             <?php echo Mage::helper('M2ePro')->__(
-                                'eBay %marketplace_title% supports %currency_code% currencies. To switch the currency you want to sell for, go to %menu_label% > Configuration > <a target="_blank" href="%url%">General</a>',
+                                'eBay %marketplace_title% supports %currency_code% Currencies. To switch the Currency you want to sell for, go to %menu_path% > <a target="_blank" href="%url%">General</a>',
                                 $this->getMarketplace()->getTitle(),
                                 $currencies,
-                                Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel(),
+                                Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
                                 $this->getUrl('*/adminhtml_ebay_configuration')
                             ); ?>
                         </span>
@@ -733,13 +742,13 @@ Otherwise, the item will be listed with quantity according to the settings in th
                         </select>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__(
-                                'Choose whether you want to add VAT to the price when a product is listed on eBay, using the VAT rate or eBay Tax Table in the Taxation section above.<br/><br/>
-                                 <b>Example:</b> For a product with Magento price = £10, VAT rate = 19%, price change percentage increase = 2%, the final eBay price will be £12.14.<br/>
-                                 Magento price: £10<br/>
+                                'Choose whether you want to add VAT to the Price when a Product is Listed on eBay, using the VAT Rate or eBay Tax Table in the Taxation Section above.<br/><br/>
+                                 <b>Example:</b> For a Product with Magento Price = £10, VAT Rate = 19%, Price change percentage increase = 2%, the final eBay Price will be £12.14.<br/>
+                                 Magento Price: £10<br/>
                                  VAT 19%: £10 * 19% = £1.90<br/>
-                                 Magento price + VAT = £10 + £1.90 = £11.90<br/>
+                                 Magento Price + VAT = £10 + £1.90 = £11.90<br/>
                                  add percentage increase 2% = £11.90 * 2% = £0.24<br/><br/>
-                                 <b>Final price on eBay</b>: £11.90 + £0.24 = £12.14'
+                                 <b>Final Price on eBay</b>: £11.90 + £0.24 = £12.14'
                             ); ?></span>
                         </p>
                     </td>
@@ -760,11 +769,11 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                         <th style="width: 65px">
                                             <?php echo Mage::helper('M2ePro')->__('Currency'); ?>
                                             <span>
-                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                                 <span class="tool-tip-message" style="font-size: 12px; display: none;">
-                                                    <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                    <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                                     <span><?php echo Mage::helper('M2ePro')->__(
-                                                        'The currency for eBay listings. Automatically set based on the eBay site you chose earlier.'
+                                                        'The Currency for eBay Listings. Automatically set based on the eBay Site you chose earlier.'
                                                     ); ?></span>
                                             </span>
                                         </th>
@@ -773,23 +782,23 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                     <th style="width: 325px">
                                         <?php echo Mage::helper('M2ePro')->__('Price Change'); ?><span class="required">*</span>
                                         <span>
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                             <span class="tool-tip-message" style="font-size: 12px; display: none; width: 400px">
-                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                                 <span>
                                                     <?php $currencyPlaceholder = is_null($currency) ? Mage::helper('M2ePro')->__('[CURRENCY]') : Mage::app()->getLocale()->currency($currency)->getSymbol(); ?>
 
                                                     <?php echo Mage::helper('M2ePro')->__(
-                                                        'A value you want the Magento Price to be modified while listing on eBay.<br/>
-                                                        Price change settings apply after VAT has been added.<br/><br/>
+                                                        'A value you want the Magento Price to be modified while Listing on eBay.<br/>
+                                                        Price change Settings apply after VAT has been added.<br/><br/>
                                                         <b>Absolute Value increase</b><br/>
-                                                        This will increase the price on eBay compared to the price on Magento.<br/>
+                                                        This will increase the Price on eBay compared to the Price on Magento.<br/>
                                                         <b>Absolute Value decrease</b><br/>
-                                                        This will reduce the price on eBay compared to the price on Magento.<br/>
+                                                        This will reduce the Price on eBay compared to the Price on Magento.<br/>
                                                         <b>Percentage increase (%)</b><br/>
-                                                        This will increase the price on eBay compared to the price on Magento.<br/>
+                                                        This will increase the Price on eBay compared to the Price on Magento.<br/>
                                                         <b>Percentage decrease (%)</b><br/>
-                                                        This will reduce the price on eBay compared to the price on Magento.',
+                                                        This will reduce the Price on eBay compared to the Price on Magento.',
                                                     $currencyPlaceholder); ?>
                                                 </span>
                                             </span>
@@ -815,19 +824,19 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                 <td class="value">
                                     <select id="start_price_mode" name="selling_format[start_price_mode]" class="required-entry" style="width: 280px">
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT == $formData['start_price_mode']): echo ' selected="selected"'; endif; ?>>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT == $formData['start_price_mode']): echo ' selected="selected"'; endif; ?>>
                                             <?php echo Mage::helper('M2ePro')->__('Product Price'); ?>
                                         </option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL == $formData['start_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL == $formData['start_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
 
                                         <optgroup class="simple_mode_disallowed" label="Magento Attribute">
-                                            <?php if ($formData['start_price_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['start_price_custom_attribute'], $this->attributes) && $formData['start_price_custom_attribute'] != ''): ?>
-                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['start_price_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE; ?>">
+                                            <?php if ($formData['start_price_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['start_price_custom_attribute'], $this->attributes) && $formData['start_price_custom_attribute'] != ''): ?>
+                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['start_price_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE; ?>">
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttributeHelper->getAttributeLabel($formData['start_price_custom_attribute'])) ?>
                                                 </option>
                                             <?php endif; ?>
                                             <?php foreach($attributesByInputTypes['text_price'] as $attribute) : ?>
-                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['start_price_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['start_price_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['start_price_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['start_price_custom_attribute']): ?>selected="selected"<?php endif; ?>>
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -835,10 +844,10 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                     </select>
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
-                                            <span><?php echo Mage::helper('M2ePro')->__('The starting price at which bidding begins.'); ?></span>
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
+                                            <span><?php echo Mage::helper('M2ePro')->__('The starting Price at which bidding begins.'); ?></span>
                                         </span>
                                     </div>
 
@@ -857,22 +866,22 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE; ?>" <?php if (preg_match('/^\-[0-9.,]*%$/',$formData['start_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage decrease'); ?></option>
                                             </select>
                                             <span id="start_price_example_container">
-                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                                 <span class="tool-tip-message" style="font-size: 12px; display: none; width: 400px">
-                                                    <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                    <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                                     <span class="start_price_example" id="start_price_example_absolute_increase"><?php echo Mage::helper('M2ePro')->__(
-                                                        'If you wish to increase the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                        'If you wish to increase the Price of an Item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="start_price_example" id="start_price_example_absolute_decrease"><?php echo Mage::helper('M2ePro')->__(
-                                                        'If you wish to reduce the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                        'If you wish to reduce the Price of an Item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="start_price_example" id="start_price_example_percentage_increase"><?php echo Mage::helper('M2ePro')->__(
-                                                        'You wish to increase by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
-                                                        In the box type “10”. The item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
+                                                        'You wish to increase by 10% the Price of a %currency% 2.00 Item selling on your Magento Store.<br/>
+                                                        In the box type “10”. The Item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="start_price_example" id="start_price_example_percentage_decrease"><?php echo Mage::helper('M2ePro')->__(
-                                                        'You wish to reduce by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
-                                                        In the box type: “10”. The item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
+                                                        'You wish to reduce by 10% the Price of a %currency% 2.00 Item selling on your Magento Store.<br/>
+                                                        In the box type: “10”. The Item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
                                                     ); ?></span>
                                                 </span>
                                             </span>
@@ -906,18 +915,18 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                 <td class="value remove_bottom_border">
                                     <select id="buyitnow_price_mode" name="selling_format[buyitnow_price_mode]" class="required-entry" style="width: 280px">
-                                        <option id="buyitnow_price_mode_none_option" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE == $formData['buyitnow_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT == $formData['buyitnow_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL == $formData['buyitnow_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
+                                        <option id="buyitnow_price_mode_none_option" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE == $formData['buyitnow_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT == $formData['buyitnow_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL == $formData['buyitnow_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
 
                                         <optgroup class="simple_mode_disallowed" label="Magento Attribute">
-                                            <?php if ($formData['buyitnow_price_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['buyitnow_price_custom_attribute'], $this->attributes) && $formData['buyitnow_price_custom_attribute'] != ''): ?>
-                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['buyitnow_price_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
+                                            <?php if ($formData['buyitnow_price_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['buyitnow_price_custom_attribute'], $this->attributes) && $formData['buyitnow_price_custom_attribute'] != ''): ?>
+                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['buyitnow_price_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttributeHelper->getAttributeLabel($formData['buyitnow_price_custom_attribute'])) ?>
                                                 </option>
                                             <?php endif; ?>
                                             <?php foreach($attributesByInputTypes['text_price'] as $attribute): ?>
-                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['buyitnow_price_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['buyitnow_price_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['buyitnow_price_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['buyitnow_price_custom_attribute']): ?>selected="selected"<?php endif; ?>>
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -925,9 +934,9 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                     </select>
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                             <span id="buyitnow_price_note"></span>
                                         </span>
                                     </div>
@@ -947,22 +956,22 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE; ?>" <?php if (preg_match('/^\-[0-9.,]*%$/',$formData['buyitnow_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage decrease'); ?></option>
                                             </select>
                                             <span id="buyitnow_price_example_container">
-                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                                 <span class="tool-tip-message tip-left" style="font-size: 12px; display: none; width: 400px">
-                                                    <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                    <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                                     <span class="buyitnow_price_example" id="buyitnow_price_example_absolute_increase"><?php echo Mage::helper('M2ePro')->__(
-                                                        'If you wish to increase the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                        'If you wish to increase the Price of an Item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="buyitnow_price_example" id="buyitnow_price_example_absolute_decrease"><?php echo Mage::helper('M2ePro')->__(
-                                                        'If you wish to reduce the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                        'If you wish to reduce the Price of an Item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="buyitnow_price_example" id="buyitnow_price_example_percentage_increase"><?php echo Mage::helper('M2ePro')->__(
-                                                        'You wish to increase by 10% the price of a %currency% 2.00 item selling on your Magento store.
-                                                        In the box type “10”. The item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
+                                                        'You wish to increase by 10% the Price of a %currency% 2.00 Item selling on your Magento Store.
+                                                        In the box type “10”. The Item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="buyitnow_price_example" id="buyitnow_price_example_percentage_decrease"><?php echo Mage::helper('M2ePro')->__(
-                                                        'You wish to reduce by 10% the price of a %currency% 2.00 item selling on your Magento store.
-                                                        In the box type: “10”. The item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
+                                                        'You wish to reduce by 10% the Price of a %currency% 2.00 Item selling on your Magento Store.
+                                                        In the box type: “10”. The Item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
                                                     ); ?></span>
                                                 </span>
                                             </span>
@@ -992,10 +1001,10 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                         <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_VARIATION_MODE_CHILDREN; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_VARIATION_MODE_CHILDREN == $formData['price_variation_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Associated Products'); ?></option>
                                     </select>
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
-                                            <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento product attribute to use for the price for Configurable and Bundle products options.'); ?></span>
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
+                                            <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento Product Attribute to use for the Price for Configurable and Bundle Products Options.'); ?></span>
                                         </span>
                                     </div>
                                 </td>
@@ -1018,18 +1027,18 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                 <td class="value">
                                     <select id="reserve_price_mode" name="selling_format[reserve_price_mode]" class="required-entry" style="width: 280px">
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE == $formData['reserve_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT == $formData['reserve_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL == $formData['reserve_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE == $formData['reserve_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT == $formData['reserve_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL == $formData['reserve_price_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
 
                                         <optgroup class="simple_mode_disallowed" label="Magento Attribute">
-                                            <?php if ($formData['reserve_price_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['reserve_price_custom_attribute'], $this->attributes) && $formData['reserve_price_custom_attribute'] != '') : ?>
-                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['reserve_price_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
+                                            <?php if ($formData['reserve_price_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['reserve_price_custom_attribute'], $this->attributes) && $formData['reserve_price_custom_attribute'] != '') : ?>
+                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['reserve_price_custom_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttributeHelper->getAttributeLabel($formData['reserve_price_custom_attribute'])) ?>
                                                 </option>
                                             <?php endif; ?>
                                             <?php foreach($attributesByInputTypes['text_price'] as $attribute) : ?>
-                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['reserve_price_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['reserve_price_custom_attribute']): ?>selected="selected"<?php endif; ?>>
+                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['reserve_price_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['reserve_price_custom_attribute']): ?>selected="selected"<?php endif; ?>>
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -1037,10 +1046,10 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                     </select>
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
-                                            <span><?php echo Mage::helper('M2ePro')->__('The lowest price at which you are selling an item.<br/><b>Note:</b> eBay charges some additional fee for using this option.'); ?></span>
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
+                                            <span><?php echo Mage::helper('M2ePro')->__('The lowest Price at which you are selling an Item.<br/><b>Note:</b> eBay charges some additional fee for using this Option.'); ?></span>
                                         </span>
                                     </div>
 
@@ -1059,22 +1068,22 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_COEFFICIENT_PERCENTAGE_DECREASE; ?>" <?php if (preg_match('/^\-[0-9.,]*%$/',$formData['reserve_price_coefficient'])): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Percentage decrease'); ?></option>
                                             </select>
                                             <span id="reserve_price_example_container">
-                                                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                                <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                                 <span class="tool-tip-message" style="font-size: 12px; display: none; width: 400px">
-                                                    <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                                    <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                                     <span class="reserve_price_example" id="reserve_price_example_absolute_increase"><?php echo Mage::helper('M2ePro')->__(
-                                                        'If you wish to increase the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                        'If you wish to increase the Price of an Item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="reserve_price_example" id="reserve_price_example_absolute_decrease"><?php echo Mage::helper('M2ePro')->__(
-                                                        'If you wish to reduce the price of an item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
+                                                        'If you wish to reduce the Price of an Item selling on eBay by %currency% 1.50, type “1.5” into the box.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="reserve_price_example" id="reserve_price_example_percentage_increase"><?php echo Mage::helper('M2ePro')->__(
-                                                        'You wish to increase by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
-                                                        In the box type “10”. The item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
+                                                        'You wish to increase by 10% the Price of a %currency% 2.00 Item selling on your Magento Store.<br/>
+                                                        In the box type “10”. The Item will then go on sale for %currency% 2.2 on eBay.', $currencyPlaceholder
                                                     ); ?></span>
                                                     <span class="reserve_price_example" id="reserve_price_example_percentage_decrease"><?php echo Mage::helper('M2ePro')->__(
-                                                        'You wish to reduce by 10% the price of a %currency% 2.00 item selling on your Magento store.<br/>
-                                                        In the box type: “10”. The item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
+                                                        'You wish to reduce by 10% the Price of a %currency% 2.00 Item selling on your Magento Store.<br/>
+                                                        In the box type: “10”. The Item will then go on sale for %currency% 1.80 on eBay.', $currencyPlaceholder
                                                     ); ?></span>
                                                 </span>
                                             </span>
@@ -1108,18 +1117,18 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                 <td class="value remove_bottom_border">
                                     <select id="price_discount_stp_mode" name="selling_format[price_discount_stp_mode]" class="required-entry" style="width: 280px">
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE == $formData['price_discount_stp_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT == $formData['price_discount_stp_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL == $formData['price_discount_stp_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE == $formData['price_discount_stp_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT == $formData['price_discount_stp_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL == $formData['price_discount_stp_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
 
                                         <optgroup class="simple_mode_disallowed" label="Magento Attribute">
-                                            <?php if ($formData['price_discount_stp_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['price_discount_stp_attribute'], $this->attributes) && $formData['price_discount_stp_attribute'] != ''): ?>
-                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['price_discount_stp_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
+                                            <?php if ($formData['price_discount_stp_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['price_discount_stp_attribute'], $this->attributes) && $formData['price_discount_stp_attribute'] != ''): ?>
+                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['price_discount_stp_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttributeHelper->getAttributeLabel($formData['price_discount_stp_attribute'])) ?>
                                                 </option>
                                             <?php endif; ?>
                                             <?php foreach($attributesByInputTypes['text_price'] as $attribute): ?>
-                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['price_discount_stp_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['price_discount_stp_attribute']): ?>selected="selected"<?php endif; ?>>
+                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['price_discount_stp_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['price_discount_stp_attribute']): ?>selected="selected"<?php endif; ?>>
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -1128,14 +1137,14 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                     </select>
 
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
-                                                    'The strike-through price is the original price of a product that is discounted shown with a line through it.
-                                                    It is only available to certain sellers who have been pre-approved by eBay.<br/><br/>
-                                                    If you qualify to display strike-through price choose the Magento attribute you want to use for it.'
+                                                    'The Strike-Through Price is the original Price of a Product that is discounted shown with a line through it.
+                                                    It is only available to certain Sellers who have been pre-approved by eBay.<br/><br/>
+                                                    If you qualify to display Strike-Through Price choose the Magento Attribute you want to use for it.'
                                                 ); ?>
                                             </span>
                                         </span>
@@ -1163,19 +1172,19 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                         <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_DISCOUNT_STP_TYPE_SOLD_ON_BOTH; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_DISCOUNT_STP_TYPE_SOLD_ON_BOTH == $formData['price_discount_stp_type']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Previous Selling Price used both'); ?></option>
                                     </select>
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
                                                     '<strong>Recommended Retail Price</strong><br/>
-                                                    This price is recommended by the manufacturer to be used at the initial sale.<br/>
+                                                    This Price is recommended by the manufacturer to be used at the initial sale.<br/>
                                                     <strong>Previous Selling Price used on eBay</strong><br/>
-                                                    This price was used in another listing on eBay 30 days prior to listing the item, excluding shipping and handling.<br/>
+                                                    This Price was used in another Listing on eBay 30 days prior to Listing the Item, excluding shipping and handling.<br/>
                                                     <strong>Previous Selling Price used beyond eBay</strong><br/>
-                                                    This price was used beyond eBay either online or offline 30 days prior to listing the item, excluding shipping and handling.<br/>
+                                                    This Price was used beyond eBay either online or offline 30 days prior to Listing the Item, excluding shipping and handling.<br/>
                                                     <strong>Previous Selling Price used both on and beyond eBay</strong><br/>
-                                                    This price was used both on and beyond eBay 30 days prior to listing the item, excluding shipping and handling.'
+                                                    This Price was used both on and beyond eBay 30 days prior to Listing the Item, excluding shipping and handling.'
                                                 ); ?>
                                             </span>
                                         </span>
@@ -1204,18 +1213,18 @@ Otherwise, the item will be listed with quantity according to the settings in th
 
                                 <td class="value remove_bottom_border bottom_border_disabled">
                                     <select id="price_discount_map_mode" name="selling_format[price_discount_map_mode]" class="required-entry" style="width: 280px">
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_NONE == $formData['price_discount_map_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_PRODUCT == $formData['price_discount_map_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
-                                        <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_SPECIAL == $formData['price_discount_map_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE == $formData['price_discount_map_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT == $formData['price_discount_map_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Price'); ?></option>
+                                        <option value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL; ?>" <?php if (Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL == $formData['price_discount_map_mode']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Special Price'); ?></option>
 
                                         <optgroup class="simple_mode_disallowed" label="Magento Attribute">
-                                            <?php if ($formData['price_discount_map_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['price_discount_map_attribute'], $this->attributes) && $formData['price_discount_map_attribute'] != ''): ?>
-                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['price_discount_map_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
+                                            <?php if ($formData['price_discount_map_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && !$magentoAttributeHelper->isExistInAttributesArray($formData['price_discount_map_attribute'], $this->attributes) && $formData['price_discount_map_attribute'] != ''): ?>
+                                                <option attribute_code="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['price_discount_map_attribute']) ?>" selected="selected" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE ?>">
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttributeHelper->getAttributeLabel($formData['price_discount_map_attribute'])) ?>
                                                 </option>
                                             <?php endif; ?>
                                             <?php foreach($attributesByInputTypes['text_price'] as $attribute): ?>
-                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['price_discount_map_mode'] == Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['price_discount_map_attribute']): ?>selected="selected"<?php endif; ?>>
+                                                <option class="simple_mode_disallowed" attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE; ?>" <?php if ($formData['price_discount_map_mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE && $attribute['code'] == $formData['price_discount_map_attribute']): ?>selected="selected"<?php endif; ?>>
                                                     <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -1224,9 +1233,9 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                     </select>
 
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
                                                     'This determines where the Minimum Advertised Price should be taken from.'
@@ -1256,17 +1265,17 @@ Otherwise, the item will be listed with quantity according to the settings in th
                                         <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_DISCOUNT_MAP_EXPOSURE_PRE_CHECKOUT; ?>" <?php if (Ess_M2ePro_Model_Ebay_Template_SellingFormat::PRICE_DISCOUNT_MAP_EXPOSURE_PRE_CHECKOUT == $formData['price_discount_map_exposure_type']): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Pre-Checkout'); ?></option>
                                     </select>
                                     <div style="float: right;">
-                                        <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+                                        <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                         <span class="tool-tip-message" style="display: none;">
-                                            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                                             <span>
                                                 <?php echo Mage::helper('M2ePro')->__(
                                                     '<strong>None</strong><br/>
-                                                    Discounted price will not be shown during either Pre-Checkout or Checkout. A buyer will be aware of discount before the payment is done.<br/>
+                                                    Discounted Price will not be shown during either Pre-Checkout or Checkout. A Buyer will be aware of discount before the payment is done.<br/>
                                                     <strong>During Checkout</strong><br/>
-                                                    Discounted price will be shown on the eBay Checkout flow page. A buyer will be aware of discount before the purchase is confirmed.<br/>
+                                                    Discounted Price will be shown on the eBay Checkout flow Page. A Buyer will be aware of discount before the purchase is confirmed.<br/>
                                                     <strong>PreCheckout</strong><br/>
-                                                    The information of discounted price will be available on the product page. A buyer will be aware of discount before he decides to make a purchase by clicking "See Price" link. Discounted price will be shown in a pop-up window.'); ?>
+                                                    The information of discounted Price will be available on the Product Page. A Buyer will be aware of discount before he decides to make a purchase by clicking "See Price" link. Discounted Price will be shown in a pop-up window.'); ?>
                                             </span>
                                         </span>
                                     </div>
@@ -1434,8 +1443,8 @@ Otherwise, the item will be listed with quantity according to the settings in th
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__(
-                                    'The Best Offer option allows you to accept offers from buyers and negotiate a price.
-                                    You can accept Best Offers on fixed price and Classified Ads in certain categories, such as eBay Motors.'
+                                    'The Best Offer Option allows you to accept offers from Buyers and negotiate a Price.
+                                    You can accept Best Offers on fixed Price and Classified Ads in certain Categories, such as eBay Motors.'
                                 ); ?>
                             </span>
                         </p>

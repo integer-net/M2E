@@ -19,6 +19,10 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
 
     public function process()
     {
+        if ($this->isDisabledByDeveloper()) {
+            return false;
+        }
+
         $this->initialize();
         $this->updateLastAccess();
 
@@ -96,6 +100,11 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
     }
 
     //####################################
+
+    protected function isDisabledByDeveloper()
+    {
+        return false;
+    }
 
     protected function initialize()
     {

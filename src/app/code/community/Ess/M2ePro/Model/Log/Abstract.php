@@ -6,14 +6,14 @@
 
 class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
 {
-    const TYPE_NOTICE = 1;
-    const TYPE_SUCCESS = 2;
-    const TYPE_WARNING = 3;
-    const TYPE_ERROR = 4;
+    const TYPE_NOTICE   = 1;
+    const TYPE_SUCCESS  = 2;
+    const TYPE_WARNING  = 3;
+    const TYPE_ERROR    = 4;
 
-    const PRIORITY_HIGH = 1;
-    const PRIORITY_MEDIUM = 2;
-    const PRIORITY_LOW = 3;
+    const PRIORITY_HIGH    = 1;
+    const PRIORITY_MEDIUM  = 2;
+    const PRIORITY_LOW     = 3;
 
     protected $componentMode = NULL;
 
@@ -31,10 +31,38 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
         return $this->componentMode;
     }
 
-    public function unsetComponentMode()
+    //####################################
+
+    public function getNextActionId()
     {
-        $this->componentMode = NULL;
-        return $this;
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
+        $table = Mage::getSingleton('core/resource')->getTableName('m2epro_config');
+        $groupConfig = '/logs/'.$this->getLastActionIdConfigKey().'/';
+
+        $lastActionId = (int)$connRead->select()
+            ->from($table,'value')
+            ->where('`group` = ?',$groupConfig)
+            ->where('`key` = ?','last_action_id')
+            ->query()->fetchColumn();
+
+        $nextActionId = $lastActionId + 1;
+
+        $connWrite->update(
+            $table,
+            array('value' => $nextActionId),
+            array('`group` = ?' => $groupConfig, '`key` = ?' => 'last_action_id')
+        );
+
+        return $nextActionId;
+    }
+
+    public function getLastActionIdConfigKey()
+    {
+        return 'general';
     }
 
     //-----------------------------------
@@ -85,48 +113,9 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
         return $string;
     }
 
-    //-----------------------------------
-
-    public function getNextActionId()
-    {
-        $groupConfig = '';
-
-        if ($this instanceof Ess_M2ePro_Model_Listing_Log) {
-            $groupConfig = 'listings';
-        } else if ($this instanceof Ess_M2ePro_Model_Listing_Other_Log) {
-            $groupConfig = 'other_listings';
-        }
-
-        if (empty($groupConfig)) {
-            throw new Exception('Wrong object class for getting action_id!');
-        }
-
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-
-        $table = Mage::getSingleton('core/resource')->getTableName('m2epro_config');
-        $groupConfig = '/logs/'.$groupConfig.'/';
-
-        $lastActionId = (int)$connRead->select()
-                                      ->from($table,'value')
-                                      ->where('`group` = ?',$groupConfig)
-                                      ->where('`key` = ?','last_action_id')
-                                      ->query()->fetchColumn();
-
-        $connWrite->update(
-            $table,
-            array('value' => $lastActionId + 1),
-            array('`group` = ?' => $groupConfig, '`key` = ?' => 'last_action_id')
-        );
-
-        return $lastActionId + 1;
-    }
-
     //####################################
 
-    protected function getActionTitleByClass($class,$type)
+    protected function getActionTitleByClass($class, $type)
     {
         $reflectionClass = new ReflectionClass ($class);
         $tempConstants = $reflectionClass->getConstants();
@@ -140,7 +129,7 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
         return '';
     }
 
-    protected function getActionsTitlesByClass($class,$prefix)
+    protected function getActionsTitlesByClass($class, $prefix)
     {
         $reflectionClass = new ReflectionClass ($class);
         $tempConstants = $reflectionClass->getConstants();
@@ -166,7 +155,7 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
 
     //-----------------------------------
 
-    protected function makeCreator()
+    protected function makeAndGetCreator()
     {
          $debugBackTrace = debug_backtrace();
 
@@ -182,10 +171,7 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
 
     protected function clearMessagesByTable($tableNameOrModelName, $columnName = NULL, $columnId = NULL)
     {
-        // Prepare tables names
-        //-----------------------------
         $logsTable  = Mage::getSingleton('core/resource')->getTableName($tableNameOrModelName);
-        //-----------------------------
 
         $where = array();
         if (!is_null($columnId)) {
@@ -196,10 +182,7 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
             $where['component_mode = ?'] = $this->componentMode;
         }
 
-        // Execute query
-        //-----------------------------
         Mage::getSingleton('core/resource')->getConnection('core_write')->delete($logsTable,$where);
-        //-----------------------------
     }
 
     //####################################

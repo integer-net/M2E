@@ -11,16 +11,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation extends Ess_M2ePro_B
     protected function _beforeToHtml()
     {
         //-------------------------------
-        $buttonBlock = $this->getLayout()
-            ->createBlock('adminhtml/widget_button')
-            ->setData( array(
-                'id' => 'wizard_complete',
-                'label'   => Mage::helper('M2ePro')->__('Complete Configuration'),
-                'onclick' => 'setLocation(\''.$this->getUrl('*/*/complete').'\');',
-                'class' => 'end_button',
-                'style' => 'display: none'
-            ) );
-        $this->setChild('end_button',$buttonBlock);
+        $this->appendWizardCompleteButton();
         //-------------------------------
 
         // Steps
@@ -39,17 +30,15 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation extends Ess_M2ePro_B
         );
         //-------------------------------
 
-        $temp = parent::_beforeToHtml();
-
-        // Set header text
-        //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Configuration Wizard (Magento Amazon Integration)');
-        //------------------------------
-
-        return $temp;
+        return parent::_beforeToHtml();
     }
 
     // ########################################
+
+    protected function getHeaderTextHtml()
+    {
+        return 'Configuration Wizard (Magento Amazon Integration)';
+    }
 
     protected function _toHtml()
     {

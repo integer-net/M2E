@@ -23,9 +23,6 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
             'marketplaceId', $this->getRequest()->getParam('marketplaceId')
         );
         Mage::helper('M2ePro/Data_Global')->setValue(
-            'attrSetId', json_decode($this->getRequest()->getParam('attrSetId'))
-        );
-        Mage::helper('M2ePro/Data_Global')->setValue(
             'ignoreListings', json_decode($this->getRequest()->getParam('ignoreListings'))
         );
 
@@ -81,22 +78,15 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                     '`main_table`.`listing_id` = `listing`.`id`' )
             ->join( array('cpe'=>Mage::getSingleton('core/resource')->getTableName('catalog_product_entity')),
                     '`main_table`.`product_id` = `cpe`.`entity_id`' )
-            ->group(array('listing.account_id','listing.marketplace_id','cpe.attribute_set_id'))
+            ->group(array('listing.account_id','listing.marketplace_id'))
             ->reset(Zend_Db_Select::COLUMNS)
             ->columns(array('marketplace_id', 'account_id'), 'listing')
-            ->columns('attribute_set_id', 'cpe')
             ->query()
             ->fetchAll();
-
-        $attributeSets = array();
-        foreach ($tempData as $data) {
-            $attributeSets[] = $data['attribute_set_id'];
-        }
 
         return $this->getResponse()->setBody(json_encode(array(
             'accountId' => $tempData[0]['account_id'],
             'marketplaceId' => $tempData[0]['marketplace_id'],
-            'attrSetId' => $attributeSets
         )));
     }
 
@@ -118,7 +108,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 $componentMode,'Listing_Product',$selectedProduct
             );
 
-            if (!$listingInstance->addProduct($listingProductInstance->getProductId(),true)) {
+            if (!$this->productCanBeMoved($listingProductInstance->getProductId(), $listingInstance)) {
                 $failedProducts[] = $listingProductInstance->getProductId();
             }
         }
@@ -142,6 +132,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
         $selectedProducts = (array)json_decode($this->getRequest()->getParam('selectedProducts'));
         $listingId = (int)$this->getRequest()->getParam('listingId');
 
+        /** @var Ess_M2ePro_Model_Listing $listingInstance */
         $listingInstance = Mage::helper('M2ePro/Component')->getCachedComponentObject(
             $componentMode,'Listing',$listingId
         );
@@ -149,9 +140,17 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
         $logModel = Mage::getModel('M2ePro/Listing_Log');
         $logModel->setComponentMode($componentMode);
 
+        $variationUpdaterModel = ucwords($listingInstance->getComponentMode())
+            .'_Listing_Product_Variation_Updater';
+
+        /** @var Ess_M2ePro_Model_Listing_Product_Variation_Updater $variationUpdaterObject */
+        $variationUpdaterObject = Mage::getModel('M2ePro/'.$variationUpdaterModel);
+        $variationUpdaterObject->beforeMassProcessEvent();
+
         $errors = 0;
         foreach ($selectedProducts as $listingProductId) {
 
+            /** @var Ess_M2ePro_Model_Listing_Product $listingProductInstance */
             $listingProductInstance = Mage::helper('M2ePro/Component')
                 ->getComponentObject($componentMode,'Listing_Product',$listingProductId);
 
@@ -166,8 +165,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                     NULL,
                     Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                     // M2ePro_TRANSLATIONS
-                    // Item was not moved
-                    'Item was not moved',
+                    // Item was not Moved because it is in progress state now
+                    'Item was not Moved because it is in progress state now',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -176,7 +175,7 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 continue;
             }
 
-            if (!$listingInstance->addProduct($listingProductInstance->getProductId(),true)) {
+            if (!$this->productCanBeMoved($listingProductInstance->getProductId(), $listingInstance)) {
 
                 $logModel->addProductMessage(
                     $listingProductInstance->getListingId(),
@@ -186,8 +185,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                     NULL,
                     Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                     // M2ePro_TRANSLATIONS
-                    // Item was not moved
-                    'Item was not moved',
+                    // Item was not Moved
+                    'Item was not Moved',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -204,8 +203,8 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                 // M2ePro_TRANSLATIONS
-                // Item was successfully moved
-                'Item was successfully moved',
+                // Item was successfully Moved
+                'Item was successfully Moved',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -218,30 +217,126 @@ class Ess_M2ePro_Adminhtml_Listing_MovingController
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_TO_LISTING,
                 // M2ePro_TRANSLATIONS
-                // Item was successfully moved
-                'Item was successfully moved',
+                // Item was successfully Moved
+                'Item was successfully Moved',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
 
-            $listingProductInstance->setData('listing_id', $listingId)->save();
+            $isStoresDifferent = $listingProductInstance->getListing()->getStoreId() != $listingInstance->getStoreId();
 
-            // Set listing store id to Component Item
-            //---------------------------------
-            $method = 'get' . ucfirst(strtolower($componentMode)) . 'Item';
-            if (!$listingProductInstance->isNotListed()) {
-                $listingProductInstance->getChildObject()
-                    ->$method()
-                    ->setData('store_id', $listingInstance->getStoreId())
-                    ->save();
+            $listingProductInstance->setData('listing_id', $listingId)->save();
+            $listingProductInstance->setListing($listingInstance);
+
+            if ($isStoresDifferent) {
+                $method = 'get'.ucfirst(strtolower($componentMode)).'Item';
+                if (!$listingProductInstance->isNotListed()) {
+                    $item = $listingProductInstance->getChildObject()->$method();
+                    if ($item) {
+                        $item->setData('store_id', $listingInstance->getStoreId())->save();
+                    }
+                }
             }
-            //---------------------------------
-        };
+
+            if ($listingProductInstance->isComponentModeAmazon()) {
+                /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+                $amazonListingProduct = $listingProductInstance->getChildObject();
+                $variationManager = $amazonListingProduct->getVariationManager();
+
+                if ($variationManager->isRelationParentType()) {
+                    $this->moveChildrenToListing($listingProductId, $listingInstance);
+                }
+            }
+
+            if ($isStoresDifferent) {
+                $variationUpdaterObject->process($listingProductInstance);
+            }
+        }
+
+        $variationUpdaterObject->afterMassProcessEvent();
 
         if ($errors == 0) {
             return $this->getResponse()->setBody(json_encode(array('result'=>'success')));
         } else {
             return $this->getResponse()->setBody(json_encode(array('result'=>'error', 'errors'=>$errors)));
+        }
+    }
+
+    //#############################################
+
+    private function productCanBeMoved($productId, $listing) {
+
+        if ($listing->isComponentModeEbay()) {
+            return !$listing->hasProduct($productId);
+        }
+
+        // Add attribute set filter
+        //----------------------------
+        $table = Mage::getSingleton('core/resource')->getTableName('catalog_product_entity');
+        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
+            ->select()
+            ->from($table,new Zend_Db_Expr('DISTINCT `entity_id`'))
+            ->where('`entity_id` = ?',(int)$productId);
+
+        $productArray = Mage::getResourceModel('core/config')
+            ->getReadConnection()
+            ->fetchCol($dbSelect);
+
+        if (count($productArray) <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    //#############################################
+
+    private function moveChildrenToListing($parentListingProductId, $listing)
+    {
+        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+
+        // Get child products ids
+        //--------------------------
+        $dbSelect = $connRead->select()
+            ->from(
+                Mage::getResourceModel('M2ePro/Amazon_Listing_Product')->getMainTable(),
+                array('listing_product_id', 'sku')
+            )
+            ->where('`variation_parent_id` = ?',$parentListingProductId);
+        $products = $connRead->fetchPairs($dbSelect);
+
+        if(!empty($products)) {
+            $connWrite->update(
+                Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable(),
+                array(
+                    'listing_id' => $listing->getId()
+                ),
+                '`id` IN (' . implode(',', array_keys($products)) . ')'
+            );
+        }
+
+        $dbSelect = $connRead->select()
+            ->from(
+                Mage::getResourceModel('M2ePro/Amazon_Item')->getMainTable(),
+                array('id')
+            )
+            ->where('`account_id` = ?', $listing->getAccountId())
+            ->where('`marketplace_id` = ?',$listing->getMarketplaceId())
+            ->where('`sku` IN (?)', implode(',', array_values($products)));
+        $items = $connRead->fetchCol($dbSelect);
+
+        if(!empty($items)) {
+            $connWrite->update(
+                Mage::getResourceModel('M2ePro/Amazon_Item')->getMainTable(),
+                array(
+                    'store_id' => $listing->getStoreId()
+                ),
+                '`id` IN ('.implode(',', $items).')'
+            );
         }
     }
 

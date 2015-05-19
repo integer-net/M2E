@@ -6,6 +6,7 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
     initialize: function()
     {
         Validation.add('M2ePro-validate-condition-note-length', M2ePro.text.condition_note_length_error, function(value) {
+
             if ($('condition_note_mode').value != BuyListingChannelSettingsHandlerObj.CONDITION_NOTE_MODE_CUSTOM_VALUE) {
                 return true;
             }
@@ -47,16 +48,10 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
     {
         var self = BuyListingChannelSettingsHandlerObj;
 
+        $('sku_custom_attribute').value = '';
         if (this.value == self.SKU_MODE_CUSTOM_ATTRIBUTE) {
-            $('sku_custom_attribute_container').show();
-        } else {
-            $('sku_custom_attribute_container').hide();
+            self.updateHiddenValue(this, $('sku_custom_attribute'));
         }
-    },
-
-    sku_custom_attribute_change: function()
-    {
-        BuyListingChannelSettingsHandlerObj.hideEmptyOption($('sku_custom_attribute'));
     },
 
     //----------------------------------
@@ -106,7 +101,7 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
         $('shipping_standard_value').hide();
         $('shipping_standard_custom_attribute').hide();
 
-        if (this.value == self.SHIPPING_MODE_NOT_SET || this.value == self.SHIPPING_MODE_DEFAULT) {
+        if (this.value == self.SHIPPING_MODE_DEFAULT) {
             $('shipping_standard_value').disabled = true;
             $('shipping_standard_value').value = '';
             $('shipping_standard_value').show();
@@ -143,8 +138,7 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
         $('shipping_expedited_value').hide();
         $('shipping_expedited_custom_attribute').hide();
 
-        if (this.value == self.SHIPPING_MODE_NOT_SET
-            || this.value == self.SHIPPING_MODE_DEFAULT
+        if (this.value == self.SHIPPING_MODE_DEFAULT
             || this.value == self.SHIPPING_MODE_DISABLED
         ) {
             $('shipping_expedited_value').disabled = true;
@@ -183,8 +177,7 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
         $('shipping_two_day_value').hide();
         $('shipping_two_day_custom_attribute').hide();
 
-        if (this.value == self.SHIPPING_MODE_NOT_SET
-            || this.value == self.SHIPPING_MODE_DEFAULT
+        if (this.value == self.SHIPPING_MODE_DEFAULT
             || this.value == self.SHIPPING_MODE_DISABLED
             ) {
             $('shipping_two_day_value').disabled = true;
@@ -223,8 +216,7 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
         $('shipping_one_day_value').hide();
         $('shipping_one_day_custom_attribute').hide();
 
-        if (this.value == self.SHIPPING_MODE_NOT_SET
-            || this.value == self.SHIPPING_MODE_DEFAULT
+        if (this.value == self.SHIPPING_MODE_DEFAULT
             || this.value == self.SHIPPING_MODE_DISABLED
             ) {
             $('shipping_one_day_value').disabled = true;
@@ -257,26 +249,13 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
 
         var condition_note_mode = $('condition_note_mode');
 
-        $('condition_value_tr', 'condition_custom_attribute_tr').invoke('hide');
-
-        if (this.value == self.CONDITION_MODE_NOT_SET) {
-            $('condition_value_tr').hide();
-            $('condition_custom_attribute_tr').hide();
-        } else if (this.value == self.CONDITION_MODE_DEFAULT) {
-            $('condition_value_tr').show();
+        $('condition_custom_attribute').value = '';
+        $('condition_value').value = '';
+        if (this.value == self.CONDITION_MODE_DEFAULT) {
+            self.updateHiddenValue(this, $('condition_value'));
         } else {
-            $('condition_custom_attribute_tr').show();
+            self.updateHiddenValue(this, $('condition_custom_attribute'));
         }
-    },
-
-    condition_value_change: function()
-    {
-        BuyListingChannelSettingsHandlerObj.hideEmptyOption($('condition_value'));
-    },
-
-    condition_custom_attribute_change: function()
-    {
-        BuyListingChannelSettingsHandlerObj.hideEmptyOption($('condition_custom_attribute'));
     },
 
     //----------------------------------
@@ -285,18 +264,49 @@ BuyListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(), 
     {
         var self = BuyListingChannelSettingsHandlerObj;
 
-        $('condition_note_value_tr', 'condition_note_custom_attribute_tr').invoke('hide');
-
         if (this.value == self.CONDITION_NOTE_MODE_CUSTOM_VALUE) {
             $('condition_note_value_tr').show();
-        } else if (this.value == self.CONDITION_NOTE_MODE_CUSTOM_ATTRIBUTE) {
-            $('condition_note_custom_attribute_tr').show();
+        } else {
+            $('condition_note_value_tr').hide();
         }
     },
 
-    condition_note_custom_attribute_change: function()
+    //----------------------------------
+
+    appendToText: function(ddId, targetId)
     {
-        BuyListingChannelSettingsHandlerObj.hideEmptyOption($('condition_note_custom_attribute'));
+        if ($(ddId).value == '') {
+            return;
+        }
+
+        var attributePlaceholder = '#' + $(ddId).value + '#',
+            element              = $(targetId);
+
+        if (document.selection) {
+            /* IE */
+            element.focus();
+            document.selection.createRange().text = attributePlaceholder;
+            element.focus();
+        } else if (element.selectionStart || element.selectionStart == '0') {
+            /* Webkit */
+            var startPos  = element.selectionStart,
+                endPos    = element.selectionEnd,
+                scrollTop = element.scrollTop,
+                tempValue;
+
+            tempValue = element.value.substring(0, startPos);
+            tempValue += attributePlaceholder;
+            tempValue += element.value.substring(endPos, element.value.length);
+            element.value = tempValue;
+
+            element.focus();
+            element.selectionStart = startPos + attributePlaceholder.length;
+            element.selectionEnd   = startPos + attributePlaceholder.length;
+            element.scrollTop      = scrollTop;
+        } else {
+            element.value += attributePlaceholder;
+            element.focus();
+        }
     }
 
     //----------------------------------

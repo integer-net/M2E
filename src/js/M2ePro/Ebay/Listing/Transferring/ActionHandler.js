@@ -3,9 +3,9 @@ EbayListingTransferringActionHandler.prototype = {
 
     // --------------------------------
 
-    callStepStack : [],
+    callStepStack: [],
 
-    source : {
+    source: {
         products_ids      : [],
         custom_settings   : null,
         account_id        : null,
@@ -37,10 +37,9 @@ EbayListingTransferringActionHandler.prototype = {
 
     // --------------------------------
 
-    initialize: function()
-    {
+    initialize: function() {},
 
-    },
+    // --------------------------------
 
     clear: function()
     {
@@ -132,13 +131,12 @@ EbayListingTransferringActionHandler.prototype = {
 
     setShownTutorial: function(callback)
     {
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/shownTutorial') ,
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : {},
-                onSuccess: function(transport){callback && callback();}.bind(this)
-            });
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/shownTutorial'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {},
+            onSuccess: function(transport) {callback && callback();}.bind(this)
+        });
     },
 
     // --------------------------------
@@ -169,7 +167,6 @@ EbayListingTransferringActionHandler.prototype = {
         return marketplaceTitle.replace(/\[Translation Available\]/g,"");
     },
 
-    //@todo is need?
     hasTargetMarketplace: function()
     {
         return $('transferring_marketplace_id') && !!$('transferring_marketplace_id').value;
@@ -218,16 +215,16 @@ EbayListingTransferringActionHandler.prototype = {
         if (this.loadedData.listings[key] != undefined && this.loadedData.listings[key] != null) {
             callback && callback();
         } else {
-            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/getListings'),{
+            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/getListings'), {
                 method: 'post',
-                asynchronous : true,
-                parameters : {
+                asynchronous: true,
+                parameters: {
                     account_id     : accountId,
                     marketplace_id : marketplaceId,
                     store_id       : storeId
                 },
-                onSuccess: function(transport)
-                {
+                onSuccess: function(transport) {
+
                     var result = transport.responseText.evalJSON();
 
                     this.loadedData.listings[key] = result['listings'];
@@ -323,24 +320,21 @@ EbayListingTransferringActionHandler.prototype = {
         if (this.loadedData.policy[key] != undefined && this.loadedData.policy[key] != null) {
             return callback && callback();
         } else {
-            new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/stepPolicy') ,
-                {
-                    method: 'post',
-                    asynchronous : true,
-                    parameters : {
-                        account_id     : accountId,
-                        marketplace_id : marketplaceId,
-                        store_id       : storeId,
-                        products_ids   : [productsIds]
-                    },
-                    onSuccess: function(transport)
-                    {
-                        this.loadedData.policy[accountId+'_'+marketplaceId+'_'+storeId] = transport.responseText;
-                        callback && callback();
-                    }.bind(this)
-                });
+            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/stepPolicy'), {
+                method: 'post',
+                asynchronous: true,
+                parameters: {
+                    account_id     : accountId,
+                    marketplace_id : marketplaceId,
+                    store_id       : storeId,
+                    products_ids   : [productsIds]
+                },
+                onSuccess: function(transport) {
+                    this.loadedData.policy[accountId+'_'+marketplaceId+'_'+storeId] = transport.responseText;
+                    callback && callback();
+                }.bind(this)
+            });
         }
-
     },
 
     getDataStepPolicy: function(accountId, marketplaceId, storeId)
@@ -365,19 +359,17 @@ EbayListingTransferringActionHandler.prototype = {
         if (this.loadedData.translation[accountId] != undefined && this.loadedData.translation[accountId] != null) {
             callback && callback();
         } else {
-            new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/stepTranslation') ,
-                {
-                    method: 'post',
-                    asynchronous : true,
-                    parameters : {
-                        account_id : accountId
-                    },
-                    onSuccess: function(transport)
-                    {
-                        this.loadedData.translation[accountId] = transport.responseText;
-                        callback && callback();
-                    }.bind(this)
-                });
+            new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/stepTranslation'), {
+                method: 'post',
+                asynchronous: true,
+                parameters: {
+                    account_id: accountId
+                },
+                onSuccess: function(transport) {
+                    this.loadedData.translation[accountId] = transport.responseText;
+                    callback && callback();
+                }.bind(this)
+            });
         }
     },
 
@@ -583,14 +575,14 @@ EbayListingTransferringActionHandler.prototype = {
         var self = this;
 
         if (this.isNeedCreateTemplates()) {
-            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating templates in process. Please wait...'));
+            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating Policies in process. Please wait...'));
             this.createTemplates(function() {
                 self.progressBarObj.setPercents(self.progressBarObj.getPercents() + 10, 1);
                 self.confirm(callback);
             });
 
         } else if (!this.hasTargetListing()) {
-            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating listing in process. Please wait...'));
+            this.progressBarObj.setStatus(M2ePro.translator.translate('Creating Listing in process. Please wait...'));
             this.createListing(function() {
                 self.progressBarObj.setPercents(self.progressBarObj.getPercents() + 10, 1);
                 self.confirm(callback);
@@ -598,7 +590,7 @@ EbayListingTransferringActionHandler.prototype = {
 
         } else {
 
-            this.addProducts(function(){
+            this.addProducts(function() {
                 if (self.getSuccessProducts().length > 0 && self.isUseMigrationService()) {
                     self.callAutoMigration(callback);
                 } else {
@@ -619,27 +611,26 @@ EbayListingTransferringActionHandler.prototype = {
             parameters.marketplace_id = this.getTargetMarketplace();
             parameters.store_id       = this.getTargetStore();
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/createListing') ,
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : parameters,
-                onSuccess: function(transport)
-                {
-                    var response = transport.responseText.evalJSON();
-                    if (response['result'] == 'success' && response['listing_id']) {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/createListing'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: parameters,
+            onSuccess: function(transport) {
 
-                        if ($('transferring_new_listing_id')) {
-                            $('transferring_new_listing_id').value = response['listing_id'];
-                        }
+                var response = transport.responseText.evalJSON();
+                if (response['result'] == 'success' && response['listing_id']) {
 
-                        return callback && callback();
+                    if ($('transferring_new_listing_id')) {
+                        $('transferring_new_listing_id').value = response['listing_id'];
                     }
 
-                    return this.ajaxError();
+                    return callback && callback();
+                }
 
-                }.bind(this)
-            });
+                return this.ajaxError();
+
+            }.bind(this)
+        });
     },
 
     // --------------------------------
@@ -649,95 +640,93 @@ EbayListingTransferringActionHandler.prototype = {
         $('translation_account_error_block') && $('translation_account_error_block').hide();
 
         var accountId = this.getTargetAccount();
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/createTranslationAccount') ,
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : {
-                    account_id : accountId,
-                    email      : $('transferring_email')     && $('transferring_email').value,
-                    first_name : $('transferring_firstname') && $('transferring_firstname').value,
-                    last_name  : $('transferring_lastname')  && $('transferring_lastname').value,
-                    company    : $('transferring_company')   && $('transferring_company').value,
-                    country    : $('transferring_country')   && $('transferring_country').value
-                },
-                onSuccess: function(transport)
-                {
-                    var response = transport.responseText.evalJSON();
-                    if (response['result'] != 'success') {
-                        $('translation_account_error_block') && $('translation_account_error_block').show();
-                        return;
-                    }
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/createTranslationAccount'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {
+                account_id : accountId,
+                email      : $('transferring_email')     && $('transferring_email').value,
+                first_name : $('transferring_firstname') && $('transferring_firstname').value,
+                last_name  : $('transferring_lastname')  && $('transferring_lastname').value,
+                company    : $('transferring_company')   && $('transferring_company').value,
+                country    : $('transferring_country')   && $('transferring_country').value
+            },
+            onSuccess: function(transport) {
 
-                    var accountSelector = $('transferring_account_id');
-                    if (accountSelector) {
-                        var option = $('transferring_account_id').down('option[value='+accountId+']');
-                        if (option) {
-                            option.setAttribute('data', '1');
+                var response = transport.responseText.evalJSON();
+                if (response['result'] != 'success') {
+                    $('translation_account_error_block') && $('translation_account_error_block').show();
+                    return;
+                }
 
-                            if ($('translation_account_ebay_id')) {
-                                $('translation_account_ebay_id').innerHTML = option.innerHTML;
-                            }
+                var accountSelector = $('transferring_account_id');
+                if (accountSelector) {
+                    var option = $('transferring_account_id').down('option[value='+accountId+']');
+                    if (option) {
+                        option.setAttribute('data', '1');
+
+                        if ($('translation_account_ebay_id')) {
+                            $('translation_account_ebay_id').innerHTML = option.innerHTML;
                         }
                     }
+                }
 
-                    if ($('translation_account_balance')) {
-                        $('translation_account_balance').innerHTML = response['info']['credit']['prepaid'];
-                    }
+                if ($('translation_account_balance')) {
+                    $('translation_account_balance').innerHTML = response['info']['credit']['prepaid'];
+                }
 
-                    if ($('translation_account_currency')) {
-                        $('translation_account_currency').innerHTML = response['info']['currency'];
-                    }
+                if ($('translation_account_currency')) {
+                    $('translation_account_currency').innerHTML = response['info']['currency'];
+                }
 
-                    if ($('translation_estimated_currency')) {
-                        $('translation_estimated_currency').innerHTML = response['info']['currency'];
-                    }
+                if ($('translation_estimated_currency')) {
+                    $('translation_estimated_currency').innerHTML = response['info']['currency'];
+                }
 
-                    callback && callback();
+                callback && callback();
 
-                }.bind(this)
-            });
+            }.bind(this)
+        });
     },
 
     refreshTranslationAccount: function(callback)
     {
         var accountId = this.getTargetAccount();
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/refreshTranslationAccount') ,
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : {
-                    account_id : accountId
-                },
-                onSuccess: function(transport)
-                {
-                    var response = transport.responseText.evalJSON();
-                    if (response['result'] != 'success') {
-                        return;
-                    }
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/refreshTranslationAccount'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {
+                account_id: accountId
+            },
+            onSuccess: function(transport) {
 
-                    if ($('translation_account_balance')) {
-                        $('translation_account_balance').innerHTML = parseFloat(response['info']['credit']['prepaid']).toFixed(2);
-                    }
+                var response = transport.responseText.evalJSON();
+                if (response['result'] != 'success') {
+                    return;
+                }
 
-                    if ($('translation_account_ebay_total_credit_value')) {
-                        $('translation_account_ebay_total_credit_value').innerHTML =
-                        parseInt(response['info']['credit']['translation']) -
-                        parseInt(response['info']['credit']['used']);
-                    }
+                if ($('translation_account_balance')) {
+                    $('translation_account_balance').innerHTML = parseFloat(response['info']['credit']['prepaid']).toFixed(2);
+                }
 
-                    if ($('translation_account_currency')) {
-                        $('translation_account_currency').innerHTML = response['info']['currency'];
-                    }
+                if ($('translation_account_ebay_total_credit_value')) {
+                    $('translation_account_ebay_total_credit_value').innerHTML =
+                    parseInt(response['info']['credit']['translation']) -
+                    parseInt(response['info']['credit']['used']);
+                }
 
-                    if ($('translation_estimated_currency')) {
-                        $('translation_estimated_currency').innerHTML = response['info']['currency'];
-                    }
+                if ($('translation_account_currency')) {
+                    $('translation_account_currency').innerHTML = response['info']['currency'];
+                }
 
-                    callback && callback();
+                if ($('translation_estimated_currency')) {
+                    $('translation_estimated_currency').innerHTML = response['info']['currency'];
+                }
 
-                }.bind(this)
-            });
+                callback && callback();
+
+            }.bind(this)
+        });
     },
 
     // --------------------------------
@@ -746,7 +735,7 @@ EbayListingTransferringActionHandler.prototype = {
     {
         var parts = this.makeProductsParts();
 
-        this.progressBarObj.setStatus(M2ePro.translator.translate('Adding products in process. Please wait...'));
+        this.progressBarObj.setStatus(M2ePro.translator.translate('Adding Products in process. Please wait...'));
 
         this.sendPartsProducts(parts, parts.length, callback);
     },
@@ -828,7 +817,6 @@ EbayListingTransferringActionHandler.prototype = {
 
     // --------------------------------
 
-    //@todo send products by packets
     callAutoMigration: function(callback)
     {
         var self = this;
@@ -847,7 +835,7 @@ EbayListingTransferringActionHandler.prototype = {
 
                 if (response['failed_products'].length) {
                     MagentoMessageObj.addError(M2ePro.translator.translate(
-                        'Some products categories settings are not set or attributes for title or description are empty.'
+                        'Some Products Categories Settings are not set or Attributes for Title or Description are empty.'
                     ));
 
                     if (response['success_products'].length == 0) {

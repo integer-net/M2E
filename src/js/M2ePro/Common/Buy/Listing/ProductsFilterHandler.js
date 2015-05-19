@@ -1,6 +1,8 @@
 BuyListingProductsFilterHandler = Class.create();
 BuyListingProductsFilterHandler.prototype = Object.extend(new CommonHandler(), {
 
+    //----------------------------------
+
     templateSellingFormatId: null,
     marketplaceId: null,
 
@@ -38,17 +40,16 @@ BuyListingProductsFilterHandler.prototype = Object.extend(new CommonHandler(), {
                 }
             }.bind(this);
 
-        TemplateHandlerObj
-            .checkMessages(
-                id,
-                nick,
-                '',
-                storeId,
-                marketplaceId,
-                checkAttributesAvailability,
-                container,
-                callback
-            );
+        TemplateHandlerObj.checkMessages(
+            id,
+            nick,
+            '',
+            storeId,
+            marketplaceId,
+            checkAttributesAvailability,
+            container,
+            callback
+        );
     }
 
     //----------------------------------

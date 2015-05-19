@@ -68,10 +68,10 @@ class Ess_M2ePro_Model_Play_Synchronization_Orders_Receive extends Ess_M2ePro_Mo
             /** @var $account Ess_M2ePro_Model_Account **/
 
             // ----------------------------------------------------------
-            $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
+            $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
             // M2ePro_TRANSLATIONS
-            // The "Receive" action for Play.com account: "%account_title%" is started. Please wait...
-            $status = 'The "Receive" action for Play.com account: "%account_title%" is started. Please wait...';
+            // The "Receive" Action for Play.com Account: "%account_title%" is started. Please wait...
+            $status = 'The "Receive" Action for Play.com Account: "%account_title%" is started. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             // ----------------------------------------------------------
 
@@ -80,7 +80,7 @@ class Ess_M2ePro_Model_Play_Synchronization_Orders_Receive extends Ess_M2ePro_Mo
                 // ----------------------------------------------------------
                 $this->getActualOperationHistory()->addTimePoint(
                     __METHOD__.'process'.$account->getId(),
-                    'Process account '.$account->getTitle()
+                    'Process Account '.$account->getTitle()
                 );
                 // ----------------------------------------------------------
 
@@ -93,8 +93,8 @@ class Ess_M2ePro_Model_Play_Synchronization_Orders_Receive extends Ess_M2ePro_Mo
 
             // ----------------------------------------------------------
             // M2ePro_TRANSLATIONS
-            // The "Receive" action for Play.com account: "%account_title%" is finished. Please wait...
-            $status = 'The "Receive" action for Play.com account: "%account_title%" is finished. Please wait...';
+            // The "Receive" Action for Play.com Account: "%account_title%" is finished. Please wait...
+            $status = 'The "Receive" Action for Play.com Account: "%account_title%" is finished. Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneAccount);
             $this->getActualLockItem()->activate();

@@ -14,7 +14,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
     private $sinceTime = NULL;
     private $toTime = NULL;
 
-    private $listingLogActionId = NULL;
+    private $logsActionId = NULL;
 
     //####################################
 
@@ -59,16 +59,16 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
             /** @var $account Ess_M2ePro_Model_Account **/
 
-            $this->getActualOperationHistory()->addText('Starting account "'.$account->getTitle().'"');
+            $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
             // M2ePro_TRANSLATIONS
-            // The "Update Listings Products" action for eBay account: "%account_title%" is started. Please wait...
-            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is started. ';
+            // The "Update Listings Products" Action for eBay Account: "%account_title%" is started. Please wait...
+            $status = 'The "Update Listings Products" Action for eBay Account: "%account_title%" is started. ';
             $status .= 'Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
 
             $this->getActualOperationHistory()->addTimePoint(
                 __METHOD__.'process'.$account->getId(),
-                'Process account '.$account->getTitle()
+                'Process Account '.$account->getTitle()
             );
 
             $this->processAccount($account);
@@ -76,8 +76,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
 
             // M2ePro_TRANSLATIONS
-            // The "Update Listings Products" action for eBay account: "%account_title%" is finished. Please wait...
-            $status = 'The "Update Listings Products" action for eBay account: "%account_title%" is finished.'.
+            // The "Update Listings Products" Action for eBay Account: "%account_title%" is finished. Please wait...
+            $status = 'The "Update Listings Products" Action for eBay Account: "%account_title%" is finished.'.
                 ' Please wait...';
             $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
             $this->getActualLockItem()->setPercents($this->getPercentsStart() + $iteration * $percentsForOneStep);
@@ -105,8 +105,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
                 continue;
             }
 
-            // Listing product isn't listed
-            if ($listingProduct->getStatus() != Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
+            // Listing product isn't listed and it child must have another item_id
+            if ($listingProduct->getStatus() != Ess_M2ePro_Model_Listing_Product::STATUS_LISTED &&
+                $listingProduct->getStatus() != Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
                 continue;
             }
 
@@ -266,7 +267,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
             if ($ebayListingProduct->getOnlineBuyItNowPrice() != $data['online_buyitnow_price']) {
                 Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
-                    $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
+                    $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::INITIATOR_SYNCHRONIZATION
                 );
             }
         }
@@ -298,7 +299,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
         if ($ebayListingProduct->getOnlineQty() != $data['online_qty'] ||
             $ebayListingProduct->getOnlineQtySold() != $data['online_qty_sold']) {
             Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
-                $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
+                $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::INITIATOR_SYNCHRONIZATION
             );
         }
 
@@ -336,6 +337,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
             $data['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED;
 
+        } else if ($change['listingStatus'] == self::EBAY_STATUS_ACTIVE &&
+                   $qty - $qtySold <= 0) {
+
+            $data['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN;
+
         } else if ($change['listingStatus'] == self::EBAY_STATUS_ACTIVE) {
 
             $data['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_LISTED;
@@ -346,7 +352,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
         }
 
         Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
-            $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::CREATOR_TYPE_SYNCHRONIZATION
+            $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::INITIATOR_SYNCHRONIZATION
         );
 
         $data['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
@@ -364,6 +370,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
                 // M2ePro_TRANSLATIONS
                 // Item status was successfully changed to "Listed".
                 $message = 'Item status was successfully changed to "Listed".';
+                break;
+            case Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN:
+                // M2ePro_TRANSLATIONS
+                // Item status was successfully changed to "Listed(Hidden)".
+                $message = 'Item status was successfully changed to "Listed(Hidden)".';
                 break;
             case Ess_M2ePro_Model_Listing_Product::STATUS_SOLD:
                 // M2ePro_TRANSLATIONS
@@ -390,7 +401,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
             $listingProduct->getProductId(),
             $listingProduct->getId(),
             Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
-            $this->getListingLogActionId(),
+            $this->getLogsActionId(),
             Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL,
             $message,
             Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
@@ -491,12 +502,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
     //####################################
 
-    private function getListingLogActionId()
+    private function getLogsActionId()
     {
-        if (is_null($this->listingLogActionId)) {
-            $this->listingLogActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
+        if (is_null($this->logsActionId)) {
+            $this->logsActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
         }
-        return $this->listingLogActionId;
+        return $this->logsActionId;
     }
 
     private function getActualListingType(Ess_M2ePro_Model_Listing_Product $listingProduct, array $change)

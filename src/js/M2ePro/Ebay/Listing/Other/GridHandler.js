@@ -11,14 +11,14 @@ EbayListingOtherGridHandler = Class.create(ListingOtherGridHandler, {
 
     getLogViewUrl: function(rowId)
     {
-        return M2ePro.url.get('adminhtml_ebay_log/listingOther',{
+        return M2ePro.url.get('adminhtml_ebay_log/listingOther', {
             id: rowId
         });
     },
 
     //----------------------------------
 
-    getSelectedItemsParts : function()
+    getSelectedItemsParts: function()
     {
         var selectedProductsArray = this.getSelectedProductsArray();
 
@@ -70,7 +70,7 @@ EbayListingOtherGridHandler = Class.create(ListingOtherGridHandler, {
 
         this.actionHandler = new EbayListingOtherActionHandler(this);
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
             relistAction: this.actionHandler.relistAction.bind(this.actionHandler),
             reviseAction: this.actionHandler.reviseAction.bind(this.actionHandler),
             stopAction: this.actionHandler.stopAction.bind(this.actionHandler)
@@ -78,5 +78,4 @@ EbayListingOtherGridHandler = Class.create(ListingOtherGridHandler, {
     }
 
     //----------------------------------
-
 });

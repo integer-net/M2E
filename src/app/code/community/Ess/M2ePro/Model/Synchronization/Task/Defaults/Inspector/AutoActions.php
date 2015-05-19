@@ -16,7 +16,7 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_AutoActions
 
     protected function getTitle()
     {
-        return 'Auto Actions';
+        return 'Auto Add/Remove Rules';
     }
 
     // -----------------------------------
@@ -35,21 +35,22 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_AutoActions
 
     protected function performActions()
     {
-        if (is_null($this->getLastProcessedMagentoProductId())) {
-            $this->setLastProcessedMagentoProductId($this->getLastMagentoProductId());
+        if (is_null($this->getLastProcessedProductId())) {
+            $this->setLastProcessedProductId($this->getLastProductId());
         }
 
-        if (count($magentoProducts = $this->getMagentoProducts()) <= 0) {
+        if (count($products = $this->getProducts()) <= 0) {
             return;
         }
 
         $tempIndex = 0;
-        $totalItems = count($magentoProducts);
+        $totalItems = count($products);
 
-        foreach ($magentoProducts as $magentoProduct) {
+        foreach ($products as $product) {
 
-            $this->processCategoriesActions($magentoProduct);
-            $this->processEbayActions($magentoProduct);
+            $this->processCategoriesActions($product);
+            $this->processGlobalActions($product);
+            $this->processWebsiteActions($product);
 
             if ((++$tempIndex)%20 == 0) {
                 $percentsPerOneItem = $this->getPercentsInterval()/$totalItems;
@@ -58,50 +59,61 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_AutoActions
             }
         }
 
-        $lastMagentoProduct = array_pop($magentoProducts);
-        $this->setLastProcessedMagentoProductId((int)$lastMagentoProduct->getId());
+        $lastMagentoProduct = array_pop($products);
+        $this->setLastProcessedProductId((int)$lastMagentoProduct->getId());
     }
 
     //####################################
 
-    private function processCategoriesActions(Mage_Catalog_Model_Product $magentoProduct)
+    private function processCategoriesActions(Mage_Catalog_Model_Product $product)
     {
-        $productCategories = $magentoProduct->getCategoryIds();
+        $productCategories = $product->getCategoryIds();
 
         $categoriesByWebsite = array(
-            0 => $productCategories // website for default store view
+            0 => $productCategories // website for admin values
         );
 
-        foreach ($magentoProduct->getWebsiteIds() as $websiteId) {
+        foreach ($product->getWebsiteIds() as $websiteId) {
             $categoriesByWebsite[$websiteId] = $productCategories;
         }
 
-        /** @var Ess_M2ePro_Model_Observer_Category $categoryObserverModel */
-        $categoryObserverModel = Mage::getModel('M2ePro/Observer_Category');
+        /** @var Ess_M2ePro_Model_Listing_Auto_Actions_Mode_Category $autoActionsCategory */
+        $autoActionsCategory = Mage::getModel('M2ePro/Listing_Auto_Actions_Mode_Category');
+        $autoActionsCategory->setProduct($product);
 
-        /** @var Ess_M2ePro_Model_Observer_Ebay_Category $ebayCategoryObserver */
-        $ebayCategoryObserver = Mage::getModel('M2ePro/Observer_Ebay_Category');
-
-        foreach ($categoriesByWebsite as $websiteId => $categoriesIds) {
-            foreach ($categoriesIds as $categoryId) {
-                $categoryObserverModel->synchProductWithAddedCategoryId($magentoProduct,$categoryId,$websiteId);
-                $ebayCategoryObserver->synchProductWithAddedCategoryId($magentoProduct,$categoryId,$websiteId);
+        foreach ($categoriesByWebsite as $websiteId => $categoryIds) {
+            foreach ($categoryIds as $categoryId) {
+                $autoActionsCategory->synchWithAddedCategoryId($categoryId, $websiteId);
             }
         }
     }
 
-    private function processEbayActions(Mage_Catalog_Model_Product $magentoProduct)
+    private function processGlobalActions(Mage_Catalog_Model_Product $product)
     {
-        /** @var Ess_M2ePro_Model_Observer_Ebay_Product $ebayObserver */
-        $ebayObserver = Mage::getModel('M2ePro/Observer_Ebay_Product');
+        /** @var Ess_M2ePro_Model_Listing_Auto_Actions_Mode_Global $object */
+        $object = Mage::getModel('M2ePro/Listing_Auto_Actions_Mode_Global');
+        $object->setProduct($product);
+        $object->synch();
+    }
 
-        $ebayObserver->tryToPerformGlobalProductActions($magentoProduct);
-        $ebayObserver->tryToPerformWebsiteProductActions($magentoProduct, true, array());
+    private function processWebsiteActions(Mage_Catalog_Model_Product $product)
+    {
+        /** @var Ess_M2ePro_Model_Listing_Auto_Actions_Mode_Website $object */
+        $object = Mage::getModel('M2ePro/Listing_Auto_Actions_Mode_Website');
+        $object->setProduct($product);
+
+        // website for admin values
+        $websiteIds = $product->getWebsiteIds();
+        $websiteIds[] = 0;
+
+        foreach ($websiteIds as $websiteId) {
+            $object->synchWithAddedWebsiteId($websiteId);
+        }
     }
 
     //####################################
 
-    private function getLastMagentoProductId()
+    private function getLastProductId()
     {
         /** @var Mage_Core_Model_Mysql4_Collection_Abstract $collection */
         $collection = Mage::getModel('catalog/product')->getCollection();
@@ -109,12 +121,12 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_AutoActions
         return (int)$collection->getLastItem()->getId();
     }
 
-    private function getMagentoProducts()
+    private function getProducts()
     {
         /** @var Mage_Core_Model_Mysql4_Collection_Abstract $collection */
         $collection = Mage::getModel('catalog/product')->getCollection();
 
-        $collection->addFieldToFilter('entity_id', array('gt' => (int)$this->getLastProcessedMagentoProductId()));
+        $collection->addFieldToFilter('entity_id', array('gt' => (int)$this->getLastProcessedProductId()));
         $collection->setOrder('entity_id','asc');
         $collection->getSelect()->limit(100);
 
@@ -123,12 +135,12 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector_AutoActions
 
     // ------------------------------------
 
-    private function getLastProcessedMagentoProductId()
+    private function getLastProcessedProductId()
     {
         return $this->getConfigValue($this->getFullSettingsPath(),'last_magento_product_id');
     }
 
-    private function setLastProcessedMagentoProductId($magentoProductId)
+    private function setLastProcessedProductId($magentoProductId)
     {
         $this->setConfigValue($this->getFullSettingsPath(),'last_magento_product_id',(int)$magentoProductId);
     }

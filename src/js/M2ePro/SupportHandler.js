@@ -3,7 +3,7 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    initialize: function(){},
+    initialize: function() {},
 
     //----------------------------------
 
@@ -16,15 +16,13 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
             return;
         }
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_support/getResultsHtml') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_support/getResultsHtml'), {
             method: 'post',
             parameters: {
                 query: query
             },
             asynchronous: true,
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
                 $('support_results').style.cssText = '';
                 $('support_results_content').innerHTML = transport.responseText;
                 $('support_results').simulate('click');
@@ -60,9 +58,9 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
 
         if (!answerBlock.visible()) {
             $('article_meta_' + answerId).hide();
-            Effect.Appear(answerBlock,{duration:0.5});
+            Effect.Appear(answerBlock, {duration:0.5});
         } else {
-            Effect.Fade(answerBlock,{duration:0.3});
+            Effect.Fade(answerBlock, {duration:0.3});
             $('article_meta_' + answerId).show();
         }
     },
@@ -73,9 +71,9 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
 
         if (!suggestionBlock.visible()) {
             $('suggestion_meta_' + suggestionId).hide();
-            Effect.Appear(suggestionBlock,{duration:0.5});
+            Effect.Appear(suggestionBlock, {duration:0.5});
         } else {
-            Effect.Fade(suggestionBlock,{duration:0.3});
+            Effect.Fade(suggestionBlock, {duration:0.3});
             $('suggestion_meta_' + suggestionId).show();
         }
     },
@@ -105,7 +103,7 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
         if (emptyField) {
             return;
         }
-        $('more').insert('<input type="file" name="files[]" onchange="SupportHandlerObj.toggleMoreButton()" /><br />');
+        $('more').insert('<input type="file" name="files[]" onchange="SupportHandlerObj.toggleMoreButton()" /><br/>');
         self.toggleMoreButton();
     },
 
@@ -127,7 +125,12 @@ SupportHandler.prototype = Object.extend(new CommonHandler(), {
         $('support_articles_content').innerHTML = '';
 
         self.setTabActive('support_articles');
-        self.scroll_page_to_top();
+
+        if (location.href.indexOf('#') == -1) {
+            setLocation(location.href+'#support_articles');
+        } else {
+            setLocation(location.href);
+        }
     }
 
     //----------------------------------

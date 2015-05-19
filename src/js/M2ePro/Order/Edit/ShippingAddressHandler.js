@@ -16,15 +16,13 @@ OrderEditShippingAddressHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = OrderEditShippingAddressHandlerObj;
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_order/getCountryRegions'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_order/getCountryRegions'), {
             method: 'get',
             asynchronous: true,
             parameters: {
                 country: $(self.countryElementId).value
             },
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
                 self.renderRegions(transport.responseText.evalJSON(true));
             }
         });

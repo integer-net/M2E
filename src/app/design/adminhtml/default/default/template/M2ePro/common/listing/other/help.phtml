@@ -1,0 +1,11 @@
+<div id="block_notice_other_listings_grid" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('3rd Party Listings'); ?>">
+    <?php
+    $menuAccountPath = Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/account');
+    $menuSynchronizationPath = Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/synchronization');
+    echo Mage::helper('M2ePro')->__('This Section contains Listings, which belong to registered Accounts (%menu_account_path%) and were Listed not by M2E Pro Extension.<br/>
+    You can Map these Listings to existing Products in Magento and Move them to another M2E Pro Listings for further management.
+     <br/>For that use single <strong>Actions</strong> on appropriate Listing record or use mass <strong>Actions</strong> in the top right corner.<br/><br/>
+    <b>Note:</b> To import 3rd Party Listings the <strong>Import 3rd Party Listings</strong> must be enabled in <i class="underline">Account\'s Settings</i>
+    (%menu_account_path% > [Amazon/Rakutem.com/Play.com ] > General Tab) <br/> and the <strong>3rd Party Listings Synchronization</strong> must be enabled in (%menu_synchronization_path%).', $menuAccountPath, $menuSynchronizationPath);
+    ?>
+</div>

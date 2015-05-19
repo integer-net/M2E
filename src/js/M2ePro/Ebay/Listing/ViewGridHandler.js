@@ -11,7 +11,7 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
     {
         $super();
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
 
             editCategorySettingsAction: function(id) {
                 this.editCategorySettings(id);
@@ -21,10 +21,10 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
 
     },
 
-    massActionSubmitClick : function($super)
+    massActionSubmitClick: function($super)
     {
         if (this.getSelectedProductsString() == '' || this.getSelectedProductsArray().length == 0) {
-            alert(M2ePro.translator.translate('Please select the products you want to perform the action on.'));
+            alert(M2ePro.translator.translate('Please select the Products you want to perform the Action on.'));
             return;
         }
         $super();
@@ -36,16 +36,22 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
     {
         this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/getCategoryChooserHtml') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/getCategoryChooserHtml'), {
             method: 'post',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 ids: this.selectedProductsIds.join(',')
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
+                this.unselectAll();
+
                 var title = M2ePro.translator.translate('eBay Categories');
+
+                if (this.selectedProductsIds.length == 1) {
+                    var productName = this.getProductNameByRowId(this.selectedProductsIds[0]);
+                    title += '&nbsp;' + M2ePro.translator.translate('of Product') + '&nbsp;"' + productName + '"';
+                }
 
                 this.openPopUp(title, transport.responseText);
 
@@ -69,17 +75,16 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
     {
         var typeEbayMain = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Ebay_Category::TYPE_EBAY_MAIN');
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/getCategorySpecificHtml') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/getCategorySpecificHtml'), {
             method: 'post',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 ids: this.selectedProductsIds.join(','),
                 category_mode: EbayListingCategoryChooserHandlerObj.getSelectedCategory(typeEbayMain)['mode'],
                 category_value: EbayListingCategoryChooserHandlerObj.getSelectedCategory(typeEbayMain)['value']
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
                 var title = M2ePro.translator.translate('Specifics');
 
                 this.openPopUp(title, transport.responseText);
@@ -102,16 +107,14 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
         categoryTemplateData = Object.extend(categoryTemplateData, this.selectedCategoriesData);
         categoryTemplateData = Object.extend(categoryTemplateData, EbayListingCategorySpecificHandlerObj.getInternalData());
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/saveCategoryTemplate') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/saveCategoryTemplate'), {
             method: 'post',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 ids: this.selectedProductsIds.join(','),
                 template_category_data: Object.toJSON(categoryTemplateData)
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
                 Windows.getFocusedWindow().close();
                 this.getGridObj().doFilter();
             }.bind(this)
@@ -168,4 +171,5 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
         } catch (ignored) {}
     }
 
+    //----------------------------------
 });

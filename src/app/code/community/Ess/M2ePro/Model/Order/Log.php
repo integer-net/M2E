@@ -27,7 +27,7 @@ class Ess_M2ePro_Model_Order_Log extends Mage_Core_Model_Abstract
         );
 
         if (!in_array($type, $validTypeValues)) {
-            throw new InvalidArgumentException('Invalid order log type.');
+            throw new InvalidArgumentException('Invalid Order Log type.');
         }
 
         $validInitiatorValues = array(
@@ -37,7 +37,7 @@ class Ess_M2ePro_Model_Order_Log extends Mage_Core_Model_Abstract
         );
 
         if (!in_array($initiator, $validInitiatorValues)) {
-            throw new InvalidArgumentException('Invalid order log initiator.');
+            throw new InvalidArgumentException('Invalid Order Log initiator.');
         }
 
         $log = array(

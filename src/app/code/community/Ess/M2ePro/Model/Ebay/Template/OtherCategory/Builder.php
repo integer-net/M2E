@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
+ */
+
 class Ess_M2ePro_Model_Ebay_Template_OtherCategory_Builder
 {
     // ########################################
@@ -29,14 +33,9 @@ class Ess_M2ePro_Model_Ebay_Template_OtherCategory_Builder
         $otherCategoryTemplateData['marketplace_id'] = (int)$data['marketplace_id'];
         $otherCategoryTemplateData['account_id'] = (int)$data['account_id'];
 
-        $collection = Mage::getModel('M2ePro/Ebay_Template_OtherCategory')->getCollection();
-        foreach ($otherCategoryTemplateData as $field => $filter) {
-            is_null($filter) && $filter = array('null' => true);
-            $collection->addFieldToFilter($field,$filter);
-        }
-
-        if ($collection->getFirstItem()->getId()) {
-            return $collection->getFirstItem();
+        $otherCategoryTemplate = $this->getTemplateIfTheSameAlreadyExists($otherCategoryTemplateData);
+        if ($otherCategoryTemplate) {
+            return $otherCategoryTemplate;
         }
 
         $categoryTemplate = Mage::getModel('M2ePro/Ebay_Template_OtherCategory')->setData($otherCategoryTemplateData);
@@ -44,6 +43,29 @@ class Ess_M2ePro_Model_Ebay_Template_OtherCategory_Builder
         //------------------------------
 
         return $categoryTemplate;
+    }
+
+    // ########################################
+
+    /**
+     * Is needed to reduce amount of the Items Specifics blocks an Categories in use
+     * @param array $templateData
+     * @return Ess_M2ePro_Model_Ebay_Template_Category|null
+     */
+    private function getTemplateIfTheSameAlreadyExists(array $templateData)
+    {
+        $collection = Mage::getModel('M2ePro/Ebay_Template_OtherCategory')->getCollection();
+
+        foreach ($templateData as $field => $fieldValue) {
+            is_null($fieldValue) && $filter = array('null' => true);
+            $collection->addFieldToFilter($field, $fieldValue);
+        }
+
+        if ($collection->getFirstItem()->getId()) {
+            return $collection->getFirstItem();
+        }
+
+        return null;
     }
 
     // ########################################

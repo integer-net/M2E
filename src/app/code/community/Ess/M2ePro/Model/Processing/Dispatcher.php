@@ -326,18 +326,19 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
         foreach ($processingRequests as $processingRequest) {
 
             /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-            /** @var $responserObject Ess_M2ePro_Model_Connector_Responser */
-            $responserObject = $processingRequest->getResponserObject();
+
             $results[$processingId]['data']['next_part'] = $nextPart;
 
-            $tempResult = $responserObject->process((array)$results[$processingId]['data'],
-                                                    (array)$results[$processingId]['messages']);
+            $responserRunner = $processingRequest->getResponserRunner();
+            $processResult = $responserRunner->process(
+                (array)$results[$processingId]['data'], (array)$results[$processingId]['messages']
+            );
 
             $this->getLockItem()->activate();
 
-            if ($tempResult) {
+            if ($processResult) {
                 if (is_null($nextPart)) {
-                    $responserObject->completeSuccessfulProcessing();
+                    $responserRunner->complete();
                 } else {
                     $nextProcessingRequests[] = $processingRequest;
                 }
@@ -366,41 +367,37 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
 
     private function executeCompletedProcessingRequests($processingRequests, array $data, array $messages = array())
     {
-        if (is_array($processingRequests)) {
+        if (!is_array($processingRequests)) {
+            $processingRequests = array($processingRequests);
+        }
 
-            foreach ($processingRequests as $processingRequest) {
+        foreach ($processingRequests as $processingRequest) {
 
-                if (!($processingRequest instanceof Ess_M2ePro_Model_Processing_Request)) {
-                    continue;
-                }
-
-                /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-                $processingRequest->executeAsCompleted($data,$messages);
+            if (!($processingRequest instanceof Ess_M2ePro_Model_Processing_Request)) {
+                continue;
             }
 
-        } else if ($processingRequests instanceof Ess_M2ePro_Model_Processing_Request) {
-            $processingRequests->executeAsCompleted($data,$messages);
+            $responserRunner = $processingRequest->getResponserRunner();
+
+            $responserRunner->process($data, $messages) && $responserRunner->complete();
         }
     }
 
     private function executeFailedProcessingRequests($processingRequests)
     {
+        if (!is_array($processingRequests)) {
+            $processingRequests = array($processingRequests);
+        }
+
         $message = 'Request wait timeout exceeded.';
 
-        if (is_array($processingRequests)) {
+        foreach ($processingRequests as $processingRequest) {
 
-            foreach ($processingRequests as $processingRequest) {
-
-                if (!($processingRequest instanceof Ess_M2ePro_Model_Processing_Request)) {
-                    continue;
-                }
-
-                /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-                $processingRequest->executeAsFailed($message);
+            if (!($processingRequest instanceof Ess_M2ePro_Model_Processing_Request)) {
+                continue;
             }
 
-        } else if ($processingRequests instanceof Ess_M2ePro_Model_Processing_Request) {
-            $processingRequests->executeAsFailed($message);
+            $processingRequest->getResponserRunner()->complete($message);
         }
     }
 

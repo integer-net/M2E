@@ -83,10 +83,10 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Dispatcher
      * @throws LogicException
      */
     protected function processAccountsMarketplaces(array $sortedProducts,
-                                                 $maxProductsForOneRequest,
-                                                 $connectorNameSingle,
-                                                 $connectorNameMultiple = NULL,
-                                                 array $params = array())
+                                                   $maxProductsForOneRequest,
+                                                   $connectorNameSingle,
+                                                   $connectorNameMultiple = NULL,
+                                                   array $params = array())
     {
         $results = array();
 

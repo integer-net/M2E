@@ -37,15 +37,15 @@ class Ess_M2ePro_Adminhtml_Ebay_LogController extends Ess_M2ePro_Controller_Admi
 
     public function listingAction()
     {
-        $id = $this->getRequest()->getParam('id');
-        $model = Mage::getModel('M2ePro/Listing')->load($id);
+        $id = $this->getRequest()->getParam('id', false);
+        if ($id) {
+            $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $id);
 
-        if (!$model->getId() && $id) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Listing does not exist.'));
-            return $this->_redirect('*/*/index');
+            if (!$listing->getId()) {
+                $this->_getSession()->addError(Mage::helper('M2ePro')->__('Listing does not exist.'));
+                return $this->_redirect('*/*/index');
+            }
         }
-
-        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model->getData());
 
         $this->_initAction();
 
@@ -63,14 +63,50 @@ class Ess_M2ePro_Adminhtml_Ebay_LogController extends Ess_M2ePro_Controller_Admi
 
     public function listingGridAction()
     {
-        $id = $this->getRequest()->getParam('id');
-        $model = Mage::getModel('M2ePro/Listing')->load($id);
+        $id = $this->getRequest()->getParam('id', false);
+        if ($id) {
+            $listing = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing', $id);
 
-        if (!$model->getId() && $id) {
-            return;
+            if (!$listing->getId()) {
+                return;
+            }
         }
 
-        Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model->getData());
+        $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_log_grid')->toHtml();
+        $this->getResponse()->setBody($response);
+    }
+
+    // -------------------------------
+
+    public function listingProductAction()
+    {
+        $listingProductId = $this->getRequest()->getParam('listing_product_id', false);
+        if ($listingProductId) {
+            $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getObject('Listing_Product', $listingProductId);
+
+            if (!$listingProduct->getId()) {
+                $this->_getSession()->addError(Mage::helper('M2ePro')->__('Listing Product does not exist.'));
+                return $this->_redirect('*/*/index');
+            }
+        }
+
+        $this->_initAction();
+
+        $logBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_log');
+
+        $this->_addContent($logBlock)->renderLayout();
+    }
+
+    public function listingProductGridAction()
+    {
+        $listingProductId = $this->getRequest()->getParam('listing_product_id', false);
+        if ($listingProductId) {
+            $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getObject('Listing_Product', $listingProductId);
+
+            if (!$listingProduct->getId()) {
+                return;
+            }
+        }
 
         $response = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_log_grid')->toHtml();
         $this->getResponse()->setBody($response);

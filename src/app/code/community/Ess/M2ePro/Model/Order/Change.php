@@ -8,6 +8,8 @@ class Ess_M2ePro_Model_Order_Change extends Ess_M2ePro_Model_Abstract
 {
     const ACTION_UPDATE_PAYMENT  = 'update_payment';
     const ACTION_UPDATE_SHIPPING = 'update_shipping';
+    const ACTION_CANCEL          = 'cancel';
+    const ACTION_REFUND          = 'refund';
 
     const CREATOR_TYPE_OBSERVER = 1;
 
@@ -57,6 +59,18 @@ class Ess_M2ePro_Model_Order_Change extends Ess_M2ePro_Model_Abstract
 
     //####################################
 
+    public static function getAllowedActions()
+    {
+        return array(
+            self::ACTION_UPDATE_PAYMENT,
+            self::ACTION_UPDATE_SHIPPING,
+            self::ACTION_CANCEL,
+            self::ACTION_REFUND,
+        );
+    }
+
+    //####################################
+
     public function isPaymentUpdateAction()
     {
         return $this->getAction() == self::ACTION_UPDATE_PAYMENT;
@@ -67,6 +81,16 @@ class Ess_M2ePro_Model_Order_Change extends Ess_M2ePro_Model_Abstract
         return $this->getAction() == self::ACTION_UPDATE_SHIPPING;
     }
 
+    public function isCancelAction()
+    {
+        return $this->getAction() == self::ACTION_CANCEL;
+    }
+
+    public function isRefundAction()
+    {
+        return $this->getAction() == self::ACTION_CANCEL;
+    }
+
     //####################################
 
     public static function create($orderId, $action, $creatorType, $component, array $params)
@@ -75,7 +99,7 @@ class Ess_M2ePro_Model_Order_Change extends Ess_M2ePro_Model_Abstract
             throw new InvalidArgumentException('Order ID is invalid.');
         }
 
-        if (!in_array($action, array(self::ACTION_UPDATE_PAYMENT, self::ACTION_UPDATE_SHIPPING))) {
+        if (!in_array($action, self::getAllowedActions())) {
             throw new InvalidArgumentException('Action is invalid.');
         }
 

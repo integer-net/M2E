@@ -40,7 +40,6 @@ ListingCategoryTreeHandler.prototype = Object.extend(new CommonHandler(), {
                 if (config[i].children) {
                     ListingCategoryTreeHandlerObj.tree_buildCategory(node, config[i].children);
                 }
-
             }
         }
     },

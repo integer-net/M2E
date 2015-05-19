@@ -16,7 +16,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single
         return array('item','update','relist');
     }
 
-    protected function getLogAction()
+    protected function getLogsAction()
     {
         return Ess_M2ePro_Model_Listing_Other_Log::ACTION_RELIST_PRODUCT;
     }
@@ -34,8 +34,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // The item either is listed or not available
-                parent::MESSAGE_TEXT_KEY => 'The item either is listed or not available',
+                // The Item either is Listed or not available
+                parent::MESSAGE_TEXT_KEY => 'The Item either is Listed or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
@@ -84,8 +84,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Item was successfully relisted
-                parent::MESSAGE_TEXT_KEY => 'Item was successfully relisted',
+                // Item was successfully Relisted
+                parent::MESSAGE_TEXT_KEY => 'Item was successfully Relisted',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
             );
         }
@@ -118,8 +118,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Relist_Single
         $this->getResponseObject()->markAsPotentialDuplicate();
 
         $message = array(
-            parent::MESSAGE_TEXT_KEY => 'An error occured while listing the item. '.
-                                'The item has been blocked. The next M2E Synchronization will resolve the problem.',
+            parent::MESSAGE_TEXT_KEY => 'An error occured while Listing the Item. '.
+                                'The Item has been blocked. The next M2E Pro Synchronization will resolve the problem.',
             parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_WARNING
         );
 

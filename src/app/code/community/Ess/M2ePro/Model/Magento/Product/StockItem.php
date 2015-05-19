@@ -34,7 +34,7 @@ class Ess_M2ePro_Model_Magento_Product_StockItem
                 case Mage_CatalogInventory_Model_Stock::BACKORDERS_YES_NOTIFY:
                     break;
                 default:
-                    throw new Exception('The requested quantity is not available.');
+                    throw new Exception('The requested Quantity is not available.');
                     break;
             }
         }

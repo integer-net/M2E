@@ -36,7 +36,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($renameAccountsData as $id => $row): ?>
-            <?php echo $row['old_title'] ?>&nbsp;<span style="color: grey;">to</span>&nbsp;<a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_account/edit', array('id' => $id,'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($renameAccountsData)): ?><br /><?php endif; ?>
+            <?php echo $row['old_title'] ?>&nbsp;<span style="color: grey;">to</span>&nbsp;<a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_account/edit', array('id' => $id,'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($renameAccountsData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -56,7 +56,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayConditionsData as $row): ?>
-            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'description', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayConditionsData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'description', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayConditionsData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -78,7 +78,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayVariationIgnoreData as $row): ?>
-            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_listing/view', array('id' => $row['id'],'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayVariationIgnoreData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_listing/view', array('id' => $row['id'],'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayVariationIgnoreData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -109,7 +109,7 @@
                     $route = '*/adminhtml_'.$row['component_mode'].'_listing/view';
                 }
             ?>
-            <a target="_blank" href="<?php echo $this->getUrl($route, array('id' => $id,'wizard' => true)); ?>"><?php echo $row['title'] ?></a><span style="color: grey; font-style: italic;">(<?php echo $componentTitles[$row['component_mode']]; ?>)</span><?php if ($tempIndex < count($hideProductsData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl($route, array('id' => $id,'wizard' => true)); ?>"><?php echo $row['title'] ?></a><span style="color: grey; font-style: italic;">(<?php echo $componentTitles[$row['component_mode']]; ?>)</span><?php if ($tempIndex < count($hideProductsData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -138,7 +138,7 @@
                     $route = '*/adminhtml_'.$row['component_mode'].'_listing/view';
                 }
             ?>
-            <a target="_blank" href="<?php echo $this->getUrl($route, array('id' => $id,'wizard' => true)); ?>"><?php echo $row['title'] ?></a><span style="color: grey; font-style: italic;">(<?php echo $componentTitles[$row['component_mode']]; ?>)</span><?php if ($tempIndex < count($listingSynchTypeData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl($route, array('id' => $id,'wizard' => true)); ?>"><?php echo $row['title'] ?></a><span style="color: grey; font-style: italic;">(<?php echo $componentTitles[$row['component_mode']]; ?>)</span><?php if ($tempIndex < count($listingSynchTypeData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -158,7 +158,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayScheduleListData as $row): ?>
-            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'synchronization', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayScheduleListData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'synchronization', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayScheduleListData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -178,7 +178,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayScheduleDelayAfterEndData as $row): ?>
-            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'synchronization', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayScheduleDelayAfterEndData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'synchronization', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayScheduleDelayAfterEndData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -200,7 +200,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($commonRelistScheduleData as $row): ?>
-            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_common_'.$row['component_mode'].'_template_synchronization/edit', array('id' => $row['id'],'wizard' => true)); ?>"><?php echo $row['title'] ?></a><span style="color: grey; font-style: italic;">(<?php echo $componentTitles[$row['component_mode']]; ?></span><?php if ($tempIndex < count($commonRelistScheduleData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_common_'.$row['component_mode'].'_template_synchronization/edit', array('id' => $row['id'],'wizard' => true)); ?>"><?php echo $row['title'] ?></a><span style="color: grey; font-style: italic;">(<?php echo $componentTitles[$row['component_mode']]; ?></span><?php if ($tempIndex < count($commonRelistScheduleData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -221,7 +221,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayProductDetailsData as $row): ?>
-            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'description', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayProductDetailsData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'description', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayProductDetailsData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>
@@ -241,7 +241,7 @@
     <div class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
         <?php $tempIndex = 1; ?>
         <?php foreach ($ebayUnusedDescriptionData as $row): ?>
-            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'description', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayUnusedDescriptionData)): ?><br /><?php endif; ?>
+            <a target="_blank" href="<?php echo $this->getUrl('*/adminhtml_ebay_template/edit', array('id' => $row['id'], 'nick' => 'description', 'wizard' => true)); ?>"><?php echo $row['title'] ?></a><?php if ($tempIndex < count($ebayUnusedDescriptionData)): ?><br/><?php endif; ?>
             <?php $tempIndex++; ?>
         <?php endforeach; ?>
     </div>

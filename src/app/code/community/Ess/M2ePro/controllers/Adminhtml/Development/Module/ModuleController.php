@@ -39,9 +39,9 @@ class Ess_M2ePro_Adminhtml_Development_Module_ModuleController
         $result = $dispatcher->process();
 
         if ($result) {
-            $this->_getSession()->addSuccess('Processing cron was successfully performed.');
+            $this->_getSession()->addSuccess('Processing Cron was successfully performed.');
         } else {
-            $this->_getSession()->addError('Processing cron was performed with errors.');
+            $this->_getSession()->addError('Processing Cron was performed with errors.');
         }
 
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());

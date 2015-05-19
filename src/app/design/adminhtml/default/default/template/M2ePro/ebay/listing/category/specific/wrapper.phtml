@@ -44,12 +44,12 @@
         &nbsp;
         <label for="skip_optional_specifics"><?php echo Mage::helper('M2ePro')->__('Skip Optional Specifics') ?></label>
         <div style="display: inline-block">
-            <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/tool-tip-icon.png' ?>" class="tool-tip-image">
+            <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
             <span class="tool-tip-message" style="display: none;">
-                <img src="<?php echo $this->getSkinUrl('M2ePro').'/images/help.png' ?>">
+                <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
                 <span>
                     <?php echo Mage::helper('M2ePro')->__(
-                        'M2E will check  all available Item Specifics for selected eBay Categories and stops at the Category where user action is required (required Item Specifics should be set).'
+                        'M2E Pro will check  all available Item Specifics for selected eBay Categories and stops at the Category where user Action is required (required Item Specifics should be set).'
                     ); ?>
                 </span>
             </span>
@@ -63,7 +63,7 @@
                 $title = $categoryData['category_main_path'] . ' ('.$category.')';
             } else {
                 $category = $categoryData['category_main_attribute'];
-                $title = Mage::helper('M2ePro')->__('Magento Attribute -> %attribute_label%', Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
+                $title = Mage::helper('M2ePro')->__('Magento Attribute > %attribute_label%', Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $category,
                     $this->getData('store_id')
                 ));
@@ -102,9 +102,9 @@
     <div style="padding: 10px; height: 195px">
 
         <?php echo Mage::helper('M2ePro')->__(
-            '<br>All selected eBay Categories were checked for required Item Specifics.
-            <br><br>
-            Now you can proceed further (use Continue button) or close this window and review Item Specifics if neccessary (use Cancel button).'); ?>
+            '<br/>All selected eBay Categories were checked for required Item Specifics.
+            <br/><br/>
+            Now you can proceed further (use Continue Button) or close this window and review Item Specifics if neccessary (use Cancel Button).'); ?>
 
     </div>
 

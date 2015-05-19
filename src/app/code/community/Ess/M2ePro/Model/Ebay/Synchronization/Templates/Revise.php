@@ -51,15 +51,36 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeQtyChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update quantity');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Quantity');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            $this->getInspector()->inspectReviseQtyRequirements($listingProduct);
+
+            $actionParams = array('only_data'=>array('qty'=>true,'variations'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetReviseQtyRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -67,15 +88,36 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executePriceChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update price');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Price');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-            $this->getInspector()->inspectRevisePriceRequirements($listingProduct);
+
+            $actionParams = array('only_data'=>array('price'=>true,'variations'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetRevisePriceRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -85,90 +127,79 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update title');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Title');
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection()->getItems() as $template) {
             $attributesForProductChange = array_merge($attributesForProductChange,$template->getTitleAttributes());
         }
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstancesByListingProduct(
             array_unique($attributesForProductChange), true
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+            $ebayListingProduct = $listingProduct->getChildObject();
 
-            if (!$listingProduct->isListed()) {
+            $titleAttributes = $ebayListingProduct->getEbayDescriptionTemplate()->getTitleAttributes();
+
+            if (!in_array($listingProduct->getData('changed_attribute'), $titleAttributes)) {
                 continue;
             }
 
-            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeTitle()) {
-                continue;
-            }
+            $actionParams = array('only_data'=>array('title'=>true));
 
-            if (!in_array($listingProduct->getData('changed_attribute'),
-                $listingProduct->getChildObject()->getDescriptionTemplate()->getTitleAttributes())) {
-                continue;
-            }
-
-            if ($this->getRunner()->isExistProduct(
+            $isExistInRunner = $this->getRunner()->isExistProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('title'=>true)))
-            ) {
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
+            if (!$this->getInspector()->isMeetReviseTitleRequirements($listingProduct)) {
                 continue;
             }
 
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('title'=>true))
+                $actionParams
             );
         }
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstancesByVariationOption(
             array('name'), true
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            $actionParams = array('only_data'=>array('variations'=>true));
 
-            if (!$listingProduct->isListed()) {
-                continue;
-            }
-
-            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeTitle()) {
-                continue;
-            }
-
-            if ($this->getRunner()->isExistProduct(
+            $isExistInRunner = $this->getRunner()->isExistProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('variations'=>true)))
-            ) {
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
-                continue;
-            }
-
-            if (!$listingProduct->getMagentoProduct()->isBundleType() &&
-                !$listingProduct->getMagentoProduct()->isGroupedType()) {
+            if (!$this->getInspector()->isMeetReviseVariationTitleRequirements($listingProduct)) {
                 continue;
             }
 
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('variations'=>true))
+                $actionParams
             );
         }
 
@@ -177,50 +208,49 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeSubTitleChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update subtitle');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Subtitle');
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection()->getItems() as $template) {
             $attributesForProductChange = array_merge($attributesForProductChange, $template->getSubTitleAttributes());
         }
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstancesByListingProduct(
             array_unique($attributesForProductChange), true
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+            $ebayListingProduct = $listingProduct->getChildObject();
 
-            if (!$listingProduct->isListed()) {
+            $subTitleAttributes = $ebayListingProduct->getEbayDescriptionTemplate()->getSubTitleAttributes();
+
+            if (!in_array($listingProduct->getData('changed_attribute'), $subTitleAttributes)) {
                 continue;
             }
 
-            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeSubTitle()) {
-                continue;
-            }
+            $actionParams = array('only_data'=>array('subtitle'=>true));
 
-            if (!in_array($listingProduct->getData('changed_attribute'),
-                $listingProduct->getChildObject()->getDescriptionTemplate()->getSubTitleAttributes())) {
-                continue;
-            }
-
-            if ($this->getRunner()->isExistProduct(
+            $isExistInRunner = $this->getRunner()->isExistProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('subtitle'=>true)))
-            ) {
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
+            if (!$this->getInspector()->isMeetReviseSubTitleRequirements($listingProduct)) {
                 continue;
             }
 
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('subtitle'=>true))
+                $actionParams
             );
         }
 
@@ -229,51 +259,52 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeDescriptionChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update description');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Description');
 
         $attributesForProductChange = array();
         foreach (Mage::getModel('M2ePro/Ebay_Template_Description')->getCollection()->getItems() as $template) {
-            $attributesForProductChange = array_merge($attributesForProductChange,
-                                                      $template->getDescriptionAttributes());
+            $attributesForProductChange = array_merge(
+                $attributesForProductChange,
+                $template->getDescriptionAttributes()
+            );
         }
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstancesByListingProduct(
             array_unique($attributesForProductChange), true
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+            $ebayListingProduct = $listingProduct->getChildObject();
 
-            if (!$listingProduct->isListed()) {
+            $descriptionAttributes = $ebayListingProduct->getEbayDescriptionTemplate()->getDescriptionAttributes();
+
+            if (!in_array($listingProduct->getData('changed_attribute'), $descriptionAttributes)) {
                 continue;
             }
 
-            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeDescription()) {
-                continue;
-            }
+            $actionParams = array('only_data'=>array('description'=>true));
 
-            if (!in_array($listingProduct->getData('changed_attribute'),
-                $listingProduct->getChildObject()->getDescriptionTemplate()->getDescriptionAttributes())) {
-                continue;
-            }
-
-            if ($this->getRunner()->isExistProduct(
+            $isExistInRunner = $this->getRunner()->isExistProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('description'=>true)))
-            ) {
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
+            if (!$this->getInspector()->isMeetReviseDescriptionRequirements($listingProduct)) {
                 continue;
             }
 
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('description'=>true))
+                $actionParams
             );
         }
 
@@ -293,47 +324,45 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
             );
         }
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstancesByListingProduct(
             array_unique($attributesForProductChange), true
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+            $ebayListingProduct = $listingProduct->getChildObject();
 
-            if (!$listingProduct->isListed()) {
-                continue;
-            }
-
-            if (!$listingProduct->getChildObject()->getEbaySynchronizationTemplate()->isReviseWhenChangeImages()) {
-                continue;
-            }
-
-            $listingProductImageAttributes = array_merge(
-                $listingProduct->getChildObject()->getDescriptionTemplate()->getImageMainAttributes(),
-                $listingProduct->getChildObject()->getDescriptionTemplate()->getGalleryImagesAttributes()
+            $imagesAttributes = array_merge(
+                $ebayListingProduct->getEbayDescriptionTemplate()->getImageMainAttributes(),
+                $ebayListingProduct->getEbayDescriptionTemplate()->getGalleryImagesAttributes()
             );
 
-            if (!in_array($listingProduct->getData('changed_attribute'), $listingProductImageAttributes)) {
+            if (!in_array($listingProduct->getData('changed_attribute'), $imagesAttributes)) {
                 continue;
             }
 
-            if ($this->getRunner()->isExistProduct(
+            $actionParams = array('only_data'=>array('images'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('images'=>true)))
-            ) {
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
+            if (!$this->getInspector()->isMeetReviseImagesRequirements($listingProduct)) {
                 continue;
             }
 
             $this->getRunner()->addProduct(
                 $listingProduct,
                 Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                array('only_data'=>array('images'=>true))
+                $actionParams
             );
         }
 
@@ -358,75 +387,27 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
             $listingProduct->setData('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP)->save();
 
-            /* @var $synchTemplate Ess_M2ePro_Model_Template_Synchronization */
-            $synchTemplate = $listingProduct->getChildObject()->getSynchronizationTemplate();
+            $actionParams = array('all_data'=>true);
 
-            $isRevise = false;
-            foreach ($listingProduct->getSynchReasons() as $reason) {
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
 
-                $neededSynchTemplate = $synchTemplate;
-
-                if (in_array($reason, array(
-                    'categoryTemplate',
-                    'otherCategoryTemplate',
-                    'descriptionTemplate',
-                    'paymentTemplate',
-                    'returnTemplate',
-                    'shippingTemplate'
-                ))) {
-                    $neededSynchTemplate = $synchTemplate->getChildObject();
-                }
-
-                if ($reason == 'otherCategoryTemplate') {
-                    $methodSuffix = 'categoryTemplate';
-                } else {
-                    $methodSuffix = $reason;
-                }
-
-                $method = 'isRevise' . ucfirst($methodSuffix);
-
-                if (!method_exists($neededSynchTemplate,$method)) {
-                    continue;
-                }
-
-                if ($neededSynchTemplate->$method()) {
-                    $isRevise = true;
-                    break;
-                }
-            }
-
-            if (!$isRevise) {
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if ($this->getRunner()
-                     ->isExistProduct(
-                            $listingProduct,
-                            Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                            array('all_data'=>true))
-            ) {
+            if (!$this->getInspector()->isMeetReviseSynchReasonsRequirements($listingProduct)) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
-                continue;
-            }
-
-            if (!$listingProduct->getChildObject()->isSetCategoryTemplate()) {
-                continue;
-            }
-
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
-                continue;
-            }
-
-            $this->getRunner()
-                 ->addProduct(
-                        $listingProduct,
-                        Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                        array('all_data'=>true)
-                 );
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -434,7 +415,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
     private function executeTotal()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute revise all');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute Revise all');
 
         $lastListingProductProcessed = $this->getConfigValue(
             $this->getFullSettingsPath().'total/','last_listing_product_id'
@@ -458,33 +439,27 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
         /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($collection->getItems() as $listingProduct) {
 
-            if ($this->getRunner()
-                     ->isExistProduct(
-                            $listingProduct,
-                            Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                            array('all_data'=>true))
-            ) {
+            $actionParams = array('all_data'=>true);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
-                continue;
-            }
-
-            if (!$listingProduct->getChildObject()->isSetCategoryTemplate()) {
-                continue;
-            }
-
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
+            if (!$this->getInspector()->isMeetReviseGeneralRequirements($listingProduct)) {
                 continue;
             }
 
             $this->getRunner()->addProduct(
-                    $listingProduct,
-                    Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                    array('all_data'=>true)
-             );
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $lastListingProduct = $collection->getLastItem()->getId();

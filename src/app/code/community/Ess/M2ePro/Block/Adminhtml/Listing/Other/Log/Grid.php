@@ -20,9 +20,11 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
         $this->viewComponentHelper = Mage::helper('M2ePro/View')->getComponentHelper($view);
         //------------------------------
 
+        $channel = $this->getRequest()->getParam('channel');
+
         // Initialization block
         //------------------------------
-        $this->setId($view . 'ListingOtherLogGrid' . $this->getEntityId());
+        $this->setId($view . ucfirst($channel) . 'ListingOtherLogGrid' . $this->getEntityId());
         //------------------------------
 
         // Set default values
@@ -70,10 +72,15 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
 
         // prepare components
         //--------------------------------
-        $components = $this->viewComponentHelper->getActiveComponents();
-        $collection->getSelect()
-            ->where('main_table.component_mode IN(\''.implode('\',\'',$components).'\')
+        $channel = $this->getData('channel');
+        if (!empty($channel)) {
+            $collection->getSelect()->where('main_table.component_mode = ?', $channel);
+        } else {
+            $components = $this->viewComponentHelper->getActiveComponents();
+            $collection->getSelect()
+                ->where('main_table.component_mode IN(\''.implode('\',\'',$components).'\')
                         OR main_table.component_mode IS NULL');
+        }
         //--------------------------------
 
         // we need sort by id also, because create_date may be same for some adjacents entries
@@ -103,18 +110,16 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
             'filter_index' => 'main_table.create_date',
         ));
 
-        if (!$this->getEntityId() && !$this->viewComponentHelper->isSingleActiveComponent()) {
-            $this->addColumn('component_mode', array(
-                'header'         => Mage::helper('M2ePro')->__('Channel'),
-                'align'          => 'right',
-                'width'          => '120px',
-                'type'           => 'options',
-                'index'          => 'component_mode',
-                'filter_index'   => 'main_table.component_mode',
-                'sortable'       => false,
-                'options'        => $this->viewComponentHelper->getActiveComponentsTitles()
-            ));
-        }
+        $this->addColumn('action', array(
+            'header'    => $columnTitles['action'],
+            'align'     => 'left',
+            'width'     => '250px',
+            'type'      => 'options',
+            'index'     => 'action',
+            'sortable'  => false,
+            'filter_index' => 'main_table.action',
+            'options' => $this->getActionTitles(),
+        ));
 
         $this->addColumn('identifier', array(
             'header' => $columnTitles['identifier'],
@@ -134,17 +139,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
             'index'     => 'title',
             'filter_index' => 'main_table.title',
             'frame_callback' => array($this, 'callbackColumnTitle')
-        ));
-
-        $this->addColumn('action', array(
-            'header'    => $columnTitles['action'],
-            'align'     => 'left',
-            'width'     => '250px',
-            'type'      => 'options',
-            'index'     => 'action',
-            'sortable'  => false,
-            'filter_index' => 'main_table.action',
-            'options' => $this->getActionTitles(),
         ));
 
         $this->addColumn('description', array(
@@ -177,17 +171,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
             'sortable'  => false,
             'options' => $this->_getLogTypeList(),
             'frame_callback' => array($this, 'callbackColumnType')
-        ));
-
-        $this->addColumn('priority', array(
-            'header'=> $columnTitles['priority'],
-            'width' => '80px',
-            'index' => 'priority',
-            'align'     => 'right',
-            'type'  => 'options',
-            'sortable'  => false,
-            'options' => $this->_getLogPriorityList(),
-            'frame_callback' => array($this, 'callbackColumnPriority')
         ));
 
         return parent::_prepareColumns();
@@ -245,19 +228,17 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        $value = Mage::helper('M2ePro')->escapeHtml($value);
-        if (strlen($value) > 60) {
-            $value = substr($value, 0, 60) . '...';
-        }
-
-        return '<span>' . $value . '</span>';
+        return '<span>' . Mage::helper('M2ePro')->escapeHtml($value) . '</span>';
     }
 
     // ####################################
 
     public function getGridUrl()
     {
-        return $this->getUrl('*/*/listingOtherGrid', array('_current'=>true));
+        return $this->getUrl('*/*/listingOtherGrid', array(
+            '_current'=>true,
+            'channel' => $this->getData('channel')
+        ));
     }
 
     public function getRowUrl($row)

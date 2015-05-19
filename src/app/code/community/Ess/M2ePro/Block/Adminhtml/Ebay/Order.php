@@ -51,14 +51,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order extends Mage_Adminhtml_Block_Widget_
             'class'     => 'button_link'
         ));
         //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-        //------------------------------
     }
 
     // ####################################

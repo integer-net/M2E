@@ -25,9 +25,9 @@
 
 <div id="block_notice_ebay_template_synchronization_form_data_stop" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Stop Rules'); ?>">
     <?php echo Mage::helper('M2ePro')->__(
-        'Set the conditions when M2E Pro should stop listings on eBay.<br/><br/>
-        If all conditions are set to No or No Action then no eBay items using this Synchronization Policy will be stopped.
-        If all options are enabled, then an item will be stopped if at least one of the stop conditions is met.'
+        'Set the Conditions when M2E Pro should stop Listings on eBay.<br/><br/>
+        If all Conditions are set to No or No Action then no eBay Items using this Synchronization Policy will be Stopped.
+        If all Options are enabled, then an Item will be Stopped if at least one of the Stop Conditions is met.'
     ); ?>
 </div>
 
@@ -52,7 +52,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_OUT_OFF_STOCK_YES; ?>" <?php if ($formData['stop_status_disabled'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_STATUS_DISABLED_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an item that is on eBay if status is changed to \'Disabled\' in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an Item that is on eBay if Status is changed to \'Disabled\' in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -67,7 +67,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_OUT_OFF_STOCK_YES; ?>" <?php if ($formData['stop_out_off_stock'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_OUT_OFF_STOCK_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an item that is on eBay if stock availability is changed to \'Out of Stock\' in Magento.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an Item that is on eBay if Stock Availability is changed to \'Out of Stock\' in Magento.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -84,7 +84,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN; ?>" <?php if ($formData['stop_qty_magento'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an item on eBay if Magento quantity is changed <b>and</b> it meets the selected conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an Item on eBay if Magento Quantity is changed <b>and</b> it meets the selected Conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -122,7 +122,7 @@
                             <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN; ?>" <?php if ($formData['stop_qty_calculated'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::STOP_QTY_BETWEEN): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Between'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an item on eBay if calculated quantity according to the selling format policy is changed <b>and</b> it meets the selected conditions.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically stops an Item on eBay if calculated Quantity according to the Price, Quantity and Format Policy is changed <b>and</b> it meets the selected Conditions.'); ?></span>
                         </p>
                     </td>
                 </tr>

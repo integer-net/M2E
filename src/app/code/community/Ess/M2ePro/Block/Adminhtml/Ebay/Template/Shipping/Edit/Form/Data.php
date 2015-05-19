@@ -36,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
         $marketplace = Mage::helper('M2ePro/Data_Global')->getValue('ebay_marketplace');
 
         if (!$marketplace instanceof Ess_M2ePro_Model_Marketplace) {
-            throw new LogicException('Marketplace is required for editing shipping template.');
+            throw new LogicException('Marketplace is required for editing Shipping Policy.');
         }
 
         return $marketplace;

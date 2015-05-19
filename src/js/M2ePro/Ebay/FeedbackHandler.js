@@ -33,15 +33,14 @@ EbayFeedbackHandler.prototype = Object.extend(new CommonHandler(), {
         $('buyer_text').innerHTML = buyerText;
         $('feedback_text').value = '';
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_feedback/getFeedbackTemplates') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_feedback/getFeedbackTemplates'), {
             method: 'get',
             asynchronous: true,
             parameters: {
                 feedback_id: feedbackId
             },
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 var feedbacksTemplates = transport.responseText.evalJSON()['feedbacks_templates'];
                 var tempHtml = '';
 
@@ -100,13 +99,18 @@ EbayFeedbackHandler.prototype = Object.extend(new CommonHandler(), {
 
         if (editForm.validate()) {
             var self = this;
-            new Ajax.Request(M2ePro.url.get('formSubmit', $('edit_form').serialize(true)) ,
-            {
+            new Ajax.Request(M2ePro.url.get('formSubmit', $('edit_form').serialize(true)), {
                 method: 'get',
                 asynchronous: true,
-                onSuccess: function(transport)
-                {
-                    MagentoMessageObj.addSuccess(M2ePro.translator.translate('Feedback has been successfully sent.'));
+                onSuccess: function(transport) {
+
+                    var result = transport.responseText.evalJSON()['result'];
+
+                    if (result == 'success') {
+                        MagentoMessageObj.addSuccess(M2ePro.translator.translate('Feedback has been successfully sent.'));
+                    } else {
+                        MagentoMessageObj.addError(M2ePro.translator.translate('Feedback was not sent.'));
+                    }
 
                     self.cancelFeedback();
 
@@ -117,5 +121,4 @@ EbayFeedbackHandler.prototype = Object.extend(new CommonHandler(), {
     }
 
     //----------------------------------
-
 });

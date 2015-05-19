@@ -20,7 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Marketplace_Switcher extends Ess_M2ePro_Block_A
         $collection = Mage::getModel('M2ePro/Marketplace')->getCollection()
             ->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE)
             ->setOrder('component_mode', 'ASC')
-            ->setOrder('title', 'ASC');
+            ->setOrder('sorder', 'ASC');
 
         if (!is_null($this->componentMode)) {
             $collection->addFieldToFilter('component_mode', $this->componentMode);

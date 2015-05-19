@@ -232,13 +232,13 @@ class Ess_M2ePro_Model_Ebay_Template_Return extends Ess_M2ePro_Model_Component_A
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_return');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_return');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_return');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_return');
         return parent::delete();
     }
 

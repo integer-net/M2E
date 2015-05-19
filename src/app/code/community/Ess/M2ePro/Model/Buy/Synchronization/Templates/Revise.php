@@ -46,15 +46,35 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
 
     private function executeQtyChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update quantity');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Quantity');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($changedListingsProducts as $listingProduct) {
-            $this->getInspector()->inspectReviseQtyRequirements($listingProduct);
+            $actionParams = array('only_data'=>array('selling'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetReviseQtyRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -62,15 +82,35 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
 
     private function executePriceChanged()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update price');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Update Price');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
-                array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
+            array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
-        /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($changedListingsProducts as $listingProduct) {
-            $this->getInspector()->inspectRevisePriceRequirements($listingProduct);
+            $actionParams = array('only_data'=>array('selling'=>true));
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
+
+            if (!$this->getInspector()->isMeetRevisePriceRequirements($listingProduct)) {
+                continue;
+            }
+
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -87,11 +127,13 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
         $listingProductCollection->addFieldToFilter('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
 
         $listingProductCollection->getSelect()->where(
-            '`is_variation_product` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_NO.
-            ' OR ('.
-                '`is_variation_product` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_PRODUCT_YES.
-                ' AND `is_variation_matched` = '.Ess_M2ePro_Model_Buy_Listing_Product::IS_VARIATION_MATCHED_YES.
-            ')'
+            '`is_variation_product` = 0
+             OR
+             (
+                `is_variation_product` = 1
+                 AND
+                 `is_variation_product_matched` = 1
+             )'
         );
 
         $listingProductCollection->getSelect()->limit(100);
@@ -101,47 +143,27 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
 
             $listingProduct->setData('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP)->save();
 
-            /* @var $synchTemplate Ess_M2ePro_Model_Template_Synchronization */
-            $synchTemplate = $listingProduct->getListing()->getChildObject()->getSynchronizationTemplate();
+            $actionParams = array('all_data'=>true);
 
-            $isRevise = false;
-            foreach ($listingProduct->getSynchReasons() as $reason) {
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
 
-                $method = 'isRevise' . ucfirst($reason);
-
-                if (!method_exists($synchTemplate,$method)) {
-                    continue;
-                }
-
-                if ($synchTemplate->$method()) {
-                    $isRevise = true;
-                    break;
-                }
-            }
-
-            if (!$isRevise) {
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if ($this->getRunner()->isExistProduct($listingProduct,
-                                                   Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                                   array('all_data'=>true))
-            ) {
+            if (!$this->getInspector()->isMeetReviseSynchReasonsRequirements($listingProduct)) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
-                continue;
-            }
-
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
-                continue;
-            }
-
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           array('all_data'=>true));
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
@@ -175,25 +197,27 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
         /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($collection->getItems() as $listingProduct) {
 
-            if ($this->getRunner()->isExistProduct($listingProduct,
-                                                   Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                                   array('all_data'=>true))
-            ) {
+            $actionParams = array('all_data'=>true);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
+
+            if ($isExistInRunner) {
                 continue;
             }
 
-            if (!$listingProduct->isRevisable()) {
+            if (!$this->getInspector()->isMeetReviseGeneralRequirements($listingProduct)) {
                 continue;
             }
 
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action')) {
-                continue;
-            }
-
-            $this->getRunner()->addProduct($listingProduct,
-                                           Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                                           array('all_data'=>true));
+            $this->getRunner()->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+                $actionParams
+            );
         }
 
         $lastListingProduct = $collection->getLastItem()->getId();

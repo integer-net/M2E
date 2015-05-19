@@ -9,14 +9,16 @@ class Ess_M2ePro_Model_Processing_Request extends Ess_M2ePro_Model_Abstract
     const PERFORM_TYPE_SINGLE  = 1;
     const PERFORM_TYPE_PARTIAL = 2;
 
-    const STATUS_NOT_FOUND = 'not_found';
-    const STATUS_COMPLETE = 'completed';
+    const STATUS_NOT_FOUND  = 'not_found';
+    const STATUS_COMPLETE   = 'completed';
     const STATUS_PROCESSING = 'processing';
 
     const MAX_LIFE_TIME_INTERVAL = 86400; // 1 day
 
-    /** @var Ess_M2ePro_Model_Connector_Responser */
-    private $responseObject = NULL;
+    //####################################
+
+    /** @var Ess_M2ePro_Model_Connector_ResponserRunner $responserRunner */
+    private $responserRunner = null;
 
     //####################################
 
@@ -98,34 +100,19 @@ class Ess_M2ePro_Model_Processing_Request extends Ess_M2ePro_Model_Abstract
 
     //####################################
 
-    public function execute(array $data, array $messages = array())
+    /**
+     * @return Ess_M2ePro_Model_Connector_ResponserRunner
+     */
+    public function getResponserRunner()
     {
-        return $this->getResponserObject()->process($data,$messages);
-    }
-
-    public function executeAsCompleted(array $data, array $messages = array())
-    {
-        $this->getResponserObject()->processCompleted($data,$messages);
-    }
-
-    public function executeAsFailed($message = NULL)
-    {
-        is_null($message) && $message = Mage::helper('M2ePro')->__('Request failed.');
-        $this->getResponserObject()->processFailed($message);
-    }
-
-    //------------------------------------
-
-    public function getResponserObject()
-    {
-        if (!is_null($this->responseObject)) {
-            return $this->responseObject;
+        if (!is_null($this->responserRunner)) {
+            return $this->responserRunner;
         }
 
-        $modelName = $this->getResponserModel();
-        $className = Mage::getConfig()->getModelClassName($modelName);
+        $this->responserRunner = Mage::getModel('M2ePro/Connector_ResponserRunner');
+        $this->responserRunner->setProcessingRequest($this);
 
-        return $this->responseObject = new $className($this);
+        return $this->responserRunner;
     }
 
     //####################################

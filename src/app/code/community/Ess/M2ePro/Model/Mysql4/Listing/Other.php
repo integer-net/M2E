@@ -16,39 +16,39 @@ class Ess_M2ePro_Model_Mysql4_Listing_Other
 
     // ########################################
 
-    public function getItemsByProductId($productId)
+    public function getItemsByProductId($productId, array $filters = array())
     {
+        $cacheKey   = __METHOD__.$productId.sha1(json_encode($filters));
+        $cacheValue = Mage::helper('M2ePro/Data_Cache_Session')->getValue($cacheKey);
+
+        if (!is_null($cacheValue)) {
+            return $cacheValue;
+        }
+
         $select = $this->_getReadAdapter()
-                       ->select()
-                       ->from(
-                           array('lo' => $this->getMainTable()),
-                           array('id','component_mode','account_id','marketplace_id')
-                       )
-                       ->where("`lo`.`product_id` IS NOT NULL AND `lo`.`product_id` = ?",(int)$productId);
+            ->select()
+            ->from(
+               $this->getMainTable(),
+               array('id','component_mode')
+            )
+            ->where("`product_id` IS NOT NULL AND `product_id` = ?",(int)$productId);
+
+        if (!empty($filters)) {
+            foreach ($filters as $column => $value) {
+                $select->where('`'.$column.'` = ?', $value);
+            }
+        }
 
         $result = array();
-        $accountMarketplaceStoreIdCache = array();
 
         foreach ($select->query()->fetchAll() as $item) {
 
-            $accountMarketplaceCacheKeyTemp = $item['account_id'].'_'.$item['marketplace_id'];
-
-            if (isset($accountMarketplaceStoreIdCache[$accountMarketplaceCacheKeyTemp])) {
-                $storeId = $accountMarketplaceStoreIdCache[$accountMarketplaceCacheKeyTemp];
-            } else {
-                $accountObj = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                    $item['component_mode'],'Account',$item['account_id']
-                );
-                $storeId = $accountObj->getChildObject()->getRelatedStoreId($item['marketplace_id']);
-                $accountMarketplaceStoreIdCache[$accountMarketplaceCacheKeyTemp] = $storeId;
-            }
-
-            $item['id'] = (int)$item['id'];
-            $item['store_id'] = (int)$storeId;
-            unset($item['account_id'],$item['marketplace_id']);
-
-            $result[] = $item;
+            $result[] = Mage::helper('M2ePro/Component')->getComponentObject(
+                $item['component_mode'], 'Listing_Other', (int)$item['id']
+            );
         }
+
+        Mage::helper('M2ePro/Data_Cache_Session')->setValue($cacheKey, $result);
 
         return $result;
     }

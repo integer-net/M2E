@@ -22,19 +22,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Grid extends Mag
         $this->setSaveParametersInSession(true);
         $this->setUseAjax(true);
         //------------------------------
-
-        $this->attributeSets = Mage::getResourceModel('eav/entity_attribute_set_collection')
-            ->setEntityTypeFilter(Mage::getModel('catalog/product')->getResource()->getTypeId())
-            ->load()->toOptionHash();
-
-        //------------------------------
-        $listingProductIds = Mage::helper('M2ePro/Data_Session')->getValue('buy_listing_product_ids');
-        $listingProductId = reset($listingProductIds);
-
-        $this->listingAttributes = Mage::helper('M2ePro/Component_Buy')
-            ->getObject('Listing_Product',$listingProductId)
-            ->getListing()
-            ->getAttributeSetsIds();
     }
 
     protected function _prepareCollection()
@@ -86,15 +73,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Grid extends Mag
             'frame_callback' => array($this, 'callbackColumnCategoryPath')
         ));
 
-        $this->addColumn('attribute_sets', array(
-            'header' => Mage::helper('M2ePro')->__('Attribute Sets'),
-            'align'  => 'left',
-            'width'  => '200px',
-            'filter'    => false,
-            'sortable'  => false,
-            'frame_callback' => array($this, 'callbackColumnAttributeSets')
-        ));
-
         $back = Mage::helper('M2ePro')->makeBackUrlParam('*/adminhtml_common_buy_template_newProduct');
 
         $this->addColumn('assignment', array(
@@ -118,12 +96,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Grid extends Mag
             'getter'    => 'getId',
             'actions'   => array(
                 array(
-                    'caption'   => Mage::helper('M2ePro')->__('Edit Template'),
+                    'caption'   => Mage::helper('M2ePro')->__('Edit'),
                     'url'       => array('base'=> '*/adminhtml_common_buy_template_newProduct/edit/back/'.$back),
                     'field'     => 'id'
                 ),
                 array(
-                    'caption'   => Mage::helper('M2ePro')->__('Delete Template'),
+                    'caption'   => Mage::helper('M2ePro')->__('Delete Policy'),
                     'url'       => array('base'=> '*/adminhtml_common_buy_template_newProduct/delete/back/'
                                          .$this->getRequest()->getParam('back')),
                     'field'     => 'ids',
@@ -177,28 +155,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Grid extends Mag
         return '&nbsp;'.$value;
     }
 
-    public function callbackColumnAttributeSets($value, $row, $column, $isExport)
-    {
-        $attributeSets = Mage::getModel('M2ePro/AttributeSet')->getCollection()
-            ->addFieldToFilter('object_type',Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_BUY_TEMPLATE_NEW_PRODUCT)
-            ->addFieldToFilter('object_id',(int)$row->getId())
-            ->toArray();
-
-        $value = '';
-        foreach ($attributeSets['items'] as $attributeSet) {
-            if (strlen($value) > 100) {
-                $value .= ', <strong>...</strong>';
-                break;
-            }
-            if (isset($this->attributeSets[$attributeSet['attribute_set_id']])) {
-                $value != '' && $value .= ', ';
-                $value .= $this->attributeSets[$attributeSet['attribute_set_id']];
-            }
-        }
-
-        return $value;
-    }
-
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
         $url = $this->getUrl(
@@ -207,27 +163,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Grid extends Mag
                 'id' => $row->getId(),
             )
         );
-        $newSkuTemplateAttributes = $row->getAttributeSetsIds();
 
-        $listingAttributesAreIncludedInNewSkuTemplate = true;
-        foreach ($this->listingAttributes as $listingAttribute) {
-            if (array_search($listingAttribute,$newSkuTemplateAttributes) === false) {
-                $listingAttributesAreIncludedInNewSkuTemplate = false;
-                continue;
-            }
-        }
-
-        if ($listingAttributesAreIncludedInNewSkuTemplate) {
-            $confirmMessage = Mage::helper('M2ePro')->__('Are you sure?');
-            $actions = '&nbsp;<a href="javascript:;" onclick="confirm(\''.$confirmMessage.'\') && ';
-            $actions .= 'setLocation(\''.$url.'\');">';
-            $actions .= Mage::helper('M2ePro')->__('Assign To This Template');
-            $actions .= '</a>';
-        } else {
-            $actions = '<span style="color: #808080;">';
-            $actions .= '&nbsp;'.Mage::helper('M2ePro')->__('Attribute Sets Mismatch');
-            $actions .= '</span>';
-        }
+        $confirmMessage = Mage::helper('M2ePro')->__('Are you sure?');
+        $actions = '&nbsp;<a href="javascript:;" onclick="confirm(\''.$confirmMessage.'\') && ';
+        $actions .= 'setLocation(\''.$url.'\');">';
+        $actions .= Mage::helper('M2ePro')->__('Assign To This Policy');
+        $actions .= '</a>';
 
         return $actions;
     }

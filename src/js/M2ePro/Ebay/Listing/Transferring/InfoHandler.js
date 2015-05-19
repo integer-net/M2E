@@ -46,4 +46,6 @@ EbayListingTransferringInfoHandler = Class.create(EbayListingViewGridHandler, {
             $('modal_dialog_message').innerHTML.evalScripts();
         } catch (ignored) {}
     }
+
+    //----------------------------------
 });

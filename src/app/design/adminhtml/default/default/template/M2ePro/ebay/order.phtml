@@ -85,7 +85,7 @@
                                         echo Mage::helper('M2ePro')->__('Incomplete');
                                     } ?>
 
-                                    <br />
+                                    <br/>
 
                                     <b><?php echo Mage::helper('M2ePro')->__('Payment'); ?>: </b>
 
@@ -100,7 +100,7 @@
                                         <?php echo Mage::helper('M2ePro')->__('Waiting'); ?>
                                     <?php } ?>
 
-                                    <br />
+                                    <br/>
 
                                     <b><?php echo Mage::helper('M2ePro')->__('Shipping'); ?>: </b>
 
@@ -205,9 +205,9 @@
                                 <strong>
                                     <?php if ($this->order->getChildObject()->getBuyerEmail() != '') { ?>
                                         <?php if (stripos($this->order->getChildObject()->getBuyerEmail(), 'Invalid Request') !== false) { ?>
-                                            &lt;<?php echo Mage::helper('M2ePro')->__('Private Restriction'); ?>&gt;<br />
+                                            &lt;<?php echo Mage::helper('M2ePro')->__('Private Restriction'); ?>&gt;<br/>
                                         <?php } else { ?>
-                                            &lt;<?php echo Mage::helper('M2ePro')->escapeHtml($this->order->getChildObject()->getBuyerEmail()); ?>&gt;<br />
+                                            &lt;<?php echo Mage::helper('M2ePro')->escapeHtml($this->order->getChildObject()->getBuyerEmail()); ?>&gt;<br/>
                                         <?php } ?>
                                     <?php } ?>
                                 </strong>
@@ -224,19 +224,19 @@
                                     <?php if (!empty($this->shippingAddress)): ?>
 
                                         <?php if (!empty($this->shippingAddress['street'][0])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][0]); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][0]); ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['street'][1])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][1]); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['street'][1]); ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['city'])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml(implode(', ', array($this->shippingAddress['city'], $this->shippingAddress['state'], $this->shippingAddress['postal_code']))) ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml(implode(', ', array($this->shippingAddress['city'], $this->shippingAddress['state'], $this->shippingAddress['postal_code']))) ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['country_name'])): ?>
-                                            <br />
+                                            <br/>
                                             <?php
                                                 if (!empty($this->shippingAddress['country_name'])) {
                                                     echo Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['country_name']);
@@ -247,7 +247,7 @@
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->shippingAddress['phone']) && stripos($this->shippingAddress['phone'], 'Invalid Request') === false): ?>
-                                            <br /><?php echo 'T: ' . Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['phone']); ?>
+                                            <br/><?php echo 'T: ' . Mage::helper('M2ePro')->escapeHtml($this->shippingAddress['phone']); ?>
                                         <?php endif; ?>
 
                                     <?php endif; ?>
@@ -290,9 +290,9 @@
 
                                 <?php
                                     if (!$this->isCurrencyAllowed()) {
-                                        echo '<br /><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('Order currency is not enabled in Magento.<br />Please, enable it in System -> Configuration -> Currency Setup.');
+                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('Order Currency is not enabled in Magento.<br/>Please, enable it in System > Configuration > Currency Setup.');
                                     } elseif (!$this->hasCurrencyConversionRate()) {
-                                        echo '<br /><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('There\'s no rate for Order currency in Magento.<br />Please, add currency convert rate in System -> Manage Currency -> Rates.');
+                                        echo '<br/><b>' . Mage::helper('M2ePro')->__('Attention!') . '</b> ' . Mage::helper('M2ePro')->__('There\'s no rate for Order Currency in Magento.<br/>Please, add Currency convert rate in System > Manage Currency > Rates.');
                                     }
                                 ?>
                             </td>
@@ -326,7 +326,7 @@
                 </table>
 
                 <?php if ($this->order->getChildObject()->hasExternalTransactions()) { ?>
-                    <br />
+                    <br/>
                     <table cellspacing="0" class="form-list">
                         <tbody>
                             <tr>
@@ -429,7 +429,7 @@
                         <?php if ($this->order->getChildObject()->isUseGlobalShippingProgram()): ?>
                             <tr>
                                 <td colspan="2">
-                                    <br />
+                                    <br/>
                                     <h4><?php echo Mage::helper('M2ePro')->__('Global Shipping Details'); ?></h4>
                                 </td>
                             </tr>
@@ -455,15 +455,15 @@
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->ebayWarehouseAddress['street'][1])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['street'][1]); ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['street'][1]); ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->ebayWarehouseAddress['city'])): ?>
-                                            <br /><?php echo Mage::helper('M2ePro')->escapeHtml(implode(', ', array($this->ebayWarehouseAddress['city'], $this->ebayWarehouseAddress['state'], $this->ebayWarehouseAddress['postal_code']))) ?>
+                                            <br/><?php echo Mage::helper('M2ePro')->escapeHtml(implode(', ', array($this->ebayWarehouseAddress['city'], $this->ebayWarehouseAddress['state'], $this->ebayWarehouseAddress['postal_code']))) ?>
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->ebayWarehouseAddress['country_name'])): ?>
-                                            <br />
+                                            <br/>
                                             <?php
                                             if (!empty($this->ebayWarehouseAddress['country_name'])) {
                                                 echo Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['country_name']);
@@ -474,7 +474,7 @@
                                         <?php endif; ?>
 
                                         <?php if (!empty($this->ebayWarehouseAddress['phone']) && stripos($this->ebayWarehouseAddress['phone'], 'Invalid Request') === false): ?>
-                                            <br /><?php echo 'T: ' . Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['phone']); ?>
+                                            <br/><?php echo 'T: ' . Mage::helper('M2ePro')->escapeHtml($this->ebayWarehouseAddress['phone']); ?>
                                         <?php endif; ?>
 
                                     </strong>

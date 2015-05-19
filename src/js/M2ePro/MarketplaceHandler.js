@@ -77,7 +77,7 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
             this.changeStatus($('status_' + changedStatuses[i].marketplace_id));
         }
 
-        MagentoMessageObj.addSuccess(M2ePro.translator.translate('Marketplaces settings have been saved.'));
+        MagentoMessageObj.addSuccess(M2ePro.translator.translate('Settings have been saved.'));
     },
 
     updateAction: function()
@@ -95,7 +95,7 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
 
             self.saveSettings();
 
-            var intervalId = setInterval(function(){
+            var intervalId = setInterval(function() {
                 if (typeof self.marketplacesUpdateFinished != 'undefined' && self.marketplacesUpdateFinished) {
                     clearInterval(intervalId);
                     window.opener.completeStep = 1;
@@ -104,16 +104,15 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
             }, 1000);
 
         } else {
-            MagentoMessageObj.addError(M2ePro.translator.translate('You must select at least one marketplace you will work with.'));
+            MagentoMessageObj.addError(M2ePro.translator.translate('You must select at least one Site you will work with.'));
         }
     },
 
     //----------------------------------
 
-    saveSettings : function()
+    saveSettings: function()
     {
-        new Ajax.Request( M2ePro.url.get('formSubmit', $('edit_form').serialize(true)) ,
-        {
+        new Ajax.Request(M2ePro.url.get('formSubmit', $('edit_form').serialize(true)), {
             method: 'get',
             asynchronous: true,
             onSuccess: function(transport) {}
@@ -176,14 +175,14 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
         return changedStatuses;
     },
 
-    runAllSynchronization : function(statuses)
+    runAllSynchronization: function(statuses)
     {
         var statusesForSynch = statuses || this.getStoredStatuses();
 
         this.marketplacesForUpdate = new Array();
         this.marketplacesForUpdateCurrentIndex = 0;
 
-        for (var i = 0; i < statusesForSynch.length; i++ ) {
+        for (var i = 0; i < statusesForSynch.length; i++) {
 
             var marketplaceId = statusesForSynch[i].marketplace_id;
             var marketplaceState = statusesForSynch[i].status;
@@ -230,11 +229,11 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
                 tempEndFlag = 1;
             }
 
-            new Ajax.Request( M2ePro.url.get('adminhtml_general/synchGetLastResult') ,
-            {
+            new Ajax.Request(M2ePro.url.get('adminhtml_general/synchGetLastResult'), {
                 method:'get',
                 asynchronous: true,
                 onSuccess: function(transport) {
+
                     if (transport.responseText == self.synchProgressObj.resultTypeError) {
                         self.synchErrors++;
                     } else if (transport.responseText == self.synchProgressObj.resultTypeWarning) {

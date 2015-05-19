@@ -20,11 +20,10 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Search_ByQuery_ItemsResponser
 
     // ########################################
 
-    protected function processResponseData($response)
+    protected function prepareResponseData($response)
     {
         if (!empty($response['unavailable'])) {
-            $this->processParsedResult(false);
-            return;
+            return false;
         }
 
         $result = array();
@@ -40,10 +39,15 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Search_ByQuery_ItemsResponser
             );
 
             if ($product['is_variation_product']) {
-                $product += array(
-                    'parentage' => $item['parentage'],
-                    'variations' => $item['variations']
-                );
+                if(empty($item['bad_parent'])) {
+                    $product += array(
+                        'parentage' => $item['parentage'],
+                        'variations' => $item['variations'],
+                        'bad_parent' => false
+                    );
+                } else {
+                    $product['bad_parent'] = (bool)$item['bad_parent'];
+                }
             }
 
             if (!empty($item['list_price'])) {
@@ -60,12 +64,8 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Search_ByQuery_ItemsResponser
             $result[] = $product;
         }
 
-        $this->processParsedResult($result);
+        return $result;
     }
-
-    // ########################################
-
-    abstract protected function processParsedResult($result);
 
     // ########################################
 }

@@ -38,40 +38,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_SellingFormat_Edit_Form ext
     protected function _beforeToHtml()
     {
         //------------------------------
-        $attributesSets = Mage::helper('M2ePro/Magento_AttributeSet')->getAll();
-        $this->setData('attributes_sets', $attributesSets);
-        //------------------------------
-
-        //------------------------------
-        $this->attribute_set_locked = false;
-        if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data')
-            && Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->getId()
-        ) {
-            $this->attribute_set_locked = Mage::helper('M2ePro/Data_Global')->getValue('temp_data')->isLocked();
-        }
-        //------------------------------
-
-        //------------------------------
-        $data = array(
-            'id'      => 'attribute_sets_select_all_button',
-            'label'   => Mage::helper('M2ePro')->__('Select All'),
-            'onclick' => 'AttributeSetHandlerObj.selectAllAttributeSets();',
-            'class'   => 'attribute_sets_select_all_button'
-        );
-        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
-        $this->setChild('attribute_sets_select_all_button',$buttonBlock);
-        //------------------------------
-
-        //------------------------------
-        $data = array(
-            'id'      => 'attribute_sets_confirm_button',
-            'label'   => Mage::helper('M2ePro')->__('Confirm'),
-            'onclick' => 'BuyTemplateSellingFormatHandlerObj.attribute_sets_confirm();',
-            'class'   => 'attribute_sets_confirm_button',
-            'style'   => 'display: none'
-        );
-        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
-        $this->setChild('attribute_sets_confirm_button',$buttonBlock);
+        $this->attributes = Mage::helper('M2ePro/Magento_Attribute')->getGeneralFromAllAttributeSets();
         //------------------------------
 
         //------------------------------

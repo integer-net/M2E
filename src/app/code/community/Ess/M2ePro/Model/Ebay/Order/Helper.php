@@ -11,6 +11,7 @@ class Ess_M2ePro_Model_Ebay_Order_Helper
     const EBAY_ORDER_STATUS_ACTIVE    = 'Active';
     const EBAY_ORDER_STATUS_COMPLETED = 'Completed';
     const EBAY_ORDER_STATUS_CANCELLED = 'Cancelled';
+    const EBAY_ORDER_STATUS_INACTIVE  = 'Inactive';
 
     const EBAY_CHECKOUT_STATUS_COMPLETE = 'Complete';
 
@@ -34,6 +35,10 @@ class Ess_M2ePro_Model_Ebay_Order_Helper
 
             case self::EBAY_ORDER_STATUS_CANCELLED:
                 $orderStatus = Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_CANCELLED;
+                break;
+
+            case self::EBAY_ORDER_STATUS_INACTIVE:
+                $orderStatus = Ess_M2ePro_Model_Ebay_Order::ORDER_STATUS_INACTIVE;
                 break;
         }
 

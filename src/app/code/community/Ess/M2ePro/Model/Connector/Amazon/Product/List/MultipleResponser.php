@@ -4,84 +4,146 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * @method Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Response getResponseObject($listingProduct)
+ */
+
 class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleResponser
     extends Ess_M2ePro_Model_Connector_Amazon_Product_Responser
 {
     // ########################################
 
-    protected function processSucceededListingsProducts(array $listingsProducts = array())
+    protected function getSuccessfulMessage(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        foreach ($listingsProducts as $listingProduct) {
-
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
-
-            Mage::getModel('M2ePro/Connector_Amazon_Product_Helper')
-                        ->updateAfterListAction($listingProduct,
-                                                $this->getListingProductRequestNativeData($listingProduct),
-                                                $this->params);
-
-            // M2ePro_TRANSLATIONS
-            // Item was successfully listed
-            $this->addListingsProductsLogsMessage($listingProduct, 'Item was successfully listed',
-                                                  Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
-                                                  Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
-        }
+        // M2ePro_TRANSLATIONS
+        // Item was successfully Listed
+        return 'Item was successfully Listed';
     }
 
     // ########################################
 
-    protected function unsetLocks($fail = false, $message = NULL)
+    public function eventAfterProcessing()
     {
-        try {
+        parent::eventAfterProcessing();
+        $this->removeSKUsFromQueue();
+    }
 
-            $this->removeFromQueueOfSKus();
-            parent::unsetLocks($fail,$message);
+    protected function inspectProducts()
+    {
+        parent::inspectProducts();
 
-        } catch (Exception $e) {
+        $childListingProducts = array();
 
-            $exception = new Exception('Failed to clear amazon SKU queue. '.$e->getMessage());
-            Mage::helper('M2ePro/Module_Exception')->process($exception);
+        foreach ($this->successfulListingProducts as $listingProduct) {
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
+            $variationManager = $listingProduct->getChildObject()->getVariationManager();
 
-            throw $e;
+            if (!$variationManager->isRelationParentType()) {
+                continue;
+            }
+
+            $childListingProducts = array_merge(
+                $childListingProducts,
+                $variationManager->getTypeModel()->getChildListingsProducts()
+            );
         }
+
+        if (empty($childListingProducts)) {
+            return;
+        }
+
+        $runner = Mage::getModel('M2ePro/Synchronization_Templates_Runner');
+        $runner->setConnectorModel('Connector_Amazon_Product_Dispatcher');
+        $runner->setMaxProductsPerStep(100);
+
+        $inspector = Mage::getModel('M2ePro/Amazon_Synchronization_Templates_Inspector');
+
+        foreach ($childListingProducts as $listingProduct) {
+            if (!$inspector->isMeetListRequirements($listingProduct)) {
+                continue;
+            }
+
+            $actionParams = array('all_data'=>true);
+
+            $runner->addProduct(
+                $listingProduct,
+                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
+                $actionParams
+            );
+        }
+
+        $runner->execute();
     }
 
     // ########################################
 
-    private function removeFromQueueOfSKus()
+    protected function processSuccess(Ess_M2ePro_Model_Listing_Product $listingProduct, array $params = array())
     {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        if ($amazonListingProduct->getVariationManager()->isRelationMode() &&
+            !$this->getRequestDataObject($listingProduct)->hasProductId() &&
+            empty($params['general_id'])
+        ) {
+            $this->getLogger()->logListingProductMessage(
+                $listingProduct,
+                'Unexpected error. The ASIN/ISBN for Parent or Child Product was not returned from Amazon.
+                 Operation cannot be finished correctly.',
+                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
+
+            return;
+        }
+
+        parent::processSuccess($listingProduct, $params);
+    }
+
+    protected function getSuccessfulParams(Ess_M2ePro_Model_Listing_Product $listingProduct, $response)
+    {
+        if (!is_array($response['asins']) || empty($response['asins'])) {
+            return array();
+        }
+
+        foreach ($response['asins'] as $key => $asin) {
+            if ((int)$key != (int)$listingProduct->getId()) {
+                continue;
+            }
+
+            return array('general_id' => $asin);
+        }
+
+        return array();
+    }
+
+    // ########################################
+
+    private function removeSKUsFromQueue()
+    {
+        /** @var Ess_M2ePro_Model_LockItem $lockItem */
+        $lockItem = Mage::getModel('M2ePro/LockItem');
+        $lockItem->setNick('amazon_list_skus_queue_' . $this->getAccount()->getId());
+
+        if (!$lockItem->isExist()) {
+            return;
+        }
+
         $skusToRemove = array();
 
         /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($this->listingsProducts as $listingProduct) {
-            $requestData = $this->getListingProductRequestNativeData($listingProduct);
-            $skusToRemove[$requestData['sku']] = true;
+            $skusToRemove[] = (string)$this->getRequestDataObject($listingProduct)->getSku();
         }
 
-        $lockItem = Mage::getModel('M2ePro/LockItem')->load(
-            'amazon_list_skus_queue_' . $this->getAccount()->getId(),
-            'nick'
-        );
+        $resultSkus = array_diff($lockItem->getContentData(), $skusToRemove);
 
-        if (!$lockItem->getId()) {
+        if (empty($resultSkus)) {
+            $lockItem->remove();
             return;
         }
 
-        $skus = json_decode($lockItem->getData('data'),true);
-
-        foreach ($skus as $key => $sku) {
-            if (isset($skusToRemove[$sku])) {
-                unset($skus[$key]);
-                continue;
-            }
-        }
-
-        if (count($skus) == 0) {
-            $lockItem->delete();
-            return;
-        }
-
-        $lockItem->setData('data',json_encode(array_unique($skus)))->save();
+        $lockItem->setContentData($resultSkus);
     }
 
     // ########################################

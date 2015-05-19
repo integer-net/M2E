@@ -22,7 +22,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search extends Mage_Adminht
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentName = Mage::helper('M2ePro/Component_Play')->getTitle();
             $headerText = Mage::helper('M2ePro')->__("Search %component_name% Listings Items", $componentName);
         } else {
              $headerText = Mage::helper('M2ePro')->__("Search Listings Items");
@@ -71,7 +71,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search extends Mage_Adminht
 
         //------------------------------
         $this->_addButton('goto_templates', array(
-            'label'     => Mage::helper('M2ePro')->__('Templates'),
+            'label'     => Mage::helper('M2ePro')->__('Policies'),
             'onclick'   => '',
             'class'     => 'button_link drop_down templates-drop-down'
         ));
@@ -81,21 +81,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search extends Mage_Adminht
         $url = $this->getUrl(
             '*/adminhtml_common_log/listing',
             array(
-                'filter' => base64_encode('component_mode=' . Ess_M2ePro_Helper_Component_Play::NICK)
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_PLAY
             )
         );
         $this->_addButton('view_log', array(
             'label'     => Mage::helper('M2ePro')->__('View Log'),
             'onclick'   => 'window.open(\'' . $url . '\')',
             'class'     => 'button_link'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
     }
@@ -137,7 +129,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search extends Mage_Adminht
         $url = $this->getUrl('*/adminhtml_common_template_sellingFormat/index', array('filter' => $filter));
         $items[] = array(
             'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Selling Format Templates'),
+            'label' => Mage::helper('M2ePro')->__('Selling Format Policies'),
             'target' => '_blank'
         );
         //------------------------------
@@ -146,7 +138,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Search extends Mage_Adminht
         $url = $this->getUrl('*/adminhtml_common_template_synchronization/index', array('filter' => $filter));
         $items[] = array(
             'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Synchronization Templates'),
+            'label' => Mage::helper('M2ePro')->__('Synchronization Policies'),
             'target' => '_blank'
         );
         //------------------------------

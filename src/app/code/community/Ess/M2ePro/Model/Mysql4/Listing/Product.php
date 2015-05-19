@@ -28,39 +28,37 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
         return $select->query()->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    public function getItemsByProductId($productId)
+    public function getItemsByProductId($productId, array $filters = array())
     {
-        $listingTable   = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $variationTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation')->getMainTable();
-        $optionTable    = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')->getMainTable();
+        $cacheKey   = __METHOD__.$productId.sha1(json_encode($filters));
+        $cacheValue = Mage::helper('M2ePro/Data_Cache_Session')->getValue($cacheKey);
+
+        if (!is_null($cacheValue)) {
+            return $cacheValue;
+        }
 
         $simpleProductsSelect = $this->_getReadAdapter()
             ->select()
             ->from(
-                array('l' => $listingTable),
-                       array('lp.id',
-                             'l.store_id',
-                             'lp.component_mode')
+                $this->getMainTable(),
+                array('id','component_mode')
             )
-            ->join(
-                array('lp' => $this->getMainTable()),
-                '`l`.`id` = `lp`.`listing_id`',
-                array()
-            )
-            ->where("`lp`.`product_id` = ?",(int)$productId);
+            ->where("`product_id` = ?",(int)$productId);
+
+        if (!empty($filters)) {
+            foreach ($filters as $column => $value) {
+                $simpleProductsSelect->where('`'.$column.'` = ?', $value);
+            }
+        }
+
+        $variationTable = Mage::getResourceModel('M2ePro/Listing_Product_Variation')->getMainTable();
+        $optionTable    = Mage::getResourceModel('M2ePro/Listing_Product_Variation_Option')->getMainTable();
 
         $variationsProductsSelect = $this->_getReadAdapter()
             ->select()
             ->from(
-                array('l' => $listingTable),
-                array('lp.id',
-                      'l.store_id',
-                      'lp.component_mode')
-            )
-            ->join(
                 array('lp' => $this->getMainTable()),
-                '`l`.`id` = `lp`.`listing_id`',
-                array()
+                array('id','component_mode')
             )
             ->join(
                 array('lpv' => $variationTable),
@@ -74,6 +72,12 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
             )
             ->where("`lpvo`.`product_id` = ?",(int)$productId);
 
+        if (!empty($filters)) {
+            foreach ($filters as $column => $value) {
+                $variationsProductsSelect->where('`lp`.`'.$column.'` = ?', $value);
+            }
+        }
+
         $unionSelect = $this->_getReadAdapter()->select()->union(array(
             $simpleProductsSelect,
             $variationsProductsSelect
@@ -83,14 +87,12 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
 
         foreach ($unionSelect->query()->fetchAll() as $item) {
 
-            $item['id'] = (int)$item['id'];
-            $item['store_id'] = (int)$item['store_id'];
-            $item['object'] = Mage::helper('M2ePro/Component')->getComponentObject(
-                $item['component_mode'], 'Listing_Product', $item['id']
+            $result[] = Mage::helper('M2ePro/Component')->getComponentObject(
+                $item['component_mode'], 'Listing_Product', (int)$item['id']
             );
-
-            $result[] = $item;
         }
+
+        Mage::helper('M2ePro/Data_Cache_Session')->setValue($cacheKey, $result);
 
         return $result;
     }
@@ -99,18 +101,15 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
 
     public function getChangedItems(array $attributes,
                                     $componentMode = NULL,
-                                    $withStoreFilter = false,
-                                    $dbSelectModifier = NULL)
+                                    $withStoreFilter = false)
     {
         $resultsByListingProduct = $this->getChangedItemsByListingProduct($attributes,
                                                                           $componentMode,
-                                                                          $withStoreFilter,
-                                                                          $dbSelectModifier);
+                                                                          $withStoreFilter);
 
         $resultsByVariationOption = $this->getChangedItemsByVariationOption($attributes,
                                                                             $componentMode,
-                                                                            $withStoreFilter,
-                                                                            $dbSelectModifier);
+                                                                            $withStoreFilter);
 
         $results = array();
 
@@ -135,8 +134,7 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
 
     public function getChangedItemsByListingProduct(array $attributes,
                                                     $componentMode = NULL,
-                                                    $withStoreFilter = false,
-                                                    $dbSelectModifier = NULL)
+                                                    $withStoreFilter = false)
     {
         if (count($attributes) <= 0) {
             return array();
@@ -162,6 +160,7 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
                           array(
                               'changed_attribute'=>'attribute',
                               'changed_to_value'=>'value_new',
+                              'change_initiators'=>'initiators',
                           )
                        )
                        ->join(
@@ -178,7 +177,6 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
         }
 
         !is_null($componentMode) && $select->where("`lp`.`component_mode` = ?",(string)$componentMode);
-        is_callable($dbSelectModifier) && call_user_func($dbSelectModifier,$select);
 
         $results = array();
 
@@ -194,8 +192,7 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
 
     public function getChangedItemsByVariationOption(array $attributes,
                                                      $componentMode = NULL,
-                                                     $withStoreFilter = false,
-                                                     $dbSelectModifier = NULL)
+                                                     $withStoreFilter = false)
     {
         if (count($attributes) <= 0) {
             return array();
@@ -223,6 +220,7 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
                             array(
                                 'changed_attribute'=>'attribute',
                                 'changed_to_value'=>'value_new',
+                                'change_initiators'=>'initiators',
                             )
                      )
                      ->join(
@@ -249,7 +247,6 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product
         }
 
         !is_null($componentMode) && $select->where("`lpvo`.`component_mode` = ?",(string)$componentMode);
-        is_callable($dbSelectModifier) && call_user_func($dbSelectModifier,$select);
 
         $results = array();
 

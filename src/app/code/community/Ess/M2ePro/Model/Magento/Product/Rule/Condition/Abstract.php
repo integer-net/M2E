@@ -316,7 +316,7 @@ abstract class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
     public function getNewChildSelectOptions()
     {
         return array(
-            array('value'=>'', 'label'=>Mage::helper('rule')->__('Please choose a condition to add...')),
+            array('value'=>'', 'label'=>Mage::helper('rule')->__('Please choose a Condition to add...')),
         );
     }
 
@@ -459,7 +459,7 @@ abstract class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
 
     public function getAddLinkHtml()
     {
-        $src = Mage::getDesign()->getSkinUrl('images/rule_component_add.gif');
+        $src = Mage::getDesign()->getSkinUrl('M2ePro/images/rule_component_add.gif');
         $html = '<img src="' . $src . '" class="rule-param-add v-middle" alt=""
                                          title="' . Mage::helper('rule')->__('Add') . '"/>';
         return $html;
@@ -467,7 +467,7 @@ abstract class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
 
     public function getRemoveLinkHtml()
     {
-        $src = Mage::getDesign()->getSkinUrl('images/rule_component_remove.gif');
+        $src = Mage::getDesign()->getSkinUrl('M2ePro/images/rule_component_remove.gif');
         $html = ' <span class="rule-param">
                      <a href="javascript:void(0)" class="rule-param-remove"
                                                   title="' . Mage::helper('rule')->__('Remove') . '">

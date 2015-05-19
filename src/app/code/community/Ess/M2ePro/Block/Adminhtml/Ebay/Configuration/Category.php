@@ -36,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category extends Mage_Adminh
 
         // Set template
         //------------------------------
-        $this->setTemplate('M2ePro/log/grid/container.phtml');
+        $this->setTemplate('M2ePro/widget/grid/container/only_content.phtml');
         //------------------------------
     }
 

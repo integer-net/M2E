@@ -11,8 +11,10 @@ class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update_Responser
 
     // ########################################
 
-    protected function unsetLocks($fail = false, $message = NULL)
+    public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
+        parent::unsetProcessingLocks($processingRequest);
+
         /** @var $lockItem Ess_M2ePro_Model_LockItem */
         $lockItem = Mage::getModel('M2ePro/LockItem');
 
@@ -24,33 +26,30 @@ class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update_Responser
 
         $lockItem->remove();
 
-        $this->getAccount()->deleteObjectLocks(NULL,$this->hash);
-        $this->getAccount()->deleteObjectLocks('synchronization',$this->hash);
-        $this->getAccount()->deleteObjectLocks('synchronization_ebay',$this->hash);
+        $this->getAccount()->deleteObjectLocks(NULL, $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks('synchronization', $processingRequest->getHash());
+        $this->getAccount()->deleteObjectLocks('synchronization_ebay', $processingRequest->getHash());
         $this->getAccount()->deleteObjectLocks(
             Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update::LOCK_ITEM_PREFIX,
-            $this->hash
+            $processingRequest->getHash()
         );
+    }
 
-        $this->getMarketplace()->deleteObjectLocks(NULL,$this->hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization',$this->hash);
-        $this->getMarketplace()->deleteObjectLocks('synchronization_ebay',$this->hash);
-        $this->getMarketplace()->deleteObjectLocks(
-            Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update::LOCK_ITEM_PREFIX,
-            $this->hash
+    public function eventFailedExecuting($message)
+    {
+        parent::eventFailedExecuting($message);
+
+        $this->getSynchronizationLog()->addMessage(
+            Mage::helper('M2ePro')->__($message),
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+            Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
         );
-
-        $fail && $this->getSynchronizationLog()->addMessage(Mage::helper('M2ePro')->__($message),
-                                                            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
-                                                            Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH);
     }
 
     // ########################################
 
     protected function processResponseData($response)
     {
-        $response = parent::processResponseData($response);
-
         try {
 
             /** @var $updatingModel Ess_M2ePro_Model_Ebay_Listing_Other_Updating */

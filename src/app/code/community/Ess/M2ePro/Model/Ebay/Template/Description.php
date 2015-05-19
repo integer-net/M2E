@@ -5,9 +5,10 @@
  */
 
 /**
+ * @method Ess_M2ePro_Model_Template_Description getParentObject()
  * @method Ess_M2ePro_Model_Mysql4_Ebay_Template_Description getResource()
  */
-class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Component_Abstract
+class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
     const TITLE_MODE_PRODUCT = 0;
     const TITLE_MODE_CUSTOM  = 1;
@@ -87,9 +88,9 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
     // ########################################
 
     /**
-     * @var Ess_M2ePro_Model_Magento_Product
+     * @var Ess_M2ePro_Model_Ebay_Template_Description_Source
      */
-    private $magentoProductModel = NULL;
+    private $descriptionSourceModel = NULL;
 
     // ########################################
 
@@ -141,50 +142,34 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         // ----------------------------------
 
         $temp = parent::deleteInstance();
-        $temp && $this->magentoProductModel = NULL;
+        $temp && $this->descriptionSourceModel = NULL;
         return $temp;
     }
 
     // ########################################
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Ebay_Template_Description_Source
      */
-    public function getMagentoProduct()
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
-        return $this->magentoProductModel;
-    }
+        if (!empty($this->descriptionSourceModel)) {
+            return $this->descriptionSourceModel;
+        }
 
-    /**
-     * @param Ess_M2ePro_Model_Magento_Product $instance
-     */
-    public function setMagentoProduct(Ess_M2ePro_Model_Magento_Product $instance)
-    {
-        $this->magentoProductModel = $instance;
+        $this->descriptionSourceModel = Mage::getModel('M2ePro/Ebay_Template_Description_Source');
+        $this->descriptionSourceModel->setMagentoProduct($magentoProduct);
+        $this->descriptionSourceModel->setDescriptionTemplate($this->getParentObject());
+
+        return $this->descriptionSourceModel;
     }
 
     // ########################################
 
-    public function getTitle()
-    {
-        return $this->getData('title');
-    }
-
     public function isCustomTemplate()
     {
         return (bool)$this->getData('is_custom_template');
-    }
-
-    //--------------------------------------
-
-    public function getCreateDate()
-    {
-        return $this->getData('create_date');
-    }
-
-    public function getUpdateDate()
-    {
-        return $this->getData('update_date');
     }
 
     // #######################################
@@ -364,25 +349,44 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     // #######################################
 
+    public function getProductDetails()
+    {
+        return $this->getSettings('product_details');
+    }
+
+    public function isProductDetailsIncludeDescription()
+    {
+        $productDetails = $this->getProductDetails();
+        return isset($productDetails['include_description']) ? (bool)$productDetails['include_description'] : true;
+    }
+
+    public function isProductDetailsIncludeImage()
+    {
+        $productDetails = $this->getProductDetails();
+        return isset($productDetails['include_image']) ? (bool)$productDetails['include_image'] : true;
+    }
+
+    public function isProductDetailsListIfNoProduct()
+    {
+        $productDetails = $this->getProductDetails();
+        return isset($productDetails['list_if_no_product']) ? (bool)$productDetails['list_if_no_product'] : true;
+    }
+
+    // ---------------------------------------
+
     public function getProductDetailAttribute($type)
     {
         if (!in_array($type, array('isbn', 'epid', 'upc', 'ean', 'gtin', 'brand', 'mpn'))) {
-            throw new InvalidArgumentException('Unknown product details name');
+            throw new InvalidArgumentException('Unknown Product details name');
         }
 
-        if (is_null($this->getData('product_details')) ||
-            $this->getData('product_details') == '' ||
-            $this->getData('product_details') == json_encode(array())) {
+        $productDetails = $this->getProductDetails();
+
+        if (!is_array($productDetails) || !isset($productDetails[$type])) {
             return NULL;
         }
 
-        $tempProductsDetails = $this->getProductDetails();
-
-        if (!isset($tempProductsDetails[$type])) {
-            return NULL;
-        }
-
-        return $tempProductsDetails[$type];
+        return $productDetails[$type];
     }
 
     public function getProductDetailAttributes()
@@ -702,408 +706,6 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     // #######################################
 
-    public function addWatermarkIfNeed($imageLink)
-    {
-        if (!$this->isWatermarkEnabled()) {
-            return $imageLink;
-        }
-
-        $imagePath = $this->imageLinkToPath($imageLink);
-        if (!is_file($imagePath)) {
-            return $imageLink;
-        }
-
-        $fileExtension = pathinfo($imagePath, PATHINFO_EXTENSION);
-        $pathWithoutExtension = preg_replace('/\.'.$fileExtension.'$/', '', $imagePath);
-
-        $markingImagePath = $pathWithoutExtension.'-'.$this->getWatermarkHash().'.'.$fileExtension;
-        if (is_file($markingImagePath)) {
-            $currentTime = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-            if (filemtime($markingImagePath) + self::WATERMARK_CACHE_TIME > $currentTime) {
-                return $this->pathToImageLink($markingImagePath);
-            }
-
-            @unlink($markingImagePath);
-        }
-
-        $prevMarkingImagePath = $pathWithoutExtension.'-'.$this->getWatermarkPreviousHash().'.'.$fileExtension;
-        if (is_file($prevMarkingImagePath)) {
-            @unlink($prevMarkingImagePath);
-        }
-
-        $varDir = new Ess_M2ePro_Model_VariablesDir(array(
-            'child_folder' => 'ebay/template/description/watermarks'
-        ));
-        $watermarkPath = $varDir->getPath().$this->getId().'.png';
-        if (!is_file($watermarkPath)) {
-            $varDir->create();
-            @file_put_contents($watermarkPath, $this->getWatermarkImage());
-        }
-
-        $watermarkPositions = array(
-            self::WATERMARK_POSITION_TOP => Varien_Image_Adapter_Abstract::POSITION_TOP_RIGHT,
-            self::WATERMARK_POSITION_MIDDLE => Varien_Image_Adapter_Abstract::POSITION_CENTER,
-            self::WATERMARK_POSITION_BOTTOM => Varien_Image_Adapter_Abstract::POSITION_BOTTOM_RIGHT
-        );
-
-        $image = new Varien_Image($imagePath);
-        $imageOriginalHeight = $image->getOriginalHeight();
-        $imageOriginalWidth = $image->getOriginalWidth();
-        $image->open();
-        $image->setWatermarkPosition($watermarkPositions[$this->getWatermarkPosition()]);
-
-        $watermark = new Varien_Image($watermarkPath);
-        $watermarkOriginalHeight = $watermark->getOriginalHeight();
-        $watermarkOriginalWidth = $watermark->getOriginalWidth();
-
-        if ($this->isWatermarkScaleModeStretch()) {
-            $image->setWatermarkPosition(Varien_Image_Adapter_Abstract::POSITION_STRETCH);
-        }
-
-        if ($this->isWatermarkScaleModeInWidth()) {
-            $watermarkWidth = $imageOriginalWidth;
-            $heightPercent = $watermarkOriginalWidth / $watermarkWidth;
-            $watermarkHeight = (int)($watermarkOriginalHeight / $heightPercent);
-
-            $image->setWatermarkWidth($watermarkWidth);
-            $image->setWatermarkHeigth($watermarkHeight);
-        }
-
-        if ($this->isWatermarkScaleModeNone()) {
-            $image->setWatermarkWidth($watermarkOriginalWidth);
-            $image->setWatermarkHeigth($watermarkOriginalHeight);
-
-            if ($watermarkOriginalHeight > $imageOriginalHeight) {
-                $image->setWatermarkHeigth($imageOriginalHeight);
-                $widthPercent = $watermarkOriginalHeight / $imageOriginalHeight;
-                $watermarkWidth = (int)($watermarkOriginalWidth / $widthPercent);
-                $image->setWatermarkWidth($watermarkWidth);
-            }
-
-            if ($watermarkOriginalWidth > $imageOriginalWidth) {
-                $image->setWatermarkWidth($imageOriginalWidth);
-                $heightPercent = $watermarkOriginalWidth / $imageOriginalWidth;
-                $watermarkHeight = (int)($watermarkOriginalHeight / $heightPercent);
-                $image->setWatermarkHeigth($watermarkHeight);
-            }
-        }
-
-        $opacity = 100;
-        if ($this->isWatermarkTransparentEnabled()) {
-            $opacity = 30;
-        }
-
-        $image->setWatermarkImageOpacity($opacity);
-        $image->watermark($watermarkPath);
-        $image->save($markingImagePath);
-
-        return $this->pathToImageLink($markingImagePath);
-    }
-
-    public function cutLongTitles($str, $length = 80)
-    {
-        $str = trim($str);
-
-        if ($str === '' || strlen($str) <= $length) {
-            return $str;
-        }
-
-        return Mage::helper('core/string')->truncate($str, $length, '');
-    }
-
-    //---------------------------------------
-
-    public function imageLinkToPath($imageLink)
-    {
-        $imageLink = str_replace('%20', ' ', $imageLink);
-
-        $baseMediaUrl = Mage::app()->getStore($this->getMagentoProduct()->getStoreId())
-                                        ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
-                                        'catalog/product';
-        $baseMediaUrl = str_replace('https://', 'http://', $baseMediaUrl);
-
-        $baseMediaPath = Mage::getSingleton('catalog/product_media_config')->getBaseMediaPath();
-
-        $imagePath = str_replace($baseMediaUrl, $baseMediaPath, $imageLink);
-        $imagePath = str_replace('/', DS, $imagePath);
-        $imagePath = str_replace('\\', DS, $imagePath);
-
-        return $imagePath;
-    }
-
-    public function pathToImageLink($path)
-    {
-        $baseMediaUrl = Mage::app()->getStore($this->getMagentoProduct()->getStoreId())
-                                        ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
-                                        'catalog/product';
-        $baseMediaPath = Mage::getSingleton('catalog/product_media_config')->getBaseMediaPath();
-
-        $imageLink = str_replace($baseMediaPath, $baseMediaUrl, $path);
-        $imageLink = str_replace(DS, '/', $imageLink);
-
-        $imageLink = str_replace('https://', 'http://', $imageLink);
-
-        return str_replace(' ', '%20', $imageLink);
-    }
-
-    // #######################################
-
-    public function getTitleResultValue()
-    {
-        $title = '';
-        $src = $this->getTitleSource();
-
-        switch ($src['mode']) {
-            case self::TITLE_MODE_PRODUCT:
-                $title = $this->getMagentoProduct()->getName();
-                break;
-
-            case self::TITLE_MODE_CUSTOM:
-                $title = Mage::helper('M2ePro/Module_Renderer_Description')
-                    ->parseTemplate($src['template'], $this->getMagentoProduct());
-                break;
-
-            default:
-                $title = $this->getMagentoProduct()->getName();
-                break;
-        }
-
-        if ($this->isCutLongTitles()) {
-            $title = $this->cutLongTitles($title);
-        }
-
-        return $title;
-    }
-
-    public function getSubTitleResultValue()
-    {
-        $subTitle = '';
-        $src = $this->getSubTitleSource();
-
-        if ($src['mode'] == self::SUBTITLE_MODE_CUSTOM) {
-            $subTitle = Mage::helper('M2ePro/Module_Renderer_Description')
-                ->parseTemplate($src['template'], $this->getMagentoProduct());
-            if ($this->isCutLongTitles()) {
-                $subTitle = $this->cutLongTitles($subTitle, 55);
-            }
-        }
-
-        return $subTitle;
-    }
-
-    public function getDescriptionResultValue()
-    {
-        $description = '';
-        $src = $this->getDescriptionSource();
-        $templateProcessor = Mage::getModel('Core/Email_Template_Filter');
-
-        switch ($src['mode']) {
-            case self::DESCRIPTION_MODE_PRODUCT:
-                $description = $this->getMagentoProduct()->getProduct()->getDescription();
-                $description = $templateProcessor->filter($description);
-                break;
-
-            case self::DESCRIPTION_MODE_SHORT:
-                $description = $this->getMagentoProduct()->getProduct()->getShortDescription();
-                $description = $templateProcessor->filter($description);
-                break;
-
-            case self::DESCRIPTION_MODE_CUSTOM:
-                $description = Mage::helper('M2ePro/Module_Renderer_Description')
-                    ->parseTemplate($src['template'], $this->getMagentoProduct());
-                $this->addWatermarkForCustomDescription($description);
-                break;
-
-            default:
-                $description = $this->getMagentoProduct()->getProduct()->getDescription();
-                $description = $templateProcessor->filter($description);
-                break;
-        }
-
-        return str_replace(array('<![CDATA[', ']]>'), '', $description);
-    }
-
-    private function addWatermarkForCustomDescription(&$description)
-    {
-        if (strpos($description, 'm2e_watermark') !== false) {
-            preg_match_all('/<(img|a) [^>]*\bm2e_watermark[^>]*>/i', $description, $tagsArr);
-
-            $tags = $tagsArr[0];
-            $tagsNames = $tagsArr[1];
-
-            $count = count($tags);
-            for($i = 0; $i < $count; $i++){
-                $dom = new DOMDocument();
-                $dom->loadHTML($tags[$i]);
-                $tag = $dom->getElementsByTagName($tagsNames[$i])->item(0);
-
-                $newTag = str_replace(' m2e_watermark="1"', '', $tags[$i]);
-                if($tagsNames[$i] === 'a') {
-                    $newTag = str_replace($tag->getAttribute('href'),
-                        $this->addWatermarkIfNeed($tag->getAttribute('href')), $newTag);
-                }
-                if($tagsNames[$i] === 'img') {
-                    $newTag = str_replace($tag->getAttribute('src'),
-                        $this->addWatermarkIfNeed($tag->getAttribute('src')), $newTag);
-                }
-                $description = str_replace($tags[$i], $newTag, $description);
-            }
-        }
-    }
-
-    // #######################################
-
-    public function getCondition()
-    {
-        $src = $this->getConditionSource();
-
-        if ($src['mode'] == self::CONDITION_MODE_NONE) {
-            return 0;
-        }
-
-        if ($src['mode'] == self::CONDITION_MODE_ATTRIBUTE) {
-            return $this->getMagentoProduct()->getAttributeValue($src['attribute']);
-        }
-
-        return $src['value'];
-    }
-
-    public function getConditionNote()
-    {
-        $note = '';
-        $src = $this->getConditionNoteSource();
-
-        if ($src['mode'] == self::CONDITION_NOTE_MODE_CUSTOM) {
-            $note = Mage::helper('M2ePro/Module_Renderer_Description')
-                    ->parseTemplate($src['template'], $this->getMagentoProduct());
-        }
-
-        return $note;
-    }
-
-    // #######################################
-
-    public function getProductDetails()
-    {
-        return $this->getSettings('product_details');
-    }
-
-    public function getProductDetail($type)
-    {
-        $attribute = $this->getProductDetailAttribute($type);
-
-        if (!$attribute) {
-            return NULL;
-        }
-
-        return $this->getMagentoProduct()->getAttributeValue($attribute);
-    }
-
-    public function isProductDetailsIncludeDescription()
-    {
-        $productDetails = $this->getProductDetails();
-        return isset($productDetails['include_description']) ? (bool)$productDetails['include_description'] : true;
-    }
-
-    public function isProductDetailsIncludeImage()
-    {
-        $productDetails = $this->getProductDetails();
-        return isset($productDetails['include_image']) ? (bool)$productDetails['include_image'] : true;
-    }
-
-    public function isProductDetailsListIfNoProduct()
-    {
-        $productDetails = $this->getProductDetails();
-        return isset($productDetails['list_if_no_product']) ? (bool)$productDetails['list_if_no_product'] : true;
-    }
-
-    // #######################################
-
-    public function getMainImageLink()
-    {
-        $imageLink = '';
-
-        if ($this->isImageMainModeProduct()) {
-            $imageLink = $this->getMagentoProduct()->getImageLink('image');
-        }
-
-        if ($this->isImageMainModeAttribute()) {
-            $src = $this->getImageMainSource();
-            $imageLink = $this->getMagentoProduct()->getImageLink($src['attribute']);
-        }
-
-        if (empty($imageLink)) {
-            return $imageLink;
-        }
-
-        return $this->addWatermarkIfNeed($imageLink);
-    }
-
-    public function getImagesForEbay()
-    {
-        if ($this->isImageMainModeNone()) {
-            return array();
-        }
-
-        $mainImage = $this->getMainImageLink();
-
-        if ($mainImage == '') {
-            $defaultImage = $this->getDefaultImageUrl();
-            if (!empty($defaultImage)) {
-                return array($defaultImage);
-            }
-
-            return array();
-        }
-
-        $mainImage = array($mainImage);
-
-        if ($this->isGalleryImagesModeNone()) {
-            return $mainImage;
-        }
-
-        $galleryImages = array();
-        $gallerySource = $this->getGalleryImagesSource();
-        $limitGalleryImages = self::GALLERY_IMAGES_COUNT_MAX;
-
-        if ($this->isGalleryImagesModeProduct()) {
-            $limitGalleryImages = (int)$gallerySource['limit'];
-            $galleryImages = $this->getMagentoProduct()->getGalleryImagesLinks((int)$gallerySource['limit']+1);
-        }
-
-        if ($this->isGalleryImagesModeAttribute()) {
-            $limitGalleryImages = self::GALLERY_IMAGES_COUNT_MAX;
-            $galleryImagesTemp = $this->getMagentoProduct()->getAttributeValue($gallerySource['attribute']);
-            $galleryImagesTemp = (array)explode(',', $galleryImagesTemp);
-            foreach ($galleryImagesTemp as $tempImageLink) {
-                $tempImageLink = trim($tempImageLink);
-                if (!empty($tempImageLink)) {
-                    $galleryImages[] = $tempImageLink;
-                }
-            }
-        }
-
-        $galleryImages = array_unique($galleryImages);
-
-        if (count($galleryImages) <= 0) {
-            return $mainImage;
-        }
-
-        foreach ($galleryImages as &$image) {
-            $image = $this->addWatermarkIfNeed($image);
-        }
-
-        $mainImagePosition = array_search($mainImage[0], $galleryImages);
-        if ($mainImagePosition !== false) {
-            unset($galleryImages[$mainImagePosition]);
-        }
-
-        $galleryImages = array_slice($galleryImages,0,$limitGalleryImages);
-        return array_merge($mainImage, $galleryImages);
-    }
-
-    // #######################################
-
     public function getTrackingAttributes()
     {
         return array_unique(array_merge(
@@ -1257,13 +859,13 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_description');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_description');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_description');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_description');
         return parent::delete();
     }
 

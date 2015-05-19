@@ -62,7 +62,7 @@ final class Ess_M2ePro_Model_Play_Synchronization_Defaults_GettingProductsLinks
     private function processAccount(Ess_M2ePro_Model_Account $account)
     {
         $this->getActualOperationHistory()->addTimePoint(
-            __METHOD__.'get'.$account->getId(),'Get and process links on products for Account '.$account->getTitle()
+            __METHOD__.'get'.$account->getId(),'Get and process links on Products for Account '.$account->getTitle()
         );
 
         if (!$this->isPossibleProcessAccount($account)) {

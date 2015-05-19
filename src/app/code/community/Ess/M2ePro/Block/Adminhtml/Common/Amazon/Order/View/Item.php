@@ -80,7 +80,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View_Item extends Mage_Admi
         ));
 
         $this->addColumn('qty_purchased', array(
-            'header'    => Mage::helper('M2ePro')->__('Qty'),
+            'header'    => Mage::helper('M2ePro')->__('QTY'),
             'align'     => 'left',
             'width'     => '80px',
             'index'     => 'qty_purchased'
@@ -149,7 +149,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View_Item extends Mage_Admi
             $sku = Mage::helper('M2ePro')->escapeHtml($row->getSku());
 
             $skuHtml = <<<HTML
-<b>{$skuLabel}:</b> {$sku}<br />
+<b>{$skuLabel}:</b> {$sku}<br/>
 HTML;
         }
 
@@ -157,7 +157,7 @@ HTML;
         $generalId = Mage::helper('M2ePro')->escapeHtml($row->getGeneralId());
 
         $generalIdHtml = <<<HTML
-<b>{$generalIdLabel}:</b> {$generalId}<br />
+<b>{$generalIdLabel}:</b> {$generalId}<br/>
 HTML;
 
         if ($row->getIsIsbnGeneralId() && !Mage::helper('M2ePro')->isISBN($row->getGeneralId())) {
@@ -212,7 +212,7 @@ HTML;
         $itemTitle = Mage::helper('M2ePro')->escapeHtml($row->getTitle());
 
         return <<<HTML
-<b>{$itemTitle}</b><br />
+<b>{$itemTitle}</b><br/>
 <div style="padding-left: 10px;">
     {$skuHtml}
     {$generalIdHtml}
@@ -277,7 +277,7 @@ HTML;
         $giftMessageLabel = Mage::helper('M2ePro')->__('Gift Message');
 
         return <<<HTML
-<strong>{$giftTypeLabel}: </strong>{$giftType}<br />
+<strong>{$giftTypeLabel}: </strong>{$giftType}<br/>
 <strong>{$giftMessageLabel}: </strong>{$giftMessage}
 HTML;
     }

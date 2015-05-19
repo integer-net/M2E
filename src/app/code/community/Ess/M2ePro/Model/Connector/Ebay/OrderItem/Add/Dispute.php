@@ -10,9 +10,9 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Add_Dispute
     // M2ePro_TRANSLATIONS
     // Dispute cannot be opened. Reason: Dispute explanation is not defined.
     // Dispute cannot be opened. Reason: Dispute reason is not defined.
-    // Unpaid Item Process was not open for item #%id%. Reason: %msg%
-    // Unpaid Item Process was not open for item #%id%. Reason: eBay failure. Please try again later.
-    // Unpaid Item Process for item #%id% has been initiated.
+    // Unpaid Item Process was not open for Item #%id%. Reason: %msg%
+    // Unpaid Item Process was not open for Item #%id%. Reason: eBay failure. Please try again later.
+    // Unpaid Item Process for Item #%id% has been initiated.
 
     const DISPUTE_EXPLANATION_BUYER_HAS_NOT_PAID = 'BuyerNotPaid';
 
@@ -83,7 +83,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Add_Dispute
             }
 
             $this->orderItem->getOrder()->addErrorLog(
-                'Unpaid Item Process was not open for item #%id%. Reason: %msg%', array(
+                'Unpaid Item Process was not open for Item #%id%. Reason: %msg%', array(
                     '!id' => $this->orderItem->getChildObject()->getItemId(),
                     'msg' => $message[parent::MESSAGE_TEXT_KEY]
                 )
@@ -109,7 +109,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Add_Dispute
         }
 
         if (empty($response['dispute_id'])) {
-            $log = 'Unpaid Item Process was not open for item #%id%. Reason: eBay failure. Please try again later.';
+            $log = 'Unpaid Item Process was not open for Item #%id%. Reason: eBay failure. Please try again later.';
             $this->orderItem->getOrder()->addErrorLog($log, array(
                 '!id' => $this->orderItem->getChildObject()->getItemId()
             ));
@@ -121,7 +121,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Add_Dispute
         );
         $this->orderItem->save();
 
-        $this->orderItem->getOrder()->addSuccessLog('Unpaid Item Process for item #%id% has been initiated.', array(
+        $this->orderItem->getOrder()->addSuccessLog('Unpaid Item Process for Item #%id% has been initiated.', array(
             '!id' => $this->orderItem->getChildObject()->getItemId()
         ));
     }

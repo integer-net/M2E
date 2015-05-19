@@ -15,12 +15,12 @@ $startWizardLink = $this->getUrl("*/adminhtml_wizard_amazon");
 
         echo Mage::helper('M2ePro')->__(
             'Click
-            <a href="%url_1%">Start Configuration</a> Wizard to quickly set up <strong>Amazon</strong> settings or
+            <a href="%url_1%">Start Configuration</a> Wizard to quickly set up <strong>Amazon</strong> Settings or
             <a href="%url_2%" onclick="%script_code%">Skip</a> it if you intend to set up it later. <br/>
-            <strong>Note:</strong> If you close the Wizard now, you will have to set up Amazon settings manually.',
+            <b>Note:</b> If you close the Wizard now, you will have to set up Amazon Settings manually.',
             $startWizardLink,
             'javascript:',
-            'confirm(M2ePro.translator.translate(\'Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.\')) && setLocation(\''.$skipWizardLink.'\')'
+            'confirm(M2ePro.translator.translate(\'Note: If you close the Wizard, it never starts again. You will be required to set all Settings manually. Press Cancel to continue working with Wizard.\')) && setLocation(\''.$skipWizardLink.'\')'
         );
 
         ?>

@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-    private $attributeSets = array();
-
     // ####################################
 
     public function __construct()
@@ -26,10 +24,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat_Grid extends Mage
         $this->setSaveParametersInSession(true);
         $this->setUseAjax(true);
         //------------------------------
-
-        $this->attributeSets = Mage::getResourceModel('eav/entity_attribute_set_collection')
-                                    ->setEntityTypeFilter(Mage::getModel('catalog/product')->getResource()->getTypeId())
-                                    ->load()->toOptionHash();
     }
 
     // ####################################
@@ -83,15 +77,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat_Grid extends Mage
                 'options'        => Mage::helper('M2ePro/View_Common_Component')->getActiveComponentsTitles()
             ));
         }
-
-        $this->addColumn('attribute_sets', array(
-            'header' => Mage::helper('M2ePro')->__('Attribute Sets'),
-            'align'  => 'left',
-            'width'  => '250px',
-            'filter'    => false,
-            'sortable'  => false,
-            'frame_callback' => array($this, 'callbackColumnAttributeSets')
-        ));
 
         $this->addColumn('create_date', array(
             'header'    => Mage::helper('M2ePro')->__('Creation Date'),
@@ -158,30 +143,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat_Grid extends Mage
         //--------------------------------
 
         return parent::_prepareMassaction();
-    }
-
-    // ####################################
-
-    public function callbackColumnAttributeSets($value, $row, $column, $isExport)
-    {
-        $attributeSets = Mage::getModel('M2ePro/AttributeSet')->getCollection()
-            ->addFieldToFilter('object_type',Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT)
-            ->addFieldToFilter('object_id',(int)$row->getId())
-            ->toArray();
-
-        $value = '';
-        foreach ($attributeSets['items'] as $attributeSet) {
-            if (strlen($value) > 100) {
-                $value .= ', <strong>...</strong>';
-                break;
-            }
-            if (isset($this->attributeSets[$attributeSet['attribute_set_id']])) {
-                $value != '' && $value .= ', ';
-                $value .= $this->attributeSets[$attributeSet['attribute_set_id']];
-            }
-        }
-
-        return $value;
     }
 
     // ####################################

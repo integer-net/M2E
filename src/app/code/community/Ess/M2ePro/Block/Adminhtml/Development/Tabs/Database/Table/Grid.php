@@ -7,7 +7,17 @@
 class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
     extends Mage_Adminhtml_Block_Widget_Grid
 {
-    private $modelName = null;
+    // ####################################
+
+    const MERGE_MODE_COOKIE_KEY = 'database_tables_merge_mode_cookie_key';
+
+    public $tableName;
+    public $modelName;
+
+    public $mergeMode = 0;
+    public $component;
+
+    // ####################################
 
     public function __construct()
     {
@@ -25,78 +35,120 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
         $this->setSaveParametersInSession(true);
         $this->setUseAjax(true);
         //------------------------------
+
+        $this->init();
+    }
+
+    private function init()
+    {
+        $this->tableName = $this->getRequest()->getParam('table');
+        $this->modelName = Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($this->tableName);
+        $this->component = $this->getRequest()->getParam('component');
+        $this->mergeMode = Mage::app()->getCookie()->get(self::MERGE_MODE_COOKIE_KEY);
+
+        if (!$this->modelName) {
+            $errorMsg = str_replace(
+                '%table_name%', $this->tableName, 'Specified table "%table_name%" cannot be managed.'
+            );
+            throw new Exception($errorMsg);
+        }
+
+        if (!$this->ifNeedToUseMergeMode()) {
+            return;
+        }
+
+        preg_match('/(ebay|amazon|buy|play)_/i', $this->modelName, $matches);
+        if (!$this->component && !empty($matches[1])) {
+            $this->modelName = str_replace($matches[1].'_', '', $this->modelName);
+            $this->component = strtolower($matches[1]);
+        }
+
+        if (!$this->component) {
+            $this->mergeMode = 0;
+        }
     }
 
     // ####################################
 
-    public function getModelName()
+    private function getModel()
     {
-        if (!is_null($this->modelName)) {
-            return $this->modelName;
-        }
+        return !$this->ifNeedToUseMergeMode()
+            ? Mage::getModel('M2ePro/'.$this->modelName)
+            : Mage::helper('M2ePro/Component')->getComponentModel($this->component, $this->modelName);
+    }
 
-        $modelName = Mage::helper('M2ePro/Module_Database_Structure')->getTableModel(
-            $this->getRequest()->getParam('table')
-        );
-
-        if (is_null($modelName)) {
-            throw new Exception(str_replace('%table_name%', $this->getRequest()->getParam('table'),
-                'Specified table "%table_name%" cannot be managed.'
-            ));
-        }
-
-        return $this->modelName = $modelName;
+    private function ifNeedToUseMergeMode()
+    {
+        return $this->mergeMode &&
+               Mage::helper('M2ePro/Module_Database_Structure')->isTableHorizontal($this->tableName);
     }
 
     // ####################################
 
     protected function _prepareCollection()
     {
-        // Get collection of prices templates
-        $collection = Mage::getModel('M2ePro/'.$this->getModelName())->getCollection();
-        $this->setCollection($collection);
-
+        $this->setCollection($this->getModel()->getCollection());
         return parent::_prepareCollection();
     }
 
     protected function _prepareColumns()
     {
-        $resourceModel = Mage::getResourceModel('M2ePro/'.$this->getModelName());
-        $table = Mage::getSingleton('core/resource')->getTableName($this->getRequest()->getParam('table'));
+        $table = Mage::getModel("M2ePro/{$this->modelName}")->getResource()->getMainTable();
+        $columns = Mage::helper('M2ePro/Module_Database_Structure')->getTableInfo($table);
 
-        $columns = $resourceModel->getReadConnection()->fetchAll("SHOW COLUMNS FROM {$table}");
+        if ($this->ifNeedToUseMergeMode()) {
+
+            array_walk($columns, function(&$el){ $el['is_parent'] = true; });
+
+            $modelName = 'M2ePro/'.ucfirst($this->component).'_'.$this->modelName;
+            $table = Mage::getModel($modelName)->getResource()->getMainTable();
+
+            $childColumns = Mage::helper('M2ePro/Module_Database_Structure')->getTableInfo($table);
+            array_walk($childColumns, function(&$el){ $el['is_parent'] = false; });
+
+            $columns = array_merge($columns, $childColumns);
+        }
 
         foreach ($columns as $column) {
 
-            $header = "<big>{$column['Field']}</big> &nbsp;
-                       <small style=\"font-weight:normal;\">({$column['Type']})</small>";
+            $header = "<big>{$column['name']}</big> &nbsp;";
+            if (isset($column['is_parent']) && $column['is_parent']) {
+                $header = '<span style="color: orangered;">p:&nbsp;</span>' . $header;
+            }
+            if (isset($column['is_parent']) && !$column['is_parent']) {
+                $header = '<span style="color: forestgreen;">ch:&nbsp;</span>' . $header;
+            }
+            $header .= "<small style=\"font-weight:normal;\">({$column['type']})</small>";
+
+            $filterIndex = 'main_table.' . strtolower($column['name']);
+            if (isset($column['is_parent']) && !$column['is_parent']) {
+                $filterIndex = 'second_table.' . strtolower($column['name']);
+            }
 
             $params = array(
                 'header'         => $header,
                 'align'          => 'left',
                 'type'           => $this->getColumnType($column),
                 'string_limit'   => 10000,
-                'index'          => strtolower($column['Field']),
-                'filter_index'   => 'main_table.'.strtolower($column['Field']),
+                'index'          => strtolower($column['name']),
+                'filter_index'   => $filterIndex,
                 'frame_callback' => array($this, 'callbackColumnData'),
+
+                'is_auto_increment' => strpos($column['extra'], 'increment') !== false
             );
 
             if ($this->getColumnType($column) == 'datetime') {
-                $params = array_merge($params, array(
-                    'filter_time' => true,
-                    'align'       => 'right',
-                    'renderer' => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_renderer_datetime',
-                    'filter'   => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_filter_datetime'
-                ));
+                $params['align']       = 'right';
+                $params['filter_time'] = true;
+                $params['renderer'] = 'M2ePro/adminhtml_development_tabs_database_table_grid_column_renderer_datetime';
+                $params['filter']   = 'M2ePro/adminhtml_development_tabs_database_table_grid_column_filter_datetime';
             }
 
-            if ($this->getRequest()->getParam('table') == 'm2epro_operation_history' && $column['Field'] == 'nick') {
-                $params = array_merge($params, array(
-                    'filter' => 'M2ePro/adminhtml_development_tabs_database_table_grid_column_filter_select',
-                ));
+            if ($this->tableName == 'm2epro_operation_history' && $column['name'] == 'nick') {
+                $params['filter'] = 'M2ePro/adminhtml_development_tabs_database_table_grid_column_filter_select';
             }
 
-            $this->addColumn($column['Field'], $params);
+            $this->addColumn($column['name'], $params);
         }
 
         $this->addColumn('actions_row', array(
@@ -116,7 +168,10 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
     protected function _toHtml()
     {
         $urlParams = array(
-            'model' => $this->getModelName(), 'table' => $this->getRequest()->getParam('table')
+            'model'     => $this->modelName,
+            'table'     => $this->tableName,
+            'component' => $this->component,
+            'merge'     => $this->mergeMode
         );
 
         $root = 'adminhtml_development_database';
@@ -124,7 +179,9 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
             $root.'/deleteTableRows'        => $this->getUrl('*/*/deleteTableRows', $urlParams),
             $root.'/updateTableCells'       => $this->getUrl('*/*/updateTableCells', $urlParams),
             $root.'/addTableRow'            => $this->getUrl('*/*/addTableRow', $urlParams),
-            $root.'/getTableCellsPopupHtml' => $this->getUrl('*/*/getTableCellsPopupHtml', $urlParams)
+            $root.'/getTableCellsPopupHtml' => $this->getUrl('*/*/getTableCellsPopupHtml', $urlParams),
+
+            $root.'/manageTable' => $this->getUrl('*/*/manageTable', array('table' => $this->tableName)),
         ));
 
         $commonJs = <<<HTML
@@ -189,10 +246,17 @@ HTML;
         $inputValue = 'NULL';
         !is_null($value) && $inputValue = Mage::helper('M2ePro')->escapeHtml($value);
 
+        $divMouseActions = '';
+
+        if (!$column->getData('is_auto_increment')) {
+            $divMouseActions = <<<HTML
+onmouseover="DevelopmentDatabaseGridHandlerObj.mouseOverCell('{$cellId}');"
+onmouseout="DevelopmentDatabaseGridHandlerObj.mouseOutCell('{$cellId}');"
+HTML;
+        }
+
         return <<<HTML
-<div style="min-height: 20px;" id="{$cellId}"
-     onmouseover="DevelopmentDatabaseGridHandlerObj.mouseOverCell('{$cellId}');"
-     onmouseout="DevelopmentDatabaseGridHandlerObj.mouseOutCell('{$cellId}');">
+<div style="min-height: 20px;" id="{$cellId}" {$divMouseActions}>
 
     <span id="{$cellId}_view_container">{$tempValue}</span>
 
@@ -218,11 +282,25 @@ HTML;
 
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
-        return <<<HTML
+        $html = <<<HTML
 <a href="javascript:void(0);" onclick="DevelopmentDatabaseGridHandlerObj.deleteTableRows('{$row->getId()}')">
-    Delete
+    <span>delete</span>
 </a>
 HTML;
+        $componentMode = $row->getData('component_mode');
+        if (Mage::helper('M2ePro/Module_Database_Structure')->isTableHorizontalParent($this->tableName) &&
+            $componentMode && !$this->mergeMode) {
+
+            $html .= <<<HTML
+<br/>
+<a style="color: green;" href="javascript:void(0);"
+   onclick="DevelopmentDatabaseGridHandlerObj.mergeParentTable('{$componentMode}')">
+    <span>join</span>
+</a>
+HTML;
+        }
+
+        return $html;
     }
 
     // ####################################
@@ -241,11 +319,11 @@ HTML;
 
     private function getColumnType($columnData)
     {
-        if ($columnData['Type'] == 'datetime') {
+        if ($columnData['type'] == 'datetime') {
             return 'datetime';
         }
 
-        if (preg_match('/int|float|decimal/', $columnData['Type'])) {
+        if (preg_match('/int|float|decimal/', $columnData['type'])) {
             return 'number';
         }
 

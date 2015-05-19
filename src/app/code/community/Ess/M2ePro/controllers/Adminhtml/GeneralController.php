@@ -17,10 +17,17 @@ class Ess_M2ePro_Adminhtml_GeneralController
 
         $accounts = array();
         foreach ($collection->getItems() as $account) {
-            $accounts[] = array(
+            $data = array(
                 'id' => $account->getId(),
                 'title' => Mage::helper('M2ePro')->escapeHtml($account->getTitle())
             );
+
+            if ($component == Ess_M2ePro_Helper_Component_Amazon::NICK) {
+                $data['marketplace_title'] = $account->getChildObject()->getMarketplace()->getTitle();
+                $data['marketplace_url'] = $account->getChildObject()->getMarketplace()->getUrl();
+            }
+
+            $accounts[] = $data;
         }
 
         $this->loadLayout();
@@ -60,25 +67,6 @@ class Ess_M2ePro_Adminhtml_GeneralController
         }
 
         return $this->getResponse()->setBody(json_encode(array('result'=>!(bool)$collection->getSize())));
-    }
-
-    public function magentoGetAttributesByAttributeSetsAction()
-    {
-        $attributeSets = $this->getRequest()->getParam('attribute_sets','');
-
-        if ($attributeSets == '') {
-            return $this->getResponse()->setBody(json_encode(array()));
-        }
-
-        $attributeSets = explode(',',$attributeSets);
-
-        if (!is_array($attributeSets) || count($attributeSets) <= 0) {
-            return $this->getResponse()->setBody(json_encode(array()));
-        }
-
-        return $this->getResponse()->setBody(json_encode(
-            Mage::helper('M2ePro/Magento_Attribute')->getByAttributeSets($attributeSets)
-        ));
     }
 
     //#############################################
@@ -170,63 +158,6 @@ class Ess_M2ePro_Adminhtml_GeneralController
         !is_null($limit) && $collection->setPageSize((int)$limit);
 
         $data = $collection->toArray();
-
-        return $this->getResponse()->setBody(json_encode($data['items']));
-    }
-
-    public function modelGetAllByAttributeSetIdAction()
-    {
-        $model = $this->getRequest()->getParam('model','');
-        $componentMode = $this->getRequest()->getParam('component_mode', '');
-        $attributeSets = $this->getRequest()->getParam('attribute_sets','');
-
-        $idField = $this->getRequest()->getParam('id_field','id');
-        $dataField = $this->getRequest()->getParam('data_field','');
-
-        if ($model == '' || $attributeSets == '' || $idField == '' || $dataField == '') {
-            return $this->getResponse()->setBody(json_encode(array()));
-        }
-
-        $templateType = 0;
-        switch ($model) {
-            case 'Template_SellingFormat':
-                $templateType = Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_TEMPLATE_SELLING_FORMAT;
-                break;
-        }
-
-        $tasTable = Mage::getResourceModel('M2ePro/AttributeSet')->getMainTable();
-
-        $collection = Mage::getModel('M2ePro/'.$model)->getCollection();
-        $componentMode != '' && $collection->addFieldToFilter('component_mode', $componentMode);
-
-        $attributeSets = explode(',', $attributeSets);
-
-        $collection->getSelect()
-                   ->join(array('tas'=>$tasTable),'`main_table`.`'.$idField.'` = `tas`.`object_id`',array())
-                   ->where('`tas`.`object_type` = ?',(int)$templateType)
-                   ->group('main_table.'.$idField)
-                   ->having('COUNT(`main_table`.`'.$idField.'`) >= ?', count($attributeSets));
-
-        $collection->addFieldToFilter('`tas`.`attribute_set_id`', array('in' => $attributeSets));
-
-        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)
-                                ->columns(array($idField, $dataField));
-
-        $sortField = $this->getRequest()->getParam('sort_field','');
-        $sortDir = $this->getRequest()->getParam('sort_dir','ASC');
-
-        if ($sortField != '' && $sortDir != '') {
-            $collection->setOrder('main_table.'.$sortField,$sortDir);
-        }
-
-        $limit = $this->getRequest()->getParam('limit',NULL);
-        !is_null($limit) && $collection->setPageSize((int)$limit);
-
-        $data = $collection->toArray();
-
-        foreach ($data['items'] as $key => $value) {
-            $data['items'][$key]['title'] = Mage::helper('M2ePro')->escapeHtml($data['items'][$key]['title']);
-        }
 
         return $this->getResponse()->setBody(json_encode($data['items']));
     }

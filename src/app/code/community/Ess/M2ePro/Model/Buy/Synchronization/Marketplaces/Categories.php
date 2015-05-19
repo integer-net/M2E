@@ -35,74 +35,104 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
 
     protected function performActions()
     {
-        $params = $this->getParams();
+        $partNumber = 1;
+        $params     = $this->getParams();
+
+        $this->deleteAllCategories();
 
         /** @var $marketplace Ess_M2ePro_Model_Marketplace **/
         $marketplace = Mage::helper('M2ePro/Component_Buy')->getObject(
             'Marketplace', (int)$params['marketplace_id']
         );
 
-        $this->getActualOperationHistory()->addText('Starting marketplace "'.$marketplace->getTitle().'"');
+        $this->getActualOperationHistory()->addText('Starting Marketplace "'.$marketplace->getTitle().'"');
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
-                                                         'Get categories from Rakuten');
-        $categories = $this->receiveFromRakuten($marketplace);
-        $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
+        for ($i = 0; $i < 100; $i++) {
+            $this->getActualLockItem()->setPercents($this->getPercentsStart());
 
-        $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
-        $this->getActualLockItem()->activate();
+            $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
+                'Get Categories from Rakuten, part № ' . $partNumber);
+            $response = $this->receiveFromRakuten($partNumber);
+            $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
-                                                         'Save categories to DB');
-        $this->saveCategoriesToDb($marketplace,$categories);
-        $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
+            if (empty($response)) {
+                break;
+            }
+
+            $this->getActualLockItem()->setStatus(
+                'Processing Category data ('.(int)$partNumber.'/'.(int)$response['total_parts'].')'
+            );
+
+            $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
+            $this->getActualLockItem()->activate();
+
+            $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
+                'Save Categories to DB');
+            $this->saveCategoriesToDb($response['data']);
+            $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
+
+            $this->getActualLockItem()->setPercents($this->getPercentsEnd());
+            $this->getActualLockItem()->activate();
+
+            $partNumber = $response['next_part'];
+
+            if (is_null($partNumber)) {
+                break;
+            }
+        }
 
         $this->logSuccessfulOperation($marketplace);
     }
 
     //####################################
 
-    protected function receiveFromRakuten(Ess_M2ePro_Model_Marketplace $marketplace)
+    protected function receiveFromRakuten($partNumber)
     {
-        $categories = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
-                            ->processVirtual('marketplace','get','info',
-                                             array('include_categories' => true),
-                                             'info',NULL,NULL);
+        $response = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
+                            ->processVirtual('marketplace','get','categories',
+                                             array('part_number' => $partNumber),
+                                             NULL, NULL, NULL);
 
-        $categories = is_null($categories) ? array() : $categories['categories'];
+        if (is_null($response) || empty($response['data'])) {
+            $response = array();
+        }
 
-        $this->getActualOperationHistory()->addText('Total received categories from Rakuten: '.count($categories));
-
-        return $categories;
+        $this->getActualOperationHistory()
+             ->addText('Total received Categories from Rakuten: '.count($response['data']));
+        return $response;
     }
 
-    protected function saveCategoriesToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $categories)
+    protected function saveCategoriesToDb(array $categories)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tableCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category');
 
-        $connWrite->delete($tableCategories);
-
-        $iteration = 0;
+        $iteration            = 0;
         $iterationsForOneStep = 1000;
-        $percentsForOneStep = ($this->getPercentsInterval()/2) / (count($categories)/$iterationsForOneStep);
+        $percentsForOneStep   = ($this->getPercentsInterval()/2) / (count($categories)/$iterationsForOneStep);
+        $totalCountCategories = count($categories);
+        $insertData           = array();
 
-        foreach ($categories as $data) {
+        for ($i = 0; $i < $totalCountCategories; $i++) {
+            $data = $categories[$i];
 
-            $insertData = array(
-                'native_id' => $data['category_id'],
-                'node_id' => $data['node_id'],
-                'category_id' => $data['id'],
+            $insertData[] = array(
+                'native_id'          => $data['category_id'],
+                'node_id'            => $data['node_id'],
+                'category_id'        => $data['id'],
                 'parent_category_id' => $data['parent_id'],
-                'title' => $data['title'],
-                'path' => $data['path'],
-                'is_listable' => $data['is_listable'],
-                'attributes' => json_encode($data['attributes']),
-                'sorder' => $data['sorder']
+                'title'              => $data['title'],
+                'path'               => $data['path'],
+                'is_listable'        => $data['is_listable'],
+                'attributes'         => json_encode($data['attributes']),
+                'sorder'             => $data['sorder']
             );
 
-            $connWrite->insert($tableCategories, $insertData);
+            if (count($insertData) >= 100 || $i >= ($totalCountCategories - 1)) {
+                $connWrite->insertMultiple($tableCategories, $insertData);
+                $insertData = array();
+            }
 
             if (++$iteration % $iterationsForOneStep == 0) {
                 $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;
@@ -113,13 +143,22 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
         }
     }
 
+    protected function deleteAllCategories()
+    {
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $tableCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category');
+
+        $connWrite->delete($tableCategories);
+    }
+
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         // M2ePro_TRANSLATIONS
-        // The "Categories" action for Rakuten Marketplace: "%mrk%" has been successfully completed.
+        // The "Categories" Action for Rakuten Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Categories" action for Rakuten Marketplace: "%mrk%" has been successfully completed.',
+            'The "Categories" Action for Rakuten Marketplace: "%mrk%" has been successfully completed.',
             array('mrk' => $marketplace->getTitle())
         );
 

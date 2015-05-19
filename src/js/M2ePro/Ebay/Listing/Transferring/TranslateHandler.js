@@ -15,28 +15,27 @@ EbayListingTransferringTranslateHandler = Class.create(CommonHandler, {
         this.closeCallback   = closeCallback;
 
         this.actionHandler.setProductsIds(selectedProductsIds);
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing/getTranslationHtml') ,
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : {
-                    products_ids: [this.actionHandler.getProductsIds()]
-                },
-                onSuccess: function (transport)
-                {
-                    var response = transport.responseText.evalJSON();
-                    if (response['result'] != 'success') {
-                        response['message'] && MagentoMessageObj.addError(response['message']);
-                        return;
-                    }
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/getTranslationHtml'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {
+                products_ids: [this.actionHandler.getProductsIds()]
+            },
+            onSuccess: function(transport) {
 
-                    var content = response['content'];
-                    var title = M2ePro.translator.translate('Translation Service');
+                var response = transport.responseText.evalJSON();
+                if (response['result'] != 'success') {
+                    response['message'] && MagentoMessageObj.addError(response['message']);
+                    return;
+                }
 
-                    this.openPopUp(title, content);
+                var content = response['content'];
+                var title = M2ePro.translator.translate('Translation Service');
 
-                }.bind(this)
-            });
+                this.openPopUp(title, content);
+
+            }.bind(this)
+        });
     },
 
     //----------------------------------
@@ -84,7 +83,7 @@ EbayListingTransferringTranslateHandler = Class.create(CommonHandler, {
 
     //----------------------------------
 
-    translationServiceChange : function(el)
+    translationServiceChange: function(el)
     {
         var estimatedAmountElement = $('translation_estimated_amount');
 
@@ -136,7 +135,7 @@ EbayListingTransferringTranslateHandler = Class.create(CommonHandler, {
 
     refreshTranslationAccount: function()
     {
-        this.actionHandler.refreshTranslationAccount(function(){
+        this.actionHandler.refreshTranslationAccount(function() {
             $('transferring_translation_service') &&
                 EbayListingTransferringTranslateHandlerObj.translationServiceChange($('transferring_translation_service'));
         });
@@ -151,32 +150,30 @@ EbayListingTransferringTranslateHandler = Class.create(CommonHandler, {
             return;
         }
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_transferring/updateTranslationService') ,
-            {
-                method: 'post',
-                asynchronous : true,
-                parameters : {
-                    products_ids : [EbayListingTransferringTranslateHandlerObj.actionHandler.getProductsIds()],
-                    translation_service : $('transferring_translation_service') &&
-                                                $('transferring_translation_service').value
-                },
-                onSuccess: function (transport)
-                {
-                    if (transport.responseText.evalJSON()['result'] == 'success') {
-                        EbayListingTransferringTranslateHandlerObj.confirmCallback &&
-                            EbayListingTransferringTranslateHandlerObj.confirmCallback();
-                    }
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_transferring/updateTranslationService'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {
+                products_ids: [EbayListingTransferringTranslateHandlerObj.actionHandler.getProductsIds()],
+                translation_service: $('transferring_translation_service') &&
+                                            $('transferring_translation_service').value
+            },
+            onSuccess: function(transport) {
 
-                    EbayListingTransferringTranslateHandlerObj.close();
+                if (transport.responseText.evalJSON()['result'] == 'success') {
+                    EbayListingTransferringTranslateHandlerObj.confirmCallback &&
+                        EbayListingTransferringTranslateHandlerObj.confirmCallback();
+                }
 
-                }.bind(this)
-            });
+                EbayListingTransferringTranslateHandlerObj.close();
 
+            }.bind(this)
+        });
     },
 
     //----------------------------------
 
-    close: function(){
+    close: function() {
         this.popUp.close();
     }
 

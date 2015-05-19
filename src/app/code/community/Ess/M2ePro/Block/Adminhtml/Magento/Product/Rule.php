@@ -15,8 +15,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Product_Rule
         $model = $this->getData('rule_model');
         $storeId = $model->getStoreId();
         $prefix = $model->getPrefix();
-        $attributeSets = is_array($model->getAttributeSets())
-            ? implode(',', $model->getAttributeSets()) : $model->getAttributeSets();
 
         $form = new Varien_Data_Form();
         $form->setHtmlId($prefix);

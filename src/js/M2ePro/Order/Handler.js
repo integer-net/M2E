@@ -105,7 +105,7 @@ OrderHandler.prototype = Object.extend(new CommonHandler(), {
         html += OrderHandlerObj.createHelpViewAllLogHtml(rowId, gridId);
 
         row.insert({
-            after : '<tr id="grid_help_content_'+rowId+'"><td class="help_line" colspan="'+($(row).childElements().length)+'">'+html+'</td></tr>'
+            after: '<tr id="grid_help_content_'+rowId+'"><td class="help_line" colspan="'+($(row).childElements().length)+'">'+html+'</td></tr>'
         });
 
         setTimeout(function() {

@@ -17,6 +17,13 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function getTitle()
+    {
+        return Mage::helper('M2ePro')->__(self::TITLE);
+    }
+
+    // ########################################
+
     public function isEnabled()
     {
         return (bool)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue('/component/'.self::NICK.'/', 'mode');
@@ -148,7 +155,7 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
 
     public function clearCache()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues(self::NICK);
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues(self::NICK);
     }
 
     // ########################################

@@ -20,7 +20,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_ProductTut
     {
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('What are M2E Products and How Do They Appear on eBay');
+        $this->_headerText = Mage::helper('M2ePro')->__('What are M2E Pro Products and How Do They Appear on eBay');
         //------------------------------
 
         //------------------------------

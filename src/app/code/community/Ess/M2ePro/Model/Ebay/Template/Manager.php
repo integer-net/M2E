@@ -66,7 +66,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
     public function setTemplate($nick)
     {
         if (!in_array(strtolower($nick),$this->getAllTemplates())) {
-            throw new Exception('Template nick is out of knowledge range.');
+            throw new Exception('Policy nick is out of knowledge range.');
         }
         $this->templateNick = strtolower($nick);
         return $this;
@@ -115,7 +115,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
             self::TEMPLATE_RETURN,
             self::TEMPLATE_SHIPPING,
             self::TEMPLATE_PAYMENT,
-            self::TEMPLATE_DESCRIPTION
         );
     }
 
@@ -130,7 +129,8 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
     {
         return array(
             self::TEMPLATE_SELLING_FORMAT,
-            self::TEMPLATE_SYNCHRONIZATION
+            self::TEMPLATE_SYNCHRONIZATION,
+            self::TEMPLATE_DESCRIPTION
         );
     }
 
@@ -416,7 +416,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
                 $name = 'Template_SellingFormat';
                 break;
             case self::TEMPLATE_DESCRIPTION:
-                $name = 'Ebay_Template_Description';
+                $name = 'Template_Description';
                 break;
             case self::TEMPLATE_SYNCHRONIZATION:
                 $name = 'Template_Synchronization';
@@ -438,12 +438,12 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
             case self::TEMPLATE_PAYMENT:
             case self::TEMPLATE_SHIPPING:
             case self::TEMPLATE_RETURN:
-            case self::TEMPLATE_DESCRIPTION:
                 $model = Mage::getModel('M2ePro/'.$this->getTemplateModelName());
                 break;
 
             case self::TEMPLATE_SELLING_FORMAT:
             case self::TEMPLATE_SYNCHRONIZATION:
+            case self::TEMPLATE_DESCRIPTION:
                 if ($returnChildModel) {
                     $modelPath = ucfirst(Ess_M2ePro_Helper_Component_Ebay::NICK).'_'.$this->getTemplateModelName();
                     $model = Mage::getModel('M2ePro/'.$modelPath);
@@ -471,12 +471,12 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
             case self::TEMPLATE_PAYMENT:
             case self::TEMPLATE_SHIPPING:
             case self::TEMPLATE_RETURN:
-            case self::TEMPLATE_DESCRIPTION:
                 $collection = $this->getTemplateModel()->getCollection();
                 break;
 
             case self::TEMPLATE_SELLING_FORMAT:
             case self::TEMPLATE_SYNCHRONIZATION:
+            case self::TEMPLATE_DESCRIPTION:
                 $collection = Mage::helper('M2ePro/Component')->getComponentCollection(
                     Ess_M2ePro_Helper_Component_Ebay::NICK,
                     $this->getTemplateModelName()

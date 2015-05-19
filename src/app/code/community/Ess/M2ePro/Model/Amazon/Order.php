@@ -324,14 +324,18 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
     public function beforeCreateMagentoOrder()
     {
         if ($this->isPending() || $this->isCanceled()) {
-            throw new Exception('Magento Order creation is not allowed for pending and canceled Amazon Orders.');
+            throw new Exception('Magento Order Creation is not allowed for pending and canceled Amazon Orders.');
         }
     }
 
     public function afterCreateMagentoOrder()
     {
         if ($this->getAmazonAccount()->isMagentoOrdersCustomerNewNotifyWhenOrderCreated()) {
-            $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            if (method_exists($this->getParentObject()->getMagentoOrder(), 'queueNewOrderEmail')) {
+                $this->getParentObject()->getMagentoOrder()->queueNewOrderEmail(false);
+            } else {
+                $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            }
         }
 
         if ($this->isFulfilledByAmazon() && !$this->getAmazonAccount()->isMagentoOrdersFbaStockEnabled()) {
@@ -515,6 +519,56 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
         $action      = Ess_M2ePro_Model_Order_Change::ACTION_UPDATE_SHIPPING;
         $creatorType = Ess_M2ePro_Model_Order_Change::CREATOR_TYPE_OBSERVER;
         $component   = Ess_M2ePro_Helper_Component_Amazon::NICK;
+
+        Mage::getModel('M2ePro/Order_Change')->create($orderId, $action, $creatorType, $component, $params);
+
+        return true;
+    }
+
+    // ########################################
+
+    public function canRefund()
+    {
+        if ($this->getStatus() == self::STATUS_CANCELED) {
+            return false;
+        }
+
+        if (!$this->getAmazonAccount()->isRefundEnabled()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function refund(array $items = array())
+    {
+        if (!$this->canRefund()) {
+            return false;
+        }
+
+        $params = array(
+            'order_id' => $this->getAmazonOrderId(),
+            'currency' => $this->getCurrency(),
+            'items'    => $items,
+        );
+
+        $totalItemsCount = $this->getParentObject()->getItemsCollection()->count();
+
+        $orderId     = $this->getParentObject()->getId();
+        $creatorType = Ess_M2ePro_Model_Order_Change::CREATOR_TYPE_OBSERVER;
+        $component   = Ess_M2ePro_Helper_Component_Amazon::NICK;
+
+        /** @var Ess_M2ePro_Model_Mysql4_Order_Change_Collection $changeCollection */
+        $changeCollection = Mage::getModel('M2ePro/Order_Change')->getCollection();
+        $changeCollection->addFieldToFilter('order_id', $orderId);
+        $changeCollection->addFieldToFilter('action', Ess_M2ePro_Model_Order_Change::ACTION_UPDATE_SHIPPING);
+
+        $action = Ess_M2ePro_Model_Order_Change::ACTION_CANCEL;
+        if ($this->isShipped() || $this->isPartiallyShipped() || count($items) != $totalItemsCount ||
+            $this->isLockedObject('update_shipping_status') || $changeCollection->getSize() > 0
+        ) {
+            $action = Ess_M2ePro_Model_Order_Change::ACTION_REFUND;
+        }
 
         Mage::getModel('M2ePro/Order_Change')->create($orderId, $action, $creatorType, $component, $params);
 

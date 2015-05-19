@@ -9,12 +9,28 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Single
 {
     // ########################################
 
+    public function __construct(array $params = array(), Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        parent::__construct($params, $listingProduct);
+
+        $this->listingProduct->setData('synch_status', Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_OK);
+        $this->listingProduct->setData('synch_reasons', null);
+
+        $additionalData = $this->listingProduct->getAdditionalData();
+        unset($additionalData['synch_template_list_rules_note']);
+        $this->listingProduct->setSettings('additional_data', $additionalData);
+
+        $this->listingProduct->save();
+    }
+
+    // ########################################
+
     protected function getCommand()
     {
         return array('item','add','single');
     }
 
-    protected function getLogAction()
+    protected function getLogsAction()
     {
         return Ess_M2ePro_Model_Listing_Log::ACTION_LIST_PRODUCT_ON_COMPONENT;
     }
@@ -41,13 +57,14 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Item is listed or not available
-                parent::MESSAGE_TEXT_KEY => 'Item is listed or not available',
+                // Item is Listed or not available
+                parent::MESSAGE_TEXT_KEY => 'Item is Listed or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
-            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->getLogger()->logListingProductMessage(
+                $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
 
             return false;
         }
@@ -56,13 +73,14 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Categories settings are not set
-                parent::MESSAGE_TEXT_KEY => 'Categories settings are not set',
+                // Categories Settings are not set
+                parent::MESSAGE_TEXT_KEY => 'Categories Settings are not set',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
-            $this->getLogger()->logListingProductMessage($this->listingProduct,$message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->getLogger()->logListingProductMessage(
+                $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
 
             return false;
         }
@@ -71,19 +89,20 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Single
             $theSameListingProduct = $this->getRequestObject()->getTheSameProductAlreadyListed()) {
 
             // M2ePro_TRANSLATIONS
-            // There is another item with the same eBay user ID, product ID and marketplace presented in "%listing_title%" (%listing_id%) Listing.
+            // There is another Item with the same eBay User ID, Product ID and Marketplace presented in "%listing_title%" (%listing_id%) Listing.
             $message = array(
                 parent::MESSAGE_TEXT_KEY => Mage::helper('M2ePro')->__(
-                    'There is another item with the same eBay user ID, '.
-                    'product ID and marketplace presented in "%listing_title%" (%listing_id%) Listing.',
+                    'There is another Item with the same eBay User ID, '.
+                    'Product ID and Marketplace presented in "%listing_title%" (%listing_id%) Listing.',
                     $theSameListingProduct->getListing()->getTitle(),
                     $theSameListingProduct->getListing()->getId()
                 ),
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
-            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->getLogger()->logListingProductMessage(
+                $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
 
             return false;
         }
@@ -115,13 +134,14 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Single
 
         $message = array(
             // M2ePro_TRANSLATIONS
-            // Item was successfully listed
-            parent::MESSAGE_TEXT_KEY => 'Item was successfully listed',
+            // Item was successfully Listed
+            parent::MESSAGE_TEXT_KEY => 'Item was successfully Listed',
             parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
         );
 
-        $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+        $this->getLogger()->logListingProductMessage(
+            $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+        );
 
         return $response;
     }
@@ -148,8 +168,8 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Single
         $this->getResponseObject()->markAsPotentialDuplicate();
 
         $message = array(
-            parent::MESSAGE_TEXT_KEY => 'An error occured while listing the item. '.
-                                'The item has been blocked. The next M2E Synchronization will resolve the problem.',
+            parent::MESSAGE_TEXT_KEY => 'An error occured while Listing the Item. '.
+                'The Item has been blocked. The next M2E Pro Synchronization will resolve the problem.',
             parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_WARNING
         );
 

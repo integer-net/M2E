@@ -1,8 +1,11 @@
 <style type="text/css">
 
-.switcher {
-    margin: 0 !important;
-}
+    .switcher {
+        margin: 0 !important;
+    }
+    td.value {
+        vertical-align: middle !important;
+    }
 
 </style>
 
@@ -35,7 +38,7 @@
 
         <div id="block_notice_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General Settings'); ?>">
             <?php echo Mage::helper('M2ePro')->__(
-                'This page sets the eBay details and Magento store view you want to use for this M2E Pro listing.'
+                'This Page sets the eBay details and Magento Store View you want to use for this M2E Pro Listing.'
             ); ?>
         </div>
 
@@ -57,8 +60,8 @@
                                     <input id="title" type="text" class="input-text required-entry M2ePro-listing-title" name="title" value="<?php echo Mage::helper('M2ePro')->escapeHtml($this->getData('title')); ?>">
                                     <p class="note">
                                         <span><?php echo Mage::helper('M2ePro')->__(
-                                            'Create a descriptive and meaningful title for your M2E Pro listing.
-                                            This is used for reference within M2E Pro and will not appear on your eBay listings.'
+                                            'Create a descriptive and meaningful Title for your M2E Pro Listing. <br/>
+                                            This is used for reference within M2E Pro and will not appear on your eBay Listings.'
                                         ); ?></span>
                                     </p>
                                 </td>
@@ -96,7 +99,7 @@
                                 ?>
                                 <select <?php if($accountSelectionDisabled) echo 'disabled="disabled"' ?> id="account_id" name="account_id" class="required-entry" style="display: none"></select>
                                 <p class="note">
-                                    <span><?php echo Mage::helper('M2ePro')->__('This is the user name of your eBay account.'); ?></span>
+                                    <span><?php echo Mage::helper('M2ePro')->__('This is the user name of your eBay Account.'); ?></span>
                                 </p>
                             </td>
                             <td class="value" <?php if($accountSelectionDisabled) echo 'style="visibility: hidden;"'?>>
@@ -131,7 +134,8 @@
                                 </select>
                                 <p class="note">
                                     <span><?php echo Mage::helper('M2ePro')->__(
-                                        'Choose the eBay site you want to list on using this M2E Pro listing. Currency will be set automatically based on the eBay site you choose.'
+                                        'Choose the eBay Site you want to list on using this M2E Pro Listing. <br/>
+                                         Currency will be set automatically based on the eBay Site you choose.'
                                     ); ?></span>
                                 </p>
 
@@ -169,7 +173,7 @@
                         <td class="value" style="vertical-align: middle">
                             <?php echo $this->getChildHtml('store_switcher'); ?>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento store view you want to use for this M2E Pro listing.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose the Magento Store View you want to use for this M2E Pro Listing.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -319,7 +323,7 @@
 
         $$('.next_step_button').each(function(btn) { btn.observe('click',function() {
             if (marketplaceSynchProgressHandlerObj.runningNow) {
-                return alert('<?php echo Mage::helper('M2ePro')->__('Please wait while synchronization is finished.'); ?>');
+                return alert('<?php echo Mage::helper('M2ePro')->__('Please wait while Synchronization is finished.'); ?>');
             }
             editForm.validate() && synchronizeMarketplace($('marketplace_id').value);
         }) });
@@ -341,7 +345,7 @@
 
         CommonHandlerObj.setValidationCheckRepetitionValue(
             'M2ePro-listing-title',
-            '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified title is already used for other listing. Listing title must be unique.')); ?>',
+            '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The specified Title is already used for other Listing. Listing Title must be unique.')); ?>',
             'Listing', 'title', 'id', null, '<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK ?>'
         );
 

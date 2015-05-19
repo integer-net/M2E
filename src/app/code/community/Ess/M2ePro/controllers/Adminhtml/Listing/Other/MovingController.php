@@ -23,9 +23,6 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MovingController
             'marketplaceId', $this->getRequest()->getParam('marketplaceId')
         );
         Mage::helper('M2ePro/Data_Global')->setValue(
-            'attrSetId', json_decode($this->getRequest()->getParam('attrSetId'))
-        );
-        Mage::helper('M2ePro/Data_Global')->setValue(
             'ignoreListings', json_decode($this->getRequest()->getParam('ignoreListings'))
         );
 
@@ -77,7 +74,6 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MovingController
 
         $selectedProductsParts = array_chunk($selectedProducts, 1000);
 
-        $attributes = array();
         foreach ($selectedProductsParts as $selectedProductsPart) {
             $listingOtherCollection = Mage::helper('M2ePro/Component')
                 ->getComponentModel($componentMode, 'Listing_Other')
@@ -102,15 +98,6 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MovingController
 
             $tempData = $listingOtherCollection
                 ->getSelect()
-                ->query()
-                ->fetchAll();
-
-            foreach ($tempData as $data) {
-                in_array($data['attribute_set_id'],$attributes) === false && $attributes[] = $data['attribute_set_id'];
-            }
-
-            $tempData = $listingOtherCollection
-                ->getSelect()
                 ->group(array('main_table.account_id','main_table.marketplace_id'))
                 ->query()
                 ->fetchAll();
@@ -126,23 +113,7 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MovingController
         $response = array(
             'accountId' => $accountId,
             'marketplaceId' => $marketplaceId,
-            'attrSetId' => $attributes
         );
-
-        if ($componentMode == Ess_M2ePro_Helper_Component_Ebay::NICK) {
-            return $this->getResponse()->setBody(json_encode($response));
-        }
-
-        $collection = Mage::helper('M2ePro/Component')
-            ->getComponentModel($componentMode, 'Listing')
-            ->getCollection();
-
-        $collection->addFieldToFilter('`main_table`.`marketplace_id`', $marketplaceId);
-        $collection->addFieldToFilter('`main_table`.`account_id`', $accountId);
-
-        if ($collection->getSize() < 1) {
-            $response['offerListingCreation'] = true;
-        }
 
         return $this->getResponse()->setBody(json_encode($response));
     }
@@ -222,7 +193,7 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MovingController
                     Ess_M2ePro_Model_Listing_Other_Log::ACTION_MOVE_LISTING,
                     // M2ePro_TRANSLATIONS
                     // Product already exists in M2E listing(s).
-                    'Product already exists in M2E listing(s).',
+                    'Product already exists in M2E Pro listing(s).',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -237,8 +208,8 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MovingController
                 NULL,
                 Ess_M2ePro_Model_Listing_Other_Log::ACTION_MOVE_LISTING,
                 // M2ePro_TRANSLATIONS
-                // Item was successfully moved
-                'Item was successfully moved',
+                // Item was successfully Moved
+                'Item was successfully Moved',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );
@@ -251,8 +222,8 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MovingController
                 NULL,
                 Ess_M2ePro_Model_Listing_Log::ACTION_MOVE_FROM_OTHER_LISTING,
                 // M2ePro_TRANSLATIONS
-                // Item was successfully moved
-                'Item was successfully moved',
+                // Item was successfully Moved
+                'Item was successfully Moved',
                 Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,
                 Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
             );

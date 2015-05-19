@@ -23,12 +23,12 @@
             <td style="padding: 10px  0 0 30px">
 
                 <h3>
-                    <?php echo Mage::helper('M2ePro')->__('Creating a new listing in one of your first jobs. Don\'t worry. It\'s easy to do.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Creating a new Listing in one of your first jobs. Don\'t worry. It\'s easy to do.'); ?>
                 </h3>
                 <br/>
 
-                <p><?php echo Mage::helper('M2ePro')->__('Think of an M2E Listing as a set of policies that will determine the type of items you wish to sell. You can create as many M2E Listings as you need.'); ?></p>
-                <p><?php echo Mage::helper('M2ePro')->__('Creating an M2E Listing with certain characteristics means you won\'t need to input these characteristics again and again every time you wish to sell an item.'); ?></p>
+                <p><?php echo Mage::helper('M2ePro')->__('Think of an M2E Pro Listing as a set of Policies that will determine the type of Items you wish to sell. You can create as many M2E Pro Listings as you need.'); ?></p>
+                <p><?php echo Mage::helper('M2ePro')->__('Creating an M2E Pro Listing with certain characteristics means you won\'t need to input these characteristics again and again every time you wish to sell an Item.'); ?></p>
 
                 <?php
 
@@ -40,14 +40,14 @@
                     $modeName = 'Advanced';
                 } ?>
 
-                <p><?php echo Mage::helper('M2ePro')->__('There are %amount% stages to complete to create a successful M2E Listing in %mode_name% Mode:',$countOfStages,$modeName); ?></p>
+                <p><?php echo Mage::helper('M2ePro')->__('There are %amount% stages to complete to create a successful M2E Pro Listing in %mode_name% Mode:',$countOfStages,$modeName); ?></p>
 
                 <ul style="list-style: decimal; padding-left: 40px;">
-                    <li><?php echo Mage::helper('M2ePro')->__('<b>General Settings</b> – information about which eBay site you wish to list on, your eBay User ID and which Magento Store settings you wish to use'); ?></li>
+                    <li><?php echo Mage::helper('M2ePro')->__('<b>General Settings</b> – information about which eBay Site you wish to list on, your eBay User ID and which Magento Store Settings you wish to use'); ?></li>
                     <li><?php echo Mage::helper('M2ePro')->__('<b>Payment and Shipping Settings</b> – what are your shipping charges, your Returns Policy and how do you wish to get paid'); ?></li>
-                    <li><?php echo Mage::helper('M2ePro')->__('<b>Selling Settings</b> – more detailed information about the type of eBay listing and how long your item will be on sale'); ?></li>
+                    <li><?php echo Mage::helper('M2ePro')->__('<b>Selling Settings</b> – more detailed information about the type of eBay Listing and how long your Item will be on sale'); ?></li>
                     <?php if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) { ?>
-                        <li><?php echo Mage::helper('M2ePro')->__('<b>Synchronization Setting</b> – how your items are synchronized on eBay'); ?></li>
+                        <li><?php echo Mage::helper('M2ePro')->__('<b>Synchronization Setting</b> – how your Items are synchronized on eBay'); ?></li>
                     <?php } ?>
                 </ul>
 

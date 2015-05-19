@@ -53,15 +53,13 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
         //------------------------------
 
         //------------------------------
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $migrationTable = Mage::getSingleton('core/resource')->getTableName('m2epro_migration_v6');
+        $migrationData = Mage::getModel('M2ePro/Registry')->load('wizard_migrationToV6_notes_html', 'key');
+        $html = $migrationData->getData('value');
+        $createDate = Mage::helper('M2ePro')->getDate($migrationData->getData('create_date'), true);
+        $threeMonths = 3 * 30 * 24 * 60 * 60;
 
-        $html = $connRead->select()->from($migrationTable,'data')
-            ->where('`component` = \'*\'')->where('`group` = \'notes\'')
-            ->query()->fetchColumn();
-
-        if (!empty($html)) {
+        if (!empty($html) && $this->referrer == Ess_M2ePro_Helper_View_Ebay::NICK &&
+            (Mage::helper('M2ePro')->getCurrentGmtDate(true) < ($createDate + $threeMonths))) {
             $url = $this->getUrl('*/adminhtml_support/migrationNotes');
             $this->_addButton('migration_notes', array(
                 'label'     => Mage::helper('M2ePro')->__('Migration Notes'),
@@ -107,14 +105,6 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
                 'class'     => 'button_link'
             ));
         }
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
         //------------------------------
     }
 

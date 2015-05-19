@@ -30,13 +30,13 @@ class Ess_M2ePro_Model_Ebay_Template_Policy extends Ess_M2ePro_Model_Component_A
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_policy');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_policy');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('ebay_template_policy');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('ebay_template_policy');
         return parent::delete();
     }
 

@@ -35,7 +35,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Synchronization_Log extends Mage_Adminhtml
 
         // Set template
         //------------------------------
-        $this->setTemplate('M2ePro/log/grid/container.phtml');
+        $this->setTemplate('M2ePro/widget/grid/container/only_content.phtml');
         //------------------------------
     }
 

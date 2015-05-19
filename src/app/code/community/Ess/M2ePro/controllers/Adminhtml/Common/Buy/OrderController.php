@@ -95,10 +95,10 @@ class Ess_M2ePro_Adminhtml_Common_Buy_OrderController
         $order = Mage::helper('M2ePro/Component_Buy')->getObject('Order', (int)$id);
 
     // M2ePro_TRANSLATIONS
-    // Magento Order is already created for this Rakuten.com Order. Press Create Order button to create new one.
+    // Magento Order is already created for this Rakuten.com Order. Press Create Order Button to create new one.
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
             $message = 'Magento Order is already created for this Rakuten.com Order. ' .
-                       'Press Create Order button to create new one.';
+                       'Press Create Order Button to create new one.';
 
             $this->_getSession()->addWarning(
                 Mage::helper('M2ePro')->__($message)
@@ -212,13 +212,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_OrderController
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Order address has been updated.'));
 
         $this->_redirect('*/adminhtml_common_buy_order/view', array('id' => $order->getId()));
-    }
-
-    //#############################################
-
-    public function updateShippingStatusAction()
-    {
-        // todo
     }
 
     //#############################################

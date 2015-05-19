@@ -36,6 +36,7 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                 listing_product_id: this.listingProductId
             },
             onSuccess: (function(transport) {
+
                 try {
                     var response = transport.responseText.evalJSON();
 
@@ -52,9 +53,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                         windowClassName: "popup-window",
                         title: popupTitle,
                         width: 600,
-                        height: 400,
+                        height: 405,
                         zIndex: 100,
-                        recenterAuto: false,
                         hideEffect: Element.hide,
                         showEffect: Element.show
                     });
@@ -80,19 +80,19 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
         this.variationAttributes.each((function(attribute,i) {
 
             var tr = container.appendChild(new Element('tr'));
-            tr.appendChild(new Element('td',{class: 'label'}))
+            tr.appendChild(new Element('td', {class: 'label'}))
               .insert(attribute + ': <span class="required">*</span>');
 
             var select = tr
-                .appendChild(new Element('td',{class: 'value'}))
-                .appendChild(new Element('select',{
+                .appendChild(new Element('td', {class: 'value'}))
+                .appendChild(new Element('select', {
                     name: 'variation_data[' + attribute + ']',
                     class:'required-entry',
                     index: i
                 }));
 
             select
-                .appendChild(new Element('option',{value: currentVariation[attribute]}))
+                .appendChild(new Element('option', {value: currentVariation[attribute]}))
                 .insert(currentVariation[attribute]);
 
             this.eachAttributeHandler(
@@ -129,6 +129,125 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
         }).bind(this));
     },
 
+    //----------------------------------
+
+    resetListingProductVariation: function()
+    {
+        MagentoMessageObj.clearAll();
+
+        new Ajax.Request(this.M2ePro.url.variation_reset_action, {
+            method: 'get',
+            parameters: {
+                component: this.M2ePro.customData.componentMode,
+                listing_product_id: this.listingProductId
+            },
+            onSuccess: (function(transport) {
+
+                try {
+                    var response = transport.responseText.evalJSON();
+
+                    MagentoMessageObj['add' + response.type[0].toUpperCase() + response.type.slice(1)](response.message);
+
+                    this.gridHandler.unselectAllAndReload();
+                } catch (e) {
+                    this.editPopup.close();
+                    MagentoMessageObj.addError('Internal Error.');
+                }
+            }).bind(this)
+        });
+    },
+
+    //###############################################
+
+    showSwitchToIndividualModePopUp: function(title)
+    {
+        var self = this;
+
+        self.switchToIndividualModePopUp = Dialog.info(null, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: M2ePro.text.switch_to_individual_mode_popup_title,
+            width: 530,
+            height: 200,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show
+        });
+
+        self.switchToIndividualModePopUp.options.destroyOnClose = true;
+
+        $('modal_dialog_message').insert($('switch_to_individual_popup').innerHTML);
+
+        $('modal_dialog_message').select('.switch-to-individual-btn')[0].observe('click', function() {
+
+            if ($('switch_to_individual_remember_checkbox').checked) {
+                new Ajax.Request(self.M2ePro.url.save_listing_additional_data, {
+                    method: 'post',
+                    parameters: {
+                        param_name: 'hide_switch_to_individual_confirm',
+                        param_value: 1
+                    },
+                    onSuccess: function(transport) {
+                        self.gridHandler.unselectAllAndReload();
+                    }
+                });
+            }
+
+            self.switchToIndividualModePopUp.close();
+            self.showManagePopup(title);
+        });
+
+        $('modal_dialog_message').select('.switch-to-individual-popup-close')[0].observe('click', function() {
+            self.switchToIndividualModePopUp.close();
+        });
+    },
+
+    showSwitchToParentModePopUp: function()
+    {
+        var self = this;
+
+        self.switchToParentModePopUp = Dialog.info(null, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: M2ePro.text.switch_to_parent_mode_popup_title,
+            width: 530,
+            height: 200,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show
+        });
+
+        self.switchToParentModePopUp.options.destroyOnClose = true;
+
+        $('modal_dialog_message').insert($('switch_to_parent_popup').innerHTML);
+
+        $('modal_dialog_message').select('.switch-to-parent-btn')[0].observe('click', function() {
+
+            if ($('switch_to_parent_remember_checkbox').checked) {
+                new Ajax.Request(self.M2ePro.url.save_listing_additional_data, {
+                    method: 'post',
+                    parameters: {
+                        param_name: 'hide_switch_to_parent_confirm',
+                        param_value: 1
+                    }
+                });
+            }
+
+            self.switchToParentModePopUp.close();
+            self.resetListingProductVariation();
+        });
+
+        $('modal_dialog_message').select('.switch-to-parent-popup-close')[0].observe('click', function() {
+            self.switchToParentModePopUp.close();
+        });
+    },
+
     //###############################################
 
     showManagePopup: function(popupTitle)
@@ -142,6 +261,7 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                 listing_product_id: this.listingProductId
             },
             onSuccess: (function(transport) {
+
                 try {
                     var response = transport.responseText.evalJSON();
 
@@ -158,9 +278,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                         windowClassName: "popup-window",
                         title: popupTitle,
                         width: 700,
-                        height: 450,
+                        height: 460,
                         zIndex: 100,
-                        recenterAuto: false,
                         hideEffect: Element.hide,
                         showEffect: Element.show
                     });
@@ -214,15 +333,15 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
         var lastTr = container.select('tr').last();
         var index = lastTr ? parseInt(lastTr.readAttribute('index')) + 1 : 1;
 
-        var tr = container.appendChild(new Element('tr',{index: index}));
+        var tr = container.appendChild(new Element('tr', {index: index}));
 
         var filters = {};
 
         this.variationAttributes.each((function(attribute,i) {
 
             var select = tr
-                .appendChild(new Element('td',{style: 'vertical-align: top; padding: 2px 4px'}))
-                .appendChild(new Element('select',{
+                .appendChild(new Element('td', {style: 'vertical-align: top; padding: 2px 4px'}))
+                .appendChild(new Element('select', {
                     name: 'variation_data['+index+'][' + attribute + ']',
                     class:'required-entry',
                     style: 'width: 100%',
@@ -243,8 +362,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
 
         }).bind(this));
 
-        tr.appendChild(new Element('td',{style: 'vertical-align: top; padding: 2px 4px'}))
-          .appendChild(new Element('button',{type:'button',class: 'scalable delete'})).insert('<span></span>')
+        tr.appendChild(new Element('td', {style: 'vertical-align: top; padding: 2px 4px'}))
+          .appendChild(new Element('button', {type:'button',class: 'scalable delete'})).insert('<span></span>')
           .observe('click',function() {container.select('tr').length > 1 && tr.remove()});
     },
 
@@ -293,16 +412,19 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
         var oldValue = container.value;
         container.update();
 
-        container.appendChild(new Element('option',{style: 'display: none'}));
-        values.each(function(value) {
-            container.appendChild(new Element('option',{value: value})).insert(value);
+        container.appendChild(new Element('option', {style: 'display: none'}));
 
-            if (value == oldValue) {
-                container.value = oldValue;
-                container.simulate('change');
-            }
+        if(typeof values != 'undefined') {
 
-        });
+            values.each(function(value) {
+                container.appendChild(new Element('option', {value: value})).insert(value);
+
+                if (value == oldValue) {
+                    container.value = oldValue;
+                    container.simulate('change');
+                }
+            });
+        }
     },
 
     //----------------------------------
@@ -352,6 +474,7 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
             method: 'post',
             parameters: parameters,
             onSuccess: (function(transport) {
+
                 try {
                     this.editPopup.close();
 
@@ -393,6 +516,7 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
             method: 'post',
             parameters: parameters,
             onSuccess: (function(transport) {
+
                 try {
                     this.managePopup.close();
 
@@ -433,8 +557,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                 unique: +(unique)
             },
             onSuccess: (function(transport) {
-                try {
 
+                try {
                     var response = transport.responseText.evalJSON();
 
                     if (response.type == 'error') {
@@ -450,6 +574,7 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                     $('variation_manage_tbody').select('tr').invoke('remove');
 
                     response.text.each((function(attributes) {
+
                         this.manageAddRow();
 
                         var tr = $('variation_manage_tbody').select('tr').last();
@@ -467,7 +592,6 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                             obj.select.simulate('change');
                         });
                     }).bind(this));
-
                 } catch (e) {
                     this.scroll_page_to_top();
                     this.managePopup.close();
@@ -477,5 +601,5 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
         });
     }
 
-    //###############################################
+    //----------------------------------
 });

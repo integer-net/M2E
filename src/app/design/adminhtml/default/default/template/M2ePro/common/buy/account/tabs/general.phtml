@@ -1,5 +1,5 @@
 <div id="block_notice_buy_accounts_general" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('General'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('On this page you have to fill in general information on your Rakuten.com account and provide all necessary accesses for the further work.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('On this Page you have to fill in General information on your Rakuten.com Account and provide all necessary accesses for the further work.'); ?>
 </div>
 
 <?php
@@ -44,7 +44,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     )); ?>);
 
     M2ePro.translator.add(<?php echo json_encode(array(
-        'Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.' => Mage::helper('M2ePro')->__('Be attentive! By deleting account you delete all information on it from M2E Pro server. This will cause inappropriate work of all accounts\' copies.'),
+        'Be attentive! By Deleting Account you delete all information on it from M2E Pro Server. This will cause inappropriate work of all Accounts\' copies.' => Mage::helper('M2ePro')->__('Be attentive! By Deleting Account you delete all information on it from M2E Pro Server. This will cause inappropriate work of all Accounts\' copies.'),
         'Invalid format of Seller ID field. It must be numeric.' => Mage::helper('M2ePro')->__('Invalid format of Seller ID field. It must be numeric.')
     )); ?>);
 
@@ -68,10 +68,10 @@ $isEdit = !!$this->getRequest()->getParam('id');
     // Data for current tab
     //-----------------------------
     M2ePro.translator.add(<?php echo json_encode(array(
-        'The specified title is already used for other account. Account title must be unique.' => Mage::helper('M2ePro')->__('The specified title is already used for other account. Account title must be unique.'),
-        'You must enable marketplace first.' => Mage::helper('M2ePro')->__('You must enable marketplace first.'),
-        'M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.'),
-        'M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com FTP login and password.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Rakuten.com account. Please, make sure, that you enter correct Rakuten.com FTP login and password.')
+        'The specified Title is already used for other Account. Account Title must be unique.' => Mage::helper('M2ePro')->__('The specified Title is already used for other Account. Account Title must be unique.'),
+        'You must enable Marketplace first.' => Mage::helper('M2ePro')->__('You must enable Marketplace first.'),
+        'M2E Pro was not able to get access to the Rakuten.com Account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Rakuten.com Account. Please, make sure, that you enter correct Rakuten.com Seller Tools login and password.'),
+        'M2E Pro was not able to get access to the Rakuten.com Account. Please, make sure, that you enter correct Rakuten.com FTP login and password.' => Mage::helper('M2ePro')->__('M2E Pro was not able to get access to the Rakuten.com Account. Please, make sure, that you enter correct Rakuten.com FTP login and password.')
     )); ?>);
 
     M2ePro.formData.title = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->escapeHtml($formData['title'])); ?>';
@@ -97,7 +97,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value" style="width: auto;">
                         <input id="title" name="title" value="<?php echo $this->escapeHtml($formData['title']); ?>" type="text" class="input-text required-entry M2ePro-account-title" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Title or identifier of Rakuten.com account for your internal use.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Title or Identifier of Rakuten.com Account for your internal use.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -118,7 +118,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     <div class="fieldset">
         <div class="hor-scroll">
             <div id="block_notice_buy_accounts_general_marketplaces_access_none" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Disable Marketplace'); ?>" collapseable="no" always_show="yes" hideblock="no">
-                <?php echo Mage::helper('M2ePro')->__('You must select and update Rakuten.com marketplace to get access to this section.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('You must select and Update Rakuten.com Marketplace to get access to this Section.'); ?>
             </div>
             <input type="hidden" class="M2ePro-marketplace-disabled" value="" />
         </div>
@@ -144,7 +144,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value" style="width: auto;">
                         <input id="web_login" name="web_login" type="text" value="<?php echo $formData['web_login'] ?>" class="input-text required-entry M2ePro-web-access" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Login to your Rakuten.com account.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Login to your Rakuten.com Account.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -158,7 +158,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     <td class="value" id="web_password_input"  <?php if ($isEdit) echo 'style="display: none;"' ?>>
                         <input id="web_password" name="web_password" type="password" class="input-text M2ePro-required-when-visible" />
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Password to your Rakuten.com account.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Password to your Rakuten.com Account.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -225,7 +225,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     <div class="fieldset">
         <div class="hor-scroll">
             <div id="block_notice_buy_accounts_general_ftp_accesses" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('FTP Accesses'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('All these actions must be allowed to your Rakuten.com Account by Rakuten first.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('All these Actions must be allowed to your Rakuten.com Account by Rakuten first.'); ?>
             </div>
             <table class="form-list" cellspacing="0" cellpadding="0">
                 <tr>
@@ -238,7 +238,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="1" <?php if ($formData['ftp_inventory_access'] == 1) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Set <i>Yes</i>, if you have enabled inventory generation option on your FTP.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Set <i>Yes</i>, if you have enabled Inventory Generation Option on your FTP.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -252,7 +252,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="1" <?php if ($formData['ftp_orders_access'] == 1) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Set <i>Yes</i>, if you have enabled orders generation option on your FTP.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Set <i>Yes</i>, if you have enabled Orders Generation Option on your FTP.'); ?></span>
                         </p>
                     </td>
                 </tr>
@@ -266,7 +266,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             <option value="1" <?php if ($formData['ftp_new_sku_access'] == 1) echo 'selected="selected"' ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Set <i>Yes</i>, if you have enabled new SKU creation option on your FTP.
+                            <span><?php echo Mage::helper('M2ePro')->__('Set <i>Yes</i>, if you have enabled new SKU Creation Option on your FTP.
                             <br/><b>Note:</b> The access of getting new SKU must be taken from Rakuten.com'); ?></span>
                         </p>
                     </td>

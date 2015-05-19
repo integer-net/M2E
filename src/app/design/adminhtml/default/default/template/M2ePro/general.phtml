@@ -38,10 +38,12 @@
         'Warning'       => Mage::helper('M2ePro')->__('Warning'),
         'None'          => Mage::helper('M2ePro')->__('None'),
         'Cancel'        => Mage::helper('M2ePro')->__('Cancel'),
+        'In Progress'   => Mage::helper('M2ePro')->__('In Progress'),
+        'Product(s)'    => Mage::helper('M2ePro')->__('Product(s)'),
 
-        'Please select the products you want to perform the action on.' => Mage::helper('M2ePro')->__('Please select the products you want to perform the action on.'),
-        'Please select items.'  => Mage::helper('M2ePro')->__('Please select items.'),
-        'Please select action.' => Mage::helper('M2ePro')->__('Please select action.'),
+        'Please select the Products you want to perform the Action on.' => Mage::helper('M2ePro')->__('Please select the Products you want to perform the Action on.'),
+        'Please select Items.'  => Mage::helper('M2ePro')->__('Please select Items.'),
+        'Please select Action.' => Mage::helper('M2ePro')->__('Please select Action.'),
         'View All Product Log' => Mage::helper('M2ePro')->__('View All Product Log'),
         'This is a required field.' => Mage::helper('M2ePro')->__('This is a required field.'),
         'Invalid input data. Decimal value required. Example 12.05' => Mage::helper('M2ePro')->__('Invalid input data. Decimal value required. Example 12.05'),
@@ -51,49 +53,3 @@
     )); ?>);
 
 </script>
-
-<?php if ($this->analytic['mode']) { ?>
-
-    <script type="text/javascript" src="<?php echo $this->analytic['url']; ?>public/analytic_v1.js"></script>
-
-    <script type="text/javascript">
-
-        var analyticDispatcher = new AnalyticDispatcher('<?php echo $this->analytic['url']; ?>');
-
-        analyticDispatcher
-
-            .setInfoParams({
-                ip: M2ePro.info.location.ip,
-                dom: M2ePro.info.location.domain,
-                pt: M2ePro.info.platform.name,
-                pv: M2ePro.info.platform.version,
-                pr: M2ePro.info.platform.revision,
-                mt: M2ePro.info.module.name,
-                mv: M2ePro.info.module.version,
-                mr: M2ePro.info.module.revision,
-                loc: M2ePro.info.locale
-            })
-
-            .setNavigationParams({
-                nid: '<?php echo $this->analytic['data']['identifier']; ?>',
-                nsi: '<?php echo $this->analytic['data']['session_id']; ?>',
-                nct: '<?php echo $this->analytic['data']['controller']; ?>',
-                nac: '<?php echo $this->analytic['data']['action']; ?>',
-                nmp: '<?php echo $this->analytic['data']['mage_params']; ?>'
-            })
-
-            <?php if (isset($this->analytic['additional_data'])) { ?>
-                .setNavigationAdditionalParams({
-                    ngp: '<?php echo $this->analytic['additional_data']['get_params']; ?>',
-                    npp: '<?php echo $this->analytic['additional_data']['post_params']; ?>'
-                })
-            <?php } ?>
-
-            .setActionMode('<?php echo $this->analytic['action_mode']; ?>')
-            .setNavigationMode('<?php echo $this->analytic['navigation_mode'] != Ess_M2ePro_Helper_Module_Analytic::NAVIGATION_MODE_DISABLED; ?>')
-
-            .process();
-
-    </script>
-
-<?php } ?>

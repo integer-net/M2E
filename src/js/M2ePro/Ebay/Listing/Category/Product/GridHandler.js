@@ -1,5 +1,7 @@
 EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHandler, {
 
+    //----------------------------------
+
     productIdCellIndex: 1,
     productTitleCellIndex: 2,
 
@@ -9,7 +11,7 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
     {
         $super();
 
-        this.actions = Object.extend(this.actions,{
+        this.actions = Object.extend(this.actions, {
 
             getSuggestedCategoriesAction: function(id) {
                 this.getSuggestedCategories(id);
@@ -30,6 +32,7 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
     getSuggestedCategories: function(id)
     {
         this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
+        this.unselectAll();
 
         if (id && !confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
@@ -37,7 +40,6 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
 
         EbayListingCategoryProductSuggestedSearchHandlerObj.search(
             this.selectedProductsIds.join(','), function(searchResult) {
-                this.unselectAll();
                 this.getGridObj().doFilter();
                 this.selectedProductsIds = [];
 
@@ -45,16 +47,15 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
 
                 if (searchResult.failed > 0) {
                     MagentoMessageObj.addError(
-                        M2ePro.translator.translate('eBay could not assign categories for %product_title% products.')
+                        M2ePro.translator.translate('eBay could not assign Categories for %product_title% Products.')
                             .replace('%product_title%', searchResult.failed)
                     );
                 } else if (searchResult.succeeded > 0) {
                     MagentoMessageObj.addSuccess(
-                        M2ePro.translator.translate('Suggested Categories were successfully received for %product_title% product(s).')
+                        M2ePro.translator.translate('Suggested Categories were successfully Received for %product_title% Product(s).')
                             .replace('%product_title%', searchResult.succeeded)
                     );
                 }
-
             }.bind(this)
         );
     },
@@ -88,15 +89,14 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
     {
         this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_categorySettings/getChooserBlockHtml') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_categorySettings/getChooserBlockHtml'), {
             method: 'post',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 ids: this.selectedProductsIds.join(',')
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
                 var title = M2ePro.translator.translate('Set eBay Category for Product(s)');
 
                 if (this.selectedProductsIds.length == 1) {
@@ -119,15 +119,13 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
 
         this.selectedProductsIds = id ? [id] : this.getSelectedProductsArray();
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_categorySettings/stepTwoSuggestedReset') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_categorySettings/stepTwoSuggestedReset'), {
             method: 'post',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 ids: this.selectedProductsIds.join(',')
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
                 this.getGridObj().doFilter();
                 this.unselectAll();
             }.bind(this)
@@ -162,12 +160,12 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
 
         Dialog.info(content, config);
 
-        $('cancel_button').observe('click', function () {
+        $('cancel_button').observe('click', function() {
             Windows.getFocusedWindow().close();
             this.unselectAll();
         }.bind(this));
 
-        $('done_button').observe('click', function () {
+        $('done_button').observe('click', function() {
             if(!this.validate()) {
                 return;
             }
@@ -184,13 +182,12 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
     {
         MagentoMessageObj.clearAll();
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_categorySettings/stepTwoModeProductValidate') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_categorySettings/stepTwoModeProductValidate'), {
             method: 'get',
-            asynchronous : true,
-            parameters : {},
-            onSuccess: function (transport)
-            {
+            asynchronous: true,
+            parameters: {},
+            onSuccess: function(transport) {
+
                 var response = transport.responseText.evalJSON();
 
                 if (response['validation']) {
@@ -211,7 +208,6 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
                     width: 430,
                     height: 200,
                     zIndex: 100,
-                    recenterAuto: false,
                     hideEffect: Element.hide,
                     showEffect: Element.show
                 });
@@ -240,8 +236,7 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
             parameters: {
                 ids: ids.join(',')
             },
-            onSuccess: function()
-            {
+            onSuccess: function() {
                 this.unselectAllAndReload();
             }.bind(this)
         });
@@ -261,11 +256,17 @@ EbayListingCategoryProductGridHandler = Class.create(EbayListingCategoryGridHand
 
         if (action == 'removeItem' ||
             action == 'editCategories' ||
-            action == 'editPrimaryCategories') {
+            action == 'editPrimaryCategories' ||
+            action == 'editStorePrimaryCategories') {
             return true;
         }
 
-        return $super();
+        var result = $super();
+        if (action == 'getSuggestedCategories' && !result) {
+            this.unselectAll();
+        }
+
+        return result;
     },
 
     //----------------------------------

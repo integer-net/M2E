@@ -160,7 +160,7 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         $ids = $this->getRequestIds();
 
         if (count($ids) == 0) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select order(s).'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Order(s).'));
             return false;
         }
 
@@ -211,9 +211,9 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
 
         if (!is_null($order->getMagentoOrderId()) && $force != 'yes') {
     // M2ePro_TRANSLATIONS
-    // Magento Order is already created for this eBay Order. Press Create Order button to create new one.
+    // Magento Order is already created for this eBay Order. Press Create Order Button to create new one.
             $message = 'Magento Order is already created for this eBay Order. ' .
-                       'Press Create Order button to create new one.';
+                       'Press Create Order Button to create new one.';
 
             $this->_getSession()->addWarning(
                 Mage::helper('M2ePro')->__($message)
@@ -276,12 +276,12 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
         $transaction = Mage::getModel('M2ePro/Ebay_Order_ExternalTransaction')->load($transactionId, 'transaction_id');
 
         if (is_null($transaction->getId())) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('eBay order transaction does not exist.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('eBay Order Transaction does not exist.'));
             return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 
         if (!$transaction->isPaypal()) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('This is not a PayPal transaction.'));
+            $this->_getSession()->addError(Mage::helper('M2ePro')->__('This is not a PayPal Transaction.'));
             return $this->_redirect('*/adminhtml_ebay_order/index');
         }
 

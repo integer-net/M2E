@@ -36,7 +36,7 @@ class Ess_M2ePro_Adminhtml_Configuration_SettingsController
         );
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The global settings have been successfully saved.')
+            Mage::helper('M2ePro')->__('The global Settings have been successfully saved.')
         );
 
         $this->_redirectUrl($this->_getRefererUrl());
@@ -50,7 +50,7 @@ class Ess_M2ePro_Adminhtml_Configuration_SettingsController
             strpos($name,'m2e_bn_') !== false && setcookie($name, '', 0, '/');
         }
 
-        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('All help blocks were restored.'));
+        $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('All Help Blocks were restored.'));
         $this->_redirectUrl($this->_getRefererUrl());
     }
 

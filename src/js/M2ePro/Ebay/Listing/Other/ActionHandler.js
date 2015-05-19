@@ -16,7 +16,7 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    startActions : function(title,url,selectedProductsParts)
+    startActions: function(title,url,selectedProductsParts)
     {
         MagentoMessageObj.clearAll();
         $('listing_container_errors_summary').hide();
@@ -31,7 +31,7 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
         self.sendPartsOfProducts(selectedProductsParts,selectedProductsParts.length,url);
     },
 
-    sendPartsOfProducts : function(parts,totalPartsCount,url)
+    sendPartsOfProducts: function(parts,totalPartsCount,url)
     {
         var self = this;
 
@@ -71,15 +71,13 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
                     actionIds += self.sendPartsResponses[i].action_id;
                 }
 
-                new Ajax.Request( self.options.url.getErrorsSummary + 'action_ids/' + actionIds + '/' ,
-                    {
-                        method:'get',
-                        onSuccess: function(transportSummary)
-                        {
-                            $('listing_container_errors_summary').innerHTML = transportSummary.responseText;
-                            $('listing_container_errors_summary').show();
-                        }
-                    });
+                new Ajax.Request(self.options.url.getErrorsSummary + 'action_ids/' + actionIds + '/' , {
+                    method:'get',
+                    onSuccess: function(transportSummary) {
+                        $('listing_container_errors_summary').innerHTML = transportSummary.responseText;
+                        $('listing_container_errors_summary').show();
+                    }
+                });
 
             } else if (combineResult == 'warning') {
                 var message = self.options.text.task_completed_warning_message;
@@ -142,14 +140,13 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
         var message = self.options.text.sending_data_message;
         ListingProgressBarObj.setStatus(message.replace('%product_title%', partExecuteString));
 
-        new Ajax.Request( url + 'id/' + self.gridHandler.listingId,
-        {
+        new Ajax.Request(url + 'id/' + self.gridHandler.listingId, {
             method: 'post',
             parameters: {
                 selected_products: partString
             },
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 if (!transport.responseText.isJSON()) {
 
                     if (transport.responseText != '') {
@@ -246,5 +243,4 @@ EbayListingOtherActionHandler = Class.create(ActionHandler, {
     }
 
     //----------------------------------
-
 });

@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log extends Mage_Adminhtml_Block_Widget_Container
 {
     public function __construct()
     {
@@ -15,6 +15,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log extends Mage_Adminhtml
         $this->setId('commonListingOtherLog');
         $this->_blockGroup = 'M2ePro';
         $this->_controller = 'adminhtml_common_listing_other_log';
+        //------------------------------
+
+        //------------------------------
+        $this->setTemplate('M2ePro/common/log/log.phtml');
         //------------------------------
 
         // Set header text
@@ -72,14 +76,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log extends Mage_Adminhtml
         //------------------------------
 
         //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
-        ));
-        //------------------------------
-
-        //------------------------------
         if (isset($otherListingData['id'])) {
             $url = $this->getUrl('*/*/*');
             $this->_addButton('show_general_log', array(
@@ -93,14 +89,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log extends Mage_Adminhtml
 
     // ########################################
 
-    public function getGridHtml()
-    {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_other_log_help');
-        return $helpBlock->toHtml() . parent::getGridHtml();
-    }
-
     protected function _toHtml()
     {
+        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_other_log_help')->toHtml();
+
+        $logBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_log_tabs', '',
+            array(
+                'channel' => $this->getRequest()->getParam('channel'),
+                'log_type' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::LOG_TYPE_ID_LISTING_OTHER
+            )
+        )->toHtml();
+
         $translations = json_encode(array(
             'Description' => Mage::helper('M2ePro')->__('Description')
         ));
@@ -119,7 +118,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log extends Mage_Adminhtml
 
 JAVASCIRPT;
 
-        return $javascript . parent::_toHtml();
+        return $javascript . parent::_toHtml() . $helpBlock . $logBlock;
     }
 
     // ########################################

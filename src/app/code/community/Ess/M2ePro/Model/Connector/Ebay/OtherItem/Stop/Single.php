@@ -16,7 +16,7 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Stop_Single
         return array('item','update','end');
     }
 
-    protected function getLogAction()
+    protected function getLogsAction()
     {
         return Ess_M2ePro_Model_Listing_Other_Log::ACTION_STOP_PRODUCT;
     }
@@ -34,8 +34,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Stop_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Item is not listed or not available
-                parent::MESSAGE_TEXT_KEY => 'Item is not listed or not available',
+                // Item is not Listed or not available
+                parent::MESSAGE_TEXT_KEY => 'Item is not Listed or not available',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
@@ -70,8 +70,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Stop_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Item was already stopped on eBay
-                parent::MESSAGE_TEXT_KEY => 'Item was already stopped on eBay',
+                // Item was already Stopped on eBay
+                parent::MESSAGE_TEXT_KEY => 'Item was already Stopped on eBay',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
@@ -81,8 +81,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Stop_Single
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Item was successfully stopped
-                parent::MESSAGE_TEXT_KEY => 'Item was successfully stopped',
+                // Item was successfully Stopped
+                parent::MESSAGE_TEXT_KEY => 'Item was successfully Stopped',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_SUCCESS
             );
         }

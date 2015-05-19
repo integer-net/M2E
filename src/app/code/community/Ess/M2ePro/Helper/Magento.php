@@ -179,7 +179,7 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             '/Unirgy_Dropship/i' => 'Rewrites stock item and in some cases return
                                      always in stock for all products',
 
-            '/Aitoc_/i' => 'Stock management conflicts.',
+            '/Aitoc_Aitquantitymanager/i' => 'Stock management conflicts.',
 
             '/Eternalsoft_Ajaxcart/i' => 'Broke some ajax responses.',
             '/Amasty_Shiprestriction/i' => '"Please specify a shipping method" error for some orders.',
@@ -353,19 +353,26 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
     public function getLocalPoolOverwrites()
     {
         $paths = array(
-            'app/code/local/Mage',
-            'app/code/local/Zend',
-            'app/code/local/Ess',
-            'app/code/local/Varien',
+            Mage::getBaseDir().'/app/code/local/Mage',
+            Mage::getBaseDir().'/app/code/local/Zend',
+            Mage::getBaseDir().'/app/code/local/Ess',
+            Mage::getBaseDir().'/app/code/local/Varien',
         );
-
-        foreach ($paths as &$patch) {
-            $patch = Mage::getBaseDir() . '/' . $patch;
-        }
 
         $overwrites = array();
         foreach ($paths as $path) {
-            $overwrites = array_merge($overwrites, $this->getLocalPoolOverwritesRec($path));
+
+            if (!is_dir($path)) {
+                continue;
+            }
+
+            $directoryIterator = new RecursiveDirectoryIterator($path, RecursiveDirectoryIterator::SKIP_DOTS);
+            $iterator = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::SELF_FIRST);
+
+            /** @var SplFileInfo $splFileObj */
+            foreach ($iterator as $splFileObj) {
+                $splFileObj->isFile() && $overwrites[] = $splFileObj->getRealPath();
+            }
         }
 
         $result = array();
@@ -376,33 +383,13 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
         return $result;
     }
 
-    private function getLocalPoolOverwritesRec($path)
-    {
-        if (!is_dir($path)) {
-            return array();
-        }
-
-        $overrides = array();
-        foreach (scandir($path) as $folderItem) {
-
-            $tempPath = $path . '/' . $folderItem;
-            is_file($tempPath) && $overrides[] = $tempPath;
-
-            if ($folderItem == '.' || $folderItem == '..' || !is_dir($tempPath)) {
-                continue;
-            }
-
-            $overrides = array_merge($overrides, $this->getLocalPoolOverwritesRec($tempPath));
-        }
-
-        return $overrides;
-    }
-
     private function isOriginalFileExists($overwritedFilename)
     {
-        $isOriginalCoreFileExist      = is_file(str_replace('/local/', '/core/', $overwritedFilename));
-        $isOriginalCommunityFileExist = is_file(str_replace('/local/', '/community/', $overwritedFilename));
-        $isOriginalLibFileExist       = is_file(str_replace('app/code/local/', 'lib/', $overwritedFilename));
+        $unixFormattedPath = str_replace('\\', '/', $overwritedFilename);
+
+        $isOriginalCoreFileExist      = is_file(str_replace('/local/', '/core/', $unixFormattedPath));
+        $isOriginalCommunityFileExist = is_file(str_replace('/local/', '/community/', $unixFormattedPath));
+        $isOriginalLibFileExist       = is_file(str_replace('app/code/local/', 'lib/', $unixFormattedPath));
 
         return $isOriginalCoreFileExist || $isOriginalCommunityFileExist || $isOriginalLibFileExist;
     }
@@ -424,6 +411,7 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
     {
         $eventObservers = array();
         foreach ($this->getAreas() as $area) {
+
             $areaNode = Mage::getConfig()->getNode($area);
             if (empty($areaNode)) {
                 continue;
@@ -435,9 +423,19 @@ class Ess_M2ePro_Helper_Magento extends Mage_Core_Helper_Abstract
             }
 
             foreach ($areaEvents->asArray() as $eventName => $eventData) {
-
                 foreach ($eventData['observers'] as $observerConfig) {
-                    $eventObservers[$area][$eventName][] = $observerConfig['class'].'::'.$observerConfig['method'];
+
+                    $observerName = '#class#::#method#';
+
+                    if (!empty($observerConfig['class'])) {
+                        $observerName = str_replace('#class#', $observerConfig['class'], $observerName);
+                    }
+
+                    if (!empty($observerConfig['method'])) {
+                        $observerName = str_replace('#method#', $observerConfig['method'], $observerName);
+                    }
+
+                    $eventObservers[$area][$eventName][] = $observerName;
                 }
 
             }

@@ -2,6 +2,12 @@
     body {
         background: none;
     }
+    #store_switcher_container p {
+        margin-bottom: 0 !important;
+        border: none !important;
+        background: none !important;
+        padding: 0 !important;
+    }
 </style>
 
 <div class="entry-edit" id="magento_block_ebay_template_description_form" style="padding: 5px;">
@@ -20,10 +26,18 @@
 
                 <?php if ($errorMessage = $this->getData('error_message')): ?>
                     <span style="color: red; font-weight: bold;"><?php echo Mage::helper('M2ePro')->escapeHtml($errorMessage); ?></span>
-                    <br /><br />
+                    <br/><br/>
                 <?php endif; ?>
 
-                <?php echo Mage::helper('M2ePro')->__('Enter Product Id'); ?>:&nbsp;&nbsp;<input id="product_id" type="text" name="id" value="<?php echo $this->getData('product_id'); ?>" class="input-text" />
+                <?php echo Mage::helper('M2ePro')->__('Enter Product Id'); ?>:&nbsp;&nbsp;
+                <input id="product_id" type="text" name="id" value="<?php echo $this->getData('product_id'); ?>" class="input-text" />
+
+                <div id="store_switcher_container" style="margin-left: 10px; margin-right: 10px; display: inline-block;">
+                    <?php echo Mage::helper('M2ePro')->__('Store'); ?>:&nbsp;&nbsp;
+                    <div style="display: inline-block; \">
+                        <?php echo $this->getChildHtml('store_switcher'); ?>
+                    </div>
+                </div>
 
                 &nbsp;&nbsp;<?php echo $this->getChildHtml('display_product_description') ?>
                 &nbsp;&nbsp;<?php echo Mage::helper('M2ePro')->__('or') ?>&nbsp;&nbsp;

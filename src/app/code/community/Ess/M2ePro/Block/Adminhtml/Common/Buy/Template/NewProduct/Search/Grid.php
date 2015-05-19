@@ -98,10 +98,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Search_Grid exte
         $html = <<<HTML
 <div style="margin-left: 3px">
     <a href="javascript:;" onclick="BuyTemplateNewProductHandlerObj.confirmSearchClick($categoryInfo)">$title</a>
-    <br>
+    <br/>
     <span style="font-weight: bold;">$foundIn</span>
     &nbsp;
-    <span title="$fullPath">$path</span><br>
+    <span title="$fullPath">$path</span><br/>
 </div>
 HTML;
 

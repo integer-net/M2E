@@ -334,9 +334,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Wi
         // --------------------------------
 
         $tips = array(
-            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last order action was completed successfully.',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last order action was completed with error(s).',
-            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last order action was completed with warning(s).'
+            Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS => 'Last order Action was completed successfully.',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR => 'Last order Action was completed with error(s).',
+            Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING => 'Last order Action was completed with warning(s).'
         );
 
         $icons = array(
@@ -380,10 +380,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Wi
 
     public function callbackColumnEbayOrder($value, $row, $column, $isExport)
     {
-        $returnString = str_replace('-', '-<br />', $value);
+        $returnString = str_replace('-', '-<br/>', $value);
 
         if ($row['selling_manager_id'] > 0) {
-            $returnString .= '<br /> [ <b>SM: </b> # ' . $row['selling_manager_id'] . ' ]';
+            $returnString .= '<br/> [ <b>SM: </b> # ' . $row['selling_manager_id'] . ' ]';
         }
 
         return $returnString;
@@ -399,7 +399,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Grid extends Mage_Adminhtml_Block_Wi
 
         foreach ($items as $item) {
             if ($html != '') {
-                $html .= '<br />';
+                $html .= '<br/>';
             }
 
             $isShowEditLink = false;
@@ -439,7 +439,7 @@ HTML;
                 $sku = Mage::helper('M2ePro')->escapeHtml($item->getSku());
 
                 $skuHtml = <<<HTML
-<span style="padding-left: 10px;"><b>{$skuLabel}:</b>&nbsp;{$sku}</span><br />
+<span style="padding-left: 10px;"><b>{$skuLabel}:</b>&nbsp;{$sku}</span><br/>
 HTML;
             }
 
@@ -455,7 +455,7 @@ HTML;
                 }
 
                 $variationHtml .= <<<HTML
-<span style="padding-left: 10px;"><b>{$optionsLabel}:</b>{$additionalHtml}</span><br />
+<span style="padding-left: 10px;"><b>{$optionsLabel}:</b>{$additionalHtml}</span><br/>
 HTML;
 
                 foreach ($variation as $optionName => $optionValue) {
@@ -463,7 +463,7 @@ HTML;
                     $optionValue = Mage::helper('M2ePro')->escapeHtml($optionValue);
 
                     $variationHtml .= <<<HTML
-<span style="padding-left: 20px;"><b><i>{$optionName}</i>:</b>&nbsp;{$optionValue}</span><br />
+<span style="padding-left: 20px;"><b><i>{$optionName}</i>:</b>&nbsp;{$optionValue}</span><br/>
 HTML;
                 }
             }
@@ -472,7 +472,7 @@ HTML;
             $qty = (int)$item->getQtyPurchased();
 
             $transactionHtml = <<<HTML
-<span style="padding-left: 10px;"><b>{$qtyLabel}:</b>&nbsp;{$qty}</span><br />
+<span style="padding-left: 10px;"><b>{$qtyLabel}:</b>&nbsp;{$qty}</span><br/>
 HTML;
 
             if ($item->getTransactionId()) {
@@ -492,8 +492,8 @@ HTML;
             $itemTitle = Mage::helper('M2ePro')->escapeHtml($item->getTitle());
 
             $html .= <<<HTML
-<b>{$itemLabel}: #</b> <a href="{$itemUrl}" target="_blank">{$itemId}</a><br />
-{$itemTitle}<br />
+<b>{$itemLabel}: #</b> <a href="{$itemUrl}" target="_blank">{$itemId}</a><br/>
+{$itemTitle}<br/>
 <small>{$skuHtml}{$variationHtml}{$transactionHtml}</small>
 HTML;
         }
@@ -504,11 +504,11 @@ HTML;
     public function callbackColumnBuyer($value, $row, $column, $isExport)
     {
         $returnString = '';
-        $returnString .= Mage::helper('M2ePro')->escapeHtml($row->getData('buyer_name')) . '<br />';
+        $returnString .= Mage::helper('M2ePro')->escapeHtml($row->getData('buyer_name')) . '<br/>';
 
         $buyerEmail = $row->getData('buyer_email');
         if ($buyerEmail && $buyerEmail != 'Invalid Request') {
-            $returnString .= '&lt;' . $buyerEmail  . '&gt;<br />';
+            $returnString .= '&lt;' . $buyerEmail  . '&gt;<br/>';
         }
 
         $returnString .= Mage::helper('M2ePro')->escapeHtml($row->getData('buyer_user_id'));

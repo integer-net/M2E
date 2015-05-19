@@ -15,6 +15,8 @@
 
         //------------------------------
 
+        $('block_notices_show').observe('change', SettingsHandlerObj.changeBlockNoticesShow).simulate('change');
+
         $('force_qty_mode').simulate('change');
 
         //------------------------------
@@ -46,7 +48,7 @@
             <div class="hor-scroll">
 
                 <div id="block_notice_configuration_interface" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Interface'); ?>">
-                    <?php echo Mage::helper('M2ePro')->__('Set M2E interface preferences, then click <b>Save Config</b>.'); ?>
+                    <?php echo Mage::helper('M2ePro')->__('Set M2E Pro interface preferences, then click <b>Save Config</b>.'); ?>
                 </div>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -66,7 +68,7 @@
                                 <option value="1" <?php if ($this->products_show_thumbnails): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Show'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Choose whether you want to see thumbnail images for products on the Add Products and View Listing pages.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose whether you want to see Thumbnail Images for Products on the Add Products and View Listing Pages.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -81,17 +83,17 @@
                                 <option value="1" <?php if ($this->block_notices_show): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Show'); ?></option>
                             </select>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Choose whether you want the help at the top of each M2E Pro page to be available.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Choose whether you want the help at the top of each M2E Pro Page to be available.'); ?></span>
                             </p>
                         </td>
                     </tr>
 
-                    <tr>
+                    <tr id="restore_block_notices_tr">
                         <td class="label"></td>
                         <td class="value">
                             <?php echo $this->getChildHtml('restore_block_notices'); ?>
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Restores manually closed help blocks.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Restores manually closed helps.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -106,7 +108,7 @@
     </div>
     <!-- End General   -->
 
-    <!-- Qty Settings  -->
+    <!-- QTY Settings  -->
     <div class="entry-edit" id="magento_block_configuration_settings_qty">
 
         <div class="entry-edit-head">
@@ -118,8 +120,8 @@
 
                 <div id="block_notice_configuration_qty" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Quantity'); ?>">
                     <?php echo Mage::helper('M2ePro')->__(
-                        'Choose whether M2E Pro should list products on external channels even if there is no stock or stock is negative.
-                        <b>Disallow</b> is the recommended setting if you are selling on eBay.'
+                        'Choose whether M2E Pro should list Products on external Channels even if there is no Stock or Stock is negative.
+                        <b>Disallow</b> is the recommended Setting if you are selling on eBay.'
                     ); ?>
                 </div>
 
@@ -138,8 +140,8 @@
                             </select>
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__(
-                                    'Choose whether M2E Pro should list products on external channels when Manage Stock = \'No\' or Backorders is enabled.
-                                    <b>Disallow</b> is the recommended setting if you are selling on eBay.'
+                                    'Choose whether M2E Pro should list Products on external Channels when Manage Stock = \'No\' or Backorders is enabled.
+                                    <b>Disallow</b> is the recommended Setting if you are selling on eBay.'
                                 ); ?></span>
                             </p>
                         </td>
@@ -147,12 +149,12 @@
 
                     <tr id="force_qty_value_tr">
                         <td class="label">
-                            <label for="force_qty_value"><?php echo Mage::helper('M2ePro')->__('QTY To Be Listed'); ?>: </label>
+                            <label for="force_qty_value"><?php echo Mage::helper('M2ePro')->__('Quantity To Be Listed'); ?>: </label>
                         </td>
                         <td class="value" colspan="2">
                             <input id="force_qty_value" name="force_qty_value" value="<?php echo $this->forceQtyValue; ?>" type="text" class="M2ePro-required-when-visible input-text validate-greater-than-zero" />
                             <p class="note">
-                                <span><?php echo Mage::helper('M2ePro')->__('Set a number to list, e.g. if you have Manage Stock "No" in Magento Product and set this value to 10, 10 will be sent as available quantity to the channel.'); ?></span>
+                                <span><?php echo Mage::helper('M2ePro')->__('Set a number to list, e.g. if you have Manage Stock "No" in Magento Product and set this value to 10, 10 will be sent as available Quantity to the Channel.'); ?></span>
                             </p>
                         </td>
                     </tr>
@@ -165,7 +167,7 @@
         </div>
 
     </div>
-    <!-- End Qty Settings   -->
+    <!-- End QTY Settings   -->
 
     <!-- Advanced Settings  -->
     <div class="entry-edit" id="magento_block_configuration_settings_advanced">
@@ -179,8 +181,8 @@
 
                 <div id="block_notice_configuration_advanced_settings" class="block_notices_module no-icon" title="<?php echo Mage::helper('M2ePro')->__('Global Synchronization'); ?>">
                     <?php echo Mage::helper('M2ePro')->__(
-                        'If you change product price or quantity via direct database access (eg using import/export tools or custom scripts), enable this option.<br/><br/>
-                        <b>Warning:</b> Tracking direct database changes is resource-intensive and may affect the performance of your Magento site and synchronization with channels.
+                        'If you change Product Price or Quantity via direct Database access (eg using Import/Export Tools or Custom scripts), enable this Option.<br/><br/>
+                        <b>Warning:</b> Tracking direct Database changes is resource-intensive and may affect the performance of your Magento Site and Synchronization with Channels.
                         Only choose \'Yes\' if you are certain you need this functionality.'
                     ); ?>
                 </div>
@@ -199,7 +201,7 @@
                                     <option value="1"<?php if ($this->inspectorMode == 1) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                                 </select>
                                 <p class="note">
-                                    <span><?php echo Mage::helper('M2ePro')->__("<b>Note:</b> Enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance."); ?></span>
+                                    <span><?php echo Mage::helper('M2ePro')->__("<b>Note:</b> Enable this Option if you really need it, as it is very resource and time consuming and may affect Synchronization performance."); ?></span>
                                 </p>
                             </td>
                         </tr>

@@ -1,65 +1,55 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @copyright  Copyright (c) 2015 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Observer_Shipment
+class Ess_M2ePro_Model_Observer_Shipment extends Ess_M2ePro_Model_Observer_Abstract
 {
     //####################################
 
-    public function salesOrderShipmentSaveAfter(Varien_Event_Observer $observer)
+    public function process()
     {
+        if (Mage::helper('M2ePro/Data_Global')->getValue('skip_shipment_observer')) {
+            // Not process invoice observer when set such flag
+            Mage::helper('M2ePro/Data_Global')->unsetValue('skip_shipment_observer');
+            return;
+        }
+
+        /** @var $shipment Mage_Sales_Model_Order_Shipment */
+        $shipment = $this->getEvent()->getShipment();
+        $magentoOrderId = $shipment->getOrderId();
+
         try {
+            /** @var $order Ess_M2ePro_Model_Order */
+            $order = Mage::helper('M2ePro/Component')
+                            ->getUnknownObject('Order', $magentoOrderId, 'magento_order_id');
+        } catch (Exception $e) {
+            return;
+        }
 
-            if (Mage::helper('M2ePro/Data_Global')->getValue('skip_shipment_observer')) {
-                // Not process invoice observer when set such flag
-                Mage::helper('M2ePro/Data_Global')->unsetValue('skip_shipment_observer');
-                return;
-            }
+        if (is_null($order)) {
+            return;
+        }
 
-            /** @var $shipment Mage_Sales_Model_Order_Shipment */
-            $shipment = $observer->getEvent()->getShipment();
-            $magentoOrderId = $shipment->getOrderId();
+        if (!in_array($order->getComponentMode(), Mage::helper('M2ePro/Component')->getActiveComponents())) {
+            return;
+        }
 
-            try {
-                /** @var $order Ess_M2ePro_Model_Order */
-                $order = Mage::helper('M2ePro/Component')
-                    ->getUnknownObject('Order', $magentoOrderId, 'magento_order_id');
-            } catch (Exception $e) {
-                return;
-            }
+        Mage::getSingleton('M2ePro/Order_Log_Manager')
+            ->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
 
-            if (is_null($order)) {
-                return;
-            }
+        /** @var $shipmentHandler Ess_M2ePro_Model_Order_Shipment_Handler */
+        $shipmentHandler = Mage::getModel('M2ePro/Order_Shipment_Handler')->factory($order->getComponentMode());
+        $result = $shipmentHandler->handle($order, $shipment);
 
-            if (!in_array($order->getComponentMode(), Mage::helper('M2ePro/Component')->getActiveComponents())) {
-                return;
-            }
-
-            Mage::getSingleton('M2ePro/Order_Log_Manager')
-                ->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
-
-            // -------------
-            /** @var $shipmentHandler Ess_M2ePro_Model_Order_Shipment_Handler */
-            $shipmentHandler = Mage::getModel('M2ePro/Order_Shipment_Handler')->factory($order->getComponentMode());
-            $result = $shipmentHandler->handle($order, $shipment);
-            // -------------
-
-            switch ($result) {
-                case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_SUCCEEDED:
-                    $this->addSessionSuccessMessage($order);
-                    break;
-                case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_FAILED:
-                    $this->addSessionErrorMessage($order);
-                    break;
-            }
-
-        } catch (Exception $exception) {
-
-            Mage::helper('M2ePro/Module_Exception')->process($exception);
-
+        switch ($result) {
+            case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_SUCCEEDED:
+                $this->addSessionSuccessMessage($order);
+                break;
+            case Ess_M2ePro_Model_Order_Shipment_Handler::HANDLE_RESULT_FAILED:
+                $this->addSessionErrorMessage($order);
+                break;
         }
     }
 
@@ -99,14 +89,14 @@ class Ess_M2ePro_Model_Observer_Shipment
                 ->getUrl('M2ePro/adminhtml_common_log/order', array('order_id' => $order->getId()));
         }
 
-        $channel = $order->getComponentTitle();
+        $chanelTitle = $order->getComponentTitle();
         // M2ePro_TRANSLATIONS
-        // Shipping Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank" >order log</a> for more details.
+        // Shipping Status for %chanel_title% Order was not updated. View <a href="%url%" target="_blank" >Order Log</a> for more details.
         $message = Mage::helper('M2ePro')->__(
             'Shipping Status for %chanel_title% Order was not updated.'.
-            ' View <a href="%url% target="_blank" >order log</a>'.
+            ' View <a href="%url% target="_blank" >Order Log</a>'.
             ' for more details.',
-            $channel, $url
+            $chanelTitle, $url
         );
 
         Mage::getSingleton('adminhtml/session')->addError($message);

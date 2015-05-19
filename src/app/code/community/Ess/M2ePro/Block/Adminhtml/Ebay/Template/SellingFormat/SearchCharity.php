@@ -44,13 +44,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_SearchCharity
         $buttonSubmitBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($dataSubmit);
         $this->setChild('submit_button', $buttonSubmitBlock);
 
-        $dataReset = array(
-            'id'    => 'searchCharity_reset',
-            'class' => 'reset_button',
-            'label' => Mage::helper('M2ePro')->__('Reset'),
-        );
-        $buttonResetBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($dataReset);
-        $this->setChild('reset_button', $buttonResetBlock);
     }
 
 }

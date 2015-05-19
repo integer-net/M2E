@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * @copyright  Copyright (c) 2013 by  ESS-UA.
+ */
+
 class Ess_M2ePro_Model_Ebay_Template_Description_Builder
     extends Ess_M2ePro_Model_Ebay_Template_Builder_Abstract
 {
@@ -23,7 +27,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
 
         // create template
         //------------------------------
-        $template = Mage::getModel('M2ePro/Ebay_Template_Description');
+        $template = Mage::helper('M2ePro/Component_Ebay')->getModel('Template_Description');
 
         if (isset($data['id'])) {
             $template->load($data['id']);
@@ -35,6 +39,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
 
         return $template;
     }
+
+    // ########################################
 
     protected function prepareData(array &$data)
     {

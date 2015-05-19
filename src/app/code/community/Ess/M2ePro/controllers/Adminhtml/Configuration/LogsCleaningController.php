@@ -39,7 +39,7 @@ class Ess_M2ePro_Adminhtml_Configuration_LogsCleaningController
             );
 
             $this->_getSession()->addSuccess(
-                Mage::helper('M2ePro')->__('The clearing settings has been successfully saved.')
+                Mage::helper('M2ePro')->__('The clearing Settings has been successfully saved.')
             );
         }
         //--------------------
@@ -64,7 +64,7 @@ class Ess_M2ePro_Adminhtml_Configuration_LogsCleaningController
                 case 'clear_all':
                     Mage::getModel('M2ePro/Log_Cleaning')->clearAllLog($log);
                     $tempString = Mage::helper('M2ePro')->__(
-                        'All log for %title% has been successfully cleared.',
+                        'All Log for %title% has been successfully cleared.',
                          str_replace('_',' ',$log)
                     );
                     $this->_getSession()->addSuccess($tempString);

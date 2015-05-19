@@ -58,7 +58,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search extends Mage_Adminhtml_Bl
 
         //------------------------------
         $this->_addButton('goto_templates', array(
-            'label'     => Mage::helper('M2ePro')->__('Templates'),
+            'label'     => Mage::helper('M2ePro')->__('Policies'),
             'onclick'   => '',
             'class'     => 'button_link drop_down templates-drop-down'
         ));
@@ -70,14 +70,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search extends Mage_Adminhtml_Bl
             'label'     => Mage::helper('M2ePro')->__('View Log'),
             'onclick'   => 'window.open(\''.$url.'\')',
             'class'     => 'button_link'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'CommonHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
     }
@@ -117,7 +109,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search extends Mage_Adminhtml_Bl
         $url = $this->getUrl('*/adminhtml_common_template_sellingFormat/index');
         $items[] = array(
             'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Selling Format Templates'),
+            'label' => Mage::helper('M2ePro')->__('Selling Format Policies'),
             'target' => '_blank'
         );
         //------------------------------
@@ -126,10 +118,23 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search extends Mage_Adminhtml_Bl
         $url = $this->getUrl('*/adminhtml_common_template_synchronization/index');
         $items[] = array(
             'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Synchronization Templates'),
+            'label' => Mage::helper('M2ePro')->__('Synchronization Policies'),
             'target' => '_blank'
         );
         //------------------------------
+
+        if(Mage::helper('M2ePro/Component_Amazon')->isActive()) {
+            //------------------------------
+            $url = $this->getUrl(
+                '*/adminhtml_common_amazon_template_description/index'
+            );
+            $items[] = array(
+                'url' => $url,
+                'label' => Mage::helper('M2ePro')->__('Amazon Description Policies'),
+                'target' => '_blank'
+            );
+            //------------------------------
+        }
 
         return $items;
     }

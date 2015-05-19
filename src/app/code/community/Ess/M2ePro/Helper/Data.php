@@ -70,7 +70,7 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $cacheKey = strtoupper($modelName.'_data_'.$field.'_'.$value);
-        $cacheData = Mage::helper('M2ePro/Data_Cache')->getValue($cacheKey);
+        $cacheData = Mage::helper('M2ePro/Data_Cache_Permanent')->getValue($cacheKey);
 
         if ($cacheData !== false) {
             return $cacheData;
@@ -96,7 +96,7 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
         $cacheData = $this->getObject($modelName,$value,$field);
 
         if (!empty($cacheData)) {
-            Mage::helper('M2ePro/Data_Cache')->setValue($cacheKey,$cacheData,$tags,60*60*24);
+            Mage::helper('M2ePro/Data_Cache_Permanent')->setValue($cacheKey,$cacheData,$tags,60*60*24);
         }
 
         return $cacheData;
@@ -283,7 +283,8 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function arrayReplaceRecursive($base, $replacements)
     {
-        foreach (array_slice(func_get_args(), 1) as $replacements) {
+        $args = func_get_args();
+        foreach (array_slice($args, 1) as $replacements) {
 
             $bref_stack = array(&$base);
             $head_stack = array($replacements);
@@ -424,36 +425,6 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     // ########################################
-
-    public function parsePrice($price, $coefficient = false)
-    {
-        if (is_string($coefficient)) {
-            $coefficient = trim($coefficient);
-        }
-
-        if ($price <= 0) {
-            return 0;
-        }
-
-        if (!$coefficient) {
-            return round($price, 2);
-        }
-
-        if (strpos($coefficient, '%')) {
-            $coefficient = str_replace('%', '', $coefficient);
-
-            if (preg_match('/^[+-]/', $coefficient)) {
-                return round($price + $price * (float)$coefficient / 100, 2);
-            }
-            return round($price * (float)$coefficient / 100, 2);
-        }
-
-        if (preg_match('/^[+-]/', $coefficient)) {
-            return round($price + (float)$coefficient, 2);
-        }
-
-        return round($price * (float)$coefficient, 2);
-    }
 
     public function generateUniqueHash($strParam = NULL, $maxLength = NULL)
     {

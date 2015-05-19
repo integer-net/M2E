@@ -7,7 +7,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
     //----------------------------------
 
-    initialize: function(attributesHandler, attributeSetHandler)
+    initialize: function(attributesHandler, attributeHandler)
     {
         // ugly hack
         if (version_compare(Prototype.Version,'1.7') < 0) {
@@ -22,10 +22,10 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
         self.attributesHandler = attributesHandler;
         self.attributesHandler.categoryHandler = self;
-        self.attributeSetHandler = attributeSetHandler;
+        self.attributeHandler = attributeHandler;
 
         self.setValidationCheckRepetitionValue('M2ePro-new-sku-template-title',
-                                                M2ePro.translator.translate('The specified title is already used for another New SKU Template.'),
+                                                M2ePro.translator.translate('The specified Title is already used for another New SKU Policy.'),
                                                 'Buy_Template_NewProduct', 'title', 'category_id',
                                                 M2ePro.formData.category.category_id);
 
@@ -54,12 +54,12 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             '- ' + M2ePro.translator.translate('Must be at least 500 pixels in width or height'),
             '- ' + M2ePro.translator.translate('No more than 5 megabytes (MB) in size'),
             '- ' + M2ePro.translator.translate('In the JPG/JPEG format'),
-            '- ' + M2ePro.translator.translate('Only contain the product being sold'),
+            '- ' + M2ePro.translator.translate('Only contain the Product being sold'),
             '- ' + M2ePro.translator.translate('Be in focus with realistic color with a pure white background'),
             '- ' + M2ePro.translator.translate('Cannot contain additional text, graphics or inset images')
         ];
         self.notes.description = [
-            M2ePro.translator.translate('Text to describe the product. Should be one block of text or a single paragraph. Do not use special characters and html tags')
+            M2ePro.translator.translate('Text to describe the Product. Should be one block of text or a single paragraph. Do not use special characters and html tags')
         ];
 
         self.changeButton.insert({
@@ -72,19 +72,11 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         }
 
         $('window_browse_category_close').observe(
-            'click',
-            function()
-            {
-                self.closeBrowseCategoryPopup();
-            }
+            'click', function() { self.closeBrowseCategoryPopup(); }
         );
 
         $('window_search_category_close').observe(
-            'click',
-            function()
-            {
-                self.closeSearchCategoryPopup();
-            }
+            'click', function() { self.closeSearchCategoryPopup(); }
         );
     },
 
@@ -92,19 +84,12 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
     showSpanWithCategoryPath: function(path)
     {
-        var spanEl = new Element('span',{'class': 'nobr','style': 'font-weight: bold'});
+        var spanEl = new Element('span', {'class': 'nobr','style': 'font-weight: bold'});
         this.changeButton.insert({'before': spanEl});
         spanEl.insert(path);
     },
 
     //----------------------------------
-
-    checkAttributeSetSelection: function()
-    {
-        if (!AttributeSetHandlerObj.checkAttributeSetSelection()) {
-            buyTemplateNewProductEditTabsJsTabs.showTabContent($('buyTemplateNewProductEditTabs_general'));
-        }
-    },
 
     checkAttributesReady: function()
     {
@@ -138,7 +123,6 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             this.categories = transport.responseText.evalJSON();
             this.showCategories(this.categoriesContainer);
         });
-
     },
 
     //----------------------------------
@@ -147,17 +131,16 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
     {
         var self = this;
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_common_buy_template_newProduct/getCategories') ,
-            {
-                method : 'get',
-                asynchronous : true,
-                parameters : {
-                    node_id : nodeId
-                },
-                onSuccess: function(transport) {
-                    callback.call(self,transport);
-                }
-            });
+        new Ajax.Request(M2ePro.url.get('adminhtml_common_buy_template_newProduct/getCategories'), {
+            method: 'get',
+            asynchronous: true,
+            parameters: {
+                node_id: nodeId
+            },
+            onSuccess: function(transport) {
+                callback.call(self,transport);
+            }
+        });
     },
 
     //----------------------------------
@@ -170,7 +153,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         self.confirmButton.hide();
         self.removeContainers(container.parentNode,container);
         var selectEl = container.appendChild(new Element('select'));
-        selectEl.appendChild(new Element('option',{'value': 'empty','style': 'display: none'}));
+        selectEl.appendChild(new Element('option', {'value': 'empty','style': 'display: none'}));
 
         self.categories.each(function(category) {
             category.parent_category_id === self.parentId && categories.push(category)
@@ -185,7 +168,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         }
 
         categories.each(function(category) {
-            selectEl.appendChild(new Element('option',{'value': category.category_id}))
+            selectEl.appendChild(new Element('option', {'value': category.category_id}))
                 .update(category.title);
         });
 
@@ -269,19 +252,6 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
     //----------------------------------
 
-    confirmAttributeSets: function()
-    {
-        var self = BuyTemplateNewProductHandlerObj;
-
-        self.attributeSetHandler.confirmAttributeSets();
-        self.attribute_sets_confirm();
-
-        // -- render Attributes
-        BuyTemplateNewProductHandlerObj.attributesHandler.showAttributes($('rakuten_native_id').value);
-    },
-
-    //----------------------------------
-
     initPopUp: function(contentId,width,height,title)
     {
         this[contentId] = new Window({
@@ -296,7 +266,6 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             width: width,
             height: height,
             zIndex: 100,
-            recenterAuto: false,
             hideEffect: Element.hide,
             showEffect: Element.show
         });
@@ -312,29 +281,28 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
         var keywords = this.searchKeywordsInput.value.trim();
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_common_buy_template_newProduct/searchCategory') ,
-            {
-                method : 'get',
-                asynchronous : true,
-                parameters : {
-                    keywords : keywords
-                },
-                onSuccess: (function(transport) {
+        new Ajax.Request(M2ePro.url.get('adminhtml_common_buy_template_newProduct/searchCategory'), {
+            method: 'get',
+            asynchronous: true,
+            parameters: {
+                keywords: keywords
+            },
+            onSuccess: (function(transport) {
 
-                    var response = transport.responseText;
-                    if (response.length == 0) {
-                        this.resetSearchClick();
-                        return $('error_block').show() && $('error_message').update(M2ePro.translator.translate('Internal Error. Please try again later.'));
-                    }
-                    if (response.isJSON() && response.evalJSON().result == 'error') {
-                        this.resetSearchClick();
-                        return $('error_block').show() && $('error_message').update(response.evalJSON().message);
-                    }
-                    $('reset_category_popup_button').show();
-                    $('searchGrid').update(response);
+                var response = transport.responseText;
+                if (response.length == 0) {
+                    this.resetSearchClick();
+                    return $('error_block').show() && $('error_message').update(M2ePro.translator.translate('Internal Error. Please try again later.'));
+                }
+                if (response.isJSON() && response.evalJSON().result == 'error') {
+                    this.resetSearchClick();
+                    return $('error_block').show() && $('error_message').update(response.evalJSON().message);
+                }
+                $('reset_category_popup_button').show();
+                $('searchGrid').update(response);
 
-                }).bind(this)
-            });
+            }).bind(this)
+        });
     },
 
     resetSearchClick: function()
@@ -464,11 +432,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
         $$('.c-custom_description_tr').invoke('hide');
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::DESCRIPTION_MODE_CUSTOM_TEMPLATE')) {
-            if (AttributeSetHandlerObj.checkAttributeSetSelection()) {
-                $$('.c-custom_description_tr').invoke('show');
-            } else {
-                this.value = 0;
-            }
+            $$('.c-custom_description_tr').invoke('show');
         }
     },
 
@@ -492,7 +456,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::IMAGE_MAIN_MODE_PRODUCT_BASE')) {
             $('main_image_attribute_tr').hide();
-        } else if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::IMAGE_MAIN_MODE_CUSTOM_ATTRIBUTE')){
+        } else if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::IMAGE_MAIN_MODE_CUSTOM_ATTRIBUTE')) {
             $('main_image_attribute_tr').show();
         }
     },
@@ -554,30 +518,26 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             });
             $('features_actions_tr').hide();
         } else {
-            if (AttributeSetHandlerObj.checkAttributeSetSelection()) {
-                var visibleElementsCounter = 0;
+            var visibleElementsCounter = 0;
 
-                $$('.features_tr').each(function(obj) {
-                    if (visibleElementsCounter == 0 || $(obj).select('input[name="category[features_template][]"]')[0].value != '') {
-                        if ($(obj).select('input[name="category[features_template][]"]')[0].value == '') {
-                            $('show_features_action').addClassName('action-disabled');
-                        }
-                        $('show_features_action').removeClassName('action-disabled');
-                        $(obj).show();
-                        visibleElementsCounter++;
+            $$('.features_tr').each(function(obj) {
+                if (visibleElementsCounter == 0 || $(obj).select('input[name="category[features_template][]"]')[0].value != '') {
+                    if ($(obj).select('input[name="category[features_template][]"]')[0].value == '') {
+                        $('show_features_action').addClassName('action-disabled');
                     }
-                });
-
-                var emptyVisibleFeaturesExist = $$('.features_tr').any(function(obj) {
-                    return $(obj).visible() && $(obj).select('input[name="category[features_template][]"]')[0].value == '';
-                });
-                $('features_actions_tr').show();
-
-                if (visibleElementsCounter > M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::FEATURES_COUNT') - 1 || emptyVisibleFeaturesExist) {
-                    $('show_features_action').addClassName('action-disabled');
+                    $('show_features_action').removeClassName('action-disabled');
+                    $(obj).show();
+                    visibleElementsCounter++;
                 }
-            } else {
-                this.value = M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::FEATURES_MODE_NONE');
+            });
+
+            var emptyVisibleFeaturesExist = $$('.features_tr').any(function(obj) {
+                return $(obj).visible() && $(obj).select('input[name="category[features_template][]"]')[0].value == '';
+            });
+            $('features_actions_tr').show();
+
+            if (visibleElementsCounter > M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::FEATURES_COUNT') - 1 || emptyVisibleFeaturesExist) {
+                $('show_features_action').addClassName('action-disabled');
             }
         }
     },
@@ -671,96 +631,12 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
     //----------------------------------
 
-    attribute_sets_confirm: function()
-    {
-        var self = BuyTemplateNewProductHandlerObj;
-
-        var AttributeSetHandlerObj = self.attributeSetHandler;
-
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[seller_sku_custom_attribute]',
-            'seller_sku_custom_attribute_td',
-            M2ePro.formData.category.seller_sku_custom_attribute,
-            '280');
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[gtin_custom_attribute]',
-            'gtin_custom_attribute_td',
-            M2ePro.formData.category.gtin_custom_attribute,
-            '280');
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[isbn_custom_attribute]',
-            'isbn_custom_attribute_td',
-            M2ePro.formData.category.isbn_custom_attribute,
-            '280');
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[asin_custom_attribute]',
-            'asin_custom_attribute_td',
-            M2ePro.formData.category.asin_custom_attribute,
-            '280');
-        AttributeSetHandlerObj.renderAttributes(
-            'select_attributes_for_mfg_name',
-            'select_attributes_for_manufacturer_span',
-            0,
-            '150');
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[mfg_part_number_custom_attribute]',
-            'mfg_part_number_custom_attribute_td',
-            M2ePro.formData.category.mfg_part_number_custom_attribute,
-            '280');
-
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[product_set_id_custom_attribute]',
-            'product_set_id_custom_attribute_td',
-            M2ePro.formData.category.product_set_id_custom_attribute,
-            '280');
-
-        // -- core
-        AttributeSetHandlerObj.renderAttributes('select_attributes','select_attributes_span');
-        AttributeSetHandlerObj.renderAttributes(
-            'select_attributes_for_title',
-            'select_attributes_for_title_span',
-            0,
-            '150');
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[main_image_attribute]',
-            'main_image_attribute_td',
-            M2ePro.formData.category.main_image_attribute,
-            '280');
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[additional_images_attribute]',
-            'additional_images_attribute_td',
-            M2ePro.formData.category.additional_images_attribute,
-            '280'
-        );
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[keywords_custom_attribute]',
-            'keywords_custom_attribute_td',
-            M2ePro.formData.category.keywords_custom_attribute,
-            '280'
-        );
-        for (var i = 0; i < M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_NewProduct_Core::FEATURES_COUNT'); i++) {
-            AttributeSetHandlerObj.renderAttributes(
-                'select_attributes_for_features_' + i,
-                'select_attributes_for_features_' + i + '_span',
-                0,
-                '150');
-        }
-        AttributeSetHandlerObj.renderAttributesWithEmptyHiddenOption(
-            'category[weight_custom_attribute]',
-            'weight_custom_attribute_td',
-            M2ePro.formData.category.weight_custom_attribute,
-            '280'
-        );
-    },
-
-    //-----------------------------------
-
     renderHelpIcon: function(param, notes) {
 
         var self = this;
         var win;
 
-        winContent = new Element('ul',{'style': 'text-align: left; margin-top: 10px'});
+        winContent = new Element('ul', {'style': 'text-align: left; margin-top: 10px'});
 
         notes.forEach(function(element, index) {
             winContent.insert('<li><p>' + element + '</p></li>');
@@ -772,7 +648,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
 
             win = win || new Window({
                 className: "magento",
-                title: M2ePro.translator.translate('All of your product images should meet the following rules:'),
+                title: M2ePro.translator.translate('All of your Product Images should meet the following Rules:'),
                 width: 400,
                 height: 180,
                 zIndex: 100,
@@ -794,4 +670,6 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             self.popups = [win];
         });
     }
+
+    //----------------------------------
 });

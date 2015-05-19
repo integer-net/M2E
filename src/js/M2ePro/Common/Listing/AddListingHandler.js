@@ -45,7 +45,7 @@ AddListingHandler.prototype = Object.extend(new CommonHandler(), {
         var parts = self.makeProductsParts();
 
         self.progressBarObj.reset();
-        self.progressBarObj.setTitle('Adding products to listing');
+        self.progressBarObj.setTitle('Adding Products to Listing');
         self.progressBarObj.setStatus('Adding in process. Please wait...');
         self.progressBarObj.show();
         self.scroll_page_to_top();
@@ -62,53 +62,20 @@ AddListingHandler.prototype = Object.extend(new CommonHandler(), {
         this.categoriesDeleteAction = deleteAction;
     },
 
-    createListing: function(items, categoriesMode)
-    {
-        var self = this;
-        var categoriesString = '';
-
-        if (categoriesMode == true) {
-            categoriesString = items;
-        }
-
-        if (items === true) {
-            self.emptyListing = 1;
-        }
-
-        new Ajax.Request(self.M2ePro.url.create_listing, {
-            method: 'post',
-            asynchronous: false,
-            parameters: {
-                empty_listing: self.emptyListing,
-                back: self.back,
-                categories: categoriesString,
-                categories_add_action: self.categoriesAddAction,
-                categories_delete_action: self.categoriesDeleteAction
-            },
-            onSuccess: function(transport) {
-                if (self.emptyListing == 1) {
-                    setLocation(transport.responseText);
-                } else {
-                    self.listing_id = transport.responseText;
-                }
-            }
-        });
-    },
-
     getListingId: function(items, categoriesMode)
     {
         var self = this;
 
-        if (window.location.href.indexOf('/add/step/') + 1) {
-            self.createListing(items, categoriesMode);
-        } else {
-            var hrefParts = explode('/', window.location.href);
+        if (self.listing_id) {
+            return;
+        }
 
-            for (var i = 0; i < hrefParts.length; i++) {
-                if (hrefParts[i] == 'id') {
-                    self.listing_id = hrefParts[i+1];
-                    break;
-                }
+        var hrefParts = explode('/', window.location.href);
+
+        for (var i = 0; i < hrefParts.length; i++) {
+            if (hrefParts[i] == 'id') {
+                self.listing_id = hrefParts[i+1];
+                break;
             }
         }
     },
@@ -186,6 +153,7 @@ AddListingHandler.prototype = Object.extend(new CommonHandler(), {
                 products: partString
             },
             onSuccess: function(transport) {
+
                 var percents = (100/partsCount)*(partsCount-parts.length);
 
                 if (percents <= 0) {
@@ -213,4 +181,5 @@ AddListingHandler.prototype = Object.extend(new CommonHandler(), {
         this.hideProductsOthersListings = hideProductsOthersListings;
     }
 
+    //----------------------------------
 });

@@ -7,7 +7,6 @@
 class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_Component_Abstract
 {
     const MODE_ITEM_SPECIFICS = 1;
-    const MODE_ATTRIBUTE_SET = 2;
     const MODE_CUSTOM_ITEM_SPECIFICS = 3;
 
     const VALUE_MODE_NONE = 0;
@@ -30,9 +29,9 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
     private $categoryTemplateModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Magento_Product
+     * @var Ess_M2ePro_Model_Ebay_Template_Category_Specific_Source[]
      */
-    private $magentoProductModel = NULL;
+    private $categorySpecificSourceModels = array();
 
     // ########################################
 
@@ -48,7 +47,7 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
     {
         $temp = parent::deleteInstance();
         $temp && $this->categoryTemplateModel = NULL;
-        $temp && $this->magentoProductModel = NULL;
+        $temp && $this->categorySpecificSourceModels = array();
         return $temp;
     }
 
@@ -64,10 +63,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
             $this->categoryTemplateModel = Mage::helper('M2ePro')->getCachedObject(
                 'Ebay_Template_Category', $this->getTemplateCategoryId(), NULL, array('template')
             );
-
-            if (!is_null($this->getMagentoProduct())) {
-                $this->categoryTemplateModel->setMagentoProduct($this->getMagentoProduct());
-            }
         }
 
         return $this->categoryTemplateModel;
@@ -84,19 +79,24 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
     //------------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Ebay_Template_Category_Specific_Source
      */
-    public function getMagentoProduct()
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
-        return $this->magentoProductModel;
-    }
+        $productId = $magentoProduct->getProductId();
 
-    /**
-     * @param Ess_M2ePro_Model_Magento_Product $instance
-     */
-    public function setMagentoProduct(Ess_M2ePro_Model_Magento_Product $instance)
-    {
-        $this->magentoProductModel = $instance;
+        if (!empty($this->categorySpecificSourceModels[$productId])) {
+            return $this->categorySpecificSourceModels[$productId];
+        }
+
+        $this->categorySpecificSourceModels[$productId] = Mage::getModel(
+            'M2ePro/Ebay_Template_Category_Specific_Source'
+        );
+        $this->categorySpecificSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->categorySpecificSourceModels[$productId]->setCategorySpecificTemplate($this);
+
+        return $this->categorySpecificSourceModels[$productId];
     }
 
     // #######################################
@@ -104,11 +104,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
     public function getTemplateCategoryId()
     {
         return (int)$this->getData('template_category_id');
-    }
-
-    public function getModeRelationId()
-    {
-        return (int)$this->getData('mode_relation_id');
     }
 
     // #######################################
@@ -123,11 +118,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
     public function isItemSpecificsMode()
     {
         return $this->getMode() == self::MODE_ITEM_SPECIFICS;
-    }
-
-    public function isAttributeSetMode()
-    {
-        return $this->getMode() == self::MODE_ATTRIBUTE_SET;
     }
 
     public function isCustomItemSpecificsMode()
@@ -171,87 +161,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
 
     // #######################################
 
-    public function getValues()
-    {
-        $valueData = array();
-
-        if ($this->isNoneValueMode()) {
-            $valueData[] = array('id'=>'unknown','value'=>'--');
-            $this->isAttributeSetMode() && $valueData[count($valueData)-1]['id'] = -10;
-        }
-
-        if ($this->isEbayRecommendedValueMode()) {
-            $valueData = json_decode($this->getData('value_ebay_recommended'),true);
-        }
-
-        if ($this->isCustomValueValueMode()) {
-            $valueData[] = array('id'=>'unknown','value'=>$this->getData('value_custom_value'));
-            $this->isAttributeSetMode() && $valueData[count($valueData)-1]['id'] = -6;
-        }
-
-        if ($this->isCustomAttributeValueMode() || $this->isCustomLabelAttributeValueMode()) {
-
-            $attributeCode = $this->getData('value_custom_attribute');
-            $valueTemp = $this->getAttributeValue($attributeCode);
-
-            $categoryId = $this->getCategoryTemplate()->getCategoryMainId();
-            $marketplaceId = $this->getCategoryTemplate()->getMarketplaceId();
-
-            if(!empty($categoryId) && !empty($marketplaceId) && strpos($valueTemp, ',') &&
-                $this->getMagentoProduct()->getAttributeFrontendInput($attributeCode) === 'multiselect') {
-
-                $specifics = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
-                                    ->getSpecifics($categoryId, $marketplaceId);
-
-                $usedAsMultiple = false;
-                foreach($specifics['specifics'] as $specific) {
-
-                    if($specific['id'] === $this->getAttributeId() &&
-                       in_array($specific['type'],array('select_multiple_or_text','select_multiple'))) {
-
-                        $valuesTemp = explode(',', $valueTemp);
-
-                        foreach($valuesTemp as $val) {
-                            $valueData[] =  array('id'=>'unknown','value'=>trim($val));
-                        }
-
-                        $usedAsMultiple = true;
-                        break;
-                    }
-                }
-
-                if (!$usedAsMultiple) {
-                    $valueData[] = array('id'=>'unknown','value'=>$valueTemp);
-                }
-
-            } else {
-                $valueData[] = array('id'=>'unknown','value'=>$valueTemp);
-            }
-
-            $this->isAttributeSetMode() && $valueData[count($valueData)-1]['id'] = -6;
-        }
-
-        return $valueData;
-    }
-
-    public function getAttributeData()
-    {
-        $labelTemp = $this->getData('attribute_title');
-
-        if ($this->isCustomAttributeValueMode()) {
-            $labelTemp = Mage::helper('M2ePro/Magento_Attribute')
-                ->getAttributeLabel($this->getData('value_custom_attribute'),
-                                    $this->getMagentoProduct()->getStoreId());
-        }
-
-        return array(
-            'id' => $this->getData('attribute_id'),
-            'title' => $labelTemp
-        );
-    }
-
-    // #######################################
-
     public function getUsedAttributes()
     {
         $attributes = array();
@@ -264,23 +173,4 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific extends Ess_M2ePro_Model_
     }
 
     // #######################################
-
-    private function getAttributeValue($attributeCode)
-    {
-        $attributeValue = $this->getMagentoProduct()->getAttributeValue($attributeCode);
-
-        if ($attributeCode == 'country_of_manufacture') {
-            $locale = Mage::getStoreConfig(
-                Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $this->getMagentoProduct()->getStoreId()
-            );
-
-            if ($countryName = Mage::helper('M2ePro/Magento')->getTranslatedCountryName($attributeValue, $locale)) {
-                $attributeValue = $countryName;
-            }
-        }
-
-        return $attributeValue;
-    }
-
-    // ########################################
 }

@@ -9,12 +9,14 @@ class Ess_M2ePro_Model_Connector_Buy_Account_Delete_EntityResponser
 {
     // ########################################
 
-    protected function unsetLocks($isFailed = false, $message = NULL)
+    public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
+        parent::unsetProcessingLocks($processingRequest);
+
         try {
-            $this->getAccount()->deleteObjectLocks(NULL,$this->hash);
-            $this->getAccount()->deleteObjectLocks('server_synchronize',$this->hash);
-            $this->getAccount()->deleteObjectLocks('deleting_from_server',$this->hash);
+            $this->getAccount()->deleteObjectLocks(NULL, $processingRequest->getHash());
+            $this->getAccount()->deleteObjectLocks('server_synchronize', $processingRequest->getHash());
+            $this->getAccount()->deleteObjectLocks('deleting_from_server', $processingRequest->getHash());
         } catch(Exception $exception) {}
     }
 

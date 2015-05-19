@@ -6,7 +6,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid_Column_Fil
     public function getHtml()
     {
         $htmlId = $this->_getHtmlId() . microtime(true);
-        $imageUrl = Mage::getDesign()->getSkinUrl('images/grid-cal.gif');
+        $imageUrl = Mage::getDesign()->getSkinUrl('M2ePro/images/grid-cal.gif');
         $utcLocaleCode = Mage_Core_Model_Locale::DEFAULT_TIMEZONE;
 
         return <<<HTML
@@ -34,7 +34,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid_Column_Fil
 
     Calendar.setup({
         inputField : "{$htmlId}_from",
-        ifFormat : "%Y-%m-%e %H:%M:00",
+        ifFormat : "%Y-%m-%d %H:%M:00",
         button : "{$htmlId}_from_trig",
         showsTime: true,
         align : "Bl",
@@ -43,7 +43,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid_Column_Fil
 
     Calendar.setup({
         inputField : "{$htmlId}_to",
-        ifFormat : "%Y-%m-%e %H:%M:00",
+        ifFormat : "%Y-%m-%d %H:%M:00",
         button : "{$htmlId}_to_trig",
         showsTime: true,
         align : "Bl",

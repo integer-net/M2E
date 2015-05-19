@@ -67,7 +67,6 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates
         $this->runner->setPercentsEnd($this->getPercentsEnd());
 
         $this->inspector = Mage::getModel('M2ePro/Buy_Synchronization_Templates_Inspector');
-        $this->inspector->setRunner($this->runner);
 
         $this->changesHelper = Mage::getModel('M2ePro/Synchronization_Templates_Changes');
         $this->changesHelper->setComponent($this->getComponent());
@@ -111,7 +110,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates
 
     private function executeRunner()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Apply products changes on Buy');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Apply Products changes on Buy');
 
         $result = $this->runner->execute();
         $this->affectResultRunner($result);
@@ -139,17 +138,18 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates
 
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Task "Inventory Synchronization" has completed with %result%. View %sl%listings log%el% for details.',
+                'Task "Inventory Synchronization" has completed with %result%. View %sl%Listings Log%el% for details.',
                 array(
                     '!sl'=>'<a target="_blank" href="route:*/adminhtml_common_log/listing/;'.
-                             'back:*/adminhtml_common_log/synchronization/;">',
+                             'back:*/adminhtml_common_log/synchronization/;'.
+                             'channel:' . Ess_M2ePro_Helper_Component_Buy::NICK . '">',
                     '!el'=>'</a>',
                     '!result'=>$resultString
                 )
             ), $resultType, $resultPriority
         );
 
-        $this->getActualOperationHistory()->addText('Updating products on Buy ended with '.$resultString.'.');
+        $this->getActualOperationHistory()->addText('Updating Products on Buy ended with '.$resultString.'.');
     }
 
     //####################################

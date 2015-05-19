@@ -23,12 +23,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
     {
         $data = $this->getCategoriesData();
 
-        $data['item_specifics'] = array_merge(
-            $this->getEbayItemSpecificsData(),
-            $this->getCustomItemSpecificsData()
-        );
-
-        $data['attribute_set'] = $this->getAttributeSetData();
+        $data['item_specifics'] = $this->getItemSpecificsData();
 
         if ($this->getCompatibilityHelper()->isMarketplaceSupportsSpecific($this->getMarketplace()->getId())) {
             $tempData = $this->getPartsCompatibilityData(
@@ -52,134 +47,20 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
     public function getCategoriesData()
     {
         $data = array(
-            'category_main_id' => $this->getCategoryTemplate()->getMainCategory(),
+            'category_main_id' => $this->getCategorySource()->getMainCategory(),
             'category_secondary_id' => 0,
             'store_category_main_id' => 0,
             'store_category_secondary_id' => 0
         );
 
         if (!is_null($this->getOtherCategoryTemplate())) {
-            $data['category_secondary_id'] = $this->getOtherCategoryTemplate()->getSecondaryCategory();
-            $data['store_category_main_id'] = $this->getOtherCategoryTemplate()->getStoreCategoryMain();
-            $data['store_category_secondary_id'] = $this->getOtherCategoryTemplate()->getStoreCategorySecondary();
+            $data['category_secondary_id'] = $this->getOtherCategorySource()->getSecondaryCategory();
+            $data['store_category_main_id'] = $this->getOtherCategorySource()->getStoreCategoryMain();
+            $data['store_category_secondary_id'] = $this->getOtherCategorySource()->getStoreCategorySecondary();
         }
 
         return $data;
     }
-
-    // ----------------------------------------
-
-    public function getEbayItemSpecificsData()
-    {
-        $data = array();
-
-        $filter = array('mode' => Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS);
-        $specifics = $this->getCategoryTemplate()->getSpecifics(true, $filter);
-
-        foreach ($specifics as $specific) {
-
-            /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
-
-            $this->searchNotFoundAttributes();
-
-            $tempAttributeData = $specific->getAttributeData();
-            $tempAttributeValues = $specific->getValues();
-
-            if (!$this->processNotFoundAttributes('Specifics')) {
-                continue;
-            }
-
-            $values = array();
-            foreach ($tempAttributeValues as $tempAttributeValue) {
-                if ($tempAttributeValue['value'] == '--') {
-                    continue;
-                }
-                $values[] = $tempAttributeValue['value'];
-            }
-
-            $data[] = array(
-                'name' => $tempAttributeData['id'],
-                'value' => $values
-            );
-        }
-
-        return $data;
-    }
-
-    public function getCustomItemSpecificsData()
-    {
-        $data = array();
-
-        $filter = array('mode' => Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS);
-        $specifics = $this->getCategoryTemplate()->getSpecifics(true, $filter);
-
-        foreach ($specifics as $specific) {
-
-            /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
-
-            $this->searchNotFoundAttributes();
-
-            $tempAttributeData = $specific->getAttributeData();
-            $tempAttributeValues = $specific->getValues();
-
-            if (!$this->processNotFoundAttributes('Specifics')) {
-                continue;
-            }
-
-            $values = array();
-            foreach ($tempAttributeValues as $tempAttributeValue) {
-                if ($tempAttributeValue['value'] == '--') {
-                    continue;
-                }
-                $values[] = $tempAttributeValue['value'];
-            }
-
-            $data[] = array(
-                'name' => $tempAttributeData['title'],
-                'value' => $values
-            );
-        }
-
-        return $data;
-    }
-
-    // ########################################
-
-    public function getAttributeSetData()
-    {
-        $data = array(
-            'attribute_set_id' => 0,
-            'attributes' => array()
-        );
-
-        $filters = array('mode' => Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ATTRIBUTE_SET);
-        $specifics = $this->getCategoryTemplate()->getSpecifics(true, $filters);
-
-        foreach ($specifics as $specific) {
-
-            /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
-
-            $this->searchNotFoundAttributes();
-
-            $tempAttributeData = $specific->getAttributeData();
-            $tempAttributeValues = $specific->getValues();
-
-            if (!$this->processNotFoundAttributes('Specifics')) {
-                continue;
-            }
-
-            $data['attribute_set_id'] = $specific->getModeRelationId();
-
-            $data['attributes'][] = array(
-                'id' => $tempAttributeData['id'],
-                'value' => $tempAttributeValues
-            );
-        }
-
-        return $data;
-    }
-
-    // ----------------------------------------
 
     public function getPartsCompatibilityData($type)
     {
@@ -204,6 +85,51 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
         }
 
         return NULL;
+    }
+
+    // ----------------------------------------
+
+    public function getItemSpecificsData()
+    {
+        $data = array();
+
+        $filter = array('mode' => array(
+            Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS,
+            Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS
+        ));
+
+        $specifics = $this->getCategoryTemplate()->getSpecifics(true, $filter);
+
+        foreach ($specifics as $specific) {
+
+            /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
+
+            $this->searchNotFoundAttributes();
+
+            $tempAttributeLabel = $specific->getSource($this->getMagentoProduct())
+                                           ->getLabel();
+            $tempAttributeValues = $specific->getSource($this->getMagentoProduct())
+                                            ->getValues();
+
+            if (!$this->processNotFoundAttributes('Specifics')) {
+                continue;
+            }
+
+            $values = array();
+            foreach ($tempAttributeValues as $tempAttributeValue) {
+                if ($tempAttributeValue == '--') {
+                    continue;
+                }
+                $values[] = $tempAttributeValue;
+            }
+
+            $data[] = array(
+                'name' => $tempAttributeLabel,
+                'value' => $values
+            );
+        }
+
+        return $data;
     }
 
     // ########################################
@@ -256,7 +182,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
             $isSingleEpid = count($emptySavedEpids) > 1;
             $msg = 'The '.implode(', ', $emptySavedEpids).' ePID'.($isSingleEpid ? 's' : '');
             $msg .= ' specified in the Compatibility Attribute';
-            $msg .= ' were dropped out of the listing because '.($isSingleEpid ? 'it was' : 'they were');
+            $msg .= ' were dropped out of the Listing because '.($isSingleEpid ? 'it was' : 'they were');
             $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';
             $this->addWarningMessage($msg);
         }
@@ -285,7 +211,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
             $isSingleKtype = count($emptySavedKtypes) > 1;
             $msg = 'The '.implode(', ', $emptySavedKtypes).' KType'.($isSingleKtype ? 's' : '');
             $msg .= ' specified in the Compatibility Attribute';
-            $msg .= ' were dropped out of the listing because '.($isSingleKtype ? 'it was' : 'they were');
+            $msg .= ' were dropped out of the Listing because '.($isSingleKtype ? 'it was' : 'they were');
             $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';
             $this->addWarningMessage($msg);
         }
@@ -331,7 +257,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
 
     private function getEbayMotorsSpecificsAttributes()
     {
-        $categoryId = $this->getCategoryTemplate()->getMainCategory();
+        $categoryId = $this->getCategorySource()->getMainCategory();
         $categoryData = $this->getEbayMarketplace()->getCategory($categoryId);
 
         $features = !empty($categoryData['features']) ?
@@ -401,6 +327,23 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
     private function getCompatibilityAttribute($type)
     {
         return $this->getCompatibilityHelper()->getAttribute($type);
+    }
+
+    // ########################################
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Category_Source
+     */
+    private function getCategorySource()
+    {
+        return $this->getEbayListingProduct()->getCategoryTemplateSource();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_OtherCategory_Source
+     */
+    private function getOtherCategorySource()
+    {
+        return $this->getEbayListingProduct()->getOtherCategoryTemplateSource();
     }
 
     // ########################################

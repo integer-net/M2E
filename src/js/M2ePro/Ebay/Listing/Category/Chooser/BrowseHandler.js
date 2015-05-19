@@ -26,7 +26,7 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
         var self = EbayListingCategoryChooserBrowseHandlerObj;
 
         if (self.marketplaceId === null) {
-            alert('You must set marketplace');
+            alert('You must set Site');
         }
 
         return self.marketplaceId;
@@ -75,12 +75,11 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
         this.renderChildCategories(0);
     },
 
-    renderChildCategories: function (parentCategoryId)
+    renderChildCategories: function(parentCategoryId)
     {
         var self = EbayListingCategoryChooserBrowseHandlerObj;
 
-        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/getChildCategories'),
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_category/getChildCategories'), {
             method: 'post',
             asynchronous: true,
             parameters: {
@@ -89,8 +88,8 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
                 "account_id": EbayListingCategoryChooserHandlerObj.getAccountId(),
                 "category_type": $('category_type').value
             },
-            onSuccess: function(transport)
-            {
+            onSuccess: function(transport) {
+
                 if (transport.responseText.length <= 2) {
                     self.simulate('leaf_selected', self.getSelectedCategories());
                     return;
@@ -118,7 +117,7 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
         });
     },
 
-    onSelectCategory: function (select)
+    onSelectCategory: function(select)
     {
         var self = EbayListingCategoryChooserBrowseHandlerObj;
 

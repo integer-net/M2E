@@ -9,6 +9,8 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
 {
     // ####################################
 
+    protected $_useCustomOptions = true;
+
     static protected $_conditionModels = array();
 
     // ####################################
@@ -44,26 +46,85 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
 
     public function getNewChildSelectOptions()
     {
-        $productAttributes = Mage::getModel('M2ePro/Magento_Product_Rule_Condition_Product')->getAttributeOption();
+        $conditions = array(
+            array(
+                'label' => Mage::helper('M2ePro')->__('Conditions Combination'),
+                'value' => $this->getConditionCombine()
+            )
+        );
 
-        $attributes = array();
-        foreach ($productAttributes as $code => $label) {
-            $attributes[] = array(
-                'value' => 'M2ePro/Magento_Product_Rule_Condition_Product|'.$code,
+        $customAttribute = $this->getCustomOptionsAttributes();
+        if ($this->_useCustomOptions && !empty($customAttribute)) {
+            $conditions[] = array(
+                'label' => $this->getCustomLabel(),
+                'value' => $this->getCustomOptions()
+            );
+        }
+
+        $conditions[] = array(
+            'label' => Mage::helper('M2ePro')->__('Product Attribute'),
+            'value' => $this->getProductOptions()
+        );
+
+        return array_merge_recursive(parent::getNewChildSelectOptions(), $conditions);
+    }
+
+    // ####################################
+
+    protected function getConditionCombine()
+    {
+        return $this->getType();
+    }
+
+    // ------------------------------------
+
+    protected function getCustomLabel()
+    {
+        return '';
+    }
+
+    protected function getCustomOptions()
+    {
+        return array();
+    }
+
+    protected  function getCustomOptionsAttributes()
+    {
+        return array();
+    }
+
+    // ------------------------------------
+
+    protected function getProductOptions()
+    {
+        $attributes = Mage::getModel('M2ePro/Magento_Product_Rule_Condition_Product')->getAttributeOption();
+        return  !empty($attributes) ?
+                $this->getOptions('M2ePro/Magento_Product_Rule_Condition_Product', $attributes)
+                : array();
+    }
+
+    // ------------------------------------
+
+    protected function getOptions($value, array $optionsAttribute, array $params = array())
+    {
+        $options = array();
+        $suffix = (count($params)) ? '|' . implode('|', $params) . '|' : '|';
+        foreach ($optionsAttribute as $code => $label) {
+            $options[] = array(
+                'value' => $value . $suffix . $code,
                 'label' => $label
             );
         }
 
-        $conditions = parent::getNewChildSelectOptions();
-        $conditions = array_merge_recursive($conditions, array(
-            array(
-                'value' => 'M2ePro/Magento_Product_Rule_Condition_Combine',
-                'label' => Mage::helper('M2ePro')->__('Conditions Combination')
-            ),
-            array('label' => Mage::helper('M2ePro')->__('Product Attribute'), 'value' => $attributes),
-        ));
+        return $options;
+    }
 
-        return $conditions;
+    // ------------------------------------
+
+    public function setCustomOptionsFlag($flag)
+    {
+        $this->_useCustomOptions = (bool)$flag;
+        return $this;
     }
 
     // ####################################
@@ -142,6 +203,22 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
 
     // ####################################
 
+    protected function beforeLoadValidate($condition)
+    {
+        if (empty($condition['attribute'])) {
+            return true;
+        }
+
+        if (!$this->_useCustomOptions &&
+            array_key_exists($condition['attribute'], $this->getCustomOptionsAttributes())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // ------------------------------------
+
     public function loadArray($arr, $key='conditions')
     {
         $this->setAggregator(isset($arr['aggregator']) ? $arr['aggregator']
@@ -152,11 +229,16 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
         if (!empty($arr[$key]) && is_array($arr[$key])) {
             foreach ($arr[$key] as $condArr) {
                 try {
+                    if(!$this->beforeLoadValidate($condArr)) {
+                        continue;
+                    }
+
                     $cond = $this->_getNewConditionModelInstance($condArr['type']);
                     if ($cond) {
 
                         if ($cond instanceof Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine) {
                             $cond->setData($this->getPrefix(), array());
+                            $cond->setCustomOptionsFlag($this->_useCustomOptions);
                         }
 
                         $this->addCondition($cond);
@@ -213,7 +295,7 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
     {
         $html = $this->getTypeElement()->getHtml().
             Mage::helper('M2ePro')->__(
-                'If %rule% of these conditions are %value%:',
+                'If %rule% of these Conditions are %value%:',
                 $this->getAggregatorElement()->getHtml(),
                 $this->getValueElement()->getHtml()
             );
@@ -237,7 +319,7 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
 
     public function asString($format='')
     {
-        $str = Mage::helper('M2ePro')->__("If %rule% of these conditions are %value%:",
+        $str = Mage::helper('M2ePro')->__("If %rule% of these Conditions are %value%:",
                                           $this->getAggregatorName(), $this->getValueName());
         return $str;
     }
@@ -310,6 +392,11 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
     {
         $key = $this->getPrefix() ? $this->getPrefix() : 'conditions';
         return $this->setData($key, $conditions);
+    }
+
+    public function getConditionModels()
+    {
+        return self::$_conditionModels;
     }
 
     // ####################################

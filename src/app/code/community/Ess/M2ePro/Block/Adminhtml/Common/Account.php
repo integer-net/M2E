@@ -60,4 +60,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Account extends Ess_M2ePro_Block_Adminht
     }
 
     // ########################################
+
+    public function getGridHtml()
+    {
+        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_account_help');
+        return $helpBlock->toHtml() . parent::getGridHtml();
+    }
+
+    // ########################################
 }

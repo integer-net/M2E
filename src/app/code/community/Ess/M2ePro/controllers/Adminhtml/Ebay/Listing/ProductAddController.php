@@ -22,11 +22,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
             ->addJs('M2ePro/Plugin/ProgressBar.js')
             ->addJs('M2ePro/Plugin/AreaWrapper.js')
+            ->addJs('M2ePro/Plugin/ActionColumn.js')
 
             ->addJs('mage/adminhtml/rules.js')
             ->addJs('M2ePro/Ebay/Listing/ProductAddHandler.js')
             ->addJs('M2ePro/Listing/ProductGridHandler.js')
 
+            ->addJs('M2ePro/AttributeHandler.js')
             ->addJs('M2ePro/ActionHandler.js')
             ->addJs('M2ePro/Listing/ActionHandler.js')
             ->addJs('M2ePro/Listing/MovingHandler.js')
@@ -36,7 +38,6 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             ->addJs('M2ePro/Ebay/Listing/Settings/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ProductAdd/Settings/GridHandler.js')
 
-            ->addJs('M2ePro/AttributeSetHandler.js')
             ->addJs('M2ePro/TemplateHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Template/SwitcherHandler.js')
             ->addJs('M2ePro/Ebay/Template/PaymentHandler.js')
@@ -47,6 +48,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             ->addJs('M2ePro/Ebay/Template/SynchronizationHandler.js')
 
             ->addJs('M2ePro/Listing/Category/TreeHandler.js')
+            ->addJs('M2ePro/Listing/AutoActionHandler.js')
             ->addJs('M2ePro/Ebay/Listing/AutoActionHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Category/ChooserHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Category/SpecificHandler.js')
@@ -227,7 +229,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
         if (is_null($this->getSessionValue('current_category_id'))) {
             $currentNode = $treeBlock->getRoot()->getChildren()->getIterator()->current();
             if (!$currentNode) {
-                throw new Exception('No categories found');
+                throw new Exception('No Categories found');
             }
             $this->setSessionValue('current_category_id', $currentNode->getId());
         }
@@ -604,7 +606,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             $response = array(
                 'validation' => false,
                 'message' => Mage::helper('M2ePro')->__(
-                    'There are no items to continue. Please, go back and select the item(s).'
+                    'There are no Items to continue. Please, go back and select the Item(s).'
                 )
             );
         } else {

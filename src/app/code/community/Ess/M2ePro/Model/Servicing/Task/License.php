@@ -22,6 +22,10 @@ class Ess_M2ePro_Model_Servicing_Task_License extends Ess_M2ePro_Model_Servicing
 
     public function processResponseData(array $data)
     {
+        if (isset($data['info']) && is_array($data['info'])) {
+            $this->updateInfoData($data['info']);
+        }
+
         if (isset($data['validation']) && is_array($data['validation'])) {
 
             $this->updateValidationMainData($data['validation']);
@@ -41,6 +45,16 @@ class Ess_M2ePro_Model_Servicing_Task_License extends Ess_M2ePro_Model_Servicing
     }
 
     // ########################################
+
+    private function updateInfoData(array $infoData)
+    {
+        $moduleName = Mage::helper('M2ePro/Module')->getName();
+        $primaryConfig = Mage::helper('M2ePro/Primary')->getConfig();
+
+        if (array_key_exists('email', $infoData)) {
+            $primaryConfig->setGroupValue('/'.$moduleName.'/license/info/','email', $infoData['email']);
+        }
+    }
 
     private function updateValidationMainData(array $validationData)
     {

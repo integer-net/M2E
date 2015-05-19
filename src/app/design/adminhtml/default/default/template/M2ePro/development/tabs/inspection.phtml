@@ -126,6 +126,24 @@
         </div>
     <?php }?>
 
+    <?php if ($this->getChild('other_issues')->isShown()) { ?>
+        <div class="entry-edit" id="magento_block_development_inspection_other_issues">
+
+            <div class="development_head_container">
+                <h4><?php echo Mage::helper('M2ePro')->__('Other Issues'); ?></h4>
+            </div>
+
+            <div class="fieldset">
+                <div class="hor-scroll">
+
+                    <?php echo $this->getChildHtml('other_issues') ?>
+
+                </div>
+            </div>
+
+        </div>
+    <?php } ?>
+
     <?php if ($this->getChild('installation')->isShown()) { ?>
         <div class="entry-edit" id="magento_block_development_inspection_installation">
 

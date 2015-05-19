@@ -46,33 +46,36 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
     {
         $actions = array();
 
-        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
-            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED) {
+        $status = $row->getData('component_mode') == Ess_M2ePro_Helper_Component_Ebay::NICK
+            ? $row->getData('ebay_status') : $row->getData('status');
+
+        if ($status == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
+            $status == Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED) {
             $actions[] = array(
                 'title' => Mage::helper('M2ePro')->__('List'),
                 'handler' => $this->getColumn()->getData('js_handler').'.actionHandler.listAction();'
             );
         }
 
-        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED ||
-            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
+        if ($status == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED ||
+            $status == Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
             $actions[] = array(
                 'title' => Mage::helper('M2ePro')->__('Revise'),
                 'handler' => $this->getColumn()->getData('js_handler').'.actionHandler.reviseAction();'
             );
         }
 
-        if ($row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED &&
-            $row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_LISTED &&
-            $row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
+        if ($status != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED &&
+            $status != Ess_M2ePro_Model_Listing_Product::STATUS_LISTED &&
+            $status != Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
             $actions[] = array(
                 'title' => Mage::helper('M2ePro')->__('Relist'),
                 'handler' => $this->getColumn()->getData('js_handler').'.actionHandler.relistAction();'
             );
         }
 
-        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED ||
-            $row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
+        if ($status == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED ||
+            $status != Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN) {
             $actions[] = array(
                 'title' => Mage::helper('M2ePro')->__('Stop'),
                 'handler' => $this->getColumn()->getData('js_handler').'.actionHandler.stopAction();'
@@ -96,7 +99,7 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
 
         foreach ($actions as $action) {
             if ($html != '') {
-                $html .= '<br />';
+                $html .= '<br/>';
             }
 
             $onclick = $this->getColumn()->getData('js_handler').'.selectByRowId(\''.$id.'\'); ' . $action['handler'];
@@ -104,22 +107,27 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
         }
 
         // --------------------------
+        $colName = 'id';
         $url = $this->getUrl(
             '*/adminhtml_development_database/manageTable',
-            array('table' => 'm2epro_listing_product', 'filter'=> base64_encode("id[from]={$id}&id[to]={$id}"))
+            array('table' => 'm2epro_listing_product',
+                  'filter'=> base64_encode("{$colName}[from]={$id}&{$colName}[to]={$id}"))
         );
-        $html .= '<br><a href="'.$url.'" target="_blank" style="color: green;">Parent Product</a>';
+        $html .= '<br/><a href="'.$url.'" target="_blank" style="color: green;">Parent Product</a>';
+
+        $colName = 'listing_product_id';
+        Mage::app()->getCookie()->get('database_tables_merge_mode_cookie_key') && $colName = 'id';
 
         $componentMode = $row->getData('component_mode');
         $url = $this->getUrl(
             '*/adminhtml_development_database/manageTable',
             array('table' => "m2epro_{$componentMode}_listing_product",
-                  'filter'=> base64_encode("listing_product_id[from]={$id}&listing_product_id[to]={$id}"))
+                  'filter'=> base64_encode("{$colName}[from]={$id}&{$colName}[to]={$id}"))
         );
-        $html .= '<br><a href="'.$url.'" target="_blank" style="color: green;">Child Product</a>';
+        $html .= '<br/><a href="'.$url.'" target="_blank" style="color: green;">Child Product</a>';
         // --------------------------
 
-        $html .= "<br>{$id}";
+        $html .= "<br/>{$id}";
         return $html;
     }
 }

@@ -60,7 +60,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
     // ########################################
 
-    abstract protected function getLogAction();
+    abstract protected function getLogsAction();
 
     abstract protected function getActionType();
 
@@ -99,11 +99,11 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
             $logger = Mage::getModel('M2ePro/Ebay_Listing_Product_Action_Logger');
 
             if (!isset($this->params['logs_action_id']) || !isset($this->params['status_changer'])) {
-                throw new Exception('Product connector has not received some params');
+                throw new Exception('Product Connector has not received some params');
             }
 
             $logger->setActionId((int)$this->params['logs_action_id']);
-            $logger->setAction($this->getLogAction());
+            $logger->setAction($this->getLogsAction());
 
             switch ($this->params['status_changer']) {
                 case Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN:
@@ -216,7 +216,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
                 return 'Stop';
         }
 
-        throw new Exception('Wrong action type');
+        throw new Exception('Wrong Action type');
     }
 
     // ########################################

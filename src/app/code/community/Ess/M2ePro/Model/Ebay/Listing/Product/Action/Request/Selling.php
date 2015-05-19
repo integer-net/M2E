@@ -49,7 +49,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
     public function getGeneralData()
     {
         $data = array(
-            'duration' => $this->getEbayListingProduct()->getDuration(),
+            'duration' => $this->getSellingFormatSource()->getDuration(),
             'is_private' => $this->getEbaySellingFormatTemplate()->isPrivateListing(),
             'currency' => $this->getEbayMarketplace()->getCurrency(),
             'out_of_stock_control' => $this->getEbaySellingFormatTemplate()->getOutOfStockControl()
@@ -67,7 +67,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
     public function getVatTaxData()
     {
         $data = array(
-            'tax_category' => $this->getEbaySellingFormatTemplate()->getTaxCategory()
+            'tax_category' => $this->getSellingFormatSource()->getTaxCategory()
         );
 
         if ($this->getEbayMarketplace()->isVatEnabled()) {
@@ -241,10 +241,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
      */
     private function getEbaySellingFormatTemplate()
     {
-        /** @var Ess_M2ePro_Model_Ebay_Template_SellingFormat $object */
-        $object = $this->getSellingFormatTemplate()->getChildObject();
-        $object->setMagentoProduct($this->getMagentoProduct());
-        return $object;
+        return $this->getSellingFormatTemplate()->getChildObject();
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_SellingFormat_Source
+     */
+    private function getSellingFormatSource()
+    {
+        return $this->getEbayListingProduct()->getSellingFormatTemplateSource();
     }
 
     // ########################################
@@ -252,8 +257,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
     public function checkQtyWarnings()
     {
         $qtyMode = $this->getEbaySellingFormatTemplate()->getQtyMode();
-        if ($qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
-            $qtyMode == Ess_M2ePro_Model_Ebay_Template_SellingFormat::QTY_MODE_PRODUCT) {
+        if ($qtyMode == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
+            $qtyMode == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT) {
 
             $listingProductId = $this->getListingProduct()->getId();
             $productId = $this->getListingProduct()->getProductId();
@@ -273,17 +278,18 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
     {
         if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_MANAGE_STOCK_NO) {
         // M2ePro_TRANSLATIONS
-        // During the quantity calculation the settings in the "Manage Stock No" field were taken into consideration.
-            $this->addWarningMessage('During the quantity calculation the settings in the "Manage Stock No" '.
+        // During the Quantity Calculation the Settings in the "Manage Stock No" field were taken into consideration.
+            $this->addWarningMessage('During the Quantity Calculation the Settings in the "Manage Stock No" '.
                                      'field were taken into consideration.');
         }
 
         if ($type === Ess_M2ePro_Model_Magento_Product::FORCING_QTY_TYPE_BACKORDERS) {
             // M2ePro_TRANSLATIONS
-            // During the quantity calculation the settings in the "Backorders" field were taken into consideration.
-            $this->addWarningMessage('During the quantity calculation the settings in the "Backorders" '.
+            // During the Quantity Calculation the Settings in the "Backorders" field were taken into consideration.
+            $this->addWarningMessage('During the Quantity Calculation the Settings in the "Backorders" '.
                                      'field were taken into consideration.');
         }
     }
 
+    // ########################################
 }

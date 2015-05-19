@@ -55,7 +55,7 @@ class Ess_M2ePro_Adminhtml_Listing_Other_MappingController
         $productIds = $this->getRequest()->getParam('product_ids');
 
         if (empty($productIds)) {
-            return $this->getResponse()->setBody('You should select one or more products');
+            return $this->getResponse()->setBody('You should select one or more Products');
         }
 
         if (empty($componentMode)) {

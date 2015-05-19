@@ -69,62 +69,63 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
     {
         if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
             // M2ePro_TRANSLATIONS
-            // Item was successfully revised
-            return 'Item was successfully revised';
+            // Item was successfully Revised
+            return 'Item was successfully Revised';
         }
 
         $sequenceString = '';
 
-        if ($this->getRequestData()->hasVariationsData()) {
+        if ($this->getRequestData()->hasVariations()) {
             // M2ePro_TRANSLATIONS
-            // variations
-            $sequenceString .= 'variations,';
+            // Variations
+            $sequenceString .= 'Variations,';
         }
 
-        if ($this->getRequestData()->hasQtyData()) {
+        if ($this->getRequestData()->hasQty()) {
             // M2ePro_TRANSLATIONS
-            // qty
-            $sequenceString .= 'qty,';
+            // QTY
+            $sequenceString .= 'QTY,';
         }
 
-        if ($this->getRequestData()->hasPriceData()) {
+        if ($this->getRequestData()->hasPrice()) {
             // M2ePro_TRANSLATIONS
-            // price
-            $sequenceString .= 'price,';
+            // Price
+            $sequenceString .= 'Price,';
         }
 
-        if ($this->getRequestData()->hasTitleData()) {
+        if ($this->getRequestData()->hasTitle()) {
             // M2ePro_TRANSLATIONS
-            // title
-            $sequenceString .= 'title,';
+            // Title
+            $sequenceString .= 'Title,';
         }
 
-        if ($this->getRequestData()->hasSubtitleData()) {
+        if ($this->getRequestData()->hasSubtitle()) {
             // M2ePro_TRANSLATIONS
-            // subtitle
-            $sequenceString .= 'subtitle,';
+            // Subtitle
+            $sequenceString .= 'Subtitle,';
         }
 
-        if ($this->getRequestData()->hasDescriptionData()) {
+        if ($this->getRequestData()->hasDescription()) {
             // M2ePro_TRANSLATIONS
-            // description
-            $sequenceString .= 'description,';
+            // Description
+            $sequenceString .= 'Description,';
         }
 
-        if ($this->getRequestData()->hasImagesData()) {
+        if ($this->getRequestData()->hasImages()) {
             // M2ePro_TRANSLATIONS
-            // images
-            $sequenceString .= 'images,';
+            // Images
+            $sequenceString .= 'Images,';
         }
 
         if (empty($sequenceString)) {
             // M2ePro_TRANSLATIONS
-            // Item was successfully revised
-            return 'Item was successfully revised';
+            // Item was successfully Revised
+            return 'Item was successfully Revised';
         }
+
         // M2ePro_TRANSLATIONS
-        // was successfully revised
-        return ucfirst(trim($sequenceString,',')).' was successfully revised';
+        // was successfully Revised
+        return ucfirst(trim($sequenceString,',')).' was successfully Revised';
     }
 
     // ########################################
@@ -159,12 +160,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
         }
 
         if (!$this->getEbayListingProduct()->isListingTypeFixed() ||
-            !$this->getRequestData()->hasVariationsData() ||
+            !$this->getRequestData()->hasVariations() ||
             !isset($data['online_buyitnow_price'])) {
             return $data;
         }
 
-        $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPriceData(true);
+        $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPrice(true);
 
         return $data;
     }

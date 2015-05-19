@@ -131,8 +131,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
 
         foreach ($data['variation'] as &$variation) {
             if (!isset($variation['not_real_qty']) && isset($variation['qty']) && (int)$variation['qty'] <= 0) {
-                $variation['_instance_']->getChildObject()->hasSales() &&
+
+                /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Variation $ebayVariation */
+                $ebayVariation = $variation['_instance_']->getChildObject();
+
+                if ($ebayVariation->getOnlineQtySold() || $ebayVariation->hasSales()) {
                     $variation['has_sales'] = true;
+                }
             }
         }
 
@@ -191,11 +196,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
         if (!empty($warningMessageReasons)) {
 
             // M2ePro_TRANSLATIONS
-            // %field_title% field(s) were ignored because eBay doesn't allow revise the item if it has sales, bids for auction type or less than 12 hours remain before the item end.
+            // %field_title% field(s) were ignored because eBay doesn't allow Revise the Item if it has sales, bids for Auction Type or less than 12 hours remain before the Item end.
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
-                    '%field_title% field(s) were ignored because eBay doesn\'t allow revise the item if it has sales, '.
-                    'bids for auction type or less than 12 hours remain before the item end.',
+                    '%field_title% field(s) were ignored because eBay doesn\'t allow Revise the Item if it has sales, '.
+                    'bids for Auction Type or less than 12 hours remain before the Item end.',
                     implode(', ', $warningMessageReasons)
                 )
             );
@@ -209,11 +214,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
         if (isset($data['bestoffer_mode']) && $data['bestoffer_mode']) {
 
             // M2ePro_TRANSLATIONS
-            // Duration field(s) was ignored because eBay doesn't allow revise the item if Best Offer is enabled.
+            // Duration field(s) was ignored because eBay doesn't allow Revise the Item if Best Offer is enabled.
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
                     'Duration field(s) was ignored because '.
-                    'eBay doesn\'t allow revise the item if Best Offer is enabled.'
+                    'eBay doesn\'t allow Revise the Item if Best Offer is enabled.'
                 )
             );
             unset($data['duration']);

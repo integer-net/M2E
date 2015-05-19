@@ -9,7 +9,7 @@
 
     <?php foreach($this->groups as $group) { ?>
 
-        <div class="entry-edit" id="magento_block_amazon_marketplaces_group_<?php echo $group['id']; ?>">
+        <div class="entry-edit" id="magento_block_amazon_marketplaces_group_<?php echo $group['id']; ?>" collapseable="no">
 
             <div class="entry-edit-head">
                 <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__($group['title']); ?></h4>
@@ -23,7 +23,7 @@
                         <?php
                             $componentName = '';
                             if (count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-                                $componentName = Ess_M2ePro_Helper_Component_Amazon::TITLE;
+                                $componentName = Mage::helper('M2ePro/Component_Amazon')->getTitle();
                             }
                         ?>
 
@@ -58,7 +58,7 @@
                                             <option value="<?php echo Ess_M2ePro_Model_Marketplace::STATUS_ENABLE; ?>"<?php if (Ess_M2ePro_Model_Marketplace::STATUS_ENABLE == $marketplace['instance']->getStatus()) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled'); ?></option>
                                         </select>
                                     <?php } ?>
-                                    <p class="note">
+                                    <p class="note note-no-tool-tip">
                                         <span><?php echo Mage::helper('M2ePro')->__($marketplace['instance']->getData('url')); ?></span>
                                     </p>
                                 </td>

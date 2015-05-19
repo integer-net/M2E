@@ -110,18 +110,21 @@ class Ess_M2ePro_Model_Ebay_Feedback extends Ess_M2ePro_Model_Component_Abstract
             );
         } catch (Exception $e) {
             Mage::helper('M2ePro/Module_Exception')->process($e);
-            return;
+            return false;
         }
 
         if (!isset($response['feedback_id'])) {
-            return;
+            return false;
         }
 
         $this->setData('seller_feedback_id', $response['feedback_id']);
         $this->setData('seller_feedback_type', $type);
         $this->setData('seller_feedback_text', $text);
+        $this->setData('seller_feedback_date', $response['feedback_date']);
 
         $this->save();
+
+        return true;
     }
 
     /**

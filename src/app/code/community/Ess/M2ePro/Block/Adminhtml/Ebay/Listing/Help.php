@@ -17,9 +17,4 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Help extends Mage_Adminhtml_Block_
 
         $this->setTemplate('M2ePro/ebay/listing/help.phtml');
     }
-
-    public function getContainerId()
-    {
-        return 'block_notice_ebay_listing';
-    }
 }

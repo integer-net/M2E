@@ -141,7 +141,7 @@ class Ess_M2ePro_Helper_Module_Database_Repair extends Mage_Core_Helper_Abstract
      */
     public function repairCrashedTable($tableName)
     {
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
 
         $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);

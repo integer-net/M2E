@@ -89,7 +89,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
 
     private function executeRunner()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Apply products changes on eBay');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Apply Products changes on eBay');
 
         $result = $this->runner->execute();
         $this->affectResultRunner($result);
@@ -117,7 +117,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
 
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Task "Update 3rd Party Listings" has completed with %result%. View %sl%listings log%el% for details.',
+                'Task "Update 3rd Party Listings" has completed with %result%. View %sl%Listings Log%el% for details.',
                 array(
                     '!sl'=>'<a target="_blank" href="route:*/adminhtml_ebay_log/listingOther/;'.
                         'back:*/adminhtml_ebay_log/synchronization/;">',
@@ -127,7 +127,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
             ), $resultType, $resultPriority
         );
 
-        $this->getActualOperationHistory()->addText('Updating products on eBay ended with '.$resultString.'.');
+        $this->getActualOperationHistory()->addText('Updating Products on eBay ended with '.$resultString.'.');
     }
 
     //####################################

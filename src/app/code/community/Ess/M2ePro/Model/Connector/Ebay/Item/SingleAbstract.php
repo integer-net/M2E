@@ -69,25 +69,25 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$this->listingProduct->getId());
 
-        if ($this->listingProduct->isLockedObject(NULL) ||
-            $this->listingProduct->isLockedObject('in_action') ||
-            $lockItem->isExist()) {
+        if ($lockItem->isExist()) {
 
             $message = array(
                 // M2ePro_TRANSLATIONS
-                // Another action is being processed. Try again when the action is completed.
-                parent::MESSAGE_TEXT_KEY => 'Another action is being processed. '
-                                           .'Try again when the action is completed.',
+                // Another Action is being processed. Try again when the Action is completed.
+                parent::MESSAGE_TEXT_KEY => 'Another Action is being processed. '
+                    .'Try again when the Action is completed.',
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_ERROR
             );
 
-            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->getLogger()->logListingProductMessage(
+                $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
 
             return false;
         }
 
         $this->lockListingProduct();
+
         return $this->filterManualListingProduct();
     }
 
@@ -106,7 +106,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
     {
         $lockItem = Mage::getModel('M2ePro/LockItem');
         $lockItem->setNick(Ess_M2ePro_Helper_Component_Ebay::NICK.'_listing_product_'.$this->listingProduct->getId());
-
         $lockItem->remove();
     }
 
@@ -125,8 +124,9 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
                 parent::MESSAGE_TYPE_KEY => parent::MESSAGE_TYPE_WARNING
             );
 
-            $this->getLogger()->logListingProductMessage($this->listingProduct, $message,
-                                                         Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM);
+            $this->getLogger()->logListingProductMessage(
+                $this->listingProduct, $message, Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
         }
     }
 
@@ -149,8 +149,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
     protected function getResponseObject()
     {
         if (is_null($this->responseObject)) {
-            $this->responseObject = $this->makeResponseObject($this->listingProduct,
-                                                              $this->getRequestDataObject());
+            $this->responseObject = $this->makeResponseObject($this->listingProduct, $this->getRequestDataObject());
         }
         return $this->responseObject;
     }

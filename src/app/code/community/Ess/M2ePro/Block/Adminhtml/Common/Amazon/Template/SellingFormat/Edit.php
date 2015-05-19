@@ -23,12 +23,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_SellingFormat_Edit
         //------------------------------
         $helper = Mage::helper('M2ePro');
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName = $helper->__(Ess_M2ePro_Helper_Component_Amazon::TITLE);
-            $headerTextEdit = $helper->__("Edit %component_name% Selling Format Template", $componentName);
-            $headerTextAdd = $helper->__("Add %component_name% Selling Format Template", $componentName);
+            $componentName = Mage::helper('M2ePro/Component_Amazon')->getTitle();
+            $headerTextEdit = $helper->__("Edit %component_name% Selling Format Policy", $componentName);
+            $headerTextAdd = $helper->__("Add %component_name% Selling Format Policy", $componentName);
         } else {
-            $headerTextEdit = $helper->__("Edit Selling Format Template");
-            $headerTextAdd = $helper->__("Add Selling Format Template" );
+            $headerTextEdit = $helper->__("Edit Selling Format Policy");
+            $headerTextAdd = $helper->__("Add Selling Format Policy" );
         }
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data')
@@ -58,14 +58,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_SellingFormat_Edit
             'label'     => Mage::helper('M2ePro')->__('Back'),
             'onclick'   => 'AmazonTemplateSellingFormatHandlerObj.back_click(\'' . $url . '\')',
             'class'     => 'back'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'AmazonTemplateSellingFormatHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
 

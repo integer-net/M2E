@@ -4,7 +4,7 @@ ListingOtherRemovingHandler = Class.create(ActionHandler, {
 
     options: {},
 
-    setOptions: function (options)
+    setOptions: function(options)
     {
         this.options = Object.extend(this.options, options);
         return this;
@@ -12,14 +12,14 @@ ListingOtherRemovingHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    run: function ()
+    run: function()
     {
         this.removingProducts(
             this.gridHandler.getSelectedProductsString()
         );
     },
 
-    removingProducts: function (productsString)
+    removingProducts: function(productsString)
     {
         new Ajax.Request(this.options.url.removingProducts, {
             method: 'post',
@@ -27,7 +27,8 @@ ListingOtherRemovingHandler = Class.create(ActionHandler, {
                 componentMode: this.options.customData.componentMode,
                 product_ids: productsString
             },
-            onSuccess: (function (transport) {
+            onSuccess: (function(transport) {
+
                 MagentoMessageObj.clearAll();
 
                 if (transport.responseText == '1') {

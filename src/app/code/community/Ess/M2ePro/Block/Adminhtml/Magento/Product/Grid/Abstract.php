@@ -7,6 +7,7 @@
 abstract class Ess_M2ePro_Block_Adminhtml_Magento_Product_Grid_Abstract
     extends Mage_Adminhtml_Block_Widget_Grid
 {
+    public $hideMassactionColumn = false;
     protected $hideMassactionDropDown = false;
 
     protected $showAdvancedFilterProductsOption = true;
@@ -70,6 +71,14 @@ abstract class Ess_M2ePro_Block_Adminhtml_Magento_Product_Grid_Abstract
         return parent::_prepareMassaction();
     }
 
+    protected function _prepareMassactionColumn()
+    {
+        if($this->hideMassactionColumn) {
+            return;
+        }
+        parent::_prepareMassactionColumn();
+    }
+
     public function getMassactionBlockName()
     {
         return 'M2ePro/adminhtml_grid_massaction';
@@ -81,7 +90,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Magento_Product_Grid_Abstract
         $advancedFilterBlock->setShowHideProductsOption($this->showAdvancedFilterProductsOption);
         $advancedFilterBlock->setGridJsObjectName($this->getJsObjectName());
 
-        return $advancedFilterBlock->toHtml() . parent::getMassactionBlockHtml();
+        return $advancedFilterBlock->toHtml() . (($this->hideMassactionColumn)
+            ? '' :  parent::getMassactionBlockHtml());
     }
 
     // ####################################
@@ -129,9 +139,6 @@ HTML;
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
-        if (strlen($value) > 60) {
-            return substr($value, 0, 60) . '...';
-        }
         return Mage::helper('M2ePro')->escapeHtml($value);
     }
 
@@ -259,9 +266,9 @@ HTML;
         $helper = Mage::helper('M2ePro');
 
         $selectItemsMessage = $helper->escapeJs(
-            $helper->__('Please select the products you want to perform the action on.')
+            $helper->__('Please select the Products you want to perform the Action on.')
         );
-        $createEmptyListingMessage = $helper->escapeJs($helper->__('Are you sure you want to create empty listing?'));
+        $createEmptyListingMessage = $helper->escapeJs($helper->__('Are you sure you want to create empty Listing?'));
 
         $showAdvancedFilterButtonText = $helper->escapeJs($helper->__('Show Advanced Filter'));
         $hideAdvancedFilterButtonText = $helper->escapeJs($helper->__('Hide Advanced Filter'));

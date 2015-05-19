@@ -3,7 +3,7 @@ ProgressBar.prototype = {
 
     //----------------------------------
 
-    initialize : function(progressBarId)
+    initialize: function(progressBarId)
     {
         if (typeof progressBarId == 'undefined') {
             progressBarId = '';
@@ -22,7 +22,7 @@ ProgressBar.prototype = {
 
     //----------------------------------
 
-    makeAndFillHtml : function()
+    makeAndFillHtml: function()
     {
         if ($$('#'+this.progressBarId).length == 0) {
             return false;

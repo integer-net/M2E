@@ -107,13 +107,13 @@ class Ess_M2ePro_Model_Account extends Ess_M2ePro_Model_Component_Parent_Abstrac
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('account');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('account');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('account');
         return parent::delete();
     }
 

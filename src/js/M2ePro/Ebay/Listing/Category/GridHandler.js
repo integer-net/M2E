@@ -46,15 +46,14 @@ EbayListingCategoryGridHandler = Class.create(GridHandler, {
     {
         validationRequired = validationRequired || false;
 
-        new Ajax.Request( M2ePro.url.get('adminhtml_ebay_listing_categorySettings/getChooserBlockHtml') ,
-        {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing_categorySettings/getChooserBlockHtml'), {
             method: 'get',
-            asynchronous : true,
-            parameters : {
+            asynchronous: true,
+            parameters: {
                 ids: this.getSelectedProductsString()
             },
-            onSuccess: function (transport)
-            {
+            onSuccess: function(transport) {
+
                 var temp = document.createElement('div');
                 temp.innerHTML = transport.responseText;
                 temp.innerHTML.evalScripts();
@@ -94,6 +93,7 @@ EbayListingCategoryGridHandler = Class.create(GridHandler, {
                 template_data: Object.toJSON(templateData)
             },
             onSuccess: function(transport) {
+
                 this.unselectAll();
                 this.getGridObj().doFilter();
 

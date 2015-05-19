@@ -44,13 +44,13 @@ class Ess_M2ePro_Model_Template_Synchronization extends Ess_M2ePro_Model_Compone
 
     public function save()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_synchronization');
         return parent::save();
     }
 
     public function delete()
     {
-        Mage::helper('M2ePro/Data_Cache')->removeTagValues('template_synchronization');
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_synchronization');
         return parent::delete();
     }
 

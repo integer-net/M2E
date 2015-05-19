@@ -3,7 +3,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    initialize : function(currentStatus, currentStep, hiddenSteps)
+    initialize: function(currentStatus, currentStep, hiddenSteps)
     {
         this.currentStatus = currentStatus;
 
@@ -15,32 +15,32 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    skip : function(url)
+    skip: function(url)
     {
-        if (!confirm(M2ePro.translator.translate('Note: If you close the wizard, it never starts again. You will be required to set all settings manually. Press Cancel to continue working with wizard.'))) {
+        if (!confirm(M2ePro.translator.translate('Note: If you close the Wizard, it never starts again. You will be required to set all Settings manually. Press Cancel to continue working with Wizard.'))) {
             return;
         }
 
         setLocation(url);
     },
 
-    complete : function(url)
+    complete: function(url)
     {
         setLocation(url);
     },
 
     //----------------------------------
 
-    setStatus : function(status, callback)
+    setStatus: function(status, callback)
     {
-        new Ajax.Request( M2ePro.url.get('setStatus') ,
-        {
+        new Ajax.Request(M2ePro.url.get('setStatus'), {
             method: 'get',
             parameters: {
                 status: status
             },
             asynchronous: true,
             onSuccess: (function(transport) {
+
                 var response = transport.responseText.evalJSON();
 
                 if (response.type == 'error') {
@@ -58,16 +58,16 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
         })
     },
 
-    setStep : function(step, callback)
+    setStep: function(step, callback)
     {
-        new Ajax.Request( M2ePro.url.get('setStep') ,
-        {
+        new Ajax.Request(M2ePro.url.get('setStep'), {
             method: 'get',
             parameters: {
                 step: step
             },
             asynchronous: true,
             onSuccess: (function(transport) {
+
                 var response = transport.responseText.evalJSON();
 
                 if (response.type == 'error') {
@@ -89,20 +89,18 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    addStep : function(step, stepContainerId)
+    addStep: function(step, stepContainerId)
     {
-        var self = WizardHandlerObj;
-
-        if (self.steps.hidden.indexOf(step) != -1) {
+        if (this.steps.hidden.indexOf(step) != -1) {
             return;
         }
 
-        self.steps[step] = stepContainerId;
-        self.steps.nicks.push(step);
-        self.renderStep(step);
+        this.steps[step] = stepContainerId;
+        this.steps.nicks.push(step);
+        this.renderStep(step);
     },
 
-    removeStep : function(step)
+    removeStep: function(step)
     {
         delete this.steps[step];
         if (this.steps.nicks.indexOf(step) != -1) {
@@ -110,16 +108,15 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
         }
     },
 
-    getNextStepByNick : function(step)
+    getNextStepByNick: function(step)
     {
-        var self = WizardHandlerObj;
-        var stepIndex = self.steps.nicks.indexOf(step);
+        var stepIndex = this.steps.nicks.indexOf(step);
 
         if (stepIndex == -1) {
             return null;
         }
 
-        var nextStepNick = self.steps.nicks[stepIndex + 1];
+        var nextStepNick = this.steps.nicks[stepIndex + 1];
 
         if (typeof nextStepNick == 'undefined') {
             return null;
@@ -130,18 +127,16 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    renderStep : function(step)
+    renderStep: function(step)
     {
-        var self = WizardHandlerObj;
-        var stepContainerId = self.steps[step];
-
+        var stepContainerId = this.steps[step];
         if (typeof stepContainerId == 'undefined') {
             return;
         }
 
         // Render step subtitle
         //----------------
-        var stepNumber = self.steps.nicks.indexOf(step) + 1;
+        var stepNumber = this.steps.nicks.indexOf(step) + 1;
         var subtitle = '[' + M2ePro.translator.translate('Step') + ' ' + stepNumber + ']';
 
         $(stepContainerId).writeAttribute('subtitle', subtitle);
@@ -164,8 +159,8 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
             obj.hide();
         });
 
-        var stepIndex = self.steps.all.indexOf(step);
-        var currentStepIndex = self.steps.all.indexOf(self.steps.current);
+        var stepIndex = this.steps.all.indexOf(step);
+        var currentStepIndex = this.steps.all.indexOf(this.steps.current);
 
         if (currentStepIndex >= stepIndex) {
             $(stepContainerId).show();
@@ -174,8 +169,8 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
         }
 
         if ((currentStepIndex > stepIndex) ||
-            self.currentStatus == M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED') ||
-            self.currentStatus == M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED')) {
+            this.currentStatus == M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED') ||
+            this.currentStatus == M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED')) {
             $$('#'+stepContainerId+' .step_completed').each(function(obj) {
                 obj.show();
             });
@@ -200,14 +195,14 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    processStep : function(stepWindowUrl, step, callback)
+    processStep: function(stepWindowUrl, step, callback)
     {
-        var self = WizardHandlerObj;
-        var win = window.open(stepWindowUrl);
+        var self = this;
+        var win  = window.open(stepWindowUrl);
 
         window.completeStep = 0;
 
-        var intervalId = setInterval(function(){
+        var intervalId = setInterval(function() {
             if (!win.closed) {
                 return;
             }
@@ -238,13 +233,13 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
         }, 1000);
     },
 
-    skipStep : function(step, callback)
+    skipStep: function(step, callback)
     {
-        var self = WizardHandlerObj;
-        var nextStepNick = self.getNextStepByNick(step);
+        var self = this,
+            nextStepNick = this.getNextStepByNick(step);
 
         if (nextStepNick) {
-            return self.setStep(nextStepNick, function() {
+            return this.setStep(nextStepNick, function() {
                 if (typeof callback == 'function') {
                     callback();
                 }
@@ -252,7 +247,7 @@ WizardHandler.prototype = Object.extend(new CommonHandler(), {
             });
         }
 
-        self.setStatus(M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED'),function() {
+        this.setStatus(M2ePro.php.constant('Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED'),function() {
             if (typeof callback == 'function') {
                 callback();
             }

@@ -55,7 +55,7 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Request extends Ess_M2
     // ----------------------------------------
 
     /**
-     * @return Ess_M2ePro_Model_Magento_Product
+     * @return Ess_M2ePro_Model_Magento_Product_Cache
      */
     protected function getMagentoProduct()
     {

@@ -392,9 +392,10 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
         $ids = array();
         $failedProducts = array();
 
+        /** @var  $logModel Ess_M2ePro_Model_Listing_Log */
         $logModel = Mage::getModel('M2ePro/Listing_Log');
         $logModel->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK);
-        $logActionId = $logModel->getNextActionId();
+        $logsActionId = $logModel->getNextActionId();
 
         foreach ($collection->getItems() as $targetListingProduct) {
 
@@ -410,11 +411,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
                     $targetListingProduct->getProductId(),
                     $targetListingProduct->getId(),
                     Ess_M2ePro_Helper_Data::INITIATOR_USER,
-                    $logActionId,
+                    $logsActionId,
                     Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
                     // M2ePro_TRANSLATIONS
-                    // Categories settings are not set.
-                    'Categories settings are not set.',
+                    // Categories Settings are not set.
+                    'Categories Settings are not set.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -428,10 +429,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
                 continue;
             }
 
-            $descriptionTemplate = $targetListingProduct->getChildObject()->getDescriptionTemplate();
+            $descriptionTemplateSource = $targetListingProduct->getChildObject()->getDescriptionTemplateSource();
+            $descriptionRenderer       = $targetListingProduct->getChildObject()->getDescriptionRenderer();
 
-            if (!trim($descriptionTemplate->getTitleResultValue()) ||
-                !trim($targetListingProduct->getChildObject()->getDescription())) {
+            $title       = trim($descriptionTemplateSource->getTitle());
+            $description = trim($descriptionRenderer->parseTemplate($descriptionTemplateSource->getDescription()));
+
+            if (!$title || !$description) {
 
                 // Set message to log
                 //---------------
@@ -440,11 +444,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
                     $targetListingProduct->getProductId(),
                     $targetListingProduct->getId(),
                     Ess_M2ePro_Helper_Data::INITIATOR_USER,
-                    $logActionId,
+                    $logsActionId,
                     Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT,
                     // M2ePro_TRANSLATIONS
-                    // Translation cannot be executed because attributes for title or description are empty.
-                    'Translation cannot be executed because attributes for title or description are empty.',
+                    // Translation cannot be executed because Attributes for Title or Description are empty.
+                    'Translation cannot be executed because Attributes for Title or Description are empty.',
                     Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
                 );
@@ -459,16 +463,16 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
             }
 
             $categoryTemplate  = $sourceListingProduct->getChildObject()->getCategoryTemplate();
-            $primaryCategoryId = $categoryTemplate->getMainCategory();
+            $primaryCategoryId = $categoryTemplate->getCategoryMainId();
             $marketplaceId     = $categoryTemplate->getMarketplaceId();
 
             $additionalData = $targetListingProduct->getAdditionalData();
             $additionalData['translation_service'] = array(
                 'from' =>  array(
                     'description'    => array(
-                        'title'       => $descriptionTemplate->getTitleResultValue(),
-                        'subtitle'    => $descriptionTemplate->getSubTitleResultValue(),
-                        'description' => $targetListingProduct->getChildObject()->getDescription(),
+                        'title'       => $title,
+                        'subtitle'    => trim($descriptionTemplateSource->getSubTitle()),
+                        'description' => $description,
                     ),
                     'category'       => array(
                         'primary_id'   => $primaryCategoryId,
@@ -822,38 +826,41 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
 
     #############################################
 
-    private function setAutoActionData($targetListing, $sourceListing, $isDifferentMarketplace = false)
+    private function setAutoActionData(Ess_M2ePro_Model_Listing $targetListing,
+                                       Ess_M2ePro_Model_Listing $sourceListing,
+                                       $isDifferentMarketplace = false)
     {
+        /** @var Ess_M2ePro_Model_Ebay_Listing $sourceEbayListing */
         $sourceEbayListing = $sourceListing->getChildObject();
 
         $listingData = array(
             'auto_mode' =>
-                $sourceEbayListing->getAutoMode(),
+                $sourceListing->getAutoMode(),
             'auto_global_adding_mode' =>
-                $sourceEbayListing->getAutoGlobalAddingMode(),
+                $sourceListing->getAutoGlobalAddingMode(),
             'auto_global_adding_template_category_id' =>
                 $sourceEbayListing->getAutoGlobalAddingTemplateCategoryId(),
             'auto_global_adding_template_other_category_id' =>
                 $sourceEbayListing->getAutoGlobalAddingTemplateOtherCategoryId(),
             'auto_website_adding_mode' =>
-                $sourceEbayListing->getAutoWebsiteAddingMode(),
+                $sourceListing->getAutoWebsiteAddingMode(),
             'auto_website_adding_template_category_id' =>
                 $sourceEbayListing->getAutoWebsiteAddingTemplateCategoryId(),
             'auto_website_adding_template_other_category_id' =>
                 $sourceEbayListing->getAutoWebsiteAddingTemplateOtherCategoryId(),
             'auto_website_deleting_mode' =>
-                $sourceEbayListing->getAutoWebsiteDeletingMode()
+                $sourceListing->getAutoWebsiteDeletingMode()
         );
 
         if ($isDifferentMarketplace) {
             if ($sourceEbayListing->isAutoGlobalAddingModeAddAndAssignCategory()) {
-                $listingData['auto_global_adding_mode'] = Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_ADD;
+                $listingData['auto_global_adding_mode'] = Ess_M2ePro_Model_Listing::ADDING_MODE_ADD;
                 $listingData['auto_global_adding_template_category_id']       = NULL;
                 $listingData['auto_global_adding_template_other_category_id'] = NULL;
             }
 
             if ($sourceEbayListing->isAutoWebsiteAddingModeAddAndAssignCategory()) {
-                $listingData['auto_website_adding_mode'] = Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_ADD;
+                $listingData['auto_website_adding_mode'] = Ess_M2ePro_Model_Listing::ADDING_MODE_ADD;
                 $listingData['auto_website_adding_template_category_id']       = NULL;
                 $listingData['auto_website_adding_template_other_category_id'] = NULL;
             }
@@ -861,53 +868,44 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
 
         $targetListing->addData($listingData)->save();
 
-        if ($sourceEbayListing->isAutoModeCategory()) {
+        if ($sourceListing->isAutoModeCategory()) {
             $this->setAutoCategoryData($targetListing->getId(), $sourceListing->getId(), $isDifferentMarketplace);
         }
     }
 
     private function setAutoCategoryData($targetListingId, $sourceListingId, $isDifferentMarketplace = false)
     {
-        $autoCategoryCollection = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category')
-            ->getCollection()
-            ->addFieldToFilter('listing_id', $sourceListingId);
+        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Auto_Category_Group');
+        $collection->addFieldToFilter('main_table.listing_id', (int)$sourceListingId);
 
-        $groupIds = array();
-        foreach($autoCategoryCollection->getItems() as $autoCategoryObject) {
+        foreach($collection->getItems() as $sourceGroup) {
 
-            $sourceGroupId = $autoCategoryObject->getData('group_id');
+            /** @var Ess_M2ePro_Model_Listing_Auto_Category_Group $sourceGroup */
 
-            if (!isset($groupIds[$sourceGroupId])) {
-                $sourceGroup = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group')->load($sourceGroupId);
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Auto_Category_Group $group */
+            $group = Mage::helper('M2ePro/Component_Ebay')->getModel('Listing_Auto_Category_Group')
+                ->addData($sourceGroup->getData());
 
-                $group = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category_Group');
-                $group->setData('listing_id', $targetListingId);
-                $group->setData('title',      $sourceGroup->getTitle());
-                $group->save();
+            $group->setData('listing_id', $targetListingId);
 
-                $groupIds[$sourceGroupId] = $group->getId();
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Auto_Category_Group $ebaySourceGroup */
+            $ebaySourceGroup = $sourceGroup->getChildObject();
+
+            if ($isDifferentMarketplace && $ebaySourceGroup->isAddingModeAddAndAssignCategory()) {
+                $group->setData('adding_mode', Ess_M2ePro_Model_Listing::ADDING_MODE_ADD);
+                $group->setData('adding_template_category_id', NULL);
+                $group->setData('adding_template_other_category_id', NULL);
             }
 
-            //------------------------------
+            $group->save();
 
-            $autoCategoryData = array(
-                'group_id'                          => $groupIds[$sourceGroupId],
-                'listing_id'                        => $targetListingId,
-                'adding_mode'                       => $autoCategoryObject->getAddingMode(),
-                'deleting_mode'                     => $autoCategoryObject->getDeletingMode(),
-                'category_id'                       => $autoCategoryObject->getCategoryId(),
-                'adding_template_category_id'       => $autoCategoryObject->getAddingTemplateCategoryId(),
-                'adding_template_other_category_id' => $autoCategoryObject->getAddingTemplateOtherCategoryId(),
-            );
+            $categories = $sourceGroup->getCategories();
 
-            if ($isDifferentMarketplace && $autoCategoryObject->isAddingModeAddAndAssignCategory()) {
-                $autoCategoryData['adding_mode'] = Ess_M2ePro_Model_Ebay_Listing::ADDING_MODE_ADD;
-                $autoCategoryData['adding_template_category_id']       = NULL;
-                $autoCategoryData['adding_template_other_category_id'] = NULL;
+            foreach ($categories as $sourceCategory) {
+                $category = Mage::getModel('M2ePro/Listing_Auto_Category')->addData($sourceCategory->getData());
+                $category->setData('group_id', $group->getId());
+                $category->save();
             }
-
-            $autoCategory = Mage::getModel('M2ePro/Ebay_Listing_Auto_Category');
-            $autoCategory->addData($autoCategoryData)->save();
         }
     }
 
@@ -931,6 +929,9 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
     {
         $data = array();
 
+        /** @var $magentoProduct Ess_M2ePro_Model_Magento_Product_Cache */
+        $magentoProduct = $listingProduct->getMagentoProduct();
+
         $filter = array('mode' => array('in' => array(
             Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS,
             Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS
@@ -939,16 +940,15 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
 
         $specifics = $categoryTemplate->getSpecifics(true, $filter);
 
+        /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
         foreach ($specifics as $specific) {
 
-            /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
+            $magentoProduct->clearNotFoundAttributes();
 
-            $listingProduct->getMagentoProduct()->clearNotFoundAttributes();
+            $tempAttributeLabel  = $specific->getSource($magentoProduct)->getLabel();
+            $tempAttributeValues = $specific->getSource($magentoProduct)->getValues();
 
-            $tempAttributeData = $specific->getAttributeData();
-            $tempAttributeValues = $specific->getValues();
-
-            $attributes = $listingProduct->getMagentoProduct()->getNotFoundAttributes();
+            $attributes = $magentoProduct->getNotFoundAttributes();
 
             if (!empty($attributes)) {
                 continue;
@@ -956,18 +956,14 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
 
             $values = array();
             foreach ($tempAttributeValues as $tempAttributeValue) {
-                if ($tempAttributeValue['value'] == '--') {
+                if ($tempAttributeValue == '--') {
                     continue;
                 }
-                $values[] = $tempAttributeValue['value'];
+                $values[] = $tempAttributeValue;
             }
 
-            $data[] = array(
-                'name' => $specific->isCustomItemSpecificsMode()
-                            ? $tempAttributeData['title']
-                            : $tempAttributeData['id'],
-                'value' => $values
-            );
+            $data[] = array('name'  => $tempAttributeLabel,
+                            'value' => $values);
         }
 
         return $data;

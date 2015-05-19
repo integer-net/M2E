@@ -21,6 +21,10 @@ function initializationMagentoBlocks()
 
     $$('div.entry-edit').each(function(blockObj) {
 
+        if (blockObj.select('form').length != 0) {
+            return;
+        }
+
         if (blockObj.select('div.entry-edit-head').length == 0) {
             return;
         }
@@ -37,16 +41,7 @@ function initializationMagentoBlocks()
             '<div class="entry-edit-head-right" style="float: right; width: 20%;"></div>';
         MagentoBlockObj.observePrepareStart(blockObj);
 
-        var noteClassName = 'note';
-        if (IS_VIEW_EBAY || IS_VIEW_CONFIGURATION) {
-            noteClassName = 'note-no-tool-tip';
-        }
-
-        if (blockObj.select('div.fieldset div.hor-scroll table.form-list tr td.value p.' + noteClassName).length > 0) {
-            MagentoFieldTipObj.observePrepareStart(blockObj);
-        }
-
-        if (!IS_VIEW_EBAY && !IS_VIEW_CONFIGURATION) {
+        if (!IS_VIEW_EBAY && !IS_VIEW_COMMON && !IS_VIEW_CONFIGURATION) {
             return;
         }
 

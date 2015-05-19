@@ -7,64 +7,139 @@
 class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Updater
     extends Ess_M2ePro_Model_Listing_Product_Variation_Updater
 {
+    private $parentListingsProductsForProcessing = array();
+
     // ########################################
 
-    public function updateVariations(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    public function process(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $options = array();
-
-        if ($listingProduct->getMagentoProduct()->isProductWithoutVariations()) {
-
-            $listingProduct->setData('is_variation_product',
-                                     Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_NO)
-                           ->save();
-
-            if ($listingProduct->getChildObject()->isVariationMatched()) {
-                $listingProduct->getChildObject()->updateVariationOptions($options);
-                $listingProduct->getChildObject()->unsetMatchedVariation();
-            }
-
+        if ($this->checkChangeAsVariationProduct($listingProduct)) {
             return;
         }
 
-        $listingProduct->setData('is_variation_product',
-                                 Ess_M2ePro_Model_Amazon_Listing_Product::IS_VARIATION_PRODUCT_YES)
-                       ->save();
+        if ($this->checkChangeAsNotVariationProduct($listingProduct)) {
+            return;
+        }
 
-        $magentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
-        foreach ($magentoVariations['set'] as $attribute => $value) {
-            $options[] = array(
-                'attribute' => $attribute,
-                'option' => NULL
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+
+        if (!$variationManager->isVariationProduct()) {
+            return;
+        }
+
+        $this->checkVariationStructureChanges($listingProduct);
+    }
+
+    public function afterMassProcessEvent()
+    {
+        foreach ($this->parentListingsProductsForProcessing as $listingProduct) {
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
+            $amazonListingProduct->getVariationManager()->getTypeModel()->getProcessor()->process();
+        }
+    }
+
+    // ########################################
+
+    private function checkChangeAsVariationProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+        $magentoProduct = $listingProduct->getMagentoProduct();
+
+        if (!$magentoProduct->isProductWithVariations() || $variationManager->isVariationProduct()) {
+            return false;
+        }
+
+        if ($magentoProduct->isSimpleTypeWithCustomOptions() || $magentoProduct->isBundleType()) {
+            $listingProduct->setData(
+                'is_general_id_owner', Ess_M2ePro_Model_Amazon_Listing_Product::IS_GENERAL_ID_OWNER_NO
             );
+            $listingProduct->setData('template_description_id', null);
         }
 
-        if (!$listingProduct->getChildObject()->isVariationMatched()) {
-            $listingProduct->getChildObject()->updateVariationOptions($options);
+        $listingProduct->setData('is_variation_product', 1);
+        $variationManager->setRelationParentType();
+        $variationManager->getTypeModel()->resetProductAttributes(false);
+        $variationManager->getTypeModel()->getProcessor()->process();
+
+        return true;
+    }
+
+    private function checkChangeAsNotVariationProduct(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+        $isVariationMagentoProduct = $listingProduct->getMagentoProduct()->isProductWithVariations();
+
+        if ($isVariationMagentoProduct || !$variationManager->isVariationProduct()) {
+            return false;
+        }
+
+        $variationManager->getTypeModel()->clearTypeData();
+
+        if ($variationManager->isRelationParentType()) {
+            $listingProduct->setData('general_id', NULL);
+            $listingProduct->setData(
+                'is_general_id_owner', Ess_M2ePro_Model_Amazon_Listing_Product::IS_GENERAL_ID_OWNER_NO
+            );
+            $listingProduct->setData('status', Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
+
+            $listingProduct->deleteInstance();
+        } else {
+            $variationManager->setSimpleType();
+        }
+
+        return true;
+    }
+
+    // ----------------------------------------
+
+    private function checkVariationStructureChanges(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Abstract $typeModel */
+        $typeModel = $variationManager->getTypeModel();
+
+        if ($variationManager->isRelationParentType()) {
+            $this->parentListingsProductsForProcessing[$listingProduct->getId()] = $listingProduct;
             return;
         }
 
-        // observe variation removal in Magento
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_PhysicalUnit $typeModel */
 
-        $currentVariation = $this->prepareCurrentVariations($listingProduct->getVariations(true));
-        if (!isset($currentVariation[0]) || !isset($currentVariation[0]['options'])) {
-            return;
-        }
-        $currentVariation = reset($currentVariation);
-        $magentoVariations = $this->prepareMagentoVariations($magentoVariations);
+        if (!$typeModel->isActualProductAttributes()) {
 
-        foreach ($magentoVariations as $magentoVariation) {
-            if ($this->isEqualVariations($magentoVariation['options'],$currentVariation['options'])) {
+            if ($variationManager->isRelationChildType()) {
+                /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $typeModel */
+                $this->parentListingsProductsForProcessing[$typeModel->getParentListingProduct()->getId()]
+                    = $typeModel->getParentListingProduct();
                 return;
             }
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Individual $typeModel */
+
+            $typeModel->resetProductVariation();
+
+            return;
         }
 
-        foreach ($listingProduct->getVariations(true) as $variation) {
-            $variation->deleteInstance();
-        }
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_PhysicalUnit $typeModel */
 
-        $listingProduct->getChildObject()->updateVariationOptions($options);
-        $listingProduct->getChildObject()->unsetMatchedVariation();
+        if ($typeModel->isVariationProductMatched() && !$typeModel->isActualProductVariation()) {
+
+            if ($variationManager->isRelationChildType()) {
+                /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $typeModel */
+                $this->parentListingsProductsForProcessing[$typeModel->getParentListingProduct()->getId()]
+                    = $typeModel->getParentListingProduct();
+                return;
+            }
+
+            $typeModel->unsetProductVariation();
+        }
     }
 
     // ########################################

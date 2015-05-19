@@ -65,7 +65,7 @@ class Ess_M2ePro_Model_Order_Reserve
         }
 
         if ($this->order->getAccount()->getChildObject()->getQtyReservationDays() <= 0) {
-            throw new LogicException('QTY reservation is disabled in Account settings.');
+            throw new LogicException('QTY Reservation is disabled in Account Settings.');
         }
 
         $this->order->associateWithStore(false);
@@ -186,6 +186,10 @@ class Ess_M2ePro_Model_Order_Reserve
                 $magentoStockItem->setStockItem($stockItem);
 
                 if (!$this->changeProductQty($magentoProduct, $magentoStockItem, $action, $qty)) {
+                    if ($action == self::ACTION_SUB) {
+                        unset($products[$key]);
+                    }
+
                     continue;
                 }
 
@@ -211,7 +215,7 @@ class Ess_M2ePro_Model_Order_Reserve
 
         if ($productsExistCount == 0 && $productsDeletedCount == 0) {
             $this->order->setData('reservation_state', self::STATE_UNKNOWN)->save();
-            throw new LogicException('The Order Item(s) was not mapped to Magento Product(s) or mapped incorrect.');
+            throw new LogicException('The Order Item(s) was not Mapped to Magento Product(s) or Mapped incorrect.');
         }
 
         if ($productsExistCount == 0) {
@@ -221,7 +225,7 @@ class Ess_M2ePro_Model_Order_Reserve
 
         if ($productsDeletedCount > 0) {
             $this->order->addWarningLog(
-                'QTY for %number% product(s) was not changed. Reason: Product(s) does not exist.',
+                'QTY for %number% Product(s) was not changed. Reason: Product(s) does not exist.',
                 array(
                     '!number' => $productsDeletedCount
                 )
@@ -257,7 +261,7 @@ class Ess_M2ePro_Model_Order_Reserve
                     $result = false;
 
                     $this->order->addErrorLog(
-                        'Qty for product "%name%" cannot be reserved. Reason: %msg%',
+                        'QTY for Product "%name%" cannot be reserved. Reason: %msg%',
                         array(
                             '!name' => $magentoProduct->getName(),
                             'msg' => $e->getMessage()

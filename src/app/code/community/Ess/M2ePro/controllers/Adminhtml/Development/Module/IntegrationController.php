@@ -170,7 +170,7 @@ HTML;
         }
 
         if (empty($listingProducts)) {
-            $this->_getSession()->addError('Failed to load listing product.');
+            $this->_getSession()->addError('Failed to load Listing Product.');
             return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
         }
 
@@ -192,7 +192,7 @@ HTML;
                            ->save();
         }
 
-        $this->_getSession()->addSuccess("Successfully removed for {$affected} affected products.");
+        $this->_getSession()->addSuccess("Successfully removed for {$affected} affected Products.");
         return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 
@@ -218,7 +218,7 @@ HTML;
         }
 
         if (empty($listingProducts)) {
-            $this->_getSession()->addError('Failed to load listing product.');
+            $this->_getSession()->addError('Failed to load Listing Product.');
             return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
         }
 
@@ -239,7 +239,7 @@ HTML;
                            ->save();
         }
 
-        $this->_getSession()->addSuccess("Successfully set for {$affected} affected products.");
+        $this->_getSession()->addSuccess("Successfully set for {$affected} affected Products.");
         return $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 
@@ -282,10 +282,10 @@ HTML;
 
         $tableContent = <<<HTML
 <tr>
-    <th>Template Code</th>
+    <th>Policy Code</th>
     <th>Listing Product ID</th>
     <th>Listing ID</th>
-    <th>Template ID</th>
+    <th>Policy ID</th>
     <th>My Mode</th>
     <th>Parent Mode</th>
 </tr>
@@ -327,7 +327,7 @@ HTML;
         <h2 style="margin: 20px 0 0 10px">Nonexistent templates
             <span style="color: #808080; font-size: 15px;">( entries)</span>
         </h2>
-        <br>
+        <br/>
         <table class="grid" cellpadding="0" cellspacing="0">
             {$tableContent}
         </table>
@@ -336,7 +336,6 @@ HTML;
 HTML;
     }
 
-    //todo change when description will be horizontal
     private function getNonexistentTemplatesByDifficultLogic($templateCode)
     {
         /** @var $resource Mage_Core_Model_Resource */
@@ -381,6 +380,7 @@ HTML;
         $horizontalTemplates = array(
             Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SELLING_FORMAT,
             Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SYNCHRONIZATION,
+            Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION,
         );
         in_array($templateCode, $horizontalTemplates) && $templateIdName = "template_{$templateCode}_id";
 
@@ -410,7 +410,7 @@ HTML;
     {
         /** @var $resource Mage_Core_Model_Resource */
         $resource = Mage::getSingleton('core/resource');
-        $connRead = $resource->getConnection('core_write');
+        $connRead = $resource->getConnection('core_read');
 
         $select = $connRead->select()
             ->from(
@@ -434,6 +434,211 @@ HTML;
             ->where("template.id IS NULL");
 
         return $select->query()->fetchAll();
+    }
+
+    //#############################################
+
+    /**
+     * @title "Show eBay Duplicates [parse logs]"
+     * @description "Show eBay Duplicates According with Logs"
+     */
+    public function showEbayDuplicatesByLogsAction()
+    {
+        /** @var $resource Mage_Core_Model_Resource */
+        $resource = Mage::getSingleton('core/resource');
+        $queryObj = $resource->getConnection('core_read')
+                             ->select()
+                             ->from(array('mll' => $resource->getTableName('m2epro_listing_log')))
+                             ->joinLeft(
+                                 array('ml' => $resource->getTableName('m2epro_listing')),
+                                 'mll.listing_id = ml.id',
+                                 array('marketplace_id')
+                             )
+                            ->joinLeft(
+                                array('mm' => $resource->getTableName('m2epro_marketplace')),
+                                'ml.marketplace_id = mm.id',
+                                array('marketplace_title' => 'title')
+                            )
+                             ->where("mll.description LIKE '%a duplicate of your item%' OR " . // ENG
+                                     "mll.description LIKE '%ette annonce est identique%' OR " . // FR
+                                     "mll.description LIKE '%ngebot ist identisch mit dem%' OR " .  // DE
+                                     "mll.description LIKE '%un duplicato del tuo oggetto%' OR " . // IT
+                                     "mll.description LIKE '%es un duplicado de tu art%'" // ESP
+                             )
+                             ->where("mll.component_mode = ?", 'ebay')
+                             ->order('mll.id DESC')
+                             ->group(array('mll.product_id', 'mll.listing_id'))
+                             ->query();
+
+        $duplicatesInfo = array();
+        while ($row = $queryObj->fetch()) {
+
+            preg_match('/.*\((\d*)\)/', $row['description'], $matches);
+            $ebayItemId = !empty($matches[1]) ? $matches[1] : '';
+
+            $duplicatesInfo[] = array(
+                'listing_id'         => $row['listing_id'],
+                'listing_title'      => $row['listing_title'],
+                'product_id'         => $row['product_id'],
+                'product_title'      => $row['product_title'],
+                'listing_product_id' => $row['listing_product_id'],
+                'description'        => $row['description'],
+                'ebay_item_id'       => $ebayItemId,
+                'marketplace_title'  => $row['marketplace_title']
+            );
+        }
+
+        if (count($duplicatesInfo) <= 0) {
+            echo $this->getEmptyResultsHtml('According to you logs there are no duplicates.');
+            return;
+        }
+
+        $tableContent = <<<HTML
+<tr>
+    <th>Listing ID</th>
+    <th>Listing Title</th>
+    <th>Product ID</th>
+    <th>Product Title</th>
+    <th>Listing Product ID</th>
+    <th>eBay Item ID</th>
+    <th>eBay Site</th>
+</tr>
+HTML;
+        foreach ($duplicatesInfo as $row) {
+            $tableContent .= <<<HTML
+<tr>
+    <td>{$row['listing_id']}</td>
+    <td>{$row['listing_title']}</td>
+    <td>{$row['product_id']}</td>
+    <td>{$row['product_title']}</td>
+    <td>{$row['listing_product_id']}</td>
+    <td>{$row['ebay_item_id']}</td>
+    <td>{$row['marketplace_title']}</td>
+</tr>
+HTML;
+        }
+
+        $html = $this->getStyleHtml() . <<<HTML
+<html>
+    <body>
+        <h2 style="margin: 20px 0 0 10px">eBay Duplicates
+            <span style="color: #808080; font-size: 15px;">(#count# entries)</span>
+        </h2>
+        <br/>
+        <table class="grid" cellpadding="0" cellspacing="0">
+            {$tableContent}
+        </table>
+    </body>
+</html>
+HTML;
+        echo str_replace('#count#', count($duplicatesInfo), $html);
+    }
+
+    /**
+     * @title "Show eBay Duplicates [mysql query]"
+     * @description "[can be stopped and removed as option, by using remove=1 query param]"
+     * @new_line
+     */
+    public function showEbayDuplicatesByMysqlQueryAction()
+    {
+        $removeMode = (bool)$this->getRequest()->getQuery('remove', false);
+
+        /* @var $readConnection Varien_Db_Adapter_Pdo_Mysql */
+        $readConnection = Mage::getSingleton('core/resource')->getConnection('core_read');
+
+        /* @var $writeConnection Varien_Db_Adapter_Pdo_Mysql */
+        $writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+
+        $table = Mage::getSingleton('core/resource')->getTableName('m2epro_listing_product');
+
+        $subSelect = $readConnection
+            ->select()
+            ->from(array('mlp2' => $table),
+                   array('listing_id', 'product_id', new Zend_Db_Expr('COUNT(*) AS count_of_duplicates')))
+            ->where('component_mode = ?', 'ebay')
+            ->group(array('listing_id', 'product_id'))
+            ->having(new Zend_Db_Expr('count_of_duplicates > 1'));
+
+        $queryStmt = $readConnection
+            ->select()
+            ->from(array('mlp' => $table),
+                   array('mlp.id', 'mlp.listing_id', 'mlp.product_id', 'mlp.status'))
+            ->joinInner(array('dup' => $subSelect),
+                        'mlp.listing_id = dup.listing_id AND mlp.product_id = dup.product_id',
+                        array('dup.count_of_duplicates'))
+            ->where('component_mode = ?', 'ebay')
+            ->query();
+
+        $skipped    = array();
+        $duplicated = array();
+
+        while($row = $queryStmt->fetch()) {
+
+            $key = $row['listing_id'].'##'.$row['product_id'];
+
+            if (!in_array($key, $skipped)) {
+                $skipped[] = $key;
+                continue;
+            }
+
+            $duplicated[$row['id']] = $row;
+            $duplicated[$row['id']]['actions'] = array();
+
+            if ($removeMode && $row['status'] == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Item_Dispatcher');
+                $dispatcherObject->process(Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
+                                           array($row['id']), array());
+
+                $duplicated[$row['id']]['actions'][] = 'stopped';
+            }
+
+            if ($removeMode) {
+                $writeConnection->delete($table, array('id = ?' => $row['id']));
+                $duplicated[$row['id']]['actions'][] = 'removed';
+            }
+        }
+
+        if (count($duplicated) <= 0) {
+            echo $this->getEmptyResultsHtml('There are no duplicates.');
+            return;
+        }
+
+        $tableContent = <<<HTML
+<tr>
+    <th>Listing Product ID</th>
+    <th>Listing ID</th>
+    <th>Magento Product ID</th>
+    <th>Count Of Copies</th>
+    <th>Actions</th>
+</tr>
+HTML;
+        foreach ($duplicated as $row) {
+            $actions = implode(', ', $row['actions']);
+            $tableContent .= <<<HTML
+<tr>
+    <td>{$row['id']}</td>
+    <td>{$row['listing_id']}</td>
+    <td>{$row['product_id']}</td>
+    <td>{$row['count_of_duplicates']}</td>
+    <td>{$actions}</td>
+</tr>
+HTML;
+        }
+
+        $html = $this->getStyleHtml() . <<<HTML
+<html>
+    <body>
+        <h2 style="margin: 20px 0 0 10px">eBay Duplicates
+            <span style="color: #808080; font-size: 15px;">(#count# entries)</span>
+        </h2>
+        <br/>
+        <table class="grid" cellpadding="0" cellspacing="0">
+            {$tableContent}
+        </table>
+    </body>
+</html>
+HTML;
+        echo str_replace('#count#', count($duplicated), $html);
     }
 
     //#############################################
@@ -473,19 +678,19 @@ HTML;
     <input name="form_key" value="{$formKey}" type="hidden" />
 
     <label style="display: inline-block; width: 150px;">Source:&nbsp;</label>
-    <input type="file" accept=".csv" name="source" required /><br>
+    <input type="file" accept=".csv" name="source" required /><br/>
 
     <label style="display: inline-block; width: 150px;">Identifier Type:&nbsp;</label>
     <select style="width: 250px;" name="source_type" required>
         <option value="sku">SKU</option>
         <option value="id">Product ID</option>
-    </select><br>
+    </select><br/>
 
     <label style="display: inline-block; width: 150px;">Target Listing:&nbsp;</label>
     <select style="width: 250px;" name="listing_id" required>
         <option style="display: none;"></option>
         {$listingsOptionsHtml}
-    </select><br>
+    </select><br/>
 
     <input type="submit" title="Run Now" onclick="return confirm('Are you sure?');" />
 </form>
@@ -532,7 +737,7 @@ HTML;
             }
         }
 
-        $this->_getSession() ->addSuccess("Success '{$success}' products.");
+        $this->_getSession() ->addSuccess("Success '{$success}' Products.");
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageModuleTabUrl());
     }
 

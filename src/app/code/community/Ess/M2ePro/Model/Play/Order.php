@@ -221,7 +221,7 @@ class Ess_M2ePro_Model_Play_Order extends Ess_M2ePro_Model_Component_Child_Play_
     {
         if ($this->isPending() || $this->isCanceled() || $this->isRefunded()) {
             throw new Exception(
-                'Magento Order creation is not allowed for Pending, Canceled and Refunded Play.com Orders.'
+                'Magento Order Creation is not allowed for Pending, Canceled and Refunded Play.com Orders.'
             );
         }
     }
@@ -229,7 +229,11 @@ class Ess_M2ePro_Model_Play_Order extends Ess_M2ePro_Model_Component_Child_Play_
     public function afterCreateMagentoOrder()
     {
         if ($this->getPlayAccount()->isMagentoOrdersCustomerNewNotifyWhenOrderCreated()) {
-            $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            if (method_exists($this->getParentObject()->getMagentoOrder(), 'queueNewOrderEmail')) {
+                $this->getParentObject()->getMagentoOrder()->queueNewOrderEmail(false);
+            } else {
+                $this->getParentObject()->getMagentoOrder()->sendNewOrderEmail();
+            }
         }
     }
 

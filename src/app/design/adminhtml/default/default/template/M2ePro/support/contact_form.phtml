@@ -57,7 +57,7 @@
         'Immediate help can be obtained from <a href="%url_1%" onclick="%script_code_1%">Documentation</a> and <a href="%url_2%" onclick="%script_code_2%">Knowledge Base</a>.
         <br/><br/>
         If you can\'t find the answer to your question, use the form below to contact us for help and we\'ll get back to you as soon as we can.
-        Our customer support team\'s hours of operation are Monday to Friday, 8am–4pm (UK time).',
+        Our Customer Support Team\'s hours of operation are Monday to Friday, 8am–4pm (UK time).',
         'javascript:void(0)', 'SupportHandlerObj.setTabActive(\'support_documentation\')',
         'javascript:void(0)', 'SupportHandlerObj.setTabActive(\'support_articles\')'
     ); ?>
@@ -69,9 +69,9 @@
 
     <div id="form_left">
 
-        <input type="text" id="subject" name="subject" class="required-entry" placeholder="<?php echo Mage::helper('M2ePro')->__('Subject'); ?>" /><br />
-        <input type="text" id="contact_name" name="contact_name" class="required-entry" placeholder="<?php echo Mage::helper('M2ePro')->__('Contact Name'); ?>" /><br />
-        <input type="text" id="contact_mail" name="contact_mail" class="required-entry validate-email" placeholder="<?php echo Mage::helper('M2ePro')->__('Contact Email'); ?>" /><br />
+        <input type="text" id="subject" name="subject" class="required-entry" placeholder="<?php echo Mage::helper('M2ePro')->__('Subject'); ?>" /><br/>
+        <input type="text" id="contact_name" name="contact_name" class="required-entry" placeholder="<?php echo Mage::helper('M2ePro')->__('Contact Name'); ?>" /><br/>
+        <input type="text" id="contact_mail" name="contact_mail" class="required-entry validate-email" placeholder="<?php echo Mage::helper('M2ePro')->__('Contact Email'); ?>" /><br/>
         <?php if (Mage::helper('M2ePro/Module_Support')->isTypePremium()) : ?>
             <select id="severity" name="severity">
                 <option value="minor"><?php echo Mage::helper('M2ePro')->__('Minor'); ?></option>
@@ -86,17 +86,17 @@
                 <option
                     <?php if ($this->getRequest()->getParam('referrer') == Ess_M2ePro_Helper_View_Ebay::NICK) echo 'selected="selected"'; ?>
                     <?php if ($this->getRequest()->getParam('referrer') == Ess_M2ePro_Helper_View_Common::NICK) echo 'style="display: none"'; ?>
-                    value="<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK; ?>"><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Ebay::TITLE), ' ', Mage::helper('M2ePro')->__('Problem'); ?>
+                    value="<?php echo Ess_M2ePro_Helper_Component_Ebay::NICK; ?>"><?php echo Mage::helper('M2ePro/Component_Ebay')->getTitle(), ' ', Mage::helper('M2ePro')->__('Problem'); ?>
                 </option>
             <?php } ?>
             <?php if (Mage::helper('M2ePro/Component_Amazon')->isActive()) { ?>
-                <option value="<?php echo Ess_M2ePro_Helper_Component_Amazon::NICK; ?>"><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Amazon::TITLE), ' ', Mage::helper('M2ePro')->__('Problem'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Helper_Component_Amazon::NICK; ?>"><?php echo Mage::helper('M2ePro/Component_Amazon')->getTitle(), ' ', Mage::helper('M2ePro')->__('Problem'); ?></option>
             <?php } ?>
             <?php if (Mage::helper('M2ePro/Component_Buy')->isEnabled()) { ?>
-                <option value="<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>"><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Buy::TITLE), ' ', Mage::helper('M2ePro')->__('Problem'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>"><?php echo Mage::helper('M2ePro/Component_Buy')->getTitle(), ' ', Mage::helper('M2ePro')->__('Problem'); ?></option>
             <?php } ?>
             <?php if (Mage::helper('M2ePro/Component_Play')->isEnabled()) { ?>
-                <option value="<?php echo Ess_M2ePro_Helper_Component_Play::NICK; ?>"><?php echo Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE), ' ', Mage::helper('M2ePro')->__('Problem'); ?></option>
+                <option value="<?php echo Ess_M2ePro_Helper_Component_Play::NICK; ?>"><?php echo Mage::helper('M2ePro/Component_Play')->getTitle(), ' ', Mage::helper('M2ePro')->__('Problem'); ?></option>
             <?php } ?>
         </select>
 

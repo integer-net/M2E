@@ -42,21 +42,30 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Stop
 
     private function immediatelyChangedProducts()
     {
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when product was changed');
+        $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Immediately when Product was changed');
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $changedListingsProducts */
         $changedListingsProducts = $this->getChangesHelper()->getInstances(
             array(Ess_M2ePro_Model_ProductChange::UPDATE_ATTRIBUTE_CODE)
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+            $runnerData = $this->getRunnerData($listingProduct);
+
+            $isExistInRunner = $this->getRunner()->isExistProduct(
+                $listingProduct,
+                $runnerData['action'],
+                $runnerData['params']
+            );
+
+            if ($isExistInRunner) {
+                continue;
+            }
 
             if (!$this->getInspector()->isMeetStopRequirements($listingProduct)) {
                 continue;
             }
-
-            $runnerData = $this->getInspector()->getRunnerStopDataByListingProduct($listingProduct);
 
             $this->getRunner()->addProduct(
                 $listingProduct,
@@ -66,6 +75,29 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Stop
         }
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__);
+    }
+
+    //####################################
+
+    private function getRunnerData(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+        $ebayListingProduct = $listingProduct->getChildObject();
+
+        if (!$ebayListingProduct->getEbaySellingFormatTemplate()->getOutOfStockControl()) {
+            return array(
+                'action' => Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
+                'params' => array()
+            );
+        }
+
+        return array(
+            'action' => Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
+            'params' => array(
+                'replaced_action' => Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
+                'only_data'       => array('qty'=>true,'variations'=>true)
+            )
+        );
     }
 
     //####################################

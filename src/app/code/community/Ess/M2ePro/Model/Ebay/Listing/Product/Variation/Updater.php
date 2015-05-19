@@ -11,15 +11,19 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
     // ########################################
 
-    public function updateVariations(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    public function process(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         if (!$listingProduct->getMagentoProduct()->isProductWithVariations()) {
             return;
         }
 
-        $rawMagentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
+        $rawMagentoVariations = $listingProduct->getMagentoProduct()
+                                               ->getVariationInstance()
+                                               ->getVariationsTypeStandard();
         $rawMagentoVariations = Mage::helper('M2ePro/Component_Ebay')
                                             ->reduceOptionsForVariations($rawMagentoVariations);
+
+        $rawMagentoVariations = $this->validateExistenceConditions($rawMagentoVariations,$listingProduct);
         $rawMagentoVariations = $this->validateLimitsConditions($rawMagentoVariations,$listingProduct);
 
         $magentoVariations = $this->prepareMagentoVariations($rawMagentoVariations);
@@ -34,94 +38,82 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
         $this->saveVariationsSets($listingProduct,$rawMagentoVariations);
     }
 
-//    public function isAddedNewVariationsAttributes(Ess_M2ePro_Model_Listing_Product $listingProduct)
-//    {
-//        if (!$listingProduct->getChildObject()->isVariationsMode()) {
-//            return false;
-//        }
-//
-//        $rawMagentoVariations = $listingProduct->getMagentoProduct()->getProductVariations();
-//        $rawMagentoVariations = $this->validateLimitsConditions($rawMagentoVariations,NULL);
-//
-//        $magentoVariations = $this->prepareMagentoVariations($rawMagentoVariations);
-//        $currentVariations = $this->prepareCurrentVariations($listingProduct->getVariations(true));
-//
-//        if (!isset($magentoVariations[0]) && !isset($currentVariations[0])) {
-//            return false;
-//        }
-//
-//        if (!isset($magentoVariations[0]) || !isset($currentVariations[0])) {
-//            return true;
-//        }
-//
-//        if (count($magentoVariations[0]['options']) != count($currentVariations[0]['options'])) {
-//            return true;
-//        }
-//
-//        return false;
-//    }
-
     // ########################################
 
-    protected function validateLimitsConditions($sourceVariations,
-                                                Ess_M2ePro_Model_Listing_Product $listingProduct = NULL)
+    protected function validateExistenceConditions($sourceVariations,
+                                                   Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        $failResult = array(
-            'set' => array(),
-            'variations' => array()
-        );
+        if (!isset($sourceVariations['set']) || !isset($sourceVariations['variations']) ||
+            !is_array($sourceVariations['set']) || !is_array($sourceVariations['variations']) ||
+            !count($sourceVariations['set']) || !count($sourceVariations['variations'])) {
 
-        $set = $sourceVariations['set'];
-        $variations = $sourceVariations['variations'];
+            $listingProduct->setData(
+                self::VALIDATE_MESSAGE_DATA_KEY,
+                'The Product was Listed as a Simple Product because M2E Pro
+                 cannot retrieve Magento variations from this Product.'
+            );
 
-        foreach ($set as $singleSet) {
+            return array(
+                'set' => array(),
+                'variations' => array()
+            );
+        }
+
+        return $sourceVariations;
+    }
+
+    protected function validateLimitsConditions($sourceVariations,
+                                                Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        if (count($sourceVariations['set']) > 5) {
+
+            // Max 5 pair attribute-option:
+            // Color: Blue, Size: XL, ...
+
+            $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
+            'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+            'Reason: number of Options more than 5.'
+            );
+
+            return array(
+                'set' => array(),
+                'variations' => array()
+            );
+        }
+
+        foreach ($sourceVariations['set'] as $singleSet) {
 
             if (count($singleSet) > 60) {
 
                 // Maximum 60 options by one attribute:
                 // Color: Red, Blue, Green, ...
 
-                if (!is_null($listingProduct)) {
-                    $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
-                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                    'Reason: number of values for each option more than 60.'
-                    );
-                }
+                $listingProduct->setData(
+                    self::VALIDATE_MESSAGE_DATA_KEY,
+                    'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+                    'Reason: number of values for each Option more than 60.'
+                );
 
-                return $failResult;
+                return array(
+                    'set' => array(),
+                    'variations' => array()
+                );
             }
         }
 
-        foreach ($variations as $singleVariation) {
-
-            if (count($singleVariation) > 5) {
-
-                // Max 5 pair attribute-option:
-                // Color: Blue, Size: XL, ...
-
-                if (!is_null($listingProduct)) {
-                    $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
-                    'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                    'Reason: number of options more than 5.'
-                    );
-                }
-
-                return $failResult;
-            }
-        }
-
-        if (count($variations) > 250) {
+        if (count($sourceVariations['variations']) > 250) {
 
             // Not more that 250 possible variations
 
-            if (!is_null($listingProduct)) {
-                $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
-                'The product was listed as a simple product as it has limitation for multi-variation items. '.
-                'Reason: sum of quantities of all possible products options more than 250.'
-                );
-            }
+            $listingProduct->setData(self::VALIDATE_MESSAGE_DATA_KEY,
+            'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
+            'Reason: sum of quantities of all possible Products options more than 250.'
+            );
 
-            return $failResult;
+            return array(
+                'set' => array(),
+                'variations' => array()
+            );
         }
 
         return $sourceVariations;
@@ -146,7 +138,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
     // ########################################
 
-    protected function getAddedVariations($magentoVariations, $currentVariations)
+    private function getAddedVariations($magentoVariations, $currentVariations)
     {
         $result = array();
 
@@ -175,7 +167,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
         return $result;
     }
 
-    protected function getDeletedVariations($magentoVariations, $currentVariations)
+    private function getDeletedVariations($magentoVariations, $currentVariations)
     {
         $result = array();
 
@@ -204,7 +196,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
 
     // ----------------------------------------
 
-    protected function addNewVariations(Ess_M2ePro_Model_Listing_Product $listingProduct, $addedVariations)
+    private function addNewVariations(Ess_M2ePro_Model_Listing_Product $listingProduct, $addedVariations)
     {
         foreach ($addedVariations as $aVariation) {
 
@@ -252,7 +244,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
         }
     }
 
-    protected function markAsDeletedVariations($deletedVariations)
+    private function markAsDeletedVariations($deletedVariations)
     {
         foreach ($deletedVariations as $dVariation) {
 
@@ -278,6 +270,77 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
                 )->addData($dataForUpdate)->save();
             }
         }
+    }
+
+    // ########################################
+
+    private function prepareMagentoVariations($variations)
+    {
+        $result = array();
+
+        if (isset($variations['variations'])) {
+            $variations = $variations['variations'];
+        }
+
+        foreach ($variations as $variation) {
+            $result[] = array(
+                'variation' => array(),
+                'options' => $variation
+            );
+        }
+
+        return $result;
+    }
+
+    private function prepareCurrentVariations($variations)
+    {
+        $result = array();
+
+        foreach ($variations as $variation) {
+
+            /** @var Ess_M2ePro_Model_Listing_Product_Variation $variation */
+
+            $temp = array(
+                'variation' => $variation->getData(),
+                'options' => array()
+            );
+
+            foreach ($variation->getOptions(false) as $option) {
+                $temp['options'][] = $option;
+            }
+
+            $result[] = $temp;
+        }
+
+        return $result;
+    }
+
+    // ----------------------------------------
+
+    private function isEqualVariations($magentoVariation, $currentVariation)
+    {
+        if (count($magentoVariation) != count($currentVariation)) {
+            return false;
+        }
+
+        foreach ($magentoVariation as $mOption) {
+
+            $haveOption = false;
+
+            foreach ($currentVariation as $cOption) {
+                if ($mOption['attribute'] == $cOption['attribute'] &&
+                    $mOption['option'] == $cOption['option']) {
+                    $haveOption = true;
+                    break;
+                }
+            }
+
+            if (!$haveOption) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // ########################################

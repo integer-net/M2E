@@ -5,6 +5,7 @@ EbayTemplatePaymentHandler = Class.create(CommonHandler, {
     initialize: function()
     {
         Validation.add('M2ePro-validate-payment-methods', M2ePro.translator.translate('Payment method should be specified.'), function(value) {
+
             if ($('pay_pal_mode').checked) {
                 return true;
             }

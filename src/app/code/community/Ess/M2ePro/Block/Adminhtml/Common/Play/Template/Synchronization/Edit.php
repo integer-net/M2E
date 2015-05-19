@@ -22,18 +22,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Template_Synchronization_Edit
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $componentName =  Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_Component_Play::TITLE);
+            $componentName  = Mage::helper('M2ePro/Component_Play')->getTitle();
             $headerTextEdit = Mage::helper('M2ePro')->__(
-                "Edit %component_name% Synchronization Template",
+                "Edit %component_name% Synchronization Policy",
                 $componentName
             );
             $headerTextAdd = Mage::helper('M2ePro')->__(
-                "Add %component_name% Synchronization Template",
+                "Add %component_name% Synchronization Policy",
                 $componentName
             );
         } else {
-            $headerTextEdit = Mage::helper('M2ePro')->__("Edit Synchronization Template");
-            $headerTextAdd = Mage::helper('M2ePro')->__("Add Synchronization Template");
+            $headerTextEdit = Mage::helper('M2ePro')->__("Edit Synchronization Policy");
+            $headerTextAdd = Mage::helper('M2ePro')->__("Add Synchronization Policy");
         }
 
         if (Mage::helper('M2ePro/Data_Global')->getValue('temp_data')
@@ -63,14 +63,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Play_Template_Synchronization_Edit
             'onclick'   => 'PlayTemplateSynchronizationHandlerObj.back_click(\''
                 .Mage::helper('M2ePro')->getBackUrl('list').'\')',
             'class'     => 'back'
-        ));
-        //------------------------------
-
-        //------------------------------
-        $this->_addButton('reset', array(
-            'label'     => Mage::helper('M2ePro')->__('Refresh'),
-            'onclick'   => 'PlayTemplateSynchronizationHandlerObj.reset_click()',
-            'class'     => 'reset'
         ));
         //------------------------------
 

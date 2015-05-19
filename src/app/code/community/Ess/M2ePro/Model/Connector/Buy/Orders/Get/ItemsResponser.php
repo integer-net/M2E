@@ -4,13 +4,9 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Model_Connector_Buy_Orders_Get_ItemsResponser
+abstract class Ess_M2ePro_Model_Connector_Buy_Orders_Get_ItemsResponser
     extends Ess_M2ePro_Model_Connector_Buy_Responser
 {
-    // ########################################
-
-    protected function unsetLocks($fail = false, $message = NULL) {}
-
     // ########################################
 
     protected function validateResponseData($response)
@@ -22,7 +18,7 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Get_ItemsResponser
         return true;
     }
 
-    protected function processResponseData($response)
+    protected function prepareResponseData($response)
     {
         return $response['orders'];
     }

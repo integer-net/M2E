@@ -53,44 +53,29 @@ final class Ess_M2ePro_Model_Cron_Type_Service extends Ess_M2ePro_Model_Cron_Typ
 
     //####################################
 
+    protected function isDisabledByDeveloper()
+    {
+        return (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                              ->getGroupValue('/cron/service/','disabled');
+    }
+
     protected function initialize()
     {
         parent::initialize();
 
-        if ($this->isDisabledByDeveloper()) {
-            return;
-        }
-
         $helper = Mage::helper('M2ePro/Module_Cron');
 
-        if (!$helper->isTypeService() || $helper->isLastAccessMoreThan(self::MAX_INACTIVE_TIME)) {
+        if (!$helper->isTypeService()) {
 
-            if (!$helper->isTypeService()) {
-                $helper->setType(Ess_M2ePro_Helper_Module_Cron::TYPE_SERVICE);
-                $helper->setLastTypeChange(Mage::helper('M2ePro')->getCurrentGmtDate());
-            }
+            $helper->setType(Ess_M2ePro_Helper_Module_Cron::TYPE_SERVICE);
+            $helper->setLastTypeChange(Mage::helper('M2ePro')->getCurrentGmtDate());
 
             $this->resetTasksStartFrom();
+
+        } else {
+            $helper->isLastAccessMoreThan(self::MAX_INACTIVE_TIME) &&
+                $this->resetTasksStartFrom();
         }
-
-        if (is_null($this->getAuthKey())) {
-
-            $servicingDispatcher = Mage::getModel('M2ePro/Servicing_Dispatcher');
-            $servicingDispatcher->setForceTasksRunning(true);
-
-            $servicingDispatcher->processTask(
-                Mage::getModel('M2ePro/Servicing_Task_Cron')->getPublicNick()
-            );
-        }
-    }
-
-    protected function updateLastAccess()
-    {
-        if ($this->isDisabledByDeveloper()) {
-            return;
-        }
-
-        parent::updateLastAccess();
     }
 
     protected function isPossibleToRun()
@@ -99,7 +84,6 @@ final class Ess_M2ePro_Model_Cron_Type_Service extends Ess_M2ePro_Model_Cron_Typ
                !is_null($this->getRequestAuthKey()) &&
                !is_null($this->getRequestConnectionId()) &&
                $this->getAuthKey() == $this->getRequestAuthKey() &&
-               !$this->isDisabledByDeveloper() &&
                parent::isPossibleToRun();
     }
 
@@ -117,12 +101,6 @@ final class Ess_M2ePro_Model_Cron_Type_Service extends Ess_M2ePro_Model_Cron_Typ
     {
         return Mage::helper('M2ePro/Module')->getConfig()
                     ->getGroupValue('/cron/service/','auth_key');
-    }
-
-    private function isDisabledByDeveloper()
-    {
-        return (bool)(int)Mage::helper('M2ePro/Module')->getConfig()
-                            ->getGroupValue('/cron/service/','disabled');
     }
 
     private function resetTaskStartFrom($taskName)

@@ -6,8 +6,10 @@
 
 class Ess_M2ePro_Model_Buy_Template_NewProduct extends Ess_M2ePro_Model_Component_Abstract
 {
-    private $coreTemplateModel = NULL;
-    private $attributesTemplateModel = NULL;
+    /**
+     * @var Ess_M2ePro_Model_Buy_Template_NewProduct_Core
+     */
+    private $newProductCoreTemplateModel = NULL;
 
     // ########################################
 
@@ -15,6 +17,15 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct extends Ess_M2ePro_Model_Componen
     {
         parent::_construct();
         $this->_init('M2ePro/Buy_Template_NewProduct');
+    }
+
+    // ########################################
+
+    static public function isAllowedUpcExemption()
+    {
+        return (bool)(int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/buy/template/new_sku/','upc_exemption'
+        );
     }
 
     // ########################################
@@ -31,8 +42,6 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct extends Ess_M2ePro_Model_Componen
                 ->addFieldToFilter('status',Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED)
                 ->getSize();
     }
-
-    // ########################################
 
     public function deleteInstance()
     {
@@ -51,74 +60,56 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct extends Ess_M2ePro_Model_Componen
                                 array('template_new_product_id = ?' => $this->getId())
                                 );
 
-        // -- delete attributes
-        $attributes = $this->getAttributesTemplate();
-        foreach ($attributes as $attribute) {
+        foreach ($this->getAttributes(true) as $attribute) {
             $attribute->deleteInstance();
         }
 
         $this->getCoreTemplate()->deleteInstance();
 
-        $attributeSets = $this->getAttributeSets();
-        foreach ($attributeSets as $attributeSet) {
-            $attributeSet->deleteInstance();
-        }
-
         $this->delete();
 
-        $this->coreTemplateModel = NULL;
-        $this->attributesTemplateModel = NULL;
+        $this->newProductCoreTemplateModel = NULL;
 
         return true;
     }
 
     // ########################################
 
-    public function getAttributeSets()
-    {
-        $collection = Mage::getModel('M2ePro/AttributeSet')->getCollection();
-        $collection->addFieldToFilter('object_type',
-                                      Ess_M2ePro_Model_AttributeSet::OBJECT_TYPE_BUY_TEMPLATE_NEW_PRODUCT);
-        $collection->addFieldToFilter('object_id',(int)$this->getId());
-
-        return $collection->getItems();
-    }
-
-    public function getAttributeSetsIds()
-    {
-        $ids = array();
-        $attributeSets = $this->getAttributeSets();
-        foreach ($attributeSets as $attributeSet) {
-            /** @var $attributeSet Ess_M2ePro_Model_AttributeSet */
-            $ids[] = $attributeSet->getAttributeSetId();
-        }
-
-        return $ids;
-    }
-
-    // ########################################
-
+    /**
+     * @return Ess_M2ePro_Model_Buy_Template_NewProduct_Core
+     */
     public function getCoreTemplate()
     {
-        if (is_null($this->coreTemplateModel)) {
-            $this->coreTemplateModel = Mage::getModel('M2ePro/Buy_Template_NewProduct_Core')->loadInstance(
-                $this->getId()
+        if (is_null($this->newProductCoreTemplateModel)) {
+
+            $this->newProductCoreTemplateModel = Mage::helper('M2ePro')->getCachedObject(
+                'Buy_Template_NewProduct_Core', $this->getId(), NULL, array('template')
             );
+
+            $this->newProductCoreTemplateModel->setNewProductTemplate($this);
         }
 
-        return $this->coreTemplateModel;
+        return $this->newProductCoreTemplateModel;
     }
 
-    public function getAttributesTemplate()
+    /**
+     * @param bool $asObjects
+     * @param array $filters
+     * @return array|Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute[]
+     */
+    public function getAttributes($asObjects = false, array $filters = array())
     {
-        if (is_null($this->attributesTemplateModel)) {
-            $this->attributesTemplateModel = Mage::getModel('M2ePro/Buy_Template_NewProduct_Attribute')
-                ->getCollection()
-                ->addFieldToFilter('template_new_product_id',$this->getId())
-                ->getItems();
+        $attributes = $this->getRelatedSimpleItems('Buy_Template_NewProduct_Attribute','template_new_product_id',
+                                                   $asObjects, $filters);
+
+        if ($asObjects) {
+            /** @var Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute $attribute */
+            foreach ($attributes as $attribute) {
+                $attribute->setNewProductTemplate($this);
+            }
         }
 
-        return $this->attributesTemplateModel;
+        return $attributes;
     }
 
     // ########################################
@@ -140,40 +131,10 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct extends Ess_M2ePro_Model_Componen
 
     // ########################################
 
-    /**
-     * @param Ess_M2ePro_Model_Buy_Listing_Product $listingProduct
-     * @return Ess_M2ePro_Model_Buy_Template_NewProduct_Source
-     */
-    public function getSource(Ess_M2ePro_Model_Buy_Listing_Product $listingProduct)
-    {
-        return Mage::getModel(
-            'M2ePro/Buy_Template_NewProduct_Source',
-            array(
-                $listingProduct,
-                $this
-            )
-        );
-    }
-
-    // ########################################
-
     public function map($listingProductIds)
     {
         if (count($listingProductIds) < 0) {
             return false;
-        }
-
-        $categoryAttributes = $this->getAttributeSetsIds();
-
-        $listingAttributes = Mage::helper('M2ePro/Component_Buy')
-                ->getObject('Listing_Product',reset($listingProductIds))
-                ->getListing()
-                ->getAttributeSetsIds();
-
-        foreach ($listingAttributes as $listingAttribute) {
-            if (array_search($listingAttribute,$categoryAttributes) === false) {
-                return false;
-            }
         }
 
         foreach ($listingProductIds as $listingProductId) {
@@ -190,6 +151,20 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct extends Ess_M2ePro_Model_Componen
         }
 
         return true;
+    }
+
+    // ########################################
+
+    public function save()
+    {
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('buy_template_newproduct');
+        return parent::save();
+    }
+
+    public function delete()
+    {
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('buy_template_newproduct');
+        return parent::delete();
     }
 
     // ########################################

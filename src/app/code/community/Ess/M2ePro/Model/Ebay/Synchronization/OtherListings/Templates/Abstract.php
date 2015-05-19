@@ -52,7 +52,8 @@ abstract class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Abs
 
     protected function getChangedInstances(array $attributes, $withStoreFilter = false)
     {
-        $cacheKey = md5(json_encode(func_get_args()));
+        $args = func_get_args();
+        $cacheKey = md5(json_encode($args));
 
         if (isset($this->cache['listings_other_products_by_params'][$cacheKey])) {
             return $this->cache['listings_other_products_by_params'][$cacheKey];
@@ -80,7 +81,7 @@ abstract class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Abs
 
             $resultListingOtherProducts[$loId] = $this->cache['listings_other_products'][$loId];
             $resultListingOtherProducts[$loId]->addData($listingOtherProductData);
-            $resultListingOtherProducts[$loId]->enableCache();
+            $resultListingOtherProducts[$loId]->getMagentoProduct()->enableCache();
 
             $this->cache['listings_other_products_by_params'][$cacheKey][$loId] = $resultListingOtherProducts[$loId];
 
@@ -99,7 +100,7 @@ abstract class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Abs
         foreach ($listingOtherProductsIds as $key => $loId) {
 
             $listingOtherProducts[$loId]->addData($changedListingOtherProducts[$key]);
-            $listingOtherProducts[$loId]->enableCache();
+            $listingOtherProducts[$loId]->getMagentoProduct()->enableCache();
 
             $this->cache['listings_other_products'][$loId] = $listingOtherProducts[$loId];
             $this->cache['listings_other_products_by_params'][$cacheKey][$loId] = $listingOtherProducts[$loId];

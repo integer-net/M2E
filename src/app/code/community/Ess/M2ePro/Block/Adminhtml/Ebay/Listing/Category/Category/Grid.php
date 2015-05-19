@@ -78,37 +78,16 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Category_Grid extends Ess
             'filter_condition_callback' => array($this, 'callbackFilterEbayCategories')
         ));
 
-        $actionsColumn = array(
+        $this->addColumn('actions', array(
             'header'    => Mage::helper('M2ePro')->__('Actions'),
             'align'     => 'center',
             'width'     => '100px',
             'type'      => 'text',
             'sortable'  => false,
             'filter'    => false,
-            'frame_callback' => array($this, 'callbackColumnActions'),
-            'actions'   => array()
-        );
-
-        $actions[] = array(
-            'label' => Mage::helper('catalog')->__('Edit Primary Category'),
-            'value'   => 'editPrimaryCategories'
-        );
-
-        if ($this->listing->getAccount()->getChildObject()->getEbayStoreCategories()) {
-            $actions[] = array(
-                'label' => Mage::helper('catalog')->__('Edit Store Primary Category'),
-                'value'   => 'editStorePrimaryCategories'
-            );
-        }
-
-        $actions[] = array(
-            'label' => Mage::helper('catalog')->__('Edit Categories'),
-            'value'   => 'editCategories'
-        );
-
-        $actionsColumn['actions'] = $actions;
-
-        $this->addColumn('actions', $actionsColumn);
+            'renderer'  => 'M2ePro/adminhtml_grid_column_renderer_action',
+            'actions'   => $this->getColumnActionsItems()
+        ));
 
         return parent::_prepareColumns();
     }
@@ -121,6 +100,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Category_Grid extends Ess
 
         // Set mass-action
         //--------------------------------
+        $this->getMassactionBlock()->addItem('editCategories', array(
+            'label'    => Mage::helper('M2ePro')->__('Edit All Categories'),
+        ));
+
         $this->getMassactionBlock()->addItem('editPrimaryCategories', array(
             'label' => Mage::helper('M2ePro')->__('Edit Primary Categories'),
             'url'   => '',
@@ -132,10 +115,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Category_Grid extends Ess
                 'url'   => '',
             ));
         }
-
-        $this->getMassactionBlock()->addItem('editCategories', array(
-            'label'    => Mage::helper('M2ePro')->__('Edit Categories'),
-        ));
         //--------------------------------
 
         return parent::_prepareMassaction();
@@ -183,7 +162,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Category_Grid extends Ess
 
             $helper = Mage::helper('M2ePro');
 
-            $iconSrc = $this->getSkinUrl('M2ePro').'/images/warning.png';
+            $iconSrc = $this->getSkinUrl('M2ePro/images/warning.png');
             $html .= <<<HTML
 <img src="{$iconSrc}" alt="">&nbsp;<span style="font-style: italic; color: gray">{$helper->__('Not Selected')}</span>
 HTML;
@@ -191,36 +170,6 @@ HTML;
         }
 
         return $html;
-    }
-
-    public function callbackColumnActions($value, $row, $column, $isExport)
-    {
-        $actions = $column->getActions();
-        $id = (int)$row->getId();
-
-        if (count($actions) == 1) {
-            $action = reset($actions);
-            $onclick = 'EbayListingCategoryCategoryGridHandlerObj.actions[\''.$action['value'].'Action\']('.$id.');';
-            return '<a href="javascript: void(0);" onclick="this.value && ' . $onclick . '">'.$action['label'].'</a>';
-        }
-
-        $optionsHtml = '<option></option>';
-
-        foreach ($actions as $option) {
-            $optionsHtml .= <<<HTML
-            <option value="{$option['value']}">{$option['label']}</option>
-HTML;
-        }
-
-        return <<<HTML
-<div style="padding: 5px;">
-    <select
-        style="width: 100px;"
-        onchange="this.value && EbayListingCategoryCategoryGridHandlerObj.actions[this.value + 'Action']({$id});">
-        {$optionsHtml}
-    </select>
-</div>
-HTML;
     }
 
     // ####################################
@@ -262,7 +211,7 @@ HTML;
             $info.= '&nbsp;('.$data[$key.'_id'].')';
         } elseif ($data[$key.'_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
             $info = Mage::helper('M2ePro')->__(
-                'Magento Attribute -> %attribute_label%',
+                'Magento Attribute > %attribute_label%',
                 Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $data[$key.'_attribute'],
                     $this->listing->getStoreId()
@@ -282,7 +231,7 @@ HTML;
             $info.= '&nbsp;('.$data[$key.'_id'].')';
         } elseif ($data[$key.'_mode'] == Ess_M2ePro_Model_Ebay_Template_Category::CATEGORY_MODE_ATTRIBUTE) {
             $info = Mage::helper('M2ePro')->__(
-                'Magento Attribute -> %attribute_label%',
+                'Magento Attribute > %attribute_label%',
                 Mage::helper('M2ePro/Magento_Attribute')->getAttributeLabel(
                     $data[$key.'_attribute'],
                     $this->listing->getStoreId()
@@ -308,6 +257,38 @@ HTML;
 </div>
 HTML;
 
+    }
+
+    // ####################################
+
+    protected function getColumnActionsItems()
+    {
+        $actions = array(
+            'editCategories' => array(
+                'caption' => Mage::helper('catalog')->__('Edit All Categories'),
+                'field'   => 'id',
+                'onclick_action' => 'EbayListingCategoryCategoryGridHandlerObj.'
+                                    .'actions[\'editCategoriesAction\']'
+            ),
+
+            'editPrimaryCategories' => array(
+                'caption' => Mage::helper('catalog')->__('Edit Primary Category'),
+                'field'   => 'id',
+                'onclick_action' => 'EbayListingCategoryCategoryGridHandlerObj.'
+                                    .'actions[\'editPrimaryCategoriesAction\']'
+            )
+        );
+
+        if ($this->listing->getAccount()->getChildObject()->getEbayStoreCategories()) {
+            $actions['editStorePrimaryCategories'] = array(
+                'caption' => Mage::helper('catalog')->__('Edit Store Primary Category'),
+                'field'   => 'id',
+                'onclick_action' => 'EbayListingCategoryCategoryGridHandlerObj.'
+                                    .'actions[\'editStorePrimaryCategoriesAction\']'
+            );
+        }
+
+        return $actions;
     }
 
     // ####################################
@@ -361,10 +342,21 @@ HTML;
 </script>
 HTML;
 
+        $disableContinue = '';
+        if ($this->getCollection()->getSize() === 0) {
+            $disableContinue = <<<JS
+$('ebay_listing_category_continue_btn').addClassName('disabled').onclick = function() {
+    return null;
+};
+JS;
+        }
+
         $additionalJs = '';
         if (!$this->getRequest()->isXmlHttpRequest()) {
             $additionalJs = <<<HTML
 <script type="text/javascript">
+
+    {$disableContinue}
 
     M2ePro.url.add({$urls});
     M2ePro.translator.add({$translations});

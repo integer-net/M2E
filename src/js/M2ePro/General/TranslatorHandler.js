@@ -1,8 +1,8 @@
-var TranslatorHandler = Class.create(Translate,{
+var TranslatorHandler = Class.create(Translate, {
 
     //----------------------------------
 
-    translate : function($super, text)
+    translate: function($super, text)
     {
         if (!this.data.get(text)) {
             alert('Translation not found : "' + text + '"');

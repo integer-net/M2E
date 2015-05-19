@@ -57,7 +57,7 @@ class Ess_M2ePro_Adminhtml_Development_Tools_AdditionalController
                 ((++$i % 10) == 0) && Mage::log("{$i} seconds passed",null,$fileName,1);
             }
 
-            echo "<div>{$seconds} seconds passed successfully!</div><br>";
+            echo "<div>{$seconds} seconds passed successfully!</div><br/>";
         }
 
         if ($isLogFileExists) {
