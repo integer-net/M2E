@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
+class Ess_M2ePro_CronController extends Mage_Core_Controller_Front_Action
 {
     //#############################################
 
