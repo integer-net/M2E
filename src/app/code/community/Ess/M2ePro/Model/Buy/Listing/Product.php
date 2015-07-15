@@ -263,13 +263,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
         return $this->getData('shipping_expedited_rate');
     }
 
-    //-----------------------------------------
-
-    public function isIgnoreNextInventorySynch()
-    {
-        return (bool)$this->getData('ignore_next_inventory_synch');
-    }
-
     // ########################################
 
     public function getSearchSettingsStatus()

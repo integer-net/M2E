@@ -30,7 +30,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SellingFormatController
 
     public function indexAction()
     {
-        return $this->_redirect('*/adminhtml_common_template_sellingFormat/index');
+        return $this->_redirect('*/adminhtml_common_template/index', array(
+            'channel' => Ess_M2ePro_Helper_Component_Buy::NICK
+        ));
     }
 
     //#############################################
@@ -47,7 +49,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SellingFormatController
 
         if (!$model->getId() && $id) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Policy does not exist'));
-            return $this->_redirect('*/*/index');
+            return $this->_redirect('*/adminhtml_common_template/index', array(
+                'channel' => Ess_M2ePro_Helper_Component_Buy::NICK
+            ));
         }
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
@@ -122,7 +126,10 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SellingFormatController
         $id = $model->getId();
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Policy was successfully saved'));
-        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list',array(),array('edit'=>array('id'=>$id))));
+        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('*/adminhtml_common_template/index', array(), array(
+            'edit' => array('id'=>$id),
+            'channel' => Ess_M2ePro_Helper_Component_Buy::NICK
+        )));
     }
 
     //#############################################

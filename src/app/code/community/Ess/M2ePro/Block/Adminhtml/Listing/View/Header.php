@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Listing_View_Header extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Listing_View_Header extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     protected $_template = 'M2ePro/listing/view/header.phtml';
 
@@ -22,10 +22,6 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Header extends Mage_Adminhtml_Bloc
 
         if($this->getListing()->isComponentModeBuy()) {
             return Mage::helper('M2ePro')->__('Rakuten');
-        }
-
-        if($this->getListing()->isComponentModePlay()) {
-            return Mage::helper('M2ePro')->__('Play');
         }
 
         return '';

@@ -31,25 +31,21 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_Installation
     protected function prepareInfo()
     {
         $cacheConfig = Mage::helper('M2ePro/Module')->getCacheConfig();
-        $this->latestVersion = $cacheConfig->getGroupValue('/installation/version/', 'last_version');
-
-        /** @var $cacheConfigCollection Mage_Core_Model_Mysql4_Collection_Abstract */
-        $cacheConfigCollection = $cacheConfig->getCollection()
-                                             ->addFieldToFilter('`group`', '/installation/version/history/')
-                                             ->setOrder('create_date','DESC');
-
-        $history = $cacheConfigCollection->toArray();
-        $this->installationVersionHistory = $history['items'];
+        $this->latestVersion = $cacheConfig->getGroupValue('/installation/', 'last_version');
+        $this->installationVersionHistory = Mage::getModel('M2ePro/Registry')
+                                                ->load('/installation/versions_history/', 'key')
+                                                ->getValueFromJson();
 
         $this->latestUpgradeDate        = false;
         $this->latestUpgradeFromVersion = '--';
         $this->latestUpgradeToVersion   = '--';
 
-        if (isset($this->installationVersionHistory[0])) {
+        $lastVersion = array_pop($this->installationVersionHistory);
+        if (!empty($lastVersion)) {
 
-            $this->latestUpgradeDate        = $this->installationVersionHistory[0]['create_date'];
-            $this->latestUpgradeFromVersion = $this->installationVersionHistory[0]['value'];
-            $this->latestUpgradeToVersion   = $this->installationVersionHistory[0]['key'];
+            $this->latestUpgradeDate        = $lastVersion['date'];
+            $this->latestUpgradeFromVersion = $lastVersion['from'];
+            $this->latestUpgradeToVersion   = $lastVersion['to'];
         }
     }
 

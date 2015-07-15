@@ -9,7 +9,7 @@
     $text = 'Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>';
     $translations[$text] = Mage::helper('M2ePro')->__(
         $text,
-        Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
+        Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration'),
         $this->getUrl('*/adminhtml_ebay_configuration')
     );
 
@@ -102,7 +102,7 @@
     <li><b>Add ePIDs to Compatibility Attribute</b> - adds selected Items ePIDs to existing ones in Compatibility Attribute chosen in the General Settings.</li>
 </ul>
 <b>Note:</b> Compatibility Items can not be replaced or removed from eBay.',
-            Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
+            Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration'),
             $this->getUrl('*/adminhtml_ebay_configuration')
         ); ?>
 

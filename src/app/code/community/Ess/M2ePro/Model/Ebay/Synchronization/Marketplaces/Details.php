@@ -62,10 +62,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
 
     protected function receiveFromEbay(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        $details = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('marketplace','get','info',
-                                             array('include_details'=>1),'info',
-                                             $marketplace->getId(),NULL,NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('marketplace','get','info',
+                                                            array('include_details' => 1),'info',
+                                                            $marketplace->getId(),NULL,NULL);
+
+        $details = $dispatcherObj->process($connectorObj);
 
         if (is_null($details)) {
             return array();

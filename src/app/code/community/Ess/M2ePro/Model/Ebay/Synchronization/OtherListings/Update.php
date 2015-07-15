@@ -109,9 +109,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             }
 
             $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
-            $dispatcherObject->processConnector('otherListings', 'update' ,'requester',
-                                                array(), $marketplace, $account, NULL,
-                                                'Ess_M2ePro_Model_Ebay_Synchronization');
+            $connectorObj = $dispatcherObject->getConnector('otherListings', 'update' ,'requester',
+                                                            array(), $marketplace, $account, NULL,
+                                                            'Ess_M2ePro_Model_Ebay_Synchronization');
+            $dispatcherObject->process($connectorObj);
             return;
         }
 
@@ -240,16 +241,38 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
 
     private function receiveChangesFromEbay(Ess_M2ePro_Model_Account $account, array $paramsConnector = array())
     {
-        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                                    ->processVirtual('item','get','changes',
-                                                     $paramsConnector,NULL,
-                                                     NULL,$account->getId(),NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('item','get','changes',
+                                                            $paramsConnector,NULL,
+                                                            NULL,$account->getId(),NULL);
+
+        $response = $dispatcherObj->process($connectorObj);
+        $this->processResponseMessages($connectorObj);
 
         if (!isset($response['items']) || !isset($response['to_time'])) {
             return NULL;
         }
 
         return $response;
+    }
+
+    private function processResponseMessages(Ess_M2ePro_Model_Connector_Protocol $connectorObj)
+    {
+        foreach ($connectorObj->getErrorMessages() as $message) {
+
+            if (!$connectorObj->isMessageError($message) && !$connectorObj->isMessageWarning($message)) {
+                continue;
+            }
+
+            $logType = $connectorObj->isMessageError($message) ? Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
+                                                               : Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING;
+
+            $this->getLog()->addMessage(
+                Mage::helper('M2ePro')->__($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]),
+                $logType,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+            );
+        }
     }
 
     // -----------------------------------
@@ -311,10 +334,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             'only_one_page' => true
         );
 
-        $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('item','get','all',
-                                             $inputData,NULL,
-                                             NULL,$account->getId(),NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('item','get','all',
+                                                            $inputData,NULL,
+                                                            NULL,$account->getId(),NULL);
+
+        $responseData = $dispatcherObj->process($connectorObj);
 
         if (!isset($responseData['items']) || !is_array($responseData['items'])) {
             return array();

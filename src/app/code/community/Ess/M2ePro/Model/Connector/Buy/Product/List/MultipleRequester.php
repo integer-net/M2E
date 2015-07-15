@@ -17,6 +17,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_MultipleRequester
 
     private $skuExistenceValidatorsObjects = array();
 
+    private $generalIdValidatorsObjects = array();
+
     private $validatorsData = array();
 
     // ########################################
@@ -86,6 +88,8 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_MultipleRequester
         if ($isNeedToCheckSkuExistence) {
             $this->processSkuExistenceValidateAndFilter();
         }
+
+        $this->processGeneralIdValidateAndFilter();
     }
 
     // ########################################
@@ -191,11 +195,11 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_MultipleRequester
 
                 /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Buy_Dispatcher */
                 $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
-                $response = $dispatcherObject->processVirtual(
-                    'product','search','skuByReferenceId',
-                    array('items' => $skus),'items',
-                    $this->account->getId()
-                );
+                $connectorObj = $dispatcherObject->getVirtualConnector('product','search','skuByReferenceId',
+                                                                       array('items' => $skus),'items',
+                                                                       $this->account->getId());
+
+                $response = $dispatcherObject->process($connectorObj);
 
             } catch (Exception $exception) {
 
@@ -240,6 +244,32 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_MultipleRequester
 
                 $this->removeAndUnlockListingProduct($listingProduct);
             }
+        }
+    }
+
+    private function processGeneralIdValidateAndFilter()
+    {
+        foreach ($this->listingsProducts as $listingProduct) {
+
+            $validator = $this->getGeneralIdValidatorObject($listingProduct);
+
+            $validationResult = $validator->validate();
+
+            foreach ($validator->getMessages() as $message) {
+                $this->getLogger()->logListingProductMessage(
+                    $listingProduct,
+                    $message['text'],
+                    $message['type'],
+                    Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+                );
+            }
+
+            if ($validationResult) {
+                $this->addValidatorsData($listingProduct, $validator->getData());
+                continue;
+            }
+
+            $this->removeAndUnlockListingProduct($listingProduct);
         }
     }
 
@@ -406,6 +436,30 @@ class Ess_M2ePro_Model_Connector_Buy_Product_List_MultipleRequester
         }
 
         return $this->skuExistenceValidatorsObjects[$listingProduct->getId()];
+    }
+
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_GeneralId
+     */
+    private function getGeneralIdValidatorObject(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        if (!isset($this->generalIdValidatorsObjects[$listingProduct->getId()])) {
+
+            /** @var $validator Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_GeneralId */
+            $validator = Mage::getModel(
+                'M2ePro/Buy_Listing_Product_Action_Type_List_Validator_GeneralId'
+            );
+
+            $validator->setParams($this->params);
+            $validator->setListingProduct($listingProduct);
+            $validator->setData($this->getValidatorsData($listingProduct));
+            $validator->setConfigurator($this->getConfigurator());
+
+            $this->generalIdValidatorsObjects[$listingProduct->getId()] = $validator;
+        }
+
+        return $this->generalIdValidatorsObjects[$listingProduct->getId()];
     }
 
     // ########################################

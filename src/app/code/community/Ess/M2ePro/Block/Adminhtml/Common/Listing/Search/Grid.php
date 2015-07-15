@@ -56,8 +56,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
         $collection->getSelect()->where('(
             (`main_table`.`component_mode` = "'.Ess_M2ePro_Helper_Component_Amazon::NICK.'"
                 AND `alp`.variation_parent_id IS NULL)
-            OR `main_table`.`component_mode` IN ("'.Ess_M2ePro_Helper_Component_Buy::NICK.'",
-                                                 "'.Ess_M2ePro_Helper_Component_Play::NICK.'")
+            OR `main_table`.`component_mode` IN ("'.Ess_M2ePro_Helper_Component_Buy::NICK.'")
         )');
 
         // Communicate with magento product table

@@ -14,6 +14,7 @@ class Ess_M2ePro_Model_ProductChange extends Ess_M2ePro_Model_Abstract
     const INITIATOR_OBSERVER        = 1;
     const INITIATOR_SYNCHRONIZATION = 2;
     const INITIATOR_INSPECTOR       = 3;
+    const INITIATOR_DEVELOPER       = 4;
 
     const UPDATE_ATTRIBUTE_CODE = '__INSTANCE__';
 

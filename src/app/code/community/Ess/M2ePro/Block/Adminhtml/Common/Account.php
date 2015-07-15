@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Account extends Ess_M2ePro_Block_Adminht
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Accounts');
+        $this->_headerText = '';
         //------------------------------
 
         // Set buttons actions
@@ -54,18 +54,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Account extends Ess_M2ePro_Block_Adminht
         return $this->getUrl('*/adminhtml_common_buy_account/new');
     }
 
-    protected function getPlayNewUrl()
-    {
-        return $this->getUrl('*/adminhtml_common_play_account/new');
-    }
-
     // ########################################
 
-    public function getGridHtml()
-    {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_account_help');
-        return $helpBlock->toHtml() . parent::getGridHtml();
-    }
-
-    // ########################################
 }

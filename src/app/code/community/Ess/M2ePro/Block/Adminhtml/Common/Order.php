@@ -36,8 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Order extends Ess_M2ePro_Block_Adminhtml
         $this->useAjax = true;
         $this->tabsAjaxUrls = array(
             self::TAB_ID_AMAZON => $this->getUrl('*/adminhtml_common_amazon_order/index'),
-            self::TAB_ID_BUY    => $this->getUrl('*/adminhtml_common_buy_order/index'),
-            self::TAB_ID_PLAY   => $this->getUrl('*/adminhtml_common_play_order/index'),
+            self::TAB_ID_BUY    => $this->getUrl('*/adminhtml_common_buy_order/index')
         );
     }
 
@@ -145,51 +144,11 @@ JAVASCRIPT;
 
     // ########################################
 
-    protected function getPlayTabBlock()
-    {
-        if (!$this->getChild('play_tab')) {
-            $this->setChild('play_tab', $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_order_grid'));
-        }
-        return $this->getChild('play_tab');
-    }
-
-    public function getPlayTabHtml()
-    {
-        return $this->getPlayTabBlockFilterHtml()
-               . parent::getPlayTabHtml();
-    }
-
-    private function getPlayTabBlockFilterHtml()
-    {
-        $accountFilterBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_account_switcher', '', array(
-            'component_mode' => Ess_M2ePro_Helper_Component_Play::NICK,
-            'controller_name' => 'adminhtml_common_order'
-        ));
-        $accountFilterBlock->setUseConfirm(false);
-
-        $orderStateSwitcherBlock = $this->getLayout()->createBlock(
-            'M2ePro/adminhtml_order_notCreatedFilter',
-            '',
-            array(
-                'component_mode' => Ess_M2ePro_Helper_Component_Play::NICK,
-                'controller' => 'adminhtml_common_order'
-            )
-        );
-
-        return '<div class="filter_block">'
-            . $accountFilterBlock->toHtml()
-            . $orderStateSwitcherBlock->toHtml()
-            . '</div>';
-    }
-
-    // ########################################
-
     protected function _componentsToHtml()
     {
         $tempGridIds = array();
         Mage::helper('M2ePro/Component_Amazon')->isActive() && $tempGridIds[] = $this->getAmazonTabBlock()->getId();
         Mage::helper('M2ePro/Component_Buy')->isActive()    && $tempGridIds[] = $this->getBuyTabBlock()->getId();
-        Mage::helper('M2ePro/Component_Play')->isActive()   && $tempGridIds[] = $this->getPlayTabBlock()->getId();
 
         $generalBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_order_general');
         $generalBlock->setGridIds($tempGridIds);

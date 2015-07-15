@@ -198,6 +198,10 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
 
                 /** @var Ess_M2ePro_Model_Listing_Product $product */
 
+                if ($product->isDeleted()) {
+                    continue;
+                }
+
                 $logModel->addProductMessage(
                     $product->getListingId(),
                     $product->getProductId(),

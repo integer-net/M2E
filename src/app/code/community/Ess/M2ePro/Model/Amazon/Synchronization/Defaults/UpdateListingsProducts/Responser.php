@@ -12,6 +12,42 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
 
     // ########################################
 
+    protected function processResponseMessages(array $messages = array())
+    {
+        parent::processResponseMessages($messages);
+
+        foreach ($this->messages as $message) {
+
+            if (!$this->isMessageError($message) && !$this->isMessageWarning($message)) {
+                continue;
+            }
+
+            $logType = $this->isMessageError($message) ? Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
+                                                       : Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING;
+
+            $this->getSynchronizationLog()->addMessage(
+                Mage::helper('M2ePro')->__($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]),
+                $logType,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+            );
+        }
+    }
+
+    protected function isNeedToParseResponseData($responseBody)
+    {
+        if (!parent::isNeedToParseResponseData($responseBody)) {
+            return false;
+        }
+
+        if ($this->hasErrorMessages()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // ########################################
+
     public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
         parent::unsetProcessingLocks($processingRequest);
@@ -66,8 +102,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
             $this->updateReceivedListingsProducts($response['data']);
             $this->updateNotReceivedListingsProducts($response['data'], $response['next_part']);
 
-            is_null($response['next_part']) && $this->resetIgnoreNextInventorySynch();
-
         } catch (Exception $exception) {
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
@@ -98,17 +132,13 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
                 continue;
             }
 
-            if ((int)$existingItem['ignore_next_inventory_synch'] == 1) {
-                continue;
-            }
-
             $receivedItem = $receivedItems[$existingItem['sku']];
 
             $newData = array(
-                'general_id' => (string)$receivedItem['identifiers']['general_id'],
-                'online_price' => (float)$receivedItem['price'],
-                'online_qty' => (int)$receivedItem['qty'],
-                'is_afn_channel' => (bool)$receivedItem['channel']['is_afn'],
+                'general_id'         => (string)$receivedItem['identifiers']['general_id'],
+                'online_price'       => (float)$receivedItem['price'],
+                'online_qty'         => (int)$receivedItem['qty'],
+                'is_afn_channel'     => (bool)$receivedItem['channel']['is_afn'],
                 'is_isbn_general_id' => (bool)$receivedItem['identifiers']['is_isbn']
             );
 
@@ -123,13 +153,37 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
             }
 
             $existingData = array(
-                'general_id' => (string)$existingItem['general_id'],
-                'online_price' => (float)$existingItem['online_price'],
-                'online_qty' => (int)$existingItem['online_qty'],
-                'is_afn_channel' => (bool)$existingItem['is_afn_channel'],
+                'general_id'         => (string)$existingItem['general_id'],
+                'online_price'       => (float)$existingItem['online_price'],
+                'online_qty'         => (int)$existingItem['online_qty'],
+                'is_afn_channel'     => (bool)$existingItem['is_afn_channel'],
                 'is_isbn_general_id' => (bool)$existingItem['is_isbn_general_id'],
-                'status' => (int)$existingItem['status']
+                'status'             => (int)$existingItem['status']
             );
+
+            $existingAdditionalData = @json_decode($existingItem['additional_data'], true);
+
+            if (!empty($existingAdditionalData['last_synchronization_dates']['qty']) &&
+                !empty($this->params['request_date'])
+            ) {
+                $lastQtySynchDate = $existingAdditionalData['last_synchronization_dates']['qty'];
+
+                if (strtotime($lastQtySynchDate) > strtotime($this->params['request_date'])) {
+                    unset($newData['online_qty'], $newData['status'], $newData['is_afn_channel']);
+                    unset($existingData['online_qty'], $existingData['status'], $existingData['is_afn_channel']);
+                }
+            }
+
+            if (!empty($existingAdditionalData['last_synchronization_dates']['price']) &&
+                !empty($this->params['request_date'])
+            ) {
+                $lastPriceSynchDate = $existingAdditionalData['last_synchronization_dates']['price'];
+
+                if (strtotime($lastPriceSynchDate) > strtotime($this->params['request_date'])) {
+                    unset($newData['online_price']);
+                    unset($existingData['online_price']);
+                }
+            }
 
             if ($newData == $existingData) {
                 continue;
@@ -137,18 +191,20 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
 
             $newData['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
 
-            if ($newData['status'] != $existingItem['status'] ||
-                $newData['online_qty'] != $existingItem['online_qty']) {
+            if ((isset($newData['status']) && $newData['status'] != $existingItem['status']) ||
+                (isset($newData['online_qty']) && $newData['online_qty'] != $existingItem['online_qty']) ||
+                (isset($newData['online_price']) && $newData['online_price'] != $existingItem['online_price'])
+            ) {
                 Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
                     $existingItem['product_id'], Ess_M2ePro_Model_ProductChange::INITIATOR_SYNCHRONIZATION
                 );
-            }
-
-            if ($newData['status'] != $existingItem['status']) {
 
                 if (!empty($existingItem['is_variation_product']) && !empty($existingItem['variation_parent_id'])) {
                     $parentIdsForProcessing[] = (int)$existingItem['variation_parent_id'];
                 }
+            }
+
+            if (isset($newData['status']) && $newData['status'] != $existingItem['status']) {
 
                 $tempLogMessage = '';
                 switch ($newData['status']) {
@@ -196,40 +252,18 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
         $parentListingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $parentListingProductCollection->addFieldToFilter('id', array('in' => array_unique($parentIdsForProcessing)));
 
-        foreach ($parentListingProductCollection->getItems() as $parentListingProduct) {
-            /** @var Ess_M2ePro_Model_Listing_Product $parentListingProduct */
-
-            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonParentListingProduct */
-            $amazonParentListingProduct = $parentListingProduct->getChildObject();
-            $amazonParentListingProduct->getVariationManager()->getTypeModel()->getProcessor()->process();
+        $parentListingsProducts = $parentListingProductCollection->getItems();
+        if (empty($parentListingsProducts)) {
+            return;
         }
-    }
 
-    protected function resetIgnoreNextInventorySynch()
-    {
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-
-        $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
-
-        /** @var $collection Varien_Data_Collection_Db */
-        $dbSelect = $connRead->select();
-        $dbSelect->from(array('lp' => $listingProductTable), array())
-                 ->join(array('l' => $listingTable), 'lp.listing_id = l.id', array())
-                 ->where('l.account_id = ?',(int)$this->getAccount()->getId())
-                 ->where('lp.component_mode = ?', Ess_M2ePro_Helper_Component_Amazon::NICK)
-                 ->reset(Zend_Db_Select::COLUMNS)
-                 ->columns(array('lp.id'));
-
-        $connWrite->update(
-            Mage::getResourceModel('M2ePro/Amazon_Listing_Product')->getMainTable(),
-            array('ignore_next_inventory_synch' => 0),
-            new Zend_Db_Expr('`listing_product_id` IN ('.$dbSelect->__toString().')')
+        $massProcessor = Mage::getModel(
+            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Mass'
         );
+        $massProcessor->setListingsProducts($parentListingsProducts);
+        $massProcessor->setForceExecuting(false);
+
+        $massProcessor->execute();
     }
 
     protected function updateNotReceivedListingsProducts($receivedItems,$nextPart)
@@ -270,7 +304,6 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
             array('sku')
         );
         $collection->getSelect()->where('l.account_id = ?',(int)$this->getAccount()->getId());
-        $collection->getSelect()->where('second_table.ignore_next_inventory_synch != ?',1);
         $collection->getSelect()->where('second_table.is_variation_parent != ?',1);
         $collection->getSelect()->where('`main_table`.`status` != ?',
             (int)Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED);
@@ -347,10 +380,11 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
             $tempColumns = array(
                 'main_table.listing_id',
                 'main_table.product_id','main_table.status',
+                'main_table.additional_data',
                 'second_table.sku','second_table.general_id',
                 'second_table.online_price','second_table.online_qty',
                 'second_table.is_afn_channel', 'second_table.is_isbn_general_id',
-                'second_table.listing_product_id', 'second_table.ignore_next_inventory_synch',
+                'second_table.listing_product_id',
                 'second_table.is_variation_product', 'second_table.variation_parent_id',
             );
         }

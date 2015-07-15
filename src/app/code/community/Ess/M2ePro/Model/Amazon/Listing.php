@@ -62,6 +62,14 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
     const RESTOCK_DATE_MODE_CUSTOM_VALUE      = 2;
     const RESTOCK_DATE_MODE_CUSTOM_ATTRIBUTE  = 3;
 
+    const GIFT_WRAP_MODE_NO = 0;
+    const GIFT_WRAP_MODE_YES = 1;
+    const GIFT_WRAP_MODE_ATTRIBUTE = 2;
+
+    const GIFT_MESSAGE_MODE_NO = 0;
+    const GIFT_MESSAGE_MODE_YES = 1;
+    const GIFT_MESSAGE_MODE_ATTRIBUTE = 2;
+
     const ADDING_MODE_ADD_AND_CREATE_NEW_ASIN_NO  = 0;
     const ADDING_MODE_ADD_AND_CREATE_NEW_ASIN_YES = 1;
 
@@ -593,6 +601,90 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
         );
     }
 
+    //----------------------------------------
+
+    public function getGiftWrapMode()
+    {
+        return $this->getData('gift_wrap_mode');
+    }
+
+    public function isGiftWrapModeYes()
+    {
+        return $this->getGiftWrapMode() == self::GIFT_WRAP_MODE_YES;
+    }
+
+    public function isGiftWrapModeNo()
+    {
+        return $this->getGiftWrapMode() == self::GIFT_WRAP_MODE_NO;
+    }
+
+    public function isGiftWrapModeAttribute()
+    {
+        return $this->getGiftWrapMode() == self::GIFT_WRAP_MODE_ATTRIBUTE;
+    }
+
+    public function getGiftWrapSource()
+    {
+        return array(
+            'mode' => $this->getGiftWrapMode(),
+            'attribute' => $this->getData('gift_wrap_attribute')
+        );
+    }
+
+    public function getGiftWrapAttributes()
+    {
+        $attributes = array();
+        $src = $this->getGiftWrapSource();
+
+        if ($src['mode'] == self::GIFT_WRAP_MODE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
+    //----------------------------------------
+
+    public function getGiftMessageMode()
+    {
+        return $this->getData('gift_message_mode');
+    }
+
+    public function isGiftMessageModeYes()
+    {
+        return $this->getGiftMessageMode() == self::GIFT_MESSAGE_MODE_YES;
+    }
+
+    public function isGiftMessageModeNo()
+    {
+        return $this->getGiftMessageMode() == self::GIFT_MESSAGE_MODE_NO;
+    }
+
+    public function isGiftMessageModeAttribute()
+    {
+        return $this->getGiftMessageMode() == self::GIFT_MESSAGE_MODE_ATTRIBUTE;
+    }
+
+    public function getGiftMessageSource()
+    {
+        return array(
+            'mode' => $this->getGiftMessageMode(),
+            'attribute' => $this->getData('gift_message_attribute')
+        );
+    }
+
+    public function getGiftMessageAttributes()
+    {
+        $attributes = array();
+        $src = $this->getGiftMessageSource();
+
+        if ($src['mode'] == self::GIFT_MESSAGE_MODE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
     // ########################################
 
     public function convertPriceFromStoreToMarketplace($price)
@@ -664,6 +756,8 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
             $this->getConditionNoteAttributes(),
             $this->getImageMainAttributes(),
             $this->getGalleryImagesAttributes(),
+            $this->getGiftWrapAttributes(),
+            $this->getGiftMessageAttributes(),
             $this->getSellingFormatTemplate()->getTrackingAttributes()
         ));
     }

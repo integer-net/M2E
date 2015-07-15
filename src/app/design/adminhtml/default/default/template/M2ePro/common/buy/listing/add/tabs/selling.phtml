@@ -1,7 +1,7 @@
 <div id="block_notice_buy_listing_add_selling_settings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Selling Settings'); ?>">
     <?php echo Mage::helper('M2ePro')->__('On this Page you can specify main Selling Settings for Rakuten.com Items you are going to sell using this M2E Pro Listing.<br/><br/>
 
-    You can set the Source to form SKU of Rakuten.com Item, appropriate Condition, Condition Note.<br/><br/>
+    You can set the Source to form Reference ID of Rakuten.com Item, appropriate Condition, Condition Note.<br/><br/>
 
     In addition to, in this Section you can select Selling Format Policy that contains Settings connected with forming of Price, Quantity etc. and Synchronization Policy that describes Rules of Automatic Synchronization of Magento Product and Rakuten.com Item.'); ?>
 </div>
@@ -56,7 +56,7 @@
     M2ePro.url.editSellingFormatTemplate = '<?php echo $this->getUrl('*/adminhtml_common_buy_template_sellingFormat/edit'); ?>' + 'id/';
     M2ePro.url.getSellingFormatTemplates = '<?php echo $this->getUrl('*/adminhtml_general/modelGetAll',array('model'=>'Template_SellingFormat','id_field'=>'id','data_field'=>'title','sort_field'=>'title','sort_dir'=>'ASC','component_mode'=>Ess_M2ePro_Helper_Component_Buy::NICK)); ?>';
     M2ePro.url.editSynchronizationTemplate = '<?php echo $this->getUrl('*/adminhtml_common_buy_template_synchronization/edit'); ?>' + 'id/';
-    M2ePro.url.getSynchronizationTemplates = '<?php echo $this->getUrl('*/adminhtml_general/modelGetAll',array('model'=>'Template_Synchronization','id_field'=>'id','data_field'=>'title','component_mode'=>Ess_M2ePro_Helper_Component_Buy::NICK)); ?>';
+    M2ePro.url.getSynchronizationTemplates = '<?php echo $this->getUrl('*/adminhtml_general/modelGetAll',array('model'=>'Template_Synchronization','id_field'=>'id','data_field'=>'title','sort_field'=>'title','sort_dir'=>'ASC','component_mode'=>Ess_M2ePro_Helper_Component_Buy::NICK)); ?>';
 
     M2ePro.autoCompleteData = {
         url : {}

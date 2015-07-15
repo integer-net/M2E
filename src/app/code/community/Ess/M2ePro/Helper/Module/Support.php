@@ -97,8 +97,9 @@ class Ess_M2ePro_Helper_Module_Support extends Mage_Core_Helper_Abstract
 
         try {
 
-            $response = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                            ->processVirtual('settings','get','supportEmail');
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+            $connectorObj = $dispatcherObject->getVirtualConnector('settings','get','supportEmail');
+            $response = $dispatcherObject->process($connectorObj);
 
             if (!empty($response['email'])) {
                 $email = $response['email'];
@@ -126,8 +127,9 @@ class Ess_M2ePro_Helper_Module_Support extends Mage_Core_Helper_Abstract
 
         try {
 
-            $response = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                                ->processVirtual('settings','get','supportType');
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+            $connectorObj = $dispatcherObject->getVirtualConnector('settings','get','supportType');
+            $response = $dispatcherObject->process($connectorObj);
 
             !empty($response['type']) && $type = $response['type'];
 

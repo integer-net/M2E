@@ -144,8 +144,7 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
             }
 
             if ($this->componentMode == Ess_M2ePro_Helper_Component_Amazon::NICK ||
-                $this->componentMode == Ess_M2ePro_Helper_Component_Buy::NICK ||
-                $this->componentMode == Ess_M2ePro_Helper_Component_Play::NICK) {
+                $this->componentMode == Ess_M2ePro_Helper_Component_Buy::NICK) {
                 $dataForAdd['identifier'] = $listingOther->getChildObject()->getGeneralId();
             }
         }

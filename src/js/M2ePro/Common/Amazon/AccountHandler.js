@@ -250,25 +250,6 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    ordersModeChange: function()
-    {
-        var self = AmazonAccountHandlerObj;
-
-        if ($('orders_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::ORDERS_MODE_YES')) {
-            $('magento_block_amazon_accounts_magento_orders_listings').show();
-            $('magento_block_amazon_accounts_magento_orders_listings_other').show();
-        } else {
-            $('magento_block_amazon_accounts_magento_orders_listings').hide();
-            $('magento_block_amazon_accounts_magento_orders_listings_other').hide();
-        }
-
-        $('magento_orders_listings_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO');
-        $('magento_orders_listings_other_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO');
-
-        self.magentoOrdersListingsModeChange();
-        self.magentoOrdersListingsOtherModeChange();
-    },
-
     magentoOrdersListingsModeChange: function()
     {
         var self = AmazonAccountHandlerObj;
@@ -445,7 +426,7 @@ CommonAmazonAccountHandler.prototype = Object.extend(new CommonHandler(), {
             self.magentoOrdersStatusMappingModeChange();
 
             $('magento_block_amazon_accounts_magento_orders_rules').hide();
-            $('magento_orders_qty_reservation_days').value = 0;
+            $('magento_orders_qty_reservation_days').value = 1;
 
             $('magento_block_amazon_accounts_magento_orders_tax').hide();
             $('magento_orders_tax_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Account::MAGENTO_ORDERS_TAX_MODE_MIXED');

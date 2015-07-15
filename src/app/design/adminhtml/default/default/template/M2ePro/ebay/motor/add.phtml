@@ -10,7 +10,7 @@
     $text = 'Please specify eBay Motors compatibility Attribute in %menu_label% <a target="_blank" href="%url%">General</a>';
     $translations[$text] = Mage::helper('M2ePro')->__(
         $text,
-        Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
+        Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration'),
         $this->getUrl('*/adminhtml_ebay_configuration')
     );
 

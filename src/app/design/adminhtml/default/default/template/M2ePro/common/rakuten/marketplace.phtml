@@ -67,26 +67,6 @@
 
                     <?php } ?>
 
-                    <?php if ($group['title'] == 'Europe' && is_null($this->getActiveWizard())): ?>
-
-                        <tr>
-                            <td class="label">
-                                <label for="marketplace_rde">
-                                    <span style="color: gray;"><?php echo Mage::helper('M2ePro')->__('Germany'); ?>:</span>
-                                </label>
-                            </td>
-                            <td class="value">
-                                <select id="marketplace_rde" disabled="disabled" class="locked_selected marketplace_status_select">
-                                    <option value="0"><?php echo Mage::helper('M2ePro')->__('Disabled - Coming Soon'); ?></option>
-                                </select>
-                                <p class="note note-no-tool-tip">
-                                    <span><?php echo 'rakuten.de'; ?></span>
-                                </p>
-                            </td>
-                        </tr>
-
-                    <?php endif; ?>
-
                 </table>
 
             </div>
@@ -95,5 +75,55 @@
     </div>
 
     <?php } ?>
+
+    <div class="entry-edit" id="magento_block_rakuten_marketplaces_group_<?php echo count($this->groups); ?>" collapseable="no">
+
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Europe'); ?></h4>
+        </div>
+
+        <div class="fieldset">
+            <div class="hor-scroll">
+
+                <table class="form-list" cellspacing="0" cellpadding="0">
+
+                    <tr>
+                        <td class="label">
+                            <label for="marketplace_rde">
+                                <span style="color: gray;"><?php echo Mage::helper('M2ePro')->__('United Kingdom'); ?>:</span>
+                            </label>
+                        </td>
+                        <td class="value">
+                            <select id="marketplace_rde" disabled="disabled" class="locked_selected marketplace_status_select">
+                                <option value="0"><?php echo Mage::helper('M2ePro')->__('Disabled - Coming Soon'); ?></option>
+                            </select>
+                            <p class="note note-no-tool-tip">
+                                <span><?php echo 'rakuten.co.uk'; ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
+                            <label for="marketplace_rde">
+                                <span style="color: gray;"><?php echo Mage::helper('M2ePro')->__('Germany'); ?>:</span>
+                            </label>
+                        </td>
+                        <td class="value">
+                            <select id="marketplace_rde" disabled="disabled" class="locked_selected marketplace_status_select">
+                                <option value="0"><?php echo Mage::helper('M2ePro')->__('Disabled - Coming Soon'); ?></option>
+                            </select>
+                            <p class="note note-no-tool-tip">
+                                <span><?php echo 'rakuten.de'; ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
 
 </div>

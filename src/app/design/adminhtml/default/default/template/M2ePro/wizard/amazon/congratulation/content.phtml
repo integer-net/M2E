@@ -21,6 +21,8 @@ $newListingsUrl = $this->getUrl('*/adminhtml_common_listing_create/index', array
 ));
 $docsLink = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
 
+$componentName = Mage::helper('M2ePro/Component_Amazon')->getTitle();
+
 ?>
 
 <div id="block_notice_wizard_congratulation" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
@@ -42,11 +44,12 @@ $docsLink = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
     <div style="margin-top: 5px">
         <?php
             echo Mage::helper('M2ePro')->__(
-                'On the next step you should create the first M2E Pro Listing (group of Magento Products). <br/><br/>
+                'On the next step you should create the first M2E Pro %amazon% Listing (group of Magento Products). <br/><br/>
 
                 During Listing creation you will have a possibility to specify main Settings for Products such as Price, Condition, Quantity, Automatic Synchronization Rules etc.
 
-                <br/><br/><a class="custom-button" href="%new_listing_url%" target="_blank"><span><span><span>Start to create first M2E Pro Listing</span></span></span></a>',
+                <br/><br/><a class="custom-button" href="%new_listing_url%"><span><span><span>Start to create first M2E Pro Listing</span></span></span></a>',
+                $componentName,
                 $newListingsUrl
             );
         ?>

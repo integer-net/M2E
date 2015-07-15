@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Listing_Other_Mapping extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Listing_Other_Mapping extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     public function __construct()
     {

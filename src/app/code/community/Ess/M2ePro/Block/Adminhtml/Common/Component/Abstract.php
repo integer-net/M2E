@@ -4,13 +4,12 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage_Adminhtml_Block_Widget_Container
+abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // ########################################
 
     const TAB_ID_AMAZON = 'amazon';
     const TAB_ID_BUY    = 'buy';
-    const TAB_ID_PLAY   = 'play';
 
     // ########################################
 
@@ -39,9 +38,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage
             case Ess_M2ePro_Helper_Component_Buy::NICK:
                 $tabId = self::TAB_ID_BUY;
                 break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $tabId = self::TAB_ID_PLAY;
-                break;
         }
 
         return $tabId;
@@ -57,11 +53,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage
     public function enableBuyTab()
     {
         $this->setEnabledTab(self::TAB_ID_BUY);
-    }
-
-    public function enablePlayTab()
-    {
-        $this->setEnabledTab(self::TAB_ID_PLAY);
     }
 
     // ########################################
@@ -99,7 +90,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage
     {
         $this->initializeAmazon();
         $this->initializeBuy();
-        $this->initializePlay();
     }
 
     protected function initializeTab($id)
@@ -120,13 +110,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage
     {
         if (Mage::helper('M2ePro/Component_Buy')->isActive()) {
             $this->initializeTab(self::TAB_ID_BUY);
-        }
-    }
-
-    protected function initializePlay()
-    {
-        if (Mage::helper('M2ePro/Component_Play')->isActive()) {
-            $this->initializeTab(self::TAB_ID_PLAY);
         }
     }
 
@@ -274,17 +257,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage
         return $this->getBuyTabBlock()->toHtml();
     }
 
-    /**
-     * @abstract
-     * @return Mage_Core_Block_Abstract
-     */
-    abstract protected function getPlayTabBlock();
-
-    public function getPlayTabHtml()
-    {
-        return $this->getPlayTabBlock()->toHtml();
-    }
-
     // ########################################
 
     /**
@@ -312,7 +284,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract extends Mage
         if (is_null($activeTab)) {
             Mage::helper('M2ePro/View_Common_Component')->isAmazonDefault() && $activeTab = self::TAB_ID_AMAZON;
             Mage::helper('M2ePro/View_Common_Component')->isBuyDefault()    && $activeTab = self::TAB_ID_BUY;
-            Mage::helper('M2ePro/View_Common_Component')->isPlayDefault()   && $activeTab = self::TAB_ID_PLAY;
         }
 
         return $activeTab;

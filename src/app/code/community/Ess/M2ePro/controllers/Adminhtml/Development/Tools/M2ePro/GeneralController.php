@@ -336,7 +336,7 @@ HTML;
     {
         ini_set('display_errors', 1);
 
-        foreach (array('Ebay', 'Amazon', 'Buy', 'Play') as $component) {
+        foreach (array('Ebay', 'Amazon', 'Buy') as $component) {
 
             $collection = Mage::helper("M2ePro/Component_{$component}")
                     ->getCollection('Listing_Product_Variation_Option');

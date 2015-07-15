@@ -16,21 +16,14 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_InstallController
      */
     public function showInstallationVersionHistoryAction()
     {
-        /** @var $cacheConfigCollection Mage_Core_Model_Mysql4_Collection_Abstract */
-        $cacheConfigCollection = Mage::helper('M2ePro/Module')->getCacheConfig()->getCollection();
-        $cacheConfigCollection->addFieldToFilter('`group`', '/installation/version/history/');
-        $cacheConfigCollection->getSelect()->order(
-            array('create_date DESC', 'key DESC')
-        );
-
-        $history = $cacheConfigCollection->toArray();
-        $history = $history['items'];
-
+        $history = Mage::getModel('M2ePro/Registry')->load('/installation/versions_history/', 'key')
+                                                    ->getValueFromJson();
         if (count($history) <= 0) {
             echo $this->getEmptyResultsHtml('Installation History is not available.');
             return;
         }
 
+        $history = array_reverse($history);
         $html = $this->getStyleHtml();
 
         $html .= <<<HTML
@@ -53,22 +46,22 @@ class Ess_M2ePro_Adminhtml_Development_Tools_M2ePro_InstallController
     </tr>
 HTML;
         $tdClass = 'color-first';
-        $previousItemDate = $history[0]['create_date'];
+        $previousItemDate = $history[0]['date'];
 
         foreach ($history as $item) {
 
-            !$item['value'] && $item['value'] = '--';
+            !$item['from'] && $item['from'] = '--';
 
-            if ((strtotime($previousItemDate) - strtotime($item['value'])) > 360) {
+            if ((strtotime($previousItemDate) - strtotime($item['from'])) > 360) {
                 $tdClass = $tdClass != 'color-second' ? 'color-second' : 'color-first';
             }
-            $previousItemDate = $item['create_date'];
+            $previousItemDate = $item['date'];
 
             $html .= <<<HTML
 <tr>
-    <td class="{$tdClass}">{$item['value']}</td>
-    <td class="{$tdClass}">{$item['key']}</td>
-    <td class="{$tdClass}">{$item['create_date']}</td>
+    <td class="{$tdClass}">{$item['from']}</td>
+    <td class="{$tdClass}">{$item['to']}</td>
+    <td class="{$tdClass}">{$item['date']}</td>
 </tr>
 HTML;
         }
@@ -80,31 +73,7 @@ HTML;
     //#############################################
 
     /**
-     * @title "Check Upgrade to 3.2.0"
-     * @description "Check extension installation"
-     * @confirm "Are you sure?"
-     */
-    public function checkInstallationCacheAction()
-    {
-        /** @var $installerInstance Ess_M2ePro_Model_Upgrade_MySqlSetup */
-        $installerInstance = new Ess_M2ePro_Model_Upgrade_MySqlSetup('M2ePro_setup');
-
-        /** @var $migrationInstance Ess_M2ePro_Model_Upgrade_Migration_ToVersion4 */
-        $migrationInstance = Mage::getModel('M2ePro/Upgrade_Migration_ToVersion4');
-        $migrationInstance->setInstaller($installerInstance);
-
-        $migrationInstance->startSetup();
-        $migrationInstance->migrate();
-        $migrationInstance->endSetup();
-
-        Mage::helper('M2ePro/Magento')->clearCache();
-
-        $this->_getSession()->addSuccess('Check installation was successfully completed.');
-        $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
-    }
-
-    /**
-     * @title "Repeat Upgrade > 3.2.0"
+     * @title "Repeat Upgrade > 4.1.0"
      * @description "Repeat Upgrade From Certain Version"
      * @new_line
      */
@@ -157,8 +126,9 @@ HTML;
      */
     public function checkFilesValidityAction()
     {
-        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                                    ->processVirtual('files','get','info');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('files','get','info');
+        $responseData = $dispatcherObject->process($connectorObj);
 
         if (count($responseData) <= 0) {
             echo $this->getEmptyResultsHtml('No files info for this M2E Pro version on server.');
@@ -243,9 +213,11 @@ HTML;
     {
         $tablesInfo = Mage::helper('M2ePro/Module_Database_Structure')->getTablesInfo();
 
-        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                            ->processVirtual('tables','get','diff',
-                                             array('tables_info' => json_encode($tablesInfo)));
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('tables','get','diff',
+                                                               array('tables_info' => json_encode($tablesInfo)));
+
+        $responseData = $dispatcherObject->process($connectorObj);
 
         if (!isset($responseData['diff'])) {
             echo $this->getEmptyResultsHtml('No Tables info for this M2E Pro version on Server.');
@@ -333,8 +305,9 @@ HTML;
      */
     public function checkConfigsValidityAction()
     {
-        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                                ->processVirtual('configs','get','info');
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('configs','get','info');
+        $responseData = $dispatcherObject->process($connectorObj);
 
         if (!isset($responseData['configs_info'])) {
             echo $this->getEmptyResultsHtml('No configs info for this M2E Pro version on server.');
@@ -459,8 +432,11 @@ HTML;
             'path'    => $originalPath ? $originalPath : $filePath
         );
 
-        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                                ->processVirtual('files','get','diff', $params);
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('files','get','diff',
+                                                               $params);
+
+        $responseData = $dispatcherObject->process($connectorObj);
 
         $html = $this->getStyleHtml();
 
@@ -525,7 +501,8 @@ HTML;
     /**
      * @title "Reset Module (Clear Installation)"
      * @description "Clear all M2ePro data tables, reset wizards"
-     * @confirm "Are you sure?"
+     * @confirm "This will remove all M2e Pro data. Are you sure?"
+     * @non-production
      */
     public function fullResetModuleStateAction()
     {
@@ -547,7 +524,7 @@ HTML;
         $connWrite->update(
             Mage::getSingleton('core/resource')->getTableName('m2epro_wizard'),
             array('status' => 0, 'step' => null),
-            '`nick` <> \'migrationToV6\' AND `nick` <> \'migrationNewAmazon\''
+            '`nick` <> \'migrationToV6\' AND `nick` <> \'migrationNewAmazon\' AND `nick` <> \'removedPlay\''
         );
 
         Mage::helper('M2ePro/Magento')->clearCache();
@@ -559,9 +536,10 @@ HTML;
     /**
      * @title "Reset Module (Without Wizards)"
      * @description "Clear all M2ePro data tables, set wizards as skipped"
-     * @confirm "Are you sure?"
+     * @confirm "This will remove all M2e Pro data. Are you sure?"
+     * @non-production
      */
-    public function ResetModuleStateAndSkippingWizardsAction()
+    public function resetModuleStateAndSkippingWizardsAction()
     {
         $this->truncateModuleTables();
 
@@ -602,7 +580,6 @@ HTML;
             'm2epro_amazon_marketplace',
             'm2epro_buy_marketplace',
             'm2epro_ebay_marketplace',
-            'm2epro_play_marketplace',
 
             'm2epro_wizard'
         );

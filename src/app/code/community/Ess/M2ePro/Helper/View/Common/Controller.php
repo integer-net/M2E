@@ -95,7 +95,7 @@ class Ess_M2ePro_Helper_View_Common_Controller extends Mage_Core_Helper_Abstract
         $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
             $message,
             implode(', ',$outdatedMarketplaces),
-            Mage::helper('M2ePro/View_Common')->getMenuPath('configuration'),
+            Mage::helper('M2ePro/View_Common')->getPageNavigationPath('configuration'),
             $controller->getUrl(
                 '*/adminhtml_common_marketplace',
                 array('tab' => Ess_M2ePro_Helper_Component_Amazon::NICK)

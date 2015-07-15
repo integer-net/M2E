@@ -264,9 +264,9 @@
 
 <?php if($showBlockedAdvancedMode): ?>
     <p style="font-size: 15px; font-weight: bolder; color: red;">
-        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration');
+        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration', 'General', 'Mode > Advanced');
             echo Mage::helper('M2ePro')->__(
-            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
+            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path%).', $menuPath);
         ?>
     </p>
 <?php endif; ?>
@@ -284,7 +284,7 @@
 
                 <tr>
                     <td class="label">
-                        <label for="listing_type"><?php echo Mage::helper('M2ePro')->__('Listing Type'); ?>: <span class="required">*</span></label>
+                        <label for="listing_type"><?php echo Mage::helper('M2ePro')->__('Listing Type'); ?>:</label>
                     </td>
                     <td class="value">
 
@@ -326,7 +326,7 @@
 
                 <tr class="simple_mode_disallowed">
                     <td class="label">
-                        <label for="listing_is_private"><?php echo Mage::helper('M2ePro')->__('Private Listing'); ?>: <span class="required">*</span></label>
+                        <label for="listing_is_private"><?php echo Mage::helper('M2ePro')->__('Private Listing'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="listing_is_private" name="selling_format[listing_is_private]" class="select">
@@ -385,7 +385,7 @@
 
                 <tr>
                     <td class="label">
-                        <label for="duration_mode"><?php echo Mage::helper('M2ePro')->__('Listing Duration'); ?>: <span class="required">*</span></label>
+                        <label for="duration_mode"><?php echo Mage::helper('M2ePro')->__('Listing Duration'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
 
@@ -494,7 +494,7 @@
 
                 <tr id="qty_mode_cv_tr" style="display: none;">
                     <td class="label">
-                        <label for="qty_custom_value"><?php echo Mage::helper('M2ePro')->__('Quantity Value'); ?>: </label>
+                        <label for="qty_custom_value"><?php echo Mage::helper('M2ePro')->__('Quantity Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <input id="qty_custom_value" name="selling_format[qty_custom_value]" value="<?php echo $this->escapeHtml($formData['qty_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible validate-digits" />
@@ -520,7 +520,7 @@
                 <!-- Max Posted QTY-->
                 <tr id="qty_modification_mode_tr" class="simple_mode_disallowed" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Conditional Quantity'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Conditional Quantity'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="qty_modification_mode" name="selling_format[qty_modification_mode]" class="required-entry">
@@ -720,7 +720,7 @@ Otherwise, the Item will be Listed with Quantity according to the Settings in th
                                 'eBay %marketplace_title% supports %currency_code% Currencies. To switch the Currency you want to sell for, go to %menu_path% > <a target="_blank" href="%url%">General</a>',
                                 $this->getMarketplace()->getTitle(),
                                 $currencies,
-                                Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
+                                Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration'),
                                 $this->getUrl('*/adminhtml_ebay_configuration')
                             ); ?>
                         </span>
@@ -733,7 +733,7 @@ Otherwise, the Item will be Listed with Quantity according to the Settings in th
 
                 <tr class="simple_mode_disallowed">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Add VAT Percentage'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Add VAT Percentage'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="price_increase_vat_percent" name="selling_format[price_increase_vat_percent]" class="M2ePro-required-when-visible">
@@ -778,9 +778,9 @@ Otherwise, the Item will be Listed with Quantity according to the Settings in th
                                             </span>
                                         </th>
                                     <?php endif; ?>
-                                    <th style="width: 305px"><?php echo Mage::helper('M2ePro')->__('Source'); ?><span class="required">*</span></th>
+                                    <th style="width: 305px"><?php echo Mage::helper('M2ePro')->__('Source'); ?></th>
                                     <th style="width: 325px">
-                                        <?php echo Mage::helper('M2ePro')->__('Price Change'); ?><span class="required">*</span>
+                                        <?php echo Mage::helper('M2ePro')->__('Price Change'); ?>
                                         <span>
                                             <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image">
                                             <span class="tool-tip-message" style="font-size: 12px; display: none; width: 400px">
@@ -1104,7 +1104,7 @@ Otherwise, the Item will be Listed with Quantity according to the Settings in th
                             <tr id="price_discount_stp_tr" class="simple_mode_disallowed">
 
                                 <td class="value remove_bottom_border">
-                                    <label><?php echo Mage::helper('M2ePro')->__('Strike-Through Price'); ?>: </label>
+                                    <label><?php echo Mage::helper('M2ePro')->__('Strike-Through Price'); ?>:</label>
                                 </td>
 
                                 <?php if (!is_null($currency)) : ?>
@@ -1464,7 +1464,7 @@ Otherwise, the Item will be Listed with Quantity according to the Settings in th
                                     <?php if (!is_null($currency)) : ?>
                                         <th style="width: 65px"><?php echo Mage::helper('M2ePro')->__('Currency'); ?></th>
                                     <?php endif; ?>
-                                    <th style="width: 400px"><?php echo Mage::helper('M2ePro')->__('Value'); ?><span class="required">*</span></th>
+                                    <th style="width: 400px"><?php echo Mage::helper('M2ePro')->__('Value'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>

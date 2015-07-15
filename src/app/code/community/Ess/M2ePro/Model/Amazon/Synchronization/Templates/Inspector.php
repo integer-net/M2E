@@ -662,7 +662,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         $currentPrice = $amazonListingProduct->getPrice();
         $onlinePrice = $amazonListingProduct->getOnlinePrice();
 
-        if ($currentPrice != $onlinePrice) {
+        $needRevise = $this->checkRevisePricesRequirements($amazonSynchronizationTemplate, $onlinePrice, $currentPrice);
+        if ($needRevise) {
             return true;
         }
 
@@ -684,9 +685,16 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         }
 
         if ((is_null($currentSalePrice) && !is_null($onlineSalePrice)) ||
-            (!is_null($currentSalePrice) && is_null($onlineSalePrice)) ||
-            (float)$currentSalePrice != (float)$onlineSalePrice
+            (!is_null($currentSalePrice) && is_null($onlineSalePrice))
         ) {
+            return true;
+        }
+
+        $needRevise = $this->checkRevisePricesRequirements(
+            $amazonSynchronizationTemplate, $onlineSalePrice, $currentSalePrice
+        );
+
+        if ($needRevise) {
             return true;
         }
 
@@ -779,6 +787,29 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         }
 
         return false;
+    }
+
+    //####################################
+
+    private function checkRevisePricesRequirements(
+        Ess_M2ePro_Model_Amazon_Template_Synchronization $amazonSynchronizationTemplate,
+        $onlinePrice, $productPrice
+    ) {
+        if ((float)$onlinePrice == (float)$productPrice) {
+            return false;
+        }
+
+        if ((float)$onlinePrice <= 0) {
+            return true;
+        }
+
+        if ($amazonSynchronizationTemplate->isReviseUpdatePriceMaxAllowedDeviationModeOff()) {
+            return true;
+        }
+
+        $deviation = abs($onlinePrice - $productPrice) / $onlinePrice * 100;
+
+        return $deviation > $amazonSynchronizationTemplate->getReviseUpdatePriceMaxAllowedDeviation();
     }
 
     //####################################

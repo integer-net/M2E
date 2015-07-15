@@ -8,25 +8,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs extends Mage_Adminhtml_Block_Wi
 {
     // ########################################
 
-    const TAB_ID_AMAZON     = 'amazon';
-    const TAB_ID_BUY        = 'buy';
-    const TAB_ID_PLAY       = 'play';
+    const CHANNEL_ID_ALL        = 'all';
+    const CHANNEL_ID_AMAZON     = 'amazon';
+    const CHANNEL_ID_BUY        = 'buy';
 
     // ----------------------------------------
 
-    const LOG_TYPE_ID_LISTING            = 'listing';
-    const LOG_TYPE_ID_LISTING_OTHER      = 'listing_other';
-    const LOG_TYPE_ID_ORDER              = 'order';
-    const LOG_TYPE_ID_SYNCHRONIZATION    = 'synchronization';
+    const TAB_ID_LISTING            = 'listing';
+    const TAB_ID_LISTING_OTHER      = 'listing_other';
+    const TAB_ID_ORDER              = 'order';
+    const TAB_ID_SYNCHRONIZATION    = 'synchronization';
 
     // ########################################
-
-    protected $urlMap = array(
-        self::LOG_TYPE_ID_LISTING => 'listing',
-        self::LOG_TYPE_ID_LISTING_OTHER => 'listingOther',
-        self::LOG_TYPE_ID_ORDER => 'order',
-        self::LOG_TYPE_ID_SYNCHRONIZATION => 'synchronization',
-    );
 
     protected $logType;
 
@@ -52,92 +45,84 @@ class Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs extends Mage_Adminhtml_Block_Wi
 
     protected function _prepareLayout()
     {
-        $this->setLogType($this->getData('log_type'));
+        $this->addTab(self::TAB_ID_LISTING, $this->prepareTabListing());
+        $this->addTab(self::TAB_ID_LISTING_OTHER, $this->prepareTabListingOther());
+        $this->addTab(self::TAB_ID_ORDER, $this->prepareTabOrder());
+        $this->addTab(self::TAB_ID_SYNCHRONIZATION, $this->prepareTabSynchronization());
 
-        $activeComponents = Mage::helper('M2ePro/View_Common_Component')->getActiveComponents();
-
-        $this->setData('channel', $this->getActiveTab());
-        $this->getRequest()->setParam('channel', $this->getData('channel'));
-
-        foreach ($activeComponents as $component) {
-            $prepareTabMethod = 'prepareTab'.ucfirst($component);
-            $this->addTab($component, $this->$prepareTabMethod());
-        }
-
-        $this->setActiveTab($this->getData('channel'));
+        $this->setActiveTab($this->getData('active_tab'));
 
         return parent::_prepareLayout();
     }
 
     // ########################################
 
-    protected function prepareTabAmazon()
+    protected function prepareTabListing()
     {
         $tab = array(
-            'label' => Mage::helper('M2ePro/Component_Amazon')->getTitle(),
-            'title' => Mage::helper('M2ePro/Component_Amazon')->getTitle()
+            'label' => Mage::helper('M2ePro')->__('Listings'),
+            'title' => Mage::helper('M2ePro')->__('Listings')
         );
 
-        if ($this->getData('channel') == self::TAB_ID_AMAZON) {
-            $tab['content'] = $this->getLayout()->createBlock(
-                'M2ePro/adminhtml_common_'.$this->logType.'_log_grid', '',
-                array(
-                    'channel' => self::TAB_ID_AMAZON
-                )
-            )->toHtml();
+        if ($this->getData('active_tab') == self::TAB_ID_LISTING) {
+            $tab['content'] = $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_log_help')->toHtml();
+            $tab['content'] .= $this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_log')->toHtml();
         } else {
-            $tab['url'] = $this->getUrl('*/adminhtml_common_log/'.$this->urlMap[$this->logType], array(
-                'channel' => self::TAB_ID_AMAZON,
-                'log_type' => $this->logType
-            ));
+            $tab['url'] = $this->getUrl('*/adminhtml_common_log/listing', array('_current' => true));
         }
 
         return $tab;
     }
 
-    protected function prepareTabBuy()
+    protected function prepareTabListingOther()
     {
         $tab = array(
-            'label' => Mage::helper('M2ePro/Component_Buy')->getTitle(),
-            'title' => Mage::helper('M2ePro/Component_Buy')->getTitle()
+            'label' => Mage::helper('M2ePro')->__('3rd Party Listings'),
+            'title' => Mage::helper('M2ePro')->__('3rd Party Listings')
         );
 
-        if ($this->getData('channel') == self::TAB_ID_BUY) {
-            $tab['content'] = $this->getLayout()->createBlock(
-                'M2ePro/adminhtml_common_'.$this->logType.'_log_grid', '',
-                array(
-                    'channel' => self::TAB_ID_BUY
-                )
-            )->toHtml();
+        if ($this->getData('active_tab') == self::TAB_ID_LISTING_OTHER) {
+            $tab['content'] = $this->getLayout()
+                                   ->createBlock('M2ePro/adminhtml_common_listing_other_log_help')->toHtml();
+            $tab['content'] .= $this->getLayout()
+                                   ->createBlock('M2ePro/adminhtml_common_listing_other_log')->toHtml();
         } else {
-            $tab['url'] = $this->getUrl('*/adminhtml_common_log/'.$this->urlMap[$this->logType], array(
-                'channel' => self::TAB_ID_BUY,
-                'log_type' => $this->logType
-            ));
+            $tab['url'] = $this->getUrl('*/adminhtml_common_log/listingOther', array('_current' => true));
         }
 
         return $tab;
     }
 
-    protected function prepareTabPlay()
+    protected function prepareTabOrder()
     {
         $tab = array(
-            'label' => Mage::helper('M2ePro/Component_Play')->getTitle(),
-            'title' => Mage::helper('M2ePro/Component_Play')->getTitle()
+            'label' => Mage::helper('M2ePro')->__('Orders'),
+            'title' => Mage::helper('M2ePro')->__('Orders')
         );
 
-        if ($this->getData('channel') == self::TAB_ID_PLAY) {
-            $tab['content'] = $this->getLayout()->createBlock(
-                'M2ePro/adminhtml_common_'.$this->logType.'_log_grid', '',
-                array(
-                    'channel' => self::TAB_ID_PLAY
-                )
-            )->toHtml();
+        if ($this->getData('active_tab') == self::TAB_ID_ORDER) {
+            $tab['content'] = $this->getLayout()->createBlock('M2ePro/adminhtml_common_order_log_help')->toHtml();
+            $tab['content'] .= $this->getLayout()->createBlock('M2ePro/adminhtml_common_order_log')->toHtml();
         } else {
-            $tab['url'] = $this->getUrl('*/adminhtml_common_log/'.$this->urlMap[$this->logType], array(
-                'channel' => self::TAB_ID_PLAY,
-                'log_type' => $this->logType
-            ));
+            $tab['url'] = $this->getUrl('*/adminhtml_common_log/order', array('_current' => true));
+        }
+
+        return $tab;
+    }
+
+    protected function prepareTabSynchronization()
+    {
+        $tab = array(
+            'label' => Mage::helper('M2ePro')->__('Synchronization'),
+            'title' => Mage::helper('M2ePro')->__('Synchronization')
+        );
+
+        if ($this->getData('active_tab') == self::TAB_ID_SYNCHRONIZATION) {
+            $tab['content'] = $this->getLayout()
+                ->createBlock('M2ePro/adminhtml_common_synchronization_log_help')->toHtml();
+            $tab['content'] .= $this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization_log')->toHtml();
+        } else {
+            $tab['url'] = $this->getUrl('*/adminhtml_common_log/synchronization', array('_current' => true));
         }
 
         return $tab;
@@ -151,17 +136,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs extends Mage_Adminhtml_Block_Wi
             'Description' => Mage::helper('M2ePro')->__('Description')
         ));
 
-        $tabElId = $this->getId();
-        $tabsIds = $this->getTabsIds();
-
-        $jsHideOneTab = '';
-
-        if (count($tabsIds) === 1) {
-            $jsHideOneTab = <<<JS
-$('{$tabElId}').hide();
-JS;
-        }
-
         $javascript = <<<JAVASCIRPT
 
 <script type="text/javascript">
@@ -170,8 +144,6 @@ JS;
 
     Event.observe(window, 'load', function() {
         LogHandlerObj = new LogHandler();
-
-        {$jsHideOneTab}
     });
 
 </script>
@@ -179,20 +151,6 @@ JS;
 JAVASCIRPT;
 
         return $javascript . parent::_toHtml() . '<div id="tabs_container"></div>';
-    }
-
-    // ########################################
-
-    protected function getActiveTab()
-    {
-        $activeTab = $this->getData('channel');
-        if (is_null($activeTab)) {
-            Mage::helper('M2ePro/View_Common_Component')->isAmazonDefault() && $activeTab = self::TAB_ID_AMAZON;
-            Mage::helper('M2ePro/View_Common_Component')->isBuyDefault()    && $activeTab = self::TAB_ID_BUY;
-            Mage::helper('M2ePro/View_Common_Component')->isPlayDefault()   && $activeTab = self::TAB_ID_PLAY;
-        }
-
-        return $activeTab;
     }
 
     // ########################################

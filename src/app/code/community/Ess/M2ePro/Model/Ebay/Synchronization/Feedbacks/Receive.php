@@ -125,10 +125,14 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Feedbacks_Receive
 
     protected function receiveFromEbay(Ess_M2ePro_Model_Account $account, array $paramsConnector = array())
     {
-        $feedbacks = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                                ->processVirtual('feedback','get','entity',
-                                                 $paramsConnector,'feedbacks',
-                                                 NULL,$account->getId(),NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('feedback','get','entity',
+                                                            $paramsConnector,'feedbacks',
+                                                            NULL,$account->getId(),NULL);
+
+        $feedbacks = $dispatcherObj->process($connectorObj);
+        $this->processResponseMessages($connectorObj);
+
         is_null($feedbacks) && $feedbacks = array();
 
         $countNewFeedbacks = 0;
@@ -186,6 +190,25 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Feedbacks_Receive
             'total' => count($feedbacks),
             'new'   => $countNewFeedbacks
         );
+    }
+
+    private function processResponseMessages(Ess_M2ePro_Model_Connector_Protocol $connectorObj)
+    {
+        foreach ($connectorObj->getErrorMessages() as $message) {
+
+            if (!$connectorObj->isMessageError($message) && !$connectorObj->isMessageWarning($message)) {
+                continue;
+            }
+
+            $logType = $connectorObj->isMessageError($message) ? Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
+                                                               : Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING;
+
+            $this->getLog()->addMessage(
+                Mage::helper('M2ePro')->__($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]),
+                $logType,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+            );
+        }
     }
 
     //####################################

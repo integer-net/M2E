@@ -632,17 +632,35 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
 
         if (!$ebayListingProduct->isVariationsReady()) {
 
-            if ($ebayListingProduct->getBuyItNowPrice() != $ebayListingProduct->getOnlineBuyItNowPrice()) {
+            $needRevise = $this->checkRevisePricesRequirements(
+                $ebaySynchronizationTemplate,
+                $ebayListingProduct->getOnlineBuyItNowPrice(),
+                $ebayListingProduct->getBuyItNowPrice()
+            );
+
+            if ($needRevise) {
                 return true;
             }
 
             if ($ebayListingProduct->isListingTypeAuction()) {
 
-                if ($ebayListingProduct->getStartPrice() != $ebayListingProduct->getOnlineStartPrice()) {
+                $needRevise = $this->checkRevisePricesRequirements(
+                    $ebaySynchronizationTemplate,
+                    $ebayListingProduct->getOnlineStartPrice(),
+                    $ebayListingProduct->getStartPrice()
+                );
+
+                if ($needRevise) {
                     return true;
                 }
 
-                if ($ebayListingProduct->getReservePrice() != $ebayListingProduct->getOnlineReservePrice()) {
+                $needRevise = $this->checkRevisePricesRequirements(
+                    $ebaySynchronizationTemplate,
+                    $ebayListingProduct->getOnlineReservePrice(),
+                    $ebayListingProduct->getReservePrice()
+                );
+
+                if ($needRevise) {
                     return true;
                 }
             }
@@ -656,7 +674,13 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Variation $ebayVariation */
                 $ebayVariation = $variation->getChildObject();
 
-                if ($ebayVariation->getPrice() != $ebayVariation->getOnlinePrice()) {
+                $needRevise = $this->checkRevisePricesRequirements(
+                    $ebaySynchronizationTemplate,
+                    $ebayVariation->getOnlinePrice(),
+                    $ebayVariation->getPrice()
+                );
+
+                if ($needRevise) {
                     return true;
                 }
             }
@@ -798,6 +822,29 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
         }
 
         return false;
+    }
+
+    //####################################
+
+    private function checkRevisePricesRequirements(
+        Ess_M2ePro_Model_Ebay_Template_Synchronization $ebaySynchronizationTemplate,
+        $onlinePrice, $productPrice
+    ) {
+        if ((float)$onlinePrice == (float)$productPrice) {
+            return false;
+        }
+
+        if ((float)$onlinePrice <= 0) {
+            return true;
+        }
+
+        if ($ebaySynchronizationTemplate->isReviseUpdatePriceMaxAllowedDeviationModeOff()) {
+            return true;
+        }
+
+        $deviation = abs($onlinePrice - $productPrice) / $onlinePrice * 100;
+
+        return $deviation > $ebaySynchronizationTemplate->getReviseUpdatePriceMaxAllowedDeviation();
     }
 
     //####################################

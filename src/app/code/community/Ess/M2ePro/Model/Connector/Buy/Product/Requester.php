@@ -222,11 +222,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
             $lockItem = Mage::getModel('M2ePro/LockItem');
             $lockItem->setNick(Ess_M2ePro_Helper_Component_Buy::NICK.'_listing_product_'.$listingProduct->getId());
 
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action') ||
-                $listingProduct->isLockedObject($this->getLockIdentifier().'_action') ||
-                $lockItem->isExist()
-            ) {
+            if ($listingProduct->isLockedObject('in_action') || $lockItem->isExist()) {
 
                 // M2ePro_TRANSLATIONS
                 // Another Action is being processed. Try again when the Action is completed.

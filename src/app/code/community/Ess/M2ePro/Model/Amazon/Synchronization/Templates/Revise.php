@@ -147,7 +147,9 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
             $attributesForProductChange = array_merge(
                 $attributesForProductChange,
-                $listing->getConditionNoteAttributes()
+                $listing->getConditionNoteAttributes(),
+                $listing->getGiftWrapAttributes(),
+                $listing->getGiftMessageAttributes()
             );
         }
 
@@ -156,7 +158,11 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
             $amazonListingProduct = $listingProduct->getChildObject();
 
-            $detailsAttributes = $amazonListingProduct->getAmazonListing()->getConditionNoteAttributes();
+            $detailsAttributes = array_merge(
+                $amazonListingProduct->getAmazonListing()->getConditionNoteAttributes(),
+                $amazonListingProduct->getAmazonListing()->getGiftWrapAttributes(),
+                $amazonListingProduct->getAmazonListing()->getGiftMessageAttributes()
+            );
 
             if ($amazonListingProduct->isExistDescriptionTemplate()) {
                 $descriptionTemplateDetailsAttributes = $amazonListingProduct->getAmazonDescriptionTemplate()

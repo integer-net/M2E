@@ -74,11 +74,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_Synchronization
         return $this->getUrl('*/adminhtml_common_buy_template_synchronization/new');
     }
 
-    protected function getPlayNewUrl()
-    {
-        return $this->getUrl('*/adminhtml_common_play_template_synchronization/new');
-    }
-
     // ########################################
 
     public function getGridHtml()

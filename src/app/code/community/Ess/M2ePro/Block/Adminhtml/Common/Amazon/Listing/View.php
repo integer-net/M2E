@@ -52,7 +52,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         //------------------------------
         $url = $this->getUrl('*/adminhtml_common_log/listing', array(
             'id' => $listingData['id'],
-            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON
+            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON
         ));
         $this->_addButton('view_log', array(
             'label'   => Mage::helper('M2ePro')->__('View Log'),
@@ -172,7 +172,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
 
         $logViewUrl = $this->getUrl('*/adminhtml_common_log/listing',array(
             'id' => $listingData['id'],
-            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON,
+            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON,
             'back' => $helper->makeBackUrlParam('*/adminhtml_common_amazon_listing/view',
                                                 array('id' =>$listingData['id']))
         ));

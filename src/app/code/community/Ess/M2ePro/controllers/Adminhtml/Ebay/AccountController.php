@@ -69,10 +69,11 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
             return $this->indexAction();
         }
 
-        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                        ->processVirtual('account','get','info',
-                                         array(),NULL,
-                                         NULL,$id,NULL);
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('account','get','info',
+                                                               array(),NULL,NULL,$id);
+
+        $response = $dispatcherObject->process($connectorObj);
 
         if (!isset($response['info'])) {
             return $this->getResponse()->setBody(json_encode(array('status' => 'error')));
@@ -125,11 +126,16 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
                                 Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_SANDBOX;
 
         try {
-            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')->processVirtual(
-                'account','get','authUrl',
-                array('back_url'=>$this->getUrl('*/*/afterGetToken',array('_current' => true))),
-                NULL,NULL,NULL,$mode
-            );
+
+            $backUrl = $this->getUrl('*/*/afterGetToken', array('_current' => true));
+
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+            $connectorObj = $dispatcherObject->getVirtualConnector('account','get','authUrl',
+                                                                   array('back_url' => $backUrl),
+                                                                   NULL,NULL,NULL,$mode);
+
+            $response = $dispatcherObject->process($connectorObj);
+
         } catch (Exception $exception) {
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
@@ -290,15 +296,6 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
         // tab: orders
         //--------------------
-        $keys = array(
-            'orders_mode',
-        );
-        foreach ($keys as $key) {
-            if (isset($post[$key])) {
-                $data[$key] = $post[$key];
-            }
-        }
-
         $data['magento_orders_settings'] = array();
 
         // m2e orders settings
@@ -529,30 +526,30 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
             if ($account->isLocked(true)) {
                 $locked++;
-            } else {
+                continue;
+            }
 
-                try {
+            try {
 
-                    Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                        ->processVirtual('account','delete','entity',
-                                                 array(), NULL,
-                                                 NULL,$account->getId(),NULL);
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+                $connectorObj = $dispatcherObject->getVirtualConnector('account','delete','entity',
+                                                                       array(),NULL,NULL,$account->getId());
+                $dispatcherObject->process($connectorObj);
 
-                } catch (Exception $e) {
-
-                    $account->deleteProcessingRequests();
-                    $account->deleteObjectLocks();
-                    $account->deleteInstance();
-
-                    throw $e;
-                }
+            } catch (Exception $e) {
 
                 $account->deleteProcessingRequests();
                 $account->deleteObjectLocks();
                 $account->deleteInstance();
 
-                $deleted++;
+                throw $e;
             }
+
+            $account->deleteProcessingRequests();
+            $account->deleteObjectLocks();
+            $account->deleteInstance();
+
+            $deleted++;
         }
 
         $tempString = Mage::helper('M2ePro')->__('%amount% record(s) were successfully deleted.', $deleted);
@@ -575,31 +572,31 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
             Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_PRODUCTION :
             Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_SANDBOX;
 
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+
         if ((bool)$id) {
+
+            /** @var Ess_M2ePro_Model_Account $model */
             $model = Mage::helper('M2ePro/Component_Ebay')->getObject('Account',$id);
 
-            $requestTempParams = array(
-                'title' => $model->getTitle(),
-                'mode' => $requestMode,
-                'token_session' => $data['token_session']
-            );
-            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('account','update','entity',
-                                             $requestTempParams,NULL,
-                                             NULL,$id,NULL);
+            $connectorObj = $dispatcherObject->getVirtualConnector('account','update','entity',
+                                                                   array('title'         => $model->getTitle(),
+                                                                         'mode'          => $requestMode,
+                                                                         'token_session' => $data['token_session']),
+                                                                   NULL,NULL,$id);
 
-            $title = empty($response['info']['UserID']) ? 'Unknown' : $response['info']['UserID'];
+            $response = $dispatcherObject->process($connectorObj);
+
+            $title = empty($response['info']['UserID']) ? 'Unknown'
+                                                        : $response['info']['UserID'];
 
             $oldTitle = $model->getTitle();
             if (($pos = strpos($oldTitle, ' (')) !== false) {
                 $oldTitle = substr($oldTitle, 0, $pos);
             }
 
-            if ($title != $oldTitle) {
-                $title = $this->correctAccountTitle($title);
-            } else {
-                $title = $model->getTitle();
-            }
+            $title != $oldTitle ? $title = $this->correctAccountTitle($title)
+                                : $title = $model->getTitle();
 
             $data['title'] = $title;
 
@@ -607,17 +604,16 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
 
             Mage::helper('M2ePro/Module_License')->setTrial(Ess_M2ePro_Helper_Component_Ebay::NICK);
 
-            $requestTempParams = array(
-                'mode' => $requestMode,
-                'token_session' => $data['token_session']
-            );
+            $connectorObj = $dispatcherObject->getVirtualConnector('account','add','entity',
+                                                                   array('mode' => $requestMode,
+                                                                         'token_session' => $data['token_session']),
+                                                                   NULL,NULL,NULL,$requestMode);
 
-            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('account','add','entity',
-                                             $requestTempParams,NULL,
-                                             NULL,NULL,$requestMode);
+            $response = $dispatcherObject->process($connectorObj);
 
-            $title = empty($response['info']['UserID']) ? 'Unknown' : $response['info']['UserID'];
+            $title = empty($response['info']['UserID']) ? 'Unknown'
+                                                        : $response['info']['UserID'];
+
             $data['title'] = $this->correctAccountTitle($title);
         }
 

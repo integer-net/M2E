@@ -46,7 +46,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View extends Mage_Adminhtml_
         //------------------------------
         $url = $this->getUrl('*/adminhtml_common_log/listing', array(
             'id' => $listingData['id'],
-            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_BUY
+            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_BUY
         ));
         $this->_addButton('view_log', array(
             'label'   => Mage::helper('M2ePro')->__('View Log'),
@@ -120,7 +120,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View extends Mage_Adminhtml_
 
         $logViewUrl = $this->getUrl('*/adminhtml_common_log/listing', array(
             'id' => $listingData['id'],
-            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_BUY,
+            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_BUY,
             'back'=>$helper->makeBackUrlParam('*/adminhtml_common_buy_listing/view', array('id' =>$listingData['id']))
         ));
         $getErrorsSummary = $this->getUrl('*/adminhtml_listing/getErrorsSummary');

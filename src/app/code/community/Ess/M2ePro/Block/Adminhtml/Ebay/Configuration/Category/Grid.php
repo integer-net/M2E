@@ -228,7 +228,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
         ));
 
         $this->addColumn('account', array(
-            'header'        => $helper->__('Account'),
+            'header'        => $helper->__('eBay User ID'),
             'align'         => 'left',
             'type'          => 'options',
             'width'         => '100px',
@@ -325,8 +325,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Grid extends Mage_A
             return;
         }
 
-        $collection->getSelect()->orWhere('main_table.path LIKE \'%'.$value.'%\'');
-        $collection->getSelect()->orWhere('main_table.value LIKE \'%'.$value.'%\'');
+        $collection->getSelect()->orWhere('main_table.path LIKE ?', '%'. $value . '%');
+        $collection->getSelect()->orWhere('main_table.value LIKE ?', '%'. $value . '%');
     }
 
     public function callbackColumnMarketplace($value, $row, $column, $isExport)

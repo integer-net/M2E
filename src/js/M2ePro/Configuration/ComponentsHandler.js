@@ -48,8 +48,6 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
                 defaultComponent = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Amazon::NICK');
             } else if ($('component_buy_mode').value == 1) {
                 defaultComponent = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Buy::NICK');
-            } else if ($('component_play_mode').value == 1) {
-                defaultComponent = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK');
             }
 
             $('view_common_component_default').value = defaultComponent;
@@ -64,8 +62,7 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
 
             components = [
                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Amazon::NICK'),
-                M2ePro.php.constant('Ess_M2ePro_Helper_Component_Buy::NICK'),
-                M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK')
+                M2ePro.php.constant('Ess_M2ePro_Helper_Component_Buy::NICK')
             ];
 
         components.each(function(nick) {

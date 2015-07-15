@@ -97,8 +97,7 @@ HTML;
             return;
         }
 
-        $where = "main_table.title LIKE '%{$value}%' OR m.title LIKE '%{$value}%'";
-        $collection->getSelect()->where($where);
+        $collection->getSelect()->where('main_table.title LIKE ? OR m.title LIKE ?', '%'. $value .'%');
     }
 
     // ####################################

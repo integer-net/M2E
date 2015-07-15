@@ -16,7 +16,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_OrderController
 
         $this->getLayout()->getBlock('head')
              ->addJs('M2ePro/Order/Debug.js')
-             ->addJs('M2ePro/OrderHandler.js')
+             ->addJs('M2ePro/Order/Handler.js')
              ->addJs('M2ePro/Order/Edit/ItemHandler.js')
              ->addJs('M2ePro/Order/Edit/ShippingAddressHandler.js');
 

@@ -72,8 +72,11 @@ ACTION;
 
     private function send($logData, $type)
     {
-        Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                ->processVirtual('logger','add','entity', array('info' => $logData, 'type' => $type));
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('logger', 'add', 'entity',
+                                                               array('info' => $logData,
+                                                                     'type' => $type));
+        $dispatcherObject->process($connectorObj);
     }
 
     // ########################################

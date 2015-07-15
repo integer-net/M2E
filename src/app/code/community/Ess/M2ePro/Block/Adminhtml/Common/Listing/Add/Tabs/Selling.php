@@ -58,7 +58,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Tabs_Selling extends Mage_Ad
         //----------------------------
         $synchronizationTemplatesCollection = Mage::helper('M2ePro/Component')
             ->getComponentCollection($this->component, 'Template_Synchronization')
-            ->setOrder('title', 'ASC');
+            ->setOrder('title', Varien_Data_Collection::SORT_ORDER_ASC);
 
         if ($synchronizationTemplatesCollection->getSize() < $maxRecordsQuantity) {
             $this->synchronizationsTemplatesDropDown = true;
@@ -83,6 +83,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Tabs_Selling extends Mage_Ad
     {
         $collection = Mage::getModel('M2ePro/Template_SellingFormat')->getCollection();
         $collection->addFieldToFilter('component_mode', $this->component);
+        $collection->setOrder('title', Varien_Data_Collection::SORT_ORDER_ASC);
 
         $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)
             ->columns(array('id', 'title'));

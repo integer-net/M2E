@@ -74,7 +74,7 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific_Source
         }
 
         if ($this->getCategorySpecificTemplate()->isCustomValueValueMode()) {
-            $valueData[] = $this->getCategorySpecificTemplate()->getData('value_custom_value');
+            $valueData = json_decode($this->getCategorySpecificTemplate()->getData('value_custom_value'),true);
         }
 
         if ($this->getCategorySpecificTemplate()->isCustomAttributeValueMode() ||

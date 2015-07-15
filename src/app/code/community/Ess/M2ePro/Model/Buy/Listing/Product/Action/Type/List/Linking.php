@@ -44,6 +44,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Linking
         $this->getListingProduct()->addData(array(
             'general_id' => $this->getGeneralId(),
             'sku'        => $this->getSku(),
+            'status'     => Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED
         ));
         $this->getListingProduct()->save();
 

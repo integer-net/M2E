@@ -23,30 +23,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Synchronization
         $this->tabsContainerId = 'edit_form';
         //------------------------------
 
-        // Set header text
-        //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Synchronization');
-        //------------------------------
-
-        // Set buttons actions
-        //------------------------------
-        $this->removeButton('back');
-        $this->removeButton('reset');
-        $this->removeButton('delete');
-        $this->removeButton('add');
-        $this->removeButton('save');
-        $this->removeButton('edit');
-        //------------------------------
+        $this->_headerText = '';
 
         if (!(bool)$this->getRequest()->getParam('wizard',false)) {
-            //------------------------------
-            $url = $this->getUrl('*/adminhtml_common_log/synchronization');
-            $this->_addButton('view_log', array(
-                'label'     => Mage::helper('M2ePro')->__('View Log'),
-                'onclick'   => 'window.open(\'' . $url . '\')',
-                'class'     => 'button_link'
-            ));
-            //------------------------------
+
+            $this->setTemplate(NULL);
 
             //------------------------------
             $params = Mage::helper('M2ePro')->escapeHtml(
@@ -67,6 +48,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Synchronization
             ));
             //------------------------------
         } else {
+
+            // Set header text
+            //------------------------------
+            $this->_headerText = Mage::helper('M2ePro')->__('Synchronization');
+            //------------------------------
+
             $activeWizardNick = Mage::helper('M2ePro/Module_Wizard')->getNick(
                 Mage::helper('M2ePro/Module_Wizard')->getActiveWizard(Ess_M2ePro_Helper_View_Common::NICK)
             );
@@ -139,33 +126,53 @@ JAVASCRIPT;
 
     // ########################################
 
-    protected function getPlayTabBlock()
-    {
-        if (!$this->getChild('play_tab')) {
-            $this->setChild(
-                'play_tab',
-                $this->getLayout()->createBlock('M2ePro/adminhtml_common_play_synchronization_form')
-            );
-        }
-        return $this->getChild('play_tab');
-    }
-
-    // ########################################
-
     protected function _componentsToHtml()
     {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization_help');
+        $tabsCount = count($this->tabs);
+
+        if ($tabsCount <= 0) {
+            return '';
+        }
+
         $formBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization_form');
         count($this->tabs) == 1 && $formBlock->setChildBlockId($this->getSingleBlock()->getContainerId());
 
-        return $helpBlock->toHtml()
-               . parent::_componentsToHtml()
-               . $formBlock->toHtml();
-    }
+        $tabsContainer = $this->getTabsContainerBlock();
+        $tabsContainer->setDestElementId($this->tabsContainerId);
 
-    protected function getTabsContainerDestinationHtml()
-    {
-        return '';
+        foreach ($this->tabs as $tabId) {
+            $tab = $this->prepareTabById($tabId);
+            $tabsContainer->addTab($tabId, $tab);
+        }
+
+        $tabsContainer->setActiveTab($this->getActiveTab());
+
+        $hideChannels = '';
+        $tabsIds = $tabsContainer->getTabsIds();
+        if (count($tabsIds) <= 1) {
+            $hideChannels = ' style="visibility: hidden"';
+        }
+
+        $hideTabsHeader = '';
+        $help = '';
+        if ((bool)$this->getRequest()->getParam('wizard',false)) {
+            $hideTabsHeader = ' style="display: none"';
+            $help = $this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization_help')->toHtml();
+        }
+
+        return <<<HTML
+<div class="content-header skip-header"{$hideTabsHeader}>
+    <table cellspacing="0">
+        <tr>
+            <td{$hideChannels}>{$tabsContainer->toHtml()}</td>
+            <td class="form-buttons">{$this->getButtonsHtml()}</td>
+        </tr>
+    </table>
+</div>
+{$help}
+{$formBlock->toHtml()}
+HTML;
+
     }
 
     // ########################################
@@ -186,4 +193,16 @@ JAVASCRIPT;
     }
 
     // ########################################
+
+    protected function getTabsContainerBlock()
+    {
+        if (is_null($this->tabsContainerBlock)) {
+            $this->tabsContainerBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization_tabs');
+        }
+
+        return $this->tabsContainerBlock;
+    }
+
+    // ########################################
+
 }

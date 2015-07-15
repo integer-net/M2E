@@ -15,6 +15,28 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Listing_OtherController
             ->_title(Mage::helper('M2ePro')->__('Manage Listings'))
             ->_title(Mage::helper('M2ePro')->__('3rd Party Listings'));
 
+        $this->getLayout()->getBlock('head')
+            ->addJs('M2ePro/Plugin/ProgressBar.js')
+            ->addCss('M2ePro/css/Plugin/ProgressBar.css')
+            ->addJs('M2ePro/Plugin/AreaWrapper.js')
+            ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
+
+            ->addJs('M2ePro/GridHandler.js')
+            ->addJs('M2ePro/Listing/Other/GridHandler.js')
+            ->addJs('M2ePro/Common/Listing/Other/GridHandler.js')
+            ->addJs('M2ePro/Common/Buy/Listing/Other/GridHandler.js')
+
+            ->addJs('M2ePro/ActionHandler.js')
+            ->addJs('M2ePro/Listing/MovingHandler.js')
+            ->addJs('M2ePro/Listing/Other/AutoMappingHandler.js')
+
+            ->addJs('M2ePro/Listing/Other/MappingHandler.js')
+
+            ->addJs('M2ePro/Listing/Other/RemovingHandler.js')
+            ->addJs('M2ePro/Listing/Other/UnmappingHandler.js');
+
+        $this->_initPopUp();
+
         return $this;
     }
 
@@ -41,8 +63,17 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Listing_OtherController
     public function gridAction()
     {
         $response = $this->loadLayout()->getLayout()
-            ->createBlock('M2ePro/adminhtml_common_buy_listing_other_grid')->toHtml();
+            ->createBlock('M2ePro/adminhtml_common_buy_listing_other_view_grid')->toHtml();
         $this->getResponse()->setBody($response);
+    }
+
+    //#############################################
+
+    public function viewAction()
+    {
+        /** @var $block Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Other_View */
+        $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_other_view');
+        $this->_initAction()->_addContent($block)->renderLayout();
     }
 
     //#############################################

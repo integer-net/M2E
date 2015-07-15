@@ -57,7 +57,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
             return;
         }
 
-        preg_match('/(ebay|amazon|buy|play)_/i', $this->modelName, $matches);
+        preg_match('/(ebay|amazon|buy)_/i', $this->modelName, $matches);
         if (!$this->component && !empty($matches[1])) {
             $this->modelName = str_replace($matches[1].'_', '', $this->modelName);
             $this->component = strtolower($matches[1]);

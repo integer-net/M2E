@@ -475,11 +475,21 @@ a.hover-underline:hover {
 
 /* ================================================ */
 
-/* second lvl tabs */
+/* Second level tabs */
 /* ================================================ */
 
-.m2epro-link-tabs a.active{
+.m2epro-link-tabs a {
     color: grey;
+    text-decoration: none;
+}
+
+.m2epro-link-tabs a.active{
+    color: black;
+    text-decoration: underline;
+}
+
+.m2epro-link-tabs a:hover {
+    text-decoration: underline;
 }
 
 /* ================================================ */

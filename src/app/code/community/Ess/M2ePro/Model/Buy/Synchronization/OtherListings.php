@@ -7,7 +7,6 @@
 final class Ess_M2ePro_Model_Buy_Synchronization_OtherListings
     extends Ess_M2ePro_Model_Buy_Synchronization_Abstract
 {
-    const INTERVAL_COEFFICIENT_VALUE = 10000;
     const LOCK_ITEM_PREFIX = 'synchronization_buy_other_listings';
 
     //####################################
@@ -53,14 +52,16 @@ final class Ess_M2ePro_Model_Buy_Synchronization_OtherListings
             return false;
         }
 
-        $totalProducts = (int)Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product')->getSize();
-        $totalProducts += (int)Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Other')->getSize();
-        $intervalCoefficient = ($totalProducts > 0) ? (int)ceil($totalProducts/self::INTERVAL_COEFFICIENT_VALUE) : 1;
+        if (!in_array(Ess_M2ePro_Model_Synchronization_Task_Abstract::DEFAULTS, $this->getAllowedTasksTypes())) {
+            return parent::intervalIsLocked();
+        }
 
-        $lastTime = strtotime($this->getConfigValue($this->getFullSettingsPath(),'last_time'));
-        $interval = (int)$this->getConfigValue($this->getFullSettingsPath(),'interval') * $intervalCoefficient;
+        $synchronizationStartTime = $this->getParentOperationHistory()->getObject()->getData('start_date');
+        $updateListingsProductsLastTime = $this->getConfigValue(
+            '/buy/defaults/update_listings_products/', 'last_time'
+        );
 
-        return $lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true);
+        return strtotime($synchronizationStartTime) > strtotime($updateListingsProductsLastTime);
     }
 
     //####################################
@@ -149,9 +150,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_OtherListings
             );
 
             $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
-            $dispatcherObject->processConnector('synchronization', 'otherListings' ,'requester',
-                                                array(), $account,
-                                                'Ess_M2ePro_Model_Buy');
+            $connectorObj = $dispatcherObject->getConnector('synchronization', 'otherListings' ,'requester',
+                                                            array(), $account, 'Ess_M2ePro_Model_Buy');
+
+            $dispatcherObject->process($connectorObj);
 
             $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
         }
@@ -211,10 +213,12 @@ final class Ess_M2ePro_Model_Buy_Synchronization_OtherListings
             $inputData['necessary_page'] = (int)$settings['next_page'];
         }
 
-        $responseData = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
-                                    ->processVirtual('inventory','get','pagesTitles',
-                                                     $inputData,NULL,
-                                                     $account->getId());
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('inventory','get','pagesTitles',
+                                                               $inputData,NULL,
+                                                               $account->getId());
+
+        $responseData = $dispatcherObject->process($connectorObj);
 
         $this->updateReceivedTitles($responseData, $account);
         $pagesSettings = $this->calculateNextPagesSettings($responseData, $inputData);
@@ -279,11 +283,12 @@ final class Ess_M2ePro_Model_Buy_Synchronization_OtherListings
             $neededItems[] = $tempItem->getData('general_id');
         }
 
-        $responseData = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
-                                    ->processVirtual('inventory','get','skusTitles',
-                                                     array('items'=>$neededItems),NULL,
-                                                     $account->getId());
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('inventory','get','skusTitles',
+                                                               array('items'=>$neededItems),NULL,
+                                                               $account->getId());
 
+        $responseData = $dispatcherObject->process($connectorObj);
         $this->updateReceivedTitles($responseData, $account);
     }
 

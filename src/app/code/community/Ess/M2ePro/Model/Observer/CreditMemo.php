@@ -69,11 +69,15 @@ class Ess_M2ePro_Model_Observer_Creditmemo extends Ess_M2ePro_Model_Observer_Abs
                     $amazonOrderItemCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Order_Item');
                     $amazonOrderItemCollection->addFieldToFilter('amazon_order_item_id', $amazonOrderItemId);
 
-                    $amazonOrderItem = $amazonOrderItemCollection->getFirstItem();
+                    /** @var Ess_M2ePro_Model_Order_Item $orderItem */
+                    $orderItem = $amazonOrderItemCollection->getFirstItem();
 
-                    if (is_null($amazonOrderItem) || !$amazonOrderItem->getId()) {
+                    if (is_null($orderItem) || !$orderItem->getId()) {
                         continue;
                     }
+
+                    /** @var Ess_M2ePro_Model_Amazon_Order_Item $amazonOrderItem */
+                    $amazonOrderItem = $orderItem->getChildObject();
 
                     $price = $creditmemoItem->getPrice();
                     if ($price > $amazonOrderItem->getPrice()) {

@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2012 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Ebay_ManageListings extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // ########################################
 

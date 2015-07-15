@@ -285,5 +285,63 @@ class Ess_M2ePro_Model_Amazon_Listing_Source
         return array_merge($mainImage, $galleryImages);
     }
 
+    //-----------------------------------------
+
+    public function getGiftWrap()
+    {
+        $result = NULL;
+        $src = $this->getAmazonListing()->getGiftWrapSource();
+
+        if ($this->getAmazonListing()->isGiftWrapModeYes()) {
+            $result = true;
+        }
+
+        if ($this->getAmazonListing()->isGiftWrapModeNo()) {
+            $result = false;
+        }
+
+        if ($this->getAmazonListing()->isGiftWrapModeAttribute()) {
+            $attributeValue = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('Yes')) {
+                $result = true;
+            }
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('No')) {
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
+
+    public function getGiftMessage()
+    {
+        $result = NULL;
+        $src = $this->getAmazonListing()->getGiftMessageSource();
+
+        if ($this->getAmazonListing()->isGiftMessageModeYes()) {
+            $result = true;
+        }
+
+        if ($this->getAmazonListing()->isGiftMessageModeNo()) {
+            $result = false;
+        }
+
+        if ($this->getAmazonListing()->isGiftMessageModeAttribute()) {
+            $attributeValue = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('Yes')) {
+                $result = true;
+            }
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('No')) {
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
+
     // ########################################
 }

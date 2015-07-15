@@ -83,7 +83,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation_License
         $userInfo['country'] = Mage::getStoreConfig('general/country/default', $defaultStoreId);
         //-------------------------------
 
-        $earlierFormData = Mage::getModel('M2ePro/Registry')->load('wizard_license_form_data', 'key')
+        $earlierFormData = Mage::getModel('M2ePro/Registry')->load('/wizard/license_form_data/', 'key')
                                                             ->getData('value');
 
         if ($earlierFormData) {

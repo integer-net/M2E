@@ -226,8 +226,8 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             (!isset($post[$key]) || !$post[$key]) && $post[$key] = 'undefined';
         }
 
-        $registry = Mage::getModel('M2ePro/Registry')->load('wizard_license_form_data', 'key');
-        $registry->setData('key', 'wizard_license_form_data');
+        $registry = Mage::getModel('M2ePro/Registry')->load('/wizard/license_form_data/', 'key');
+        $registry->setData('key', '/wizard/license_form_data/');
         $registry->setData('value', json_encode($post));
         $registry->save();
 
@@ -249,11 +249,16 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         $accountMode = $this->getRequest()->getParam('account_mode');
 
         try {
-            $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')->processVirtual(
-                    'account','get','authUrl',
-                    array('back_url'=>$this->getUrl('*/*/afterToken', array('mode' => $accountMode))),
-                    NULL,NULL,NULL,$accountMode
-            );
+
+             $backUrl = $this->getUrl('*/*/afterToken', array('mode' => $accountMode));
+
+             $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+             $connectorObj = $dispatcherObject->getVirtualConnector('account','get','authUrl',
+                                                                    array('back_url' => $backUrl),
+                                                                    NULL,NULL,NULL,$accountMode);
+
+            $response = $dispatcherObject->process($connectorObj);
+
         } catch (Exception $exception) {
             return $this->getResponse()->setBody(json_encode(array(
                 'url' => null
@@ -292,10 +297,13 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             'mode' => $accountMode,
             'token_session' => $tokenSessionId
         );
-        $response = array_filter(Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-            ->processVirtual('account','add','entity',
-                             $requestParams,NULL,
-                             NULL,NULL,$accountMode));
+
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('account','add','entity',
+                                                               $requestParams,NULL,
+                                                               NULL,NULL,$accountMode);
+
+        $response = array_filter($dispatcherObject->process($connectorObj));
 
         if (empty($response)) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Account Add Entity failed.'));
@@ -385,7 +393,6 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         return $this->getResponse()->setBody(json_encode(array(
             'result' => 'success',
             'text' => array(
-                'orders'        => $account->getChildObject()->isOrdersModeEnabled() ? $yes : $no,
                 'listing_other' => $account->getChildObject()->isOtherListingsSynchronizationEnabled() ? $yes : $no,
                 'feedbacks'     => $account->getChildObject()->isFeedbacksReceive() ? $yes : $no,
             )

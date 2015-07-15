@@ -42,7 +42,7 @@ class Ess_M2ePro_Model_Processing_Request extends Ess_M2ePro_Model_Abstract
 
     public function getNextPart()
     {
-        return (int)$this->getData('next_part');
+        return $this->getData('next_part');
     }
 
     //------------------------------------

@@ -11,13 +11,15 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Relist_Response
 
     public function processSuccess($params = array())
     {
-        $data = array(
-            'ignore_next_inventory_synch' => 1
-        );
+        $data = array();
 
         if ($this->getConfigurator()->isAllPermitted()) {
             $data['synch_status'] = Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_OK;
             $data['synch_reasons'] = NULL;
+        }
+
+        if ($this->getConfigurator()->isDetails() || $this->getConfigurator()->isImages()) {
+            $data['defected_messages'] = null;
         }
 
         $data = $this->appendStatusChangerValue($data);
@@ -27,6 +29,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Relist_Response
         $data = $this->appendPriceValues($data);
 
         $this->getListingProduct()->addData($data);
+
+        $this->setLastSynchronizationDates();
+
         $this->getListingProduct()->save();
     }
 

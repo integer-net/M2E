@@ -56,6 +56,18 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
             ) );
         $this->setChild('add_custom_specific_button',$buttonBlock);
         //------------------------------
+
+        //------------------------------
+        $buttonBlock = $this->getLayout()
+            ->createBlock('adminhtml/widget_button')
+            ->setData( array(
+                'label'   => '',
+                'onclick' => 'EbayListingCategorySpecificHandler'.$uniqueId.'Obj.removeItemSpecificsCustomValue(this);',
+                'class'   => 'scalable delete remove_item_specifics_custom_value_button',
+                'style'   => 'padding-bottom:1px; padding-right:0px; padding-left:4px;'
+            ) );
+        $this->setChild('remove_item_specifics_custom_value_button',$buttonBlock);
+        //------------------------------
     }
 
     // ########################################
@@ -160,6 +172,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
         foreach ($specifics as $specific) {
 
             if ($specific['mode'] == Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS) {
+                $specific['value_custom_value'] = json_decode($specific['value_custom_value'],true);
                 $this->_selectedSpecifics[] = $specific;
                 continue;
             }
@@ -171,7 +184,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific extends Mage_Adm
             unset($specific['value_ebay_recommended']);
 
             if ($specific['value_mode'] == Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_VALUE) {
-                $specific['value_data'] = $specific['value_custom_value'];
+                $specific['value_data'] = json_decode($specific['value_custom_value'],true);
             }
             unset($specific['value_custom_value']);
 

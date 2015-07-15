@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2011 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Review extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Review extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // ####################################
 
@@ -23,11 +23,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Review extends Mage_Adminhtm
     }
 
     // ####################################
-
-    public function getHeaderCssClass()
-    {
-        return 'icon-head ' . parent::getHeaderCssClass();
-    }
 
     public function getHeaderWidth()
     {

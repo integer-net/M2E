@@ -63,9 +63,11 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
         Mage::helper('M2ePro/Client')->setMemoryLimit(self::MAX_MEMORY_LIMIT);
         Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
 
-        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                                    ->processVirtual('servicing','update','data',
-                                                     $this->getRequestData($allowedTasks));
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('servicing','update','data',
+                                                               $this->getRequestData($allowedTasks));
+
+        $responseData = $dispatcherObject->process($connectorObj);
 
         if (!is_array($responseData)) {
             return false;

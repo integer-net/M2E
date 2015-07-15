@@ -57,8 +57,8 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
             ));
         }
 
-        $channel = $this->getData('channel');
-        if (!empty($channel)) {
+        $channel = $this->getRequest()->getParam('channel');
+        if (!empty($channel) && $channel != Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_ALL) {
             $collection->getSelect()->where('main_table.component_mode = ?', $channel);
         } else {
             $components = Mage::helper('M2ePro/View')->getComponentHelper()->getActiveComponents();
@@ -221,10 +221,6 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
                 $channelOrderId = $order->getData('buy_order_id');
                 $url = $this->getUrl('*/adminhtml_common_buy_order/view', array('id' => $row->getData('order_id')));
                 break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $channelOrderId = $order->getData('play_order_id');
-                $url = $this->getUrl('*/adminhtml_common_play_order/view', array('id' => $row->getData('order_id')));
-                break;
             default:
                 $channelOrderId = Mage::helper('M2ePro')->__('N/A');
                 $url = '#';
@@ -280,14 +276,6 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
             $ordersIds = array_merge($ordersIds, $tempOrdersIds);
         }
 
-        if (Mage::helper('M2ePro/Component_Play')->isActive()) {
-            $tempOrdersIds = Mage::getModel('M2ePro/Play_Order')
-                ->getCollection()
-                ->addFieldToFilter('play_order_id', array('like' => '%'.$value.'%'))
-                ->getColumnValues('order_id');
-            $ordersIds = array_merge($ordersIds, $tempOrdersIds);
-        }
-
         $ordersIds = array_unique($ordersIds);
 
         $collection->addFieldToFilter('`main_table`.order_id', array('in' => $ordersIds));
@@ -304,7 +292,7 @@ class Ess_M2ePro_Block_Adminhtml_Order_Log_Grid extends Mage_Adminhtml_Block_Wid
     {
         return $this->getUrl('*/*/orderGrid', array(
             '_current' => true,
-            'channel' => $this->getData('channel')
+            'channel' => $this->getRequest()->getParam('channel')
         ));
     }
 }

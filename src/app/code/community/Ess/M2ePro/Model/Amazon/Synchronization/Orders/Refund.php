@@ -100,8 +100,6 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Refund
     {
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Account');
-        $accountsCollection->addFieldToFilter('orders_mode', Ess_M2ePro_Model_Amazon_Account::ORDERS_MODE_YES);
-
         return $accountsCollection->getItems();
     }
 
@@ -163,9 +161,9 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Refund
 
         /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-        $dispatcherObject->processConnector(
-            'orders', 'refund', 'itemsRequester', array('items' => $items), $account
-        );
+        $connectorObj = $dispatcherObject->getConnector('orders', 'refund', 'itemsRequester',
+                                                        array('items' => $items), $account);
+        $dispatcherObject->process($connectorObj);
     }
 
     // ##########################################################

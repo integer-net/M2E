@@ -85,7 +85,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
         $this->getActualOperationHistory()->addTimePoint(__METHOD__,'Execute scheduled');
 
         /** @var Ess_M2ePro_Model_Template_Synchronization $synchTemplateCollection */
-        $synchTemplateCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Template_Synchronization');;
+        $synchTemplateCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Template_Synchronization');
 
         foreach ($synchTemplateCollection as $synchTemplate) {
 

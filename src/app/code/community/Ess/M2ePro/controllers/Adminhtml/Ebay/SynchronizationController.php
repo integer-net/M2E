@@ -83,7 +83,7 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
             ->clearMessages($task);
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The Synchronization Task Log has been successfully cleaned.')
+            Mage::helper('M2ePro')->__('The Synchronization Task Log has been successfully cleared.')
         );
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('index'));
     }
@@ -211,7 +211,7 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
                 'eBay 3rd Party Listings are being downloaded now. ' .
                 'They will be available soon in %menu_root% > 3rd Party. ' .
                 'You can continue working with M2E Pro.',
-                Mage::helper('M2ePro/View_Ebay')->getMenuPath('listings')
+                Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('listings', '3rd Party')
             );
         }
 

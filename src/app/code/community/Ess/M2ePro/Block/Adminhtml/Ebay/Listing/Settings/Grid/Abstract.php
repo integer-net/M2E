@@ -71,7 +71,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
         $modeParent   = Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT;
         $modeCustom   = Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM;
         $modeTemplate = Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE;
-        $modePolicy   = Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY;
 
         $templatePayment  = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_PAYMENT;
         $templateShipping = Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING;
@@ -105,14 +104,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
                                 'mode'     => $modeTemplate,
                                 'template' => $templatePayment
                             )),
-                            'label' => Mage::helper('M2ePro')->__('M2E Pro Policy')
-                        ),
-                        array(
-                            'value' => json_encode(array(
-                                'mode'     => $modePolicy,
-                                'template' => $templatePayment
-                            )),
-                            'label' => Mage::helper('M2ePro')->__('eBay Policy')
+                            'label' => Mage::helper('M2ePro')->__('Policies')
                         ),
                     ),
                 ),
@@ -139,15 +131,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
                                 'mode'     => $modeTemplate,
                                 'template' => $templateShipping
                             )),
-                            'label' => Mage::helper('M2ePro')->__('M2E Pro Policy')
-                        ),
-                        array(
-                            'value' => json_encode(array(
-                                'mode'     => $modePolicy,
-                                'template' => $templateShipping
-                            )),
-                            'label' => Mage::helper('M2ePro')->__('eBay Policy')
-                        ),
+                            'label' => Mage::helper('M2ePro')->__('Policies')
+                        )
                     ),
                 ),
 
@@ -173,15 +158,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
                                 'mode'     => $modeTemplate,
                                 'template' => $templateReturn
                             )),
-                            'label' => Mage::helper('M2ePro')->__('M2E Pro Policy')
-                        ),
-                        array(
-                            'value' => json_encode(array(
-                                'mode'     => $modePolicy,
-                                'template' => $templateReturn
-                            )),
-                            'label' => Mage::helper('M2ePro')->__('eBay Policy')
-                        ),
+                            'label' => Mage::helper('M2ePro')->__('Policies')
+                        )
                     ),
                 )
             ),
@@ -221,7 +199,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
                                 'mode'     => $modeTemplate,
                                 'template' => $templateSelling
                             )),
-                            'label' => Mage::helper('M2ePro')->__('M2E Pro Policy')
+                            'label' => Mage::helper('M2ePro')->__('Policies')
                         ),
                     ),
                 ),
@@ -248,7 +226,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
                                 'mode'     => $modeTemplate,
                                 'template' => $templateDescription
                             )),
-                            'label' => Mage::helper('M2ePro')->__('M2E Pro Policy')
+                            'label' => Mage::helper('M2ePro')->__('Policies')
                         ),
                     ),
                 )
@@ -279,7 +257,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
                     json_encode(array(
                         'mode'     => $modeTemplate,
                         'template' => $templateSynch
-                    )) => Mage::helper('M2ePro')->__('M2E Pro Policy'),
+                    )) => Mage::helper('M2ePro')->__('Policies'),
                 ),
                 'filter_condition_callback' => array($this, 'callbackFilterSettings'),
                 'frame_callback' => array($this, 'callbackColumnSynchSettings')
@@ -393,9 +371,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $paymentSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $paymentSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
-            case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY:
-                $paymentSettings = $helper->__('eBay > ') . $tm->getResultObject()->getApiName(); break;
+                $paymentSettings = $tm->getResultObject()->getTitle(); break;
         }
 
         $tm = $listingProduct->getTemplateManager(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_SHIPPING);
@@ -407,9 +383,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $shippingSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $shippingSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
-            case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY:
-                $shippingSettings = $helper->__('eBay > ') . $tm->getResultObject()->getApiName(); break;
+                $shippingSettings = $tm->getResultObject()->getTitle(); break;
         }
 
         $tm = $listingProduct->getTemplateManager(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_RETURN);
@@ -421,9 +395,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Grid_Abstract
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $returnSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $returnSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
-            case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY:
-                $returnSettings = $helper->__('eBay > ') . $tm->getResultObject()->getApiName(); break;
+                $returnSettings = $tm->getResultObject()->getTitle(); break;
         }
 
         $html = <<<HTML
@@ -462,7 +434,7 @@ HTML;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $sellingSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $sellingSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
+                $sellingSettings = $tm->getResultObject()->getTitle(); break;
         }
 
         $tm = $listingProduct->getTemplateManager(Ess_M2ePro_Model_Ebay_Template_Manager::TEMPLATE_DESCRIPTION);
@@ -474,7 +446,7 @@ HTML;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $descriptionSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $descriptionSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
+                $descriptionSettings = $tm->getResultObject()->getTitle(); break;
         }
 
         $html = <<<HTML
@@ -510,7 +482,7 @@ HTML;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM:
                 $synchSettings = $helper->__('Custom Settings'); break;
             case Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE:
-                $synchSettings = $helper->__('M2E Pro > ') . $tm->getResultObject()->getTitle(); break;
+                $synchSettings = $tm->getResultObject()->getTitle(); break;
         }
 
         $html = <<<HTML

@@ -148,9 +148,6 @@ class Ess_M2ePro_Block_Adminhtml_Template_SellingFormat_Messages
             case Ess_M2ePro_Helper_Component_Buy::NICK:
                 $model = Mage::getModel('M2ePro/Buy_Template_SellingFormat');
                 break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $model = Mage::getModel('M2ePro/Play_Template_SellingFormat');
-                break;
         }
 
         if (is_null($model)) {

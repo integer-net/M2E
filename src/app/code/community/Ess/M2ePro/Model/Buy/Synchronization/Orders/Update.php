@@ -113,8 +113,6 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Orders_Update
     {
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Account');
-        $accountsCollection->addFieldToFilter('orders_mode', Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_YES);
-
         return $accountsCollection->getItems();
     }
 
@@ -164,9 +162,9 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Orders_Update
 
         /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Buy_Dispatcher */
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
-        $dispatcherObject->processConnector(
-            'orders', 'update', 'shippingRequester', array('items' => $items), $account
-        );
+        $connectorObj = $dispatcherObject->getConnector('orders', 'update', 'shippingRequester',
+                                                        array('items' => $items), $account);
+        $dispatcherObject->process($connectorObj);
     }
 
     // ##########################################################

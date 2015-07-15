@@ -7,7 +7,6 @@
 final class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings
     extends Ess_M2ePro_Model_Amazon_Synchronization_Abstract
 {
-    const INTERVAL_COEFFICIENT_VALUE = 50000;
     const LOCK_ITEM_PREFIX = 'synchronization_amazon_other_listings';
 
     //####################################
@@ -53,14 +52,16 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings
             return false;
         }
 
-        $totalProducts = (int)Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product')->getSize();
-        $totalProducts += (int)Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other')->getSize();
-        $intervalCoefficient = ($totalProducts > 0) ? (int)ceil($totalProducts/self::INTERVAL_COEFFICIENT_VALUE) : 1;
+        if (!in_array(Ess_M2ePro_Model_Synchronization_Task_Abstract::DEFAULTS, $this->getAllowedTasksTypes())) {
+            return parent::intervalIsLocked();
+        }
 
-        $lastTime = strtotime($this->getConfigValue($this->getFullSettingsPath(),'last_time'));
-        $interval = (int)$this->getConfigValue($this->getFullSettingsPath(),'interval') * $intervalCoefficient;
+        $synchronizationStartTime = $this->getParentOperationHistory()->getObject()->getData('start_date');
+        $updateListingsProductsLastTime = $this->getConfigValue(
+            '/amazon/defaults/update_listings_products/', 'last_time'
+        );
 
-        return $lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true);
+        return strtotime($synchronizationStartTime) > strtotime($updateListingsProductsLastTime);
     }
 
     //####################################
@@ -100,9 +101,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings
                 );
 
                 $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-                $dispatcherObject->processConnector('synchronization', 'otherListings' ,'requester',
-                                                    array(), $account,
-                                                    'Ess_M2ePro_Model_Amazon');
+                $connectorObj = $dispatcherObject->getConnector('synchronization', 'otherListings' ,'requester',
+                                                                array(), $account, 'Ess_M2ePro_Model_Amazon');
+
+                $dispatcherObject->process($connectorObj);
 
                 $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
             }

@@ -31,11 +31,13 @@ class Ess_M2ePro_Model_Buy_Search_Custom
 
     public function process()
     {
-        $searchData = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')->processConnector(
-            'custom', $this->getSearchMethod(), 'requester', $this->getConnectorParams(),
-            $this->listingProduct->getAccount(), 'Ess_M2ePro_Model_Buy_Search'
-        );
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
+        $connectorObj = $dispatcherObject->getConnector('custom', $this->getSearchMethod(), 'requester',
+                                                        $this->getConnectorParams(),
+                                                        $this->listingProduct->getAccount(),
+                                                        'Ess_M2ePro_Model_Buy_Search');
 
+        $searchData = $dispatcherObject->process($connectorObj);
         return $this->prepareResult($searchData);
     }
 

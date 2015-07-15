@@ -154,9 +154,10 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Requester
             $this->getLogger()->setStatus(Ess_M2ePro_Helper_Data::STATUS_SUCCESS);
             $this->setIsProcessingItems(false);
 
+            $this->filterLockedListingsProducts();
+
             $this->validateAndProcessParentListingsProducts();
 
-            $this->filterLockedListingsProducts();
             $this->lockListingsProducts();
 
             $this->validateAndFilterListingsProducts();

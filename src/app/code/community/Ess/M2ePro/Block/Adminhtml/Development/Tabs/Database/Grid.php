@@ -37,32 +37,40 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Grid extends Mage_Adm
 
     protected function _prepareCollection()
     {
-        $helper = Mage::helper('M2ePro/Module_Database_Structure');
+        $magentoHelper   = Mage::helper('M2ePro/Magento');
+        $structureHelper = Mage::helper('M2ePro/Module_Database_Structure');
+
+        $tablesList = $magentoHelper->getMySqlTables();
+        foreach ($tablesList as &$tableName) {
+            $tableName = str_replace($magentoHelper->getDatabaseTablesPrefix(), '', $tableName);
+        }
+
+        $tablesList = array_unique(array_merge($tablesList, $structureHelper->getMySqlTables()));
 
         $collection = new Varien_Data_Collection();
-        foreach ($helper->getGroupedMySqlTables() as $moduleTable => $group) {
+        foreach ($tablesList as $tableName) {
 
-            $tableRow = array(
-                'table_name' => $moduleTable,
-                'component'  => 'general',
-                'group'      => $group,
-                'is_exist'   => $isExists = $helper->isTableExists($moduleTable),
-                'is_crashed' => $isExists ? !$helper->isTableStatusOk($moduleTable) : false,
-                'records'    => 0,
-                'size'       => 0,
-                'model'      => $helper->getTableModel($moduleTable)
-            );
-
-            foreach (Mage::helper('M2ePro/Component')->getComponents() as $component) {
-                if (strpos(strtolower($moduleTable),strtolower($component)) !== false) {
-                    $tableRow['component'] = $component;
-                    break;
-                }
+            if (!$structureHelper->isModuleTable($tableName)) {
+                continue;
             }
 
+            $tableRow = array(
+                'table_name' => $tableName,
+                'component'  => '',
+                'group'      => '',
+                'is_exist'   => $isExists = $structureHelper->isTableExists($tableName),
+                'is_crashed' => $isExists ? !$structureHelper->isTableStatusOk($tableName) : false,
+                'records'    => 0,
+                'size'       => 0,
+                'model'      => $structureHelper->getTableModel($tableName)
+            );
+
             if ($tableRow['is_exist'] && !$tableRow['is_crashed']) {
-                $tableRow['size']    = $helper->getDataLength($moduleTable);
-                $tableRow['records'] = $helper->getCountOfRecords($moduleTable);
+
+                $tableRow['component'] = $structureHelper->getTableComponent($tableName);
+                $tableRow['group']     = $structureHelper->getTableGroup($tableName);
+                $tableRow['size']      = $structureHelper->getDataLength($tableName);
+                $tableRow['records']   = $structureHelper->getCountOfRecords($tableName);
             }
 
             $collection->addItem(new Varien_Object($tableRow));

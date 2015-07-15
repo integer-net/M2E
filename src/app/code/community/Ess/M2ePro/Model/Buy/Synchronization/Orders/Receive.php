@@ -111,8 +111,6 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive
     {
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Account');
-        $accountsCollection->addFieldToFilter('orders_mode', Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_YES);
-
         return $accountsCollection->getItems();
     }
 
@@ -129,15 +127,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Orders_Receive
 
     private function processAccount(Ess_M2ePro_Model_Account $account)
     {
-        $entity = 'orders';
-        $type   = 'receive';
-        $name   = 'requester';
-        $prefix = 'Ess_M2ePro_Model_Buy_Synchronization';
-
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
-        $dispatcherObject->processConnector(
-            $entity, $type, $name, array(), $account, $prefix
-        );
+        $connectorObj = $dispatcherObject->getConnector('orders', 'receive', 'requester', array(),
+                                                        $account, 'Ess_M2ePro_Model_Buy_Synchronization');
+        $dispatcherObject->process($connectorObj);
     }
 
     // ##########################################################

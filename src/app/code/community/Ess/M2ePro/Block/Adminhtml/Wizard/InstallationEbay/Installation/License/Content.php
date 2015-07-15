@@ -52,7 +52,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_License_Co
         //-------------------------------
 
         //-------------------------------
-        $earlierFormData = Mage::getModel('M2ePro/Registry')->load('wizard_license_form_data', 'key')
+        $earlierFormData = Mage::getModel('M2ePro/Registry')->load('/wizard/license_form_data/', 'key')
                                                             ->getData('value');
 
         if ($earlierFormData) {

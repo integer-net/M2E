@@ -70,10 +70,13 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
 
     protected function receiveFromEbay(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        $categories = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('marketplace','get','info',
-                                             array('include_categories'=>1),'info',
-                                             $marketplace->getId(),NULL,NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('marketplace','get','info',
+                                                            array('include_categories' => 1),'info',
+                                                            $marketplace->getId(),NULL,NULL);
+
+        $categories = $dispatcherObj->process($connectorObj);
+
         if (is_null($categories)) {
             $categories = array();
         } else {

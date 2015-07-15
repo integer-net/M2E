@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2015 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Order_Help extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Order_Help extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     public function __construct()
     {

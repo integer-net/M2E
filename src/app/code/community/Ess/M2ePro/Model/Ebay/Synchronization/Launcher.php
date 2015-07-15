@@ -43,7 +43,6 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Launcher
         $result = !$this->processTask('Templates') ? false : $result;
         $result = !$this->processTask('Feedbacks') ? false : $result;
         $result = !$this->processTask('Marketplaces') ? false : $result;
-        $result = !$this->processTask('Policies') ? false : $result;
 
         return $result;
     }

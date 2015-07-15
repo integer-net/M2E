@@ -18,6 +18,9 @@ class Ess_M2ePro_Model_Amazon_Search_Settings_ByIdentifier_Requester
         parent::setProcessingLocks($processingRequest);
 
         $this->getListingProduct()->addObjectLock(NULL, $processingRequest->getHash());
+        $this->getListingProduct()->addObjectLock('in_action', $processingRequest->getHash());
+        $this->getListingProduct()->addObjectLock('search_action', $processingRequest->getHash());
+
         $this->getListingProduct()->getListing()->addObjectLock(NULL, $processingRequest->getHash());
     }
 

@@ -236,20 +236,6 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
         return true;
     }
 
-    protected function validateLockedObject()
-    {
-        if ($this->getListingProduct()->isLockedObject('in_action')) {
-
-            // M2ePro_TRANSLATIONS
-            // Another Action is being processed. Try again when the Action is completed.
-            $this->addMessage('Another Action is being processed. Try again when the Action is completed.');
-
-            return false;
-        }
-
-        return true;
-    }
-
     // ----------------------------------------
 
     protected function validateQty()

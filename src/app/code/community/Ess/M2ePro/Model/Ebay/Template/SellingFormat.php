@@ -24,7 +24,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const QTY_MODIFICATION_MODE_ON = 1;
 
     const QTY_MIN_POSTED_DEFAULT_VALUE = 1;
-    const QTY_MAX_POSTED_DEFAULT_VALUE = 10;
+    const QTY_MAX_POSTED_DEFAULT_VALUE = 100;
 
     const TAX_CATEGORY_MODE_NONE      = 0;
     const TAX_CATEGORY_MODE_VALUE     = 1;
@@ -957,11 +957,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     public function getDefaultSettingsAdvancedMode()
     {
-        $simpleSettings = $this->getDefaultSettingsSimpleMode();
-
-        $simpleSettings['qty_modification_mode'] = self::QTY_MODIFICATION_MODE_ON;
-
-        return $simpleSettings;
+        return $this->getDefaultSettingsSimpleMode();
     }
 
     // #######################################

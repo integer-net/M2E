@@ -53,7 +53,7 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
         //------------------------------
 
         //------------------------------
-        $migrationData = Mage::getModel('M2ePro/Registry')->load('wizard_migrationToV6_notes_html', 'key');
+        $migrationData = Mage::getModel('M2ePro/Registry')->load('/wizard/migrationToV6_notes_html/', 'key');
         $html = $migrationData->getData('value');
         $createDate = Mage::helper('M2ePro')->getDate($migrationData->getData('create_date'), true);
         $threeMonths = 3 * 30 * 24 * 60 * 60;

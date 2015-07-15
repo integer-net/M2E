@@ -34,6 +34,13 @@ class Ess_M2ePro_Model_Observer_Dispatcher
 
     //####################################
 
+    public function catalogProductAttributeUpdateBefore(Varien_Event_Observer $eventObserver)
+    {
+        $this->process('Product_Attribute_Update_Before', $eventObserver);
+    }
+
+    //####################################
+
     public function catalogCategoryChangeProducts(Varien_Event_Observer $eventObserver)
     {
         $this->process('Category', $eventObserver);
@@ -98,11 +105,6 @@ class Ess_M2ePro_Model_Observer_Dispatcher
     public function associateBuyItemWithProduct(Varien_Event_Observer $eventObserver)
     {
         $this->process('Buy_Order_Item', $eventObserver);
-    }
-
-    public function associatePlayItemWithProduct(Varien_Event_Observer $eventObserver)
-    {
-        $this->process('Play_Order_Item', $eventObserver);
     }
 
     //####################################

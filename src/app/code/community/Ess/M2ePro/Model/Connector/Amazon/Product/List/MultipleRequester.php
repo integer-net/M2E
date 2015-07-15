@@ -214,16 +214,23 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
 
                     /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
                     $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-                    $response = $dispatcherObject->processVirtual(
-                        'product','search','asinBySkus',
-                        array('include_info' => true, 'only_realtime' => true, 'items' => $skus),'items',
-                        $this->account->getId()
-                    );
+                    $connectorObj = $dispatcherObject->getVirtualConnector('product','search','asinBySkus',
+                                                                           array('include_info' => true,
+                                                                                 'only_realtime' => true,
+                                                                                 'items' => $skus),
+                                                                           'items',
+                                                                           $this->account->getId());
+                    $response = $dispatcherObject->process($connectorObj);
+
+                    if (is_null($response) && $connectorObj->hasErrorMessages()) {
+                        throw new Exception($connectorObj->getCombinedErrorMessage());
+                    }
 
                 } while (is_null($response) && ++$countTriedTemp <= 3);
 
                 if (is_null($response)) {
-                    throw new Exception('Requests are throttled many times.');
+                    throw new Exception('Searching of SKU in your inventory on Amazon is not available now.
+                                         Please repeat the action later.');
                 }
 
             } catch (Exception $exception) {

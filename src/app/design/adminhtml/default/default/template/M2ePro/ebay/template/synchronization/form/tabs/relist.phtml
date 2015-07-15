@@ -43,7 +43,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Relist Action'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Relist Action'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_mode" name="synchronization[relist_mode]" class="required-entry">
@@ -60,7 +60,7 @@
 
                 <tr id="relist_filter_user_lock_tr_container" <?php if ($formData['relist_mode'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::RELIST_MODE_NONE): echo ' style="display:none;"'; endif; ?>>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Relist When Stopped Manually'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Relist When Stopped Manually'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_filter_user_lock" name="synchronization[relist_filter_user_lock]" class="required-entry">
@@ -77,7 +77,7 @@
 
                 <tr id="relist_send_data_tr_container" <?php if ($formData['relist_mode'] == Ess_M2ePro_Model_Ebay_Template_Synchronization::RELIST_MODE_NONE): echo ' style="display:none;"'; endif; ?>>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Synchronize Data'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Synchronize Data'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_send_data" name="synchronization[relist_send_data]" class="required-entry">
@@ -115,7 +115,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Product Status'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Product Status'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_status_enabled" name="synchronization[relist_status_enabled]" class="required-entry M2ePro-validate-stop-relist-conditions-product-status">
@@ -133,7 +133,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Stock Availability'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Stock Availability'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_is_in_stock" name="synchronization[relist_is_in_stock]" class="required-entry M2ePro-validate-stop-relist-conditions-stock-availability">
@@ -151,7 +151,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Magento Quantity'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Magento Quantity'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_qty_magento" name="synchronization[relist_qty_magento]" class="required-entry M2ePro-validate-stop-relist-conditions-item-qty" qty_type="magento">
@@ -193,7 +193,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Calculated Quantity'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Calculated Quantity'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_qty_calculated" name="synchronization[relist_qty_calculated]" class="required-entry M2ePro-validate-stop-relist-conditions-item-qty" qty_type="calculated">

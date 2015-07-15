@@ -82,9 +82,10 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
 
     public function searchAction()
     {
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_search'))
-            ->renderLayout();
+        /** @var $block Ess_M2ePro_Block_Adminhtml_Common_Listing */
+        $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_listing_search');
+
+        $this->_initAction()->_addContent($block)->renderLayout();
     }
 
     public function searchGridAction()
@@ -364,7 +365,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         );
         $locked && $this->_getSession()->addError($tempString);
 
-        $this->_redirect('*/adminhtml_common_listing/index');
+        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl());
     }
 
     //#############################################

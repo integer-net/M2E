@@ -185,21 +185,24 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Ebay extends Mage_Core_Helper_Ab
         }
 
         if (!is_null($categoryRow['item_specifics'])) {
+
             $specifics = (array)json_decode($categoryRow['item_specifics'],true);
+
         } else {
-            $specifics = (array)Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                ->processVirtual(
-                    'marketplace','get','categorySpecifics',
-                    array('category_id'=>$categoryId), 'specifics',
-                    $marketplaceId, NULL, NULL
-                );
+
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+            $connectorObj = $dispatcherObject->getVirtualConnector('marketplace','get','categorySpecifics',
+                                                                   array('category_id' => $categoryId), 'specifics',
+                                                                   $marketplaceId, NULL, NULL);
+
+            $specifics = (array)$dispatcherObject->process($connectorObj);
 
             /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
             $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
             $connWrite->update($tableDictCategory,
-                array('item_specifics' => json_encode($specifics)),
-                array('marketplace_id = ?' => (int)$marketplaceId,
-                      'category_id = ?' => (int)$categoryId));
+                               array('item_specifics' => json_encode($specifics)),
+                               array('marketplace_id = ?' => (int)$marketplaceId,
+                                     'category_id = ?' => (int)$categoryId));
         }
 
         $cacheHelper->setValue($cacheKey,$specifics,array(self::CACHE_TAG));

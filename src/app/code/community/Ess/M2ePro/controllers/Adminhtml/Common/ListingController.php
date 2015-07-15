@@ -16,14 +16,33 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
              ->_title(Mage::helper('M2ePro')->__('Listings'));
 
         $this->getLayout()->getBlock('head')
-             ->addCss('M2ePro/css/Plugin/DropDown.css')
-             ->addCss('M2ePro/css/Plugin/AutoComplete.css')
+            ->addCss('M2ePro/css/Plugin/ProgressBar.css')
+            ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
+            ->addCss('M2ePro/css/Plugin/DropDown.css')
+            ->addCss('M2ePro/css/Plugin/AutoComplete.css')
 
-             ->addJs('M2ePro/Plugin/DropDown.js')
-             ->addJs('M2ePro/Plugin/AutoComplete.js')
-             ->addJs('M2ePro/Plugin/ActionColumn.js')
+            ->addJs('M2ePro/ActionHandler.js')
+            ->addJs('M2ePro/GridHandler.js')
 
-             ->addJs('M2ePro/Listing/EditListingTitle.js')
+            ->addJs('M2ePro/Plugin/ActionColumn.js')
+            ->addJs('M2ePro/Plugin/AreaWrapper.js')
+            ->addJs('M2ePro/Plugin/AutoComplete.js')
+            ->addJs('M2ePro/Plugin/DropDown.js')
+            ->addJs('M2ePro/Plugin/ProgressBar.js')
+
+            ->addJs('M2ePro/Listing/EditListingTitle.js')
+            ->addJs('M2ePro/Listing/MovingHandler.js')
+            ->addJs('M2ePro/Listing/Other/GridHandler.js')
+
+            ->addJs('M2ePro/Common/Listing.js')
+            ->addJs('M2ePro/Common/Listing/Other/GridHandler.js')
+            ->addJs('M2ePro/Common/Buy/Listing/Other/GridHandler.js')
+            ->addJs('M2ePro/Common/Amazon/Listing/Other/GridHandler.js')
+
+            ->addJs('M2ePro/Listing/Other/AutoMappingHandler.js')
+            ->addJs('M2ePro/Listing/Other/MappingHandler.js')
+            ->addJs('M2ePro/Listing/Other/RemovingHandler.js')
+            ->addJs('M2ePro/Listing/Other/UnmappingHandler.js');
             ;
 
         $this->_initPopUp();
@@ -50,10 +69,44 @@ class Ess_M2ePro_Adminhtml_Common_ListingController
             Mage::helper('M2ePro')->__('You must create at least one synchronization policy first.')
         );*/
 
-        $this->_initAction();
-
-        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_listing'))
+        $this->_initAction()
+             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_manageListings'))
              ->renderLayout();
+    }
+
+    //#############################################
+
+    public function getListingTabAction()
+    {
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            $this->_redirect('*/adminhtml_common_listing/index');
+        }
+
+        $this->getResponse()->setBody(
+            $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_listing')->toHtml()
+        );
+    }
+
+    public function getListingOtherTabAction()
+    {
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            $this->_redirect('*/adminhtml_common_listing/index');
+        }
+
+        $this->getResponse()->setBody(
+            $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_listing_other')->toHtml()
+        );
+    }
+
+    public function getSearchTabAction()
+    {
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            $this->_redirect('*/adminhtml_common_listing/index');
+        }
+
+        $this->getResponse()->setBody(
+            $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_listing_search')->toHtml()
+        );
     }
 
     //#############################################

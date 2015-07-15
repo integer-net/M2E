@@ -29,11 +29,13 @@ class Ess_M2ePro_Model_Amazon_Search_Custom
 
     public function process()
     {
-        $searchData = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher')->processConnector(
-            'custom', $this->getSearchMethod(), 'requester', $this->getConnectorParams(),
-            $this->listingProduct->getAccount(), 'Ess_M2ePro_Model_Amazon_Search'
-        );
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+        $connectorObj = $dispatcherObject->getConnector('custom', $this->getSearchMethod(), 'requester',
+                                                        $this->getConnectorParams(),
+                                                        $this->listingProduct->getAccount(),
+                                                        'Ess_M2ePro_Model_Amazon_Search');
 
+        $searchData = $dispatcherObject->process($connectorObj);
         return $this->prepareResult($searchData);
     }
 
@@ -90,10 +92,10 @@ class Ess_M2ePro_Model_Amazon_Search_Custom
 
         $validationHelper = Mage::helper('M2ePro');
 
-        return (Mage::helper('M2ePro/Component_Amazon')->isASIN($query) ? 'asin' :
-               ($validationHelper->isISBN($query)                       ? 'isbn' :
-               ($validationHelper->isUPC($query)                        ? 'upc'  :
-               ($validationHelper->isEAN($query)                        ? 'ean'  : false))));
+        return (Mage::helper('M2ePro/Component_Amazon')->isASIN($query) ? 'ASIN' :
+               ($validationHelper->isISBN($query)                       ? 'ISBN' :
+               ($validationHelper->isUPC($query)                        ? 'UPC'  :
+               ($validationHelper->isEAN($query)                        ? 'EAN'  : false))));
     }
 
     private function prepareResult($searchData)

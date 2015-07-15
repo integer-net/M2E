@@ -23,6 +23,9 @@
     )); ?>);
 
     Event.observe(window, 'load', function() {
+
+        AttributeHandlerObj.attrData = '<?php echo $this->getAttributesJsHtml(); ?>';
+
         $('buyTemplateNewProductEditTabs_attribute').observe('click', BuyTemplateNewProductHandlerObj.checkAttributesReady.bind(BuyTemplateNewProductHandlerObj));
     });
 

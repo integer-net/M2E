@@ -64,10 +64,6 @@ class Ess_M2ePro_Model_Order_Reserve
             throw new LogicException('QTY is already reserved.');
         }
 
-        if ($this->order->getAccount()->getChildObject()->getQtyReservationDays() <= 0) {
-            throw new LogicException('QTY Reservation is disabled in Account Settings.');
-        }
-
         $this->order->associateWithStore(false);
         $this->order->associateItemsWithProducts(false);
 

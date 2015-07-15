@@ -86,6 +86,20 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Mapping_Grid extends Mage_Adminht
             'options' => $tempTypes
         ));
 
+        $this->addColumn('stock_availability', array(
+            'header'=> Mage::helper('M2ePro')->__('Stock Availability'),
+            'width' => '100px',
+            'index' => 'is_in_stock',
+            'filter_index' => 'is_in_stock',
+            'type'  => 'options',
+            'sortable'  => false,
+            'options' => array(
+                1 => Mage::helper('M2ePro')->__('In Stock'),
+                0 => Mage::helper('M2ePro')->__('Out of Stock')
+            ),
+            'frame_callback' => array($this, 'callbackColumnStockAvailability')
+        ));
+
         $this->addColumn('actions', array(
             'header'       => Mage::helper('M2ePro')->__('Actions'),
             'align'        => 'left',
@@ -145,6 +159,15 @@ class Ess_M2ePro_Block_Adminhtml_Listing_Other_Mapping_Grid extends Mage_Adminht
     public function callbackColumnType($value, $row, $column, $isExport)
     {
         return '<div style="margin-left: 3px">'.Mage::helper('M2ePro')->escapeHtml($value).'</div>';
+    }
+
+    public function callbackColumnStockAvailability($value, $row, $column, $isExport)
+    {
+        if ((int)$row->getData('is_in_stock') <= 0) {
+            return '<span style="color: red;">'.$value.'</span>';
+        }
+
+        return $value;
     }
 
     public function callbackColumnActions($value, $row, $column, $isExport)

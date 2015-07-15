@@ -474,14 +474,13 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
 
             /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
             $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-            $response = $dispatcherObject->processVirtual(
-                'product','search','asinBySkus',
-                array(
-                    'include_info' => true,
-                    'only_realtime' => true,
-                    'items' => array($sku)
-                ),'items', $listingProduct->getAccount()->getId()
-            );
+            $connectorObj = $dispatcherObject->getVirtualConnector('product','search','asinBySkus',
+                                                                   array('include_info'  => true,
+                                                                         'only_realtime' => true,
+                                                                         'items'         => array($sku)),
+                                                                   'items', $listingProduct->getAccount()->getId());
+
+            $response = $dispatcherObject->process($connectorObj);
 
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);

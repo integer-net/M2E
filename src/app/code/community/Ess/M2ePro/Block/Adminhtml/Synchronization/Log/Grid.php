@@ -49,8 +49,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
         $collection = Mage::getModel('M2ePro/Synchronization_Log')->getCollection();
         //--------------------------------
 
-        $channel = $this->getData('channel');
-        if (!empty($channel)) {
+        $channel = $this->getRequest()->getParam('channel');
+        if (!empty($channel) && $channel != Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_ALL) {
             $collection->getSelect()->where('component_mode = ?', $channel);
         } else {
             $components = $this->viewComponentHelper->getActiveComponents();
@@ -203,7 +203,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Synchronization_Log_Grid extends Ess_M
     {
         return $this->getUrl('*/*/synchronizationGrid', array(
             '_current'=>true,
-            'channel' => $this->getData('channel')
+            'channel' => $this->getRequest()->getParam('channel')
         ));
     }
 

@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2011 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // ####################################
 
@@ -39,11 +39,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin extends Mage_
     }
 
     // ####################################
-
-    public function getHeaderCssClass()
-    {
-        return 'icon-head ' . parent::getHeaderCssClass();
-    }
 
     public function getHeaderWidth()
     {

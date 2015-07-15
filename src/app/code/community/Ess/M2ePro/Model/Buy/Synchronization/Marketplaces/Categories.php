@@ -88,10 +88,12 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
 
     protected function receiveFromRakuten($partNumber)
     {
-        $response = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')
-                            ->processVirtual('marketplace','get','categories',
-                                             array('part_number' => $partNumber),
-                                             NULL, NULL, NULL);
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('marketplace','get','categories',
+                                                               array('part_number' => $partNumber),
+                                                               NULL, NULL, NULL);
+
+        $response = $dispatcherObject->process($connectorObj);
 
         if (is_null($response) || empty($response['data'])) {
             $response = array();
@@ -155,11 +157,12 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Marketplaces_Categories
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         // M2ePro_TRANSLATIONS
-        // The "Categories" Action for Rakuten Marketplace: "%mrk%" has been successfully completed.
+        // The "Categories" Action for %buy% Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Categories" Action for Rakuten Marketplace: "%mrk%" has been successfully completed.',
-            array('mrk' => $marketplace->getTitle())
+            'The "Categories" Action for %buy% Marketplace: "%mrk%" has been successfully completed.',
+            array('!buy' => Mage::helper('M2ePro/Component_Buy')->getTitle(),
+                  'mrk' => $marketplace->getTitle())
         );
 
         $this->getLog()->addMessage($tempString,

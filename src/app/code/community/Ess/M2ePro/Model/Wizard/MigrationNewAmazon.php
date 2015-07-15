@@ -34,7 +34,7 @@ class Ess_M2ePro_Model_Wizard_MigrationNewAmazon extends Ess_M2ePro_Model_Wizard
 
     public function getDataForDescriptionTemplatesStep()
     {
-        $tempTemplates = Mage::getModel('M2ePro/Registry')->load('wizard_new_amazon_description_templates', 'key')
+        $tempTemplates = Mage::getModel('M2ePro/Registry')->load('/wizard/new_amazon_description_templates/', 'key')
                                                           ->getData('value');
 
         return $tempTemplates ? (array)json_decode($tempTemplates, true) : array();

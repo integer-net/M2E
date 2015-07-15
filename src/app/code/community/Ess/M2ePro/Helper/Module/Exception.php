@@ -6,8 +6,9 @@
 
 class Ess_M2ePro_Helper_Module_Exception extends Mage_Core_Helper_Abstract
 {
-    const FILTER_TYPE_TYPE = 1;
-    const FILTER_TYPE_INFO = 2;
+    const FILTER_TYPE_TYPE    = 1;
+    const FILTER_TYPE_INFO    = 2;
+    const FILTER_TYPE_MESSAGE = 3;
 
     // ########################################
 
@@ -31,11 +32,11 @@ class Ess_M2ePro_Helper_Module_Exception extends Mage_Core_Helper_Abstract
                 $info .= $this->getCurrentUserActionInfo();
                 $info .= Mage::helper('M2ePro/Module_Support_Form')->getSummaryInfo();
 
-                if ($this->isExceptionFiltered($info, $type)) {
+                if ($this->isExceptionFiltered($info, $exception->getMessage(), $type)) {
                     return;
                 }
 
-                $this->send($info, $type);
+                $this->send($info, $exception->getMessage(), $type);
             }
 
             Mage::helper('M2ePro/Data_Global')->unsetValue('send_exception_to_server');
@@ -63,11 +64,11 @@ class Ess_M2ePro_Helper_Module_Exception extends Mage_Core_Helper_Abstract
                 $info .= $this->getCurrentUserActionInfo();
                 $info .= Mage::helper('M2ePro/Module_Support_Form')->getSummaryInfo();
 
-                if ($this->isExceptionFiltered($info, $type)) {
+                if ($this->isExceptionFiltered($info, $error['message'], $type)) {
                     return;
                 }
 
-                $this->send($info, $type);
+                $this->send($info, $error['message'], $type);
             }
 
             Mage::helper('M2ePro/Data_Global')->unsetValue('send_exception_to_server');
@@ -114,14 +115,19 @@ class Ess_M2ePro_Helper_Module_Exception extends Mage_Core_Helper_Abstract
 
     private function getExceptionInfo(Exception $exception, $type)
     {
+        $additionalData = $exception instanceof Ess_M2ePro_Model_Exception ? $exception->getAdditionalData()
+                                                                           : '';
+
+        is_array($additionalData) && $additionalData = print_r($additionalData, true);
+
         $exceptionInfo = <<<EXCEPTION
 -------------------------------- EXCEPTION INFO ----------------------------------
 Type: {$type}
 File: {$exception->getFile()}
 Line: {$exception->getLine()}
-Message: {$exception->getMessage()}
 Code: {$exception->getCode()}
-
+Message: {$exception->getMessage()}
+Additional Data: {$additionalData}
 
 EXCEPTION;
 
@@ -221,38 +227,37 @@ ACTION;
 
     // ########################################
 
-    private function send($info, $type)
+    private function send($info, $message, $type)
     {
-        Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                ->processVirtual('exception','add','entity',
-                                 array('info' => $info, 'type' => $type));
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('exception','add','entity',
+                                                               array('info'    => $info,
+                                                                     'message' => $message,
+                                                                     'type'    => $type));
+
+        $dispatcherObject->process($connectorObj);
     }
 
-    private function isExceptionFiltered($info, $type)
+    private function isExceptionFiltered($info, $message, $type)
     {
         if (!(bool)(int)Mage::helper('M2ePro/Module')->getConfig()
                             ->getGroupValue('/debug/exceptions/','filters_mode')) {
             return false;
         }
 
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $tableName = Mage::getSingleton('core/resource')->getTableName('m2epro_exceptions_filters');
-
-        $exceptionFilters = $connRead->select()
-                                     ->from($tableName,array('preg_match','type'))
-                                     ->query()
-                                     ->fetchAll();
+        $exceptionFilters = Mage::getModel('M2ePro/Registry')->load('/exceptions_filters/', 'key')
+                                                             ->getValueFromJson();
 
         foreach ($exceptionFilters as $exceptionFilter) {
 
             try {
 
-                if ($exceptionFilter['type'] == self::FILTER_TYPE_TYPE) {
-                    $tempResult = preg_match($exceptionFilter['preg_match'],$type);
-                } else {
-                    $tempResult = preg_match($exceptionFilter['preg_match'],$info);
-                }
+                $searchSubject = '';
+                $exceptionFilter['type'] == self::FILTER_TYPE_TYPE    && $searchSubject = $type;
+                $exceptionFilter['type'] == self::FILTER_TYPE_MESSAGE && $searchSubject = $message;
+                $exceptionFilter['type'] == self::FILTER_TYPE_INFO    && $searchSubject = $info;
+
+                $tempResult = preg_match($exceptionFilter['preg_match'], $searchSubject);
 
             } catch (Exception $exception) {
                 return false;

@@ -98,12 +98,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsKtypes
 
     protected function receiveFromEbay(Ess_M2ePro_Model_Marketplace $marketplace, $partNumber)
     {
-        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                          ->processVirtual(
-                              'marketplace','get','motorsKtypes',
-                               array('part_number' => $partNumber),
-                               NULL,$marketplace->getId()
-                          );
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('marketplace','get','motorsKtypes',
+                                                            array('part_number' => $partNumber),
+                                                            NULL,$marketplace->getId());
+
+        $response = $dispatcherObj->process($connectorObj);
 
         if (is_null($response) || empty($response['data'])) {
             $response = array();

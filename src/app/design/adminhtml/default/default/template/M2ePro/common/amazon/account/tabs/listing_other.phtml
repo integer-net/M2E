@@ -66,8 +66,8 @@
 
 <div id="block_notice_amazon_accounts_other_listings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('3rd Party Listings'); ?>">
     <?php
-    $menuOtherListingsPath = Mage::helper('M2ePro/View_Common')->getMenuPath('listings/listing_other');
-    $menuSynchronizationPath = Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/synchronization');
+    $menuOtherListingsPath = Mage::helper('M2ePro/View_Common')->getPageNavigationPath('listings', '3rd Party', 'amazon');
+    $menuSynchronizationPath = Mage::helper('M2ePro/View_Common')->getPageNavigationPath('configuration', 'Synchronization', 'amazon');
     echo Mage::helper('M2ePro')->__('
         The 3rd Party Listings are the Items, which were Listed on Amazon without using M2E Pro Extension. <br/><br/>
 
@@ -116,7 +116,7 @@
                 <tbody id="other_listings_store_view_tr">
                     <tr id="marketplaces_related_store_id_container" <?php if (!$isEdit) echo ' style="display:none;"'; ?>>
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Related Store View'); ?>: <span class="required">*</span></label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Related Store View'); ?>:</label>
                         </td>
                         <td class="value" style="width: auto;">
                             <?php

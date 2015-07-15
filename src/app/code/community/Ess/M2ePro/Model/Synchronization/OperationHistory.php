@@ -142,7 +142,7 @@ class Ess_M2ePro_Model_Synchronization_OperationHistory extends Ess_M2ePro_Model
 
         $profilerData = preg_replace('/^/m', "{$offset}", $this->getContentData('profiler'));
 
-        return <<<INFO
+        $info = <<<INFO
 {$offset}{$nick}
 {$offset}Start Date: {$this->getObject()->getData('start_date')}
 {$offset}End Date: {$this->getObject()->getData('end_date')}
@@ -150,6 +150,40 @@ class Ess_M2ePro_Model_Synchronization_OperationHistory extends Ess_M2ePro_Model
 
 {$offset}{$separationLine}
 {$profilerData}
+INFO;
+
+        if ($fatalErrorInfo = $this->getContentData('fatal_error')) {
+
+            $info .= <<<INFO
+
+{$offset}<span style="color: red; font-weight: bold;">Fatal Error Occurred: {$fatalErrorInfo['message']}</span>
+{$offset}<span style="color: red; font-weight: bold;">File: {$fatalErrorInfo['file']}::{$fatalErrorInfo['line']}</span>
+
+INFO;
+        }
+
+        if ($exceptionInfo = $this->getContentData('exception')) {
+
+            $info .= <<<INFO
+
+{$offset}<span style="color: red; font-weight: bold;">Exception Occurred: {$exceptionInfo['message']}</span>
+{$offset}<span style="color: red; font-weight: bold;">File: {$exceptionInfo['file']}::{$exceptionInfo['line']}</span>
+
+INFO;
+        }
+
+        if ($messages = $this->getContentData('messages')) {
+
+            $info .= <<<INFO
+
+{$offset}<span style="color: red; font-weight: bold;">Messages:</span>
+{$offset}<span style="color: red; font-weight: bold;">{$messages}</span>
+
+INFO;
+        }
+
+        return <<<INFO
+{$info}
 {$offset}{$separationLine}
 
 INFO;

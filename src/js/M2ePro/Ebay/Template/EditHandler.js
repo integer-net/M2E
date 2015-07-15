@@ -53,7 +53,13 @@ EbayTemplateEditHandler = Class.create(CommonHandler, {
                     $('edit_form').appendChild(editFormData);
                 }
 
-                editFormData.update(transport.responseText);
+                editFormData.innerHTML = transport.responseText;
+                editFormData.innerHTML.extractScripts()
+                    .map(function(script) {
+                        try {
+                            eval(script);
+                        } catch(e) {}
+                    });
 
                 var titleInput = $$('input[name="'+this.templateNick+'[title]"]')[0];
                 var marketplaceIdInput = $$('input[name="'+this.templateNick+'[marketplace_id]"]')[0];

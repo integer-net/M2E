@@ -5,7 +5,7 @@
  */
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Description_Category_Chooser_Edit
-    extends Mage_Adminhtml_Block_Widget_Container
+    extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // ########################################
 

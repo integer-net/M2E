@@ -7,7 +7,6 @@
 final class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts
     extends Ess_M2ePro_Model_Buy_Synchronization_Defaults_Abstract
 {
-    const INTERVAL_COEFFICIENT_VALUE = 10000;
     const LOCK_ITEM_PREFIX = 'synchronization_buy_default_update_listings_products';
 
     //####################################
@@ -48,14 +47,32 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts
             return false;
         }
 
-        $totalProducts = (int)Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product')->getSize();
-        $totalProducts += (int)Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Other')->getSize();
-        $intervalCoefficient = ($totalProducts > 0) ? (int)ceil($totalProducts/self::INTERVAL_COEFFICIENT_VALUE) : 1;
+        return parent::intervalIsLocked();
+    }
 
-        $lastTime = strtotime($this->getConfigValue($this->getFullSettingsPath(),'last_time'));
-        $interval = (int)$this->getConfigValue($this->getFullSettingsPath(),'interval') * $intervalCoefficient;
+    protected function intervalGetLastTime()
+    {
+        $currentLastTime = parent::intervalGetLastTime();
 
-        return $lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true);
+        if (empty($currentLastTime)) {
+            return null;
+        }
+
+        if (!in_array(Ess_M2ePro_Model_Synchronization_Task_Abstract::OTHER_LISTINGS, $this->getAllowedTasksTypes())) {
+            return $currentLastTime;
+        }
+
+        $otherListingsLastTime = $this->getConfigValue('/buy/other_listings/', 'last_time');
+
+        if (empty($otherListingsLastTime)) {
+            return null;
+        }
+
+        if (strtotime($otherListingsLastTime) < strtotime($currentLastTime)) {
+            return $otherListingsLastTime;
+        }
+
+        return $currentLastTime;
     }
 
     //####################################
@@ -96,9 +113,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts
                 if ($collection->getSize()) {
 
                     $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
-                    $dispatcherObject->processConnector('defaults', 'updateListingsProducts' ,'requester',
-                                                        array(), $account,
-                                                        'Ess_M2ePro_Model_Buy_Synchronization');
+                    $connectorObj = $dispatcherObject->getConnector('defaults', 'updateListingsProducts' ,'requester',
+                                                                    array(), $account,
+                                                                    'Ess_M2ePro_Model_Buy_Synchronization');
+                    $dispatcherObject->process($connectorObj);
                 }
 
                 $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());

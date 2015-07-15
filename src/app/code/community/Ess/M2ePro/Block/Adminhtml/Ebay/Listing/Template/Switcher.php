@@ -7,7 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Switcher extends Mage_Adminhtml_Block_Widget
 {
     private $templates = NULL;
-    private $policies = NULL;
 
     // ########################################
 
@@ -196,11 +195,6 @@ HTML;
         return $this->getTemplateMode() == Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE;
     }
 
-    public function isTemplateModePolicy()
-    {
-        return $this->getTemplateMode() == Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY;
-    }
-
     // ########################################
 
     public function getFormDataBlock()
@@ -272,9 +266,8 @@ HTML;
         }
 
         $templates = $this->getTemplates();
-        $policies  = $this->getPolicies();
 
-        if (count($templates) == 0 && count($policies) == 0 && !$this->canDisplayUseDefaultOption()) {
+        if (count($templates) == 0 && !$this->canDisplayUseDefaultOption()) {
             return false;
         }
 
@@ -315,12 +308,6 @@ HTML;
         $this->templates = $collection->getItems();
 
         return $this->templates;
-    }
-
-    public function getPolicies()
-    {
-        // todo next
-        return array();
     }
 
     // ########################################

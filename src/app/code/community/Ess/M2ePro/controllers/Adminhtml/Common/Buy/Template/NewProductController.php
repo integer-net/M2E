@@ -220,7 +220,11 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
         // Saving attributes info
         //----------------------------
-        $attributes = $buyTemplateNewProductInstance->getAttributesTemplate();
+        /* @var $templateAttributesInstance Ess_M2ePro_Model_Buy_Template_NewProduct */
+        $templateAttributesInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct')
+            ->loadInstance($buyTemplateNewProductInstance->getId());
+
+        $attributes = $templateAttributesInstance->getAttributes(true);
 
         foreach ($attributes as $attribute) {
             $attribute->deleteInstance();
@@ -312,13 +316,13 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         /* @var $buyTemplateNewProductInstance Ess_M2ePro_Model_Buy_Template_NewProduct */
         $buyTemplateNewProductInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct')->loadInstance($id);
 
-        $formData['category']  = $buyTemplateNewProductInstance->getCoreTemplate()->getData();
-        $formData['category'] = array_merge($formData['category'], $buyTemplateNewProductInstance->getData());
+        $formData['category']   = $buyTemplateNewProductInstance->getCoreTemplate()->getData();
+        $formData['category']   = array_merge($formData['category'], $buyTemplateNewProductInstance->getData());
         $formData['attributes'] = array();
 
-        $attributesTemplates = $buyTemplateNewProductInstance->getAttributesTemplate();
-        foreach ($attributesTemplates as $attributeTemplate) {
-            $formData['attributes'][] = $attributeTemplate->getData();
+        $attributes = $buyTemplateNewProductInstance->getAttributes(true);
+        foreach ($attributes as $attribute) {
+            $formData['attributes'][] = $attribute->getData();
         }
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data',$formData);

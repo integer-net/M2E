@@ -23,15 +23,16 @@ class Ess_M2ePro_Helper_Component_Amazon_Vocabulary extends Mage_Core_Helper_Abs
 
             /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
             $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-
-            $dispatcherObject->processVirtual(
+            $connectorObj = $dispatcherObject->getVirtualConnector(
                 'product','add','vocabulary',
                 array(
-                    'type' => self::VOCABULARY_TYPE_ATTRIBUTE,
+                    'type'     => self::VOCABULARY_TYPE_ATTRIBUTE,
                     'original' => $channelAttr,
-                    'value' => $magentoAttr
+                    'value'    => $magentoAttr
                 )
             );
+
+            $dispatcherObject->process($connectorObj);
 
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);
@@ -57,16 +58,17 @@ class Ess_M2ePro_Helper_Component_Amazon_Vocabulary extends Mage_Core_Helper_Abs
 
             /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
             $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-
-            $dispatcherObject->processVirtual(
+            $connectorObj = $dispatcherObject->getVirtualConnector(
                 'product','add','vocabulary',
                 array(
-                    'type' => self::VOCABULARY_TYPE_OPTION,
+                    'type'      => self::VOCABULARY_TYPE_OPTION,
                     'attribute' => $channelAttr,
-                    'original' => $channelOption,
-                    'value' => $productOption
+                    'original'  => $channelOption,
+                    'value'     => $productOption
                 )
             );
+
+            $dispatcherObject->process($connectorObj);
 
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);

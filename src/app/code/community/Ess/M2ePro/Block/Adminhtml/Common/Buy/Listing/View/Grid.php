@@ -77,6 +77,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_View_Grid
             array('blp' => 'M2ePro/Buy_Listing_Product'),
             'listing_product_id=id',
             array(
+                'template_new_product_id'       => 'template_new_product_id',
                 'general_id'                    => 'general_id',
                 'buy_sku'                       => 'sku',
                 'online_price'                  => 'online_price',
@@ -505,7 +506,7 @@ HTML;
 
             switch ($lock->getTag()) {
 
-                case 'new_sku_action':
+                case 'newsku_action':
                     $html .= '<br/><span style="color: #605fff">[Add New SKU in Progress...]</span>';
                     break;
 
@@ -615,7 +616,6 @@ HTML;
             $iconSrc = $iconPath.'unassign.png';
 
             return <<<HTML
-&nbsp;
 <a href="{$newSkuTemplateUrl}">{$newSkuTemplateTitle}</a>
 <a href="javascript:;" title="{$tip}"
    onclick="ListingGridHandlerObj.productSearchHandler.showUnmapFromGeneralIdPrompt('{$lpId}');">

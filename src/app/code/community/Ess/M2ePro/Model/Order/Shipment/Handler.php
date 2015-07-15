@@ -27,10 +27,6 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
             case Ess_M2ePro_Helper_Component_Ebay::NICK:
                 $handler = Mage::getModel('M2ePro/Ebay_Order_Shipment_Handler');
                 break;
-
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $handler = Mage::getModel('M2ePro/Play_Order_Shipment_Handler');
-                break;
         }
 
         if (!$handler) {

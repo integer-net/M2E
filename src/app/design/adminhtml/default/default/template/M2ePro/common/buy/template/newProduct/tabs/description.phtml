@@ -169,7 +169,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <!-- title -->
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="title_mode" name="category[title_mode]" class="select required-entry">
@@ -189,8 +189,13 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     </td>
                     <td class="value">
                         <input id="title_template" name="category[title_template]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['title_template']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your Product.'); ?></span>
+                        </p>
+                    </td>
+                    <td class="value">
                         <span id="select_attributes_for_title_span" class="select-wrapper">
-                            <select id="select_attributes_for_title">
+                            <select id="select_attributes_for_title" style="width: 150px;">
                                 <?php foreach($this->attributes as $attribute) : ?>
                                     <option value="<?php echo $attribute['code']; ?>">
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
@@ -199,9 +204,6 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             </select>
                         </span>
                         <?php echo $this->getChildHtml('select_attributes_for_title_button'); ?>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your Product.'); ?></span>
-                        </p>
                     </td>
                 </tr>
 
@@ -219,8 +221,13 @@ $isEdit = !!$this->getRequest()->getParam('id');
                     </td>
                     <td class="value">
                         <input id="manufacturer_template" name="category[mfg_name_template]" value="<?php echo Mage::helper('M2ePro')->__($formData['category']['mfg_name_template']); ?>" type="text" class="input-text M2ePro-required-when-visible" />
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your Product.'); ?></span>
+                        </p>
+                        </td>
+                    <td class="value">
                         <span id="select_attributes_for_manufacturer_span" class="select-wrapper">
-                            <select id="select_attributes_for_manufacturer">
+                            <select id="select_attributes_for_manufacturer" style="width: 150px;">
                                 <?php foreach($this->attributes as $attribute) : ?>
                                     <option value="<?php echo $attribute['code']; ?>">
                                         <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
@@ -229,9 +236,6 @@ $isEdit = !!$this->getRequest()->getParam('id');
                             </select>
                         </span>
                         <?php echo $this->getChildHtml('select_attributes_for_mfg_name_template_button'); ?>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('The name of the brand/manufacturer of your Product.'); ?></span>
-                        </p>
                     </td>
                 </tr>
 
@@ -264,7 +268,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="mfg_part_number_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Part No Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Manufacturer Part No Attribute'); ?>:</label>
                     </td>
                     <td class="value">
                         <div id="mfg_part_number_custom_attribute_td">
@@ -313,7 +317,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="weight_custom_attribute_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Weight Attribute'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Weight Attribute'); ?>:</label>
                     </td>
                     <td class="value">
                         <div id="weight_custom_attribute_td">
@@ -344,7 +348,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <!-- main image -->
                 <tr class="requirie-attribute-set">
                     <td class="label">
-                        <label for="main_image_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>: <span class="required">*</span> (<a id="main_image_help" title="Help">?</a>)</label>
+                        <label for="main_image_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>: <span class="required">*</span>(<a id="main_image_help" title="Help">?</a>)</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="main_image_mode" name="category[main_image_mode]" class="select required-entry">
@@ -446,7 +450,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
     <div class="fieldset">
         <div class="hor-scroll">
 
-            <table class="form-list" cellspacing="0" cellpadding="0" style="width:100%">
+            <table class="form-list" cellspacing="0" cellpadding="0">
 
                 <tr>
                     <td class="label">
@@ -509,21 +513,31 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <?php for ($i = 0; $i < Ess_M2ePro_Model_Buy_Template_NewProduct_Core::FEATURES_COUNT; $i++): ?>
                 <tr class="features_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Value #%number%', $i + 1); ?>:</label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Value #%number%', $i + 1); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
                         <input id="features_<?php echo $i; ?>" name="category[features_template][]" type="text" class="input-text M2ePro-required-when-visible" value="<?php echo !empty($formData['category']['features_template'][$i]) ? $formData['category']['features_template'][$i] : ''; ?>">
-                        <span id="select_attributes_for_features_<?php echo $i; ?>_span" class="select-wrapper"></span>
-                        <?php echo $this->getChildHtml("select_attributes_for_features_{$i}_button"); ?>
                         <p class="note">
                             <span><?php echo Mage::helper('M2ePro')->__('Max. 250 characters.'); ?></span>
                         </p>
+                        </td>
+                    <td class="value">
+                        <span id="select_attributes_for_features_<?php echo $i; ?>_span" class="select-wrapper">
+                            <select id="select_attributes_for_features_<?php echo $i; ?>" style="width: 150px;">
+                                <?php foreach($this->attributes as $attribute) : ?>
+                                    <option value="<?php echo $attribute['code']; ?>">
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </span>
+                        <?php echo $this->getChildHtml("select_attributes_for_features_{$i}_button"); ?>
                     </td>
                 </tr>
                 <?php endfor; ?>
 
                 <tr id="features_actions_tr" style="display: none;">
-                    <td></td>
+                    <td class="label"></td>
                     <td class="value" style="padding-top: 0 !important;">
                         <a id="show_features_action" href="javascript: void(0);" onclick="BuyTemplateNewProductHandlerObj.showFeature()"><?php echo Mage::helper('M2ePro')->__('Add New') ?></a>
                         /
@@ -565,7 +579,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 </tr>
 
                 <tr class="c-custom_description_tr" style="display: none;">
-                    <td class="label"></td>
+                    <td class="label"><?php echo Mage::helper('M2ePro')->__('Description Value'); ?>: <span class="required">*</span></td>
                     <td class="value">
 
                         <script type="text/javascript">

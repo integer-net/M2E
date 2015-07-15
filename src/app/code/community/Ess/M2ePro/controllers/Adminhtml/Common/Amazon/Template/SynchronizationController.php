@@ -18,6 +18,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
         $this->getLayout()->getBlock('head')
              ->addJs('M2ePro/Common/Amazon/Template/SynchronizationHandler.js');
 
+        $this->_initPopUp();
+
         return $this;
     }
 
@@ -30,7 +32,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
 
     public function indexAction()
     {
-        return $this->_redirect('*/adminhtml_common_template_synchronization/index');
+        return $this->_redirect('*/adminhtml_common_template/index', array(
+            'channel' => Ess_M2ePro_Helper_Component_Amazon::NICK
+        ));
     }
 
     //#############################################
@@ -47,7 +51,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
 
         if (!$model->getId() && $id) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Policy does not exist'));
-            return $this->_redirect('*/adminhtml_common_template_synchronization/index');
+            return $this->_redirect('*/adminhtml_common_template/index', array(
+                'channel' => Ess_M2ePro_Helper_Component_Amazon::NICK
+            ));
         }
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
@@ -67,7 +73,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
     public function saveAction()
     {
         if (!$post = $this->getRequest()->getPost()) {
-            $this->_redirect('*/adminhtml_common_template_synchronization/index');
+            return $this->indexAction();
         }
 
         $id = $this->getRequest()->getParam('id');
@@ -107,6 +113,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
             'revise_update_qty_max_applied_value_mode',
             'revise_update_qty_max_applied_value',
             'revise_update_price',
+            'revise_update_price_max_allowed_deviation_mode',
+            'revise_update_price_max_allowed_deviation',
             'revise_update_details',
             'revise_update_images',
             'revise_change_selling_format_template',
@@ -176,7 +184,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SynchronizationController
         //--------------------
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Policy was successfully saved'));
-        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list',array(),array('edit'=>array('id'=>$id))));
+        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('*/adminhtml_common_template/index', array(), array(
+            'edit' => array('id'=>$id),
+            'channel' => Ess_M2ePro_Helper_Component_Amazon::NICK
+        )));
     }
 
     //#############################################

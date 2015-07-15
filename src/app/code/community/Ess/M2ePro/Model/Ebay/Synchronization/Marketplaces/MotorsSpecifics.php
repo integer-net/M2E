@@ -90,11 +90,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
 
     protected function receiveFromEbay($partNumber)
     {
-        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual(
-                                'marketplace','get','motorsSpecifics',
-                                 array('part_number' => $partNumber)
-                            );
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('marketplace','get','motorsSpecifics',
+                                                            array('part_number' => $partNumber));
+
+        $response = $dispatcherObj->process($connectorObj);
 
         if (is_null($response) || empty($response['data'])) {
             $response = array();
@@ -158,10 +158,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
 
     protected function logSuccessfulOperation()
     {
-        $message = Mage::helper('M2ePro')->__(
+        $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Parts Compatibility" Action for eBay Motors Site has been successfully completed.'
         );
-        $this->getLog()->addMessage($message,
+
+        $this->getLog()->addMessage($tempString,
                                     Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW);
     }

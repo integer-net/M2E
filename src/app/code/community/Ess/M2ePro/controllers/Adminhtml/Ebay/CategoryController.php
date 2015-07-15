@@ -643,7 +643,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
 
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_VALUE;
                 if ((int)$post['item_specifics_value_mode_' . $i] == $temp) {
-                    $attributeValue = $post['item_specifics_value_custom_value_'.$i];
+                    $attributeValue = (array)$post['item_specifics_value_custom_value_'.$i];
                     $customAttribute = '';
                     $ebayRecommendedTemp = '';
                 }
@@ -673,7 +673,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                     'attribute_title'        => $post['item_specifics_attribute_title_'.$i],
                     'value_mode'             => (int)$post['item_specifics_value_mode_'.$i],
                     'value_ebay_recommended' => !empty($ebayRecommendedTemp) ? json_encode($ebayRecommendedTemp) : '',
-                    'value_custom_value'     => $attributeValue,
+                    'value_custom_value'     => !empty($attributeValue)      ? json_encode($attributeValue)      : '',
                     'value_custom_attribute' => $customAttribute
                 );
             }
@@ -685,7 +685,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                 $temp = Ess_M2ePro_Model_Ebay_Template_Category_Specific::VALUE_MODE_CUSTOM_VALUE;
                 if ((int)$post['custom_item_specifics_value_mode_' . $i] == $temp) {
                     $attributeTitle = $post['custom_item_specifics_label_custom_value_'.$i];
-                    $attributeValue = $post['item_specifics_value_custom_value_'.$i];
+                    $attributeValue = (array)$post['item_specifics_value_custom_value_'.$i];
                     $customAttribute = '';
                 }
 
@@ -708,7 +708,7 @@ class Ess_M2ePro_Adminhtml_Ebay_CategoryController extends Ess_M2ePro_Controller
                     'attribute_title'           => $attributeTitle,
                     'value_mode'                => (int)$post['custom_item_specifics_value_mode_' . $i],
                     'value_ebay_recommended'    => '',
-                    'value_custom_value'        => $attributeValue,
+                    'value_custom_value'        => !empty($attributeValue) ? json_encode($attributeValue) : '',
                     'value_custom_attribute'    => $customAttribute
                 );
             }

@@ -33,8 +33,7 @@ final class Ess_M2ePro_Model_Cron_Task_Synchronization extends Ess_M2ePro_Model_
         $dispatcher->setAllowedComponents(array(
             Ess_M2ePro_Helper_Component_Ebay::NICK,
             Ess_M2ePro_Helper_Component_Amazon::NICK,
-            Ess_M2ePro_Helper_Component_Buy::NICK,
-            Ess_M2ePro_Helper_Component_Play::NICK,
+            Ess_M2ePro_Helper_Component_Buy::NICK
         ));
 
         $dispatcher->setAllowedTasksTypes(array(

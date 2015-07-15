@@ -48,18 +48,6 @@ AmazonListingProductSearchHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
-    autoHeightFix: function()
-    {
-
-        setTimeout(function() {
-            Windows.getFocusedWindow().content.style.height = '';
-            Windows.getFocusedWindow().content.style.maxHeight = '650px';
-        }, 50);
-
-    },
-
-    //----------------------------------
-
     options: {},
 
     setOptions: function(options)

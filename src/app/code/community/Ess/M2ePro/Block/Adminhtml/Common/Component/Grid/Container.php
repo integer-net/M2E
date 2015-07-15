@@ -13,8 +13,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Grid_Container
 
     abstract protected function getBuyNewUrl();
 
-    abstract protected function getPlayNewUrl();
-
     // ########################################
 
     protected function getAddButtonOnClickAction()

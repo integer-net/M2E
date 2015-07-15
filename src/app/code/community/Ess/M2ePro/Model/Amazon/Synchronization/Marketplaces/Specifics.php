@@ -87,14 +87,14 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
 
     protected function receiveFromAmazon(Ess_M2ePro_Model_Marketplace $marketplace, $partNumber)
     {
-        $response = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher')
-                          ->processVirtual(
-                              'marketplace', 'get', 'specifics',
-                               array(
-                                   'part_number' => $partNumber,
-                                   'marketplace' => $marketplace->getNativeId()
-                               )
-                          );
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('marketplace', 'get', 'specifics',
+                                                               array(
+                                                                   'part_number' => $partNumber,
+                                                                   'marketplace' => $marketplace->getNativeId()
+                                                               ));
+
+        $response = $dispatcherObject->process($connectorObj);
 
         if (is_null($response) || empty($response['data'])) {
             $response = array();
@@ -171,11 +171,12 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
 
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        // ->__('The "Specifics" Action for Amazon Marketplace: "%mrk%" has been successfully completed.');
+        // ->__('The "Specifics" Action for %amazon% Marketplace: "%mrk%" has been successfully completed.');
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Specifics" Action for Amazon Marketplace: "%mrk%" has been successfully completed.',
-            array('mrk' => $marketplace->getTitle())
+            'The "Specifics" Action for %amazon% Marketplace: "%mrk%" has been successfully completed.',
+            array('!amazon' => Mage::helper('M2ePro/Component_Amazon')->getTitle(),
+                  'mrk' => $marketplace->getTitle())
         );
 
         $this->getLog()->addMessage($tempString,

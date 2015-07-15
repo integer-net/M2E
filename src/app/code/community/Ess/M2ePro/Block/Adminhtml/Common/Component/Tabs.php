@@ -26,10 +26,5 @@ class Ess_M2ePro_Block_Adminhtml_Common_Component_Tabs extends Mage_Adminhtml_Bl
         return $this->addTabAfter($tabId, $tab, Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY);
     }
 
-    public function addTabAfterPlay($tabId, $tab)
-    {
-        return $this->addTabAfter($tabId, $tab, Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_PLAY);
-    }
-
     // ########################################
 }

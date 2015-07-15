@@ -212,7 +212,7 @@ Do not forget to press Save Button after returning back to Magento
         $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
             $message,
             implode(', ',$outdatedMarketplaces),
-            Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
+            Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration'),
             $controller->getUrl(
                 '*/adminhtml_ebay_marketplace',
                 array('tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_MARKETPLACE)

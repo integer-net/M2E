@@ -37,9 +37,6 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
     const OTHER_LISTINGS_MAPPING_SKU_DEFAULT_PRIORITY = 1;
     const OTHER_LISTINGS_MAPPING_TITLE_DEFAULT_PRIORITY = 2;
 
-    const ORDERS_MODE_NO = 0;
-    const ORDERS_MODE_YES = 1;
-
     const MAGENTO_ORDERS_LISTINGS_MODE_NO = 0;
     const MAGENTO_ORDERS_LISTINGS_MODE_YES = 1;
 
@@ -103,10 +100,6 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
         if ($this->isLocked()) {
             return false;
         }
-
-        $policiesTable  = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_account_policy');
-        Mage::getSingleton('core/resource')->getConnection('core_write')
-            ->delete($policiesTable,array('account_id = ?'=>$this->getId()));
 
         $storeCategoriesTable = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_account_store_category');
         Mage::getSingleton('core/resource')->getConnection('core_write')
@@ -370,18 +363,6 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
     {
         $storeId = $this->getSetting('marketplaces_data', array((int)$marketplaceId, 'related_store_id'));
         return !is_null($storeId) ? (int)$storeId : Mage_Core_Model_App::ADMIN_STORE_ID;
-    }
-
-    // ########################################
-
-    public function getOrdersMode()
-    {
-        return (int)$this->getData('orders_mode');
-    }
-
-    public function isOrdersModeEnabled()
-    {
-        return $this->getOrdersMode() == self::ORDERS_MODE_YES;
     }
 
     // ########################################
@@ -802,10 +783,12 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
 
     public function updateEbayStoreInfo()
     {
-        $data = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                        ->processVirtual('account','get','store',
-                                         array(),NULL,
-                                         NULL,$this->getId(),NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('account','get','store',
+                                                            array(),NULL,
+                                                            NULL,$this->getId(),NULL);
+
+        $data = $dispatcherObj->process($connectorObj);
 
         if (!is_array($data)) {
             return;
@@ -854,9 +837,12 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
     {
         // Get shipping discount profiles
         //----------------------------
-        $data = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')->processVirtual(
-            'account', 'get', 'shippingDiscountProfiles', array(), NULL, $marketplaceId, $this->getId(), NULL
-        );
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('account', 'get', 'shippingDiscountProfiles',
+                                                            array(), NULL, $marketplaceId, $this->getId(),
+                                                            NULL);
+
+        $data = $dispatcherObj->process($connectorObj);
 
         if (empty($data)) {
             return;
@@ -903,8 +889,6 @@ class Ess_M2ePro_Model_Ebay_Account extends Ess_M2ePro_Model_Component_Child_Eba
             'other_listings_synchronization' => self::OTHER_LISTINGS_SYNCHRONIZATION_NO,
             'other_listings_mapping_mode' => self::OTHER_LISTINGS_MAPPING_MODE_NO,
             'other_listings_mapping_settings' => json_encode(array()),
-
-            'orders_mode' => self::ORDERS_MODE_YES,
 
             'magento_orders_settings' => json_encode(array(
                 'listing' => array(

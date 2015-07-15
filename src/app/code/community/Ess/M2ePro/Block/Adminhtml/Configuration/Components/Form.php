@@ -50,12 +50,10 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Components_Form extends Ess_M2ePr
         $this->component_ebay_mode = Mage::helper('M2ePro/Component_Ebay')->isActive();
         $this->component_amazon_mode = Mage::helper('M2ePro/Component_Amazon')->isActive();
         $this->component_buy_mode = Mage::helper('M2ePro/Component_Buy')->isActive();
-        $this->component_play_mode = Mage::helper('M2ePro/Component_Play')->isActive();
 
         $this->component_ebay_allowed = Mage::helper('M2ePro/Component_Ebay')->isAllowed();
         $this->component_amazon_allowed = Mage::helper('M2ePro/Component_Amazon')->isAllowed();
         $this->component_buy_allowed = Mage::helper('M2ePro/Component_Buy')->isAllowed();
-        $this->component_play_allowed = Mage::helper('M2ePro/Component_Play')->isAllowed();
 
         $this->component_group_rakuten_allowed = Mage::helper('M2ePro/Component')->isRakutenAllowed();
 

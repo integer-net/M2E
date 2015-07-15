@@ -265,11 +265,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Linking
             'variation_child_modification' => 'none',
         );
 
-        $result = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher')->processVirtual(
-            'product', 'search', 'byIdentifier', $params, 'items',
-            $this->getListingProduct()->getListing()->getAccount()
-        );
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('product', 'search', 'byIdentifier',
+                                                               $params, 'items',
+                                                               $this->getListingProduct()->getListing()->getAccount());
 
+        $result = $dispatcherObject->process($connectorObj);
         return !empty($result) ? reset($result) : array();
     }
 

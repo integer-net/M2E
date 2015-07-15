@@ -354,6 +354,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         return $this->getSettings('product_details');
     }
 
+    // ---------------------------------------
+
     public function isProductDetailsIncludeDescription()
     {
         $productDetails = $this->getProductDetails();

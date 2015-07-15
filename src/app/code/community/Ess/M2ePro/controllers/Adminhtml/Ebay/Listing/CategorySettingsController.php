@@ -442,14 +442,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             }
 
             try {
-                $suggestions = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                    ->processConnector(
-                        'category',
-                        'get',
-                        'suggested',
-                        array('query' => $query),
-                        $marketplaceId
-                    );
+
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+                $connectorObj = $dispatcherObject->getConnector('category','get','suggested',
+                                                                array('query' => $query), $marketplaceId);
+
+                $suggestions = $dispatcherObject->process($connectorObj);
+
             } catch (Exception $e) {
                 $result['failed']++;
                 continue;

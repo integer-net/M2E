@@ -30,12 +30,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
         $this->tabsContainerId = 'edit_form';
         //------------------------------
 
-        // Set header text
-        //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__('Marketplaces');
-        //------------------------------
+        $this->_headerText = '';
 
         if ((bool)$this->getRequest()->getParam('wizard',false)) {
+
+            $this->_headerText = Mage::helper('M2ePro')->__('Marketplaces');
+
             $this->activeWizardNick = Mage::helper('M2ePro/Module_Wizard')->getNick(
                 Mage::helper('M2ePro/Module_Wizard')->getActiveWizard(Ess_M2ePro_Helper_View_Common::NICK)
             );
@@ -50,6 +50,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
             ));
             //------------------------------
         } else {
+
+            $this->setTemplate(NULL);
 
             //------------------------------
             $this->addButton('run_update_all', array(
@@ -86,7 +88,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
 
     public function setEnabledTab($id)
     {
-        if ($id == self::TAB_ID_BUY || $id == self::TAB_ID_PLAY) {
+        if ($id == self::TAB_ID_BUY) {
             $id = self::TAB_ID_RAKUTEN;
         }
         parent::setEnabledTab($id);
@@ -117,11 +119,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
     }
 
     protected function getBuyTabBlock()
-    {
-        return null;
-    }
-
-    protected function getPlayTabBlock()
     {
         return null;
     }
@@ -164,14 +161,51 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
 
     protected function _componentsToHtml()
     {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_marketplace_help');
+        $tabsCount = count($this->tabs);
+
+        if ($tabsCount <= 0) {
+            return '';
+        }
 
         $formBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_marketplace_general_form');
         count($this->tabs) == 1 && $formBlock->setChildBlockId($this->getSingleBlock()->getContainerId());
 
-        return $helpBlock->toHtml() .
-               parent::_componentsToHtml() .
-               $formBlock->toHtml();
+        $tabsContainer = $this->getTabsContainerBlock();
+        $tabsContainer->setDestElementId($this->tabsContainerId);
+
+        foreach ($this->tabs as $tabId) {
+            $tab = $this->prepareTabById($tabId);
+            $tabsContainer->addTab($tabId, $tab);
+        }
+
+        $tabsContainer->setActiveTab($this->getActiveTab());
+
+        $hideChannels = '';
+        $tabsIds = $tabsContainer->getTabsIds();
+        if (count($tabsIds) <= 1) {
+            $hideChannels = ' style="visibility: hidden"';
+        }
+
+        $hideTabsHeader = '';
+        $help = '';
+        if ((bool)$this->getRequest()->getParam('wizard',false)) {
+            $hideTabsHeader = ' style="display: none"';
+            $help = $this->getLayout()->createBlock('M2ePro/adminhtml_common_marketplace_help')->toHtml();
+        }
+
+        return <<<HTML
+<div class="content-header skip-header"{$hideTabsHeader}>
+    <table cellspacing="0">
+        <tr>
+            <td{$hideChannels}>{$tabsContainer->toHtml()}</td>
+            <td class="form-buttons">{$this->getButtonsHtml()}</td>
+        </tr>
+    </table>
+</div>
+{$help}
+{$formBlock->toHtml()}
+HTML;
+
     }
 
     protected function getTabsContainerDestinationHtml()
@@ -193,6 +227,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Marketplace extends Ess_M2ePro_Block_Adm
     public function canShowUpdateNowButton()
     {
         return !(bool)$this->getRequest()->getParam('wizard',false);
+    }
+
+    // ########################################
+
+    protected function getTabsContainerBlock()
+    {
+        if (is_null($this->tabsContainerBlock)) {
+            $this->tabsContainerBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_marketplace_tabs');
+        }
+
+        return $this->tabsContainerBlock;
     }
 
     // ########################################

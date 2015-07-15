@@ -113,7 +113,6 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationToV6Controller
         !empty($data['ebay']) && $this->saveEbaySellingFormatData($data['ebay']);
         !empty($data['amazon']) && $this->saveAmazonSellingFormatData($data['amazon']);
         !empty($data['buy']) && $this->saveBuySellingFormatData($data['buy']);
-        !empty($data['play']) && $this->savePlaySellingFormatData($data['play']);
     }
 
     //#############################################
@@ -188,20 +187,6 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationToV6Controller
         );
 
         $this->saveSellingFormatData($data, $coefficientIds, 'm2epro_buy_template_selling_format');
-    }
-
-    protected function savePlaySellingFormatData($data)
-    {
-        if (empty($data)) {
-            return;
-        }
-
-        $coefficientIds = array(
-            'price_gbr_coefficient',
-            'price_euro_coefficient',
-        );
-
-        $this->saveSellingFormatData($data, $coefficientIds, 'm2epro_play_template_selling_format');
     }
 
     // ------------------------------------------

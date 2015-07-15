@@ -86,9 +86,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
 
     public function searchAction()
     {
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_search'))
-            ->renderLayout();
+        /** @var $block Ess_M2ePro_Block_Adminhtml_Common_Listing */
+        $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_common_listing_search');
+
+        $this->_initAction()->_addContent($block)->renderLayout();
     }
 
     public function searchGridAction()
@@ -167,7 +168,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
 
         if (!empty($listingProductsIds)) {
             $this->_redirect('*/adminhtml_common_amazon_listing_productAdd/index', array(
-                'id' => $id
+                'id' => $id,
+                'not_completed' => 1
             ));
             return;
         }
@@ -325,6 +327,12 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             'gallery_images_limit',
             'gallery_images_attribute',
 
+            'gift_wrap_mode',
+            'gift_wrap_attribute',
+
+            'gift_message_mode',
+            'gift_message_attribute',
+
             'handling_time_mode',
             'handling_time_value',
             'handling_time_custom_attribute',
@@ -386,7 +394,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
         );
         $locked && $this->_getSession()->addError($tempString);
 
-        $this->_redirect('*/adminhtml_common_listing/index');
+        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl());
     }
 
     //#############################################
@@ -633,16 +641,13 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
 
         /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('product','search','categoriesByAsin',
+                                                               array('item' => $asin,
+                                                                     'only_realtime' => true),
+                                                               null,
+                                                               $listingProduct->getAccount()->getId());
 
-        $categoriesData = $dispatcherObject->processVirtual(
-            'product','search','categoryByAsin',
-            array(
-                'item' => $asin,
-                'only_realtime' => true
-            ),
-            null,
-            $listingProduct->getAccount()->getId()
-        );
+        $categoriesData = $dispatcherObject->process($connectorObj);
 
         return $this->getResponse()->setBody(json_encode(array(
             'data' => empty($categoriesData['categories']) ? '' : $categoriesData['categories']
@@ -1143,42 +1148,42 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             $productsIds = explode(',', $productsIds);
         }
 
-        // getting correct ids without parents children
         $productsIdsTemp = $this->filterProductsForMapOrUnmapDescriptionTemplateByChunks($productsIds);
 
-        $message = Mage::helper('M2ePro')->__('Description Policy was successfully unassigned.');
-        $type = 'success';
+        $messages = array();
 
         if (count($productsIdsTemp) == 0) {
-            $message = '<p>'
-                . Mage::helper('M2ePro')->__(
+            $messages[] = array(
+                'type' => 'warning',
+                'text' => '<p>' . Mage::helper('M2ePro')->__(
                     'Description Policy cannot be unassigned from some Products because they are
-                     participating in the new ASIN(s)/ISBN(s) creation.')
-                . '</p>';
-            $type = 'warning';
+                     participating in the new ASIN(s)/ISBN(s) creation.') . '</p>'
+            );
         } else {
-            $productsIdsTemp = $this->filterLockedProducts($productsIdsTemp);
+            $productsIdsLocked = $this->filterLockedProducts($productsIdsTemp);
 
-            if (count($productsIdsTemp) < count($productsIds)) {
-                $message = '<p>'
-                    . Mage::helper('M2ePro')->__(
+            if (count($productsIdsLocked) < count($productsIds)) {
+                $messages[] = array(
+                    'type' => 'warning',
+                    'text' => '<p>' . Mage::helper('M2ePro')->__(
                         'Description Policy cannot be unassigned because the Products are in Action or
-                         in the process of new ASIN(s)/ISBN(s) Creation.')
-                    . '</p>';
-                $type = 'warning';
+                         in the process of new ASIN(s)/ISBN(s) Creation.'). '</p>'
+                );
             }
         }
 
-        if (!empty($productsIdsTemp)) {
-            // getting correct ids with parents children
-            $productsIdsTemp = $this->filterProductsForMapOrUnmapDescriptionTemplateByChunks($productsIdsTemp);
-            $this->setDescriptionTemplateFroProductsByChunks($productsIdsTemp, NULL);
-            $this->runProcessorForParents($productsIdsTemp);
+        if (!empty($productsIdsLocked)) {
+            $messages[] = array(
+                'type' => 'success',
+                'text' => Mage::helper('M2ePro')->__('Description Policy was successfully unassigned.')
+            );
+
+            $this->setDescriptionTemplateFroProductsByChunks($productsIdsLocked, NULL);
+            $this->runProcessorForParents($productsIdsLocked);
         }
 
         return $this->getResponse()->setBody(json_encode(array(
-            'type' => $type,
-            'message' => $message
+            'messages' => $messages
         )));
     }
 
@@ -1235,9 +1240,20 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             );
         }
 
-        $filteredProductsIdsByType = $variationHelper->filterProductsByMagentoProductType($productsIdsTemp);
+        $productsIdsLocked = $this->filterLockedProducts($productsIdsTemp);
 
-        if (count($productsIdsTemp) != count($filteredProductsIdsByType)) {
+        if (count($productsIdsTemp) != count($productsIdsLocked)) {
+            $messages[] = array(
+                'type' => 'warning',
+                'text' => Mage::helper('M2ePro')->__(
+                    'Description Policy cannot be assigned because the Products are in Action.'
+                )
+            );
+        }
+
+        $filteredProductsIdsByType = $variationHelper->filterProductsByMagentoProductType($productsIdsLocked);
+
+        if (count($productsIdsLocked) != count($filteredProductsIdsByType)) {
             $messages[] = array(
                 'type' => 'warning',
                 'text' => Mage::helper('M2ePro')->__(

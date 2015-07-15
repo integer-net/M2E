@@ -15,28 +15,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_OtherController
              ->_title(Mage::helper('M2ePro')->__('Manage Listings'))
              ->_title(Mage::helper('M2ePro')->__('3rd Party Listings'));
 
-        $this->getLayout()->getBlock('head')
-             ->addJs('M2ePro/Plugin/ProgressBar.js')
-             ->addCss('M2ePro/css/Plugin/ProgressBar.css')
-             ->addJs('M2ePro/Plugin/AreaWrapper.js')
-             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
-
-             ->addJs('M2ePro/GridHandler.js')
-             ->addJs('M2ePro/Listing/Other/GridHandler.js')
-             ->addJs('M2ePro/Common/Listing/Other/GridHandler.js')
-             ->addJs('M2ePro/Common/Buy/Listing/Other/GridHandler.js')
-             ->addJs('M2ePro/Common/Play/Listing/Other/GridHandler.js')
-             ->addJs('M2ePro/Common/Amazon/Listing/Other/GridHandler.js')
-
-             ->addJs('M2ePro/ActionHandler.js')
-             ->addJs('M2ePro/Listing/MovingHandler.js')
-             ->addJs('M2ePro/Listing/Other/AutoMappingHandler.js')
-
-             ->addJs('M2ePro/Listing/Other/MappingHandler.js')
-
-             ->addJs('M2ePro/Listing/Other/RemovingHandler.js')
-             ->addJs('M2ePro/Listing/Other/UnmappingHandler.js');
-
         $this->_initPopUp();
 
         return $this;

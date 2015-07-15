@@ -37,9 +37,21 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
 
     public function indexAction()
     {
-        $this->_initAction()
-             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization'))
-             ->renderLayout();
+        if ((bool)$this->getRequest()->getParam('wizard',false)) {
+            $this->_initAction()
+                ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_synchronization'))
+                ->renderLayout();
+        } else {
+            $this->_initAction()
+                ->_addContent(
+                    $this->getLayout()->createBlock(
+                        'M2ePro/adminhtml_common_configuration', '',
+                        array(
+                            'active_tab' => Ess_M2ePro_Block_Adminhtml_Common_Configuration_Tabs::TAB_ID_SYNCHRONIZATION
+                        )
+                    )
+                )->renderLayout();
+        }
     }
 
     //#############################################
@@ -81,21 +93,6 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
                                                              (int)$this->getRequest()
                                                                         ->getParam('buy_other_listings_mode'));
 
-            } elseif ($component == Ess_M2ePro_Helper_Component_Play::NICK) {
-
-                Mage::helper('M2ePro/Module')->getSynchronizationConfig()
-                                             ->setGroupValue('/play/templates/',
-                                                             'mode',
-                                                             (int)$this->getRequest()->getParam('play_templates_mode'));
-                Mage::helper('M2ePro/Module')->getSynchronizationConfig()
-                                             ->setGroupValue('/play/orders/',
-                                                             'mode',
-                                                             (int)$this->getRequest()->getParam('play_orders_mode'));
-                Mage::helper('M2ePro/Module')->getSynchronizationConfig()
-                                             ->setGroupValue('/play/other_listings/',
-                                                             'mode',
-                                                             (int)$this->getRequest()
-                                                                        ->getParam('play_other_listings_mode'));
             }
         }
     }
@@ -119,7 +116,7 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
                 ->clearMessages($task);
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The Synchronization Task Log has been successfully cleaned.')
+            Mage::helper('M2ePro')->__('The Synchronization Task Log has been successfully cleared.')
         );
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('index'));
     }
@@ -220,10 +217,6 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
             ->addFieldToFilter('nick', array('like' => 'synchronization_buy%'))
             ->getSize();
 
-        $playProcessing = Mage::getModel('M2ePro/LockItem')->getCollection()
-            ->addFieldToFilter('nick', array('like' => 'synchronization_play%'))
-            ->getSize();
-
         if ($amazonProcessing > 0) {
             $warningMessages[] = Mage::helper('M2ePro')->__(
                 'Data has been sent on Amazon. It is being processed now. You can continue working with M2E Pro.'
@@ -233,12 +226,6 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
         if ($buyProcessing > 0) {
             $warningMessages[] = Mage::helper('M2ePro')->__(
                 'Data has been sent on Rakuten.com. It is being processed now. You can continue working with M2E Pro.'
-            );
-        }
-
-        if ($playProcessing > 0) {
-            $warningMessages[] = Mage::helper('M2ePro')->__(
-                'Data has been sent on Play.com. It is being processed now. You can continue working with M2E Pro.'
             );
         }
 

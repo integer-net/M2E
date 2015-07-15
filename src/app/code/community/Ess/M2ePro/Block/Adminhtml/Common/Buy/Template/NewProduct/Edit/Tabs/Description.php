@@ -37,7 +37,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Tabs_Descri
         $data        = array(
             'label'   => Mage::helper('M2ePro')->__('Insert'),
             'onclick' => "AttributeHandlerObj.appendToText(".
-                "'select_attributes_for_mfg_name'," . " 'manufacturer_template'".
+                "'select_attributes_for_manufacturer'," . " 'manufacturer_template'".
             ");",
             'class'   => 'select_attributes_for_mfg_name_template_button'
         );

@@ -13,10 +13,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Stop_Validator
     {
         $params = $this->getParams();
 
-        if (!$this->validateLockedObject()) {
-            return false;
-        }
-
         if (!$this->getListingProduct()->isStoppable()) {
 
             if (empty($params['remove'])) {
@@ -27,6 +23,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Stop_Validator
 
             } else {
                 $this->getListingProduct()->deleteInstance();
+                $this->getListingProduct()->isDeleted(true);
             }
 
             return false;

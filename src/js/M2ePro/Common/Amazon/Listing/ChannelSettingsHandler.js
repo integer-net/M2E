@@ -153,6 +153,30 @@ AmazonListingChannelSettingsHandler.prototype = Object.extend(new CommonHandler(
 
     //----------------------------------
 
+    gift_wrap_mode_change: function()
+    {
+        var self = AmazonListingChannelSettingsHandlerObj;
+
+        $('gift_wrap_attribute').value = '';
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Listing::GIFT_WRAP_MODE_ATTRIBUTE')) {
+            self.updateHiddenValue(this, $('gift_wrap_attribute'));
+        }
+    },
+
+    gift_message_mode_change: function()
+    {
+        var self = AmazonListingChannelSettingsHandlerObj;
+
+        $('gift_message_attribute').value = '';
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Listing::GIFT_MESSAGE_MODE_ATTRIBUTE')) {
+            self.updateHiddenValue(this, $('gift_message_attribute'));
+        }
+    },
+
+    //----------------------------------
+
     condition_note_mode_change: function()
     {
         var self = AmazonListingChannelSettingsHandlerObj;

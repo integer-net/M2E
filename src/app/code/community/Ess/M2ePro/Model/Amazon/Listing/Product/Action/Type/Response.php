@@ -234,4 +234,25 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Response
     }
 
     // ########################################
+
+    protected function setLastSynchronizationDates()
+    {
+        if (!$this->getConfigurator()->isQty() && !$this->getConfigurator()->isPrice()) {
+            return;
+        }
+
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+
+        if ($this->getConfigurator()->isQty()) {
+            $additionalData['last_synchronization_dates']['qty'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+        }
+
+        if ($this->getConfigurator()->isPrice()) {
+            $additionalData['last_synchronization_dates']['price'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+        }
+
+        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+    }
+
+    // ########################################
 }

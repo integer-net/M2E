@@ -72,8 +72,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
 
         // prepare components
         //--------------------------------
-        $channel = $this->getData('channel');
-        if (!empty($channel)) {
+        $channel = $this->getRequest()->getParam('channel');
+        if (!empty($channel) && $channel != Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_ALL) {
             $collection->getSelect()->where('main_table.component_mode = ?', $channel);
         } else {
             $components = $this->viewComponentHelper->getActiveComponents();
@@ -213,10 +213,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
                 $url = Mage::helper('M2ePro/Component_Buy')->getItemUrl($value);
                 $identifier = '<a href="' . $url . '" target="_blank">' . $value . '</a>';
                 break;
-
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $identifier = '<p>' . $value . '</p>';
-                break;
         }
 
         return $identifier;
@@ -237,7 +233,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Other_Log_Grid extends Ess_M2e
     {
         return $this->getUrl('*/*/listingOtherGrid', array(
             '_current'=>true,
-            'channel' => $this->getData('channel')
+            'channel' => $this->getRequest()->getParam('channel')
         ));
     }
 

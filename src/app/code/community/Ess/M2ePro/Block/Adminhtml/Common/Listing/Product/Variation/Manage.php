@@ -82,4 +82,22 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Manage
     }
 
     //##############################################################
+
+    public function getComponentLabel()
+    {
+        $label = '';
+
+        switch($this->getComponent()) {
+        case Ess_M2ePro_Helper_Component_Amazon::NICK:
+            $label = 'Amazon';
+            break;
+        case Ess_M2ePro_Helper_Component_Buy::NICK:
+            $label = 'Rakuten.com';
+            break;
+        }
+
+        return $label;
+    }
+
+    //##############################################################
 }

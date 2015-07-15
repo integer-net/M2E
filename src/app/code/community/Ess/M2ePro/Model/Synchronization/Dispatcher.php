@@ -46,7 +46,6 @@ final class Ess_M2ePro_Model_Synchronization_Dispatcher
             $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Ebay::NICK) ? false : $result;
             $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Amazon::NICK) ? false : $result;
             $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Buy::NICK) ? false : $result;
-            $result = !$this->processComponent(Ess_M2ePro_Helper_Component_Play::NICK) ? false : $result;
 
         } catch (Exception $exception) {
 

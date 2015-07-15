@@ -170,10 +170,11 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Mapping_Grid extends Mage_Ad
     public function callbackColumnActions($value, $row, $column, $isExport)
     {
         $productId = (int)$row->getId();
+        $productSku = $row->getSku();
         $label = Mage::helper('M2ePro')->__('Map To This Product');
 
         $js = <<<JS
-$('product_id').setValue('{$productId}'); $('sku').setValue(''); $$('#product_mapping_submit_button')[0].click();
+OrderEditItemHandlerObj.assignProduct('{$productId}', '{$productSku}');
 JS;
 
         $html = <<<HTML

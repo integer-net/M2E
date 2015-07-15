@@ -170,9 +170,9 @@
 
 <?php if($showBlockedAdvancedMode): ?>
     <p style="font-size: 15px; font-weight: bolder; color: red;">
-        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration');
+        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration', 'General', 'Mode > Advanced');
         echo Mage::helper('M2ePro')->__(
-            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
+            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path%).', $menuPath);
         ?>
     </p>
 <?php endif; ?>
@@ -293,7 +293,7 @@
 
 <div id="block_notice_ebay_template_description_image" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Images & Watermark'); ?>">
     <?php echo Mage::helper('M2ePro')->__('The images your potential Buyers will see on your eBay Listing. Using lots of high-quality pictures provides a great shopping experience and helps to sell your Items.<br/>'); ?>
-    <?php echo Mage::helper('M2ePro')->__('You can add a watermark to your images. <br/><b>Note:</b> The watermark option is only available for the images hosted on Magento.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('You can add a watermark to your images. <br/><b>Note:</b> The watermark Option is only available for the images hosted on Magento.'); ?>
 </div>
 
 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -536,7 +536,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="title_mode" name="description[title_mode]" class="select">
@@ -655,7 +655,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="description_mode" name="description[description_mode]" class="required-entry">
@@ -695,6 +695,7 @@
 
             <tr class="c-custom_description_tr">
                 <td class="label">
+                    <label><?php echo Mage::helper('M2ePro')->__('Description Value'); ?>: <span class="required">*</span></label>
                 </td>
                 <td class="value">
                     <?php if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()): ?>

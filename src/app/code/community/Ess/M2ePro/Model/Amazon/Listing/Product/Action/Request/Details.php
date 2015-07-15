@@ -33,19 +33,42 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
         }
 
         if (!$this->getVariationManager()->isRelationParentType()) {
-            $data = array_merge($data, $this->getConditionData());
+            $data = array_merge(
+                $data,
+                $this->getConditionData(),
+                $this->getGiftData()
+            );
         }
 
-        if (!$this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
-            return $data;
-        }
+        $isUseDescriptionTemplate = false;
 
-        $variationManager = $this->getAmazonListingProduct()->getVariationManager();
+        do {
 
-        if (($variationManager->isRelationChildType() || $variationManager->isIndividualType()) &&
-            ($this->getMagentoProduct()->isSimpleTypeWithCustomOptions() ||
-             $this->getMagentoProduct()->isBundleType())
-        ) {
+            if (!$this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
+                break;
+            }
+
+            $variationManager = $this->getAmazonListingProduct()->getVariationManager();
+
+            if (($variationManager->isRelationChildType() || $variationManager->isIndividualType()) &&
+                ($this->getMagentoProduct()->isSimpleTypeWithCustomOptions() ||
+                 $this->getMagentoProduct()->isBundleType())) {
+                break;
+            }
+
+            $isUseDescriptionTemplate = true;
+
+        } while (false);
+
+        if (!$isUseDescriptionTemplate) {
+
+            if (isset($data['gift_wrap']) || isset($data['gift_message'])) {
+
+                $data['description_data']['title'] = $this->getAmazonListingProduct()
+                                                          ->getMagentoProduct()
+                                                          ->getName();
+            }
+
             return $data;
         }
 
@@ -79,30 +102,25 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
         );
     }
 
-    private function getProductData()
+    private function getGiftData()
     {
         $data = array();
+        $giftWrap = $this->getAmazonListingProduct()->getListingSource()->getGiftWrap();
 
-        $this->searchNotFoundAttributes();
-
-        foreach ($this->getDescriptionTemplate()->getSpecifics(true) as $specific) {
-
-            $path = $specific->getSource(
-                $this->getAmazonListingProduct()->getActualMagentoProduct()
-            )->getPath();
-
-            $data = Mage::helper('M2ePro')->arrayReplaceRecursive(
-                $data, json_decode($path, true)
-            );
+        if (!is_null($giftWrap)) {
+            $data['gift_wrap'] = $giftWrap;
         }
 
-        $this->processNotFoundAttributes('Product Specifics');
+        $giftMessage = $this->getAmazonListingProduct()->getListingSource()->getGiftMessage();
 
-        return array(
-            'product_data'      => $data,
-            'product_data_nick' => $this->getDescriptionTemplate()->getProductDataNick(),
-        );
+        if (!is_null($giftMessage)) {
+            $data['gift_message'] = $giftMessage;
+        }
+
+        return $data;
     }
+
+    // ---------------------------------------
 
     private function getDescriptionData()
     {
@@ -164,6 +182,33 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
 
         return array(
             'description_data' => $data
+        );
+    }
+
+    // ---------------------------------------
+
+    private function getProductData()
+    {
+        $data = array();
+
+        $this->searchNotFoundAttributes();
+
+        foreach ($this->getDescriptionTemplate()->getSpecifics(true) as $specific) {
+
+            $path = $specific->getSource(
+                $this->getAmazonListingProduct()->getActualMagentoProduct()
+            )->getPath();
+
+            $data = Mage::helper('M2ePro')->arrayReplaceRecursive(
+                $data, json_decode($path, true)
+            );
+        }
+
+        $this->processNotFoundAttributes('Product Specifics');
+
+        return array(
+            'product_data'      => $data,
+            'product_data_nick' => $this->getDescriptionTemplate()->getProductDataNick(),
         );
     }
 

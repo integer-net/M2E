@@ -103,7 +103,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Payment_Info extends Mage_Payment_Block
         switch ($this->getAdditionalData('component_mode')) {
             case Ess_M2ePro_Helper_Component_Ebay::NICK:
             case Ess_M2ePro_Helper_Component_Buy::NICK:
-            case Ess_M2ePro_Helper_Component_Play::NICK:
                 break;
             case Ess_M2ePro_Helper_Component_Amazon::NICK:
                 if ($this->getOrder()) {
@@ -139,9 +138,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Payment_Info extends Mage_Payment_Block
                 // todo uncomment when word "Beta" will be removed from the title
 //                $title = Mage::helper('M2ePro/Component_Buy')->getTitle();
                 $title = 'Rakuten.com';
-                break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $title = Mage::helper('M2ePro/Component_Play')->getTitle();
                 break;
         }
 

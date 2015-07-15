@@ -8,7 +8,7 @@
     $ebayText = '';
     if (isset($this->components[Ess_M2ePro_Helper_Component_Ebay::NICK])) {
         $ebayText = Mage::helper('M2ePro')->__(
-            'The <span style="text-decoration: underline;">eBay component</span>, its upgrades and support are free according to eBay / Magento Partner Agreement. And they will stay free until the partner agreement is active.<br/>'
+            'The <span style="text-decoration: underline;">eBay Component</span>, its upgrades and support are free according to eBay / Magento Partner Agreement. And they will stay free until the partner agreement is active.<br/>'
         );
         $components[] = Mage::helper('M2ePro/Component_Ebay')->getTitle();
     }
@@ -25,11 +25,6 @@
         $components[] = Mage::helper('M2ePro/Component_Buy')->getTitle();
     }
 
-    if (isset($this->components[Ess_M2ePro_Helper_Component_Play::NICK])) {
-        $betaComponents[] = Mage::helper('M2ePro/Component_Play')->getTitle();
-        $components[] = Mage::helper('M2ePro/Component_Play')->getTitle();
-    }
-
     $componentsString = '';
     $componentsCount = count($this->components);
     for ($componentCount = 0; $componentCount < $componentsCount; $componentCount++) {
@@ -43,8 +38,8 @@
     }
 
     if (!empty($componentsString)) {
-        $componentString = ' ' . Mage::helper('M2ePro')->__('component');
-        if ($componentsCount > 1) $componentString = ' ' . Mage::helper('M2ePro')->__('components');
+        $componentString = ' ' . Mage::helper('M2ePro')->__('Component');
+        if ($componentsCount > 1) $componentString = ' ' . Mage::helper('M2ePro')->__('Components');
 
         $componentsString .= $componentString;
     }
@@ -62,11 +57,11 @@
     }
 
     if (!empty($betaComponentsString)) {
-        $componentString = ' ' . Mage::helper('M2ePro')->__('component');
-        if ($betaComponentsCount > 1) $componentString = ' ' . Mage::helper('M2ePro')->__('components');
+        $componentString = ' ' . Mage::helper('M2ePro')->__('Component');
+        if ($betaComponentsCount > 1) $componentString = ' ' . Mage::helper('M2ePro')->__('Components');
 
         $betaText = Mage::helper('M2ePro')->__(
-            'Current %component_name% %version_title% are in <span style="text-decoration: underline;">Beta</span> state and are provided free of charge. However, please be advised that upon the live version of the Product release some monthly subscription fee will be introduced.<br/>',
+            'Current %component_name% %version_title% are in <span style="text-decoration: underline;">Beta</span> State and are provided free of charge. However, please be advised that upon the live version of the Product release some monthly subscription fee will be introduced.<br/>',
             $betaComponentsString, $componentString
         );
     }
@@ -349,9 +344,6 @@
                             case Ess_M2ePro_Helper_Component_Buy::NICK:
                                 $componentTitle = Mage::helper('M2ePro/Component_Buy')->getTitle();
                                 break;
-                            case Ess_M2ePro_Helper_Component_Play::NICK:
-                                $componentTitle = Mage::helper('M2ePro/Component_Play')->getTitle();
-                                break;
                         }
                     ?>
 
@@ -378,13 +370,6 @@
                         <?php if ($componentName == Ess_M2ePro_Helper_Component_Buy::NICK) { ?>
                             <div id="block_notice_license_buy" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
                                 <?php echo Mage::helper('M2ePro')->__('<b>Note:</b> The current Beta version of the Rakuten.com module is provided free of charge.
-                                However, please be advised that upon the live version of the Product release some monthly subscription fee will introduced.'); ?>
-                            </div>
-                        <?php } ?>
-
-                        <?php if ($componentName == Ess_M2ePro_Helper_Component_Play::NICK) { ?>
-                            <div id="block_notice_license_buy" class="block_notices_module" title="" subtitle="" collapseable="no" hideblock="no" always_show="yes">
-                                <?php echo Mage::helper('M2ePro')->__('<b>Note:</b> The current Beta version of the Play.com module is provided free of charge.
                                 However, please be advised that upon the live version of the Product release some monthly subscription fee will introduced.'); ?>
                             </div>
                         <?php } ?>
@@ -416,11 +401,11 @@
                                                  ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_SUSPENDED ||
                                                   $componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CLOSED ||
                                                   $componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CANCELED)) { ?>
-                                                    <span style="color:red;">(
-                                                        <?php if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_SUSPENDED) echo Mage::helper('M2ePro')->__('Suspended'); ?>
-                                                        <?php if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CLOSED) echo Mage::helper('M2ePro')->__('Closed'); ?>
-                                                        <?php if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CANCELED) echo Mage::helper('M2ePro')->__('Canceled'); ?>
-                                                    )</span>
+                                                    <span style="color:red;">(<?php
+                                                        if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_SUSPENDED) echo Mage::helper('M2ePro')->__('Suspended');
+                                                        if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CLOSED) echo Mage::helper('M2ePro')->__('Closed');
+                                                        if ($componentData['status'] == Ess_M2ePro_Helper_Module_License::STATUS_CANCELED) echo Mage::helper('M2ePro')->__('Canceled');
+                                                    ?>)</span>
                                         <?php } ?>
 
                                         <?php if (Mage::helper('M2ePro/Magento')->isGoEdition()) { ?>

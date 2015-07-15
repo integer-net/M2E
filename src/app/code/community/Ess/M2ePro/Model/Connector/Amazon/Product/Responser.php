@@ -250,6 +250,30 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Responser
 
     // ########################################
 
+    protected function processResponseMessages(array $messages = array())
+    {
+        parent::processResponseMessages($messages);
+
+        foreach ($this->listingsProducts as $listingProduct) {
+            $this->processMessages($listingProduct, $this->messages);
+        }
+    }
+
+    protected function isNeedToParseResponseData($responseBody)
+    {
+        if (!parent::isNeedToParseResponseData($responseBody)) {
+            return false;
+        }
+
+        if ($this->hasErrorMessages() && !isset($responseBody['messages'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // ########################################
+
     protected function validateResponseData($response)
     {
         return isset($response['messages']) && is_array($response['messages']);
@@ -263,10 +287,10 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Responser
             $responseMessages[(int)$key] = $value;
         }
 
-        $globalMessages = $this->messages;
+        $globalMessages = array();
 
         if (isset($responseMessages[0]) && is_array($responseMessages[0])) {
-            $globalMessages = array_merge($globalMessages, $responseMessages[0]);
+            $globalMessages = $responseMessages[0];
             unset($responseMessages[0]);
         }
 
@@ -279,7 +303,7 @@ abstract class Ess_M2ePro_Model_Connector_Amazon_Product_Responser
                 $messages = array_merge($globalMessages, $responseMessages[(int)$listingProduct->getId()]);
             }
 
-            if (!$this->processMessages($listingProduct, $messages)) {
+            if (!$this->processMessages($listingProduct, $messages) || $this->hasErrorMessages()) {
                 continue;
             }
 

@@ -28,8 +28,8 @@ class Ess_M2ePro_Model_Observer_Magento_Configuration extends Ess_M2ePro_Model_O
                 $action = 'save';
                 break;
 
-            case Ess_M2ePro_Helper_View_Configuration::CONFIG_SECTION_LOGS_CLEANING;
-                $controllerName = 'adminhtml_configuration_logsCleaning';
+            case Ess_M2ePro_Helper_View_Configuration::CONFIG_SECTION_LOGS_CLEARING;
+                $controllerName = 'adminhtml_configuration_logsClearing';
                 $action = 'save';
                 break;
 

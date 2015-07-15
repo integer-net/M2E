@@ -24,6 +24,7 @@ class Ess_M2ePro_Model_Servicing_Task_Settings extends Ess_M2ePro_Model_Servicin
     {
         $this->updateLockData($data);
         $this->updateServersBaseUrls($data);
+        $this->updateDefaultServerBaseUrlIndex($data);
         $this->updateLastVersion($data);
     }
 
@@ -68,6 +69,27 @@ class Ess_M2ePro_Model_Servicing_Task_Settings extends Ess_M2ePro_Model_Servicin
 
             $index++;
         }
+
+        for ($deletedIndex=$index; $deletedIndex<100; $deletedIndex++) {
+
+            $deletedBaseUrl = $config->getGroupValue('/server/','baseurl_'.$deletedIndex);
+
+            if (is_null($deletedBaseUrl)) {
+                break;
+            }
+
+            $config->deleteGroupValue('/server/','baseurl_'.$deletedIndex);
+        }
+    }
+
+    private function updateDefaultServerBaseUrlIndex(array $data)
+    {
+        if (!isset($data['default_server_baseurl_index']) || (int)$data['default_server_baseurl_index'] <= 0) {
+            return;
+        }
+
+        Mage::helper('M2ePro/Primary')->getConfig()
+                ->setGroupValue('/server/','default_baseurl_index',(int)$data['default_server_baseurl_index']);
     }
 
     private function updateLastVersion(array $data)
@@ -77,7 +99,7 @@ class Ess_M2ePro_Model_Servicing_Task_Settings extends Ess_M2ePro_Model_Servicin
         }
 
         Mage::helper('M2ePro/Module')->getCacheConfig()->setGroupValue(
-            '/installation/version/', 'last_version', $data['last_version']
+            '/installation/', 'last_version', $data['last_version']
         );
     }
 

@@ -52,19 +52,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
 
     public function isAllPermitted()
     {
-        return $this->isGeneral() &&
-               $this->isQty() && $this->isPrice() &&
+        return $this->isQty() && $this->isPrice() &&
                $this->isImages() && $this->isDetails();
     }
 
     // ########################################
-
-    public function isGeneral()
-    {
-        return $this->isAllowed(self::TYPE_GENERAL);
-    }
-
-    // -----------------------------------------
 
     public function isQty()
     {

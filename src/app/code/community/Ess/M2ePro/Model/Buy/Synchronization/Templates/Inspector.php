@@ -593,7 +593,9 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
             return false;
         }
 
-        return $buyListingProduct->getPrice() != $buyListingProduct->getOnlinePrice();
+        return $this->checkRevisePricesRequirements(
+            $buySynchronizationTemplate, $buyListingProduct->getOnlinePrice(), $buyListingProduct->getPrice()
+        );
     }
 
     //------------------------------------
@@ -637,6 +639,29 @@ class Ess_M2ePro_Model_Buy_Synchronization_Templates_Inspector
         }
 
         return false;
+    }
+
+    //####################################
+
+    private function checkRevisePricesRequirements(
+        Ess_M2ePro_Model_Buy_Template_Synchronization $buySynchronizationTemplate,
+        $onlinePrice, $productPrice
+    ) {
+        if ((float)$onlinePrice == (float)$productPrice) {
+            return false;
+        }
+
+        if ((float)$onlinePrice <= 0) {
+            return true;
+        }
+
+        if ($buySynchronizationTemplate->isReviseUpdatePriceMaxAllowedDeviationModeOff()) {
+            return true;
+        }
+
+        $deviation = abs($onlinePrice - $productPrice) / $onlinePrice * 100;
+
+        return $deviation > $buySynchronizationTemplate->getReviseUpdatePriceMaxAllowedDeviation();
     }
 
     //####################################

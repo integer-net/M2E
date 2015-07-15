@@ -5,7 +5,7 @@
  */
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Description_Category_Specific_Add
-    extends Mage_Adminhtml_Block_Widget_Container
+    extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // ########################################
 
@@ -58,7 +58,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Description_Category_Spe
 
         $cancelWord = Mage::helper('M2ePro')->__('Cancel');
         $buttonsContainer = <<< HTML
-<div style="margin-top: 17px; text-align: right; position: absolute; left: 86%; top: 90%;">
+<div style="margin-top: 17px; text-align: right; position: absolute; left: 83.5%; top: 90%;">
     <a href="javascript:void(0)" class="specifics_cancel_button">{$cancelWord}</a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     {$doneButton->toHtml()}

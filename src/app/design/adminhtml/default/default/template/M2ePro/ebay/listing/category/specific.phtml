@@ -204,7 +204,20 @@
             </select>
         </td>
         <td id="<?php echo $uniqueId; ?>specific_value_%i%_cell" style="width: 100%; vertical-align:top; text-align: left;">
-            <input id="<?php echo $uniqueId; ?>item_specifics_value_custom_value_%i%" name="item_specifics_value_custom_value_%i%" type="text" style="display: none; width: 99%; padding-left: 2px; padding-right: 0;" class="input-text M2ePro-required-when-visible item-specific" />
+            <div id="<?php echo $uniqueId; ?>item_specifics_custom_value_%i%" style="display: none;">
+                <table style="border:none; border-spacing: 0 2px">
+                    <tbody id="<?php echo $uniqueId; ?>item_specifics_custom_value_tbody_%i%" data-min_values="%min_values%" data-max_values="%max_values%">
+                        <!-- #specific_custom_value_table_row_template inserts here -->
+                    </tbody>
+                </table>
+                <a id="<?php echo $uniqueId; ?>add_item_specifics_custom_value_button_%i%"
+                   data-counter="%i%"
+                   href="javascript: void(0);"
+                   style="display:none; float:right; font-size:11px;"
+                   onclick="EbayListingCategorySpecificHandler<?php echo $uniqueId; ?>Obj.addItemSpecificsCustomValueRow(this);">
+                   <?php echo Mage::helper('M2ePro')->__('Add more'); ?>
+                </a>
+            </div>
             <select id="<?php echo $uniqueId; ?>item_specifics_value_ebay_recommended_%i%" name="item_specifics_value_ebay_recommended_%i%" style="display: none; width: 100%;" class="M2ePro-required-when-visible item-specific"></select>
             <select id="<?php echo $uniqueId; ?>item_specifics_value_custom_attribute_%i%" name="item_specifics_value_custom_attribute_%i%" style="display: none; width: 100%;"></select>
         </td>
@@ -213,6 +226,17 @@
         </td>
     </tr>
 
+</script>
+
+<script type="text/m2e-template-html" id="<?php echo $uniqueId; ?>specific_custom_value_template">
+    <tr>
+        <td style="border: none; width: 100%; vertical-align:top; text-align: left; padding: 0; ">
+            <input id="<?php echo $uniqueId; ?>item_specifics_value_custom_value_%i%_%position%" name="item_specifics_value_custom_value_%i%[]" type="text" style="width: 99%; padding-left: 2px; padding-right: 0;" class="input-text M2ePro-required-when-visible item-specific" />
+        </td>
+        <td id="<?php echo $uniqueId; ?>item_specifics_custom_value_remove_%i%_%position%" class="btn_value_remove" style="display: none; padding:0; border: none;">
+            <?php echo $this->getChildHtml('remove_item_specifics_custom_value_button'); ?>
+        </td>
+    </tr>
 </script>
 
 </form>
