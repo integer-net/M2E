@@ -188,7 +188,7 @@ MarketplaceHandler.prototype = Object.extend(new CommonHandler(), {
             var marketplaceState = statusesForSynch[i].status;
 
             if (!marketplaceId) {
-                return false;
+                continue;
             }
 
             this.changeStatusInfo(marketplaceId, marketplaceState);

@@ -209,7 +209,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
 
         if(count($emptySavedKtypes) > 0) {
             $isSingleKtype = count($emptySavedKtypes) > 1;
-            $msg = 'The '.implode(', ', $emptySavedKtypes).' KType'.($isSingleKtype ? 's' : '');
+            $msg = 'The '.implode(', ', $emptySavedKtypes).' kType'.($isSingleKtype ? 's' : '');
             $msg .= ' specified in the Compatibility Attribute';
             $msg .= ' were dropped out of the Listing because '.($isSingleKtype ? 'it was' : 'they were');
             $msg .= ' deleted from eBay Catalog of Compatible Vehicles.';

@@ -109,7 +109,6 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
     {
         /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Attribute $attributeMatcher */
         $attributeMatcher = Mage::getModel('M2ePro/Amazon_Listing_Product_Variation_Matcher_Attribute');
-        $attributeMatcher->setMarketplaceId($this->getProcessor()->getMarketplaceId());
         $attributeMatcher->setMagentoProduct($this->getProcessor()->getListingProduct()->getMagentoProduct());
         $attributeMatcher->setDestinationAttributes($channelAttributes);
         $attributeMatcher->canUseDictionary($canUseDictionary);

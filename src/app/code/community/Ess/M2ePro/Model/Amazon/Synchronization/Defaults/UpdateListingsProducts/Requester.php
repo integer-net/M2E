@@ -39,7 +39,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
     {
         return array_merge(
             parent::getResponserParams(),
-            array('processed_inventory_hash' => Mage::helper('M2ePro')->generateUniqueHash())
+            array(
+                'processed_inventory_hash' => Mage::helper('M2ePro')->generateUniqueHash(),
+                'request_date'             => Mage::helper('M2ePro')->getCurrentGmtDate(),
+            )
         );
     }
 

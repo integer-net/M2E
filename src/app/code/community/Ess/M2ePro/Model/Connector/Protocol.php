@@ -8,15 +8,18 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 {
     const API_VERSION = 1;
 
-    const MESSAGE_TEXT_KEY = 'text';
-    const MESSAGE_TYPE_KEY = 'type';
+    const MESSAGE_TEXT_KEY   = 'text';
+    const MESSAGE_TYPE_KEY   = 'type';
     const MESSAGE_SENDER_KEY = 'sender';
-    const MESSAGE_CODE_KEY = 'code';
+    const MESSAGE_CODE_KEY   = 'code';
 
-    const MESSAGE_TYPE_ERROR = 'error';
+    const MESSAGE_TYPE_ERROR   = 'error';
     const MESSAGE_TYPE_WARNING = 'warning';
     const MESSAGE_TYPE_SUCCESS = 'success';
-    const MESSAGE_TYPE_NOTICE = 'notice';
+    const MESSAGE_TYPE_NOTICE  = 'notice';
+
+    const MESSAGE_SENDER_SYSTEM    = 'system';
+    const MESSAGE_SENDER_COMPONENT = 'component';
 
     // ########################################
 
@@ -24,6 +27,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
     protected $requestExtraData = array();
 
     protected $response = array();
+    protected $responseInfo = array();
     protected $messages = array();
     protected $resultType = self::MESSAGE_TYPE_ERROR;
 
@@ -49,11 +53,15 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
         $this->response = NULL;
 
         try {
-            $this->response = Mage::helper('M2ePro/Server')
+            $curlResult = Mage::helper('M2ePro/Server')
                                     ->sendRequest($this->request,
                                                   $this->getRequestHeaders(),
                                                   $this->getRequestTimeout(),
                                                   false);
+
+            $this->response = $curlResult['response'];
+            $this->responseInfo = $curlResult;
+
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Client')->updateMySqlConnection();
             throw $exception;
@@ -64,8 +72,11 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
         $this->response = @json_decode($this->response,true);
 
         if (!isset($this->response['response']) || !isset($this->response['data'])) {
-            throw new Exception('Please ensure that CURL library is installed on your Server and it supports HTTPS
-            protocol. Also ensure that outgoing Connection to m2epro.com, port 443 is allowed by firewall.');
+
+            $errorMsg = 'Please ensure that CURL library is installed on your Server and it supports HTTPS protocol.
+                         Also ensure that outgoing Connection to m2epro.com, port 443 is allowed by firewall.';
+
+            throw new Ess_M2ePro_Model_Exception($errorMsg, $this->responseInfo);
         }
 
         $this->processResponseInfo($this->response['response']);
@@ -77,27 +88,22 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
     {
         $this->resultType = $responseInfo['result']['type'];
 
-        $internalServerErrorMessage = '';
+        $internalServerErrorMessage = array();
 
         foreach ($responseInfo['result']['messages'] as $message) {
 
-            $type = $message[self::MESSAGE_TYPE_KEY];
-            $sender = $message[self::MESSAGE_SENDER_KEY];
-
-            if ($type == self::MESSAGE_TYPE_ERROR && $sender == 'system') {
-                $internalServerErrorMessage != '' && $internalServerErrorMessage .= ', ';
-                $internalServerErrorMessage .= $message[self::MESSAGE_TEXT_KEY];
+            if ($this->isMessageError($message) && $this->isMessageSenderSystem($message)) {
+                $internalServerErrorMessage[] = $message[self::MESSAGE_TEXT_KEY];
                 continue;
             }
 
             $this->messages[] = $message;
         }
 
-        if ($internalServerErrorMessage != '') {
+        if (!empty($internalServerErrorMessage)) {
 
             throw new Exception(Mage::helper('M2ePro')->__(
-                "Internal Server error(s) [%error_message%]",
-                $internalServerErrorMessage
+                "Internal Server Error(s) [%error_message%]", implode(', ', $internalServerErrorMessage)
             ));
         }
     }
@@ -256,6 +262,77 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
             var_dump($this->response);
             echo '</pre>';
         }
+    }
+
+    // ########################################
+
+    public function isMessageError($message)
+    {
+        return $message[self::MESSAGE_TYPE_KEY] == self::MESSAGE_TYPE_ERROR;
+    }
+
+    public function isMessageWarning($message)
+    {
+        return $message[self::MESSAGE_TYPE_KEY] == self::MESSAGE_TYPE_WARNING;
+    }
+
+    public function isMessageSenderSystem($message)
+    {
+        return $message[self::MESSAGE_SENDER_KEY] == self::MESSAGE_SENDER_SYSTEM;
+    }
+
+    public function isMessageSenderComponent($message)
+    {
+        return $message[self::MESSAGE_SENDER_KEY] == self::MESSAGE_SENDER_COMPONENT;
+    }
+
+    // ----------------------------------------
+
+    public function getErrorMessages()
+    {
+        $messages = array();
+
+        foreach ($this->messages as $message) {
+            $this->isMessageError($message) && $messages[] = $message;
+        }
+
+        return $messages;
+    }
+
+    public function getWarningMessages()
+    {
+        $messages = array();
+
+        foreach ($this->messages as $message) {
+            $this->isMessageWarning($message) && $messages[] = $message;
+        }
+
+        return $messages;
+    }
+
+    // ----------------------------------------
+
+    public function hasErrorMessages()
+    {
+        return count($this->getErrorMessages()) > 0;
+    }
+
+    public function hasWarningMessages()
+    {
+        return count($this->getWarningMessages()) > 0;
+    }
+
+    // ----------------------------------------
+
+    public function getCombinedErrorMessage()
+    {
+        $messages = array();
+
+        foreach ($this->getErrorMessages() as $message) {
+            $messages[] = $message[self::MESSAGE_TEXT_KEY];
+        }
+
+        return !empty($messages) ? implode(', ', $messages) : null;
     }
 
     // ########################################

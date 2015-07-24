@@ -71,7 +71,32 @@ class Ess_M2ePro_Model_Buy_Listing_Source
 
         is_string($result) && $result = trim($result);
 
+        if (!empty($result)) {
+            return $this->applySkuModification($result);
+        }
+
         return $result;
+    }
+
+    // ----------------------------------------
+
+    protected function applySkuModification($sku)
+    {
+        if ($this->getBuyListing()->isSkuModificationModeNone()) {
+            return $sku;
+        }
+
+        $source = $this->getBuyListing()->getSkuModificationSource();
+
+        if ($this->getBuyListing()->isSkuModificationModePrefix()) {
+            $sku = $source['value'] . $sku;
+        } elseif ($this->getBuyListing()->isSkuModificationModePostfix()) {
+            $sku = $sku . $source['value'];
+        } elseif ($this->getBuyListing()->isSkuModificationModeTemplate()) {
+            $sku = str_replace('%value%', $sku, $source['value']);
+        }
+
+        return $sku;
     }
 
     // ----------------------------------------

@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Form extends Mage_Adminhtml_Block_Widget_Form
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -38,6 +40,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Form extend
         $this->nodes = $connRead->select()
             ->from(Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category'))
             ->where('parent_category_id = ?', 0)
+            ->order('title ASC')
             ->query()
             ->fetchAll();
 
@@ -63,4 +66,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Edit_Form extend
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

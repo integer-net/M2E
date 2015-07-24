@@ -14,6 +14,11 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
     const SKU_MODE_DEFAULT          = 1;
     const SKU_MODE_CUSTOM_ATTRIBUTE = 2;
 
+    const SKU_MODIFICATION_MODE_NONE     = 0;
+    const SKU_MODIFICATION_MODE_PREFIX   = 1;
+    const SKU_MODIFICATION_MODE_POSTFIX  = 2;
+    const SKU_MODIFICATION_MODE_TEMPLATE = 3;
+
     const GENERATE_SKU_MODE_NO  = 0;
     const GENERATE_SKU_MODE_YES = 1;
 
@@ -244,6 +249,41 @@ class Ess_M2ePro_Model_Buy_Listing extends Ess_M2ePro_Model_Component_Child_Buy_
         return array(
             'mode'      => $this->getSkuMode(),
             'attribute' => $this->getData('sku_custom_attribute')
+        );
+    }
+
+    //-------------------------
+
+    public function getSkuModificationMode()
+    {
+        return (int)$this->getData('sku_modification_mode');
+    }
+
+    public function isSkuModificationModeNone()
+    {
+        return $this->getSkuModificationMode() == self::SKU_MODIFICATION_MODE_NONE;
+    }
+
+    public function isSkuModificationModePrefix()
+    {
+        return $this->getSkuModificationMode() == self::SKU_MODIFICATION_MODE_PREFIX;
+    }
+
+    public function isSkuModificationModePostfix()
+    {
+        return $this->getSkuModificationMode() == self::SKU_MODIFICATION_MODE_POSTFIX;
+    }
+
+    public function isSkuModificationModeTemplate()
+    {
+        return $this->getSkuModificationMode() == self::SKU_MODIFICATION_MODE_TEMPLATE;
+    }
+
+    public function getSkuModificationSource()
+    {
+        return array(
+            'mode'  => $this->getSkuModificationMode(),
+            'value' => $this->getData('sku_modification_custom_value')
         );
     }
 

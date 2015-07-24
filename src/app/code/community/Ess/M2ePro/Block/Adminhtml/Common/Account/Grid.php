@@ -6,6 +6,7 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Account_Grid extends Ess_M2ePro_Block_Adminhtml_Account_Grid
 {
+    // ####################################
 
     protected function _prepareCollection()
     {
@@ -97,8 +98,7 @@ HTML;
             return;
         }
 
-        $where = "main_table.title LIKE '%{$value}%' OR m.title LIKE '%{$value}%'";
-        $collection->getSelect()->where($where);
+        $collection->getSelect()->where('main_table.title LIKE ? OR m.title LIKE ?', '%'. $value .'%');
     }
 
     // ####################################

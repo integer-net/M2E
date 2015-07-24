@@ -79,11 +79,6 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
         return this.getSwitcherValueMode(templateNick) == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE');
     },
 
-    isSwitcherValueModePolicy: function(templateNick)
-    {
-        return this.getSwitcherValueMode(templateNick) == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY');
-    },
-
     isExistSynchronizationTab: function()
     {
         return typeof EbayTemplateSynchronizationHandlerObj != 'undefined';
@@ -119,9 +114,6 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
         switch (templateMode) {
             case M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT'):
                 EbayListingTemplateSwitcherHandlerObj.clearContent(templateNick);
-                break;
-
-            case M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY'):
                 break;
 
             case M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM'):
@@ -229,23 +221,16 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
     {
         var labelContainer = $('template_' + templateNick + '_nick_label');
         var templateLabel  = labelContainer.down('span.template');
-        var policyLabel    = labelContainer.down('span.policy');
         var parentLabel    = labelContainer.down('span.parent');
 
         labelContainer.hide();
         templateLabel.hide();
-        policyLabel.hide();
 
         parentLabel && parentLabel.hide();
 
         if (this.isSwitcherValueModeTemplate(templateNick)) {
             labelContainer.show();
             templateLabel.show();
-        }
-
-        if (this.isSwitcherValueModePolicy(templateNick)) {
-            labelContainer.show();
-            policyLabel.show();
         }
 
         if (this.isSwitcherValueModeEmpty(templateNick) && parentLabel) {
@@ -368,8 +353,11 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
 
         var me = this;
         if(!me.isCreatedDialog) {
+            var html = template.innerHTML;
+            template.down('.dialog_confirm_content').remove();
             me.isCreatedDialog = true;
-            Dialog._openDialog(template.innerHTML, {
+
+            Dialog._openDialog(html, {
                 draggable: true,
                 resizable: true,
                 closable: true,
@@ -415,6 +403,7 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
                 }.bind(this),
                 cancel: function() {},
                 onClose: function() {
+                    template.insert('<div class="dialog_confirm_content"></div>');
                     me.isCreatedDialog = false;
                 }
             });
@@ -531,7 +520,7 @@ EbayListingTemplateSwitcherHandler = Class.create(CommonHandler, {
 
         optionGroup = document.createElement('optgroup');
         optionGroup.className = 'templates-group';
-        optionGroup.label = M2ePro.translator.translate('M2E Pro Policies');
+        optionGroup.label = M2ePro.translator.translate('Policies');
 
         switcher.appendChild(optionGroup);
 

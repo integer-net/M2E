@@ -85,8 +85,6 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
     const WATERMARK_CACHE_TIME = 604800; // 7 days
     const GALLERY_IMAGES_COUNT_MAX = 11;
 
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Ebay_Template_Description_Source
      */
@@ -292,9 +290,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         } elseif ($src['mode'] == self::DESCRIPTION_MODE_SHORT) {
             $attributes[] = 'short_description';
         } else {
-            $match = array();
-            preg_match_all('/#([a-zA-Z_]+?)#/', $src['template'], $match);
-            $match && $attributes = $match[1];
+            preg_match_all('/#([a-zA-Z_]+?)#|#(image|media_gallery)\[.*\]#+?/', $src['template'], $match);
+            !empty($match[0]) && $attributes = array_filter(array_merge($match[1], $match[2]));
         }
 
         return $attributes;
@@ -354,6 +351,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         return $this->getSettings('product_details');
     }
 
+    // ---------------------------------------
+
     public function isProductDetailsIncludeDescription()
     {
         $productDetails = $this->getProductDetails();
@@ -366,17 +365,11 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         return isset($productDetails['include_image']) ? (bool)$productDetails['include_image'] : true;
     }
 
-    public function isProductDetailsListIfNoProduct()
-    {
-        $productDetails = $this->getProductDetails();
-        return isset($productDetails['list_if_no_product']) ? (bool)$productDetails['list_if_no_product'] : true;
-    }
-
     // ---------------------------------------
 
     public function getProductDetailAttribute($type)
     {
-        if (!in_array($type, array('isbn', 'epid', 'upc', 'ean', 'gtin', 'brand', 'mpn'))) {
+        if (!in_array($type, array('isbn', 'epid', 'upc', 'ean', 'brand', 'mpn'))) {
             throw new InvalidArgumentException('Unknown Product details name');
         }
 
@@ -403,9 +396,6 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         $temp && $attributes[] = $temp;
 
         $temp = $this->getProductDetailAttribute('ean');
-        $temp && $attributes[] = $temp;
-
-        $temp = $this->getProductDetailAttribute('gtin');
         $temp && $attributes[] = $temp;
 
         $temp = $this->getProductDetailAttribute('brand');
@@ -758,12 +748,10 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
                 'epid'  => '',
                 'upc'   => '',
                 'ean'   => '',
-                'gtin'  => '',
                 'brand' => '',
                 'mpn'   => '',
                 'include_description' => 1,
                 'include_image'       => 1,
-                'list_if_no_product'  => 1,
             )),
 
             'editor_type' => self::EDITOR_TYPE_SIMPLE,

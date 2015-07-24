@@ -13,7 +13,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Response
     {
         $data = array(
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_LISTED,
-            'ignore_next_inventory_synch' => 1,
         );
 
         $data = $this->appendStatusChangerValue($data);

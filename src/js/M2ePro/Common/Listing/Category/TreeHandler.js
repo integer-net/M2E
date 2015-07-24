@@ -58,10 +58,6 @@ ListingCategoryTreeHandler.prototype = Object.extend(new CommonHandler(), {
     {
         categories_selected_items.push(id);
         array_unique(categories_selected_items);
-
-        if (!node.isLeaf() && node.hasChildNodes()) {
-            ListingCategoryTreeHandlerObj.tree_processChildren(node, node.attributes.checked);
-        }
     },
 
     tree_categoryRemove: function(id, node)
@@ -71,10 +67,6 @@ ListingCategoryTreeHandler.prototype = Object.extend(new CommonHandler(), {
         }
 
         array_unique(categories_selected_items);
-
-        if (!node.isLeaf() && node.hasChildNodes()) {
-            ListingCategoryTreeHandlerObj.tree_processChildren(node, node.attributes.checked);
-        }
     }
 
     //----------------------------------

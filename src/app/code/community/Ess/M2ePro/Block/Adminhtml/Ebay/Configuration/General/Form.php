@@ -46,6 +46,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
             '/view/ebay/feedbacks/notification/','mode'
         );
 
+        $this->is_ebay_feedbacks_enabled = Mage::helper('M2ePro/View_Ebay')->isFeedbacksShouldBeShown();
+
         $this->use_last_specifics_mode = (bool)(int)$configModel->getGroupValue(
             '/view/ebay/template/category/','use_last_specifics'
         );
@@ -56,6 +58,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
         /** @var Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility $compatibilityHelper */
         $compatibilityHelper = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility');
 
+        $resource = Mage::getSingleton('core/resource');
+        $specificsDictionaryTable = $resource->getTableName('m2epro_ebay_dictionary_motor_specific');
+        $ktypeDictionaryTable     = $resource->getTableName('m2epro_ebay_dictionary_motor_ktype');
+
         // ------------------------
         /** @var Ess_M2ePro_Model_Mysql4_Marketplace_Collection $specificsMarketplaceCollection */
         $specificsMarketplaceCollection = Mage::getModel('M2ePro/Marketplace')->getCollection();
@@ -65,6 +71,23 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
         );
         $specificsMarketplaceCollection->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
         $this->is_motors_specifics_marketplace_enabled = (bool)$specificsMarketplaceCollection->getSize();
+
+        $ebayDictionaryRecords = (int)$resource->getConnection('core_read')
+            ->select()
+            ->from($specificsDictionaryTable, array(new Zend_Db_Expr('COUNT(*)')))
+            ->where('is_custom = 0')
+            ->query()
+            ->fetchColumn();
+
+        $customDictionaryRecords = (int)$resource->getConnection('core_read')
+              ->select()
+              ->from($specificsDictionaryTable, array(new Zend_Db_Expr('COUNT(*)')))
+              ->where('is_custom = 1')
+              ->query()
+              ->fetchColumn();
+
+        $this->motors_specifics_dictionary_ebay_count   = $ebayDictionaryRecords;
+        $this->motors_specifics_dictionary_custom_count = $customDictionaryRecords;
         // ------------------------
 
         // ------------------------
@@ -76,8 +99,26 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
         );
         $ktypeMarketplaceCollection->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
         $this->is_motors_ktypes_marketplace_enabled = (bool)$ktypeMarketplaceCollection->getSize();
+
+        $ebayDictionaryRecords = (int)$resource->getConnection('core_read')
+             ->select()
+             ->from($ktypeDictionaryTable, array(new Zend_Db_Expr('COUNT(*)')))
+             ->where('is_custom = 0')
+             ->query()
+             ->fetchColumn();
+
+        $customDictionaryRecords = (int)$resource->getConnection('core_read')
+             ->select()
+             ->from($ktypeDictionaryTable, array(new Zend_Db_Expr('COUNT(*)')))
+             ->where('is_custom = 1')
+             ->query()
+             ->fetchColumn();
+
+        $this->motors_ktypes_dictionary_ebay_count   = $ebayDictionaryRecords;
+        $this->motors_ktypes_dictionary_custom_count = $customDictionaryRecords;
         // ------------------------
 
+        // ------------------------
         $attributesForPartsCompatibility = Mage::getResourceModel('catalog/product_attribute_collection')
             ->addVisibleFilter()
             ->addFieldToFilter('backend_type', array('eq' => 'text'))
@@ -88,6 +129,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
 
         $this->motors_specifics_attribute = $configModel->getGroupValue('/ebay/motor/','motors_specifics_attribute');
         $this->motors_ktypes_attribute = $configModel->getGroupValue('/ebay/motor/','motors_ktypes_attribute');
+        // ------------------------
 
         return parent::_beforeToHtml();
     }
@@ -120,7 +162,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
     public function isCurrencyForCode($code, $currency)
     {
         return $currency == Mage::helper('M2ePro/Module')->getConfig()
-                                                            ->getGroupValue('/ebay/selling/currency/', $code);
+                                                         ->getGroupValue('/ebay/selling/currency/', $code);
     }
 
     // #################################################

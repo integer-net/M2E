@@ -30,10 +30,15 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     const REVISE_MAX_AFFECTED_QTY_MODE_OFF = 0;
     const REVISE_MAX_AFFECTED_QTY_MODE_ON = 1;
 
-    const REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT = 10;
+    const REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT = 5;
 
     const REVISE_UPDATE_PRICE_NONE = 0;
     const REVISE_UPDATE_PRICE_YES  = 1;
+
+    const REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_OFF = 0;
+    const REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_ON  = 1;
+
+    const REVISE_UPDATE_PRICE_MAX_ALLOWED_DEVIATION_DEFAULT = 3;
 
     const REVISE_UPDATE_TITLE_NONE = 0;
     const REVISE_UPDATE_TITLE_YES  = 1;
@@ -177,6 +182,31 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     public function getReviseUpdateQtyMaxAppliedValue()
     {
         return (int)$this->getData('revise_update_qty_max_applied_value');
+    }
+
+    //------------------------
+
+    public function getReviseUpdatePriceMaxAllowedDeviationMode()
+    {
+        return (int)$this->getData('revise_update_price_max_allowed_deviation_mode');
+    }
+
+    public function isReviseUpdatePriceMaxAllowedDeviationModeOn()
+    {
+        return $this->getReviseUpdatePriceMaxAllowedDeviationMode() == self::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_ON;
+    }
+
+    public function isReviseUpdatePriceMaxAllowedDeviationModeOff()
+    {
+        return $this->getReviseUpdatePriceMaxAllowedDeviationMode()
+                    == self::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_OFF;
+    }
+
+    //------------------------
+
+    public function getReviseUpdatePriceMaxAllowedDeviation()
+    {
+        return (int)$this->getData('revise_update_price_max_allowed_deviation');
     }
 
     //------------------------
@@ -510,22 +540,24 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
     public function getReviseDefaultSettingsSimpleMode()
     {
         return array(
-            'revise_update_qty'                        => self::REVISE_UPDATE_QTY_YES,
-            'revise_update_qty_max_applied_value_mode' => self::REVISE_MAX_AFFECTED_QTY_MODE_OFF,
-            'revise_update_qty_max_applied_value'      => self::REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT,
-            'revise_update_price'                      => self::REVISE_UPDATE_PRICE_YES,
-            'revise_update_title'                      => self::REVISE_UPDATE_TITLE_YES,
-            'revise_update_sub_title'                  => self::REVISE_UPDATE_SUB_TITLE_YES,
-            'revise_update_description'                => self::REVISE_UPDATE_DESCRIPTION_YES,
-            'revise_update_images'                     => self::REVISE_UPDATE_IMAGES_YES,
+            'revise_update_qty'                              => self::REVISE_UPDATE_QTY_YES,
+            'revise_update_qty_max_applied_value_mode'       => self::REVISE_MAX_AFFECTED_QTY_MODE_OFF,
+            'revise_update_qty_max_applied_value'            => self::REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT,
+            'revise_update_price'                            => self::REVISE_UPDATE_PRICE_YES,
+            'revise_update_price_max_allowed_deviation_mode' => self::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_OFF,
+            'revise_update_price_max_allowed_deviation'      => self::REVISE_UPDATE_PRICE_MAX_ALLOWED_DEVIATION_DEFAULT,
+            'revise_update_title'                            => self::REVISE_UPDATE_TITLE_NONE,
+            'revise_update_sub_title'                        => self::REVISE_UPDATE_SUB_TITLE_NONE,
+            'revise_update_description'                      => self::REVISE_UPDATE_DESCRIPTION_NONE,
+            'revise_update_images'                           => self::REVISE_UPDATE_IMAGES_NONE,
 
-            'revise_change_selling_format_template'    =>
+            'revise_change_selling_format_template'          =>
                     Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES,
-            'revise_change_description_template'       => self::REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES,
-            'revise_change_category_template'          => self::REVISE_CHANGE_CATEGORY_TEMPLATE_YES,
-            'revise_change_payment_template'           => self::REVISE_CHANGE_PAYMENT_TEMPLATE_YES,
-            'revise_change_shipping_template'          => self::REVISE_CHANGE_SHIPPING_TEMPLATE_YES,
-            'revise_change_return_template'            => self::REVISE_CHANGE_RETURN_TEMPLATE_YES
+            'revise_change_description_template'             => self::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE,
+            'revise_change_category_template'                => self::REVISE_CHANGE_CATEGORY_TEMPLATE_YES,
+            'revise_change_payment_template'                 => self::REVISE_CHANGE_PAYMENT_TEMPLATE_YES,
+            'revise_change_shipping_template'                => self::REVISE_CHANGE_SHIPPING_TEMPLATE_YES,
+            'revise_change_return_template'                  => self::REVISE_CHANGE_RETURN_TEMPLATE_YES
         );
     }
 
@@ -534,7 +566,7 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
         return array(
             'relist_mode'             => self::RELIST_MODE_YES,
             'relist_filter_user_lock' => self::RELIST_FILTER_USER_LOCK_YES,
-            'relist_send_data'        => self::RELIST_SEND_DATA_YES,
+            'relist_send_data'        => self::RELIST_SEND_DATA_NONE,
             'relist_status_enabled'   => self::RELIST_STATUS_ENABLED_YES,
             'relist_is_in_stock'      => self::RELIST_IS_IN_STOCK_YES,
 
@@ -595,6 +627,9 @@ class Ess_M2ePro_Model_Ebay_Template_Synchronization extends Ess_M2ePro_Model_Co
         $simpleSettings = $this->getReviseDefaultSettingsSimpleMode();
 
         $simpleSettings['revise_update_qty_max_applied_value_mode'] = self::REVISE_MAX_AFFECTED_QTY_MODE_ON;
+
+        $simpleSettings['revise_update_price_max_allowed_deviation_mode']
+            = self::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_ON;
 
         return $simpleSettings;
     }

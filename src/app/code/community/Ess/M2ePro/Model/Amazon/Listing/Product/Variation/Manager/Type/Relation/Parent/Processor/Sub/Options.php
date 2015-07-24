@@ -16,14 +16,14 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     protected function check()
     {
-        if (count($this->getProcessor()->getChildListingProducts()) <= 0) {
+        if (count($this->getProcessor()->getTypeModel()->getChildListingsProducts()) <= 0) {
             return;
         }
 
         if (!$this->getProcessor()->isGeneralIdOwner() && !$this->getProcessor()->isGeneralIdSet()) {
-            foreach ($this->getProcessor()->getChildListingProducts() as $listingProduct) {
+            foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $listingProduct) {
                 if ($listingProduct->isNotListed()) {
-                    $this->getProcessor()->tryToDeleteChildListingProduct($listingProduct);
+                    $this->getProcessor()->tryToRemoveChildListingProduct($listingProduct);
                     continue;
                 }
 
@@ -36,7 +36,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             return;
         }
 
-        foreach ($this->getProcessor()->getChildListingProducts() as $listingProduct) {
+        foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $listingProduct) {
             /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
 
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
@@ -54,14 +54,14 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             }
 
             if (!$typeModel->isVariationProductMatched() && !$typeModel->isVariationChannelMatched()) {
-                $this->getProcessor()->tryToDeleteChildListingProduct($listingProduct);
+                $this->getProcessor()->tryToRemoveChildListingProduct($listingProduct);
                 continue;
             }
 
             if ($typeModel->isVariationProductMatched() && $typeModel->isVariationChannelMatched() &&
                 count($typeModel->getProductOptions()) != count($typeModel->getChannelOptions())
             ) {
-                $this->getProcessor()->tryToDeleteChildListingProduct($listingProduct);
+                $this->getProcessor()->tryToRemoveChildListingProduct($listingProduct);
             }
         }
     }
@@ -91,7 +91,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     private function matchExistingChildren()
     {
-        foreach ($this->getProcessor()->getChildListingProducts() as $childListingProduct) {
+        foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $childListingProduct) {
             /** @var Ess_M2ePro_Model_Listing_Product $childListingProduct */
 
             if (!$childListingProduct->getId()) {
@@ -120,7 +120,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     private function deleteBrokenChildren()
     {
-        foreach ($this->getProcessor()->getChildListingProducts() as $childListingProduct) {
+        foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $childListingProduct) {
             /** @var Ess_M2ePro_Model_Listing_Product $childListingProduct */
 
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $childTypeModel */
@@ -131,7 +131,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             }
 
             if (!$childTypeModel->isVariationChannelMatched() && !$childTypeModel->isVariationProductMatched()) {
-                $this->getProcessor()->tryToDeleteChildListingProduct($childListingProduct);
+                $this->getProcessor()->tryToRemoveChildListingProduct($childListingProduct);
                 continue;
             }
 
@@ -142,7 +142,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             }
 
             if (!$childTypeModel->isVariationProductMatched()) {
-                $this->getProcessor()->tryToDeleteChildListingProduct($childListingProduct);
+                $this->getProcessor()->tryToRemoveChildListingProduct($childListingProduct);
                 continue;
             }
 
@@ -150,7 +150,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
                 continue;
             }
 
-            $this->getProcessor()->tryToDeleteChildListingProduct($childListingProduct);
+            $this->getProcessor()->tryToRemoveChildListingProduct($childListingProduct);
         }
     }
 
@@ -172,7 +172,9 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
                 continue;
             }
 
-            $this->getProcessor()->createChildListingProduct($productOption, $channelOptions[$generalId], $generalId);
+            $this->getProcessor()->getTypeModel()->createChildListingProduct(
+                $productOption, $channelOptions[$generalId], $generalId
+            );
         }
     }
 
@@ -185,7 +187,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             return false;
         }
 
-        foreach ($this->getProcessor()->getChildListingProducts() as $childListingProduct) {
+        foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $childListingProduct) {
             /** @var Ess_M2ePro_Model_Listing_Product $childListingProduct */
 
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $childTypeModel */
@@ -204,18 +206,20 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         $productOptions = $this->getProcessor()->getTypeModel()->getNotRemovedUnusedProductOptions();
 
         foreach ($productOptions as $productOption) {
-            $this->getProcessor()->createChildListingProduct($productOption);
+            $this->getProcessor()->getTypeModel()->createChildListingProduct($productOption);
         }
     }
 
     private function setMatchedAttributesToChildren()
     {
-        foreach ($this->getProcessor()->getChildListingProducts() as $childListingProduct) {
+        foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $childListingProduct) {
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonChildListingProduct */
             $amazonChildListingProduct = $childListingProduct->getChildObject();
             $childTypeModel = $amazonChildListingProduct->getVariationManager()->getTypeModel();
 
-            if ($childTypeModel->isActualMatchedAttributes()) {
+            if ($childTypeModel->isActualMatchedAttributes() &&
+                !is_null($childTypeModel->getCorrectMatchedAttributes())
+            ) {
                 continue;
             }
 
@@ -253,7 +257,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
             $existChild = $this->findChildByProductOptions($productOption);
             if (!is_null($existChild)) {
-                $this->getProcessor()->tryToDeleteChildListingProduct($existChild);
+                $this->getProcessor()->tryToRemoveChildListingProduct($existChild);
             }
 
             $productVariation = $this->getProcessor()->getProductVariation($productOption);
@@ -296,7 +300,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
         $existChild = $this->findChildByChannelOptions($channelOptions[$generalId]);
         if (!is_null($existChild)) {
-            $this->getProcessor()->tryToDeleteChildListingProduct($existChild);
+            $this->getProcessor()->tryToRemoveChildListingProduct($existChild);
         }
 
         $listingProduct->setData('general_id', $generalId);
@@ -317,7 +321,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     private function findChildByOptions(array $options, $type)
     {
-        foreach ($this->getProcessor()->getChildListingProducts() as $childListingProduct) {
+        foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $childListingProduct) {
             /** @var Ess_M2ePro_Model_Listing_Product $childListingProduct */
 
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $childTypeModel */
@@ -350,7 +354,6 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         }
 
         $this->optionMatcher = Mage::getModel('M2ePro/Amazon_Listing_Product_Variation_Matcher_Option');
-        $this->optionMatcher->setMarketplaceId($this->getProcessor()->getMarketplaceId());
         $this->optionMatcher->setMagentoProduct($this->getProcessor()->getListingProduct()->getMagentoProduct());
         $this->optionMatcher->setMatchedAttributes($this->getProcessor()->getTypeModel()->getMatchedAttributes());
 

@@ -12,8 +12,6 @@
 class Ess_M2ePro_Model_Ebay_Listing_Product_PriceCalculator
     extends Ess_M2ePro_Model_Listing_Product_PriceCalculator
 {
-    // ########################################
-
     /**
      * @var bool
      */

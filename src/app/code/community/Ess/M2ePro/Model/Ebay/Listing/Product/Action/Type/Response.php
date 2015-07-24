@@ -283,17 +283,19 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
 
             $data['online_start_price'] = NULL;
             $data['online_reserve_price'] = NULL;
+            $data['online_buyitnow_price'] = NULL;
 
             if ($this->getRequestData()->hasVariations()) {
-                $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPrice(false);
+                $data['online_current_price'] = $this->getRequestData()->getVariationPrice(false);
             } else if ($this->getRequestData()->hasPriceFixed()) {
-                $data['online_buyitnow_price'] = $this->getRequestData()->getPriceFixed();
+                $data['online_current_price'] = $this->getRequestData()->getPriceFixed();
             }
 
         } else {
 
             if ($this->getRequestData()->hasPriceStart()) {
                 $data['online_start_price'] = $this->getRequestData()->getPriceStart();
+                $data['online_current_price'] = $this->getRequestData()->getPriceStart();
             }
             if ($this->getRequestData()->hasPriceReserve()) {
                 $data['online_reserve_price'] = $this->getRequestData()->getPriceReserve();
@@ -318,10 +320,16 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Response
 
         if ($this->getRequestData()->hasPrimaryCategory()) {
 
-            $data['online_category'] = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
+            $tempPath = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')->getPath(
                 $this->getRequestData()->getPrimaryCategory(),
                 $this->getMarketplace()->getId()
-            ).' ('.$this->getRequestData()->getPrimaryCategory().')';
+            );
+
+            if ($tempPath) {
+                $data['online_category'] = $tempPath.' ('.$this->getRequestData()->getPrimaryCategory().')';
+            } else {
+                $data['online_category'] = $this->getRequestData()->getPrimaryCategory();
+            }
         }
 
         return $data;

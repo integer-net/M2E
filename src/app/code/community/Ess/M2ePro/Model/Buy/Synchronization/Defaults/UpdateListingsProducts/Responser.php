@@ -12,6 +12,42 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
 
     // ########################################
 
+    protected function processResponseMessages(array $messages = array())
+    {
+        parent::processResponseMessages($messages);
+
+        foreach ($this->messages as $message) {
+
+            if (!$this->isMessageError($message) && !$this->isMessageWarning($message)) {
+                continue;
+            }
+
+            $logType = $this->isMessageError($message) ? Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
+                                                       : Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING;
+
+            $this->getSynchronizationLog()->addMessage(
+                Mage::helper('M2ePro')->__($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]),
+                $logType,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+            );
+        }
+    }
+
+    protected function isNeedToParseResponseData($responseBody)
+    {
+        if (!parent::isNeedToParseResponseData($responseBody)) {
+            return false;
+        }
+
+        if ($this->hasErrorMessages()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // ########################################
+
     public function unsetProcessingLocks(Ess_M2ePro_Model_Processing_Request $processingRequest)
     {
         parent::unsetProcessingLocks($processingRequest);
@@ -55,8 +91,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
 
             $this->updateReceivedListingsProducts($response['data']);
 
-            is_null($response['next_part']) && $this->resetIgnoreNextInventorySynch();
-
         } catch (Exception $exception) {
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
@@ -85,19 +119,15 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
                 continue;
             }
 
-            if ((int)$existingItem['ignore_next_inventory_synch'] == 1) {
-                continue;
-            }
-
             $receivedItem = $receivedItems[$existingItem['sku']];
 
             $newData = array(
-                'general_id' => (int)$receivedItem['general_id'],
-                'online_price' => (float)$receivedItem['price'],
-                'online_qty' => (int)$receivedItem['qty'],
-                'condition' => (int)$receivedItem['condition'],
-                'condition_note' => (string)$receivedItem['condition_note'],
-                'shipping_standard_rate' => (float)$receivedItem['shipping_standard_rate'],
+                'general_id'              => (int)$receivedItem['general_id'],
+                'online_price'            => (float)$receivedItem['price'],
+                'online_qty'              => (int)$receivedItem['qty'],
+                'condition'               => (int)$receivedItem['condition'],
+                'condition_note'          => (string)$receivedItem['condition_note'],
+                'shipping_standard_rate'  => (float)$receivedItem['shipping_standard_rate'],
                 'shipping_expedited_mode' => (int)$receivedItem['shipping_expedited_mode'],
                 'shipping_expedited_rate' => (float)$receivedItem['shipping_expedited_rate']
             );
@@ -109,53 +139,93 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
             }
 
             $existingData = array(
-                'general_id' => (int)$existingItem['general_id'],
-                'online_price' => (float)$existingItem['online_price'],
-                'online_qty' => (int)$existingItem['online_qty'],
-                'condition' => (int)$existingItem['condition'],
-                'condition_note' => (string)$existingItem['condition_note'],
-                'shipping_standard_rate' => (float)$existingItem['shipping_standard_rate'],
+                'general_id'              => (int)$existingItem['general_id'],
+                'online_price'            => (float)$existingItem['online_price'],
+                'online_qty'              => (int)$existingItem['online_qty'],
+                'condition'               => (int)$existingItem['condition'],
+                'condition_note'          => (string)$existingItem['condition_note'],
+                'shipping_standard_rate'  => (float)$existingItem['shipping_standard_rate'],
                 'shipping_expedited_mode' => (int)$existingItem['shipping_expedited_mode'],
                 'shipping_expedited_rate' => (float)$existingItem['shipping_expedited_rate'],
-                'status' => (int)$existingItem['status']
+                'status'                  => (int)$existingItem['status']
             );
+
+            $existingAdditionalData = @json_decode($existingItem['additional_data'], true);
+
+            if (!empty($existingAdditionalData['last_synchronization_dates']['selling']) &&
+                !empty($this->params['request_date'])
+            ) {
+                $lastSellingSynchDate = $existingAdditionalData['last_synchronization_dates']['selling'];
+
+                if (strtotime($lastSellingSynchDate) > strtotime($this->params['request_date'])) {
+                    unset($newData['online_qty'], $newData['online_price'], $newData['status']);
+                    unset($existingData['online_qty'], $existingData['online_price'], $existingData['status']);
+                }
+            }
 
             if ($newData == $existingData) {
                 continue;
             }
 
-            $newData['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
-
-            if ($newData['status'] != $existingItem['status'] ||
-                $newData['online_qty'] != $existingItem['online_qty']) {
+            if ((isset($newData['status']) && $newData['status'] != $existingItem['status']) ||
+                (isset($newData['online_qty']) && $newData['online_qty'] != $existingItem['online_qty']) ||
+                (isset($newData['online_price']) && $newData['online_price'] != $existingItem['online_price'])
+            ) {
                 Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
                     $existingItem['product_id'], Ess_M2ePro_Model_ProductChange::INITIATOR_SYNCHRONIZATION
                 );
             }
 
-            if ($newData['status'] != $existingItem['status']) {
+            $tempLogMessages = array();
 
-                $tempLogMessage = '';
-                switch ($newData['status']) {
-                    case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
-                        // M2ePro_TRANSLATIONS
-                        // Item status was successfully changed to "Active".
-                        $tempLogMessage = 'Item status was successfully changed to "Active".';
-                        break;
-                    case Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED:
-                        // M2ePro_TRANSLATIONS
-                        // Item status was successfully changed to "Inactive".
-                        $tempLogMessage = 'Item status was successfully changed to "Inactive".';
-                        break;
+            if (isset($newData['online_price']) && $newData['online_price'] != $existingData['online_price']) {
+                // M2ePro_TRANSLATIONS
+                // Item Price was successfully changed from %from% to %to% .
+                $tempLogMessages[] = Mage::helper('M2ePro')->__(
+                    'Item Price was successfully changed from %from% to %to% .',
+                    $existingItem['online_price'],
+                    $newData['online_price']
+                );
+            }
+
+            if (isset($newData['online_qty']) && $newData['online_qty'] != $existingData['online_qty']) {
+                // M2ePro_TRANSLATIONS
+                // Item QTY was successfully changed from %from% to %to% .
+                $tempLogMessages[] = Mage::helper('M2ePro')->__(
+                    'Item QTY was successfully changed from %from% to %to% .',
+                    $existingItem['online_qty'],
+                    $newData['online_qty']
+                );
+            }
+
+            if (isset($newData['status']) && $newData['status'] != $existingData['status']) {
+
+                $newData['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_COMPONENT;
+
+                $statusChangedFrom = Mage::helper('M2ePro/Component_Buy')
+                    ->getHumanTitleByListingProductStatus($existingData['status']);
+                $statusChangedTo = Mage::helper('M2ePro/Component_Buy')
+                    ->getHumanTitleByListingProductStatus($newData['status']);
+
+                if (!empty($statusChangedFrom) && !empty($statusChangedTo)) {
+                    // M2ePro_TRANSLATIONS
+                    // Item Status was successfully changed from "%from%" to "%to%" .
+                    $tempLogMessages[] = Mage::helper('M2ePro')->__(
+                        'Item Status was successfully changed from "%from%" to "%to%" .',
+                        $statusChangedFrom,
+                        $statusChangedTo
+                    );
                 }
+            }
 
+            foreach($tempLogMessages as $tempLogMessage) {
                 $tempLog->addProductMessage(
                     $existingItem['listing_id'],
                     $existingItem['product_id'],
                     $existingItem['listing_product_id'],
                     Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
                     $this->getLogsActionId(),
-                    Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL,
+                    Ess_M2ePro_Model_Listing_Log::ACTION_CHANNEL_CHANGE,
                     $tempLogMessage,
                     Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
@@ -167,33 +237,6 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
 
             $listingProductObj->addData($newData)->save();
         }
-    }
-
-    protected function resetIgnoreNextInventorySynch()
-    {
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-
-        $listingTable = Mage::getResourceModel('M2ePro/Listing')->getMainTable();
-        $listingProductTable = Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable();
-
-        /** @var $collection Varien_Data_Collection_Db */
-        $dbSelect = $connRead->select();
-        $dbSelect->from(array('lp' => $listingProductTable), array())
-                 ->join(array('l' => $listingTable), 'lp.listing_id = l.id', array())
-                 ->where('l.account_id = ?',(int)$this->getAccount()->getId())
-                 ->where('lp.component_mode = ?',Ess_M2ePro_Helper_Component_Buy::NICK)
-                 ->reset(Zend_Db_Select::COLUMNS)
-                 ->columns(array('lp.id'));
-
-        $connWrite->update(
-            Mage::getResourceModel('M2ePro/Buy_Listing_Product')->getMainTable(),
-            array('ignore_next_inventory_synch' => 0),
-            new Zend_Db_Expr('`listing_product_id` IN ('.$dbSelect->__toString().')')
-        );
     }
 
     // ########################################
@@ -220,13 +263,13 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
         if ($withData) {
             $tempColumns = array('main_table.listing_id',
                                  'main_table.product_id','main_table.status',
+                                 'main_table.additional_data',
                                  'second_table.sku','second_table.general_id',
                                  'second_table.online_price','second_table.online_qty',
                                  'second_table.condition','second_table.condition_note',
                                  'second_table.shipping_standard_rate',
                                  'second_table.shipping_expedited_mode',
                                  'second_table.shipping_expedited_rate',
-                                 'second_table.ignore_next_inventory_synch',
                                  'second_table.listing_product_id');
         }
 

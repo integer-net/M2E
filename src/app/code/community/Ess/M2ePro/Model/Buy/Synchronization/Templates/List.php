@@ -52,12 +52,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_List
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            $actionParams = array('all_data'=>true);
+            $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_LIST, $configurator
             );
 
             if ($isExistInRunner) {
@@ -69,9 +67,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_List
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_LIST, $configurator
             );
 
             $this->setListAttemptData($listingProduct);
@@ -99,12 +95,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_List
             $listingProduct->getMagentoProduct()->enableCache();
             $listingProduct->setData('tried_to_list',1)->save();
 
-            $actionParams = array('all_data'=>true);
+            $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_LIST, $configurator
             );
 
             if ($isExistInRunner) {
@@ -116,9 +110,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_List
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_LIST,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_LIST, $configurator
             );
 
             $this->setListAttemptData($listingProduct);

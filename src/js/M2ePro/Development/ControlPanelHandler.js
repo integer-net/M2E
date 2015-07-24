@@ -1,5 +1,5 @@
-ControlPanelHandler = Class.create();
-ControlPanelHandler.prototype = Object.extend(new CommonHandler(), {
+DevelopmentControlPanelHandler = Class.create();
+DevelopmentControlPanelHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 

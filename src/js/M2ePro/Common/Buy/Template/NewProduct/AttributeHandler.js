@@ -6,6 +6,8 @@ CommonBuyTemplateNewProductAttributeHandler.prototype = Object.extend(new Common
     popups: [],
     attributesDataDefinion: [],
 
+    attrData: '',
+
     //----------------------------------
 
     initialize: function()

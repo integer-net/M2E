@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs extends Mage_Adminhtml_Block_Widget_Tabs
 {
-    // ########################################
-
     const TAB_ID_LISTING            = 'listing';
     const TAB_ID_LISTING_OTHER      = 'listing_other';
     const TAB_ID_ORDER              = 'order';
@@ -27,10 +25,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs extends Mage_Adminhtml_Block_Widg
 
     protected function _prepareLayout()
     {
-        $isAdvancedMode = Mage::helper('M2ePro/View_Ebay')->isAdvancedMode();
-
         $this->addTab(self::TAB_ID_LISTING, $this->prepareTabListing());
-        $isAdvancedMode && $this->addTab(self::TAB_ID_LISTING_OTHER, $this->prepareTabListingOther());
+
+        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode() &&
+            Mage::helper('M2ePro/View_Ebay')->is3rdPartyShouldBeShown()) {
+
+            $this->addTab(self::TAB_ID_LISTING_OTHER, $this->prepareTabListingOther());
+        }
+
         $this->addTab(self::TAB_ID_ORDER, $this->prepareTabOrder());
         $this->addTab(self::TAB_ID_SYNCHRONIZATION, $this->prepareTabSynchronization());
 

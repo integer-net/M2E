@@ -36,9 +36,6 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
     const OTHER_LISTINGS_MOVE_TO_LISTINGS_SYNCH_MODE_PRICE  = 2;
     const OTHER_LISTINGS_MOVE_TO_LISTINGS_SYNCH_MODE_QTY  = 3;
 
-    const ORDERS_MODE_NO  = 0;
-    const ORDERS_MODE_YES = 1;
-
     const MAGENTO_ORDERS_LISTINGS_MODE_NO  = 0;
     const MAGENTO_ORDERS_LISTINGS_MODE_YES = 1;
 
@@ -394,18 +391,6 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
             'other_listings_move_settings', 'synch', self::OTHER_LISTINGS_MOVE_TO_LISTINGS_SYNCH_MODE_NONE
         );
         return $setting == self::OTHER_LISTINGS_MOVE_TO_LISTINGS_SYNCH_MODE_PRICE;
-    }
-
-    // ########################################
-
-    public function getOrdersMode()
-    {
-        return (int)$this->getData('orders_mode');
-    }
-
-    public function isOrdersModeEnabled()
-    {
-        return $this->getOrdersMode() == self::ORDERS_MODE_YES;
     }
 
     // ########################################

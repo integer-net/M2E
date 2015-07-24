@@ -43,6 +43,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings
         $result = true;
 
         $result = !$this->processTask('OtherListings_Update') ? false : $result;
+        $result = !$this->processTask('OtherListings_Sku') ? false : $result;
         $result = !$this->processTask('OtherListings_Templates') ? false : $result;
 
         return $result;

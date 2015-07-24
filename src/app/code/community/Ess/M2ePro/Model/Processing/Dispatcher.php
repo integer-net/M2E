@@ -220,9 +220,11 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
 
             // send parts to the server
             $dispatcherObject = Mage::getModel('M2ePro/Connector_'.ucfirst($component).'_Dispatcher');
-            $results = $dispatcherObject->processVirtual('processing','get','results',
-                                                          array('processing_ids'=>$processingIds),
-                                                         'results', NULL, NULL);
+            $connectorObj = $dispatcherObject->getVirtualConnector('processing','get','results',
+                                                                   array('processing_ids'=>$processingIds),
+                                                                   'results', NULL, NULL);
+
+            $results = $dispatcherObject->process($connectorObj);
 
             if (empty($results)) {
                 continue;
@@ -265,22 +267,29 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
 
             $nextPart = NULL;
 
-            foreach ($processingObjects[$processingId] as $processingRequest) {
+            foreach ($processingObjects[$processingId] as $key => $processingRequest) {
 
                 /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-                $tempNextPart = $processingRequest->getNextPart();
+
+                if (is_null($processingRequest->getNextPart())) {
+                    unset($processingObjects[$processingId][$key]);
+                    continue;
+                }
+
+                $tempNextPart = (int)$processingRequest->getNextPart();
 
                 if (is_null($nextPart) || $tempNextPart < $nextPart) {
                     $nextPart = $tempNextPart;
                 }
             }
 
-            if (is_null($nextPart) || $nextPart < 1) {
-                $nextPart = 1;
+            if (empty($processingObjects[$processingId])) {
+                continue;
             }
 
-            $this->processPartialProcessingRequestsNextPart($component,$processingId,$processingObjects[$processingId],
-                                                            $nextPart, 1);
+            $this->processPartialProcessingRequestsNextPart(
+                $component, $processingId, array_values($processingObjects[$processingId]), $nextPart, 1
+            );
         }
     }
 
@@ -296,8 +305,10 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
 
         // send parts to the server
         $dispatcherObject = Mage::getModel('M2ePro/Connector_'.ucfirst($component).'_Dispatcher');
-        $results = $dispatcherObject->processVirtual('processing','get','results',
-                                                      $params, 'results', NULL, NULL);
+        $connectorObj = $dispatcherObject->getVirtualConnector('processing','get','results',
+                                                               $params, 'results', NULL, NULL);
+
+        $results = $dispatcherObject->process($connectorObj);
 
         if (empty($results)) {
             return;
@@ -317,8 +328,7 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
         !isset($results[$processingId]['messages']) && $results[$processingId]['messages'] = array();
 
         $nextPart = NULL;
-        if (isset($results[$processingId]['next_part']) &&
-            (int)$results[$processingId]['next_part'] >= 2) {
+        if (isset($results[$processingId]['next_part']) && (int)$results[$processingId]['next_part'] >= 2) {
             $nextPart = (int)$results[$processingId]['next_part'];
         }
 
@@ -327,40 +337,47 @@ final class Ess_M2ePro_Model_Processing_Dispatcher
 
             /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
 
-            $results[$processingId]['data']['next_part'] = $nextPart;
-
             $responserRunner = $processingRequest->getResponserRunner();
-            $processResult = $responserRunner->process(
-                (array)$results[$processingId]['data'], (array)$results[$processingId]['messages']
-            );
+
+            if ((int)$processingRequest->getNextPart() == $necessaryPart) {
+
+                $results[$processingId]['data']['next_part'] = $nextPart;
+
+                $processResult = $responserRunner->process(
+                    (array)$results[$processingId]['data'], (array)$results[$processingId]['messages']
+                );
+
+                if (!$processResult) {
+                    continue;
+                }
+
+                $processingRequest->setData('next_part', $nextPart)->save();
+            }
 
             $this->getLockItem()->activate();
 
-            if ($processResult) {
-                if (is_null($nextPart)) {
-                    $responserRunner->complete();
-                } else {
-                    $nextProcessingRequests[] = $processingRequest;
-                }
+            if (is_null($nextPart)) {
+                $responserRunner->complete();
+            } else {
+                $nextProcessingRequests[] = $processingRequest;
             }
         }
 
-        if (!is_null($nextPart) && count($nextProcessingRequests) > 0) {
-
-            foreach ($nextProcessingRequests as $processingRequest) {
-                /** @var $processingRequest Ess_M2ePro_Model_Processing_Request */
-                $processingRequest->setData('next_part',$nextPart)->save();
-            }
-
-            if ($countCycles >= self::MAX_REQUESTS_PER_ONE_TIME) {
-                return;
-            }
-
-            unset($results, $dispatcherObject, $processingRequests);
-
-            $this->processPartialProcessingRequestsNextPart($component,$processingId,$nextProcessingRequests,
-                                                            $nextPart, $countCycles + 1);
+        if (is_null($nextPart) || empty($nextProcessingRequests)) {
+            return;
         }
+
+        if ($countCycles >= self::MAX_REQUESTS_PER_ONE_TIME) {
+            return;
+        }
+
+        unset($results, $dispatcherObject, $processingRequests);
+
+        $this->processPartialProcessingRequestsNextPart(
+            $component, $processingId,
+            $nextProcessingRequests,
+            $nextPart, $countCycles + 1
+        );
     }
 
     // ########################################

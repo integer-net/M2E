@@ -53,6 +53,8 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationNewAmazon_Installation
         return 'Migration Wizard to the New M2E Pro Amazon Generation';
     }
 
+    protected function appendButtons() {}
+
     protected function _toHtml()
     {
         $urls = json_encode(array(

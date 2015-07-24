@@ -28,24 +28,47 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
     {
         $data = array();
 
-        if (!$this->getConfigurator()->isDetails()) {
+        if (!$this->getConfigurator()->isDetailsAllowed()) {
             return $data;
         }
 
         if (!$this->getVariationManager()->isRelationParentType()) {
-            $data = array_merge($data, $this->getConditionData());
+            $data = array_merge(
+                $data,
+                $this->getConditionData(),
+                $this->getGiftData()
+            );
         }
 
-        if (!$this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
-            return $data;
-        }
+        $isUseDescriptionTemplate = false;
 
-        $variationManager = $this->getAmazonListingProduct()->getVariationManager();
+        do {
 
-        if (($variationManager->isRelationChildType() || $variationManager->isIndividualType()) &&
-            ($this->getMagentoProduct()->isSimpleTypeWithCustomOptions() ||
-             $this->getMagentoProduct()->isBundleType())
-        ) {
+            if (!$this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
+                break;
+            }
+
+            $variationManager = $this->getAmazonListingProduct()->getVariationManager();
+
+            if (($variationManager->isRelationChildType() || $variationManager->isIndividualType()) &&
+                ($this->getMagentoProduct()->isSimpleTypeWithCustomOptions() ||
+                 $this->getMagentoProduct()->isBundleType())) {
+                break;
+            }
+
+            $isUseDescriptionTemplate = true;
+
+        } while (false);
+
+        if (!$isUseDescriptionTemplate) {
+
+            if (isset($data['gift_wrap']) || isset($data['gift_message'])) {
+
+                $data['description_data']['title'] = $this->getAmazonListingProduct()
+                                                          ->getMagentoProduct()
+                                                          ->getName();
+            }
+
             return $data;
         }
 
@@ -79,30 +102,25 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
         );
     }
 
-    private function getProductData()
+    private function getGiftData()
     {
         $data = array();
+        $giftWrap = $this->getAmazonListingProduct()->getListingSource()->getGiftWrap();
 
-        $this->searchNotFoundAttributes();
-
-        foreach ($this->getDescriptionTemplate()->getSpecifics(true) as $specific) {
-
-            $path = $specific->getSource(
-                $this->getAmazonListingProduct()->getActualMagentoProduct()
-            )->getPath();
-
-            $data = Mage::helper('M2ePro')->arrayReplaceRecursive(
-                $data, json_decode($path, true)
-            );
+        if (!is_null($giftWrap)) {
+            $data['gift_wrap'] = $giftWrap;
         }
 
-        $this->processNotFoundAttributes('Product Specifics');
+        $giftMessage = $this->getAmazonListingProduct()->getListingSource()->getGiftMessage();
 
-        return array(
-            'product_data'      => $data,
-            'product_data_nick' => $this->getDescriptionTemplate()->getProductDataNick(),
-        );
+        if (!is_null($giftMessage)) {
+            $data['gift_message'] = $giftMessage;
+        }
+
+        return $data;
     }
+
+    // ---------------------------------------
 
     private function getDescriptionData()
     {
@@ -110,22 +128,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
 
         $data = array(
             'brand'                    => $source->getBrand(),
+
             'manufacturer'             => $source->getManufacturer(),
             'manufacturer_part_number' => $source->getManufacturerPartNumber(),
-
-            'item_dimensions_volume'                 => $source->getItemDimensionsVolume(),
-            'item_dimensions_volume_unit_of_measure' => $source->getItemDimensionsVolumeUnitOfMeasure(),
-            'item_dimensions_weight'                 => $source->getItemDimensionsWeight(),
-            'item_dimensions_weight_unit_of_measure' => $source->getItemDimensionsWeightUnitOfMeasure(),
-
-            'package_dimensions_volume'                 => $source->getPackageDimensionsVolume(),
-            'package_dimensions_volume_unit_of_measure' => $source->getPackageDimensionsVolumeUnitOfMeasure(),
-
-            'package_weight'                  => $source->getPackageWeight(),
-            'package_weight_unit_of_measure'  => $source->getPackageWeightUnitOfMeasure(),
-
-            'shipping_weight'                 => $source->getShippingWeight(),
-            'shipping_weight_unit_of_measure' => $source->getShippingWeightUnitOfMeasure(),
         );
 
         $this->searchNotFoundAttributes();
@@ -148,6 +153,46 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
         $data['target_audience'] = $this->getDefinitionSource()->getTargetAudience();
         $this->processNotFoundAttributes('Target Audience');
 
+        $this->searchNotFoundAttributes();
+        $data['item_dimensions_volume'] = $source->getItemDimensionsVolume();
+        $this->processNotFoundAttributes('Product Dimensions Volume');
+
+        $this->searchNotFoundAttributes();
+        $data['item_dimensions_volume_unit_of_measure'] = $source->getItemDimensionsVolumeUnitOfMeasure();
+        $this->processNotFoundAttributes('Product Dimensions Measure Units');
+
+        $this->searchNotFoundAttributes();
+        $data['item_dimensions_weight'] = $source->getItemDimensionsWeight();
+        $this->processNotFoundAttributes('Product Dimensions Weight');
+
+        $this->searchNotFoundAttributes();
+        $data['item_dimensions_weight_unit_of_measure'] = $source->getItemDimensionsWeightUnitOfMeasure();
+        $this->processNotFoundAttributes('Product Dimensions Weight Units');
+
+        $this->searchNotFoundAttributes();
+        $data['package_dimensions_volume'] = $source->getPackageDimensionsVolume();
+        $this->processNotFoundAttributes('Package Dimensions Volume');
+
+        $this->searchNotFoundAttributes();
+        $data['package_dimensions_volume_unit_of_measure'] = $source->getPackageDimensionsVolumeUnitOfMeasure();
+        $this->processNotFoundAttributes('Package Dimensions Measure Units');
+
+        $this->searchNotFoundAttributes();
+        $data['package_weight'] = $source->getPackageWeight();
+        $this->processNotFoundAttributes('Package Weight');
+
+        $this->searchNotFoundAttributes();
+        $data['package_weight_unit_of_measure'] = $source->getPackageWeightUnitOfMeasure();
+        $this->processNotFoundAttributes('Package Weight Units');
+
+        $this->searchNotFoundAttributes();
+        $data['shipping_weight'] = $source->getShippingWeight();
+        $this->processNotFoundAttributes('Shipping Weight');
+
+        $this->searchNotFoundAttributes();
+        $data['shipping_weight_unit_of_measure'] = $source->getShippingWeightUnitOfMeasure();
+        $this->processNotFoundAttributes('Shipping Weight Units');
+
         if (is_null($data['package_weight'])) {
             unset(
                 $data['package_weight'],
@@ -162,8 +207,78 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
             );
         }
 
+        if (!$this->getVariationManager()->isRelationParentType()) {
+            return array(
+                'description_data' => $data
+            );
+        }
+
+        if (in_array('', $data['item_dimensions_volume']) || $data['item_dimensions_volume_unit_of_measure'] === '') {
+            unset(
+                $data['item_dimensions_volume'],
+                $data['item_dimensions_volume_unit_of_measure']
+            );
+        }
+
+        if ($data['item_dimensions_weight'] === '' || $data['item_dimensions_weight_unit_of_measure'] === '') {
+            unset(
+                $data['item_dimensions_weight'],
+                $data['item_dimensions_weight_unit_of_measure']
+            );
+        }
+
+        if (in_array('', $data['package_dimensions_volume']) ||
+            $data['package_dimensions_volume_unit_of_measure'] === ''
+        ) {
+            unset(
+                $data['package_dimensions_volume'],
+                $data['package_dimensions_volume_unit_of_measure']
+            );
+        }
+
+        if ($data['package_weight'] === '' || $data['package_weight_unit_of_measure'] === '') {
+            unset(
+                $data['package_weight'],
+                $data['package_weight_unit_of_measure']
+            );
+        }
+
+        if ($data['shipping_weight'] === '' || $data['shipping_weight_unit_of_measure'] === '') {
+            unset(
+                $data['shipping_weight'],
+                $data['shipping_weight_unit_of_measure']
+            );
+        }
+
         return array(
             'description_data' => $data
+        );
+    }
+
+    // ---------------------------------------
+
+    private function getProductData()
+    {
+        $data = array();
+
+        $this->searchNotFoundAttributes();
+
+        foreach ($this->getDescriptionTemplate()->getSpecifics(true) as $specific) {
+
+            $path = $specific->getSource(
+                $this->getAmazonListingProduct()->getActualMagentoProduct()
+            )->getPath();
+
+            $data = Mage::helper('M2ePro')->arrayReplaceRecursive(
+                $data, json_decode($path, true)
+            );
+        }
+
+        $this->processNotFoundAttributes('Product Specifics');
+
+        return array(
+            'product_data'      => $data,
+            'product_data_nick' => $this->getDescriptionTemplate()->getProductDataNick(),
         );
     }
 

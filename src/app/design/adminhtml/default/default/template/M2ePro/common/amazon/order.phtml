@@ -1,6 +1,11 @@
 <?php
     /** @var $this Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View */
     echo $this->getChildHtml('item_edit');
+
+    $currency = $this->order->getData('currency');
+    if (empty($currency)) {
+        $currency = $this->order->getMarketplace()->getChildObject()->getDefaultCurrency();
+    }
 ?>
 
 <!-- ########################################################################################### -->
@@ -316,7 +321,7 @@
                                     <?php if (!$this->order->getData('shipping_price')) { ?>
                                         <?php echo Mage::helper('M2ePro')->__('N/A'); ?>
                                     <?php } else { ?>
-                                        <?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getCurrency(), $this->order->getData('shipping_price')); ?>
+                                        <?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $this->order->getData('shipping_price')); ?>
                                     <?php } ?>
                                 </strong>
                             </td>
@@ -388,22 +393,22 @@
 
                 <tr>
                     <td class="label"><?php echo Mage::helper('M2ePro')->__('Subtotal'); ?></td>
-                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getChildObject()->getSubtotalPrice());?></span></td>
+                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $this->order->getChildObject()->getSubtotalPrice());?></span></td>
                 </tr>
 
                 <tr>
                     <td class="label"><?php echo Mage::helper('M2ePro')->__('Shipping &amp; Handling'); ?></td>
-                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getData('shipping_price')); ?></span></td>
+                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $this->order->getData('shipping_price')); ?></span></td>
                 </tr>
 
                 <tr>
                     <td class="label"><?php echo Mage::helper('M2ePro')->__('Promotions'); ?></td>
-                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getChildObject()->getPromotionDiscountAmount() + $this->order->getChildObject()->getShippingDiscountAmount()); ?></span></td>
+                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $this->order->getChildObject()->getPromotionDiscountAmount() + $this->order->getChildObject()->getShippingDiscountAmount()); ?></span></td>
                 </tr>
 
                 <tr>
                     <td class="label"><?php echo Mage::helper('M2ePro')->__('Tax'); ?></td>
-                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getChildObject()->getProductPriceTaxAmount()); ?></span></td>
+                    <td><span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $this->order->getChildObject()->getProductPriceTaxAmount()); ?></span></td>
                 </tr>
 
             </tbody>
@@ -417,7 +422,7 @@
                     <td class="emph">
                         <big>
                             <strong>
-                                <span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getChildObject()->getGrandTotalPrice());?></span>
+                                <span class="price"><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $this->order->getChildObject()->getGrandTotalPrice());?></span>
                             </strong>
                         </big>
                     </td>
@@ -425,7 +430,7 @@
 
                 <tr>
                     <td class="label"><small><?php echo Mage::helper('M2ePro')->__('Amount Paid'); ?></small></td>
-                    <td><span class="price"><small><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($this->order->getData('currency'), $this->order->getData('paid_amount'));?></small></span></td>
+                    <td><span class="price"><small><?php echo Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $this->order->getData('paid_amount'));?></small></span></td>
                 </tr>
 
             </tfoot>

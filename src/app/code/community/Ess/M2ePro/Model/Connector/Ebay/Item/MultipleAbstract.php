@@ -45,7 +45,8 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
         /** @var Ess_M2ePro_Model_Marketplace $marketplace */
         $marketplace = reset($listingsProducts)->getMarketplace();
 
-        $listingProductIds = array();
+        $listingProductIds   = array();
+        $actionConfigurators = array();
 
         foreach($listingsProducts as $listingProduct) {
 
@@ -62,19 +63,31 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
             }
 
             $listingProductIds[] = $listingProduct->getId();
+
+            if (!is_null($listingProduct->getActionConfigurator())) {
+                $actionConfigurators[$listingProduct->getId()] = $listingProduct->getActionConfigurator();
+            } else {
+                $actionConfigurators[$listingProduct->getId()] = Mage::getModel(
+                    'M2ePro/Ebay_Listing_Product_Action_Configurator'
+                );
+            }
         }
 
         /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
         $listingProductCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('id', array('in' => array_unique($listingProductIds)));
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $actualListingsProducts */
         $actualListingsProducts = $listingProductCollection->getItems();
 
         if (empty($actualListingsProducts)) {
             throw new Exception('All products were removed before connector processing');
         }
 
-        $this->listingsProducts = $actualListingsProducts;
+        foreach ($actualListingsProducts as $actualListingProduct) {
+            $actualListingProduct->setActionConfigurator($actionConfigurators[$actualListingProduct->getId()]);
+            $this->listingsProducts[$actualListingProduct->getId()] = $actualListingProduct;
+        }
 
         parent::__construct($params,$marketplace,$account);
     }

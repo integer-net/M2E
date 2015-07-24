@@ -7,8 +7,6 @@
 class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
     extends Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
 {
-    //#############################################
-
     protected  $sessionKey = 'ebay_listing_product_add';
 
     //#############################################
@@ -35,6 +33,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             ->addJs('M2ePro/GridHandler.js')
             ->addJs('M2ePro/Listing/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ViewGridHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/VariationProductManageHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Settings/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ProductAdd/Settings/GridHandler.js')
 

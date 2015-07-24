@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Magento_Quote_Item
 {
-    // ########################################
-
     /** @var Mage_Sales_Model_Quote */
     private $quote = NULL;
 

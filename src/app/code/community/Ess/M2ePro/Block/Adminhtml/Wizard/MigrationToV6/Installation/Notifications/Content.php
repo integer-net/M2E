@@ -30,7 +30,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Installation_Notifications
             ->toHtml();
 
         $registry = Mage::getModel('M2ePro/Registry');
-        $html = $registry->load('wizard_migrationToV6_notes_html', 'key')->getData('value');
+        $html = $registry->load('/wizard/migrationToV6_notes_html/', 'key')->getData('value');
 
         if (empty($html)) {
             $this->setData('save_migration_notes', true);
@@ -38,7 +38,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Installation_Notifications
         }
 
         if ($this->getData('save_migration_notes')) {
-            $registry->setData('key', 'wizard_migrationToV6_notes_html')
+            $registry->setData('key', '/wizard/migrationToV6_notes_html/')
                      ->setData('value', $html);
             $registry->save();
         }

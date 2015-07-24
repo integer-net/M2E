@@ -30,21 +30,6 @@ class Ess_M2ePro_Model_Buy_Marketplace extends Ess_M2ePro_Model_Component_Child_
 
     // ########################################
 
-    public function isSynchronized()
-    {
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $table = Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category');
-
-        $count = (int)$connRead->select()->from($table,'COUNT(*)')
-                                         ->query()
-                                         ->fetchColumn();
-
-        return $count > 0;
-    }
-
-    // ########################################
-
     public function save()
     {
         Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');

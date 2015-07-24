@@ -16,6 +16,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Grid extend
     /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Option $matcherOptions */
     private $matcherOptions;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -24,10 +26,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Grid extend
         $this->listingProduct = Mage::getModel('M2ePro/Listing_Product')->load($this->productId);
 
         $this->matcherAttributes = Mage::getModel('M2ePro/Amazon_Listing_Product_Variation_Matcher_Attribute');
-        $this->matcherAttributes->setMarketplaceId(Mage::helper('M2ePro/Data_Global')->getValue('marketplace_id'));
-
         $this->matcherOptions = Mage::getModel('M2ePro/Amazon_Listing_Product_Variation_Matcher_Option');
-        $this->matcherOptions->setMarketplaceId(Mage::helper('M2ePro/Data_Global')->getValue('marketplace_id'));
 
         $this->currency = Mage::helper('M2ePro/Component_Amazon')
             ->getCachedObject('Marketplace', Mage::helper('M2ePro/Data_Global')->getValue('marketplace_id'))
@@ -453,13 +452,23 @@ HTML;
             );
 
             $variations = $row->getData('variations');
+            $amazonAttributes = array_keys($variations['set']);
+
             $this->matcherAttributes->setMagentoProduct($this->listingProduct->getMagentoProduct());
-            $this->matcherAttributes->setDestinationAttributes(array_keys($variations['set']));
+            $this->matcherAttributes->setDestinationAttributes($amazonAttributes);
 
             if(!$this->matcherAttributes->isAmountEqual()) {
+                $magentoAttributes = implode(',', $this->listingProduct->getChildObject()->getVariationManager()
+                    ->getTypeModel()->getProductAttributes());
+                $amazonAttributes = implode(',', $amazonAttributes);
+
                 $msg = Mage::helper('M2ePro')->__(
-                    'This ASIN/ISBN cannot be assigned to selected Magento Product. <br/>
-                     The number of Magento Attributes is different from Amazon Attributes.'
+                    'This ASIN/ISBN cannot be assigned to selected Magento Product.<br/>
+                     The number of Magento Attributes is different from Amazon Attributes.<br/>
+                     Magento Attributes: %magento_attributes%<br/>
+                     Amazon Attributes: %amazon_attributes%<br/>',
+                    $magentoAttributes,
+                    $amazonAttributes
                 );
             }
 

@@ -24,7 +24,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration/account');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration');
     }
 
     //#############################################
@@ -169,15 +169,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
 
         // tab: orders
         //--------------------
-        $keys = array(
-            'orders_mode'
-        );
-        foreach ($keys as $key) {
-            if (isset($post[$key])) {
-                $data[$key] = $post[$key];
-            }
-        }
-
         $data['magento_orders_settings'] = array();
 
         // m2e orders settings
@@ -373,7 +364,11 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
                         'ftp_inventory_access' => $post['ftp_inventory_access'],
                         'ftp_orders_access' => $post['ftp_orders_access']
                     );
-                    $dispatcherObject->processConnector('account', 'add' ,'entityRequester', $params, $id);
+
+                    $connectorObj = $dispatcherObject->getConnector('account', 'add' ,'entityRequester',
+                                                                    $params, $id);
+                    $dispatcherObject->process($connectorObj);
+
                 } else {
                     $newData = array(
                         'title' => $post['title'],
@@ -395,7 +390,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
                     $params = array_diff_assoc($newData, $oldData);
 
                     if (!empty($params)) {
-                        $dispatcherObject->processConnector('account', 'update' ,'entityRequester', $params, $id);
+                        $connectorObj = $dispatcherObject->getConnector('account', 'update' ,'entityRequester',
+                                                                        $params, $id);
+                        $dispatcherObject->process($connectorObj);
                     }
                 }
             }
@@ -462,9 +459,10 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
             try {
 
                 $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
-                $status = $dispatcherObject->processVirtual('account','check',$commandName,$params,'status');
+                $connectorObj = $dispatcherObject->getVirtualConnector('account','check',$commandName,
+                                                                       $params,'status');
 
-                $result['result'] = $status;
+                $result['result'] = $dispatcherObject->process($connectorObj);
 
             } catch (Exception $exception) {
                 $result['result'] = false;

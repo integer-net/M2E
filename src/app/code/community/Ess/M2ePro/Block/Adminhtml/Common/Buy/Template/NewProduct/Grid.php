@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_NewProduct_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();

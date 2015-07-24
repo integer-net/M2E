@@ -32,7 +32,7 @@
         'qty_custom_value' => 1,
         'qty_custom_attribute' => '',
         'qty_percentage' => 100,
-        'qty_modification_mode' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODIFICATION_MODE_ON,
+        'qty_modification_mode' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF,
         'qty_min_posted_value' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MIN_POSTED_DEFAULT_VALUE,
         'qty_max_posted_value' => Ess_M2ePro_Model_Amazon_Template_SellingFormat::QTY_MAX_POSTED_DEFAULT_VALUE,
 
@@ -279,7 +279,7 @@
 
                 <tr id="qty_custom_value_tr" style="display: none;">
                     <td class="label">
-                        <label for="qty_custom_value"><?php echo Mage::helper('M2ePro')->__('Quantity Value'); ?>: </label>
+                        <label for="qty_custom_value"><?php echo Mage::helper('M2ePro')->__('Quantity Value'); ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value" style="width: auto;">
                         <input id="qty_custom_value" name="qty_custom_value" value="<?php echo $this->escapeHtml($formData['qty_custom_value']); ?>" type="text" class="input-text M2ePro-required-when-visible validate-digits" />
@@ -307,7 +307,7 @@
                 <!-- Max Posted QTY-->
                 <tr id="qty_modification_mode_tr" style="display: none;">
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Conditional Quantity'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Conditional Quantity'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="qty_modification_mode" name="qty_modification_mode" class="required-entry">

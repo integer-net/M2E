@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -19,22 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
 
         // Set header text
         //------------------------------
-        $additionalTitleString = '';
-        if ($accountId = $this->getRequest()->getParam('account')) {
-            $accountObj = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
-                'Account',$accountId
-            );
-            $additionalTitleString .= Mage::helper('M2ePro')->__('eBay User ID').': "'.$accountObj->getTitle().'"';
-        }
-        if ($marketplaceId = $this->getRequest()->getParam('marketplace')) {
-            $marketplaceObj = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
-                'Marketplace',$marketplaceId
-            );
-            !empty($additionalTitleString) && $additionalTitleString .= ', ';
-            $additionalTitleString .= Mage::helper('M2ePro')->__('eBay Site').': "'.$marketplaceObj->getTitle().'"';
-        }
-        !empty($additionalTitleString) && $additionalTitleString = ' ('.$additionalTitleString.')';
-        $this->_headerText = Mage::helper('M2ePro')->__('3rd Party Listings').$additionalTitleString;
+        $this->_headerText = Mage::helper('M2ePro')->__('3rd Party Listings');
         //------------------------------
 
         // Set buttons actions
@@ -57,6 +44,26 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
             ));
         }
         //------------------------------
+    }
+
+    // ####################################
+
+    public function getGridHtml()
+    {
+        $accountId = $this->getRequest()->getParam('account');
+        $marketplaceId = $this->getRequest()->getParam('marketplace');
+
+        //------------------------------
+        $viewHeaderBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_listing_other_view_header','',
+            array(
+                'account' => Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Account', $accountId),
+                'marketplace' => Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Marketplace', $marketplaceId)
+            )
+        );
+        //------------------------------
+
+        return $viewHeaderBlock->toHtml() . parent::getGridHtml();
     }
 
     // ####################################

@@ -18,6 +18,8 @@ abstract class Ess_M2ePro_Model_Order_ShippingAddress extends Varien_Object
     /** @var Mage_Directory_Model_Region */
     protected $region;
 
+    // ########################################
+
     abstract public function getRawData();
 
     public function __construct(Ess_M2ePro_Model_Order $order)
@@ -100,4 +102,6 @@ abstract class Ess_M2ePro_Model_Order_ShippingAddress extends Varien_Object
     {
         return $this->getData('state');
     }
+
+    // ########################################
 }

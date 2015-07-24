@@ -19,14 +19,14 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
 
     public function parseTemplate($text, Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
-        $text = $this->insertAttributes($text, $magentoProduct);
-        $text = $this->insertImages($text, $magentoProduct);
-        $text = $this->insertMediaGalleries($text, $magentoProduct);
-
         $design = Mage::getDesign();
 
         $oldArea = $design->getArea();
         $design->setArea('adminhtml');
+
+        $text = $this->insertAttributes($text, $magentoProduct);
+        $text = $this->insertImages($text, $magentoProduct);
+        $text = $this->insertMediaGalleries($text, $magentoProduct);
 
         //  the CMS static block replacement i.e. {{media url=’image.jpg’}}
         $filter = new Mage_Core_Model_Email_Template_Filter();

@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid_Column_Filter_Select
     extends Mage_Adminhtml_Block_Widget_Grid_Column_Filter_Select
 {
+    // ####################################
+
     protected function _getOptions()
     {
         $options = array();
@@ -32,4 +34,6 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid_Column_Fil
 
         return $options;
     }
+
+    // ####################################
 }

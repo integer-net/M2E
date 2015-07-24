@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit_Tabs_Order extends Mage
 {
     protected $_possibleMagentoStatuses = null;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -82,4 +84,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit_Tabs_Order extends Mage
 
         return $this->_possibleMagentoStatuses;
     }
+
+    // ####################################
 }

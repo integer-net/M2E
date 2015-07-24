@@ -88,7 +88,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
             case Ess_M2ePro_Model_Listing_Product::ACTION_RELIST:
                 $result = $this->processGroupedProducts(
                     $sortedProductsData,
-                    100,
+                    1000,
                     'Ess_M2ePro_Model_Connector_Buy_Product_Relist_MultipleRequester',
                     $params
                 );
@@ -97,7 +97,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
             case Ess_M2ePro_Model_Listing_Product::ACTION_REVISE:
                 $result = $this->processGroupedProducts(
                     $sortedProductsData,
-                    100,
+                    1000,
                     'Ess_M2ePro_Model_Connector_Buy_Product_Revise_MultipleRequester',
                     $params
                 );
@@ -106,7 +106,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
             case Ess_M2ePro_Model_Listing_Product::ACTION_STOP:
                 $result = $this->processGroupedProducts(
                     $sortedProductsData,
-                    100,
+                    1000,
                     'Ess_M2ePro_Model_Connector_Buy_Product_Stop_MultipleRequester',
                     $params
                 );
@@ -197,6 +197,10 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Dispatcher
             foreach ($products as $product) {
 
                 /** @var Ess_M2ePro_Model_Listing_Product $product */
+
+                if ($product->isDeleted()) {
+                    continue;
+                }
 
                 $logModel->addProductMessage(
                     $product->getListingId(),

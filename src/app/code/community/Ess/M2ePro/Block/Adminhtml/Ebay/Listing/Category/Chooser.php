@@ -2,8 +2,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Chooser extends Mage_Adminhtml_Block_Widget
 {
-    // ########################################
-
     const INTERFACE_MODE_FULL     = 1;
     const INTERFACE_MODE_COMPACT  = 2;
 

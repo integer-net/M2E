@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin_NewAsinPopup extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -35,4 +37,5 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin_NewAsinPop
         $this->setChild('noBtn', $noButton);
     }
 
+    // ####################################
 }

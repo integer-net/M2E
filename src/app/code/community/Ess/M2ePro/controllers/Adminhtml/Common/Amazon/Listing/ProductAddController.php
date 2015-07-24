@@ -43,6 +43,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
             ->addJs('M2ePro/Common/Amazon/Listing/ChannelSettingsHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/SearchAsinGridHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/ProductSearchHandler.js')
+            ->addJs('M2ePro/Common/Amazon/Listing/VariationProductManageHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/NewAsinTemplateDescriptionGridHandler.js');
 
         $this->_initPopUp();
@@ -648,5 +649,4 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
     }
 
     // ####################################
-
 }

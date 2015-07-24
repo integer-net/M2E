@@ -34,11 +34,13 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
 
     getCategoriesSelectElementId: function(categoryId)
     {
+        if (categoryId === null) categoryId = 0;
         return 'category_chooser_select_' + categoryId;
     },
 
     getCategoryChildrenElementId: function(categoryId)
     {
+        if (categoryId === null) categoryId = 0;
         return 'category_chooser_children_' + categoryId;
     },
 
@@ -71,8 +73,8 @@ EbayListingCategoryChooserBrowseHandler.prototype = Object.extend(new CommonHand
 
     renderTopLevelCategories: function(containerId)
     {
-        this.prepareDomStructure(0, $(containerId));
-        this.renderChildCategories(0);
+        this.prepareDomStructure(null, $(containerId));
+        this.renderChildCategories(null);
     },
 
     renderChildCategories: function(parentCategoryId)

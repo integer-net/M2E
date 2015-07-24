@@ -28,7 +28,7 @@ class Ess_M2ePro_Adminhtml_Common_MarketplaceController
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration/marketplace');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration');
     }
 
     //#############################################
@@ -36,8 +36,12 @@ class Ess_M2ePro_Adminhtml_Common_MarketplaceController
     public function indexAction()
     {
         $this->_initAction()
-             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_marketplace'))
-             ->renderLayout();
+            ->_addContent(
+                $this->getLayout()->createBlock(
+                    'M2ePro/adminhtml_common_configuration', '',
+                    array('active_tab' => Ess_M2ePro_Block_Adminhtml_Common_Configuration_Tabs::TAB_ID_MARKETPLACE)
+                )
+            )->renderLayout();
     }
 
     public function saveAction()

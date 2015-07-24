@@ -8,6 +8,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Dispatcher
 {
     private $logsActionId = NULL;
 
+    // ########################################
+
     /**
      * @param int $action
      * @param array|Ess_M2ePro_Model_Listing_Other $products

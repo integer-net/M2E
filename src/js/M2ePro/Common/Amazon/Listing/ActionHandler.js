@@ -1,4 +1,4 @@
-AmazonListingActionHandler = Class.create(ListingActionHandler, {
+CommonAmazonListingActionHandler = Class.create(ListingActionHandler, {
 
     //----------------------------------
 

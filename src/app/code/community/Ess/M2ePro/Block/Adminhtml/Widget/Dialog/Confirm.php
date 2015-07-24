@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Widget_Dialog_Confirm
     extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -33,4 +35,6 @@ class Ess_M2ePro_Block_Adminhtml_Widget_Dialog_Confirm
         $this->setChild('ok_button', $buttonBlock);
         //------------------------------
     }
+
+    // ####################################
 }

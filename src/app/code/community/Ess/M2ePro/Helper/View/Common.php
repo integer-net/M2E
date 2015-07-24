@@ -19,32 +19,103 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
 
     public function getMenuRootNodeLabel()
     {
-        $componentsLabels = array();
+        $activeComponents = $this->getActiveComponentsLabels();
 
-        if (Mage::helper('M2ePro/Component_Amazon')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro/Component_Amazon')->getTitle();
-        }
-
-        if (Mage::helper('M2ePro/Component_Buy')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro/Component_Buy')->getTitle();
-        }
-
-        if (Mage::helper('M2ePro/Component_Play')->isActive()) {
-            $componentsLabels[] = Mage::helper('M2ePro/Component_Play')->getTitle();
-        }
-
-        if (count($componentsLabels) <= 0 || count($componentsLabels) > 2) {
+        if (count($activeComponents) <= 0 || count($activeComponents) > 1) {
             return Mage::helper('M2ePro')->__(self::TITLE);
         }
 
-        return implode(' / ', $componentsLabels);
+        return array_shift($activeComponents);
     }
 
-    // todo change for support tabs when common view will be like ebay
-    public function getMenuPath($pathNick)
+    // ########################################
+
+    public function getActiveComponentsLabels()
     {
+        $labels = array();
+
+        if (Mage::helper('M2ePro/Component_Amazon')->isActive()) {
+            $labels[] = Mage::helper('M2ePro/Component_Amazon')->getTitle();
+        }
+
+        if (Mage::helper('M2ePro/Component_Buy')->isActive()) {
+            $labels[] = Mage::helper('M2ePro/Component_Buy')->getTitle();
+        }
+
+        return $labels;
+    }
+
+    // ########################################
+
+    public function getPageNavigationPath($pathNick, $tabName = NULL, $channel = NULL, $additionalEnd = NULL,
+                                          $params = array())
+    {
+        $pathParts = array();
+
         $rootMenuNode = Mage::getConfig()->getNode('adminhtml/menu/m2epro_common');
-        return Mage::helper('M2ePro/View')->getMenuPath($rootMenuNode, $pathNick, $this->getMenuRootNodeLabel());
+        $menuLabel = Mage::helper('M2ePro/View')->getMenuPath($rootMenuNode, $pathNick, $this->getMenuRootNodeLabel());
+
+        if (!$menuLabel) {
+            return '';
+        }
+
+        $pathParts['menu'] = $menuLabel;
+
+        if ($tabName) {
+            $pathParts['tab'] = $tabName . ' ' . Mage::helper('M2ePro')->__('Tab');
+        } else {
+            $pathParts['tab'] = NULL;
+        }
+
+        $channelLabel = '';
+        if ($channel) {
+
+            $components = $this->getActiveComponentsLabels();
+
+            if ($channel == 'any') {
+                if (count($components) > 1) {
+                    if (isset($params['any_channel_as_label']) && $params['any_channel_as_label'] === true) {
+                        $channelLabel = Mage::helper('M2ePro')->__('Any Channel');
+                    } else {
+                        $channelLabel = '[' . join($components, '/') . ']';
+                    }
+                }
+
+            } elseif ($channel == 'all') {
+                if (count($components) > 1) {
+                    $channelLabel = Mage::helper('M2ePro')->__('All Channels');
+                }
+            } else {
+
+                if (!Mage::helper('M2ePro/Component_' . ucfirst($channel))->isActive()) {
+                    throw new Exception('Channel is not Active!');
+                }
+
+                if (count($components) > 1) {
+                    $channelLabel = Mage::helper('M2ePro/Component_' . ucfirst($channel))->getTitle();
+                }
+            }
+        }
+
+        $pathParts['channel'] = $channelLabel;
+
+        $pathParts['additional'] = $additionalEnd;
+
+        $resultPath = array();
+
+        $resultPath['menu'] = $pathParts['menu'];
+        if (isset($params['reverse_tab_and_channel']) && $params['reverse_tab_and_channel'] === true) {
+            $resultPath['channel'] = $pathParts['channel'];
+            $resultPath['tab'] = $pathParts['tab'];
+        } else {
+            $resultPath['tab'] = $pathParts['tab'];
+            $resultPath['channel'] = $pathParts['channel'];
+        }
+        $resultPath['additional'] = $pathParts['additional'];
+
+        $resultPath = array_diff($resultPath, array(''));
+
+        return join($resultPath, ' > ');
     }
 
     // ########################################
@@ -72,20 +143,6 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function getDocumentationUrl()
-    {
-        return Mage::helper('M2ePro/Module')->getConfig()
-                    ->getGroupValue('/view/common/support/', 'documentation_url');
-    }
-
-    public function getVideoTutorialsUrl()
-    {
-        return Mage::helper('M2ePro/Module')->getConfig()
-                    ->getGroupValue('/view/common/support/', 'video_tutorials_url');
-    }
-
-    // ########################################
-
     public function prepareMenu(array $menuArray)
     {
         if (!Mage::getSingleton('admin/session')->isAllowed(self::MENU_ROOT_NODE_NICK)) {
@@ -99,24 +156,6 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
 
         $tempTitle = $this->getMenuRootNodeLabel();
         !empty($tempTitle) && $menuArray[self::MENU_ROOT_NODE_NICK]['label'] = $tempTitle;
-
-        // Amazon Description Templates
-        //---------------------------------
-        if (!Mage::helper('M2ePro/Component_Amazon')->isActive()) {
-
-            unset($menuArray[self::MENU_ROOT_NODE_NICK]['children']['templates']['children']['description']);
-            $menuArray[self::MENU_ROOT_NODE_NICK]
-                      ['children']['templates']['children']['synchronization']['last'] = true;
-        }
-
-        if (Mage::helper('M2ePro/Component_Amazon')->isActive() &&
-            Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-
-            $menuTitle = Mage::helper('M2ePro')->__('Description Policies');
-            $menuArray[self::MENU_ROOT_NODE_NICK]
-                      ['children']['templates']['children']['description']['label'] = $menuTitle;
-        }
-        //---------------------------------
 
         // Add wizard menu item
         //---------------------------------
@@ -139,27 +178,55 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         }
         //---------------------------------
 
-        // Set documentation redirect url
-        //---------------------------------
-        if (isset($menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['doc'])) {
-            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['doc']['click'] =
-                "window.open(this.href, '_blank'); return false;";
-            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['doc']['url'] =
-                $this->getDocumentationUrl();
-        }
-        //---------------------------------
-
-        // Set video tutorials redirect url
-        //---------------------------------
-        if (isset($menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['tutorial'])) {
-            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['tutorial']['click'] =
-                "window.open(this.href, '_blank'); return false;";
-            $menuArray[self::MENU_ROOT_NODE_NICK]['children']['help']['children']['tutorial']['url'] =
-                $this->getVideoTutorialsUrl();
-        }
-        //---------------------------------
-
         return $menuArray;
+    }
+
+    // ########################################
+
+    public function is3rdPartyShouldBeShown($component)
+    {
+        $components = array(
+            Ess_M2ePro_Helper_Component_Amazon::NICK,
+            Ess_M2ePro_Helper_Component_Buy::NICK
+        );
+
+        if (!in_array($component, $components)) {
+            throw new LogicException('Invalid component nick.');
+        }
+
+        $sessionKey = $component . '_is_3rd_party_should_be_shown';
+        $sessionCache = Mage::helper('M2ePro/Data_Cache_Session');
+
+        if (!is_null($sessionCache->getValue($sessionKey))) {
+            return $sessionCache->getValue($sessionKey);
+        }
+
+        $componentModelName = 'M2ePro/Component_' . ucfirst($component);
+        $otherListingSynchYes = constant('Ess_M2ePro_Model_'
+                                         . ucfirst($component)
+                                         . '_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES');
+
+        $accountCollection = Mage::helper($componentModelName)->getCollection('Account');
+        $accountCollection->addFieldToFilter(
+            'other_listings_synchronization', $otherListingSynchYes
+        );
+
+        if ((bool)$accountCollection->getSize()) {
+            $result = true;
+        } else {
+            $collection = Mage::helper($componentModelName)->getCollection('Listing_Other');
+
+            $logCollection = Mage::getModel('M2ePro/Listing_Other_Log')->getCollection();
+            $logCollection->addFieldToFilter(
+                'component_mode', $component
+            );
+
+            $result = $collection->getSize() || $logCollection->getSize();
+        }
+
+        $sessionCache->setValue($sessionKey, $result);
+
+        return $result;
     }
 
     // ########################################

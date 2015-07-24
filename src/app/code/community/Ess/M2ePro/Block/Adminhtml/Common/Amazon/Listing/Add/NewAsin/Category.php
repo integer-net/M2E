@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin_Category
     extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -120,7 +122,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin_Category
 
         CommonHandler.prototype.scroll_page_to_top = function() { return; }
 
-        ListingGridHandlerObj = new NewAsinTemplateDescriptionGridHandler(
+        ListingGridHandlerObj = new CommonAmazonListingNewAsinTemplateDescriptionGridHandler(
             '{$this->getChild('grid')->getId()}',
             {$this->getListing()->getId()}
         );
@@ -155,5 +157,4 @@ HTML;
     }
 
     // ####################################
-
 }

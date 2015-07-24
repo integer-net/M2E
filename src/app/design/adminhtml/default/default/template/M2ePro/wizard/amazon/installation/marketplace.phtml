@@ -1,8 +1,13 @@
 <div id="block_notice_wizard_installation_step_marketplaces" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Marketplaces Set Up'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes" style="display:none;">
     <div>
-        <div class="step_container_description">
-            <?php echo Mage::helper('M2ePro')->__('In this Section you can choose the Amazon Marketplaces, on which you are going to sell your Items.  <br/><br/>
-            <b>Please Note:</b> you can always enable or disable Marketplaces in %marketplaces_path%.', Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/marketplace')); ?>
+        <div class="step_container_description" style="float: none;">
+            <?php echo Mage::helper('M2ePro')->__('In this Section you can choose the Amazon Marketplaces, on which you are going to sell your Items.  <br/><br/>'); ?>
+        </div>
+        <div id="marketplaces_container" style="margin-bottom: 10px;">
+            <?php echo $this->getChildHtml('wizard_marketplace_form');?>
+        </div>
+        <div class="step_container_description" style="float: none;">
+            <?php echo Mage::helper('M2ePro')->__('<b>Please Note:</b> you can always enable/disable Marketplaces or resynchronize their data in %marketplaces_path%.', Mage::helper('M2ePro/View_Common')->getPageNavigationPath('configuration', 'Marketplaces', 'amazon')); ?>
         </div>
         <div class="step_container_completed">
             <span class="step_completed" style="display:none;"><?php echo Mage::helper('M2ePro')->__('Completed'); ?></span>

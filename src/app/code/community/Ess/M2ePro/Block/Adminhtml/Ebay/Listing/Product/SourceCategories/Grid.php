@@ -7,8 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_SourceCategories_Grid
     extends Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
 {
-    // ####################################
-
     private $selectedIds = array();
 
     private $currentCategoryId = NULL;

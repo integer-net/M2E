@@ -6,5 +6,7 @@
 
 class Ess_M2ePro_Model_Order_DuplicateException extends Exception
 {
+    // ########################################
 
+    // ########################################
 }

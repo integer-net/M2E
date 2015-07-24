@@ -62,8 +62,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
 
     // ----------------------------------------
 
-    protected function getBuyItNowPrice()
+    protected function getFixedPrice()
     {
+        if (!$this->listingProduct->isListingTypeFixed()) {
+            return 'N/A';
+        }
+
         if ($this->listingProduct->isVariationsReady()) {
 
             $pricesList = array();
@@ -76,7 +80,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
             $price = count($pricesList) > 0 ? min($pricesList) : 0;
 
         } else {
-            $price = $this->listingProduct->getBuyItNowPrice();
+            $price = $this->listingProduct->getFixedPrice();
         }
 
         if (empty($price)) {
@@ -88,6 +92,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
 
     protected function getStartPrice()
     {
+        if (!$this->listingProduct->isListingTypeAuction()) {
+            return 'N/A';
+        }
+
         $price = $this->listingProduct->getStartPrice();
 
         if (empty($price)) {
@@ -99,7 +107,26 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Description_Renderer
 
     protected function getReservePrice()
     {
+        if (!$this->listingProduct->isListingTypeAuction()) {
+            return 'N/A';
+        }
+
         $price = $this->listingProduct->getReservePrice();
+
+        if (empty($price)) {
+            return 'N/A';
+        }
+
+        return sprintf('%01.2f', $price);
+    }
+
+    protected function getBuyItNowPrice()
+    {
+        if (!$this->listingProduct->isListingTypeAuction()) {
+            return 'N/A';
+        }
+
+        $price = $this->listingProduct->getBuyItNowPrice();
 
         if (empty($price)) {
             return 'N/A';

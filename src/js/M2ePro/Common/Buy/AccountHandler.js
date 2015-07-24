@@ -236,25 +236,6 @@ CommonBuyAccountHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    ordersModeChange: function()
-    {
-        var self = BuyAccountHandlerObj;
-
-        if ($('orders_mode').value == M2ePro.php.constant('Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_YES')) {
-            $('magento_block_buy_accounts_magento_orders_listings').show();
-            $('magento_block_buy_accounts_magento_orders_listings_other').show();
-        } else {
-            $('magento_block_buy_accounts_magento_orders_listings').hide();
-            $('magento_block_buy_accounts_magento_orders_listings_other').hide();
-        }
-
-        $('magento_orders_listings_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO');
-        $('magento_orders_listings_other_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO');
-
-        self.magentoOrdersListingsModeChange();
-        self.magentoOrdersListingsOtherModeChange();
-    },
-
     magentoOrdersListingsModeChange: function()
     {
         var self = BuyAccountHandlerObj;

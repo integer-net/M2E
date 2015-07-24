@@ -322,7 +322,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
 
     public function getPrice()
     {
-        $src = $this->getEbaySellingFormatTemplate()->getBuyItNowPriceSource();
+        $src = $this->getEbaySellingFormatTemplate()->getFixedPriceSource();
         return $this->getCalculatedPrice($src, true, true);
     }
 

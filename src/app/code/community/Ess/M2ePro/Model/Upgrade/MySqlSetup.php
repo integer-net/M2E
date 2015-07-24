@@ -7,6 +7,7 @@
 class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 {
     private $moduleTables = array();
+    private $modifiersCache = array();
 
     //####################################
 
@@ -14,7 +15,6 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
     {
         // Get needed mysql tables
         $tempTables = Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables();
-        $tempTables = array_merge($this->getMySqlTablesV3(),$tempTables);
         $tempTables = array_merge($this->getMySqlTablesV4(),$tempTables);
         $tempTables = array_merge($this->getMySqlTablesV5(),$tempTables);
         $tempTables = array_merge($this->getRemovedMySqlTables(),$tempTables);
@@ -113,6 +113,40 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
     //####################################
 
+    public function getTableModifier($tableName)
+    {
+        /** @var Ess_M2ePro_Model_Upgrade_Modifier_Table|false $tableModifier */
+        $tableModifier = $this->getModifier($tableName, 'table', 'modifier_table');
+        return $tableModifier;
+    }
+
+    public function getConfigUpdater($tableName)
+    {
+        /** @var Ess_M2ePro_Model_Upgrade_Modifier_ConfigUpdater|false $configUpdater */
+        $configUpdater = $this->getModifier($tableName, 'configUpdater', 'modifier_config_updater');
+        return $configUpdater;
+    }
+
+    private function getModifier($tableName, $modifierModelName, $cacheKey = NULL)
+    {
+        $cacheKey = !is_null($cacheKey) ? $cacheKey . $tableName : $tableName;
+        if (isset($this->modifiersCache[$cacheKey])) {
+            return $this->modifiersCache[$cacheKey];
+        }
+
+        $modifierModelName = 'M2ePro/Upgrade_Modifier_' . ucfirst($modifierModelName);
+        /** @var Ess_M2ePro_Model_Upgrade_Modifier_Abstract $tableModifier */
+        $tableModifier = Mage::getModel($modifierModelName);
+        $tableModifier->setInstaller($this);
+        $tableModifier->setConnection($this->getConnection());
+        $tableModifier->setTableName($tableName);
+
+        $this->modifiersCache[$cacheKey] = $tableModifier;
+        return $tableModifier;
+    }
+
+    //####################################
+
     public function removeConfigDuplicates()
     {
         $tables = $this->getConfigTablesV5();
@@ -170,51 +204,6 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
     }
 
     //------------------------------------
-
-    private function getMySqlTablesV3()
-    {
-        return array(
-            'ess_config',
-            'm2epro_accounts',
-            'm2epro_accounts_store_categories',
-            'm2epro_config',
-            'm2epro_descriptions_templates',
-            'm2epro_dictionary_categories',
-            'm2epro_dictionary_marketplaces',
-            'm2epro_dictionary_shippings',
-            'm2epro_dictionary_shippings_categories',
-            'm2epro_ebay_items',
-            'm2epro_ebay_listings',
-            'm2epro_ebay_listings_logs',
-            'm2epro_ebay_orders',
-            'm2epro_ebay_orders_external_transactions',
-            'm2epro_ebay_orders_items',
-            'm2epro_ebay_orders_logs',
-            'm2epro_feedbacks',
-            'm2epro_feedbacks_templates',
-            'm2epro_listings',
-            'm2epro_listings_categories',
-            'm2epro_listings_logs',
-            'm2epro_listings_products',
-            'm2epro_listings_products_variations',
-            'm2epro_listings_products_variations_options',
-            'm2epro_listings_templates',
-            'm2epro_listings_templates_calculated_shipping',
-            'm2epro_listings_templates_payments',
-            'm2epro_listings_templates_shippings',
-            'm2epro_listings_templates_specifics',
-            'm2epro_lock_items',
-            'm2epro_marketplaces',
-            'm2epro_messages',
-            'm2epro_migration_temp',
-            'm2epro_products_changes',
-            'm2epro_selling_formats_templates',
-            'm2epro_synchronizations_logs',
-            'm2epro_synchronizations_runs',
-            'm2epro_synchronizations_templates',
-            'm2epro_templates_attribute_sets'
-        );
-    }
 
     private function getMySqlTablesV4()
     {
@@ -446,7 +435,10 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
             'm2epro_ebay_listing_auto_filter',
             'm2epro_synchronization_run',
             'm2epro_ebay_listing_auto_category',
-            'm2epro_ebay_dictionary_policy'
+            'm2epro_ebay_dictionary_policy',
+            'm2epro_ebay_template_policy',
+            'm2epro_ebay_account_policy',
+            'm2epro_play_listing_auto_category_group'
         );
     }
 
@@ -475,24 +467,47 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
     private function updateInstallationVersionHistory($oldVersion, $newVersion)
     {
         $connection = $this->getConnection();
-        $tableName = $this->getTable('m2epro_cache_config');
+        $tableName = $this->getTable('m2epro_registry');
 
         if (!in_array($tableName, $connection->listTables())) {
             return;
         }
 
         $currentGmtDate = Mage::getModel('core/date')->gmtDate();
-
-        $mysqlColumns = array('group','key','value','update_date','create_date');
-        $mysqlData = array(
-            'group'       => '/installation/version/history/',
-            'key'         => $newVersion,
-            'value'       => $oldVersion,
-            'update_date' => $currentGmtDate,
-            'create_date' => $currentGmtDate
+        $versionsHistory = $connection->select()
+                                      ->from($tableName, array('key', 'value'))
+                                      ->where('`key` = ?', '/installation/versions_history/')
+                                      ->query()
+                                      ->fetch();
+        $versionData = array(
+            'from' => $oldVersion,
+            'to'   => $newVersion,
+            'date' => $currentGmtDate
         );
 
-        $connection->insertArray($tableName, $mysqlColumns, array($mysqlData));
+        if (!empty($versionsHistory)) {
+
+            $versionsHistory = @json_decode($versionsHistory['value'], true);
+            $versionsHistory[] = $versionData;
+            $mysqlData = array(
+                'value'       => @json_encode($versionsHistory),
+                'update_date' => $currentGmtDate,
+                'create_date' => $currentGmtDate
+            );
+
+            $connection->update($tableName, $mysqlData, array('`key` = ?' => '/installation/versions_history/'));
+        } else {
+
+            $mysqlData = array(
+                'key'         => '/installation/versions_history/',
+                'value'       => @json_encode(array($versionData)),
+                'update_date' => $currentGmtDate,
+                'create_date' => $currentGmtDate
+            );
+            $mysqlColumns = array('key','value','update_date','create_date');
+
+            $connection->insertArray($tableName, $mysqlColumns, array($mysqlData));
+        }
     }
 
     private function updateCompilation()

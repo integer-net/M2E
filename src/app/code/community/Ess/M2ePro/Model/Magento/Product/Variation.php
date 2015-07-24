@@ -6,11 +6,7 @@
 
 class Ess_M2ePro_Model_Magento_Product_Variation
 {
-    // ##########################################################
-
     const GROUPED_PRODUCT_ATTRIBUTE_LABEL = 'Option';
-
-    // ##########################################################
 
     /** @var Ess_M2ePro_Model_Magento_Product $magentoProduct */
     private $magentoProduct;
@@ -177,7 +173,7 @@ class Ess_M2ePro_Model_Magento_Product_Variation
 
             $attributeLabel = '';
 
-            if (!(int)$configurableAttribute->getData('use_default')) {
+            if (!(int)$configurableAttribute->getData('use_default') && $configurableAttribute->getData('label')) {
                 $attributeLabel = $configurableAttribute->getData('label');
             }
 
@@ -776,7 +772,7 @@ class Ess_M2ePro_Model_Magento_Product_Variation
                 $attributeKeyTitle = $attributeStoreTitles[$this->getMagentoProduct()->getStoreId()];
             }
 
-            if (!(int)$configurableAttribute->getData('use_default')) {
+            if (!(int)$configurableAttribute->getData('use_default') && $configurableAttribute->getData('label')) {
                 $attributeKeyTitle = $configurableAttribute->getData('label');
                 $attributeStoreTitles[] = $configurableAttribute->getData('label');
             }

@@ -288,7 +288,7 @@ HTML;
     M2ePro.text.show_advanced_filter = '{$showAdvancedFilterButtonText}';
     M2ePro.text.hide_advanced_filter = '{$hideAdvancedFilterButtonText}';
 
-    ProductGridHandlerObj = new ProductGridHandler();
+    ProductGridHandlerObj = new ListingProductGridHandler();
     ProductGridHandlerObj.setGridId('{$this->getJsObjectName()}');
 
     var init = function () {

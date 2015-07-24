@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Model_Magento_Tax_Helper
 {
+    // ########################################
+
     public function hasRatesForCountry($countryId)
     {
         return Mage::getModel('tax/calculation_rate')
@@ -34,4 +36,6 @@ class Ess_M2ePro_Model_Magento_Tax_Helper
     {
         return Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_BASED_ON, $store) == 'origin';
     }
+
+    // ########################################
 }

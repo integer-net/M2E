@@ -12,6 +12,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Item extends Mage_Adminhtml_Blo
     /** @var $taxCalculator Mage_Tax_Model_Calculation */
     private $taxCalculator;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -299,4 +301,6 @@ HTML;
     {
         return $this->getUrl('*/*/orderItemGrid', array('_current' => true));
     }
+
+    // ####################################
 }

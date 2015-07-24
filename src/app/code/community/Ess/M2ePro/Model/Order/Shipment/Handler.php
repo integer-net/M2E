@@ -13,6 +13,8 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
     const HANDLE_RESULT_SKIPPED   = 0;
     const HANDLE_RESULT_SUCCEEDED = 1;
 
+    // ########################################
+
     public static function factory($component)
     {
         $handler = null;
@@ -26,10 +28,6 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
                 break;
             case Ess_M2ePro_Helper_Component_Ebay::NICK:
                 $handler = Mage::getModel('M2ePro/Ebay_Order_Shipment_Handler');
-                break;
-
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $handler = Mage::getModel('M2ePro/Play_Order_Shipment_Handler');
                 break;
         }
 
@@ -76,4 +74,6 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
 
         return $trackingDetails;
     }
+
+    // ########################################
 }

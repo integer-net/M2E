@@ -9,7 +9,7 @@
     Event.observe(window, 'load', function() {
         SupportHandlerObj = new SupportHandler();
 
-        ControlPanelHandlerObj = new ControlPanelHandler();
+        ControlPanelHandlerObj = new DevelopmentControlPanelHandler();
 
         editForm = new varienForm('edit_form', '<?php echo $this->getValidationUrl(); ?>');
         $('query').focus();

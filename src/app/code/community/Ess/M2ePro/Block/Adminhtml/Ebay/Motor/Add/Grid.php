@@ -6,8 +6,6 @@
 
 abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-    // ##########################################################
-
     private $listingId = null;
 
     // ##########################################################
@@ -103,14 +101,27 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Grid extends Mage_Admin
             $this->getCompatibilityType()
         );
 
-        $editLabel = Mage::helper('M2ePro')->__('Edit Note');
-        $addLabel = Mage::helper('M2ePro')->__('Add Note');
-        $saveLabel = Mage::helper('M2ePro')->__('Save Note');
+        $editLabel   = Mage::helper('M2ePro')->__('Edit Note');
+        $addLabel    = Mage::helper('M2ePro')->__('Add Note');
+        $saveLabel   = Mage::helper('M2ePro')->__('Save Note');
         $cancelLabel = Mage::helper('M2ePro')->__('Cancel');
+
+        $type = $this->getCompatibilityType();
+        $removeTitle = Mage::helper('M2ePro')->__('Remove this record.');
+
+        $removeCustomRecordHtml = '';
+        if (isset($row['is_custom']) && $row['is_custom']) {
+            $removeCustomRecordHtml = <<<HTML
+<a href="javascript:void(0);"
+   class="remove-custom-created-record-link"
+   onclick="EbayMotorCompatibilityHandlerObj.removeCustomCompatibilityRecord('{$type}', '{$row[$idKey]}');"
+   align="center" title="{$removeTitle}"></a>
+HTML;
+        }
 
         return <<<HTML
 
-{$value}
+{$value}{$removeCustomRecordHtml}
 <br/>
 <br/>
 <div id="note_{$row[$idKey]}">
@@ -140,7 +151,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Grid extends Mage_Admin
 </div>
 
 HTML;
-
     }
 
     //##############################################################
@@ -156,14 +166,30 @@ HTML;
     {
         $additionalJs =
 '<script type="text/javascript">
+
     $H(EbayMotorCompatibilityHandlerObj.savedNotes).each(function(note) {
+
          if ($(\'note_view_\' + note.key)) {
+
              $(\'note_view_\' + note.key).innerHTML = note.value;
+             $(\'note_edit_link_\' + note.key).show();
+             $(\'note_add_link_\' + note.key).hide();
          }
     });
+
 </script>';
 
         return parent::_toHtml() . $additionalJs;
+    }
+
+    public function getEmptyText()
+    {
+        return Mage::helper('M2ePro')->__(
+            'No records found.
+             You can add Custom Compatible Vehicles manually or through the %link_start%Import Tool%link_end%.',
+            '<a target="_blank" href="'.$this->getUrl('*/adminhtml_ebay_configuration/index').'">',
+            '</a>'
+        );
     }
 
     //##############################################################

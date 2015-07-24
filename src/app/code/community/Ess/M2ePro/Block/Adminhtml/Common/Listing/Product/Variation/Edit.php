@@ -7,8 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Edit
     extends Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation
 {
-    //##############################################################
-
     public $currentVariation = array();
 
     //##############################################################

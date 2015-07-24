@@ -87,6 +87,32 @@ function initializationMagentoBlocks()
     });
 }
 
+function prepareFloatingToolbarContent()
+{
+    var headerElements = $$('.content-header');
+
+    if (headerElements.length == 0) {
+        return;
+    }
+
+    var wasFirstFound = false;
+    for (var i = 0; i < headerElements.length; i++) {
+
+        if (headerElements[i].parentElement.hasClassName('content-header-floating')) {
+            continue;
+        }
+
+        if (!wasFirstFound) {
+            wasFirstFound = true;
+            continue;
+        }
+
+        headerElements[i].addClassName('skip-header');
+    }
+
+    updateTopButtonToolbarToggle();
+}
+
 // Set main observers
 // ----------------------------------
 Event.observe(window, 'load', function() {
@@ -101,6 +127,8 @@ Event.observe(window, 'load', function() {
         }
 
     };
+
+    prepareFloatingToolbarContent();
 
     Ajax.Responders.register(ajaxHandler);
 });

@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Mysql4_Amazon_Template_Description_Definition
     extends Ess_M2ePro_Model_Mysql4_Abstract
 {
-    // ########################################
-
     protected $_isPkAutoIncrement = false;
 
     // ########################################

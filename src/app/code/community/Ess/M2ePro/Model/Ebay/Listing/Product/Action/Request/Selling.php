@@ -25,7 +25,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
     {
         $data = array();
 
-        if ($this->getConfigurator()->isGeneral()) {
+        if ($this->getConfigurator()->isGeneralAllowed()) {
 
             $data = array_merge(
                 $this->getGeneralData(),
@@ -111,7 +111,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
 
     public function getQtyData()
     {
-        if (!$this->getConfigurator()->isQty() ||
+        if (!$this->getConfigurator()->isQtyAllowed() ||
             $this->getIsVariationItem()) {
             return array();
         }
@@ -127,7 +127,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
 
     public function getPriceData()
     {
-        if (!$this->getConfigurator()->isPrice() ||
+        if (!$this->getConfigurator()->isPriceAllowed() ||
             $this->getIsVariationItem()) {
             return array();
         }
@@ -136,7 +136,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
 
         if ($this->getEbayListingProduct()->isListingTypeFixed()) {
 
-            $data['price_fixed'] = $this->getEbayListingProduct()->getBuyItNowPrice();
+            $data['price_fixed'] = $this->getEbayListingProduct()->getFixedPrice();
 
             $data['bestoffer_mode'] = $this->getEbaySellingFormatTemplate()->isBestOfferEnabled();
 
@@ -156,7 +156,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
 
     public function getPriceDiscountStpData()
     {
-        if (!$this->getConfigurator()->isPrice() ||
+        if (!$this->getConfigurator()->isPriceAllowed() ||
             $this->getIsVariationItem()) {
             return array();
         }
@@ -182,7 +182,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling
 
     public function getPriceDiscountMapData()
     {
-        if (!$this->getConfigurator()->isPrice() ||
+        if (!$this->getConfigurator()->isPriceAllowed() ||
             $this->getIsVariationItem()) {
             return array();
         }

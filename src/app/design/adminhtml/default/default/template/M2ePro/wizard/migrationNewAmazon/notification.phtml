@@ -1,24 +1,18 @@
 <?php
 
-$skipWizardLink = $this->getUrl("*/adminhtml_wizard_migrationNewAmazon/skip");
 $startWizardLink = $this->getUrl("*/adminhtml_wizard_migrationNewAmazon");
 
 ?>
 
 <div class="wizard-note">
 
-    <a class="wizard-close" href="javascript:void(0);" onclick="WizardHandlerObj.skip('<?php echo $skipWizardLink; ?>');" title="<?php echo Mage::helper('M2ePro')->__('Skip Wizard') ?>">&times;</a>
-
     <div>
         <?php
 
         echo Mage::helper('M2ePro')->__(
             'Click
-            <a href="%url_1%">Start Configuration</a> Wizard to start migration process to <strong>new M2E Pro Amazon</strong> generation or click
-            <a href="%url_2%" onclick="%script_code%">Skip</a> if you want to do it later. <br/>',
-            $startWizardLink,
-            'javascript:',
-            'confirm(M2ePro.translator.translate(\'Note: If you close the Wizard, it never starts again. You will be required to set all Settings manually. Press Cancel to continue working with Wizard.\')) && setLocation(\''.$skipWizardLink.'\')'
+            <a href="%url_1%">Start Configuration</a> Wizard to start migration process to <strong>new M2E Pro Amazon</strong> generation.',
+            $startWizardLink
         );
 
         ?>

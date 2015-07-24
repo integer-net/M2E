@@ -81,7 +81,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search extends Mage_Admin
         $url = $this->getUrl(
             '*/adminhtml_common_log/listing',
             array(
-                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON
             )
         );
         $this->_addButton('view_log', array(
@@ -149,7 +149,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search extends Mage_Admin
         );
         $items[] = array(
             'url' => $url,
-            'label' => Mage::helper('M2ePro')->__('Amazon Description Policies'),
+            'label' => Mage::helper('M2ePro')->__('%amazon% Description Policies',
+                                                   Mage::helper('M2ePro/Component_Amazon')->getTitle()),
             'target' => '_blank'
         );
         //------------------------------

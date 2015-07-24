@@ -14,8 +14,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Service extends Ess_M2ePro_Model_C
     const COST_MODE_CUSTOM_ATTRIBUTE = 2;
     const COST_MODE_CALCULATED       = 3;
 
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Ebay_Template_Shipping
      */

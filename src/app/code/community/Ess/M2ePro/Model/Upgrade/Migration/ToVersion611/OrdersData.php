@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Upgrade_Migration_ToVersion611_OrdersData
 {
-    // ##########################################################
-
     const MAX_ORDERS_PER_ITERATION = 100;
 
     const MAX_EXECUTION_LIMIT_PERCENT = 70;

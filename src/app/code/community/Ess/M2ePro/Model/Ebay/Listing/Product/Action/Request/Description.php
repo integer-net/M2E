@@ -18,7 +18,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     {
         $data = array();
 
-        if ($this->getConfigurator()->isGeneral()) {
+        if ($this->getConfigurator()->isGeneralAllowed()) {
 
             $data = array_merge(
                 array(
@@ -44,7 +44,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
 
     public function getTitleData()
     {
-        if (!$this->getConfigurator()->isTitle()) {
+        if (!$this->getConfigurator()->isTitleAllowed()) {
             return array();
         }
 
@@ -59,7 +59,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
 
     public function getSubtitleData()
     {
-        if (!$this->getConfigurator()->isSubtitle()) {
+        if (!$this->getConfigurator()->isSubtitleAllowed()) {
             return array();
         }
 
@@ -74,7 +74,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
 
     public function getDescriptionData()
     {
-        if (!$this->getConfigurator()->isDescription()) {
+        if (!$this->getConfigurator()->isDescriptionAllowed()) {
             return array();
         }
 
@@ -94,7 +94,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
 
     public function getImagesData()
     {
-        if (!$this->getConfigurator()->isImages()) {
+        if (!$this->getConfigurator()->isImagesAllowed()) {
             return array();
         }
 
@@ -119,7 +119,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     {
         $data = array();
 
-        foreach (array('isbn','epid','upc','ean','gtin','brand','mpn') as $tempType) {
+        foreach (array('isbn','epid','upc','ean','brand','mpn') as $tempType) {
+
+            if ($this->getIsVariationItem() && $tempType != 'brand') {
+                continue;
+            }
 
             $this->searchNotFoundAttributes();
             $tempValue = $this->getDescriptionSource()->getProductDetail($tempType);
@@ -135,14 +139,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
             $data[$tempType] = $tempValue;
         }
 
+        $data = $this->deleteNotAllowedIdentifier($data);
+
         if (empty($data)) {
             return $data;
         }
 
         $data['include_description'] = $this->getEbayDescriptionTemplate()->isProductDetailsIncludeDescription();
         $data['include_image'] = $this->getEbayDescriptionTemplate()->isProductDetailsIncludeImage();
-
-        $data['list_if_no_product'] = $this->getEbayDescriptionTemplate()->isProductDetailsListIfNoProduct();
 
         return $data;
     }
@@ -201,6 +205,50 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description
     private function getDescriptionSource()
     {
         return $this->getEbayListingProduct()->getDescriptionTemplateSource();
+    }
+
+    // ########################################
+
+    private function deleteNotAllowedIdentifier(array $data)
+    {
+        if (empty($data)) {
+            return $data;
+        }
+
+        $categoryId = $this->getEbayListingProduct()->getCategoryTemplateSource()->getMainCategory();
+        $marketplaceId = $this->getMarketplace()->getId();
+        $categoryFeatures = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
+                                   ->getFeatures($categoryId, $marketplaceId);
+
+        if (empty($categoryFeatures)) {
+            return $data;
+        }
+
+        $statusDisabled = Ess_M2ePro_Helper_Component_Ebay_Category_Ebay::PRODUCT_IDENTIFIER_STATUS_DISABLED;
+
+        foreach (array('ean','upc','isbn') as $identifier) {
+
+            $key = $identifier.'_enabled';
+            if (!isset($categoryFeatures[$key]) || $categoryFeatures[$key] != $statusDisabled) {
+                continue;
+            }
+
+            if (isset($data[$identifier])) {
+
+                unset($data[$identifier]);
+
+                // M2ePro_TRANSLATIONS
+                // The value of %type% was no sent because it is not allowed in this Category
+                $this->addWarningMessage(
+                    Mage::helper('M2ePro')->__(
+                        'The value of %type% was no sent because it is not allowed in this Category',
+                        Mage::helper('M2ePro')->__(strtoupper($identifier))
+                    )
+                );
+            }
+        }
+
+        return $data;
     }
 
     // ########################################

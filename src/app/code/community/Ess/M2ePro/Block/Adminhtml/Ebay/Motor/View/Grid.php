@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-    // ########################################
-
     private $listingProductId = array();
 
     private $compatibilityType = null;
@@ -125,7 +123,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid extends Mage_Adminhtml_Blo
     {
         $typeIdentifierTitle = 'ePID';
         if ($this->getCompatibilityType() == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_KTYPE) {
-            $typeIdentifierTitle = 'KType';
+            $typeIdentifierTitle = 'kType';
         }
 
         $this->addColumn('id', array(
@@ -349,7 +347,7 @@ HTML;
 
     protected function _toHtml()
     {
-        $additionalCss =<<<CSS
+        $additionalCss = <<<CSS
 
 <style>
     body {

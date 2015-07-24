@@ -1,5 +1,5 @@
-EditListingTitle = Class.create();
-EditListingTitle.prototype = {
+ListingEditListingTitle = Class.create();
+ListingEditListingTitle.prototype = {
 
     //----------------------------------
 

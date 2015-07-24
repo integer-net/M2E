@@ -203,16 +203,16 @@ Do not forget to press Save Button after returning back to Magento
         }
 
 // M2ePro_TRANSLATIONS
-// %marketplace_title% data was changed on eBay. You need to synchronize it the Extension works properly. Please, go to %menu_label% > Configuration > <a href="%url%" target="_blank">eBay Sites</a> and click the Save And Update Button.
+// %marketplace_title% data was changed on eBay. You need to synchronize it the Extension works properly. Please, go to %menu_label% > Configuration > <a href="%url%" target="_blank">eBay Sites</a> and click the Update All Now Button.
 
         $message = '%marketplace_title% data was changed on eBay. You need to synchronize it'.
                    ' the Extension works properly. Please, go to %menu_path% > '.
-                   '<a href="%url%" target="_blank">eBay Sites</a> and click the Save And Update Button.';
+                   '<a href="%url%" target="_blank">eBay Sites</a> and click the Update All Now Button.';
 
         $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
             $message,
             implode(', ',$outdatedMarketplaces),
-            Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration'),
+            Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration'),
             $controller->getUrl(
                 '*/adminhtml_ebay_marketplace',
                 array('tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_MARKETPLACE)

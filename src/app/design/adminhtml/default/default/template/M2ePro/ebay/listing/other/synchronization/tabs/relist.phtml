@@ -48,7 +48,7 @@ $formData = array_merge($defaults, $formData);
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Relist Action'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Relist Action'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_mode" name="relist_mode" class="required-entry">
@@ -63,7 +63,7 @@ $formData = array_merge($defaults, $formData);
 
                 <tr id="relist_filter_user_lock_tr_container" class="relist-options" <?php if ($formData['relist_mode'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_MODE_NONE): echo ' style="display:none;"'; endif; ?>>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Relist When Stopped Manually'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Relist When Stopped Manually'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_filter_user_lock" name="relist_filter_user_lock" class="required-entry">
@@ -78,7 +78,7 @@ $formData = array_merge($defaults, $formData);
 
                 <tr id="relist_send_data_tr_container" class="relist-options" <?php if ($formData['relist_mode'] == Ess_M2ePro_Model_Ebay_Listing_Other_Synchronization::RELIST_MODE_NONE): echo ' style="display:none;"'; endif; ?>>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Synchronize Data'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Synchronize Data'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_send_data" name="relist_send_data" class="required-entry">
@@ -110,7 +110,7 @@ $formData = array_merge($defaults, $formData);
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Product Status'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Product Status'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_status_enabled" name="relist_status_enabled" class="required-entry M2ePro-validate-stop-relist-conditions-product-status">
@@ -125,7 +125,7 @@ $formData = array_merge($defaults, $formData);
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Stock Availability'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Stock Availability'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_is_in_stock" name="relist_is_in_stock" class="required-entry M2ePro-validate-stop-relist-conditions-stock-availability">
@@ -140,7 +140,7 @@ $formData = array_merge($defaults, $formData);
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Quantity'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="relist_qty" name="relist_qty" class="required-entry M2ePro-validate-stop-relist-conditions-item-qty">

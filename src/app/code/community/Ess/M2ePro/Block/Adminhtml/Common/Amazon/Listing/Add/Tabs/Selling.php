@@ -51,6 +51,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_Tabs_Selling
         return array(
             'sku_mode' => Ess_M2ePro_Model_Amazon_Listing::SKU_MODE_DEFAULT,
             'sku_custom_attribute' => '',
+            'sku_modification_mode' => Ess_M2ePro_Model_Amazon_Listing::SKU_MODIFICATION_MODE_NONE,
+            'sku_modification_custom_value' => '',
             'generate_sku_mode' => Ess_M2ePro_Model_Amazon_Listing::GENERATE_SKU_MODE_NO,
 
             'template_selling_format_id' => '',
@@ -67,6 +69,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_Tabs_Selling
             'gallery_images_mode' => Ess_M2ePro_Model_Amazon_Listing::GALLERY_IMAGES_MODE_NONE,
             'gallery_images_limit' => '',
             'gallery_images_attribute' => '',
+
+            'gift_wrap_mode' => Ess_M2ePro_Model_Amazon_Listing::GIFT_WRAP_MODE_NO,
+            'gift_wrap_attribute' => '',
+
+            'gift_message_mode' => Ess_M2ePro_Model_Amazon_Listing::GIFT_MESSAGE_MODE_NO,
+            'gift_message_attribute' => '',
 
             'handling_time_mode' => Ess_M2ePro_Model_Amazon_Listing::HANDLING_TIME_MODE_NONE,
             'handling_time_value' => '',

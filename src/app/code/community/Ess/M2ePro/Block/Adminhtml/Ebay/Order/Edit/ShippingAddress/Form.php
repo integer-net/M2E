@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Edit_ShippingAddress_Form extends Ma
 {
     private $order;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -57,4 +59,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Edit_ShippingAddress_Form extends Ma
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

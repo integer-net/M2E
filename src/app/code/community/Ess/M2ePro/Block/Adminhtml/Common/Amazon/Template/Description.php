@@ -21,10 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Description extends Mage
 
         // Set header text
         //------------------------------
-        $componentName = !Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()
-            ? Mage::helper('M2ePro/Component_Amazon')->getTitle().' ' : '';
-
-        $this->_headerText = Mage::helper('M2ePro')->__("%sDescription Policies", $componentName);
+        $this->_headerText = '';
         //------------------------------
 
         // Set buttons actions
@@ -38,17 +35,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Description extends Mage
         //------------------------------
 
         //------------------------------
-        $url = $this->getUrl(
-            '*/adminhtml_common_listing/index', array('tab' => Ess_M2ePro_Helper_Component_Amazon::NICK)
-        );
-        $this->_addButton('goto_listings', array(
-            'label'     => Mage::helper('M2ePro')->__('Listings'),
-            'onclick'   => 'setLocation(\'' . $url .'\')',
-            'class'     => 'button_link'
-        ));
-        //------------------------------
-
-        //------------------------------
         $url = $this->getUrl('*/adminhtml_common_amazon_template_description/new');
         $this->_addButton('add', array(
             'label'     => Mage::helper('M2ePro')->__('Add Description Policy'),
@@ -56,14 +42,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Description extends Mage
             'class'     => 'add'
         ));
         //------------------------------
-    }
-
-    // ####################################
-
-    public function getGridHtml()
-    {
-        $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_template_description_help');
-        return $helpBlock->toHtml() . parent::getGridHtml();
     }
 
     // ########################################

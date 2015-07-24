@@ -10,13 +10,15 @@ class Ess_M2ePro_Adminhtml_Common_Listing_ProductAddController
     protected $component;
     protected $sessionKeyPostfix = '_listing_product_add';
 
+    //#############################################
+
     protected function _initAction()
     {
-        $componentTitle = constant('Ess_M2ePro_Helper_Component_'.ucfirst($this->getComponent()).'::TITLE');
+        $componentTitle = Mage::helper('M2ePro/Component_'.ucfirst($this->getComponent()))->getTitle();
 
         $this->loadLayout()
             ->_title(Mage::helper('M2ePro')->__('Manage Listings'))
-            ->_title(Mage::helper('M2ePro')->__($componentTitle.' Listings'));
+            ->_title(Mage::helper('M2ePro')->__('%component_title% Listings', $componentTitle));
 
         $this->getLayout()->getBlock('head')
             ->setCanLoadExtJs(true)
@@ -32,7 +34,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_ProductAddController
 
             ->addJs('M2ePro/Common/Listing/Category/Summary/GridHandler.js')
             ->addJs('M2ePro/Common/Listing/Category/TreeHandler.js')
-            ->addJs('M2ePro/Common/Listing/Category/Handler.js')
             ->addJs('M2ePro/Common/Listing/AddListingHandler.js');
 
         if ($this->getComponent() === Ess_M2ePro_Helper_Component_Amazon::NICK) {
@@ -338,8 +339,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_ProductAddController
 
         $isLastPart = $this->getRequest()->getParam('is_last_part');
         if ($isLastPart == 'yes') {
-
-            Mage::helper('M2ePro/Data_Session')->setValue('temp_listing_categories', array());
 
             $backUrl = $this->getUrl('*/*/index', array(
                 'id' => $listingId,

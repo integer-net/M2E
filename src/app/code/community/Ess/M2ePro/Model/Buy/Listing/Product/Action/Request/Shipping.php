@@ -11,7 +11,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Request_Shipping
 
     public function getData()
     {
-        if (!$this->getConfigurator()->isShipping()) {
+        if (!$this->getConfigurator()->isShippingAllowed()) {
             return array();
         }
 

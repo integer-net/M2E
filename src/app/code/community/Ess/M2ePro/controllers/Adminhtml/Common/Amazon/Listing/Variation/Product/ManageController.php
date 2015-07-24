@@ -40,7 +40,6 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
 
             ->addJs('M2ePro/TemplateHandler.js')
             ->addJs('M2ePro/Common/Listing/Category/TreeHandler.js')
-            ->addJs('M2ePro/Common/Listing/Category/Handler.js')
             ->addJs('M2ePro/Common/Listing/AddListingHandler.js')
             ->addJs('M2ePro/Common/Listing/SettingsHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/ChannelSettingsHandler.js')
@@ -51,13 +50,14 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
         return $this;
     }
 
-    protected function _setActiveMenu($menuPath) {
+    protected function _setActiveMenu($menuPath)
+    {
         return $this;
     }
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/listings/listing');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/listings');
     }
 
     // -------------------------------------------
@@ -102,11 +102,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
 
         $help = $this->loadLayout()->getLayout()
             ->createBlock('M2ePro/adminhtml_common_amazon_listing_variation_product_manage_tabs_variations_help');
-        $help->setListingProductId($productId);
 
-        $this->_initAction()->_addContent($help);
-
-        $this->_initAction()->_addContent($grid)->renderLayout();
+        $this->_initAction();
+        $this->_addContent($help);
+        $this->_addContent($grid)->renderLayout();
     }
 
     public function viewVariationsGridAjaxAction()
@@ -154,18 +153,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
 
         $childTypeModel->setProductVariation($magentoVariation);
 
-        $productOptions = $childTypeModel->getProductOptions();
-        $channelOptions = $childTypeModel->getChannelOptions();
-        $matchedAttributes = $amazonParentListingProduct->getVariationManager()->getTypeModel()->getMatchedAttributes();
-
-        foreach ($matchedAttributes as $magentoAttr => $amazonAttr) {
-            Mage::helper('M2ePro/Component_Amazon_Vocabulary')->addOptions(
-                $parentListingProduct->getMarketplace()->getId(),
-                $productOptions[$magentoAttr],
-                $channelOptions[$amazonAttr],
-                $amazonAttr
-            );
-        }
+        // todo add options to vocabulary
 
         $amazonParentListingProduct->getVariationManager()
             ->getTypeModel()
@@ -326,23 +314,75 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
 
     public function setVariationThemeAction()
     {
-        $productId = $this->getRequest()->getParam('product_id');
-        $variationTheme = $this->getRequest()->getParam('variation_theme', null);
+        $listingProductId = $this->getRequest()->getParam('product_id');
+        $variationTheme   = $this->getRequest()->getParam('variation_theme', null);
 
-        if (empty($productId) || is_null($variationTheme)) {
+        if (empty($listingProductId) || is_null($variationTheme)) {
             return $this->getResponse()->setBody('You should provide correct parameters.');
         }
 
-        $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$productId);
-        $parent = $listingProduct->getChildObject()->getVariationManager()->getTypeModel();
+        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+        $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$listingProductId);
 
-        if ($parent->getChannelTheme() != $variationTheme) {
-            $parent->setChannelTheme($variationTheme, false);
-            $parent->setIsChannelThemeSetManually(true);
-            $parent->getProcessor()->process();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
+        $parentTypeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
+
+        $result = array('success' => true);
+
+        if ($parentTypeModel->getChannelTheme() == $variationTheme) {
+            return $this->getResponse()->setBody(json_encode($result));
         }
 
-        $this->getResponse()->setBody(json_encode(array('success' => true)));
+        $parentTypeModel->setChannelTheme($variationTheme, false);
+        $parentTypeModel->setIsChannelThemeSetManually(true);
+
+        $productDataNick = $amazonListingProduct->getAmazonDescriptionTemplate()->getProductDataNick();
+
+        $marketplaceDetails = Mage::getModel('M2ePro/Amazon_Marketplace_Details');
+        $marketplaceDetails->setMarketplaceId($amazonListingProduct->getMarketplace()->getId());
+
+        $themeAttributes   = $marketplaceDetails->getVariationThemeAttributes($productDataNick, $variationTheme);
+        $productAttributes = $parentTypeModel->getProductAttributes();
+
+        if (count($themeAttributes) != 1 || count($productAttributes) != 1) {
+            $parentTypeModel->getProcessor()->process();
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        $productAttribute = reset($productAttributes);
+        $themeAttribute   = reset($themeAttributes);
+
+        $parentTypeModel->setMatchedAttributes(array($productAttribute => $themeAttribute), true);
+        $parentTypeModel->getProcessor()->process();
+
+        if ($productAttribute == $themeAttribute || $listingProduct->getMagentoProduct()->isGroupedType()) {
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        $vocabularyHelper = Mage::helper('M2ePro/Component_Amazon_Vocabulary');
+
+        if ($vocabularyHelper->isAttributeAutoActionDisabled()) {
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        if ($vocabularyHelper->isAttributeExistsInLocalStorage($productAttribute, $themeAttribute)) {
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        if ($vocabularyHelper->isAttributeExistsInServerStorage($productAttribute, $themeAttribute)) {
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        if ($vocabularyHelper->isAttributeAutoActionNotSet()) {
+            $result['vocabulary_attributes'] = array($productAttribute => $themeAttribute);
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        $vocabularyHelper->addAttribute($productAttribute, $themeAttribute);
+
+        return $this->getResponse()->setBody(json_encode($result));
     }
 
     public function setMatchedAttributesAction()
@@ -359,18 +399,62 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
             $variationAttributes['amazon_attributes']
         );
 
+        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
         $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$productId);
 
-        $listingProduct->getChildObject()->getVariationManager()->getTypeModel()
-                                                                ->setMatchedAttributes($matchedAttributes);
-        $listingProduct->getChildObject()->getVariationManager()->getTypeModel()->getProcessor()->process();
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
 
-        foreach ($matchedAttributes as $magentoAttr => $amazonAttr) {
-            Mage::helper('M2ePro/Component_Amazon_Vocabulary')
-                ->addAttributes($listingProduct->getMarketplace()->getId(), $magentoAttr, $amazonAttr);
+        $typeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
+
+        $typeModel->setMatchedAttributes($matchedAttributes);
+        $typeModel->getProcessor()->process();
+
+        $result = array(
+            'success' => true,
+        );
+
+        if ($listingProduct->getMagentoProduct()->isGroupedType()) {
+            return $this->getResponse()->setBody(json_encode($result));
         }
 
-        $this->getResponse()->setBody(json_encode(array('success' => true)));
+        $vocabularyHelper = Mage::helper('M2ePro/Component_Amazon_Vocabulary');
+
+        if ($vocabularyHelper->isAttributeAutoActionDisabled()) {
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        $attributesForAddingToVocabulary = array();
+
+        foreach ($matchedAttributes as $productAttribute => $channelAttribute) {
+            if ($productAttribute == $channelAttribute) {
+                continue;
+            }
+
+            if ($vocabularyHelper->isAttributeExistsInLocalStorage($productAttribute, $channelAttribute)) {
+                continue;
+            }
+
+            if ($vocabularyHelper->isAttributeExistsInServerStorage($productAttribute, $channelAttribute)) {
+                continue;
+            }
+
+            $attributesForAddingToVocabulary[$productAttribute] = $channelAttribute;
+        }
+
+        if ($vocabularyHelper->isAttributeAutoActionNotSet()) {
+            if (!empty($attributesForAddingToVocabulary)) {
+                $result['vocabulary_attributes'] = $attributesForAddingToVocabulary;
+            }
+
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        foreach ($attributesForAddingToVocabulary as $productAttribute => $channelAttribute) {
+            $vocabularyHelper->addAttribute($productAttribute, $channelAttribute);
+        }
+
+        return $this->getResponse()->setBody(json_encode($result));
     }
 
     public function createNewChildAction()
@@ -418,23 +502,137 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
 
         $parentTypeModel->getProcessor()->process();
 
-        if (!$createNewAsin) {
-            $matchedAttributes = $parentTypeModel->getMatchedAttributes();
+        $result = array(
+            'type' => 'success',
+            'msg'  => Mage::helper('M2ePro')->__('New Amazon Child Product was successfully created.')
+        );
 
-            foreach ($matchedAttributes as $productAttribute => $channelAttribute) {
-                Mage::helper('M2ePro/Component_Amazon_Vocabulary')->addOptions(
-                    $parentListingProduct->getMarketplace()->getId(),
-                    $productOptions[$productAttribute],
-                    $channelOptions[$channelAttribute],
-                    $channelAttribute
-                );
+        if ($createNewAsin) {
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        $vocabularyHelper = Mage::helper('M2ePro/Component_Amazon_Vocabulary');
+
+        if ($vocabularyHelper->isOptionAutoActionDisabled()) {
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        $matchedAttributes = $parentTypeModel->getMatchedAttributes();
+
+        $optionsForAddingToVocabulary = array();
+
+        foreach ($matchedAttributes as $productAttribute => $channelAttribute) {
+            $productOption = $productOptions[$productAttribute];
+            $channelOption = $channelOptions[$channelAttribute];
+
+            if ($productOption == $channelOption) {
+                continue;
+            }
+
+            if ($vocabularyHelper->isOptionExistsInLocalStorage($productOption, $channelOption, $channelAttribute)) {
+                continue;
+            }
+
+            if ($vocabularyHelper->isOptionExistsInServerStorage($productOption, $channelOption, $channelAttribute)) {
+                continue;
+            }
+
+            $optionsForAddingToVocabulary[$channelAttribute] = array($productOption => $channelOption);
+        }
+
+        if ($vocabularyHelper->isOptionAutoActionNotSet()) {
+            if (!empty($optionsForAddingToVocabulary)) {
+                $result['vocabulary_attribute_options'] = $optionsForAddingToVocabulary;
+            }
+
+            return $this->getResponse()->setBody(json_encode($result));
+        }
+
+        foreach ($optionsForAddingToVocabulary as $channelAttribute => $options) {
+            foreach ($options as $productOption => $channelOption) {
+                $vocabularyHelper->addOption($productOption, $channelOption, $channelAttribute);
             }
         }
 
-        $this->getResponse()->setBody(json_encode(array(
-            'type' => 'success',
-            'msg'  => Mage::helper('M2ePro')->__('New Amazon Child Product was successfully created.')
-        )));
+        return $this->getResponse()->setBody(json_encode($result));
+    }
+
+    public function addAttributesToVocabularyAction()
+    {
+        $attributes           = $this->getRequest()->getParam('attributes');
+        $isRememberAutoAction = (bool)$this->getRequest()->getParam('is_remember', false);
+        $needAddToVocabulary  = (bool)$this->getRequest()->getParam('need_add', false);
+
+        if (!empty($attributes)) {
+            $attributes = json_decode($attributes, true);
+        }
+
+        if (!$isRememberAutoAction && !$needAddToVocabulary) {
+            return;
+        }
+
+        $vocabularyHelper = Mage::helper('M2ePro/Component_Amazon_Vocabulary');
+
+        if ($isRememberAutoAction && !$needAddToVocabulary) {
+            $vocabularyHelper->disableAttributeAutoAction();
+            return;
+        }
+
+        if (!$needAddToVocabulary) {
+            return;
+        }
+
+        if ($isRememberAutoAction) {
+            $vocabularyHelper->enableAttributeAutoAction();
+        }
+
+        if (empty($attributes)) {
+            return;
+        }
+
+        foreach ($attributes as $productAttribute => $channelAttribute) {
+            $vocabularyHelper->addAttribute($productAttribute, $channelAttribute);
+        }
+    }
+
+    public function addOptionsToVocabularyAction()
+    {
+        $optionsData          = $this->getRequest()->getParam('options_data');
+        $isRememberAutoAction = (bool)$this->getRequest()->getParam('is_remember', false);
+        $needAddToVocabulary  = (bool)$this->getRequest()->getParam('need_add', false);
+
+        if (!empty($optionsData)) {
+            $optionsData = json_decode($optionsData, true);
+        }
+
+        if (!$isRememberAutoAction && !$needAddToVocabulary) {
+            return;
+        }
+
+        $vocabularyHelper = Mage::helper('M2ePro/Component_Amazon_Vocabulary');
+
+        if ($isRememberAutoAction && !$needAddToVocabulary) {
+            $vocabularyHelper->disableOptionAutoAction();
+            return;
+        }
+
+        if (!$needAddToVocabulary) {
+            return;
+        }
+
+        if ($isRememberAutoAction) {
+            $vocabularyHelper->enableOptionAutoAction();
+        }
+
+        if (empty($optionsData)) {
+            return;
+        }
+
+        foreach ($optionsData as $channelAttribute => $options) {
+            foreach ($options as $productOption => $channelOption) {
+                $vocabularyHelper->addOption($productOption, $channelOption, $channelAttribute);
+            }
+        }
     }
 
     //#############################################
@@ -474,14 +672,13 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
 
             /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Amazon_Dispatcher */
             $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-            $response = $dispatcherObject->processVirtual(
-                'product','search','asinBySkus',
-                array(
-                    'include_info' => true,
-                    'only_realtime' => true,
-                    'items' => array($sku)
-                ),'items', $listingProduct->getAccount()->getId()
-            );
+            $connectorObj = $dispatcherObject->getVirtualConnector('product','search','asinBySkus',
+                                                                   array('include_info'  => true,
+                                                                         'only_realtime' => true,
+                                                                         'items'         => array($sku)),
+                                                                   'items', $listingProduct->getAccount()->getId());
+
+            $response = $dispatcherObject->process($connectorObj);
 
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);

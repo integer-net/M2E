@@ -1,7 +1,7 @@
 <div id="block_notice_buy_accounts_orders" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Orders'); ?>">
     <?php
-    $menuSalesPath = Mage::helper('M2ePro/View_Common')->getMenuPath('orders');
-    $menuSynchronizationPath = Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/synchronization');
+    $menuSalesPath = Mage::helper('M2ePro/View_Common')->getPageNavigationPath('orders', '', 'buy');
+    $menuSynchronizationPath = Mage::helper('M2ePro/View_Common')->getPageNavigationPath('configuration', 'Synchronization', 'buy');
     echo Mage::helper('M2ePro')->__('This Tab contains Settings of Rakuten.com Orders, Rakuten.com Customers Import; Magento Orders and Products Creation.<br/><br/>
 
     If you set <strong>Import Rakuten.com Orders</strong> to <i>Yes</i>, a new Rakuten.com Order will be imported to the System and can be found in (%menu_sales_path%).<br/>
@@ -19,8 +19,6 @@ $formData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data') ? Mage::he
 $formData['magento_orders_settings'] = !empty($formData['magento_orders_settings']) ? json_decode($formData['magento_orders_settings'], true) : array();
 
 $defaults = array(
-    'orders_mode' => Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_YES,
-
     'magento_orders_settings' => array(
         'listing' => array(
             'mode' => Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_YES,
@@ -80,8 +78,6 @@ $isEdit = !!$this->getRequest()->getParam('id');
         'Prefix length should not be greater than 5 characters.' => Mage::helper('M2ePro')->__('Prefix length should not be greater than 5 characters.')
     )); ?>);
 
-    M2ePro.formData.orders_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['orders_mode']); ?>';
-
     M2ePro.formData.magento_orders_listings_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing']['mode']); ?>';
     M2ePro.formData.magento_orders_listings_store_mode = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing']['store_mode']); ?>';
     M2ePro.formData.magento_orders_listings_store_id = '<?php echo Mage::helper('M2ePro')->escapeJs($formData['magento_orders_settings']['listing']['store_id']); ?>';
@@ -98,8 +94,6 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
     Event.observe(window, 'load', function() {
         setTimeout(function() {
-            $('orders_mode').observe('change', BuyAccountHandlerObj.ordersModeChange);
-
             $('magento_orders_listings_mode').observe('change', BuyAccountHandlerObj.magentoOrdersListingsModeChange);
             $('magento_orders_listings_store_mode').observe('change', BuyAccountHandlerObj.magentoOrdersListingsStoreModeChange);
 
@@ -119,41 +113,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
 </script>
 
-<div class="entry-edit" id="magento_block_buy_accounts_orders_mode">
-
-    <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('General'); ?></h4>
-    </div>
-
-    <div class="fieldset">
-        <div class="hor-scroll">
-
-            <table class="form-list" cellspacing="0" cellpadding="0">
-
-                <tr>
-                    <td class="label">
-                        <label for="orders_mode"><?php echo Mage::helper('M2ePro')->__('Import Rakuten.com Orders'); ?>: <span class="required">*</span></label>
-                    </td>
-                    <td class="value" style="width: auto;">
-                        <select id="orders_mode" name="orders_mode" class="M2ePro-required-when-visible">
-                            <option value="<?php echo Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO; ?>" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_YES; ?>" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_YES) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
-                        </select>
-                        <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Allows importing Orders from Rakuten.com to M2E Pro.'); ?></span>
-                        </p>
-
-                    </td>
-                </tr>
-
-            </table>
-
-        </div>
-    </div>
-
-</div>
-
-<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_listings" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO) echo 'style="display: none;"'; ?>>
+<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_listings">
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Product Is Listed By M2E Pro'); ?></h4>
@@ -166,7 +126,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label for="magento_orders_listings_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_listings_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="magento_orders_listings_mode" name="magento_orders_settings[listing][mode]" class="M2ePro-required-when-visible">
@@ -181,7 +141,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="magento_orders_listings_store_mode_container" <?php if($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO) echo 'style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="magento_orders_listings_store_mode"><?php echo Mage::helper('M2ePro')->__('Store View Source'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_listings_store_mode"><?php echo Mage::helper('M2ePro')->__('Store View Source'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="magento_orders_listings_store_mode" name="magento_orders_settings[listing][store_mode]" class="M2ePro-required-when-visible">
@@ -213,7 +173,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
 </div>
 
-<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_listings_other" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO) echo 'style="display: none;"'; ?>>
+<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_listings_other">
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Product Is Listed By Any Other Software'); ?></h4>
@@ -226,7 +186,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label for="magento_orders_listings_other_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_listings_other_mode"><?php echo Mage::helper('M2ePro')->__('Create Order in Magento'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="magento_orders_listings_other_mode" name="magento_orders_settings[listing_other][mode]" class="required-entry">
@@ -253,7 +213,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="magento_orders_listings_other_product_mode_container" <?php if($formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO) echo 'style="display: none;"'; ?>>
                     <td class="label">
-                        <label for="magento_orders_listings_other_product_mode"><?php echo Mage::helper('M2ePro')->__('Product Not Found'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_listings_other_product_mode"><?php echo Mage::helper('M2ePro')->__('Product Not Found'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="magento_orders_listings_other_product_mode" name="magento_orders_settings[listing_other][product_mode]" class="M2ePro-required-when-visible">
@@ -270,7 +230,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
                 <?php $canShowBlock = $formData['magento_orders_settings']['listing_other']['product_mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_PRODUCT_MODE_IMPORT; ?>
                 <tr id="magento_orders_listings_other_product_tax_class_id_container" <?php if (!$canShowBlock): ?>style="display: none;"<?php endif; ?>>
                     <td class="label">
-                        <label for="magento_orders_listings_other_product_tax_class_id"><?php echo Mage::helper('M2ePro')->__('Product Tax Class') ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_listings_other_product_tax_class_id"><?php echo Mage::helper('M2ePro')->__('Product Tax Class') ?>:</label>
                     </td>
                     <td class="value">
                         <select id="magento_orders_listings_other_product_tax_class_id" name="magento_orders_settings[listing_other][product_tax_class_id]" class="M2ePro-required-when-visible">
@@ -291,7 +251,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
 </div>
 
-<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_number" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_number" <?php if(($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Magento Order Number'); ?></h4>
@@ -369,7 +329,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
 </div>
 
-<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_customer" <?php if($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_customer" <?php if(($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Customer Settings'); ?></h4>
@@ -381,7 +341,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label for="magento_orders_customer_mode"><?php echo Mage::helper('M2ePro')->__('Customer'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_customer_mode"><?php echo Mage::helper('M2ePro')->__('Customer'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="magento_orders_customer_mode" name="magento_orders_settings[customer][mode]" class="M2ePro-required-when-visible">
@@ -479,7 +439,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
 </div>
 
-<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_tax" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_tax" <?php if (($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Order Tax Settings'); ?></h4>
@@ -501,7 +461,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label for="magento_orders_tax_mode"><?php echo Mage::helper('M2ePro')->__('Tax Source'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_tax_mode"><?php echo Mage::helper('M2ePro')->__('Tax Source'); ?>:</label>
                     </td>
 
                     <td class="value" style="width: auto;">
@@ -523,7 +483,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
 <?php $statusList = $this->getMagentoOrderStatusList(); ?>
 
-<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_status_mapping" <?php if ($formData['orders_mode'] == Ess_M2ePro_Model_Buy_Account::ORDERS_MODE_NO || ($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
+<div class="entry-edit" id="magento_block_buy_accounts_magento_orders_status_mapping" <?php if (($formData['magento_orders_settings']['listing']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_MODE_NO && $formData['magento_orders_settings']['listing_other']['mode'] == Ess_M2ePro_Model_Buy_Account::MAGENTO_ORDERS_LISTINGS_OTHER_MODE_NO)) echo 'style="display: none;"'; ?>>
 
     <div class="entry-edit-head">
         <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('Order Status Mapping'); ?></h4>
@@ -541,7 +501,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr>
                     <td class="label">
-                        <label for="magento_orders_status_mapping_mode"><?php echo Mage::helper('M2ePro')->__('Status Mapping'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_status_mapping_mode"><?php echo Mage::helper('M2ePro')->__('Status Mapping'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="magento_orders_status_mapping_mode" name="magento_orders_settings[status_mapping][mode]" class="M2ePro-required-when-visible">
@@ -563,7 +523,7 @@ $isEdit = !!$this->getRequest()->getParam('id');
 
                 <tr id="magento_orders_status_mapping_processing_container">
                     <td class="label">
-                        <label for="magento_orders_status_mapping_processing"><?php echo Mage::helper('M2ePro')->__('Order Status is Open'); ?>: <span class="required">*</span></label>
+                        <label for="magento_orders_status_mapping_processing"><?php echo Mage::helper('M2ePro')->__('Order Status is Open'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <select id="magento_orders_status_mapping_processing" name="magento_orders_settings[status_mapping][processing]" class="M2ePro-required-when-visible" <?php echo $isDisabledStatusStyle; ?>>

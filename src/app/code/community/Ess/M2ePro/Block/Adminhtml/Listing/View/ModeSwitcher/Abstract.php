@@ -9,6 +9,8 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_ModeSwitcher_Abstract extends Mage
     const NICK = 'default';
     const LABEL = 'Default';
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -65,4 +67,6 @@ HTML;
 
         return $this->_data['current_view_mode'];
     }
+
+    // ####################################
 }

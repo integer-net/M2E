@@ -39,9 +39,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Categories
         $params     = $this->getParams();
 
         /** @var $marketplace Ess_M2ePro_Model_Marketplace **/
-        $marketplace = Mage::helper('M2ePro/Component_Amazon')->getObject(
-            'Marketplace', (int)$params['marketplace_id']
-        );
+        $marketplace = Mage::helper('M2ePro/Component_Amazon')
+                            ->getObject('Marketplace', (int)$params['marketplace_id']);
 
         $this->deleteAllCategories($marketplace);
 
@@ -87,11 +86,13 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Categories
 
     protected function receiveFromAmazon(Ess_M2ePro_Model_Marketplace $marketplace, $partNumber)
     {
-        $response = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher')
-                            ->processVirtual('marketplace','get','categories',
-                                             array('part_number' => $partNumber,
-                                                   'marketplace' => $marketplace->getNativeId()),
-                                             NULL,NULL,NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+        $connectorObj  = $dispatcherObj->getVirtualConnector('marketplace','get','categories',
+                                                             array('part_number' => $partNumber,
+                                                                   'marketplace' => $marketplace->getNativeId()),
+                                                             NULL,NULL,NULL);
+
+        $response = $dispatcherObj->process($connectorObj);
 
         if (is_null($response) || empty($response['data'])) {
             $response = array();
@@ -99,42 +100,53 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Categories
 
         $dataCount = isset($response['data']) ? count($response['data']) : 0;
         $this->getActualOperationHistory()->addText("Total received Categories from Amazon: {$dataCount}");
+
         return $response;
     }
 
-    protected function saveCategoriesToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $categories)
+    protected function deleteAllCategories(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tableCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_category');
 
-        if (!count($categories)) {
+        $connWrite->delete($tableCategories,array('marketplace_id = ?' => $marketplace->getId()));
+    }
+
+    protected function saveCategoriesToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $categories)
+    {
+        $totalCountCategories = count($categories);
+        if ($totalCountCategories <= 0) {
             return;
         }
 
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $tableCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_category');
+
         $iteration            = 0;
         $iterationsForOneStep = 1000;
-        $percentsForOneStep   = ($this->getPercentsInterval()/2) / (count($categories)/$iterationsForOneStep);
-        $categoriesCount      = count($categories);
+        $percentsForOneStep   = ($this->getPercentsInterval()/2) / ($totalCountCategories/$iterationsForOneStep);
         $insertData           = array();
 
-        for ($i = 0; $i < $categoriesCount; $i++) {
+        for ($i = 0; $i < $totalCountCategories; $i++) {
+
             $data = $categories[$i];
 
             $insertData[] = array(
-                'category_id'         => $data['id'],
                 'marketplace_id'      => $marketplace->getId(),
+                'category_id'         => $data['id'],
                 'parent_category_id'  => $data['parent_id'],
                 'title'               => $data['title'],
                 'path'                => $data['path'],
-                'is_listable'         => $data['is_listable'],
+                'is_leaf'             => $data['is_listable'],
                 'product_data_nick'   => ($data['is_listable'] ? $data['product_data']['nick'] : NULL),
                 'browsenode_id'       => ($data['is_listable'] ? $data['browsenode_id'] : NULL),
                 'keywords'            => ($data['is_listable'] ? json_encode($data['keywords']) : NULL),
                 'required_attributes' => ($data['is_listable'] ? json_encode($data['required_attributes']) : NULL)
             );
 
-            if (count($insertData) >= 100 || $i >= ($categoriesCount - 1)) {
+            if (count($insertData) >= 100 || $i >= ($totalCountCategories - 1)) {
                 $connWrite->insertMultiple($tableCategories, $insertData);
                 $insertData = array();
             }
@@ -148,23 +160,15 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Categories
         }
     }
 
-    protected function deleteAllCategories(Ess_M2ePro_Model_Marketplace $marketplace)
-    {
-        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
-        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $tableCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_category');
-
-        $connWrite->delete($tableCategories,array('marketplace_id = ?' => $marketplace->getId()));
-    }
-
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         // M2ePro_TRANSLATIONS
-        // The "Categories" Action for Amazon Marketplace: "%mrk%" has been successfully completed.
+        // The "Categories" Action for %amazon% Marketplace: "%mrk%" has been successfully completed.
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-            'The "Categories" Action for Amazon Marketplace: "%mrk%" has been successfully completed.',
-            array('mrk' => $marketplace->getTitle())
+            'The "Categories" Action for %amazon% Marketplace: "%mrk%" has been successfully completed.',
+            array('!amazon' => Mage::helper('M2ePro/Component_Amazon')->getTitle(),
+                  'mrk'     => $marketplace->getTitle())
         );
 
         $this->getLog()->addMessage($tempString,

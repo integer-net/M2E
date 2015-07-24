@@ -94,8 +94,9 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
         //--------------------------------
         // Get collection
         //----------------------------
-        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
-        $collection = Mage::getModel('catalog/product')->getCollection();
+        /* @var $collection Ess_M2ePro_Model_Mysql4_Magento_Product_Collection */
+        $collection = Mage::getConfig()->getModelInstance('Ess_M2ePro_Model_Mysql4_Magento_Product_Collection',
+            Mage::getModel('catalog/product')->getResource());
         $collection->addAttributeToSelect('sku');
         $collection->addAttributeToSelect('name');
         //--------------------------------
@@ -136,7 +137,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
                 'ebay_item_id'          => 'ebay_item_id',
                 'online_category'       => 'online_category',
                 'online_qty_sold'       => 'online_qty_sold',
+                'online_start_price'    => 'online_start_price',
+                'online_current_price'  => 'online_current_price',
+                'online_reserve_price'  => 'online_reserve_price',
                 'online_buyitnow_price' => 'online_buyitnow_price',
+                'min_online_price'      => 'online_current_price'
             )
         );
         $collection->joinTable(
@@ -346,7 +351,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Settings_Grid
         if ($this->getCompatibilityType() == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC) {
             $partsCompatibilityTypeTitle = 'ePIDs';
         } else {
-            $partsCompatibilityTypeTitle = 'KTypes';
+            $partsCompatibilityTypeTitle = 'kTypes';
         }
 
         $html = <<<HTML
@@ -618,7 +623,9 @@ HTML;
                            .' If you are planning to order more Items for Translation in future,'
                            .' you can credit the sum greater than the one needed for current Translation.'
                            .' Click <a href="%url%" target="_blank">here</a> to find out more.',
-                    'http://docs.m2epro.com/display/eBayMagentoV6/Translation#Translation-Account.1'),
+                Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_View_Ebay::NICK,
+                    'Sell+on+another+eBay+Site#SellonanothereBaySite-Account')
+                ),
             'Amount to Pay.' => $helper->__('Amount to Pay'),
             'Insert amount to be credited to an Account' => $helper->__('Insert amount to be credited to an Account.'),
             'Confirm' => $helper->__('Confirm'),
@@ -779,10 +786,7 @@ HTML;
             }
 
             /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add $partsCompatibilityBlock */
-            $partsCompatibilityBlock = $this->getLayout()->createBlock(
-                'M2ePro/adminhtml_ebay_motor_add'
-            );
-
+            $partsCompatibilityBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_motor_add');
             $partsCompatibilityBlock->setCompatibilityType($compatibilityType);
             $partsCompatibilityBlock->setProductGridId($this->getId());
 

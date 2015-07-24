@@ -14,22 +14,5 @@ class Ess_M2ePro_Block_Adminhtml_Renderer_Description_Abstract extends Mage_Admi
         $this->setData('area', 'adminhtml');
     }
 
-    /**
-     * Get absolute path to template
-     * @return string
-     */
-    public function getTemplateFile()
-    {
-        $params = array(
-            '_relative' => true,
-            '_area' => 'adminhtml',
-            '_package' => 'default',
-            '_theme' => 'default'
-        );
-
-        $templateName = Mage::getDesign()->getTemplateFilename($this->getTemplate(), $params);
-        return $templateName;
-    }
-
     // ####################################
 }

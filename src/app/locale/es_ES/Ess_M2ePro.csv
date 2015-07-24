@@ -260,10 +260,10 @@
 "<b>
     Do you want to set up a rule by which products will be automatically added or deleted from the current M2E listing?
 </b>.
-<br><br>
-Click Start Configure to create a rule<br> or Cancel if you do not want to do it now.
-<br><br>
-<b>Note:</b> You can always return to it by clicking Automatic Action button on this page.","<b> ¿Quieres configurar una regla para añadir o eliminar productos automáticamente desde el anuncio de M2E actual? </b>.<br><br>Pulsa Iniciar configuración para crear una regla<br> o Cancelar si no quieres realizar esta acción ahora.<br><br><b>Nota:</b> puedes volver en cualquier momento, pulsando el botón Acción automática en esta página."
+<br/><br/>
+Click Start Configure to create a rule<br/> or Cancel if you do not want to do it now.
+<br/><br/>
+<b>Note:</b> You can always return to it by clicking Automatic Action button on this page.","<b> ¿Quieres configurar una regla para añadir o eliminar productos automáticamente desde el anuncio de M2E actual? </b>.<br/><br/>Pulsa Iniciar configuración para crear una regla<br/> o Cancelar si no quieres realizar esta acción ahora.<br/><br/><b>Nota:</b> puedes volver en cualquier momento, pulsando el botón Acción automática en esta página."
 "Yes, I Want","Sí, quiero"
 "No, Skip It","No, omitir"
 "Do you want to customise M2E Listing settings for the necessary products?","¿Quieres personalizar la configuración de anuncio de M2E para los productos necesarios?"
@@ -452,8 +452,8 @@ Click Start Configure to create a rule<br> or Cancel if you do not want to do it
 "Edit ""%s"" %s Policy","Modificar la política %s de ""%s"""
 "Add %s Policy","Añadir la política %s"
 "Duplicate","Duplicar"
-"<br>
-<b>Note:</b> All changes you have made will be automatically applied to all M2E listings where this policy is used.","<br><b>Nota:</b> todos los cambios realizados se aplicarán automáticamente a todos los anuncios de M2E en los que se usa esta política."
+"<br/>
+<b>Note:</b> All changes you have made will be automatically applied to all M2E listings where this policy is used.","<br/><b>Nota:</b> todos los cambios realizados se aplicarán automáticamente a todos los anuncios de M2E en los que se usa esta política."
 "Template nick is not set.","No se ha establecido el apodo de plantilla."
 "Marketplace is required for editing payment template.","Es necesario determinar el mercado para modificar la plantilla de pago."
 "Marketplace is required for editing return template.","Es necesario determinar el mercado para modificar la plantilla de devolución."
@@ -736,7 +736,7 @@ Click Start Configure to create a rule<br> or Cancel if you do not want to do it
 "Policy cannot be deleted as it is used in Listing settings.","La política no se puede eliminar porque se usa en la configuración de anuncio."
 "The listing was successfully saved.","El anuncio se ha guardado correctamente."
 "To change account settings click on its record in the grid or choose Edit in the Action dropdown.
-    <br>To review accounts feedback, click the appropriate link. An account can be also deleted, but only if it is not used in M2E listing settings.","Para cambiar la configuración de una cuenta, pulsa el registro correspondiente en la tabla o elige Modificar en el menú desplegable Acción.    <br>Para revisar los votos de las cuentas, pulsa el vínculo correspondiente. Una cuenta también se puede eliminar, pero solo si no se usa en la configuración de anuncio de M2E."
+    <br/>To review accounts feedback, click the appropriate link. An account can be also deleted, but only if it is not used in M2E listing settings.","Para cambiar la configuración de una cuenta, pulsa el registro correspondiente en la tabla o elige Modificar en el menú desplegable Acción.    <br/>Para revisar los votos de las cuentas, pulsa el vínculo correspondiente. Una cuenta también se puede eliminar, pero solo si no se usa en la configuración de anuncio de M2E."
 "
         M2E allows you to receive feedback from your buyers and respond them according to the settings below.
 <br/><br/><b>Note:</b> The Feedback Synchronization must be enabled in %s > Configuration > Synchronization.","        M2E te permite recibir votos de los compradores y responderles en función de la configuración siguiente.<br/><br/><b>Nota:</b> la Sincronización de votos debe estar activada en %s > Configuración > Sincronización."
@@ -780,15 +780,15 @@ Click Start Configure to create a rule<br> or Cancel if you do not want to do it
 "Expiration Date","Fecha de vencimiento"
 "
         The 3rd Party Listings are the items, which were listed on eBay without using M2E Pro extension.
-        <br><br>
+        <br/><br/>
         Set 'Yes' in Import 3rd Party Listings to allow importing for the current eBay Account. Imported listings you can find in Sell on eBay -> Listings -> 3rd Party.
-        <br>
+        <br/>
         Use 'Product Mapping' settings to connect eBay listings to Magento products.
-        <br><br>
+        <br/><br/>
         <b>Note:</b> The 3rd Party Listings Synchronization must be enabled in %1$s > Configuration > Synchronization.
-        ","        Los anuncios externos son los artículos que se pusieron en venta en eBay sin usar la extensión                 M2E Pro.        <br><br>        Elige la opción 'Sí' en Importar anuncios externos a fin de permitir la importación en la cuenta de eBay actual. Los anuncios importados pueden encontrarse en Vender en eBay -> Anuncios -> Externos.        <br>        Usa la configuración de 'Asignación de producto' para conectar los anuncios de eBay a productos de Magento.        <br><br>        <b>Nota:</b> la opción Sincronización de anuncios externos debe estar activada en %1$s > Configuración > Sincronización.        "
+        ","        Los anuncios externos son los artículos que se pusieron en venta en eBay sin usar la extensión                 M2E Pro.        <br/><br/>        Elige la opción 'Sí' en Importar anuncios externos a fin de permitir la importación en la cuenta de eBay actual. Los anuncios importados pueden encontrarse en Vender en eBay -> Anuncios -> Externos.        <br/>        Usa la configuración de 'Asignación de producto' para conectar los anuncios de eBay a productos de Magento.        <br/><br/>        <b>Nota:</b> la opción Sincronización de anuncios externos debe estar activada en %1$s > Configuración > Sincronización.        "
 "Import 3rd Party Listings","Importar anuncios externos"
-"Allows importing 3rd Party Listings.<br><b>Note:</b> Only active eBay Listings created less than 2 years before will be imported.","Permite importar anuncios externos.<br><b>Nota:</b> solamente se importarán los anuncios de eBay activos creados hace menos de dos años."
+"Allows importing 3rd Party Listings.<br/><b>Note:</b> Only active eBay Listings created less than 2 years before will be imported.","Permite importar anuncios externos.<br/><b>Nota:</b> solamente se importarán los anuncios de eBay activos creados hace menos de dos años."
 "Product Mapping","Asignación de producto"
 "Maps eBay product with Magento product.","Asigna el producto de eBay a un producto de Magento."
 "Mapping Settings","Configuración de asignación"
@@ -799,16 +799,16 @@ Click Start Configure to create a rule<br> or Cancel if you do not want to do it
 "Mapped Items Synchronization","Sincronización de artículos asignados"
 "Enabled","Activado"
 "Enables / Disables synchronization of Mapped 3rd Party<br/>Listings for the current account. Click 'Synchronization Settings' button to configure settings.
-                            <br><b>Note:</b> The first 3rd Party Listings Synchronization launches the first product automapping. After that you can launch it manually in Sell on eBay > Listings > 3rd Party.","Activa o desactiva la sincronización de los anuncios externos asignados<br/>para la cuenta actual. Pulsa el botón 'Configuración de sincronización' para configurar los valores.                            <br><b>Nota:</b> la primera sincronización de anuncios externos inicia la primera asignación automática de los productos. Posteriormente, podrás iniciarla manualmente en Vender en eBay > Anuncios > Externos."
+                            <br/><b>Note:</b> The first 3rd Party Listings Synchronization launches the first product automapping. After that you can launch it manually in Sell on eBay > Listings > 3rd Party.","Activa o desactiva la sincronización de los anuncios externos asignados<br/>para la cuenta actual. Pulsa el botón 'Configuración de sincronización' para configurar los valores.                            <br/><b>Nota:</b> la primera sincronización de anuncios externos inicia la primera asignación automática de los productos. Posteriormente, podrás iniciarla manualmente en Vender en eBay > Anuncios > Externos."
 "Related Store Views","Vistas de tienda relacionadas"
 "Related Store View","Vista de tienda relacionada"
 "Establish connection between eBay sites and Magento Store Views for correct data synchronization.","Establece una conexión entre las vistas de la tienda Magento y los sitios de eBay para poder realizar una sincronización correcta de los datos."
 "For each eBay account M2E Pro allows import orders coming from eBay and setting up automatic Magento orders creation.
                                          Using appropriate settings you can create Magento orders for the items listed by the 3rd party software and by M2E Pro.
-                                         <br>
-                                         <br>
+                                         <br/>
+                                         <br/>
                                          <b>Note:</b> The Product Stock QTY only reduces after Magento Order creation.<br/>
-                                         The Order Synchronization must be enabled in %1$s > Configuration > Synchronization.","M2E Pro permite importar pedidos procedentes de eBay y configurar la creación automática de pedidos de Magento para todas las cuentas de eBay. Con la configuración adecuada, podrás crear pedidos de Magento para los artículos puestos en venta por software de terceros y por M2E Pro.                                         <br>                                         <br>                                         <b>Nota:</b> la cantidad de existencias del producto solamente se reduce tras crear el pedido de Magento.<br/>                                         La Sincronización de votos debe estar activada en %1$s > Configuración > Sincronización."
+                                         The Order Synchronization must be enabled in %1$s > Configuration > Synchronization.","M2E Pro permite importar pedidos procedentes de eBay y configurar la creación automática de pedidos de Magento para todas las cuentas de eBay. Con la configuración adecuada, podrás crear pedidos de Magento para los artículos puestos en venta por software de terceros y por M2E Pro.                                         <br/>                                         <br/>                                         <b>Nota:</b> la cantidad de existencias del producto solamente se reduce tras crear el pedido de Magento.<br/>                                         La Sincronización de votos debe estar activada en %1$s > Configuración > Sincronización."
 "Import eBay Orders","Importar pedidos de eBay"
 "Choose to import the orders placed on eBay.","Elige importar los pedidos realizados en eBay."
 "Product Is Listed By M2E Pro","Producto puesto en venta por M2E Pro"
@@ -831,12 +831,12 @@ Click Start Configure to create a rule<br> or Cancel if you do not want to do it
 "Customer Settings","Configuración del cliente"
 "Customers","Clientes"
 "There are several ways to specify a customer Magento Orders will be assigned to:
-                <br>
+                <br/>
                     <br/><b>Guest Account</b> - the system does not require a customer account to be created. Default guest account will be used instead.
-                    <br><b>Note:</b> To use this option, Magento Guest Checkout option must be enabled.
-                <br><br/><b>Predefined Customer</b> - the system uses predefined customer.
-                <br><br/><b>Create New</b> - a new customer will be created in Magento.
-                    <br/><b>Note:</b> If a customer already exists in Magento, the system assigns orders to him.","Existen varias formas de especificar un cliente al que se asignarán los pedidos de Magento:                <br>                    <br/><b>Cuenta de invitado</b>: el sistema no obliga a que se cree una cuenta de cliente. En su lugar se usará la cuenta de invitado predeterminada.                    <br><b>Nota:</b> para usar esta posibilidad, la opción Compra sin registrarte de Magento debe estar activada.                <br><br/><b>Cliente predefinido</b>: el sistema usa un cliente predefinido.                <br><br/><b>Crear nuevo</b>: se creará un nuevo cliente en Magento.                    <br/><b>Nota:</b> si ya existe un cliente en Magento, el sistema le asignará los pedidos."
+                    <br/><b>Note:</b> To use this option, Magento Guest Checkout option must be enabled.
+                <br/><br/><b>Predefined Customer</b> - the system uses predefined customer.
+                <br/><br/><b>Create New</b> - a new customer will be created in Magento.
+                    <br/><b>Note:</b> If a customer already exists in Magento, the system assigns orders to him.","Existen varias formas de especificar un cliente al que se asignarán los pedidos de Magento:                <br/>                    <br/><b>Cuenta de invitado</b>: el sistema no obliga a que se cree una cuenta de cliente. En su lugar se usará la cuenta de invitado predeterminada.                    <br/><b>Nota:</b> para usar esta posibilidad, la opción Compra sin registrarte de Magento debe estar activada.                <br/><br/><b>Cliente predefinido</b>: el sistema usa un cliente predefinido.                <br/><br/><b>Crear nuevo</b>: se creará un nuevo cliente en Magento.                    <br/><b>Nota:</b> si ya existe un cliente en Magento, el sistema le asignará los pedidos."
 "Customer","Cliente"
 "Guest Account","Cuenta de invitado"
 "Predefined Customer","Cliente predefinido"
@@ -906,17 +906,17 @@ Click Start Configure to create a rule<br> or Cancel if you do not want to do it
 "Marketplace","Mercado"
 "
     Be careful when you edit categories data, as all changes you have made will be automatically applied to all M2E listings where these categories are used.
-    <br>
-    <br>
+    <br/>
+    <br/>
     <b>Note:</b> If M2E has defined, that a category was removed from eBay, it highlights it.
-    ","    Ten cuidado al modificar los datos de las categorías, ya que todos los cambios que realices se aplicarán automáticamente a todos los anuncios de M2E que usen dichas categorías.    <br>    <br>    <b>Nota:</b> si M2E ha definido que una categoría se ha eliminado de eBay, la resalta.    "
+    ","    Ten cuidado al modificar los datos de las categorías, ya que todos los cambios que realices se aplicarán automáticamente a todos los anuncios de M2E que usen dichas categorías.    <br/>    <br/>    <b>Nota:</b> si M2E ha definido que una categoría se ha eliminado de eBay, la resalta.    "
 "Every time you set a category you specify Item Specifics adapted to M2E listing or product it is set for.
-<br>All variety of Item Specifics sets you can find on the Specifics tab.
+<br/>All variety of Item Specifics sets you can find on the Specifics tab.
 The number of sets is equal to the number of category usage in M2E.
-<br>
-<br>
+<br/>
+<br/>
 <b>Note:</b> When you change a Primary category, you will need to specify Item Specifics for every created dates.
-","Siempre que establezcas una categoría, debes especificar Características del artículo adaptadas al anuncio o producto de M2E para el que se establece.<br>En la pestaña Características puedes encontrar todos los conjuntos posibles de Características del artículo. El número de conjuntos es igual al de usos de categorías en M2E.<br><br><b>Nota:</b> si cambias una categoría principal, tendrás que especificar Características del artículo para todas las fechas de creación."
+","Siempre que establezcas una categoría, debes especificar Características del artículo adaptadas al anuncio o producto de M2E para el que se establece.<br/>En la pestaña Características puedes encontrar todos los conjuntos posibles de Características del artículo. El número de conjuntos es igual al de usos de categorías en M2E.<br/><br/><b>Nota:</b> si cambias una categoría principal, tendrás que especificar Características del artículo para todas las fechas de creación."
 "Created at","Creado el"
 "Simple","Sencillo"
 "Advanced","Avanzado"
@@ -933,8 +933,8 @@ The number of sets is equal to the number of category usage in M2E.
 "Choose the currency you want to sell for.","Elige la divisa que quieres usar para vender."
 "Prevent eBay Item Duplicates","Impedir duplicados de artículos de eBay"
 "Does not list a Magento product if it was listed from another M2E listing.
-                                <br>
-                                <b>Note:</b> This mechanism only works for auto listing and in Live eBay environment.","Un producto de Magento no se pone en venta si ya se ha puesto en venta en otro anuncio de M2E.                                <br>                                <b>Nota:</b> este mecanismo solo funciona para poner en venta automáticamente y en entornos activos de eBay."
+                                <br/>
+                                <b>Note:</b> This mechanism only works for auto listing and in Live eBay environment.","Un producto de Magento no se pone en venta si ya se ha puesto en venta en otro anuncio de M2E.                                <br/>                                <b>Nota:</b> este mecanismo solo funciona para poner en venta automáticamente y en entornos activos de eBay."
 "Parts compatibility is a better way for sellers to list parts that fit a variety of vehicles. This format adds standard information to your listing. You can create one listing describing a single part and add a complete list of compatible vehicles.
                 <br/><br/>To use this feature you have to:
                  <ul class=""list"">
@@ -1028,19 +1028,19 @@ The number of sets is equal to the number of category usage in M2E.
 "eBay suggests the best categories for your products based on title and attribute set of product.","eBay sugiere las mejores categorías para los productos en función del título y el conjunto de atributos de cada uno."
 "Set manually for each product","Establecer manualmente para cada producto"
 "You have complete freedom to choose (individually, or by grouping a set of products together) the most suitable eBay category for your products.","Tienes total libertad para elegir (individualmente o agrupando un conjunto de productos) la categoría de eBay más adecuada para tus productos."
-"If you continue the settings you will choose next will be applied to the current M2E Listing and automatically assigned to all products added later.<br><br>","Si continúas, la configuración que elijas a continuación se aplicará al anuncio de M2E actual y se asignará automáticamente a todos los productos añadidos posteriormente.<br><br>"
+"If you continue the settings you will choose next will be applied to the current M2E Listing and automatically assigned to all products added later.<br/><br/>","Si continúas, la configuración que elijas a continuación se aplicará al anuncio de M2E actual y se asignará automáticamente a todos los productos añadidos posteriormente.<br/><br/>"
 "Apply Settings","Aplicar configuración"
 "<b>Warning:</b> There are <span id=""failed_count""></span> product(s) of <span id=""total_count""></span>
 which have no Primary eBay category specified.
-<br><br>
+<br/><br/>
 You can correct it now by Cancelling this message and choosing Edit Category action.
 Or if you are not sure which category to choose, Continue working.
-You will have a chance to correct category(s) later in the listing settings.","<b>Advertencia:</b> hay <span id=""failed_count""></span> producto(s) de <span id=""total_count""></span> que no tiene(n) una categoría principal de eBay especificada.<br><br>Para corregir este problema, cancela este mensaje y elige la acción Modificar categoría. Si no sabes qué categoría elegir, sigue trabajando. Podrás corregir las categorías posteriormente en la configuración de anuncios."
+You will have a chance to correct category(s) later in the listing settings.","<b>Advertencia:</b> hay <span id=""failed_count""></span> producto(s) de <span id=""total_count""></span> que no tiene(n) una categoría principal de eBay especificada.<br/><br/>Para corregir este problema, cancela este mensaje y elige la acción Modificar categoría. Si no sabes qué categoría elegir, sigue trabajando. Podrás corregir las categorías posteriormente en la configuración de anuncios."
 "Skip Optional Specifics","Omitir características adicionales"
 "M2E will check  all available Item Specifics for selected eBay Categories and stops at the Category where user action is required (required Item Specifics should be set).","M2E comprobará todas las características del artículo disponibles para las categorías de eBay seleccionadas y se detendrá en las categorías que requieran la acción de usuario (deben establecerse las características del artículo obligatorias)."
-"<br>All selected eBay Categories were checked for required Item Specifics.
-            <br><br>
-            Now you can proceed further (use Continue button) or close this window and review Item Specifics if neccessary (use Cancel button).","<br>Se comprobaron las características del artículo obligatorias de todas las categorías de eBay seleccionadas.            <br><br>            Ahora puedes continuar (usa el botón Continuar) o cerrar esta ventana y revisar las características del artículo en caso necesario (usa el botón Cancelar)."
+"<br/>All selected eBay Categories were checked for required Item Specifics.
+            <br/><br/>
+            Now you can proceed further (use Continue button) or close this window and review Item Specifics if neccessary (use Cancel button).","<br/>Se comprobaron las características del artículo obligatorias de todas las categorías de eBay seleccionadas.            <br/><br/>            Ahora puedes continuar (usa el botón Continuar) o cerrar esta ventana y revisar las características del artículo en caso necesario (usa el botón Cancelar)."
 "The category <b>%cat%</b> doesn't have Item Specific.","La categoría <b>%cat%</b> no incluye características del artículo."
 "Adding specific item details will attract your buyers and help them to find your item in a search. We recommend using as many item specifics as you can.
                 <br/>There are mandatory specifics and the chance to create your own.
@@ -1051,7 +1051,7 @@ You will have a chance to correct category(s) later in the listing settings.","<
                     <li>
                         <b>eBay Recommended</b>
                         <br/>eBay recommends certain characteristics your item may possess. Simply choose the most appropriate one from the drop down menu.
-                        <br>So if you are selling headphones, eBay will recommend an ABC list of the most common brands from Apple and Bose to Creative.
+                        <br/>So if you are selling headphones, eBay will recommend an ABC list of the most common brands from Apple and Bose to Creative.
                         <br/>This is a sensible option for beginners to eBay.
                         <br/>
                         <b>Note:</b> These options correspond to the Primary eBay Category, not any Secondary Category you may have chosen.
@@ -1069,7 +1069,7 @@ You will have a chance to correct category(s) later in the listing settings.","<
                         <b>None</b>
                         <br/>You choose not to offer potential buyers any item specific information. Be aware that this may hamper your items appearing in eBay search results.
                     </li>
-                </ul>","Añadir detalles específicos de un artículo te permite atraer compradores y ayudarles a encontrar tu artículo en una búsqueda. Te recomendamos que uses el mayor número posible de características del artículo.                <br/>Hay características obligatorias y también existe la posibilidad de crear las tuyas propias.                <br/>                <br/>Tienes cuatro opciones a tu disposición.                <br/>                <ul class=""list"">                    <li>                        <b>Recomendado por eBay</b>                        <br/>eBay recomienda algunas características que pueden ser relevantes para el artículo. Solo tienes que elegir la más adecuada en el menú desplegable.                        <br>Así, si vendes auriculares, eBay recomendará una lista de las marcas más comunes ordenadas alfabéticamente, desde Apple y Bose hasta Creative.                        <br/>Esta es una opción práctica para los principiantes en eBay.                        <br/>                        <b>Nota:</b> estas opciones corresponden a la categoría principal de eBay, no a cualquier categoría secundaria que puedas haber elegido.                    </li>                    <li>                        <b>Atributo personalizado</b>                        <br/>Elige el atributo personalizado que contiene las características del artículo para personalizar aún más los detalles.                    </li>                    <li>                        <b>Valor personalizado</b>                        <br/>Esta opción te permite escribir manualmente información específica sobre el producto en lugar de elegirla en una lista desplegable.                        <br/>Es especialmente útil si la opción Recomendado por eBay no incluye información sobre el artículo concreto que tienes en venta.                    </li>                    <li>                        <b>Ninguno</b>                        <br/>Con esta opción eliges no ofrecer a los posibles compradores información específica del artículo. Ten en cuenta que esto puede dificultar la aparición de tus artículos en los resultados de búsqueda en eBay.                    </li>                </ul>"
+                </ul>","Añadir detalles específicos de un artículo te permite atraer compradores y ayudarles a encontrar tu artículo en una búsqueda. Te recomendamos que uses el mayor número posible de características del artículo.                <br/>Hay características obligatorias y también existe la posibilidad de crear las tuyas propias.                <br/>                <br/>Tienes cuatro opciones a tu disposición.                <br/>                <ul class=""list"">                    <li>                        <b>Recomendado por eBay</b>                        <br/>eBay recomienda algunas características que pueden ser relevantes para el artículo. Solo tienes que elegir la más adecuada en el menú desplegable.                        <br/>Así, si vendes auriculares, eBay recomendará una lista de las marcas más comunes ordenadas alfabéticamente, desde Apple y Bose hasta Creative.                        <br/>Esta es una opción práctica para los principiantes en eBay.                        <br/>                        <b>Nota:</b> estas opciones corresponden a la categoría principal de eBay, no a cualquier categoría secundaria que puedas haber elegido.                    </li>                    <li>                        <b>Atributo personalizado</b>                        <br/>Elige el atributo personalizado que contiene las características del artículo para personalizar aún más los detalles.                    </li>                    <li>                        <b>Valor personalizado</b>                        <br/>Esta opción te permite escribir manualmente información específica sobre el producto en lugar de elegirla en una lista desplegable.                        <br/>Es especialmente útil si la opción Recomendado por eBay no incluye información sobre el artículo concreto que tienes en venta.                    </li>                    <li>                        <b>Ninguno</b>                        <br/>Con esta opción eliges no ofrecer a los posibles compradores información específica del artículo. Ten en cuenta que esto puede dificultar la aparición de tus artículos en los resultados de búsqueda en eBay.                    </li>                </ul>"
 "Value","Valor"
 "Add more information to help buyers find your item in search results.","Añade más información para ayudar a los compradores a encontrar tu artículo en los resultados de la búsqueda. "
 "eBay Recommended","Recomendado por eBay"
@@ -1077,10 +1077,10 @@ You will have a chance to correct category(s) later in the listing settings.","<
 "Custom Attribute","Atributo personalizado"
 "Custom Label / Attribute","Etiqueta personalizada/atributo personalizado"
 "M2E Pro Listings","Anuncios de M2E Pro"
-"This page contains all created M2E Listings.<br>
-You can perform different Actions on a single Listing or on a group of Listings.<br>
+"This page contains all created M2E Listings.<br/>
+You can perform different Actions on a single Listing or on a group of Listings.<br/>
 Actions for a single Listing you can find in the Action column of the grid. Choose a necessary option in the appropriate Listing dropdown to execute it.
-<br>Mass actions are in the Actions dropdown at the top right corner of the grid. Select check-boxes of appropriate items, choose an Action from the dropdown and press the Submit button.","Esta página contiene todos los anuncios de M2E creados.<br>Puedes realizar distintas acciones, en un solo anuncio o en un grupo de anuncios.<br>Puedes encontrar acciones para un solo anuncio en la columna Acción de la tabla. Elige la opción necesaria en la lista desplegable de anuncios adecuada para ejecutarla.<br>Las acciones por lotes se encuentran en el menú desplegable Acciones en la esquina superior derecha de la tabla. Marca las casillas de los artículos adecuados, elige una acción en el menú desplegable y pulsa el botón Enviar."
+<br/>Mass actions are in the Actions dropdown at the top right corner of the grid. Select check-boxes of appropriate items, choose an Action from the dropdown and press the Submit button.","Esta página contiene todos los anuncios de M2E creados.<br/>Puedes realizar distintas acciones, en un solo anuncio o en un grupo de anuncios.<br/>Puedes encontrar acciones para un solo anuncio en la columna Acción de la tabla. Elige la opción necesaria en la lista desplegable de anuncios adecuada para ejecutarla.<br/>Las acciones por lotes se encuentran en el menú desplegable Acciones en la esquina superior derecha de la tabla. Marca las casillas de los artículos adecuados, elige una acción en el menú desplegable y pulsa el botón Enviar."
 "This Log contains all information about actions, which were done on all M2E Pro Listings and their items.","Este registro contiene toda la información sobre las acciones que se han realizado en todos los anuncios de M2E Pro y sus artículos."
 "
 This page contains eBay Listings, which belong to registered eBay Accounts (%1$s > Configuration > Accounts Settings) and were listed not by M2E Pro extension.<br/>
@@ -1123,8 +1123,8 @@ They are filtered by eBay User ID and Marketplaces in the grid. To review necess
 "Item Description","Descripción del artículo"
 "Updates eBay listing description when it changes in Magento.","Actualiza la descripción en el anuncio de eBay cuando ésta cambia en Magento."
 "Specifies Magento product data to be synchronized with eBay.
-    <br><br>
-    <b>Note:</b> If you set 'Not Set' in an option, the synchronization will not be performed for it.","Especifica los datos del producto de Magento que deben sincronizarse con eBay.    <br><br>    <b>Nota:</b> si especificas 'Sin establecer' en una opción, ésta no se incluirá en la sincronización."
+    <br/><br/>
+    <b>Note:</b> If you set 'Not Set' in an option, the synchronization will not be performed for it.","Especifica los datos del producto de Magento que deben sincronizarse con eBay.    <br/><br/>    <b>Nota:</b> si especificas 'Sin establecer' en una opción, ésta no se incluirá en la sincronización."
 "The price will be calculated according to Catalog Price Rules (Magento > Promotions > Catalog Price Rules).","El precio se calculará en función de las reglas de precios del catálogo (Magento > Promociones > Reglas de precios del catálogo)."
 "Updates price on eBay listing(s) when the source of price changes.","Actualiza el precio en los anuncios de eBay cuando cambia la fuente del precio."
 "Synchronization Source","Fuente de sincronización"
@@ -1132,31 +1132,31 @@ They are filtered by eBay User ID and Marketplaces in the grid. To review necess
 "Product QTY","Cantidad del producto"
 "Magento Attributes","Atributos de Magento"
 "<b>Product QTY</b> - eBay listing quantity will be synchronized with Magento product quantity.
-    <br><b>Magento Attribute</b> - eBay listing quantity will be synchronized with attribute value.
-","<b>Cantidad del producto</b>: la cantidad en el anuncio de eBay se sincronizará con la cantidad del producto en Magento.    <br><b>Atributo de Magento</b>: la cantidad en anuncio de eBay se sincronizará con el valor del atributo."
+    <br/><b>Magento Attribute</b> - eBay listing quantity will be synchronized with attribute value.
+","<b>Cantidad del producto</b>: la cantidad en el anuncio de eBay se sincronizará con la cantidad del producto en Magento.    <br/><b>Atributo de Magento</b>: la cantidad en anuncio de eBay se sincronizará con el valor del atributo."
 "Product Price","Precio de producto"
 "Special Price","Precio especial"
 "
-    <b>Product Price</b> - eBay Listing price will be synchronized with the original Magento product price.<br>
-    <b>Special Price</b> - eBay Listing price will be synchronized with the special price of Magento product.<br>
+    <b>Product Price</b> - eBay Listing price will be synchronized with the original Magento product price.<br/>
+    <b>Special Price</b> - eBay Listing price will be synchronized with the special price of Magento product.<br/>
     <b>Magento Attribute</b> - eBay listing price will be synchronized with attribute value.
-","    <b>Precio de producto</b>: el precio en el anuncio de eBay se sincronizará con el precio original del producto en Magento.<br>    <b>Precio especial</b>: el precio en el anuncio de eBay se sincronizará con el precio especial del producto en Magento.<br>    <b>Atributo de Magento</b>: el precio en el anuncio de eBay se sincronizará con el valor del atributo."
+","    <b>Precio de producto</b>: el precio en el anuncio de eBay se sincronizará con el precio original del producto en Magento.<br/>    <b>Precio especial</b>: el precio en el anuncio de eBay se sincronizará con el precio especial del producto en Magento.<br/>    <b>Atributo de Magento</b>: el precio en el anuncio de eBay se sincronizará con el valor del atributo."
 "
-    <b>Product Name</b> - eBay listing title will be synchronized with the original Magento product name.<br>
+    <b>Product Name</b> - eBay listing title will be synchronized with the original Magento product name.<br/>
     <b>Magento Attribute</b> - eBay listing title will be synchronized with attribute value.
-    ","    <b>Nombre del producto</b>: el título en el anuncio de eBay se sincronizará con el nombre original del producto en Magento.<br>    <b>Atributo de Magento</b>: el título en el anuncio de eBay se sincronizará con el valor del atributo.    "
+    ","    <b>Nombre del producto</b>: el título en el anuncio de eBay se sincronizará con el nombre original del producto en Magento.<br/>    <b>Atributo de Magento</b>: el título en el anuncio de eBay se sincronizará con el valor del atributo.    "
 "Choose Magento attribute that will be synchronized with subtitle on eBay.","Elige el atributo de Magento que se sincronizará con el subtítulo en eBay."
 "Product Description","Descripción del producto"
 "Product Short Description","Descripción breve del producto"
 "
-    <b>Product Description</b> - eBay listing description will be synchronized with the original description of Magento product.<br>
-    <b>Product Short Description</b> - eBay listing description will be synchronized with the original short Magento product description.<br>
+    <b>Product Description</b> - eBay listing description will be synchronized with the original description of Magento product.<br/>
+    <b>Product Short Description</b> - eBay listing description will be synchronized with the original short Magento product description.<br/>
     <b>Magento Attribute</b> - eBay listing description will be synchronized with attribute value.
-    ","    <b>Descripción del producto</b>: la descripción en el anuncio de eBay se sincronizará con la descripción original del producto en Magento.<br>    <b>Descripción breve del producto</b>: la descripción en el anuncio de eBay se sincronizará con la descripción breve original del producto en Magento.<br>    <b>Atributo de Magento</b>: la descripción en el anuncio de eBay se sincronizará con el valor del atributo.    "
+    ","    <b>Descripción del producto</b>: la descripción en el anuncio de eBay se sincronizará con la descripción original del producto en Magento.<br/>    <b>Descripción breve del producto</b>: la descripción en el anuncio de eBay se sincronizará con la descripción breve original del producto en Magento.<br/>    <b>Atributo de Magento</b>: la descripción en el anuncio de eBay se sincronizará con el valor del atributo.    "
 "Define the conditions when you want eBay items stopped.
     <br/><br/>
-    <b>Note:</b> If all options are set to No or No Action, then the stop action is disabled.<br>
-If all options are enabled, then an item will be stopped if at least one of the Stop Conditions is met.","Define las condiciones que quieres que se den para que los artículos se detengan en eBay.    <br/><br/>    <b>Nota:</b> si todas las opciones se establecen en No o Ninguna acción, la acción de detención aparece desactivada.<br>Si todas las opciones están activadas, un artículo se detendrá si se cumple al menos una de las condiciones de detención."
+    <b>Note:</b> If all options are set to No or No Action, then the stop action is disabled.<br/>
+If all options are enabled, then an item will be stopped if at least one of the Stop Conditions is met.","Define las condiciones que quieres que se den para que los artículos se detengan en eBay.    <br/><br/>    <b>Nota:</b> si todas las opciones se establecen en No o Ninguna acción, la acción de detención aparece desactivada.<br/>Si todas las opciones están activadas, un artículo se detendrá si se cumple al menos una de las condiciones de detención."
 "Stop Conditions","Condiciones de detención"
 "Stop When Status Disabled","Detener cuando el estado sea Desactivado"
 "Automatically stops eBay listing if its status is changed to 'Disabled' in Magento.","Detiene automáticamente el anuncio de eBay si su estado se cambia a 'Desactivado' en Magento."
@@ -1171,23 +1171,23 @@ If all options are enabled, then an item will be stopped if at least one of the 
 "Displayed products have the same Attribute Set as the Listing you are going to add them to.<br/><br/>
     <b>Note:</b> A product can be added to the listing only once. If a product was added to the Listing earlier, it will not be displayed. ","Los productos mostrados tienen el mismo conjunto de atributos que el anuncio al que se van a añadir.<br/><br/>    <b>Nota</b>: un producto solamente puede añadirse al anuncio una vez. Si un producto se añadió al anuncio anteriormente, no se mostrará. "
 "<b>%s</b> product(s) were successfully added to the M2E Listing.<br/>
-    You can Review them in the Listing or Start listing on eBay right now.<br><br>
-    <b>Note:</b> The products without Primary eBay Category specified will not be listed. You can specify it later in the listing settings.","<b>%s</b> producto(s) se ha(n) añadido correctamente al anuncio de M2E.<br/>    Puedes revisarlos en el anuncio o ponerlos en venta en eBay inmediatamente.<br><br>    <b>Nota:</b> los productos que no tengan especificada la categoría principal de eBay no se pondrán en venta. Puedes especificarla posteriormente en la configuración de anuncio."
+    You can Review them in the Listing or Start listing on eBay right now.<br/><br/>
+    <b>Note:</b> The products without Primary eBay Category specified will not be listed. You can specify it later in the listing settings.","<b>%s</b> producto(s) se ha(n) añadido correctamente al anuncio de M2E.<br/>    Puedes revisarlos en el anuncio o ponerlos en venta en eBay inmediatamente.<br/><br/>    <b>Nota:</b> los productos que no tengan especificada la categoría principal de eBay no se pondrán en venta. Puedes especificarla posteriormente en la configuración de anuncio."
 "Magento Categories","Categorías de Magento"
 "The quantity of chosen products in each category is shown in brackets.
-<br>
+<br/>
 If the product belongs to several categories, it is shown in each category. And if you remove the category with such product it will be subtracted from
  each category.
 
-","La cantidad de productos elegidos de cada categoría se muestra entre paréntesis.<br>Si el producto pertenece a varias categorías, se mostrará en cada una de ellas. Asimismo, si se elimina la categoría con el producto, éste se quitará de cada categoría."
+","La cantidad de productos elegidos de cada categoría se muestra entre paréntesis.<br/>Si el producto pertenece a varias categorías, se mostrará en cada una de ellas. Asimismo, si se elimina la categoría con el producto, éste se quitará de cada categoría."
 "Selected Products: ","Productos seleccionados: "
 "Selected Categories: ","Categorías seleccionadas: "
 "view","visita"
 "Search Items","Buscar artículos"
 "This page contains all products added to M2E listings or assigned to the 3rd Party. It allows quick searching listings by their products.","Esta página contiene todos los productos añadidos a anuncios de M2E o asignados a anuncios externos. Permite la búsqueda rápida de los anuncios por sus productos."
 "Keep the existing M2E Listing settings or customise these settings for the products shown below.","Conserva la configuración existente de los anuncios de M2E o personalízala para los productos que se muestran a continuación."
-"You can edit Settings for a single product by choosing necessary edit action on appropriate line of the grid<br>
-        or edit and set the same settings for several products items: select items and choose necessary action from the Actions drop down menu.","Puedes modificar la configuración de un solo producto eligiendo la acción de modificación necesaria en la línea adecuada de la tabla,<br>        o bien modificar y establecer la misma configuración para varios artículos de producto: selecciona los artículos y elige la acción necesaria en el menú desplegable Acciones."
+"You can edit Settings for a single product by choosing necessary edit action on appropriate line of the grid<br/>
+        or edit and set the same settings for several products items: select items and choose necessary action from the Actions drop down menu.","Puedes modificar la configuración de un solo producto eligiendo la acción de modificación necesaria en la línea adecuada de la tabla,<br/>        o bien modificar y establecer la misma configuración para varios artículos de producto: selecciona los artículos y elige la acción necesaria en el menú desplegable Acciones."
 "Select appropriate product view.","Selecciona la vista del producto adecuada."
 "There are two ways to select your products :","Hay dos formas de seleccionar los productos:"
 "Products List","Lista de productos"
@@ -1230,13 +1230,13 @@ If the product belongs to several categories, it is shown in each category. And 
 "Processing","En proceso"
 "Completed","Finalizado"
 "Enable certain marketplaces you will work with and press the Save And Update button. All necessary marketplace data will be downloaded and synchronized with M2E Pro.
-<br>
+<br/>
 It is recommended to update marketplaces when any marketplace changes are announced.
-<br><br>
-<b>Note:</b> Installation and update processes might be time-consuming, depending on the number of enabled marketplaces and your server environment. ","Activa algunos mercados con los que vayas a trabajar y pulsa el botón Guardar y actualizar. Se descargarán todos los datos necesarios de los mercados y se sincronizarán con M2E Pro.<br>Se recomienda actualizar los mercados cuando se anuncien cambios en relación con estos.<br><br><b>Nota</b>: los procesos de instalación y de actualización pueden tardar, según el número de mercados activados y el entorno del servidor. "
+<br/><br/>
+<b>Note:</b> Installation and update processes might be time-consuming, depending on the number of enabled marketplaces and your server environment. ","Activa algunos mercados con los que vayas a trabajar y pulsa el botón Guardar y actualizar. Se descargarán todos los datos necesarios de los mercados y se sincronizarán con M2E Pro.<br/>Se recomienda actualizar los mercados cuando se anuncien cambios en relación con estos.<br/><br/><b>Nota</b>: los procesos de instalación y de actualización pueden tardar, según el número de mercados activados y el entorno del servidor. "
 "Please specify eBay motors compatibility attribute in %s > Configuration > <a target=""_blank"" href=""%s"">General</a>","Especifica el atributo de compatibilidad de eBay Motor en %s > Configuración > <a target=""_blank"" href=""%s"">General</a>."
 "Please edit categories settings for selected products and select the compatibility attribute.","Modifica la configuración de las categorías de los productos seleccionados y selecciona el atributo de compatibilidad."
-"Add Vehicles","Añadir vehículos"
+"Add Compatible Vehicles","Añadir vehículos"
 "Select the items, compatible with your part and choose one of three actions in the Actions dropdown:
 <ul class=list>
     <li><b>Overwrite ePIDs in Compatibility Attribute</b> - replaces items ePIDs in the Compatibility Attribute chosen in %s > Configuration > <a target=""_blank"" href=""%s"">General</a> with selected ones.</li>
@@ -1317,9 +1317,9 @@ you can create them manually by using appropriate options in the Action dropdown
                     then, you can use <a target=""_blank"" href=""%s#magento_block_configuration_settings_advanced"">""Track Direct Database Changes""</a> %s functionality to detect changes in products' price and quantity.","Si las actualizaciones de catálogo en Magento se han realizado con herramientas de importación o exportación, secuencias de comandos personalizadas o cambios directos, puedes usar la función <a target=""_blank"" href=""%s#magento_block_configuration_settings_advanced"">""Seguimiento de cambios directos en la base de datos""</a> de %s para detectar los cambios en el precio y la cantidad de los productos."
 "Updates and synchronizes eBay Listings according to Synchronization Policies' rules.","Actualiza y sincroniza los anuncios de eBay de acuerdo con las reglas de las políticas de sincronización."
 "If your eBay listings for some reason were asynchronized with the products in Magento, <a href=""javascript:"" onclick=""%s"">turn on</a> the Revise All action to catch data up.
-    <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
-<br><br>
-    ","Si por algún motivo tus anuncios de eBay no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.<br><br>    "
+    <br/>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
+<br/><br/>
+    ","Si por algún motivo tus anuncios de eBay no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br/>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.<br/><br/>    "
 "In Progress, start date - ","En curso, fecha de inicio: "
 "Finished, end date - ","Finalizado, fecha de finalización: "
 "Imports and synchronizes eBay Orders for accounts, which have enabled Import eBay Orders in their Accounts settings.","Importa y sincroniza los pedidos de eBay de las cuentas que tienen activada la opción Importar pedidos de eBay en la configuración de cuentas."
@@ -1339,14 +1339,14 @@ you can create them manually by using appropriate options in the Action dropdown
 "Used, Pre-owned, Like new","Usado, Segunda mano, Como nuevo"
 "If item is not new, you can provide additional details about the item's condition, such as whether it has defects, missing parts, scratches, or other wear and tear. You have up to 1000 characters.","Si el artículo no es nuevo, puedes proporcionar detalles adicionales sobre su estado, por ejemplo, si tiene defectos, le faltan piezas, está arañado o tiene otros signos de deterioro y desgaste. Puedes usar un máximo de 1.000 caracteres."
 "Images & Watermark","Imágenes y marcas de agua"
-"The images your potential buyers will see on your eBay listing. Using lots of high-quality pictures provides a great shopping experience and helps to sell your items.<br>","Las imágenes que los posibles compradores verán en el anuncio de eBay. La inclusión de muchas imágenes de alta calidad proporciona una excelente experiencia de compra y ayuda a vender tus artículos. <br>"
+"The images your potential buyers will see on your eBay listing. Using lots of high-quality pictures provides a great shopping experience and helps to sell your items.<br/>","Las imágenes que los posibles compradores verán en el anuncio de eBay. La inclusión de muchas imágenes de alta calidad proporciona una excelente experiencia de compra y ayuda a vender tus artículos. <br/>"
 "You can add a watermark to your images. <br/><b>Note:</b> The watermark option is only available for the images hosted on Magento.","Puedes añadir una marca de agua a las imágenes. <br/><b>Nota:</b> la opción de marca de agua solo está disponible para las imágenes alojadas en Magento."
 "Main Image","Imagen principal"
 "Product Base Image","Imagen básica del producto"
 "The first photo appears in the top left of your eBay item and next to your item's title in search results.
                                     <br/><b>Note:</b> Media Image Attribute or Attribute should contain absolute url. e.g. http://mymagentostore.com/images/baseimage.jpg","La primera foto aparece en la parte superior izquierda del artículo de eBay y junto al título de este en los resultados de búsqueda.                                    <br/><b>Nota:</b> Atributo de imagen multimedia o Atributo deben contener una URL absoluta. Por ejemplo: http://mymagentostore.com/images/baseimage.jpg"
 "Default Image Url","URL de la imagen predeterminada"
-"From 30 October 2013 eBay does not allow to list products without images. If a product does not have the Main Image this image will be used instead.<br><b>Note:</b> Use absolute url. e.g. http://mymagentostore.com/images/defaultimage.jpg","Desde el 30 de octubre de 2013, eBay no permite poner en venta productos sin imágenes. Si un producto no tiene una imagen principal, esta imagen se usará en su lugar.<br><b>Nota:</b> usa una URL absoluta. Por ejemplo: http://mymagentostore.com/images/defaultimage.jpg"
+"From 30 October 2013 eBay does not allow to list products without images. If a product does not have the Main Image this image will be used instead.<br/><b>Note:</b> Use absolute url. e.g. http://mymagentostore.com/images/defaultimage.jpg","Desde el 30 de octubre de 2013, eBay no permite poner en venta productos sin imágenes. Si un producto no tiene una imagen principal, esta imagen se usará en su lugar.<br/><b>Nota:</b> usa una URL absoluta. Por ejemplo: http://mymagentostore.com/images/defaultimage.jpg"
 "Picture Pack","Paquete de imágenes"
 "Displays larger, more detailed pictures (up to 800w x 800h pixels - 800 pixels on the longest side). <br/><b>Note:</b> This feature may come with additional fee.","Muestra imágenes más grandes con mayor detalle (hasta 800 x 800 píxeles: 800 píxeles por el lado más largo). <br/><b>Nota</b>: esta función puede conllevar el pago de una tarifa adicional."
 "Gallery Images","Imágenes de la galería"
@@ -1462,7 +1462,7 @@ you can create them manually by using appropriate options in the Action dropdown
         <b>Note:</b> Inventory Synchronization setting must be enabled in Synchronization (Configuration > Synchronization).
         Otherwise, Synchronization Policy Rules will not take effect.","Hay cuatro configuraciones de reglas:        <br/>        <ul class=""list"">            <li style=""list-style: decimal !important;"">Reglas de puesta en venta</li>            <li style=""list-style: decimal !important;"">Reglas de revisión</li>            <li style=""list-style: decimal !important;"">Reglas para volver a poner en venta</li>            <li style=""list-style: decimal !important;"">Reglas de detención</li>        </ul>        <b>Nota:</b> la configuración Sincronización del inventario debe estar activada en Sincronización (Configuración > Sincronización). De lo contrario, las reglas de la política de sincronización no se aplicarán."
 "Be careful when you edit policies, as all changes you have made will be automatically applied to all M2E listings where these policies are used.
-    <br>If a policy is used in a M2E Listing, it cannot be deleted.","Ten cuidado al modificar las políticas, ya que todos los cambios que realices se aplicarán automáticamente a todos los anuncios de M2E que usen dichas políticas.    <br>Si una política se usa en un anuncio de M2E, no se podrá eliminar."
+    <br/>If a policy is used in a M2E Listing, it cannot be deleted.","Ten cuidado al modificar las políticas, ya que todos los cambios que realices se aplicarán automáticamente a todos los anuncios de M2E que usen dichas políticas.    <br/>Si una política se usa en un anuncio de M2E, no se podrá eliminar."
 "Payment method should be specified.","Se debe especificar la forma de pago."
 "PayPal","PayPal"
 "PayPal Accepted","Se acepta PayPal"
@@ -1498,7 +1498,7 @@ you can create them manually by using appropriate options in the Action dropdown
 "Quantity And Duration","Cantidad y duración"
 "The length of time your eBay listing will be active. You can have it last 1, 3, 5, 7, 10, 30 days or Good 'Til Cancelled.
                                                                         <br />Good 'Til Cancelled listings renew automatically every 30 days unless all of the items sell, you end the listing, or the listing breaches an eBay policy.","El tiempo que el anuncio de eBay estará activo. Puedes definir una duración de 1, 3, 5, 7, 10 o 30 días o elegir Anuncio abierto.                                                                        <br />Los anuncios abiertos se renuevan automáticamente cada 30 días a menos que se vendan todos los artículos, finalices el anuncio o éste infrinja una política de eBay."
-"</br>Attribute must contain a whole number. If you choose ""Good Till Cancelled"" the attribute must contain 100.","</br>El atributo debe incluir un número entero. Si eliges ""Anuncio abierto"", el atributo debe contener 100."
+"<br/>Attribute must contain a whole number. If you choose ""Good Till Cancelled"" the attribute must contain 100.","<br/>El atributo debe incluir un número entero. Si eliges ""Anuncio abierto"", el atributo debe contener 100."
 "Single Item","Artículo individual"
 "Custom QTY Number","Número de cantidad personalizado"
 "The number of items you have for sale.","El número de artículos que tienes en venta."
@@ -1508,7 +1508,7 @@ you can create them manually by using appropriate options in the Action dropdown
 "Set a maximum number to sell on eBay, e.g. if you have 10 items in stock but want to keep 2 items back, set a maximum quantity of 8.","Establece un número máximo para vender en eBay; p. ej., si tienes 10 artículos disponibles, pero quieres conservar dos, establece la cantidad máxima 8."
 "Out Of Stock Control","Control Sin existencias"
 "This is useful if you are waiting for additional stock of an item with the same eBay item ID. Instead of ending the listing and then recreating it when the inventory arrives, you can use this flag to hide the listing. Then when you have the item available, automatic or manual Revise will update the inventory and the listing will appear again. 
-                                <br><b>Note:</b> Once you list a product with this option it cannot be changed. To cancel it you should end and list the item again.","Esta opción es útil si esperas recibir existencias adicionales de un artículo con el mismo número de artículo de eBay. En lugar de finalizar el anuncio y volver a crearlo al recibir las existencias, puedes usar esta marca para ocultar el anuncio. Después, cuando el artículo esté disponible, el inventario se actualizará mediante la modificación automática o manual y el anuncio volverá a aparecer.                                 <br><b>Nota:</b> una vez que hayas puesto en venta un producto con esta opción, no se podrá cambiar. Para cancelarlo, deberás finalizarlo y poner en venta el artículo de nuevo."
+                                <br/><b>Note:</b> Once you list a product with this option it cannot be changed. To cancel it you should end and list the item again.","Esta opción es útil si esperas recibir existencias adicionales de un artículo con el mismo número de artículo de eBay. En lugar de finalizar el anuncio y volver a crearlo al recibir las existencias, puedes usar esta marca para ocultar el anuncio. Después, cuando el artículo esté disponible, el inventario se actualizará mediante la modificación automática o manual y el anuncio volverá a aparecer.                                 <br/><b>Nota:</b> una vez que hayas puesto en venta un producto con esta opción, no se podrá cambiar. Para cancelarlo, deberás finalizarlo y poner en venta el artículo de nuevo."
 "Ignore Variations","Omitir variantes"
 "Select 'Yes' to list Configurable, Grouped, Bundle and Simple with Custom options products as Simple (without variations).","Selecciona 'Sí' para poner en venta productos configurables, agrupados, de conjunto y simples con opciones personalizadas como artículos simples (sin variantes)."
 "Taxation","Impuestos"
@@ -1520,7 +1520,7 @@ you can create them manually by using appropriate options in the Action dropdown
 "and","y"
 "eBay %s supports %s currencies. To switch the currency you want to sell for, go to %s > Configuration > <a target=""_blank"" href=""%s"">General</a>","eBay %s admite %s divisas. Para cambiar la divisa que quieres usar para vender, ve a %s > Configuración > <a target=""_blank"" href=""%s"">General</a>."
 "Add VAT Percentage","Añadir porcentaje de IVA"
-"Increases the price that will be sent on eBay by VAT Rate (%).<br>e.g., VAT Rate = 19%, Magento Price = Â£10, Percentage increase = 2%;<br>eBay Price will be counted as (Â£10 + 19%) + 2% = Â£12.14","Aumenta el precio que se enviará a eBay según el tipo de IVA (%).<br>P. ej., Tipo de IVA = 19%, Precio de Magento = 10 €, Porcentaje de aumento = 2%;<br>El precio de eBay se contará como (10 € + 19%) + 2% = 12,14 €"
+"Increases the price that will be sent on eBay by VAT Rate (%).<br/>e.g., VAT Rate = 19%, Magento Price = Â£10, Percentage increase = 2%;<br/>eBay Price will be counted as (Â£10 + 19%) + 2% = Â£12.14","Aumenta el precio que se enviará a eBay según el tipo de IVA (%).<br/>P. ej., Tipo de IVA = 19%, Precio de Magento = 10 €, Porcentaje de aumento = 2%;<br/>El precio de eBay se contará como (10 € + 19%) + 2% = 12,14 €"
 "The accepted currency for the item. This has been determined by the eBay site you chose earlier.","La divisa aceptada para el artículo. La determina el sitio de eBay elegido anteriormente."
 "Price Change","Cambio de precio"
 "[CURRENCY]","[DIVISA]"
@@ -1675,9 +1675,9 @@ you can create them manually by using appropriate options in the Action dropdown
 "List Action","Acción Poner en venta"
 "Enables automatic listing of unlisted items if they meet List Conditions.","Permite poner en venta automáticamente artículos no puestos en venta si cumplen las condiciones correspondientes."
 "List Conditions","Condiciones de puesta en venta"
-"<b>Enabled</b> â€“ M2E Listing items automatically list on eBay if this status is set to Enabled.<br>
+"<b>Enabled</b> â€“ M2E Listing items automatically list on eBay if this status is set to Enabled.<br/>
 <b>Any</b> â€“ M2E Listing items automatically list on eBay regardless of its status.
-","<b>Activado</b>: los artículos de los anuncios de M2E se ponen automáticamente en venta en eBay si el estado está establecido en Activado.<br><b>Cualquiera</b>: los artículos de los anuncios de M2E se ponen automáticamente en venta en eBay independientemente de su estado."
+","<b>Activado</b>: los artículos de los anuncios de M2E se ponen automáticamente en venta en eBay si el estado está establecido en Activado.<br/><b>Cualquiera</b>: los artículos de los anuncios de M2E se ponen automáticamente en venta en eBay independientemente de su estado."
 "<b>In Stock</b> - M2E Listing items list automatically, if the products are in stock.
                                     <br/><b>Any</b> - M2E Listing items list automatically, regardless of the stock availability.","<b>Disponible</b>: los artículos de los anuncios de M2E se ponen automáticamente en venta si los productos están disponibles.                                    <br/><b>Cualquiera</b>: los artículos de los anuncios de M2E se ponen automáticamente en venta, independientemente de la disponibilidad de existencias."
 "M2E Pro will automatically list M2E Listings items if they meet defined conditions.
@@ -1737,8 +1737,8 @@ you can create them manually by using appropriate options in the Action dropdown
 "PM","PM"
 "Define the conditions when you want eBay items stopped.
                                            <br/>
-                                           <br/><b>Note:</b> If all options are set to No or No Action, then the stop action for eBay items, which use this Synchronization Policy, is disabled.<br>
-If all options are enabled, then an item will be stopped if at least one of the Stop Conditions is met.","Define las condiciones cuando quieras que se detengan artículos en eBay.                                           <br/>                                           <br/><b>Nota:</b>: si todas las opciones están establecidas en No o Ninguna acción, la acción de detención de los artículos de eBay que utilizan esta política de sincronización se desactiva.<br>Si todas las opciones están activadas, un artículo se detendrá si se cumple al menos una de las condiciones de detención."
+                                           <br/><b>Note:</b> If all options are set to No or No Action, then the stop action for eBay items, which use this Synchronization Policy, is disabled.<br/>
+If all options are enabled, then an item will be stopped if at least one of the Stop Conditions is met.","Define las condiciones cuando quieras que se detengan artículos en eBay.                                           <br/>                                           <br/><b>Nota:</b>: si todas las opciones están establecidas en No o Ninguna acción, la acción de detención de los artículos de eBay que utilizan esta política de sincronización se desactiva.<br/>Si todas las opciones están activadas, un artículo se detendrá si se cumple al menos una de las condiciones de detención."
 "Automatically stops an item that is on eBay if status is changed to 'Disabled' in Magento.","Detiene automáticamente un artículo en eBay si su estado se cambia a 'Desactivado' en Magento."
 "Automatically stops an item that is on eBay if stock availability is changed to 'Out of Stock' in Magento.","Detiene automáticamente un artículo en eBay si la disponibilidad de existencias se cambia a 'Sin existencias' en Magento."
 "Stop When Quantity Is","Detener cuando la cantidad sea"
@@ -2386,17 +2386,17 @@ If all options are enabled, then an item will be stopped if at least one of the 
 "Control Panel (M2E Pro)","Panel de control (M2E Pro)"
 "New buyer negative feedback was received. Go to the %sfeedback page%s.","Se han recibido nuevos votos negativos de compradores. Ve a la %spágina de votos%s."
 "The token for ""%s"" eBay Account has been expired.
-                        <br>
+                        <br/>
                         Please, go to %s > Configuration > eBay Account > <a href=""%s"" target=""_blank"">General TAB</a>,
                         click on the Get Token button. (You will be redirected to the eBay website.)
                         Sign-in and press I Agree on eBay page.
-                        Do not forget to press Save button after returning back to Magento","El código de la cuenta de eBay ""%s"" ha caducado.                        <br>                        Ve a %s > Configuración > Cuenta de eBay > <a href=""%s"" target=""_blank"">pestaña General</a> y pulsa el botón Obtener código personal. (Accederás al sitio Web de eBay.) Identifícate y pulsa Acepto en la página de eBay. No olvides pulsar el botón Guardar después de volver a Magento"
+                        Do not forget to press Save button after returning back to Magento","El código de la cuenta de eBay ""%s"" ha caducado.                        <br/>                        Ve a %s > Configuración > Cuenta de eBay > <a href=""%s"" target=""_blank"">pestaña General</a> y pulsa el botón Obtener código personal. (Accederás al sitio Web de eBay.) Identifícate y pulsa Acepto en la página de eBay. No olvides pulsar el botón Guardar después de volver a Magento"
 "Attention! The token for ""%s"" eBay Account will be expired soon ( %s ).
-                    <br>
+                    <br/>
                     Please, go to %s > Configuration > eBay Account > <a href=""%s"" target=""_blank"">General TAB</a>,
                     click on the Get Token button. (You will be redirected to the eBay website.)
                     Sign-in and press I Agree on eBay page.
-                    Do not forget to press Save button after returning back to Magento","¡Atención! El código de la cuenta de eBay ""%s"" caducará pronto (%s).                    <br>                        Ve a %s > Configuración > Cuenta de eBay > <a href=""%s"" target=""_blank"">pestaña General</a> y pulsa el botón Obtener código personal. (Accederás al sitio Web de eBay.) Identifícate y pulsa Acepto en la página de eBay. No olvides pulsar el botón Guardar después de volver a Magento"
+                    Do not forget to press Save button after returning back to Magento","¡Atención! El código de la cuenta de eBay ""%s"" caducará pronto (%s).                    <br/>                        Ve a %s > Configuración > Cuenta de eBay > <a href=""%s"" target=""_blank"">pestaña General</a> y pulsa el botón Obtener código personal. (Accederás al sitio Web de eBay.) Identifícate y pulsa Acepto en la página de eBay. No olvides pulsar el botón Guardar después de volver a Magento"
 "Sell On eBay","Vender en eBay"
 "Request was deleted during account deleting.","La solicitud se ha eliminado durante el borrado de la cuenta."
 "Encoding type ""%s"" is not supported.","No se admite el tipo de codificación ""%s""."
@@ -3102,9 +3102,9 @@ you can create them manually by using appropriate options in the Action dropdown
                     then, you can use <a target=""_blank"" href=""%s#magento_block_configuration_settings_advanced"">""Track Direct Database Changes""</a> %s functionality to detect changes in products' price and quantity.","Si las actualizaciones de catálogo en Magento se han realizado con herramientas de importación o exportación, secuencias de comandos personalizadas o cambios directos, puedes usar la función <a target=""_blank"" href=""%s#magento_block_configuration_settings_advanced"">""Seguimiento de cambios directos en la base de datos""</a> de %s para detectar los cambios en el precio y la cantidad de los productos."
 "Updates and synchronizes Amazon Listings according to<br/>Synchronization Templates' rules.","Actualiza y sincroniza los anuncios de Amazon de acuerdo con las reglas de las <br/>plantillas de sincronización."
 "If your Amazon listings for some reason were asynchronized with the products in Magento, <a href=""javascript:"" onclick=""%s"">turn on</a> the Revise All action to catch data up.
-        <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
-    <br><br>
-        ","Si por algún motivo tus anuncios de Amazon no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.    <br><br>        "
+        <br/>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
+    <br/><br/>
+        ","Si por algún motivo tus anuncios de Amazon no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br/>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.    <br/><br/>        "
 "In Progress, start date - ","En curso, fecha de inicio: "
 "Finished, end date - ","Finalizado, fecha de finalización: "
 "Imports and synchronizes Amazon Orders for accounts,<br/>which have enabled Import Amazon Orders in their<br/>Accounts settings.","Importa y sincroniza los pedidos de Amazon de las cuentas<br/>que tienen activada la opción Importar pedidos de Amazon en la<br/>configuración de la cuenta."
@@ -3134,17 +3134,17 @@ you can create them manually by using appropriate options in the Action dropdown
 "Manufacturer Part Number","Número de pieza del fabricante"
 "Manufacturer Part Number of the product(s). Max. 40 characters.","Número de pieza del fabricante de los productos. Máximo. 40 caracteres."
 "Package Quantity","Cantidad de paquetes"
-"The number of units included in the item you are offering for sale, <br>such that each unit
-                            is packaged for individual sale.","Número de unidades incluidas en el artículo que vendes, <br>de modo que cada unidad está empaquetada para la venta individual."
+"The number of units included in the item you are offering for sale, <br/>such that each unit
+                            is packaged for individual sale.","Número de unidades incluidas en el artículo que vendes, <br/>de modo que cada unidad está empaquetada para la venta individual."
 "Choose the attribute that contains Package Quantity.","Elige el atributo que contiene Cantidad de paquetes."
 "Number of Items","Número de artículos"
 "The number of discrete items included in the item you are offering for sale,
-                            <br>such that each item is not packaged for individual sale.
-                                <br>
+                            <br/>such that each item is not packaged for individual sale.
+                                <br/>
                                 <strong>For ex.</strong>, if you are selling a case of 10 packages of socks,
                                 and each package contains
-                                <br>3 pairs of socks, the case would have Package Quantity = 10 and Number of Items = 30.
-                            ","Número de artículos distintos que están incluidos en el artículo que vendes,                            <br>de modo que cada artículo no está empaquetado para la venta individual.                                <br>                                <strong>Por ejemplo,</strong>, si vendes una caja de 10 paquetes de calcetines y cada paquete contiene                                <br>tres pares de calcetines, la caja tendría los siguientes valores: Cantidad de paquetes = 10 y Número de artículos = 30.                            "
+                                <br/>3 pairs of socks, the case would have Package Quantity = 10 and Number of Items = 30.
+                            ","Número de artículos distintos que están incluidos en el artículo que vendes,                            <br/>de modo que cada artículo no está empaquetado para la venta individual.                                <br/>                                <strong>Por ejemplo,</strong>, si vendes una caja de 10 paquetes de calcetines y cada paquete contiene                                <br/>tres pares de calcetines, la caja tendría los siguientes valores: Cantidad de paquetes = 10 y Número de artículos = 30.                            "
 "Choose the attribute that contains Number Of Items.","Elige el atributo que contiene Número de artículos."
 "Package Weight","Peso del paquete"
 "Package Weight of the product(s).","Peso del paquete de los productos."
@@ -3571,9 +3571,9 @@ you can create them manually by using appropriate options in the Action dropdown
                     then, you can use <a target=""_blank"" href=""%s#magento_block_configuration_settings_advanced"">""Track Direct Database Changes""</a> %s functionality to detect changes in products' price and quantity.","Si las actualizaciones de catálogo en Magento se han realizado con herramientas de importación o exportación, secuencias de comandos personalizadas o cambios directos, puedes usar la función <a target=""_blank"" href=""%s#magento_block_configuration_settings_advanced"">""Seguimiento de cambios directos en la base de datos""</a> de %s para detectar los cambios en el precio y la cantidad de los productos."
 "Updates and synchronizes Rakuten.com Listings according to<br/>Synchronization Templates' rules.","Actualiza y sincroniza los anuncios de Rakuten.com de acuerdo con las<br/>reglas de las plantillas de sincronización."
 "If your Rakuten.com listings for some reason were asynchronized with the products in Magento, <a href=""javascript:"" onclick=""%s"">turn on</a> the Revise All action to catch data up.
-        <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
-    <br><br>
-        ","Si por algún motivo tus anuncios de Rakuten.com no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.    <br><br>        "
+        <br/>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
+    <br/><br/>
+        ","Si por algún motivo tus anuncios de Rakuten.com no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br/>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.    <br/><br/>        "
 "Imports and synchronizes Rakuten.com Orders for accounts,<br/>which have enabled Import Rakuten.com Orders in their<br/>Accounts settings.","Importa y sincroniza los pedidos de Rakuten.com para las cuentas,<br/>que tienen activado Importar pedidos de Rakuten.com en su<br/>configuración de la cuenta."
 "Imports and synchronizes 3rd Party Listings for Rakuten.com<br/>accounts, which have enabled Import 3rd Party Listings<br/>in their Accounts settings.","Importa y sincroniza los anuncios externos para las cuentas de Rakuten.com,<br/>que tienen activado Importar anuncios externos<br/>en la configuración de la cuenta."
 "New SKU Template (Beta)","Plantilla Nuevo número de referencia (beta)"
@@ -3593,10 +3593,10 @@ you can create them manually by using appropriate options in the Action dropdown
 "The category does not have attributes.","La categoría no tiene atributos."
 "Select Category first.","Selecciona la categoría primero."
 " Description is used to design your items' description on Rakuten.com. The more information you provide the easier it is for buyers to make a choice.
-        <br>
-        <br>
+        <br/>
+        <br/>
         It is possible to choose a Product Description or Product Short Description, which will be taken from Magento. Or you can create a Custom Description by adding necessary information.
-    "," La descripción se usa para diseñar la descripción de tus artículos en Rakuten.com. Cuanta más información facilites, más fácil será para los compradores decidirse.        <br>        <br>        Se puede elegir una descripción o descripción breve del producto, que se tomará de Magento. También se puede crear una descripción personalizada añadiendo la información necesaria.    "
+    "," La descripción se usa para diseñar la descripción de tus artículos en Rakuten.com. Cuanta más información facilites, más fácil será para los compradores decidirse.        <br/>        <br/>        Se puede elegir una descripción o descripción breve del producto, que se tomará de Magento. También se puede crear una descripción personalizada añadiendo la información necesaria.    "
 "Details","Detalles"
 "Item's title that buyers will see on Rakuten.com listing.","Título del artículo que los compradores verán en el anuncio de Rakuten.com."
 "The name of the brand/manufacturer of your product.","Nombre de la marca o fabricante del producto."
@@ -3616,13 +3616,13 @@ you can create them manually by using appropriate options in the Action dropdown
 "Features","Opciones"
 "Custom Features","Opciones personalizadas"
 "Max. 250 characters.","Máximo. 250 caracteres."
-"Should be one block of text or a single paragraph. Do not use special characters and html tags.</br>
-                                                                        Limited to 8'000 characters.","Debe ser un bloque de texto o un solo párrafo. No uses caracteres especiales ni etiquetas html.</br>                                                                        Límite de 8.000 caracteres."
+"Should be one block of text or a single paragraph. Do not use special characters and html tags.<br/>
+                                                                        Limited to 8'000 characters.","Debe ser un bloque de texto o un solo párrafo. No uses caracteres especiales ni etiquetas html.<br/>                                                                        Límite de 8.000 caracteres."
 "This tab contains the main information on products you want to list: Attribute Set
  (it must be the same as M2E Listing has to be assigned), Products Identifiers and
- Category in which the products have to be listed.<br><br>
+ Category in which the products have to be listed.<br/><br/>
 The category either can be chosen by <u>Browsing</u> all categories from the list or can be found with <u>Searching
- tool</u> by entering keywords.","Esta pestaña contiene la información principal sobre los productos que quieres poner en venta: Conjunto de atributos (debe ser el mismo que el del anuncio de M2E que se debe asignar), Identificadores de producto y Categoría donde se deben poner en venta.<br><br>La categoría se puede elegir <u>examinando</u> todas las categorías de la lista o se pueden encontrar con la <u>herramienta de búsqueda</u> introduciendo palabras clave."
+ tool</u> by entering keywords.","Esta pestaña contiene la información principal sobre los productos que quieres poner en venta: Conjunto de atributos (debe ser el mismo que el del anuncio de M2E que se debe asignar), Identificadores de producto y Categoría donde se deben poner en venta.<br/><br/>La categoría se puede elegir <u>examinando</u> todas las categorías de la lista o se pueden encontrar con la <u>herramienta de búsqueda</u> introduciendo palabras clave."
 "Invalid input data. Integer value required.","Datos de entrada no válidos. Se requiere un valor entero."
 "Invalid input data. Decimal value required. Example 12.05","Datos de entrada no válidos. Se requiere un valor decimal. Ejemplo: 12,05"
 "Invalid input data. String value required.","Datos de entrada no válidos. Se requiere un valor de cadena."
@@ -3817,14 +3817,14 @@ You can map these Listings to existing products in Magento and move them to anot
 "Assign Play ID Automatically","Asignar identificador de Play automáticamente"
 "Allows searching Play ID by data, that have already been specified in Listing Search settings.","Permite realizar una búsqueda de identificador de Play por datos, ya especificados en la configuración de búsqueda de anuncio."
 "<div>
-    This section contains Play.com Channel, Product Search, Shipping and Condition settings.<br>
+    This section contains Play.com Channel, Product Search, Shipping and Condition settings.<br/>
         <ul class=""list"">
         <li>In the General section you have to specify Play.com Account, which listed items will be related to, and the Reference Code for its products.</li>
         <li>In the Search Settings you have to specify the identifiers, at which products will be searched on Play.com.</li>
         <li>In the Shipping section you have to specify Shipping information.</li>
         <li>The Condition section allows specifying item(s) condition and making notes to better describe the condition.</li>
         </ul>
-        <b>Note:</b> <i>Not Set</i> and <i>Not Set / Not Changeable</i> options are used for the 3rd Party Listings mainly. If these options are chosen, Play.com will be used as a master record.</div>","<div>    Esta sección contiene la configuración de Canal de Play.com, Búsqueda de producto, Envío y Estado.<br>        <ul class=""list"">        <li>En la sección General debes especificar la cuenta de Play.com, los artículos puestos en venta que se relacionarán y el código de referencia de sus productos.</li>        <li>En Configuración de la búsqueda, debes especificar los identificadores donde se buscarán productos en Play.com.</li>        <li>En la sección Envío debes especificar la información de envío.</li>        <li>La sección Estado permite especificar el estado de los artículos y realizar anotaciones para describirlo en mayor detalle.</li>        </ul>        <b>Nota:</b> las opciones <i>Sin establecer</i> y <i>Sin establecer/No se puede cambiar</i> se usan para los anuncios externos principalmente. Si se eligen estas opciones, Play.com se usará como un registro maestro.</div>"
+        <b>Note:</b> <i>Not Set</i> and <i>Not Set / Not Changeable</i> options are used for the 3rd Party Listings mainly. If these options are chosen, Play.com will be used as a master record.</div>","<div>    Esta sección contiene la configuración de Canal de Play.com, Búsqueda de producto, Envío y Estado.<br/>        <ul class=""list"">        <li>En la sección General debes especificar la cuenta de Play.com, los artículos puestos en venta que se relacionarán y el código de referencia de sus productos.</li>        <li>En Configuración de la búsqueda, debes especificar los identificadores donde se buscarán productos en Play.com.</li>        <li>En la sección Envío debes especificar la información de envío.</li>        <li>La sección Estado permite especificar el estado de los artículos y realizar anotaciones para describirlo en mayor detalle.</li>        </ul>        <b>Nota:</b> las opciones <i>Sin establecer</i> y <i>Sin establecer/No se puede cambiar</i> se usan para los anuncios externos principalmente. Si se eligen estas opciones, Play.com se usará como un registro maestro.</div>"
 "UPC/EAN Attribute","Atributo UPC/EAN"
 "Play ID Attribute","Atributo Identificador de Play"
 "Parameter the product search will be performed by.<br/>For ex.: http://www.play.com/Mobiles/Mobile/4-/20020059/-/Product.html.<br/>Play ID = 20020059","Parámetro por el que se realizará la búsqueda de productos.<br/>Por ejemplo: http://www.play.com/Mobiles/Mobile/4-/20020059/-/Product.html.<br/>Identificador de Play = 20020059"
@@ -3843,9 +3843,9 @@ This section contains parameters for action ""Assign Play ID Automatically","Act
 "UPC/EAN","UPC/EAN"
 "
                 This section determines information about how your products will be shipped.
-                <br><br>
+                <br/><br/>
                 <b>Note:</b> <i>Not Set / Not Changeable</i> is used for the 3rd Party Listings mainly. If this option is chosen, Play.com will be used as a master record.
-                ","                Esta sección determina la información sobre cómo se enviarán los productos.                <br><br>                <b>Nota:</b> <i>Sin establecer/No se puede cambiar</i> se usa para los anuncios externos principalmente. Si se elige esta opción, Play.com se usará como un registro maestro.                "
+                ","                Esta sección determina la información sobre cómo se enviarán los productos.                <br/><br/>                <b>Nota:</b> <i>Sin establecer/No se puede cambiar</i> se usa para los anuncios externos principalmente. Si se elige esta opción, Play.com se usará como un registro maestro.                "
 "Delivery Region","Región de entrega"
 "Region to which you are willing to deliver.","Región en la que estás dispuesto a hacer la entrega."
 "Delivery Region Value","Valor de región de entrega"
@@ -3932,9 +3932,9 @@ you can create them manually by using appropriate options in the Action dropdown
     <br/><b>Note:</b> Cron job must be set up for automatic synchronization. Otherwise, you will have to perform the synchronization manually.","Esta sección te permite establecer preferencias para la sincronización de los datos.<br/>    Debes activar/desactivar las tareas de sincronización, que se realizarán de forma automática para todas las cuentas de Play.com y pulsar a continuación <span style=""text-decoration: underline;"">Guardar configuración</span>.<br/>    Para ejecutar la tarea necesaria manualmente, pulsa el botón <span style=""text-decoration: underline;"">Ejecutar ahora</span>; para ejecutar todas las tareas a la vez, pulsa <span style=""text-decoration: underline;"">Ejecutar activado ahora</span>.<br/>    <br/><b>Nota:</b> para realizar una sincronización automática, debe configurarse el trabajo de cron. De lo contrario, tendrás que realizar la sincronización de forma manual."
 "Updates and synchronizes Play.com Listings according to<br/>Synchronization Templates' rules.","Actualiza y sincroniza los anuncios de Play.com de acuerdo con las<br/>reglas de las plantillas de sincronización."
 "If your Play.com listings for some reason were asynchronized with the products in Magento, <a href=""javascript:"" onclick=""%s"">turn on</a> the Revise All action to catch data up.
-        <br>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
-    <br><br>
-        ","Si por algún motivo tus anuncios de Play.com no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.    <br><br>        "
+        <br/>Revise is performed by the Inventory Synchronization, 100 items per a cycle.
+    <br/><br/>
+        ","Si por algún motivo tus anuncios de Play.com no están sincronizados con los productos de Magento, <a href=""javascript:"" onclick=""%s"">activa</a> la acción Modificar todo para obtener los datos.        <br/>La modificación se lleva a cabo mediante la sincronización del inventario, 100 artículos por ciclo.    <br/><br/>        "
 "Imports and synchronizes Play.com Orders for accounts,<br/>which have enabled Import Play.com Orders in their<br/>Accounts settings.","Importa y sincroniza los pedidos de Play.com para las cuentas,<br/>que tienen activado Importar pedidos de Play.com en su<br/>configuración de la cuenta."
 "Imports and synchronizes 3rd Party Listings for Play.com<br/>accounts, which have enabled Import 3rd Party Listings<br/>in their Accounts settings.","Importa y sincroniza los anuncios externos para las cuentas de Play.com,<br/>que tienen activado Importar anuncios externos<br/>en la configuración de la cuenta."
 "Selling Format Template contains price-related data and quantity for the items, which will be listed on Play.com.<br/><br/>
@@ -4020,7 +4020,7 @@ will be automatically fully or partially updated.<br/>
 "and","y"
 "component","componente"
 "components","componentes"
-"Current %s %s are in <span style=""text-decoration: underline;"">Beta</span> state and are provided free of charge. However, please be advised that upon the live version of the product release some monthly subscription fee will be introduced.</br>","Las versiones actuales de %s %s se encuentran en estado <span style=""text-decoration: underline;"">Beta</span> y se proporcionan totalmente gratis. Sin embargo, recuerda que cuando se lance la versión comercial del producto se aplicará una tarifa mensual de suscripción.</br>"
+"Current %s %s are in <span style=""text-decoration: underline;"">Beta</span> state and are provided free of charge. However, please be advised that upon the live version of the product release some monthly subscription fee will be introduced.<br/>","Las versiones actuales de %s %s se encuentran en estado <span style=""text-decoration: underline;"">Beta</span> y se proporcionan totalmente gratis. Sin embargo, recuerda que cuando se lance la versión comercial del producto se aplicará una tarifa mensual de suscripción.<br/>"
 "<br/><b>Note:</b> M2E Pro v.6.x.x consists of %s.<br/>
     %s
     %s
@@ -4063,11 +4063,11 @@ will be automatically fully or partially updated.<br/>
 "Preferences for logs history clearing.","Preferencias de borrado del historial de registros."
 "M2E Pro activation.","Activación de M2E Pro."
 "Set preferences for automatic logs clearing and Save configuration.
-        <br>
+        <br/>
         To launch a task manually press Run Now. To clear all log records of the certain Log press Clear All button.
-        <br><br>
+        <br/><br/>
         <b>Note:</b> Autoclearing is performed by cron.
-       ","Establece las preferencias de borrado automático de registros y guarda la configuración.        <br>        Para lanzar una tarea manualmente, pulsa Ejecutar ahora. Para borrar toda la información guardada de un registro determinado, pulsa el botón Borrar todo.        <br><br>        <b>Nota:</b> el borrado automático se realiza mediante cron.       "
+       ","Establece las preferencias de borrado automático de registros y guarda la configuración.        <br/>        Para lanzar una tarea manualmente, pulsa Ejecutar ahora. Para borrar toda la información guardada de un registro determinado, pulsa el botón Borrar todo.        <br/><br/>        <b>Nota:</b> el borrado automático se realiza mediante cron.       "
 "Listings Log Clearing","Borrado de registros de anuncios"
 "Keep For (days)","Conservar durante (días)"
 "Saves records for the definite number of days.","Guarda los registros el número de días indicado."
@@ -4085,8 +4085,8 @@ will be automatically fully or partially updated.<br/>
 "Restores manually closed Help blocks.","Restaura los bloques de ayuda cerrados manualmente."
 "Global Synchronization","Sincronización global"
 "Has to be enabled if product price and quantity changes are made directly to database.  Data update depends on the number of products and can be fully completed after several synchronization cycles finish.
-                    <br><br>
-                    <b>Note:</b> Enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance.","Se debe activar si los cambios de precio y cantidad de producto se realizan directamente en la base de datos. La actualización de datos depende del número de productos y se puede realizar completamente después de la finalización de varios ciclos de sincronización.                    <br><br>                    <b>Nota:</b> activa esta opción solo si la necesitas realmente, ya que usa muchos recursos y tarda mucho tiempo, lo que podría afectar al rendimiento de la sincronización."
+                    <br/><br/>
+                    <b>Note:</b> Enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance.","Se debe activar si los cambios de precio y cantidad de producto se realizan directamente en la base de datos. La actualización de datos depende del número de productos y se puede realizar completamente después de la finalización de varios ciclos de sincronización.                    <br/><br/>                    <b>Nota:</b> activa esta opción solo si la necesitas realmente, ya que usa muchos recursos y tarda mucho tiempo, lo que podría afectar al rendimiento de la sincronización."
 "Track Direct Database Changes","Seguimiento de cambios directos en la base de datos"
 "<b>Note:</b> Enable this option if you really need it, as it is very resource and time consuming and may affect synchronization performance.","<b>Nota:</b> activa esta opción solo si la necesitas realmente, ya que usa muchos recursos y tarda mucho tiempo, lo que podría afectar al rendimiento de la sincronización."
 "PHP","PHP"
@@ -4163,7 +4163,7 @@ will be automatically fully or partially updated.<br/>
 "Advanced Filter","Filtro avanzado"
 "Products Presented In Other Listings","Productos presentados en otros anuncios"
 "Not Show","No mostrar"
-"Makes the filter result more precise:<br/><b>Show</b> - all products will be displayed;<br><b>Not Show</b> - the products, which are not included in any listing, will be only displayed.","Aumenta la precisión del resultado del filtro:<br/><b>Mostrar</b>: se presentan todos los productos.<br><b>No mostrar</b>: solo se presentan los productos que no están incluidos en ningún anuncio."
+"Makes the filter result more precise:<br/><b>Show</b> - all products will be displayed;<br/><b>Not Show</b> - the products, which are not included in any listing, will be only displayed.","Aumenta la precisión del resultado del filtro:<br/><b>Mostrar</b>: se presentan todos los productos.<br/><b>No mostrar</b>: solo se presentan los productos que no están incluidos en ningún anuncio."
 "eBay User ID","Seudónimo de eBay"
 "eBay Site","Página de eBay"
 "Magento Store View","Vista de tienda de Magento"
@@ -4272,8 +4272,8 @@ will be automatically fully or partially updated.<br/>
 "<b>Synchronization Setting</b> â€“ how your items are synchronized on eBay","<b>Configuración de sincronización</b>: información sobre cómo se sincronizan los artículos en eBay"
 "Please select an M2E Mode","Selecciona un modo de M2E"
 "There are two modes available to you.
-            <br>
-            We have chosen the mode we think is most suitable for you, based on your selling history, but you can change this if you prefer.","Dispones de dos modos.            <br>            Hemos elegido el modo que consideramos que resulta más adecuado para ti, según tu historial de venta, pero puedes cambiarlo si así lo prefieres."
+            <br/>
+            We have chosen the mode we think is most suitable for you, based on your selling history, but you can change this if you prefer.","Dispones de dos modos.            <br/>            Hemos elegido el modo que consideramos que resulta más adecuado para ti, según tu historial de venta, pero puedes cambiarlo si así lo prefieres."
 "Simple","Sencillo"
 "Suitable for new users and for those with a limited inventory.","Adecuado para los usuarios nuevos y para los que tienen un inventario limitado."
 "Advanced","Avanzado"
@@ -4297,14 +4297,14 @@ will be automatically fully or partially updated.<br/>
              Click
              <a href=""%s"">Start Configuration</a> Wizard to quickly set up main settings","Has instalado correctamente <strong>M2E Pro v. %s</strong>.<br/>             Pulsa el asistente <a href=""%s"">Iniciar configuración</a> para establecer rápidamente la configuración principal"
 "Step %d","Paso %d"
-"<b>Congratulations!</b><br>
+"<b>Congratulations!</b><br/>
                 You have successfully installed the new version of M2E Pro.
-                <br>In this version 'Sell on eBay' has been separated from the other channels and completely updated. All data was successfully migrated but we would recommend you check the settings in light of the changes weâ€™ve identified below.
-                ","<b>Enhorabuena!</b><br>                Has instalado correctamente la nueva versión de M2E Pro.                <br>En esta versión, ""Vender en eBay"" se ha separado de otros canales y se ha actualizado por completo. Todos los datos se han migrado correctamente, pero te recomendamos que compruebes la configuración según los cambios que hemos identificado a continuación.                "
+                <br/>In this version 'Sell on eBay' has been separated from the other channels and completely updated. All data was successfully migrated but we would recommend you check the settings in light of the changes weâ€™ve identified below.
+                ","<b>Enhorabuena!</b><br/>                Has instalado correctamente la nueva versión de M2E Pro.                <br/>En esta versión, ""Vender en eBay"" se ha separado de otros canales y se ha actualizado por completo. Todos los datos se han migrado correctamente, pero te recomendamos que compruebes la configuración según los cambios que hemos identificado a continuación.                "
 "1) Templates have been replaced by Policies","1) Las plantillas se han reemplazado por políticas"
 "All templates are now policies. Use these to create all the necessary settings for listing Magento products on eBay.
-            <br><br>The templates have been renamed:
-            <br>
+            <br/><br/>The templates have been renamed:
+            <br/>
              <table>
             <thead>
                     <td width=""200""><b>Previously known as:</b></td>
@@ -4342,11 +4342,11 @@ will be automatically fully or partially updated.<br/>
                 <td>Settings for autosynchronization between Magento and eBay</td>
             </tr>
             </table>
-                ","Ahora, todas las plantillas son políticas. Utilízalas para crear la configuración necesaria para poner en venta productos de Magento en eBay.            <br><br>Se ha cambiado el nombre de las plantillas:            <br>             <table>            <thead>                    <td width=""200""><b>Nombre anterior:</b></td>                    <td width=""200""><b>Nuevo nombre de política:</b></td>                    <td width=""250""><b>Qué incluye:</b></td>            </thead>            <tr>                <td>General</td>                <td>Pago</td>                <td>Cómo te pagan los compradores</td>            </tr>            <tr>                <td>General</td>                <td>Envío</td>                <td>Tus gastos de envío y servicio</td>            </tr>             <tr>                <td>General</td>                <td>Devoluciones</td>                <td>Tu plazo de devolución y quién paga los gastos de envío</td>            </tr>            <tr>                <td>Formato de la venta</td>                <td>Precio, cantidad y formato</td>                <td>Información detallada, en la que se incluyen el precio, la cantidad y la duración del anuncio</td>            </tr>            <tr>                <td>Descripción, actualizaciones de anuncio, detalles de producto y estado</td>                <td>Descripción </td>                <td>Configuración para ayudarte a describir tus artículos de forma precisa</td>            </tr>            <tr>                <td>Sincronización</td>                <td>Sincronización</td>                <td>Configuración de la sincronización automática entre Magento e eBay</td>            </tr>            </table>                "
+                ","Ahora, todas las plantillas son políticas. Utilízalas para crear la configuración necesaria para poner en venta productos de Magento en eBay.            <br/><br/>Se ha cambiado el nombre de las plantillas:            <br/>             <table>            <thead>                    <td width=""200""><b>Nombre anterior:</b></td>                    <td width=""200""><b>Nuevo nombre de política:</b></td>                    <td width=""250""><b>Qué incluye:</b></td>            </thead>            <tr>                <td>General</td>                <td>Pago</td>                <td>Cómo te pagan los compradores</td>            </tr>            <tr>                <td>General</td>                <td>Envío</td>                <td>Tus gastos de envío y servicio</td>            </tr>             <tr>                <td>General</td>                <td>Devoluciones</td>                <td>Tu plazo de devolución y quién paga los gastos de envío</td>            </tr>            <tr>                <td>Formato de la venta</td>                <td>Precio, cantidad y formato</td>                <td>Información detallada, en la que se incluyen el precio, la cantidad y la duración del anuncio</td>            </tr>            <tr>                <td>Descripción, actualizaciones de anuncio, detalles de producto y estado</td>                <td>Descripción </td>                <td>Configuración para ayudarte a describir tus artículos de forma precisa</td>            </tr>            <tr>                <td>Sincronización</td>                <td>Sincronización</td>                <td>Configuración de la sincronización automática entre Magento e eBay</td>            </tr>            </table>                "
 "2) Easier to create new listings","2) Mayor sencillez para crear nuevos anuncios"
 "Itâ€™s now quicker and easier to create eBay listings. You can set up a single listing from scratch using custom setting mode or use previously saved information. You can also edit listings individually or in bulk with details in your listing settings*, policies and custom settings.
-            <br>
-            <br>
+            <br/>
+            <br/>
             When your listings have been created, you can choose between 3 different modes to view and filter them:
             <br/>
                 <ul style=""list-style: disc; padding-left: 35px;"">
@@ -4356,16 +4356,16 @@ will be automatically fully or partially updated.<br/>
                 </ul>
             <br/>
             * Attributes have been removed from listing settings.
-            ","Ahora es más rápido y sencillo crear anuncios de eBay. Puedes configurar un anuncio desde cero con el modo de configuración personalizada o usar información guardada anteriormente. También puedes modificar los anuncios de forma individual o por lotes, con los detalles de la configuración de anuncio*, las políticas y la configuración personalizada.            <br>            <br>            Cuando hayas creado los anuncios, puedes elegir entre tres modos distintos de verlos y filtrarlos:            <br/>                <ul style=""list-style: disc; padding-left: 35px;"">                    <li><b>eBay</b>: muestra la información de producto relacionada con eBay de modo que te resulte fácil buscar y modificar anuncios por lotes (por ejemplo, poner en venta, volver a poner en venta, modificar, detener, etc.).</li>                    <li><b>Magento</b>: muestra la información de producto relacionada con el catálogo de Magento, como la cantidad de Magento, el estado de existencias, etc.</li>                    <li><b>Configuración</b>: muestra información relacionada con la configuración de producto (por ejemplo, la configuración de venta, las categorías de eBay, etc.), para facilitar la realización de cambios en la configuración por lotes.</li>                </ul>            <br/>            * Los atributos se han eliminado de la configuración de los anuncios.            "
+            ","Ahora es más rápido y sencillo crear anuncios de eBay. Puedes configurar un anuncio desde cero con el modo de configuración personalizada o usar información guardada anteriormente. También puedes modificar los anuncios de forma individual o por lotes, con los detalles de la configuración de anuncio*, las políticas y la configuración personalizada.            <br/>            <br/>            Cuando hayas creado los anuncios, puedes elegir entre tres modos distintos de verlos y filtrarlos:            <br/>                <ul style=""list-style: disc; padding-left: 35px;"">                    <li><b>eBay</b>: muestra la información de producto relacionada con eBay de modo que te resulte fácil buscar y modificar anuncios por lotes (por ejemplo, poner en venta, volver a poner en venta, modificar, detener, etc.).</li>                    <li><b>Magento</b>: muestra la información de producto relacionada con el catálogo de Magento, como la cantidad de Magento, el estado de existencias, etc.</li>                    <li><b>Configuración</b>: muestra información relacionada con la configuración de producto (por ejemplo, la configuración de venta, las categorías de eBay, etc.), para facilitar la realización de cambios en la configuración por lotes.</li>                </ul>            <br/>            * Los atributos se han eliminado de la configuración de los anuncios.            "
 "Please check video tutorials to have quick overview of new UI.","Consulta los tutoriales en vídeo para obtener un resumen rápido de la nueva interfaz de usuario."
 "3) Other improvements and changes","3) Otras mejoras y cambios"
 "
                         <b>eBay Fee estimation</b> has been added to the listing view, allowing you to see how much youâ€™ll be charged for listing your item on eBay.
-                        <br><br>
+                        <br/><br/>
                         <b>Automatic currency rate conversion</b> has been added. If Magento has the currency conversion rate, it will be converted automatically to all your prices.
-                        <br><br>
+                        <br/><br/>
                         <b>List / Relist Schedule</b> has been removed from Amazon, Rakuten.com and Play.com synchronization templates and updated for eBay. It now covers both list and relist rules.
-                        <br><br>
+                        <br/><br/>
                         <b>The following terms have been rephrased for eBay:</b>
                                 <br/><br/>
                                 <ul style=""list-style: disc; padding-left: 35px;"">
@@ -4382,15 +4382,15 @@ will be automatically fully or partially updated.<br/>
                                     <li><b>Advanced</b> - for more experienced users.</li>
                                 </ul>
                                 You can change the mode any time in Sell on eBay > Configuration > General.
-                        <br><br>
+                        <br/><br/>
                         <b>The global settings for M2E</b> have been moved and divided into:
                                 <ul style=""list-style: disc; padding-left: 35px;"">
-                                <br>
+                                <br/>
                                 <li>Common â€“ for all channels. Find these settings in Magento > System > Configuration and select M2E Pro;</li>
                                 <li>eBay settings. Find these settings in Sell on eBay > Configuration > General.</li>
                             </li>
                         </ul>
-                        ","                        Se ha añadido el <b>cálculo de tarifas de eBay</b> a la vista de anuncio, lo que te permite ver cuánto se te cobrará por poner en venta tu artículo en eBay.                        <br><br>                        Se ha añadido la <b>conversión automática del tipo de cambio de divisa</b>. Si Magento tiene el tipo de cambio de conversión de divisa, la conversión de todos tus precios se realizará automáticamente.                        <br><br>                        <b>Programación de poner en venta/volver a poner en venta</b> se ha eliminado de las plantillas de sincronización de Amazon, Rakuten.com y Play.com, y se ha actualizado para eBay. Ahora abarca las reglas tanto de puesta en venta como de nueva puesta en venta.                        <br><br>                        <b>Se han reformulado los siguientes términos para eBay:</b>                                <br/><br/>                                <ul style=""list-style: disc; padding-left: 35px;"">                                    <li>Título de la cuenta ahora es <b>Seudónimo de eBay</b></li>                                    <li>Mercado ahora es <b>Sitio de eBay</b></li>                                    <li>Plantilla ahora es <b>Política</b></li>                                    <li>Acciones en productos de categorías ahora es <b>Acciones automáticas</b></li>                                </ul>                            </li>                        <b>Modo sencillo/avanzado para eBay</b>. Ahora hay dos modos disponibles para eBay.                                <br/><br/>                                <ul style=""list-style: disc; padding-left: 35px;"">                                    <li><b>Sencillo</b>: adecuado para los usuarios nuevos y para los que tienen un inventario limitado.</li>                                    <li><b>Avanzado</b>: adecuado para los usuarios con más experiencia.</li>                                </ul>                                Puedes cambiar el modo en cualquier momento en Vender en eBay > Configuración > General.                        <br><br>                        <b>La configuración global de M2E</b> se ha trasladado y dividido en:                                <ul style=""list-style: disc; padding-left: 35px;"">                                <br>                                <li>Común: para todos los canales. Para acceder a esta configuración, ve a Magento > Sistema > Configuración y selecciona M2E Pro.</li>                                <li>Configuración de eBay. Para acceder a esta configuración, ve a Vender en eBay > Configuración > General.</li>                            </li>                        </ul>                        "
+                        ","                        Se ha añadido el <b>cálculo de tarifas de eBay</b> a la vista de anuncio, lo que te permite ver cuánto se te cobrará por poner en venta tu artículo en eBay.                        <br/><br/>                        Se ha añadido la <b>conversión automática del tipo de cambio de divisa</b>. Si Magento tiene el tipo de cambio de conversión de divisa, la conversión de todos tus precios se realizará automáticamente.                        <br/><br/>                        <b>Programación de poner en venta/volver a poner en venta</b> se ha eliminado de las plantillas de sincronización de Amazon, Rakuten.com y Play.com, y se ha actualizado para eBay. Ahora abarca las reglas tanto de puesta en venta como de nueva puesta en venta.                        <br/><br/>                        <b>Se han reformulado los siguientes términos para eBay:</b>                                <br/><br/>                                <ul style=""list-style: disc; padding-left: 35px;"">                                    <li>Título de la cuenta ahora es <b>Seudónimo de eBay</b></li>                                    <li>Mercado ahora es <b>Sitio de eBay</b></li>                                    <li>Plantilla ahora es <b>Política</b></li>                                    <li>Acciones en productos de categorías ahora es <b>Acciones automáticas</b></li>                                </ul>                            </li>                        <b>Modo sencillo/avanzado para eBay</b>. Ahora hay dos modos disponibles para eBay.                                <br/><br/>                                <ul style=""list-style: disc; padding-left: 35px;"">                                    <li><b>Sencillo</b>: adecuado para los usuarios nuevos y para los que tienen un inventario limitado.</li>                                    <li><b>Avanzado</b>: adecuado para los usuarios con más experiencia.</li>                                </ul>                                Puedes cambiar el modo en cualquier momento en Vender en eBay > Configuración > General.                        <br/><br/>                        <b>La configuración global de M2E</b> se ha trasladado y dividido en:                                <ul style=""list-style: disc; padding-left: 35px;"">                                <br/>                                <li>Común: para todos los canales. Para acceder a esta configuración, ve a Magento > Sistema > Configuración y selecciona M2E Pro.</li>                                <li>Configuración de eBay. Para acceder a esta configuración, ve a Vender en eBay > Configuración > General.</li>                            </li>                        </ul>                        "
 "Migration Notifications","Notificaciones de migración"
 "Below you can find all changes that have been made after migration. Click on the links to check or edit changed options.","A continuación, puedes encontrar todos los cambios que se han realizado después de la migración. Pulsa los vínculos para comprobar o modificar las opciones cambiadas."
 "You have no notifications of Migration!","No tienes ninguna notificación de migración"
@@ -4431,8 +4431,8 @@ will be automatically fully or partially updated.<br/>
 "Invalid coefficient format.","Formato de coeficiente no válido"
 "Selling Format Currency Conversion","Conversión de divisa de formato de venta"
 "In the table below you can see Selling Format templates, which prices will be converted.
-        <br>The currency rate you can check in <a href=""%s"" target=""_blank"">Manage currency rate</a> settings. If you need to correct the prices, use coefficients.
-        ","En la tabla siguiente puedes ver las plantillas de formato de venta cuyos precios se convertirán.        <br>El tipo de cambio de divisa lo puedes comprobar en la configuración <a href=""%s"" target=""_blank"">Gestionar tipos de cambio de divisa</a>. Si necesitas corregir los precios, usa coeficientes.        "
+        <br/>The currency rate you can check in <a href=""%s"" target=""_blank"">Manage currency rate</a> settings. If you need to correct the prices, use coefficients.
+        ","En la tabla siguiente puedes ver las plantillas de formato de venta cuyos precios se convertirán.        <br/>El tipo de cambio de divisa lo puedes comprobar en la configuración <a href=""%s"" target=""_blank"">Gestionar tipos de cambio de divisa</a>. Si necesitas corregir los precios, usa coeficientes.        "
 "You have successfully upgraded to <strong>M2E Pro v. %s</strong>.<br/>
              Click
              <a href=""%s"">Start Migration</a> Wizard to quickly set up main settings","Has actualizado correctamente la aplicación a <strong>M2E Pro v. %s</strong>.<br/>             Pulsa el asistente <a href=""%s"">Iniciar migración</a> para establecer rápidamente la configuración principal"

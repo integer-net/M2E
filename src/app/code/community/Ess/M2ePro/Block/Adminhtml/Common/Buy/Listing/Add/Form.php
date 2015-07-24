@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_Form
     extends Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Form
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();

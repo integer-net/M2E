@@ -96,7 +96,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_AccountMarketplace_Form extends Ma
         $this->setChild(
             'store_switcher',
             $this->getLayout()->createBlock(
-                'M2ePro/adminhtml_storeSwitcher', '', array('id'=>'store_id','selected' => $this->getData('store_id'))
+                'M2ePro/adminhtml_storeSwitcher', '', array(
+                    'id'=>'store_id',
+                    'selected' => $this->getData('store_id'),
+                    'display_default_store_mode' => 'down',
+                    'required_option' => true,
+                    'empty_option' => true
+                )
             )
         );
         //------------------------------

@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_SearchCharity
     extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -46,4 +48,5 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_SellingFormat_SearchCharity
 
     }
 
+    // ####################################
 }

@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Listing_Breadcrumb extends Mage_Adminhtml_Block_Template
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -18,4 +20,5 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Breadcrumb extends Mage_Adminhtm
         $this->setTemplate('M2ePro/common/listing/breadcrumb.phtml');
     }
 
+    // ####################################
 }

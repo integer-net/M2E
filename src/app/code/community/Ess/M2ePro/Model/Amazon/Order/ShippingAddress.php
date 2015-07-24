@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Model_Amazon_Order_ShippingAddress extends Ess_M2ePro_Model_Order_ShippingAddress
 {
+    // ########################################
+
     public function getRawData()
     {
         return array(
@@ -94,4 +96,6 @@ class Ess_M2ePro_Model_Amazon_Order_ShippingAddress extends Ess_M2ePro_Model_Ord
 
         return preg_replace('/[^ \w]+/', '', $state);
     }
+
+    // ########################################
 }

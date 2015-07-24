@@ -6,6 +6,7 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Product_WarningPopup extends Mage_Adminhtml_Block_Template
 {
+    // ####################################
 
     public function __construct()
     {
@@ -32,4 +33,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Product_WarningPopup exte
 
         return $this;
     }
+
+    // ####################################
 }

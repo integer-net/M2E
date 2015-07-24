@@ -11,7 +11,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Request_NewProduct
 
     public function getData()
     {
-        if (!$this->getConfigurator()->isNewProduct()) {
+        if (!$this->getConfigurator()->isNewProductAllowed()) {
             return array();
         }
 

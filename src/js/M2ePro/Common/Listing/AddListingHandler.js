@@ -1,5 +1,5 @@
-AddListingHandler = Class.create();
-AddListingHandler.prototype = Object.extend(new CommonHandler(), {
+CommonListingAddListingHandler = Class.create();
+CommonListingAddListingHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
@@ -22,25 +22,19 @@ AddListingHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
-    add: function(items, categoriesMode, back, isList, categoriesSave)
+    add: function(items, back, isList)
     {
         var self = this;
         self.is_list = isList;
         self.back = back;
 
-        self.getListingId(items, categoriesMode);
+        self.getListingId(items);
 
         if (self.emptyListing == 1) {
             return;
         }
 
-        if (categoriesMode == true) {
-            self.categories = items;
-        } else {
-            self.products = items;
-        }
-
-        self.getProductsFromCategories(categoriesSave);
+        self.products = items;
 
         var parts = self.makeProductsParts();
 
@@ -62,7 +56,7 @@ AddListingHandler.prototype = Object.extend(new CommonHandler(), {
         this.categoriesDeleteAction = deleteAction;
     },
 
-    getListingId: function(items, categoriesMode)
+    getListingId: function(items)
     {
         var self = this;
 
@@ -78,29 +72,6 @@ AddListingHandler.prototype = Object.extend(new CommonHandler(), {
                 break;
             }
         }
-    },
-
-    getProductsFromCategories: function(categoriesSave)
-    {
-        var self = this;
-
-        if (self.categories == '') {
-            return;
-        }
-
-        new Ajax.Request(self.M2ePro.url.get_products_from_categories, {
-            method: 'post',
-            asynchronous: false,
-            parameters: {
-                listing_id: self.listing_id,
-                categories: self.categories,
-                categories_save: categoriesSave,
-                hide_products_others_listings: +self.hideProductsOthersListings
-            },
-            onComplete: function(transport) {
-                self.products = transport.responseText;
-            }
-        });
     },
 
     makeProductsParts: function()

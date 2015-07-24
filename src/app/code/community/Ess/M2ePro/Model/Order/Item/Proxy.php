@@ -6,10 +6,8 @@
 
 abstract class Ess_M2ePro_Model_Order_Item_Proxy
 {
-    // ########################################
-
     /** @var Ess_M2ePro_Model_Ebay_Order_Item|Ess_M2ePro_Model_Amazon_Order_Item|
-     * Ess_M2ePro_Model_Buy_Order_Item|Ess_M2ePro_Model_Play_Order_Item */
+     * Ess_M2ePro_Model_Buy_Order_Item */
     protected $item = NULL;
 
     protected $qty = NULL;

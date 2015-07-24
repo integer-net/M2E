@@ -1,5 +1,5 @@
-ProductGridHandler = Class.create();
-ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
+ListingProductGridHandler = Class.create();
+ListingProductGridHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
@@ -23,7 +23,7 @@ ProductGridHandler.prototype = Object.extend(new CommonHandler(), {
     save_and_list_click: function(back)
     {
         if (this.getSelectedProducts()) {
-            this.addListingHandlerObj.add(this.getSelectedProducts(), false, back, 'yes');
+            this.addListingHandlerObj.add(this.getSelectedProducts(), back, 'yes');
         }
     },
 

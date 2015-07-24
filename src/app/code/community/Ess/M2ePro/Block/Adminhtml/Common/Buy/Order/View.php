@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View extends Mage_Adminhtml_Block_Widget_Form_Container
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -69,4 +71,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View extends Mage_Adminhtml_Bl
             //------------------------------
         }
     }
+
+    // ####################################
 }

@@ -24,7 +24,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     const QTY_MODIFICATION_MODE_ON = 1;
 
     const QTY_MIN_POSTED_DEFAULT_VALUE = 1;
-    const QTY_MAX_POSTED_DEFAULT_VALUE = 10;
+    const QTY_MAX_POSTED_DEFAULT_VALUE = 100;
 
     const TAX_CATEGORY_MODE_NONE      = 0;
     const TAX_CATEGORY_MODE_VALUE     = 1;
@@ -61,8 +61,6 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     const RESTRICTED_TO_BUSINESS_DISABLED = 0;
     const RESTRICTED_TO_BUSINESS_ENABLED  = 1;
-
-    // ########################################
 
     /**
      * @var Ess_M2ePro_Model_Ebay_Template_SellingFormat_Source[]
@@ -372,6 +370,59 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     public function isPriceVariationModeChildren()
     {
         return $this->getPriceVariationMode() == self::PRICE_VARIATION_MODE_CHILDREN;
+    }
+
+    //-------------------------
+
+    public function getFixedPriceMode()
+    {
+        return (int)$this->getData('fixed_price_mode');
+    }
+
+    public function isFixedPriceModeNone()
+    {
+        return $this->getFixedPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE;
+    }
+
+    public function isFixedPriceModeProduct()
+    {
+        return $this->getFixedPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT;
+    }
+
+    public function isFixedPriceModeSpecial()
+    {
+        return $this->getFixedPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_SPECIAL;
+    }
+
+    public function isFixedPriceModeAttribute()
+    {
+        return $this->getFixedPriceMode() == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE;
+    }
+
+    public function getFixedPriceCoefficient()
+    {
+        return $this->getData('fixed_price_coefficient');
+    }
+
+    public function getFixedPriceSource()
+    {
+        return array(
+            'mode'        => $this->getFixedPriceMode(),
+            'coefficient' => $this->getFixedPriceCoefficient(),
+            'attribute'   => $this->getData('fixed_price_custom_attribute')
+        );
+    }
+
+    public function getFixedPriceAttributes()
+    {
+        $attributes = array();
+        $src = $this->getFixedPriceSource();
+
+        if ($src['mode'] == Ess_M2ePro_Model_Template_SellingFormat::PRICE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
     }
 
     //-------------------------
@@ -709,7 +760,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     {
         if ($this->isListingTypeFixed()) {
 
-            if ($this->isBuyItNowPriceModeProduct() || $this->isBuyItNowPriceModeSpecial()) {
+            if ($this->isFixedPriceModeProduct() || $this->isFixedPriceModeSpecial()) {
                 return true;
             }
 
@@ -862,6 +913,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
     {
         return array_unique(array_merge(
             $this->getQtyAttributes(),
+            $this->getFixedPriceAttributes(),
             $this->getStartPriceAttributes(),
             $this->getReservePriceAttributes(),
             $this->getBuyItNowPriceAttributes()
@@ -874,6 +926,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             $this->getListingTypeAttributes(),
             $this->getDurationAttributes(),
             $this->getQtyAttributes(),
+            $this->getFixedPriceAttributes(),
             $this->getStartPriceAttributes(),
             $this->getReservePriceAttributes(),
             $this->getBuyItNowPriceAttributes(),
@@ -920,6 +973,10 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'price_increase_vat_percent' => 0,
             'price_variation_mode' => self::PRICE_VARIATION_MODE_PARENT,
 
+            'fixed_price_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT,
+            'fixed_price_coefficient' => '',
+            'fixed_price_custom_attribute' => '',
+
             'start_price_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT,
             'start_price_coefficient' => '',
             'start_price_custom_attribute' => '',
@@ -928,7 +985,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
             'reserve_price_coefficient' => '',
             'reserve_price_custom_attribute' => '',
 
-            'buyitnow_price_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_PRODUCT,
+            'buyitnow_price_mode' => Ess_M2ePro_Model_Template_SellingFormat::PRICE_NONE,
             'buyitnow_price_coefficient' => '',
             'buyitnow_price_custom_attribute' => '',
 
@@ -957,11 +1014,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat extends Ess_M2ePro_Model_Comp
 
     public function getDefaultSettingsAdvancedMode()
     {
-        $simpleSettings = $this->getDefaultSettingsSimpleMode();
-
-        $simpleSettings['qty_modification_mode'] = self::QTY_MODIFICATION_MODE_ON;
-
-        return $simpleSettings;
+        return $this->getDefaultSettingsSimpleMode();
     }
 
     // #######################################

@@ -9,8 +9,6 @@
  */
 class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
-    // ########################################
-
     const TRANSLATION_STATUS_NONE                     = 0;
     const TRANSLATION_STATUS_PENDING                  = 1;
     const TRANSLATION_STATUS_PENDING_PAYMENT_REQUIRED = 2;
@@ -57,17 +55,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
     private $descriptionTemplateModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Template_Payment|Ess_M2ePro_Model_Ebay_Template_Policy
+     * @var Ess_M2ePro_Model_Ebay_Template_Payment
      */
     private $paymentTemplateModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Template_Return|Ess_M2ePro_Model_Ebay_Template_Policy
+     * @var Ess_M2ePro_Model_Ebay_Template_Return
      */
     private $returnTemplateModel = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Template_Shipping|Ess_M2ePro_Model_Ebay_Template_Policy
+     * @var Ess_M2ePro_Model_Ebay_Template_Shipping
      */
     private $shippingTemplateModel = NULL;
 
@@ -531,6 +529,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
 
     //-----------------------------------------
 
+    public function getOnlineCurrentPrice()
+    {
+        return (float)$this->getData('online_current_price');
+    }
+
     public function getOnlineStartPrice()
     {
         return (float)$this->getData('online_start_price');
@@ -662,14 +665,24 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
             return $this->getData(__METHOD__);
         }
 
-        $result = $this->isSetCategoryTemplate() &&
-                  $this->getEbayMarketplace()->isMultivariationEnabled() &&
+        if (!$this->isSetCategoryTemplate()) {
+            $this->setData(__METHOD__,false);
+            return false;
+        }
+
+        $isVariationEnabled = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
+                                                ->isVariationEnabled(
+                                                    (int)$this->getCategoryTemplateSource()->getMainCategory(),
+                                                    $this->getMarketplace()->getId()
+                                                );
+
+        if (is_null($isVariationEnabled)) {
+            $isVariationEnabled = true;
+        }
+
+        $result = $this->getEbayMarketplace()->isMultivariationEnabled() &&
                   !$this->getEbaySellingFormatTemplate()->isIgnoreVariationsEnabled() &&
-                  Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
-                                   ->isVariationEnabled(
-                                       (int)$this->getCategoryTemplateSource()->getMainCategory(),
-                                       $this->getMarketplace()->getId()
-                                   ) &&
+                  $isVariationEnabled &&
                   $this->isListingTypeFixed() &&
                   $this->getMagentoProduct()->isProductWithVariations();
 
@@ -707,6 +720,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
 
     // ########################################
 
+    public function getFixedPrice()
+    {
+        $src = $this->getEbaySellingFormatTemplate()->getFixedPriceSource();
+        return $this->getCalculatedPrice($src, true, true);
+    }
+
+    //-----------------------------------------
+
     public function getStartPrice()
     {
         $price = 0;
@@ -733,11 +754,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
 
     public function getBuyItNowPrice()
     {
+        $price = 0;
+
+        if (!$this->isListingTypeAuction()) {
+            return $price;
+        }
+
         $src = $this->getEbaySellingFormatTemplate()->getBuyItNowPriceSource();
         return $this->getCalculatedPrice($src, true, true);
     }
 
-     //-----------------------------------------
+    //-----------------------------------------
 
     public function getPriceDiscountStp()
     {
@@ -812,7 +839,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
         $price = 0;
         switch ($src['mode']) {
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::BEST_OFFER_ACCEPT_MODE_PERCENTAGE:
-                $price = $this->getBuyItNowPrice() * (float)$src['value'] / 100;
+                $price = $this->getFixedPrice() * (float)$src['value'] / 100;
                 break;
 
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::BEST_OFFER_ACCEPT_MODE_ATTRIBUTE:
@@ -842,7 +869,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
         $price = 0;
         switch ($src['mode']) {
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::BEST_OFFER_REJECT_MODE_PERCENTAGE:
-                $price = $this->getBuyItNowPrice() * (float)$src['value'] / 100;
+                $price = $this->getFixedPrice() * (float)$src['value'] / 100;
                 break;
 
             case Ess_M2ePro_Model_Ebay_Template_SellingFormat::BEST_OFFER_REJECT_MODE_ATTRIBUTE:
@@ -892,7 +919,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
         foreach (Mage::getModel('M2ePro/Ebay_Template_Manager')->getTrackingAttributesTemplates() as $template) {
             $templateManager = $this->getTemplateManager($template);
             $resultObjectTemp = $templateManager->getResultObject();
-            if ($resultObjectTemp && $templateManager->isResultObjectTemplate()) {
+            if ($resultObjectTemp) {
                 $attributes = array_merge($attributes,$resultObjectTemp->getTrackingAttributes());
             }
         }

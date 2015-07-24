@@ -11,6 +11,8 @@ EbayListingViewGridHandler = Class.create(ListingGridHandler, {
     {
         $super();
 
+        this.variationProductManageHandler = new EbayListingVariationProductManageHandler(this);
+
         this.actions = Object.extend(this.actions, {
 
             editCategorySettingsAction: function(id) {

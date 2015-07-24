@@ -18,7 +18,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
             $this->getRequestVariations()->getData()
         );
 
-        if ($this->getConfigurator()->isGeneral()) {
+        if ($this->getConfigurator()->isGeneralAllowed()) {
 
             $data['sku'] = $this->getEbayListingProduct()->getSku();
 
@@ -57,7 +57,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Request
 
     private function processingReplacedAction($data)
     {
-        $params = $this->getParams();
+        $params = $this->getConfigurator()->getParams();
 
         if (!isset($params['replaced_action'])) {
             return $data;

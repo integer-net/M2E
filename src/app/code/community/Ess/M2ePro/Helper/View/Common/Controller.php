@@ -86,16 +86,16 @@ class Ess_M2ePro_Helper_View_Common_Controller extends Mage_Core_Helper_Abstract
         }
 
 // M2ePro_TRANSLATIONS
-// %marketplace_title% data was changed on Amazon. You need to synchronize it the Extension works properly. Please, go to %menu_label% > <a href="%url%" target="_blank">Marketplaces</a> and click the Update All Button.
+// %marketplace_title% data was changed on Amazon. You need to synchronize it the Extension works properly. Please, go to %menu_label% > <a href="%url%" target="_blank">Marketplaces</a> and click the Update All Now Button.
 
         $message = '%marketplace_title% data was changed on Amazon. You need to synchronize it '.
                    'the Extension works properly. Please, go to %menu_path% > '.
-                   '<a href="%url%" target="_blank">Marketplaces</a> and click the Update All Button.';
+                   '<a href="%url%" target="_blank">Marketplaces</a> and click the Update All Now Button.';
 
         $controller->getSession()->addNotice(Mage::helper('M2ePro')->__(
             $message,
             implode(', ',$outdatedMarketplaces),
-            Mage::helper('M2ePro/View_Common')->getMenuPath('configuration'),
+            Mage::helper('M2ePro/View_Common')->getPageNavigationPath('configuration'),
             $controller->getUrl(
                 '*/adminhtml_common_marketplace',
                 array('tab' => Ess_M2ePro_Helper_Component_Amazon::NICK)

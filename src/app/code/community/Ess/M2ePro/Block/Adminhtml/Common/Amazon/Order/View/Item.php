@@ -6,6 +6,11 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View_Item extends Mage_Adminhtml_Block_Widget_Grid
 {
+    /** @var $order Ess_M2ePro_Model_Order */
+    protected $order = null;
+
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -25,7 +30,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View_Item extends Mage_Admi
         $this->_defaultLimit = 200;
         //------------------------------
 
-        /** @var $order Ess_M2ePro_Model_Order */
         $this->order = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
     }
 
@@ -98,7 +102,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View_Item extends Mage_Admi
             'header'    => Mage::helper('M2ePro')->__('Promotions'),
             'align'     => 'left',
             'width'     => '80px',
-            'index'     => 'discount_amount',
+            'filter'    => false,
+            'sortable'  => false,
             'frame_callback' => array($this, 'callbackColumnDiscountAmount')
         ));
 
@@ -249,19 +254,44 @@ HTML;
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        return Mage::getSingleton('M2ePro/Currency')->formatPrice($row->getData('currency'), $row->getData('price'));
+        $currency = $row->getData('currency');
+        if (empty($currency)) {
+            $currency = $this->order->getMarketplace()->getChildObject()->getDefaultCurrency();
+        }
+
+        return Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $row->getData('price'));
     }
 
     public function callbackColumnGiftPrice($value, $row, $column, $isExport)
     {
-        return Mage::getSingleton('M2ePro/Currency')
-            ->formatPrice($row->getData('currency'), $row->getData('gift_price'));
+        $currency = $row->getData('currency');
+        if (empty($currency)) {
+            $currency = $this->order->getMarketplace()->getChildObject()->getDefaultCurrency();
+        }
+
+        return Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $row->getData('gift_price'));
     }
 
     public function callbackColumnDiscountAmount($value, $row, $column, $isExport)
     {
-        return Mage::getSingleton('M2ePro/Currency')
-            ->formatPrice($row->getData('currency'), $row->getData('discount_amount'));
+        $currency = $row->getData('currency');
+        if (empty($currency)) {
+            $currency = $this->order->getMarketplace()->getChildObject()->getDefaultCurrency();
+        }
+
+        $discountDetails = $row->getData('discount_details');
+        if (empty($discountDetails)) {
+            Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, 0);
+        }
+
+        $discountDetails = @json_decode($row->getData('discount_details'), true);
+        if (empty($discountDetails['promotion']['value'])) {
+            Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, 0);
+        }
+
+        return Mage::getSingleton('M2ePro/Currency')->formatPrice(
+            $currency, (int)$discountDetails['promotion']['value']
+        );
     }
 
     public function callbackColumnGiftOptions($value, $row, $column, $isExport)
@@ -276,18 +306,25 @@ HTML;
         $giftMessage = Mage::helper('M2ePro')->escapeHtml($row->getData('gift_message'));
         $giftMessageLabel = Mage::helper('M2ePro')->__('Gift Message');
 
-        return <<<HTML
-<strong>{$giftTypeLabel}: </strong>{$giftType}<br/>
-<strong>{$giftMessageLabel}: </strong>{$giftMessage}
-HTML;
+        $resultHtml = '';
+        if (!empty($giftType)) {
+            $resultHtml .= "<strong>{$giftTypeLabel}: </strong>{$giftType}<br/>";
+        }
+
+        $resultHtml .= "<strong>{$giftMessageLabel}: </strong>{$giftMessage}";
+
+        return $resultHtml;
     }
 
     public function callbackColumnRowTotal($value, $row, $column, $isExport)
     {
+        $currency = $row->getData('currency');
+        if (empty($currency)) {
+            $currency = $this->order->getMarketplace()->getChildObject()->getDefaultCurrency();
+        }
+
         $price = (float)$row->getData('price') + (float)$row->getData('gift_price');
-        return Mage::getSingleton('M2ePro/Currency')->formatPrice(
-            $row->getData('currency'), $price * $row->getData('qty_purchased')
-        );
+        return Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $price * $row->getData('qty_purchased'));
     }
 
     public function getRowUrl($row)
@@ -299,4 +336,6 @@ HTML;
     {
         return $this->getUrl('*/*/orderItemGrid', array('_current' => true));
     }
+
+    // ####################################
 }

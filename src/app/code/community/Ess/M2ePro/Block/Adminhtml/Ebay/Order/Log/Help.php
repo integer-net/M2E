@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Log_Help extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -17,4 +19,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_Log_Help extends Mage_Adminhtml_Bloc
 
         $this->setTemplate('M2ePro/ebay/order/log/help.phtml');
     }
+
+    // ####################################
 }

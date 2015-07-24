@@ -82,4 +82,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Manage
     }
 
     //##############################################################
+
+    public function getComponentTitle()
+    {
+        $component = $this->getComponent();
+        return Mage::helper('M2ePro/Component_' . ucfirst($component))->getChannelTitle();
+    }
+
+    //##############################################################
 }

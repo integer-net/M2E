@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleResponser
     extends Ess_M2ePro_Model_Connector_Translation_Responser
 {
-    // ########################################
-
     protected $listingsProducts = array();
 
     protected $failedListingsProducts = array();

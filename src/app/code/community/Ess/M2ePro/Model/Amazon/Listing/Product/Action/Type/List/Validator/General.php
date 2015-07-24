@@ -24,11 +24,28 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_General
             return false;
         }
 
-        if (!$this->getVariationManager()->isPhysicalUnit()) {
+        if ($this->getVariationManager()->isLogicalUnit()) {
             return true;
         }
 
-        if (!$this->validatePhysicalUnitRequirements() || !$this->validatePhysicalUnitMatching()) {
+        if (!$this->validateQty()) {
+            return false;
+        }
+
+        if (!$this->validatePrice()) {
+            return false;
+        }
+
+        $condition = $this->getAmazonListingProduct()->getListingSource()->getCondition();
+        if (empty($condition)) {
+            // M2ePro_TRANSLATIONS
+            // You cannot list this Product because the Item Condition is not specified. You can set the Condition in the Selling Settings of the Listing.
+            $this->addMessage('You cannot list this Product because the Item Condition is not specified.
+                               You can set the Condition in the Selling Settings of the Listing.');
+            return false;
+        }
+
+        if ($this->getVariationManager()->isPhysicalUnit() && !$this->validatePhysicalUnitMatching()) {
             return false;
         }
 
@@ -40,28 +57,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_General
     }
 
     // ########################################
-
-    private function validatePhysicalUnitRequirements()
-    {
-        if (!$this->validateQty()) {
-            return false;
-        }
-
-        if (!$this->validatePrice()) {
-            return false;
-        }
-
-        $condition = $this->getAmazonListingProduct()->getListingSource()->getCondition();
-        if (empty($condition)) {
-// M2ePro_TRANSLATIONS
-// You cannot list this Product because the Item Condition is not specified. You can set the Condition in the Selling Settings of the Listing.
-            $this->addMessage('You cannot list this Product because the Item Condition is not specified.
-                               You can set the Condition in the Selling Settings of the Listing.');
-            return false;
-        }
-
-        return true;
-    }
 
     private function validateChildRequirements()
     {

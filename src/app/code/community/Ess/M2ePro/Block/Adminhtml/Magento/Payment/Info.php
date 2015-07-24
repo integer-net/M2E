@@ -13,24 +13,8 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Payment_Info extends Mage_Payment_Block
     protected function _construct()
     {
         parent::_construct();
+        $this->setData('area', 'adminhtml');
         $this->setTemplate('M2ePro/magento/order/payment/info.phtml');
-    }
-
-    /**
-     * Get absolute path to template
-     *
-     * @return string
-     */
-    public function getTemplateFile()
-    {
-        $params = array(
-            '_relative' => true,
-            '_area' => 'adminhtml',
-            '_package' => 'default',
-            '_theme' => 'default'
-        );
-
-        return Mage::getDesign()->getTemplateFilename($this->getTemplate(), $params);
     }
 
     // ########################################
@@ -103,7 +87,6 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Payment_Info extends Mage_Payment_Block
         switch ($this->getAdditionalData('component_mode')) {
             case Ess_M2ePro_Helper_Component_Ebay::NICK:
             case Ess_M2ePro_Helper_Component_Buy::NICK:
-            case Ess_M2ePro_Helper_Component_Play::NICK:
                 break;
             case Ess_M2ePro_Helper_Component_Amazon::NICK:
                 if ($this->getOrder()) {
@@ -124,28 +107,8 @@ class Ess_M2ePro_Block_Adminhtml_Magento_Payment_Info extends Mage_Payment_Block
 
     public function getChannelTitle()
     {
-        $title = '';
-
-        switch ($this->getAdditionalData('component_mode')) {
-            case Ess_M2ePro_Helper_Component_Ebay::NICK:
-                $title = Mage::helper('M2ePro/Component_Ebay')->getTitle();
-                break;
-            case Ess_M2ePro_Helper_Component_Amazon::NICK:
-                // todo uncomment when word "Beta" will be removed from the title
-//                $title = Mage::helper('M2ePro/Component_Amazon')->getTitle();
-                $title = 'Amazon';
-                break;
-            case Ess_M2ePro_Helper_Component_Buy::NICK:
-                // todo uncomment when word "Beta" will be removed from the title
-//                $title = Mage::helper('M2ePro/Component_Buy')->getTitle();
-                $title = 'Rakuten.com';
-                break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $title = Mage::helper('M2ePro/Component_Play')->getTitle();
-                break;
-        }
-
-        return $title;
+        $component = $this->getAdditionalData('component_mode');
+        return Mage::helper('M2ePro/Component_' . ucfirst($component))->getChannelTitle();
     }
 
     public function getTransactions()

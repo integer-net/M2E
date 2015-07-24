@@ -260,4 +260,17 @@ abstract class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Response
     }
 
     // ########################################
+
+    protected function setLastSynchronizationDates()
+    {
+        if (!$this->getConfigurator()->isSellingAllowed()) {
+            return;
+        }
+
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+        $additionalData['last_synchronization_dates']['selling'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+    }
+
+    // ########################################
 }

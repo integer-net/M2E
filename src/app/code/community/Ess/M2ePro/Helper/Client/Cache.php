@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Helper_Client_Cache extends Ess_M2ePro_Helper_Magento_Abstract
 {
-    // ################################
-
     const BACKEND_TYPE_APC       = 'apc';
     const BACKEND_TYPE_MEMCACHED = 'memcached';
     const BACKEND_TYPE_REDIS     = 'cm_cache_backend_redis';
@@ -31,6 +29,13 @@ class Ess_M2ePro_Helper_Client_Cache extends Ess_M2ePro_Helper_Magento_Abstract
     public function isRedisAvailable()
     {
         return extension_loaded('redis') && class_exists('Redis', false);
+    }
+
+    //---------------------------------
+
+    public function isZendOpcacheAvailable()
+    {
+        return function_exists('opcache_get_status');
     }
 
     // ################################

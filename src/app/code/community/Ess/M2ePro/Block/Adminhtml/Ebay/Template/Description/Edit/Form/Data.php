@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extends Mage_Adminhtml_Block_Widget
 {
-    // ####################################
-
     private $attributeSets = array();
 
     public $attributes = array();
@@ -41,9 +39,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Description_Edit_Form_Data extend
             'subtitle' => Mage::helper('M2ePro')->__('Subtitle'),
             'condition' => Mage::helper('M2ePro')->__('Condition'),
             'condition_description' => Mage::helper('M2ePro')->__('Seller Notes'),
-            'buy_it_now_price' => Mage::helper('M2ePro')->__('Buy It Now Price'),
+            'fixed_price' => Mage::helper('M2ePro')->__('Fixed Price'),
             'start_price' => Mage::helper('M2ePro')->__('Start Price'),
             'reserve_price' => Mage::helper('M2ePro')->__('Reserve Price'),
+            'buyitnow_price' => Mage::helper('M2ePro')->__('Buy It Now Price'),
             'qty' => Mage::helper('M2ePro')->__('QTY'),
             'listing_type' => Mage::helper('M2ePro')->__('Listing Type'),
             'listing_duration' => Mage::helper('M2ePro')->__('Listing Duration'),

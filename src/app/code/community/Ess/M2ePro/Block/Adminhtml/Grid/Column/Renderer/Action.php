@@ -3,6 +3,8 @@
 class Ess_M2ePro_Block_Adminhtml_Grid_Column_Renderer_Action
     extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Action
 {
+    // ####################################
+
     public function render(Varien_Object $row)
     {
         $actions = $this->getColumn()->getActions();
@@ -84,4 +86,6 @@ class Ess_M2ePro_Block_Adminhtml_Grid_Column_Renderer_Action
 
         return $outHtml . $notGroupedOptions;
     }
+
+    // ####################################
 }

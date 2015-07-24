@@ -167,25 +167,20 @@ abstract class Ess_M2ePro_Block_Adminhtml_Log_Grid_Abstract
 
     public function callbackDescription($value, $row, $column, $isExport)
     {
-        $fullDescription = Mage::helper('M2ePro/View')->decodeLogMessage($row->getData('description'));
+        $fullDescription = Mage::helper('M2ePro/View')->getModifiedLogMessage($row->getData('description'));
+
         $row->setData('description', $fullDescription);
+        $renderedText = $column->getRenderer()->render($row);
 
-        $value = $column->getRenderer()->render($row);
-        return $this->prepareLongText($fullDescription, $value);
-    }
-
-    //####################################
-
-    protected function prepareLongText($fullText, $renderedText)
-    {
-        if (strlen($fullText) == strlen($renderedText)) {
-            return Mage::helper('M2ePro/View')->appendLinksToLogMessage($renderedText);
+        if (strlen($fullDescription) == strlen($renderedText)) {
+            return $renderedText;
         }
 
-        $fullText = Mage::helper('M2ePro/View')->appendLinksToLogMessage($fullText);
+        $row->setData('description', strip_tags($fullDescription));
+        $renderedText = $column->getRenderer()->render($row);
 
         $renderedText .= '&nbsp;(<a href="javascript:void(0)" onclick="LogHandlerObj.showFullText(this);">more</a>)
-                          <div style="display: none;"><br/>'.$fullText.'<br/><br/></div>';
+                          <div style="display: none;"><br/>'.$fullDescription.'<br/><br/></div>';
 
         return $renderedText;
     }

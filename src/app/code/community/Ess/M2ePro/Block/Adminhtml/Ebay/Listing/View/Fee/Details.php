@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Fee_Details extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -57,4 +59,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Fee_Details extends Mage_Admi
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

@@ -7,7 +7,7 @@
 final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
     extends Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Abstract
 {
-    const LOCK_ITEM_PREFIX = 'synchronization_ebay_other_listings';
+    const LOCK_ITEM_PREFIX = 'synchronization_ebay_other_listings_update';
 
     //####################################
 
@@ -30,25 +30,17 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
 
     protected function getPercentsEnd()
     {
-        return 50;
+        return 40;
     }
 
     //####################################
 
     protected function performActions()
     {
-        $this->executeUpdateInventoryData();
-        $this->executeUpdateInventorySku();
-    }
-
-    //####################################
-
-    private function executeUpdateInventoryData()
-    {
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account');
         $accountsCollection->addFieldToFilter('other_listings_synchronization',
-                                              Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES);
+            Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES);
 
         $accounts = $accountsCollection->getItems();
 
@@ -94,6 +86,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
         }
     }
 
+    //####################################
+
     private function executeUpdateInventoryDataAccount(Ess_M2ePro_Model_Account $account)
     {
         $sinceTime = $this->getSinceTimeByAccount($account);
@@ -109,9 +103,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
             }
 
             $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
-            $dispatcherObject->processConnector('otherListings', 'update' ,'requester',
-                                                array(), $marketplace, $account, NULL,
-                                                'Ess_M2ePro_Model_Ebay_Synchronization');
+            $connectorObj = $dispatcherObject->getConnector('otherListings', 'update' ,'requester',
+                                                            array(), $marketplace, $account, NULL,
+                                                            'Ess_M2ePro_Model_Ebay_Synchronization');
+            $dispatcherObject->process($connectorObj);
             return;
         }
 
@@ -122,88 +117,6 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
         $updatingModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Updating');
         $updatingModel->initialize($account);
         $updatingModel->processResponseData($changes);
-    }
-
-    // -----------------------------------
-
-    private function executeUpdateInventorySku()
-    {
-        /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
-        $accountsCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account');
-        $accountsCollection->addFieldToFilter('other_listings_synchronization',
-                                              Ess_M2ePro_Model_Ebay_Account::OTHER_LISTINGS_SYNCHRONIZATION_YES);
-
-        $accounts = $accountsCollection->getItems();
-
-        if (count($accounts) <= 0) {
-            return;
-        }
-
-        $iteration = 0;
-        $percentsForOneStep = ($this->getPercentsInterval()/2) / count($accounts);
-
-        foreach ($accounts as $account) {
-
-            /** @var $account Ess_M2ePro_Model_Account **/
-
-            $this->getActualOperationHistory()->addText('Starting Account "'.$account->getTitle().'"');
-            // M2ePro_TRANSLATIONS
-            // The "Update 3rd Party SKU(s)" Action for eBay Account: "%account_title%" is started. Please wait...
-            $status = 'The "Update 3rd Party SKU(s)" Action for eBay Account: "%account_title%" is started. ';
-            $status .= 'Please wait...';
-            $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
-
-            if (!$this->isLockedAccount($account)) {
-
-                $this->getActualOperationHistory()->addTimePoint(
-                    __METHOD__.'process'.$account->getId(),
-                    'Process Account '.$account->getTitle()
-                );
-
-                $this->executeUpdateInventorySkuAccount($account);
-
-                $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'process'.$account->getId());
-            }
-            // M2ePro_TRANSLATIONS
-            // The "Update 3rd Party SKU(s)" Action for eBay Account: "%account_title%" is finished. Please wait...
-            $status = 'The "Update 3rd Party SKU(s)" Action for eBay Account: "%account_title%" is finished.'.
-                ' Please wait...';
-            $this->getActualLockItem()->setStatus(Mage::helper('M2ePro')->__($status, $account->getTitle()));
-            $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2 +
-                                                    $iteration * $percentsForOneStep);
-            $this->getActualLockItem()->activate();
-
-            $iteration++;
-        }
-    }
-
-    private function executeUpdateInventorySkuAccount(Ess_M2ePro_Model_Account $account)
-    {
-        /** @var $listingOtherCollection Mage_Core_Model_Mysql4_Collection_Abstract */
-        $listingOtherCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Other');
-        $listingOtherCollection->addFieldToFilter('`main_table`.account_id',(int)$account->getId());
-        $listingOtherCollection->getSelect()->where('`second_table`.`sku` IS NULL');
-        $listingOtherCollection->getSelect()->order('second_table.start_date ASC');
-        $listingOtherCollection->getSelect()->limit(200);
-
-        if (!$listingOtherCollection->getSize()) {
-            return;
-        }
-
-        $firstItem = $listingOtherCollection->getFirstItem();
-
-        $sinceTime = $firstItem->getData('start_date');
-        $receivedData = $this->receiveSkusFromEbay($account, $sinceTime);
-
-        if (empty($receivedData['items'])) {
-            foreach ($listingOtherCollection->getItems() as $listingOther) {
-                $listingOther->getChildObject()->setData('sku','')->save();
-            }
-            return;
-        }
-
-        $this->updateSkusForReceivedItems($listingOtherCollection, $account, $receivedData['items']);
-        $this->updateSkusForNotReceivedItems($listingOtherCollection, $receivedData['to_time']);
     }
 
     //####################################
@@ -240,10 +153,13 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
 
     private function receiveChangesFromEbay(Ess_M2ePro_Model_Account $account, array $paramsConnector = array())
     {
-        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                                    ->processVirtual('item','get','changes',
-                                                     $paramsConnector,NULL,
-                                                     NULL,$account->getId(),NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('item','get','changes',
+                                                            $paramsConnector,NULL,
+                                                            NULL,$account->getId(),NULL);
+
+        $response = $dispatcherObj->process($connectorObj);
+        $this->processResponseMessages($connectorObj);
 
         if (!isset($response['items']) || !isset($response['to_time'])) {
             return NULL;
@@ -252,75 +168,23 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Update
         return $response;
     }
 
-    // -----------------------------------
-
-    private function updateSkusForReceivedItems($listingOtherCollection,Ess_M2ePro_Model_Account $account,array $items)
+    private function processResponseMessages(Ess_M2ePro_Model_Connector_Protocol $connectorObj)
     {
-        /** @var $mappingModel Ess_M2ePro_Model_Ebay_Listing_Other_Mapping */
-        $mappingModel = Mage::getModel('M2ePro/Ebay_Listing_Other_Mapping');
+        foreach ($connectorObj->getErrorMessages() as $message) {
 
-        foreach ($items as $item) {
-            foreach ($listingOtherCollection->getItems() as $listingOther) {
-
-                /** @var $listingOther Ess_M2ePro_Model_Listing_Other */
-
-                if ((float)$listingOther->getData('item_id') != $item['id']) {
-                    continue;
-                }
-
-                $listingOther->getChildObject()->setData('sku',(string)$item['sku'])->save();
-
-                if ($account->getChildObject()->isOtherListingsMappingEnabled()) {
-                    $mappingModel->initialize($account);
-                    $mappingModel->autoMapOtherListingProduct($listingOther);
-                }
-
-                break;
-            }
-        }
-    }
-
-    //-- eBay item IDs which were removed can lead to the issue and getting SKU process freezes
-    private function updateSkusForNotReceivedItems($listingOtherCollection, $toTimeReceived)
-    {
-        foreach ($listingOtherCollection->getItems() as $listingOther) {
-
-            /** @var Ess_M2ePro_Model_Ebay_Listing_Other $ebayListingOther */
-            $ebayListingOther = $listingOther->getChildObject();
-
-            if (!is_null($ebayListingOther->getSku())) {
+            if (!$connectorObj->isMessageError($message) && !$connectorObj->isMessageWarning($message)) {
                 continue;
             }
 
-            if (strtotime($ebayListingOther->getStartDate()) >= strtotime($toTimeReceived)) {
-                continue;
-            }
+            $logType = $connectorObj->isMessageError($message) ? Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
+                                                               : Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING;
 
-            $ebayListingOther->setData('sku', '')->save();
+            $this->getLog()->addMessage(
+                Mage::helper('M2ePro')->__($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]),
+                $logType,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+            );
         }
-    }
-
-    private function receiveSkusFromEbay(Ess_M2ePro_Model_Account $account, $sinceTime)
-    {
-        $sinceTime = new DateTime($sinceTime,new DateTimeZone('UTC'));
-        $sinceTime->modify('-1 minute');
-        $sinceTime = $sinceTime->format('Y-m-d H:i:s');
-
-        $inputData = array(
-            'since_time'    => $sinceTime,
-            'only_one_page' => true
-        );
-
-        $responseData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('item','get','all',
-                                             $inputData,NULL,
-                                             NULL,$account->getId(),NULL);
-
-        if (!isset($responseData['items']) || !is_array($responseData['items'])) {
-            return array();
-        }
-
-        return $responseData;
     }
 
     //####################################

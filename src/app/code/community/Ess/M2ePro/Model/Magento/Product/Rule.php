@@ -6,8 +6,6 @@
 
 Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
 {
-    // ####################################
-
     protected $_conditions = null;
 
     protected $_form;

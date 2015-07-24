@@ -51,12 +51,14 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Stop
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            $runnerData = $this->getRunnerData($listingProduct);
+            $action = $this->getAction($listingProduct);
+
+            $configurator = Mage::getModel('M2ePro/Ebay_Listing_Product_Action_Configurator');
+
+            $this->prepareConfigurator($listingProduct, $configurator, $action);
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                $runnerData['action'],
-                $runnerData['params']
+                $listingProduct, $action, $configurator
             );
 
             if ($isExistInRunner) {
@@ -68,9 +70,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Stop
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                $runnerData['action'],
-                $runnerData['params']
+                $listingProduct, $action, $configurator
             );
         }
 
@@ -79,25 +79,37 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Stop
 
     //####################################
 
-    private function getRunnerData(Ess_M2ePro_Model_Listing_Product $listingProduct)
+    private function getAction(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
         $ebayListingProduct = $listingProduct->getChildObject();
 
         if (!$ebayListingProduct->getEbaySellingFormatTemplate()->getOutOfStockControl()) {
-            return array(
-                'action' => Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
-                'params' => array()
-            );
+            return Ess_M2ePro_Model_Listing_Product::ACTION_STOP;
         }
 
-        return array(
-            'action' => Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-            'params' => array(
-                'replaced_action' => Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
-                'only_data'       => array('qty'=>true,'variations'=>true)
-            )
-        );
+        return Ess_M2ePro_Model_Listing_Product::ACTION_REVISE;
+    }
+
+    private function prepareConfigurator(Ess_M2ePro_Model_Listing_Product $listingProduct,
+                                         Ess_M2ePro_Model_Ebay_Listing_Product_Action_Configurator $configurator,
+                                         $action)
+    {
+        if ($action != Ess_M2ePro_Model_Listing_Product::ACTION_STOP) {
+            $configurator->setParams(array('replaced_action' => Ess_M2ePro_Model_Listing_Product::ACTION_STOP));
+        }
+
+        /** @var Ess_M2ePro_Model_Ebay_Listing_Product $ebayListingProduct */
+        $ebayListingProduct = $listingProduct->getChildObject();
+
+        if (!$ebayListingProduct->getEbaySellingFormatTemplate()->getOutOfStockControl() &&
+            $action == Ess_M2ePro_Model_Listing_Product::ACTION_STOP
+        ) {
+            return;
+        }
+
+        $configurator->setPartialMode();
+        $configurator->allowQty()->allowVariations();
     }
 
     //####################################

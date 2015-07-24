@@ -267,8 +267,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
             'relist_qty_value_max' => 10,
             'revise_update_qty' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_NONE,
             'revise_update_price' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_NONE,
+            'revise_update_details' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_DETAILS_NONE,
+            'revise_update_images' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_IMAGES_NONE,
             'revise_change_selling_format_template' =>
                                 Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_NONE,
+            'revise_change_description_template' =>
+                            Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE,
             'revise_change_listing' =>
                                 Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_NONE,
             'stop_status_disabled' => Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_STATUS_DISABLED_NONE,
@@ -281,19 +285,32 @@ class Ess_M2ePro_Model_Amazon_Listing_Other_Moving
         if ($this->getAmazonAccount()->isOtherListingsMoveToListingsSynchModePrice() ||
             $this->getAmazonAccount()->isOtherListingsMoveToListingsSynchModeAll()
         ) {
-            $dataForAdd['revise_update_price'] =
-                Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_YES;
+            $additionalPriceSettings = array(
+                'revise_update_price' => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_YES,
+                'revise_update_price_max_allowed_deviation_mode' =>
+                    Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_ON,
+                'revise_update_price_max_allowed_deviation'      =>
+                    Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_PRICE_MAX_ALLOWED_DEVIATION_DEFAULT,
+            );
+
+            $dataForAdd = array_merge($dataForAdd, $additionalPriceSettings);
         }
 
         if ($this->getAmazonAccount()->isOtherListingsMoveToListingsSynchModeQty() ||
             $this->getAmazonAccount()->isOtherListingsMoveToListingsSynchModeAll()
         ) {
-            $dataForAdd['revise_update_qty'] = Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_YES;
-            $dataForAdd['relist_mode'] = Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_MODE_YES;
-            $dataForAdd['stop_status_disabled'] =
-                Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_STATUS_DISABLED_YES;
-            $dataForAdd['stop_out_off_stock'] =
-                Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_OUT_OFF_STOCK_YES;
+            $additionalQtySettings = array(
+                'revise_update_qty'    => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_YES,
+                'revise_update_qty_max_applied_value_mode' =>
+                    Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON,
+                'revise_update_qty_max_applied_value' =>
+                    Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT,
+                'relist_mode'          => Ess_M2ePro_Model_Amazon_Template_Synchronization::RELIST_MODE_YES,
+                'stop_status_disabled' => Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_STATUS_DISABLED_YES,
+                'stop_out_off_stock'   => Ess_M2ePro_Model_Amazon_Template_Synchronization::STOP_OUT_OFF_STOCK_YES,
+            );
+
+            $dataForAdd = array_merge($dataForAdd, $additionalQtySettings);
         }
 
         $tempModel->addData($dataForAdd)->save();

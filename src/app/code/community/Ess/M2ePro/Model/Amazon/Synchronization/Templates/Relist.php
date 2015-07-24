@@ -51,18 +51,20 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Relist
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            /** @var Ess_M2ePro_Model_Amazon_Template_Synchronization $amazonSynchronizationTemplate */
-            $amazonSynchronizationTemplate = $listingProduct->getChildObject()->getAmazonSynchronizationTemplate();
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
 
-            $actionParams = array('only_data' => array('qty'=>true));
-            if ($amazonSynchronizationTemplate->isRelistSendData()) {
-                $actionParams = array('all_data'=>true);
+            $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
+
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
+
+            if (!$amazonSynchronizationTemplate->isRelistSendData()) {
+                $configurator->setPartialMode();
+                $configurator->allowQty();
             }
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_RELIST, $configurator
             );
 
             if ($isExistInRunner) {
@@ -74,9 +76,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Relist
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_RELIST,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_RELIST, $configurator
             );
         }
 

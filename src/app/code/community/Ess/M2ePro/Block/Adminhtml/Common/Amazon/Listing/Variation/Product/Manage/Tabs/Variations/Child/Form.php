@@ -14,6 +14,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
 
     protected $listingProductId;
 
+    // ####################################
+
     /**
      * @param mixed $listingProductId
      * @return $this
@@ -393,6 +395,5 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
         return $return;
     }
 
-    // ----------------------------------------
-
+    // ####################################
 }

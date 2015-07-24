@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Edit_Primary_Tabs extends Mage_Adminhtml_Block_Widget_Tabs
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -43,4 +45,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Category_Edit_Primary_Tabs e
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

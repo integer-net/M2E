@@ -14,6 +14,8 @@ class Ess_M2ePro_Model_Amazon_Order_Helper
     const AMAZON_STATUS_CANCELED            = 'Canceled';
     const AMAZON_STATUS_INVOICE_UNCONFIRMED = 'InvoiceUnconfirmed';
 
+    // ########################################
+
     public function getStatus($amazonOrderStatus)
     {
         switch ($amazonOrderStatus) {
@@ -43,4 +45,6 @@ class Ess_M2ePro_Model_Amazon_Order_Helper
 
         return $status;
     }
+
+    // ########################################
 }

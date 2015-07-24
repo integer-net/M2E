@@ -1,4 +1,4 @@
-BuyListingGridHandler = Class.create(CommonListingGridHandler, {
+CommonBuyListingGridHandler = Class.create(CommonListingGridHandler, {
 
     //----------------------------------
 
@@ -20,7 +20,7 @@ BuyListingGridHandler = Class.create(CommonListingGridHandler, {
     {
         $super();
         this.movingHandler = new ListingMovingHandler(this);
-        this.productSearchHandler = new BuyListingProductSearchHandler(this);
+        this.productSearchHandler = new CommonBuyListingProductSearchHandler(this);
 
         this.actions = Object.extend(this.actions, {
 

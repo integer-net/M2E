@@ -25,7 +25,9 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_OtherIssues
 
     protected function isShown()
     {
-        return $this->isMagicQuotesEnabled() || $this->isGdLibraryUnAvailable();
+        return $this->isMagicQuotesEnabled() ||
+               $this->isGdLibraryUnAvailable() ||
+               $this->isZendOpcacheAvailable();
     }
 
     // ########################################
@@ -38,6 +40,11 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_OtherIssues
     public function isGdLibraryUnAvailable()
     {
         return !extension_loaded('gd') || !function_exists('gd_info');
+    }
+
+    public function isZendOpcacheAvailable()
+    {
+        return Mage::helper('M2ePro/Client_Cache')->isZendOpcacheAvailable();
     }
 
     // ########################################

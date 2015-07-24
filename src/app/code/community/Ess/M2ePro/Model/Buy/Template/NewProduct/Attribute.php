@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Buy_Template_NewProduct_Attribute extends Ess_M2ePro_Model_Component_Abstract
 {
-    // ########################################
-
     const ATTRIBUTE_MODE_NONE              = 0;
     const ATTRIBUTE_MODE_CUSTOM_VALUE      = 1;
     const ATTRIBUTE_MODE_CUSTOM_ATTRIBUTE  = 2;

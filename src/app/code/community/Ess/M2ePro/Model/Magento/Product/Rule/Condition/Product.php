@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
     extends Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
 {
-    // ####################################
-
     protected $_entityAttributeValues = null;
 
     protected $_isUsedForRuleProperty = 'is_used_for_promo_rules';
@@ -158,6 +156,10 @@ class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
              */
             $this->_defaultOperatorInputByType['category'] = array('==', '!=', '{}', '!{}', '()', '!()');
             $this->_arrayInputTypes[] = 'category';
+            /*
+             * price and price range modification
+             */
+            $this->_defaultOperatorInputByType['price'] = array('==', '!=', '>=', '>', '<=', '<', '{}', '!{}');
         }
         return $this->_defaultOperatorInputByType;
     }

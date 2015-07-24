@@ -7,6 +7,8 @@
 class Ess_M2ePro_Model_Connector_Ebay_Category_Get_Suggested
     extends Ess_M2ePro_Model_Connector_Ebay_Abstract
 {
+    // ########################################
+
     protected function getCommand()
     {
         return array('category', 'get', 'suggested');
@@ -37,4 +39,6 @@ class Ess_M2ePro_Model_Connector_Ebay_Category_Get_Suggested
     {
         return 30;
     }
+
+    // ########################################
 }

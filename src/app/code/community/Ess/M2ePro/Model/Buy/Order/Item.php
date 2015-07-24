@@ -9,8 +9,6 @@
  */
 class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_Buy_Abstract
 {
-    // ########################################
-
     /** @var $channelItem Ess_M2ePro_Model_Buy_Item */
     private $channelItem = NULL;
 

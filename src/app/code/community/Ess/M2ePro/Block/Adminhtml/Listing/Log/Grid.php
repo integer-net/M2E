@@ -74,8 +74,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
 
         // prepare components
         //--------------------------------
-        $channel = $this->getData('channel');
-        if (!empty($channel)) {
+        $channel = $this->getRequest()->getParam('channel');
+        if (!empty($channel) && $channel != Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_ALL) {
             $collection->getSelect()->where('component_mode = ?', $channel);
         } else {
             $components = $this->viewComponentHelper->getActiveComponents();
@@ -214,14 +214,18 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
             $value = substr($value, 0, 50) . '...';
         }
 
+        $value = Mage::helper('M2ePro')->escapeHtml($value);
+
         if ($row->getData('listing_id')) {
+
             $url = $this->getUrl(
                 '*/adminhtml_'.$row->getData('component_mode').'_listing/view',
                 array('id' => $row->getData('listing_id'))
             );
+
             $value = '<a target="_blank" href="'.$url.'">' .
-                Mage::helper('M2ePro')->escapeHtml($value) .
-                    '</a><br/>ID: '.$row->getData('listing_id');
+                         $value .
+                     '</a><br/>ID: '.$row->getData('listing_id');
         }
 
         return $value;
@@ -235,8 +239,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
 
         $url = $this->getUrl('adminhtml/catalog_product/edit', array('id' => $row->getData('product_id')));
         $value = '<a target="_blank" href="'.$url.'" target="_blank">'.
-            Mage::helper('M2ePro')->escapeHtml($value).
-                '</a><br/>ID: '.$row->getData('product_id');
+                     Mage::helper('M2ePro')->escapeHtml($value).
+                 '</a><br/>ID: '.$row->getData('product_id');
 
         $additionalData = json_decode($row->getData('additional_data'), true);
         if(empty($additionalData['variation_options'])) {
@@ -246,8 +250,10 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
         $value .= '<div style="font-size: 11px; color: grey;">';
         foreach ($additionalData['variation_options'] as $attribute => $option) {
             !$option && $option = '--';
-            $value .= '<strong>' . Mage::helper('M2ePro')->escapeHtml($attribute) .
-                '</strong>:&nbsp;' . Mage::helper('M2ePro')->escapeHtml($option) . '<br/>';
+            $value .= '<strong>'.
+                          Mage::helper('M2ePro')->escapeHtml($attribute) .
+                      '</strong>:&nbsp;'.
+                      Mage::helper('M2ePro')->escapeHtml($option) . '<br/>';
         }
         $value .= '</div>';
 
@@ -257,15 +263,17 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
     public function callbackColumnAttributes($value, $row, $column, $isExport)
     {
         $additionalData = json_decode($row->getData('additional_data'), true);
-        if(empty($additionalData['variation_options'])) {
+        if (empty($additionalData['variation_options'])) {
             return '';
         }
 
         $result = '<div style="font-size: 11px; color: grey;">';
         foreach ($additionalData['variation_options'] as $attribute => $option) {
             !$option && $option = '--';
-            $result .= '<strong>' . Mage::helper('M2ePro')->escapeHtml($attribute) .
-                '</strong>:&nbsp;' . Mage::helper('M2ePro')->escapeHtml($option) . '<br/>';
+            $result .= '<strong>'.
+                           Mage::helper('M2ePro')->escapeHtml($attribute) .
+                       '</strong>:&nbsp;'.
+                       Mage::helper('M2ePro')->escapeHtml($option) . '<br/>';
         }
         $result .= '</div>';
 
@@ -282,10 +290,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
             return;
         }
 
-        $where = "listing_title LIKE '%{$value}%'";
-        if (is_numeric($value)) {
-            $where .= ' OR listing_id = '.$value;
-        }
+        $where = 'listing_title LIKE ' . $collection->getSelect()->getAdapter()->quote('%'. $value .'%');
+        is_numeric($value) && $where .= ' OR listing_id = ' . $value;
 
         $collection->getSelect()->where($where);
     }
@@ -298,10 +304,8 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
             return;
         }
 
-        $where = "product_title LIKE '%{$value}%'";
-        if (is_numeric($value)) {
-            $where .= ' OR product_id = '.$value;
-        }
+        $where = 'product_title LIKE ' . $collection->getSelect()->getAdapter()->quote('%'. $value .'%');
+        is_numeric($value) && $where .= ' OR product_id = ' . $value;
 
         $collection->getSelect()->where($where);
     }
@@ -314,7 +318,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
             return;
         }
 
-        $collection->getSelect()->where("additional_data LIKE '%{$value}%'");
+        $collection->getSelect()->where('additional_data LIKE ?', '%'. $value .'%');
     }
 
     // ####################################
@@ -323,7 +327,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Listing_Log_Grid extends Ess_M2ePro_Bl
     {
         return $this->getUrl('*/*/'.$this->getActionName(), array(
             '_current'=>true,
-            'channel' => $this->getData('channel')
+            'channel' => $this->getRequest()->getParam('channel')
         ));
     }
 

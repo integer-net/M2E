@@ -6,12 +6,8 @@
 
 abstract class Ess_M2ePro_Model_Order_Proxy
 {
-    // ########################################
-
     const CHECKOUT_GUEST    = 'guest';
     const CHECKOUT_REGISTER = 'register';
-
-    // ########################################
 
     /** @var $order Ess_M2ePro_Model_Ebay_Order|Ess_M2ePro_Model_Amazon_Order|Ess_M2ePro_Model_Buy_Order */
     protected $order = NULL;

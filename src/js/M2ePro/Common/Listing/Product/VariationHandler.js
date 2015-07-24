@@ -1,5 +1,5 @@
-ListingProductVariationHandler = Class.create();
-ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
+CommonListingProductVariationHandler = Class.create();
+CommonListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
@@ -27,6 +27,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
 
     showEditPopup: function(popupTitle)
     {
+        var self = this;
+
         MagentoMessageObj.clearAll();
 
         new Ajax.Request(this.M2ePro.url.get_variation_edit_popup, {
@@ -60,6 +62,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                     });
 
                     $('modal_dialog_message').insert(response.text);
+
+                    self.autoHeightFix();
 
                 } catch (e) {
                     this.editPopup.close();
@@ -252,6 +256,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
 
     showManagePopup: function(popupTitle)
     {
+        var self = this;
+
         MagentoMessageObj.clearAll();
 
         new Ajax.Request(this.M2ePro.url.get_variation_manage_popup, {
@@ -285,6 +291,8 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
                     });
 
                     $('modal_dialog_message').insert(response.text);
+
+                    self.autoHeightFix();
 
                 } catch (e) {
                     this.managePopup.close();
@@ -363,8 +371,28 @@ ListingProductVariationHandler.prototype = Object.extend(new CommonHandler(), {
         }).bind(this));
 
         tr.appendChild(new Element('td', {style: 'vertical-align: top; padding: 2px 4px'}))
-          .appendChild(new Element('button', {type:'button',class: 'scalable delete'})).insert('<span></span>')
-          .observe('click',function() {container.select('tr').length > 1 && tr.remove()});
+            .appendChild(new Element('button', {type:'button',class: 'scalable delete'})).insert('<span></span>')
+            .observe('click', function() {
+                if (container.select('tr').length > 1) {
+                    tr.remove();
+                }
+
+                if (container.select('tr').length == 1) {
+                    container.select('button.delete').each(function(btn){
+                        btn.hide();
+                    });
+                }
+            });
+
+        container.select('button.delete').each(function(btn){
+            btn.hide();
+        });
+
+        if (container.select('tr').length > 1) {
+            container.select('button.delete').each(function(btn){
+                btn.show();
+            });
+        }
     },
 
     //###############################################

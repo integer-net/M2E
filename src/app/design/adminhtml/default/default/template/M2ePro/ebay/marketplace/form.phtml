@@ -53,11 +53,12 @@
 <input name="form_key" value="<?php echo $this->getFormKey(); ?>" type="hidden" />
 
 <div id="<?php echo $this->getContainerId(); ?>">
+<?php foreach ($this->groups as $group) : ?>
 
-    <div class="entry-edit" id="magento_block_ebay_marketplaces" magento_block="no">
+    <div class="entry-edit" id="magento_block_ebay_marketplaces_group_<?php echo $group['id']; ?>" collapseable="no">
 
         <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('eBay Sites'); ?></h4>
+            <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__($group['title']); ?></h4>
         </div>
 
         <div class="fieldset">
@@ -73,7 +74,7 @@
                         $isFirst = true;
                     ?>
 
-                    <?php foreach($this->marketplaces as $marketplace) { ?>
+                    <?php foreach($group['marketplaces'] as $marketplace) { ?>
 
                         <?php if ($isFirst) {?>
 
@@ -143,14 +144,14 @@
                         </tr>
 
                     <?php } ?>
-
                 </table>
 
-           </div>
+            </div>
         </div>
 
     </div>
 
+<?php endforeach; ?>
 </div>
 
 </form>

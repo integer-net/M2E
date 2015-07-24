@@ -7,7 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Magento_Grid
     extends Ess_M2ePro_Block_Adminhtml_Magento_Product_Grid_Abstract
 {
-
     // ####################################
 
     public function __construct()
@@ -49,7 +48,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Magento_Grid
 
         // Get collection
         //----------------------------
-        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
+        /* @var $collection Ess_M2ePro_Model_Mysql4_Magento_Product_Collection */
         $collection = Mage::getConfig()->getModelInstance('Ess_M2ePro_Model_Mysql4_Magento_Product_Collection',
             Mage::getModel('catalog/product')->getResource());
         $collection->getSelect()->group('e.entity_id');
@@ -100,7 +99,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Magento_Grid
 
         if ($store->getId()) {
             $collection->joinAttribute(
-                'price', 'catalog_product/price', 'entity_id', NULL, 'left', $store->getId()
+                'magento_price', 'catalog_product/price', 'entity_id', NULL, 'left', $store->getId()
             );
             $collection->joinAttribute(
                 'status', 'catalog_product/status', 'entity_id', NULL, 'inner',$store->getId()
@@ -193,14 +192,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Magento_Grid
 
         $store = $this->_getStore();
 
-        $this->addColumn('price', array(
+        $this->addColumn('magento_price', array(
             'header'    => Mage::helper('M2ePro')->__('Price'),
             'align'     => 'right',
             'width'     => '100px',
             'type'      => 'price',
             'currency_code' => $store->getBaseCurrency()->getCode(),
-            'index'     => 'price',
-            'filter_index' => 'price',
+            'index'     => 'magento_price',
+            'filter_index' => 'magento_price',
             'frame_callback' => array($this, 'callbackColumnPrice')
         ));
 
@@ -252,6 +251,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Magento_Grid
         }
 
         return parent::_prepareColumns();
+    }
+
+    // ####################################
+
+    public function callbackColumnPrice($value, $row, $column, $isExport)
+    {
+        $rowVal = $row->getData();
+
+        if (!isset($rowVal['magento_price']) || (float)$rowVal['magento_price'] <= 0) {
+            $value = 0;
+            $value = '<span style="color: red;">'.$value.'</span>';
+        }
+        return $value;
     }
 
     // ####################################
@@ -332,5 +344,4 @@ JAVASCRIPT;
     }
 
     // ####################################
-
 }

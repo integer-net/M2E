@@ -20,7 +20,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
         $this->logLimitationsAndReasons();
 
-        if (!$this->getIsVariationItem() || !$this->getConfigurator()->isVariations()) {
+        if (!$this->getIsVariationItem() || !$this->getConfigurator()->isVariationsAllowed()) {
             return $data;
         }
 
@@ -100,6 +100,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
                 $item['price_discount_map'] = $priceDiscountMapData;
             }
 
+            $variationDetails = $this->getVariationDetails($variation);
+
+            if (!empty($variationDetails)) {
+                $item['details'] = $variationDetails;
+            }
+
             $options = $variation->getOptions(true);
 
             foreach ($options as $option) {
@@ -163,13 +169,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
             return;
         }
 
-        $tempResult = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
+        $isVariationEnabled = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
                                     ->isVariationEnabled(
                                         (int)$this->getCategorySource()->getMainCategory(),
                                         $this->getMarketplace()->getId()
                                     );
 
-        if (!$tempResult) {
+        if (!is_null($isVariationEnabled) && !$isVariationEnabled) {
             $this->addWarningMessage(
                 Mage::helper('M2ePro')->__(
                     'The Product was Listed as a Simple Product as it has limitation for Multi-Variation Items. '.
@@ -372,6 +378,107 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
             $this->addWarningMessage('During the Quantity Calculation the Settings in the "Backorders" '.
                                      'field were taken into consideration.');
         }
+    }
+
+    // ########################################
+
+    private function getVariationDetails(Ess_M2ePro_Model_Listing_Product_Variation $variation)
+    {
+        $data = array();
+
+        $this->searchNotFoundAttributes();
+
+        $tempValue = $this->getEbayListingProduct()
+                          ->getDescriptionTemplateSource()
+                          ->getProductDetail('brand');
+
+        if ($this->processNotFoundAttributes(strtoupper('brand')) && $tempValue) {
+            $data['brand'] = $tempValue;
+        }
+
+        $options = NULL;
+        $additionalData = $variation->getAdditionalData();
+
+        foreach (array('isbn','upc','ean','mpn') as $tempType) {
+
+            if (isset($additionalData['product_details'][$tempType])) {
+                $data[$tempType] = $additionalData['product_details'][$tempType];
+                continue;
+            }
+
+            if (!$this->getMagentoProduct()->isConfigurableType() &&
+                !$this->getMagentoProduct()->isGroupedType()) {
+                continue;
+            }
+
+            $attribute = $this->getEbayListingProduct()
+                              ->getEbayDescriptionTemplate()
+                              ->getProductDetailAttribute($tempType);
+
+            if (!$attribute) {
+                continue;
+            }
+
+            if (is_null($options)) {
+                $options = $variation->getOptions(true);
+            }
+
+            /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
+            $option = reset($options);
+
+            $this->searchNotFoundAttributes();
+            $tempValue = $option->getMagentoProduct()->getAttributeValue($attribute);
+
+            if (!$this->processNotFoundAttributes(strtoupper($tempType)) || !$tempValue) {
+                continue;
+            }
+
+            $data[$tempType] = $tempValue;
+        }
+
+        return $this->deleteNotAllowedIdentifier($data);
+    }
+
+    private function deleteNotAllowedIdentifier(array $data)
+    {
+        if (empty($data)) {
+            return $data;
+        }
+
+        $categoryId = $this->getCategorySource()->getMainCategory();
+        $marketplaceId = $this->getMarketplace()->getId();
+        $categoryFeatures = Mage::helper('M2ePro/Component_Ebay_Category_Ebay')
+                                  ->getFeatures($categoryId, $marketplaceId);
+
+        if (empty($categoryFeatures)) {
+            return $data;
+        }
+
+        $statusDisabled = Ess_M2ePro_Helper_Component_Ebay_Category_Ebay::PRODUCT_IDENTIFIER_STATUS_DISABLED;
+
+        foreach (array('ean','upc','isbn') as $identifier) {
+
+            $key = $identifier.'_enabled';
+            if (!isset($categoryFeatures[$key]) || $categoryFeatures[$key] != $statusDisabled) {
+                continue;
+            }
+
+            if (isset($data[$identifier])) {
+
+                unset($data[$identifier]);
+
+                // M2ePro_TRANSLATIONS
+                // The value of %type% was no sent because it is not allowed in this Category
+                $this->addWarningMessage(
+                    Mage::helper('M2ePro')->__(
+                        'The value of %type% was no sent because it is not allowed in this Category',
+                        Mage::helper('M2ePro')->__(strtoupper($identifier))
+                    )
+                );
+            }
+        }
+
+        return $data;
     }
 
     // ########################################

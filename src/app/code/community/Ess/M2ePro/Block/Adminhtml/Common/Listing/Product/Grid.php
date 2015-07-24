@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Grid extends Mage_Adminh
 {
     private $listing;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -146,21 +148,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Grid extends Mage_Adminh
 
             // alternatively sql select (for mysql v.5.1)
             // $collection->getSelect()->where('`e`.`entity_id` NOT IN ('.$dbExcludeSelect->__toString().')');
-        }
-        //----------------------------
-
-        // Add categories filter
-        //----------------------------
-        $categoriesData = Mage::helper('M2ePro/Data_Global')->getValue('temp_listing_categories');
-
-        if (count($categoriesData) > 0) {
-            $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                                 ->select()
-                                 ->from(Mage::getSingleton('core/resource')->getTableName('catalog_category_product'),
-                                        new Zend_Db_Expr('DISTINCT `product_id`'))
-                                 ->where('`category_id` IN ('.implode(',',$categoriesData).')');
-
-            $collection->getSelect()->where('`e`.`entity_id` IN ('.$dbSelect->__toString().')');
         }
         //----------------------------
 
@@ -487,9 +474,6 @@ STYLE;
         $showAdvancedFilterButtonText = $helper->escapeJs($helper->__('Show Advanced Filter'));
         $hideAdvancedFilterButtonText = $helper->escapeJs($helper->__('Hide Advanced Filter'));
 
-        $getProductsUrl = $this->getUrl(
-            '*/adminhtml_common_' . $this->getData('component') . '_listing/getProductsFromCategories'
-        );
         $addProductsUrl = $this->getUrl(
             '*/adminhtml_common_listing_productAdd/addProducts', array(
                 'component' => $this->getData('component')
@@ -511,15 +495,14 @@ STYLE;
     M2ePro.text.create_empty_listing_message = '{$createEmptyListingMessage}';
     M2ePro.text.show_advanced_filter = '{$showAdvancedFilterButtonText}';
     M2ePro.text.hide_advanced_filter = '{$hideAdvancedFilterButtonText}';
-    M2ePro.url.get_products_from_categories = '{$getProductsUrl}';
     M2ePro.url.add_products = '{$addProductsUrl}';
     M2ePro.url.back = '{$backUrl}';
 
     WrapperObj = new AreaWrapper('add_products_container');
     ProgressBarObj = new ProgressBar('add_products_progress_bar');
-    AddListingObj = new AddListingHandler(M2ePro, ProgressBarObj, WrapperObj);
+    AddListingObj = new CommonListingAddListingHandler(M2ePro, ProgressBarObj, WrapperObj);
     AddListingObj.listing_id = '{$this->getRequest()->getParam('id')}';
-    ProductGridHandlerObj = new ProductGridHandler(AddListingObj);
+    ProductGridHandlerObj = new ListingProductGridHandler(AddListingObj);
     ProductGridHandlerObj.setGridId('{$this->getId()}');
 
     var init = function () {

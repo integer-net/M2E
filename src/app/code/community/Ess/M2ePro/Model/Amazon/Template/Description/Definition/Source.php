@@ -379,6 +379,10 @@ class Ess_M2ePro_Model_Amazon_Template_Description_Definition_Source
             ? $src['custom_value']
             : $this->getMagentoProduct()->getAttributeValue($src['custom_attribute']);
 
+        if ($weight === '') {
+            return '';
+        }
+
         $weight = str_replace(',', '.', $weight);
         $weight = round((float)$weight, 2);
 

@@ -6,15 +6,11 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Order_MigrationToV611 extends Mage_Adminhtml_Block_Widget
 {
-    // ##########################################################
-
     const ORDERS_COUNT_PER_AJAX_REQUEST = 10000;
-
-    // ##########################################################
 
     private $notMigratedOrdersCount = 0;
 
-    // ##########################################################
+    // ####################################
 
     public function __construct()
     {
@@ -40,5 +36,5 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_MigrationToV611 extends Mage_Adminht
         return self::ORDERS_COUNT_PER_AJAX_REQUEST;
     }
 
-    // ##########################################################
+    // ####################################
 }

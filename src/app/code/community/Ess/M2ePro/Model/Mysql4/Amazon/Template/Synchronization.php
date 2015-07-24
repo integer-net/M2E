@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Mysql4_Amazon_Template_Synchronization
     extends Ess_M2ePro_Model_Mysql4_Component_Child_Abstract
 {
-    // ########################################
-
     protected $_isPkAutoIncrement = false;
 
     // ########################################

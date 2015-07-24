@@ -6,10 +6,7 @@
 
 class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 {
-    // M2ePro_TRANSLATIONS
-    // Amazon (Beta)
     const NICK  = 'amazon';
-    const TITLE = 'Amazon (Beta)';
 
     const MARKETPLACE_CA = 24;
     const MARKETPLACE_DE = 25;
@@ -21,7 +18,31 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     public function getTitle()
     {
-        return Mage::helper('M2ePro')->__(self::TITLE);
+        return Mage::helper('M2ePro')->__('Amazon (Beta)');
+    }
+
+    public function getChannelTitle()
+    {
+        return Mage::helper('M2ePro')->__('Amazon');
+    }
+
+    // ########################################
+
+    public function getHumanTitleByListingProductStatus($status)
+    {
+        $statuses = array(
+            Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN    => Mage::helper('M2ePro')->__('Unknown'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED => Mage::helper('M2ePro')->__('Not Listed'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_LISTED     => Mage::helper('M2ePro')->__('Active'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED    => Mage::helper('M2ePro')->__('Inactive'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED    => Mage::helper('M2ePro')->__('Inactive (Blocked)')
+        );
+
+        if (!isset($statuses[$status])) {
+            return NULL;
+        }
+
+        return $statuses[$status];
     }
 
     // ########################################
@@ -168,9 +189,15 @@ class Ess_M2ePro_Helper_Component_Amazon extends Mage_Core_Helper_Abstract
 
     public function isASIN($string)
     {
-        return !empty($string) &&
-               $string{0} == 'B' &&
-               strlen($string) == 10;
+        if (strlen($string) != 10) {
+            return false;
+        }
+
+        if (!preg_match('/^B[A-Z0-9]{9}$/', $string)) {
+            return false;
+        }
+
+        return true;
     }
 
     // ########################################

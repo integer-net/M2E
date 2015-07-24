@@ -50,17 +50,22 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
 
     private function closeConnection()
     {
-        header('Connection: Close');
-        header('Content-Length: 13');
+        ob_end_clean();
+        ob_start();
+
+        ignore_user_abort(true);
         echo 'processing...';
 
-        while(ob_get_level()) {
+        header('Connection: Close');
+        header('Content-Length: '.ob_get_length());
+
+        while (ob_get_level()) {
             if (!$result = @ob_end_flush()) {
                 break;
             }
         }
 
-        flush();
+        @flush();
 
         $this->getResponse()->headersSentThrowsException = false;
     }

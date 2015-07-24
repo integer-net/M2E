@@ -81,7 +81,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search extends Mage_Adminhtm
         $url = $this->getUrl(
             '*/adminhtml_common_log/listing',
             array(
-                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_BUY
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_BUY
             )
         );
         $this->_addButton('view_log', array(

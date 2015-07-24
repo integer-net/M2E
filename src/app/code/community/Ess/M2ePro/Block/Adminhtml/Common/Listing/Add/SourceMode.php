@@ -10,6 +10,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_SourceMode
     const SOURCE_LIST = 'list';
     const SOURCE_CATEGORIES = 'categories';
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -61,4 +63,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_SourceMode
 
         return parent::_toHtml();
     }
+
+    // ####################################
 }

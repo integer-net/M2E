@@ -19,8 +19,6 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     const CROSS_BORDER_TRADE_NORTH_AMERICA  = 1;
     const CROSS_BORDER_TRADE_UNITED_KINGDOM = 2;
 
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Marketplace
      */

@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Connector_Amazon_Product_Stop_MultipleResponser
     extends Ess_M2ePro_Model_Connector_Amazon_Product_Responser
 {
-    // ########################################
-
     /** @var Ess_M2ePro_Model_Listing_Product[] $parentsForProcessing */
     protected $parentsForProcessing = array();
 

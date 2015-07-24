@@ -14,6 +14,9 @@ class Ess_M2ePro_Model_Magento_Translate extends Mage_Core_Model_Translate
     const MODULE_NAME = 'Ess_M2ePro';
 
     protected $mode;
+
+    // ########################################
+
     /**
      * @param mixed $mode
      */
@@ -85,4 +88,6 @@ class Ess_M2ePro_Model_Magento_Translate extends Mage_Core_Model_Translate
         $args = func_get_args();
         return parent::translate($args);
     }
+
+    // ########################################
 }

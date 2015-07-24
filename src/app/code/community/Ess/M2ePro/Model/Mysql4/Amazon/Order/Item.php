@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Mysql4_Amazon_Order_Item
     extends Ess_M2ePro_Model_Mysql4_Abstract
 {
-    // ########################################
-
     protected $_isPkAutoIncrement = false;
 
     // ########################################

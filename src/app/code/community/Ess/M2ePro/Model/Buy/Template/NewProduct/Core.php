@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Component_Abstract
 {
-    // ########################################
-
     const GTIN_MODE_NONE = 0;
     const GTIN_MODE_CUSTOM_ATTRIBUTE = 2;
 
@@ -647,6 +645,14 @@ class Ess_M2ePro_Model_Buy_Template_NewProduct_Core extends Ess_M2ePro_Model_Com
             'custom_value' => $this->getWeightCustomValue(),
             'custom_attribute' => $this->getWeightCustomAttribute(),
         );
+    }
+
+    // ########################################
+
+    public function save()
+    {
+        Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('template_newproduct_core');
+        return parent::save();
     }
 
     // ########################################

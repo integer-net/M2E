@@ -12,6 +12,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
      */
     private $runner = NULL;
 
+    /**
+     * @var Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
+     */
+    private $inspector = NULL;
+
     private $cache = array();
 
     //####################################
@@ -52,6 +57,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
         $this->runner->setLockItem($this->getActualLockItem());
         $this->runner->setPercentsStart($this->getPercentsStart() + $this->getPercentsInterval()/2);
         $this->runner->setPercentsEnd($this->getPercentsEnd());
+
+        $this->inspector = Mage::getModel('M2ePro/Ebay_Synchronization_OtherListings_Templates_Inspector');
     }
 
     protected function afterEnd()
@@ -80,6 +87,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
         $task = parent::makeTask($taskPath);
 
         $task->setRunner($this->runner);
+        $task->setInspector($this->inspector);
         $task->setCache($this->cache);
 
         return $task;
@@ -117,13 +125,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates
 
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Task "Update 3rd Party Listings" has completed with %result%. View %sl%Listings Log%el% for details.',
-                array(
-                    '!sl'=>'<a target="_blank" href="route:*/adminhtml_ebay_log/listingOther/;'.
-                        'back:*/adminhtml_ebay_log/synchronization/;">',
-                    '!el'=>'</a>',
-                    '!result'=>$resultString
-                )
+                'Task "Update 3rd Party Listings" has completed with %result%. View Listings Log for details.',
+                array('!result'=>$resultString)
             ), $resultType, $resultPriority
         );
 

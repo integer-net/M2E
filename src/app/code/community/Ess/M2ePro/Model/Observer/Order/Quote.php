@@ -38,17 +38,6 @@ class Ess_M2ePro_Model_Observer_Order_Quote extends Ess_M2ePro_Model_Observer_Ab
 
     public function process()
     {
-        /* @var $quoteItem Mage_Sales_Model_Quote_Item */
-        $quoteItem = $this->getEvent()->getItem();
-
-        // skip qty changes when it was reserved
-        $reservationTempKey = Ess_M2ePro_Helper_Data::CUSTOM_IDENTIFIER.'_order_reservation';
-        $reservationTempValue = $quoteItem->getData($reservationTempKey);
-
-        if (!is_null($reservationTempValue)) {
-            return;
-        }
-
         if (!$this->areThereAffectedItems()) {
             return;
         }

@@ -11,10 +11,6 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_NewSku_Validator
 
     public function validate()
     {
-        if (!$this->validateLockedObject()) {
-            return false;
-        }
-
         if (!$this->getListingProduct()->isNotListed()) {
 
             // M2ePro_TRANSLATIONS

@@ -51,4 +51,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Buy_Installation_Account extends Mage_Ad
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

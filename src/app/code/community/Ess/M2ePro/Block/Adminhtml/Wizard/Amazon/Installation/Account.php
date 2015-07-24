@@ -51,4 +51,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation_Account extends Mage
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

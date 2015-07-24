@@ -35,6 +35,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             ->addJs('M2ePro/Listing/EditListingTitle.js')
             ->addJs('M2ePro/Ebay/Listing/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ViewGridHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/VariationProductManageHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Ebay/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Settings/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Translation/GridHandler.js')
@@ -420,30 +421,25 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
 
     public function motorSpecificGridAction()
     {
-        $response = $this->loadLayout()->getLayout()
-            ->createBlock('M2ePro/adminhtml_ebay_motor_add_specific_grid')
-            ->toHtml();
-        $this->getResponse()->setBody($response);
+        /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Specific_Grid $block */
+        $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_motor_add_specific_grid');
+        $this->getResponse()->setBody($block->toHtml());
     }
 
     public function motorKtypeGridAction()
     {
-        $listingId = (int)$this->getRequest()->getParam('listing_id');
-
+        /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Ktype_Grid $block */
         $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_motor_add_ktype_grid');
-        $block->setListingId($listingId);
-
         $this->getResponse()->setBody($block->toHtml());
     }
 
     public function motorViewDetailsAction()
     {
         $compatibilityType = $this->getRequest()->getParam('compatibility_type');
-        $listingProductId = $this->getRequest()->getParam('listing_product_id');
+        $listingProductId  = $this->getRequest()->getParam('listing_product_id');
 
-        $block = $this->loadLayout()->getLayout()
-            ->createBlock('M2ePro/adminhtml_ebay_motor_view');
-
+        /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View $block */
+        $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_motor_view');
         $block->setCompatibilityType($compatibilityType);
         $block->setListingProductId($listingProductId);
 
@@ -453,15 +449,14 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
     public function motorViewGridAction()
     {
         $compatibilityType = $this->getRequest()->getParam('compatibility_type');
-        $listingProductId = $this->getRequest()->getParam('listing_product_id');
+        $listingProductId  = $this->getRequest()->getParam('listing_product_id');
 
-        $block = $this->loadLayout()->getLayout()
-            ->createBlock('M2ePro/adminhtml_ebay_motor_view_grid');
-
+        /** @var Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View_Grid $block */
+        $block = $this->loadLayout()->getLayout()->createBlock('M2ePro/adminhtml_ebay_motor_view_grid');
         $block->setCompatibilityType($compatibilityType);
         $block->setListingProductId($listingProductId);
 
-        if ($this->getRequest()->isAjax()) {
+        if ($this->getRequest()->isXmlHttpRequest()) {
             $this->getResponse()->setBody($block->toHtml());
             return;
         }
@@ -487,7 +482,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         if (empty($compatibilityAttribute)) {
             $message = Mage::helper('M2ePro')->__('Compatibility Attribute is not selected.');
             return $this->getResponse()->setBody(json_encode(array(
-                'ok' => false,
+                'ok'      => false,
                 'message' => Mage::helper('M2ePro')->escapeJs($message)
             )));
         }
@@ -495,18 +490,21 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         if (!$listingId || !$listingProductIds || empty($ids)) {
             $message = Mage::helper('M2ePro')->__('Required parameters were not selected.');
             return $this->getResponse()->setBody(json_encode(array(
-                'ok' => false,
+                'ok'      => false,
                 'message' => Mage::helper('M2ePro')->escapeJs($message)
             )));
         }
 
         try {
+
             Mage::getResourceModel('M2ePro/Ebay_Listing')->updatePartsCompatibilityAttributesData(
                 $listingId, $listingProductIds, $compatibilityAttribute, $ids, $overwrite
             );
+
         } catch (Exception $e) {
+
             return $this->getResponse()->setBody(json_encode(array(
-                'ok' => false,
+                'ok'      => false,
                 'message' => Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__($e->getMessage()))
             )));
         }
@@ -514,14 +512,15 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
         if ($compatibilityType == Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::TYPE_SPECIFIC) {
             $typeTitle = 'ePIDs';
         } else {
-            $typeTitle = 'KTypes';
+            $typeTitle = 'kTypes';
         }
 
         $message = Mage::helper('M2ePro')->__(
             '%type% were saved in Compatibility Attribute.', array('type' => $typeTitle)
         );
+
         return $this->getResponse()->setBody(json_encode(array(
-            'ok' => true,
+            'ok'      => true,
             'message' => Mage::helper('M2ePro')->escapeJs($message))
         ));
     }
@@ -601,6 +600,66 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             $listingProduct->getListingId(), array($listingProductId),
             $compatibilityAttribute, $compatibilityHelper->buildAttributeValue($compatibilityData), true
         );
+    }
+
+    //---------------------------------------------
+
+    public function addCustomCompatibilityRecordAction()
+    {
+        $helper = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility');
+        $compatibilityType = $this->getRequest()->getParam('compatibility_type');
+
+        $insertData = $this->getRequest()->getParam('row', array());
+        foreach ($insertData as &$item) {
+            $item == '' && $item = null;
+        }
+        $insertData['is_custom'] = 1;
+
+        $tableName = $helper->getDictionaryTable($compatibilityType);
+        $idKey = $helper->getIdentifierKey($compatibilityType);
+
+        $existedItem = Mage::getSingleton('core/resource')->getConnection('core/read')
+              ->select()
+              ->from($tableName)
+              ->where("{$idKey} = ?", $insertData[$idKey])
+              ->query()
+              ->fetch();
+
+        if ($existedItem) {
+
+            return $this->getResponse()->setBody(json_encode(array(
+                 'result'  => false,
+                 'message' => Mage::helper('M2ePro')->__('Record with such identifier is already exists.')
+            )));
+        }
+
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core/write');
+        $connWrite->insert($tableName, $insertData);
+
+        return $this->getResponse()->setBody(json_encode(array('result' => true)));
+    }
+
+    public function removeCustomCompatibilityRecordAction()
+    {
+        $helper = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility');
+        $compatibilityType = $this->getRequest()->getParam('compatibility_type');
+        $keyId = $this->getRequest()->getParam('key_id');
+
+        if (!$compatibilityType || !$keyId) {
+
+            return $this->getResponse()->setBody(json_encode(array(
+                'result'  => false,
+                'message' => Mage::helper('M2ePro')->__('The some of required fields are not filled up.')
+            )));
+        }
+
+        $tableName = $helper->getDictionaryTable($compatibilityType);
+        $idKey = $helper->getIdentifierKey($compatibilityType);
+
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core/write');
+        $connWrite->delete($tableName, array("{$idKey} = ?" => $keyId));
+
+        return $this->getResponse()->setBody(json_encode(array('result' => true)));
     }
 
     //#############################################

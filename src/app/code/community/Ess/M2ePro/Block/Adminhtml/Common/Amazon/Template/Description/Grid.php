@@ -201,9 +201,8 @@ HTML;
         }
 
         $collection->getSelect()->where(
-            "`atd`.`category_path` LIKE '%{$value}%' OR
-             `atd`.`browsenode_id` LIKE '%{$value}%' OR
-             `main_table`.`title` LIKE '%{$value}%'"
+            '`atd`.`category_path` LIKE ? OR `atd`.`browsenode_id` LIKE ? OR `main_table`.`title` LIKE ?',
+            '%'. $value .'%'
         );
     }
 

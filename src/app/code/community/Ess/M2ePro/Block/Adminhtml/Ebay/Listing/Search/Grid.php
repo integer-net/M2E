@@ -86,16 +86,46 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
                 'product_sku'           => 'cpe.sku',
                 'currency'              => 'em.currency',
                 'ebay_item_id'          => 'ebit.item_id',
+                'listing_product_id'    => 'main_table.id',
+                'additional_data'       => 'main_table.additional_data',
                 'status'                => 'main_table.status',
                 'online_sku'            => 'second_table.online_sku',
                 'online_title'          => 'second_table.online_title',
                 'online_qty'            => new Zend_Db_Expr('(second_table.online_qty - second_table.online_qty_sold)'),
                 'online_qty_sold'       => 'second_table.online_qty_sold',
+                'online_bids'           => 'second_table.online_bids',
+                'online_start_price'    => 'second_table.online_start_price',
+                'online_current_price'  => 'second_table.online_current_price',
+                'online_reserve_price'  => 'second_table.online_reserve_price',
                 'online_buyitnow_price' => 'second_table.online_buyitnow_price',
+                'min_online_price'      => 'second_table.online_current_price',
+                'max_online_price'      => 'IF(
+                    (`t`.`variation_max_price` IS NULL),
+                    `second_table`.`online_current_price`,
+                    `t`.`variation_max_price`
+                )',
                 'listing_id'            => 'l.id',
                 'listing_title'         => 'l.title',
                 'is_m2epro_listing'     => new Zend_Db_Expr(1),
                 'is_in_stock'           => 'cisi.is_in_stock',
+            )
+        );
+        $listingProductCollection->getSelect()->joinLeft(
+            new Zend_Db_Expr('(
+                SELECT
+                    `mlpv`.`listing_product_id`,
+                    MAX(`melpv`.`online_price`) as variation_max_price
+                FROM `'. Mage::getResourceModel('M2ePro/Listing_Product_Variation')->getMainTable() .'` AS `mlpv`
+                INNER JOIN `' .
+                        Mage::getResourceModel('M2ePro/Ebay_Listing_Product_Variation')->getMainTable() .
+                    '` AS `melpv`
+                    ON (`mlpv`.`id` = `melpv`.`listing_product_variation_id`)
+                WHERE `melpv`.`status` != ' . Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED . '
+                GROUP BY `mlpv`.`listing_product_id`
+            )'),
+            'second_table.listing_product_id=t.listing_product_id',
+            array(
+                'variation_max_price' => 'variation_max_price',
             )
         );
         //------------------------------
@@ -123,16 +153,25 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
                 'product_sku'           => 'second_table.sku',
                 'currency'              => 'second_table.currency',
                 'ebay_item_id'          => 'second_table.item_id',
+                'listing_product_id'    => new Zend_Db_Expr('NULL'),
+                'additional_data'       => new Zend_Db_Expr('NULL'),
                 'status'                => 'main_table.status',
                 'online_sku'            => new Zend_Db_Expr('NULL'),
                 'online_title'          => new Zend_Db_Expr('NULL'),
                 'online_qty'            => new Zend_Db_Expr('(second_table.online_qty - second_table.online_qty_sold)'),
                 'online_qty_sold'       => 'second_table.online_qty_sold',
-                'online_buyitnow_price' => 'second_table.online_price',
+                'online_bids'           => new Zend_Db_Expr('NULL'),
+                'online_start_price'    => new Zend_Db_Expr('NULL'),
+                'online_current_price'  => 'second_table.online_price',
+                'online_reserve_price'  => new Zend_Db_Expr('NULL'),
+                'online_buyitnow_price' => new Zend_Db_Expr('NULL'),
+                'min_online_price'      => 'second_table.online_price',
+                'max_online_price'      => 'second_table.online_price',
                 'listing_id'            => new Zend_Db_Expr('NULL'),
                 'listing_title'         => new Zend_Db_Expr('NULL'),
                 'is_m2epro_listing'     => new Zend_Db_Expr(0),
-                'is_in_stock'           => 'cisi.is_in_stock'
+                'is_in_stock'           => 'cisi.is_in_stock',
+                'variation_max_price'   => new Zend_Db_Expr('NULL'),
             )
         );
         //------------------------------
@@ -157,12 +196,20 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
                 'product_sku',
                 'currency',
                 'ebay_item_id',
+                'listing_product_id',
+                'additional_data',
                 'status',
                 'online_sku',
                 'online_title',
                 'online_qty',
                 'online_qty_sold',
+                'online_bids',
+                'online_start_price',
+                'online_current_price',
+                'online_reserve_price',
                 'online_buyitnow_price',
+                'min_online_price',
+                'max_online_price',
                 'listing_id',
                 'listing_title',
                 'is_m2epro_listing',
@@ -217,12 +264,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             'frame_callback' => array($this, 'callbackColumnIsInStock')
         ));
 
-        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
+        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode() &&
+            Mage::helper('M2ePro/View_Ebay')->is3rdPartyShouldBeShown()) {
             $this->addColumn('is_m2epro_listing', array(
                 'header'    => $helper->__('Listing Type'),
                 'align'     => 'left',
                 'width'     => '100px',
                 'type'      => 'options',
+                'sortable'  => false,
                 'index'     => 'is_m2epro_listing',
                 'options'   => array(
                     1 => $helper->__('M2E Pro'),
@@ -232,7 +281,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         }
 
         $this->addColumn('ebay_item_id', array(
-            'header'    => $helper->__('eBay Item ID'),
+            'header'    => $helper->__('Item ID'),
             'align'     => 'left',
             'width'     => '100px',
             'type'      => 'text',
@@ -242,7 +291,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('online_qty', array(
-            'header'    => $helper->__('eBay Available QTY'),
+            'header'    => $helper->__('Available QTY'),
             'align'     => 'right',
             'width'     => '50px',
             'type'      => 'number',
@@ -252,7 +301,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         ));
 
         $this->addColumn('online_qty_sold', array(
-            'header'    => $helper->__('eBay Sold QTY'),
+            'header'    => $helper->__('Sold QTY'),
             'align'     => 'right',
             'width'     => '50px',
             'type'      => 'number',
@@ -261,14 +310,23 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
             'frame_callback' => array($this, 'callbackColumnOnlineQtySold')
         ));
 
-        $this->addColumn('online_buyitnow_price', array(
-            'header'    => $helper->__('"Buy It Now" Price'),
+        $dir = $this->getParam($this->getVarNameDir(), $this->_defaultDir);
+
+        if ($dir == 'desc') {
+            $priceSortField = 'max_online_price';
+        } else {
+            $priceSortField = 'min_online_price';
+        }
+
+        $this->addColumn('price', array(
+            'header'    => $helper->__('Price'),
             'align'     =>'right',
             'width'     => '50px',
             'type'      => 'number',
-            'index'     => 'online_buyitnow_price',
-            'filter_index' => 'online_buyitnow_price',
-            'frame_callback' => array($this, 'callbackColumnOnlineBuyItNowPrice')
+            'index'     => $priceSortField,
+            'filter_index' => $priceSortField,
+            'frame_callback' => array($this, 'callbackColumnPrice'),
+            'filter_condition_callback' => array($this, 'callbackFilterPrice')
         ));
 
         $this->addColumn('status',
@@ -342,6 +400,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnProductTitle($value, $row, $column, $isExport)
     {
+        $listingProductId = $row->getData('listing_product_id');
         $onlineTitle = $row->getData('online_title');
         !empty($onlineTitle) && $value = $onlineTitle;
 
@@ -349,6 +408,22 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
         $additional = $this->getListingHtml($row);
         $additional .= $this->getSkuHtml($row);
+
+        if (!empty($listingProductId)) {
+            /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+            $listingProduct = Mage::helper('M2ePro/Component_Ebay')
+                ->getObject('Listing_Product',$row->getData('listing_product_id'));
+
+            if ($listingProduct->getChildObject()->isVariationsReady()) {
+                $additionalData = (array)json_decode($row->getData('additional_data'), true);
+
+                $productAttributes = array_keys($additionalData['variations_sets']);
+
+                $additional .= '<div style="font-size: 11px; font-weight: bold; color: grey; margin: 7px 0 0 7px">';
+                $additional .= implode(', ', $productAttributes);
+                $additional .= '</div>';
+            }
+        }
 
         if ($additional) {
             $value .= '<br/><hr style="border: none; border-top: 1px solid silver; margin: 2px 0px;"/>'
@@ -455,13 +530,18 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
         return $value;
     }
 
-    public function callbackColumnOnlineBuyItNowPrice($value, $row, $column, $isExport)
+    public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        if (is_null($value) || $value === '') {
+        $onlineMinPrice = $row->getData('min_online_price');
+        $onlineMaxPrice = $row->getData('max_online_price');
+        $onlineStartPrice = $row->getData('online_start_price');
+        $onlineCurrentPrice = $row->getData('online_current_price');
+
+        if (is_null($onlineMinPrice) || $onlineMinPrice === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        if ((float)$value <= 0) {
+        if ((float)$onlineMinPrice <= 0) {
             return '<span style="color: #f00;">0</span>';
         }
 
@@ -469,11 +549,73 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
         if (strpos($currency, ',') !== false) {
             $currency = Mage::helper('M2ePro/Component_Ebay')
-                        ->getCachedObject('Marketplace',$row->getMarketplaceId())
-                        ->getChildObject()->getCurrency();
+                ->getCachedObject('Marketplace',$row->getMarketplaceId())
+                ->getChildObject()->getCurrency();
         }
 
-        return Mage::app()->getLocale()->currency($currency)->toCurrency($value);
+        if (!empty($onlineStartPrice)) {
+
+            $onlineReservePrice = $row->getData('online_reserve_price');
+            $onlineBuyItNowPrice = $row->getData('online_buyitnow_price');
+
+            $onlineStartStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineStartPrice);
+
+            $startPriceText = Mage::helper('M2ePro')->__('Start Price');
+
+            $iconHelpPath = $this->getSkinUrl('M2ePro/images/i_logo.png');
+            $toolTipIconPath = $this->getSkinUrl('M2ePro/images/i_icon.png');
+            $onlineCurrentPriceHtml = '';
+            $onlineReservePriceHtml = '';
+            $onlineBuyItNowPriceHtml = '';
+
+            if ($row->getData('online_bids') > 0) {
+                $currentPriceText = Mage::helper('M2ePro')->__('Current Price');
+                $onlineCurrentStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineCurrentPrice);
+                $onlineCurrentPriceHtml = '<strong>'.$currentPriceText.':</strong> '.$onlineCurrentStr.'<br/><br/>';
+            }
+
+            if ($onlineReservePrice > 0) {
+                $reservePriceText = Mage::helper('M2ePro')->__('Reserve Price');
+                $onlineReserveStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineReservePrice);
+                $onlineReservePriceHtml = '<strong>'.$reservePriceText.':</strong> '.$onlineReserveStr.'<br/>';
+            }
+
+            if ($onlineBuyItNowPrice > 0) {
+                $buyItNowText = Mage::helper('M2ePro')->__('Buy It Now Price');
+                $onlineBuyItNowStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineBuyItNowPrice);
+                $onlineBuyItNowPriceHtml = '<strong>'.$buyItNowText.':</strong> '.$onlineBuyItNowStr;
+            }
+
+            $intervalHtml = <<<HTML
+<img class="tool-tip-image"
+     style="vertical-align: middle;"
+     src="{$toolTipIconPath}"><span class="tool-tip-message" style="display:none; text-align: left; min-width: 140px;">
+    <img src="{$iconHelpPath}"><span style="color:gray;">
+        {$onlineCurrentPriceHtml}
+        <strong>{$startPriceText}:</strong> {$onlineStartStr}<br/>
+        {$onlineReservePriceHtml}
+        {$onlineBuyItNowPriceHtml}
+    </span>
+</span>
+HTML;
+
+            if ($onlineCurrentPrice > $onlineStartPrice) {
+                $resultHtml = '<span style="color: grey; text-decoration: line-through;">'.$onlineStartStr.'</span>';
+                $resultHtml .= '<br/>'.$intervalHtml.'&nbsp;'.
+                    '<span class="product-price-value">'.$onlineCurrentStr.'</span>';
+
+            } else {
+                $resultHtml = $intervalHtml.'&nbsp;'.'<span class="product-price-value">'.$onlineStartStr.'</span>';
+            }
+
+            return $resultHtml;
+        }
+
+        $onlineMinPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMinPrice);
+        $onlineMaxPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMaxPrice);
+
+        return '<span class="product-price-value">' . $onlineMinPriceStr . '</span>' .
+        (($onlineMinPrice != $onlineMaxPrice) ? ' - ' . $onlineMaxPriceStr :  '');
     }
 
     public function callbackColumnStatus($value, $row, $column, $isExport)
@@ -546,6 +688,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 HTML;
     }
 
+    // ####################################
+
     protected function callbackFilterTitle($collection, $column)
     {
         $value = $column->getFilter()->getValue();
@@ -558,6 +702,43 @@ HTML;
             'product_name LIKE ? OR product_sku LIKE ? OR listing_title LIKE ?'.
             ' OR online_sku LIKE ? OR online_title LIKE ?', '%'.$value.'%'
         );
+    }
+
+    protected function callbackFilterPrice($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if (empty($value)) {
+            return;
+        }
+
+        $condition = '';
+
+        if (!empty($value['from'])) {
+            $condition = 'min_online_price >= \''.$value['from'].'\'';
+        }
+        if (!empty($value['to'])) {
+            if (!empty($value['from'])) {
+                $condition .= ' AND ';
+            }
+            $condition .= 'min_online_price <= \''.$value['to'].'\'';
+        }
+
+        $condition = '(' . $condition . ') OR (';
+
+        if (!empty($value['from'])) {
+            $condition .= 'max_online_price >= \''.$value['from'].'\'';
+        }
+        if (!empty($value['to'])) {
+            if (!empty($value['from'])) {
+                $condition .= ' AND ';
+            }
+            $condition .= 'max_online_price <= \''.$value['to'].'\'';
+        }
+
+        $condition .= ')';
+
+        $collection->getSelect()->where($condition);
     }
 
     // ####################################

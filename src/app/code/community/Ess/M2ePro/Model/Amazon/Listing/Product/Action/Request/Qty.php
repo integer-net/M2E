@@ -11,7 +11,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty
 
     public function getData()
     {
-        if (!$this->getConfigurator()->isQty()) {
+        if (!$this->getConfigurator()->isQtyAllowed()) {
             return array();
         }
 
@@ -24,10 +24,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty
         );
 
         $this->checkQtyWarnings();
-
-        if (!$this->getConfigurator()->isGeneral()) {
-            return $data;
-        }
 
         if (!isset($this->validatorsData['handling_time'])) {
             $handlingTime = $this->getAmazonListingProduct()->getListingSource()->getHandlingTime();

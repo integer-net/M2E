@@ -7,8 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_SourceCategories_Tree
     extends Mage_Adminhtml_Block_Catalog_Category_Abstract
 {
-    // #############################################
-
     protected $selectedIds = array();
 
     /* @var string */

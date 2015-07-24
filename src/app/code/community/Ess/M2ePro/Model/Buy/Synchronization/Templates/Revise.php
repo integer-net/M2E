@@ -54,12 +54,13 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
-            $actionParams = array('only_data'=>array('selling'=>true));
+
+            $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
+            $configurator->setPartialMode();
+            $configurator->allowSelling();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -71,9 +72,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -90,12 +89,13 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
-            $actionParams = array('only_data'=>array('selling'=>true));
+
+            $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
+            $configurator->setPartialMode();
+            $configurator->allowSelling();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -107,9 +107,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -126,16 +124,6 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
         $listingProductCollection->addFieldToFilter('status', Ess_M2ePro_Model_Listing_Product::STATUS_LISTED);
         $listingProductCollection->addFieldToFilter('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_NEED);
 
-        $listingProductCollection->getSelect()->where(
-            '`is_variation_product` = 0
-             OR
-             (
-                `is_variation_product` = 1
-                 AND
-                 `is_variation_product_matched` = 1
-             )'
-        );
-
         $listingProductCollection->getSelect()->limit(100);
 
         /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
@@ -143,12 +131,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
 
             $listingProduct->setData('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP)->save();
 
-            $actionParams = array('all_data'=>true);
+            $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -160,9 +146,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -197,12 +181,10 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
         /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($collection->getItems() as $listingProduct) {
 
-            $actionParams = array('all_data'=>true);
+            $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -214,9 +196,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 

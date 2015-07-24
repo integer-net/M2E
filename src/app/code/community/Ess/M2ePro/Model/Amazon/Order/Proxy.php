@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Amazon_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 {
-    // ########################################
-
     /** @var $order Ess_M2ePro_Model_Amazon_Order */
     protected $order = NULL;
 

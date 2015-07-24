@@ -70,6 +70,14 @@ class Ess_M2ePro_Helper_View_Development_Command extends Mage_Core_Helper_Abstra
                 continue;
             }
 
+            $methodInvisible = false;
+            preg_match('/@invisible/', $commentsString, $matches);
+            isset($matches[0]) && $methodInvisible = true;
+
+            $methodNonProduction = false;
+            preg_match('/@non-production/', $commentsString, $matches);
+            isset($matches[0]) && $methodNonProduction = true;
+
             $methodTitle = $action;
             preg_match('/@title[\s]*\"(.*)\"/', $commentsString, $matches);
             isset($matches[1]) && $methodTitle = $matches[1];
@@ -110,12 +118,14 @@ class Ess_M2ePro_Helper_View_Development_Command extends Mage_Core_Helper_Abstra
             isset($matches[0]) && $methodNewWindow = true;
 
             $methods[] = array(
-                'title'       => $methodTitle,
-                'description' => $methodDescription,
-                'url'         => Mage::helper('adminhtml')->getUrl('*/'.$controller.'/'.$action),
-                'content'     => $methodContent,
-                'new_line'    => $methodNewLine,
-                'confirm'     => $methodConfirm,
+                'invisible'      => $methodInvisible,
+                'non_production' => $methodNonProduction,
+                'title'          => $methodTitle,
+                'description'    => $methodDescription,
+                'url'            => Mage::helper('adminhtml')->getUrl('*/' . $controller . '/' . $action),
+                'content'        => $methodContent,
+                'new_line'       => $methodNewLine,
+                'confirm'        => $methodConfirm,
                 'prompt'      => array(
                     'text' => $methodPrompt,
                     'var'  => $methodPromptVar

@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Existence
     extends Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Validator
 {
-    // ########################################
-
     private $existenceResult = array();
 
     // ########################################

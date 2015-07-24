@@ -7,8 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Category_Grid
     extends Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Grid
 {
-    // ####################################
-
     private $selectedIds = array();
 
     private $currentCategoryId = NULL;
@@ -116,7 +114,7 @@ var add_category_products = function(callback) {
                     return false;
                 }
 
-                ProductGridHandlerObj.addListingHandlerObj.add(ids, false, 'view', '');
+                ProductGridHandlerObj.addListingHandlerObj.add(ids, 'view', '');
             }
         });
 

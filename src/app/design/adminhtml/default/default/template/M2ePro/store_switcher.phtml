@@ -2,9 +2,15 @@
 
     <p class="<?php echo Mage::helper('M2ePro/Magento')->isGoEdition() ? '' : 'switcher'; ?>">
 
-        <select id="<?php echo $this->getStoreSelectId(); ?>" name="<?php echo $this->getStoreSelectName(); ?>" style="width: 250px;" class="left-col-block">
+        <select id="<?php echo $this->getStoreSelectId(); ?>" name="<?php echo $this->getStoreSelectName(); ?>" style="width: 250px;" class="left-col-block store-switcher
+                    <?php if ($this->isRequiredOption()) : ?> M2ePro-store-switcher-validation<?php endif; ?>"
+                    <?php if ($this->hasEmptyOption()) : ?> onchange="return removeStoreSwitcherEmptyOption(this);"<?php endif; ?>>
 
-            <?php if ($this->hasDefaultOption()): ?>
+            <?php if ($this->hasEmptyOption()): ?>
+                <option value="-1"></option>
+            <?php endif; ?>
+
+            <?php if ($this->hasDefaultOption() && $this->isDisplayDefaultStoreModeUp()): ?>
                 <option value=""><?php echo $this->getDefaultStoreName(); ?></option>
             <?php endif; ?>
 
@@ -29,6 +35,10 @@
                 <?php endforeach; ?>
             <?php endforeach; ?>
 
+            <?php if ($this->hasDefaultOption() && $this->isDisplayDefaultStoreModeDown()): ?>
+                <option value=""><?php echo $this->getDefaultStoreName(); ?></option>
+            <?php endif; ?>
+
         </select>
 
     </p>
@@ -49,6 +59,39 @@
             <?php else: ?>
                 setLocation('<?php echo $this->getSwitchUrl(); ?>'+storeParam);
             <?php endif; ?>
+        }
+
+        Validation.add('M2ePro-store-switcher-validation', '<?php echo Mage::helper('M2ePro')->__('You should select Store View'); ?>', function(value, element) {
+
+            if (!element.visible()) {
+                return true;
+            }
+
+            if (element.up('tr') && !element.up('tr').visible()) {
+                return true;
+            }
+
+            if (value == -1 || value == null) {
+                return false;
+            }
+
+            return true;
+        });
+
+        function removeStoreSwitcherEmptyOption(obj)
+        {
+            if (obj.value == -1) {
+                return true;
+            }
+
+            obj.select('option').each(function(option) {
+                if (option.value == -1) {
+                    obj.options[option.index].remove();
+                    return true;
+                }
+            });
+
+            return true;
         }
 
     </script>

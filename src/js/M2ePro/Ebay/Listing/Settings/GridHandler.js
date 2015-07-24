@@ -58,7 +58,7 @@ EbayListingSettingsGridHandler = Class.create(EbayListingViewGridHandler, {
                 this.openPopUp(
                     M2ePro.translator.translate('Compatibility Attribute'),
                     transport.responseText,
-                    {width: 610, height: 310}
+                    {width: 750, height: 450}
                 );
 
                 EbayMotorCompatibilityHandlerObj.setMode('view');

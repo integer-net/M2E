@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Ebay_Order_Builder extends Mage_Core_Model_Abstract
 {
-    // ##########################################################
-
     const STATUS_NOT_MODIFIED = 0;
     const STATUS_NEW          = 1;
     const STATUS_UPDATED      = 2;

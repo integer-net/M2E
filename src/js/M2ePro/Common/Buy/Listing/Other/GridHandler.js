@@ -1,4 +1,4 @@
-BuyListingOtherGridHandler = Class.create(CommonListingOtherGridHandler, {
+CommonBuyListingOtherGridHandler = Class.create(CommonListingOtherGridHandler, {
 
     //----------------------------------
 

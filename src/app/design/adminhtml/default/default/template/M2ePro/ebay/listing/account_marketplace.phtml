@@ -223,12 +223,20 @@
                         account_select_el.setValue(account.id);
 
                         var accountLink = M2ePro.url.get('adminhtml_ebay_account/edit', {'id': account.id});
-                        var linkElement = new Element('a', {
-                            'href': accountLink,
-                            'target': '_blank'
-                        }).update(account.title);
+                        var accountElement;
 
-                        account_label_el.update(linkElement);
+                        if (<?php echo (int) $this->getRequest()->getParam('wizard', 0); ?>) {
+                            accountElement = new Element('span', {
+                                'style': 'color: #ea7601;'
+                            }).update(account.title);
+                        } else {
+                            accountElement = new Element('a', {
+                                'href': accountLink,
+                                'target': '_blank'
+                            }).update(account.title);
+                        }
+
+                        account_label_el.update(accountElement);
 
                         account_label_el.show();
                         account_select_el.hide();
@@ -289,14 +297,12 @@
 
         var synchronizeMarketplace = function(marketplaceId) {
 
-            new Ajax.Request('<?php echo $this->getUrl('*/adminhtml_ebay_general/isMarketplaceEnabledAndSynchronized'); ?>', {
+            new Ajax.Request('<?php echo $this->getUrl('*/adminhtml_ebay_general/isMarketplaceEnabled'); ?>', {
                 method: 'get',
                 parameters: { marketplace_id: marketplaceId },
                 onSuccess: function(transport) {
 
-                    var isSynchronized = transport.responseText.evalJSON();
-
-                    if (isSynchronized) {
+                    if (transport.responseText.evalJSON()) {
                         return marketplaceSynchProgressHandlerObj.end();
                     }
 

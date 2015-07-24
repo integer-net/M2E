@@ -7,6 +7,8 @@
 class Ess_M2ePro_Model_Buy_Magento_Product_Rule_Condition_Product
     extends Ess_M2ePro_Model_Magento_Product_Rule_Condition_Product
 {
+    // ########################################
+
     protected function getCustomFilters()
     {
         $buyFilters = array(
@@ -41,4 +43,6 @@ class Ess_M2ePro_Model_Buy_Magento_Product_Rule_Condition_Product
 
         return $this->_customFiltersCache[$filterId];
     }
+
+    // ########################################
 }

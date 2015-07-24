@@ -27,8 +27,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Genera
         if (strlen($sku) > self::SKU_MAX_LENGTH) {
 
             // M2ePro_TRANSLATIONS
-            // The length of sku must be less than 40 characters.
-            $this->addMessage('The length of sku must be less than 30 characters.');
+            // The length of Reference ID must be less than 30 characters.
+            $this->addMessage('The length of Reference ID must be less than 30 characters.');
 
             return false;
         }

@@ -7,8 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
     extends Mage_Adminhtml_Block_Widget_Grid
 {
-    // ####################################
-
     const MERGE_MODE_COOKIE_KEY = 'database_tables_merge_mode_cookie_key';
 
     public $tableName;
@@ -57,7 +55,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
             return;
         }
 
-        preg_match('/(ebay|amazon|buy|play)_/i', $this->modelName, $matches);
+        preg_match('/(ebay|amazon|buy)_/i', $this->modelName, $matches);
         if (!$this->component && !empty($matches[1])) {
             $this->modelName = str_replace($matches[1].'_', '', $this->modelName);
             $this->component = strtolower($matches[1]);
@@ -195,7 +193,7 @@ HTML;
 <script type="text/javascript">
 
    M2ePro.url.add({$urls});
-   DevelopmentDatabaseGridHandlerObj = new DatabaseGridHandler('{$this->getId()}');
+   DevelopmentDatabaseGridHandlerObj = new DevelopmentDatabaseGridHandler('{$this->getId()}');
 
 </script>
 HTML;
@@ -235,7 +233,9 @@ HTML;
 
     public function callbackColumnData($value, $row, $column, $isExport)
     {
-        $cellId = 'table_row_cell_'.$column->getId().'_'.$row->getId();
+        $rowId = $row->getId();
+        $columnId = $column->getId();
+        $cellId = 'table_row_cell_'.$columnId.'_'.$rowId;
 
         $tempValue = '<span style="color:silver;"><small>NULL</small></span>';
         if (!is_null($value)) {
@@ -261,7 +261,9 @@ HTML;
     <span id="{$cellId}_view_container">{$tempValue}</span>
 
     <span id="{$cellId}_edit_container" style="display: none;">
-        <textarea style="width:100%; height:100%;" id="{$cellId}_edit_input">{$inputValue}</textarea>
+        <textarea style="width:100%; height:100%;" id="{$cellId}_edit_input"
+                  onkeydown="DevelopmentDatabaseGridHandlerObj.onKeyDownEdit('{$rowId}','{$columnId}', event)"
+>{$inputValue}</textarea>
     </span>
 
     <span id="{$cellId}_edit_link" style="display: none;">&nbsp;
@@ -274,7 +276,7 @@ HTML;
     </span>
     <span id="{$cellId}_save_link" style="display: none;">&nbsp;
         <a href="javascript:void(0);"
-           onclick="DevelopmentDatabaseGridHandlerObj.saveTableCell('{$row->getId()}','{$column->getId()}');">save</a>
+           onclick="DevelopmentDatabaseGridHandlerObj.saveTableCell('{$rowId}','{$columnId}');">save</a>
     </span>
 </div>
 HTML;

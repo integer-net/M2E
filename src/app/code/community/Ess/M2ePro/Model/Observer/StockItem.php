@@ -29,14 +29,6 @@ class Ess_M2ePro_Model_Observer_StockItem extends Ess_M2ePro_Model_Observer_Abst
 
     public function process()
     {
-        // skip qty changes when it was reserved
-        $reservationTempKey = Ess_M2ePro_Helper_Data::CUSTOM_IDENTIFIER.'_order_reservation';
-        $reservationTempValue = $this->getEventObserver()->getData('item')->getData($reservationTempKey);
-
-        if (!is_null($reservationTempValue)) {
-            return;
-        }
-
         if (!$this->areThereAffectedItems()) {
             return;
         }

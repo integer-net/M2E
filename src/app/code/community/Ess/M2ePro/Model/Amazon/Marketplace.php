@@ -65,22 +65,6 @@ class Ess_M2ePro_Model_Amazon_Marketplace extends Ess_M2ePro_Model_Component_Chi
 
     // ########################################
 
-    public function isSynchronized()
-    {
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-        $table = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_marketplace');
-
-        $count = (int)$connRead->select()->from($table,'COUNT(*)')
-                               ->where('marketplace_id=?',$this->getId())
-                               ->query()
-                               ->fetchColumn();
-
-        return (int)($count > 0);
-    }
-
-    // ########################################
-
     public function save()
     {
         Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues('marketplace');

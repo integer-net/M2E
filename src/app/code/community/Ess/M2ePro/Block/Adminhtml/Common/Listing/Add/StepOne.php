@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_StepOne extends Mage_Adminhtml_Block_Widget_Form_Container
 {
+    // ####################################
+
     public function __construct($attributes)
     {
         parent::__construct();
@@ -23,8 +25,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_StepOne extends Mage_Adminht
         // Set header text
         //------------------------------
         if (!Mage::helper('M2ePro/View_Common_Component')->isSingleActiveComponent()) {
-            $titleConst = constant('Ess_M2ePro_Helper_Component_'.ucfirst($this->getData('component')).'::TITLE');
-            $componentName =  Mage::helper('M2ePro')->__($titleConst);
+            $componentName = Mage::helper('M2ePro/Component_'.ucfirst($this->getData('component')))->getTitle();
+
             $headerText = Mage::helper('M2ePro')
                 ->__("Creating A New %component_name% M2E Pro Listing", $componentName);
         } else {
@@ -54,4 +56,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_StepOne extends Mage_Adminht
         ));
         //------------------------------
     }
+
+    // ####################################
 }

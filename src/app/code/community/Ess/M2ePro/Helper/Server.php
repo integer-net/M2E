@@ -6,19 +6,48 @@
 
 class Ess_M2ePro_Helper_Server extends Mage_Core_Helper_Abstract
 {
+    const MAX_INTERVAL_OF_RETURNING_TO_DEFAULT_BASEURL = 86400;
+
     // ########################################
 
     public function getEndpoint()
     {
-        return $this->getBaseUrl().'index.php';
+        if ($this->getCurrentBaseUrlIndex() != $this->getDefaultBaseUrlIndex()) {
+
+            $currentTimeStamp = Mage::helper('M2ePro/Data')->getCurrentGmtDate(true);
+
+            $interval = self::MAX_INTERVAL_OF_RETURNING_TO_DEFAULT_BASEURL;
+            $switchingDateTime = Mage::helper('M2ePro/Module')->getCacheConfig()
+                                        ->getGroupValue('/server/baseurl/','datetime_of_last_switching');
+
+            if (is_null($switchingDateTime) || strtotime($switchingDateTime) + $interval <= $currentTimeStamp) {
+                $this->setCurrentBaseUrlIndex($this->getDefaultBaseUrlIndex());
+            }
+        }
+
+        return $this->getCurrentBaseUrl().'index.php';
     }
 
     public function switchEndpoint()
     {
-        return $this->switchBaseUrl();
+        $previousIndex = $this->getCurrentBaseUrlIndex();
+        $nextIndex = $previousIndex + 1;
+
+        is_null($this->getBaseUrlByIndex($nextIndex)) && $nextIndex = 1;
+        $this->setCurrentBaseUrlIndex($nextIndex);
+
+        if ($this->getCurrentBaseUrlIndex() == $previousIndex) {
+            return false;
+        }
+
+        $cacheConfig = Mage::helper('M2ePro/Module')->getCacheConfig();
+        $cacheConfig->setGroupValue('/server/baseurl/','datetime_of_last_switching',
+                                        Mage::helper('M2ePro/Data')->getCurrentGmtDate());
+
+        return true;
     }
 
-    // ----------------------------------------
+    // ########################################
 
     public function getAdminKey()
     {
@@ -65,6 +94,8 @@ class Ess_M2ePro_Helper_Server extends Mage_Core_Helper_Abstract
         curl_setopt($curlObject, CURLOPT_TIMEOUT, $timeout);
 
         $response = curl_exec($curlObject);
+
+        $curlInfo    = curl_getinfo($curlObject);
         $errorNumber = curl_errno($curlObject);
 
         curl_close($curlObject);
@@ -76,95 +107,87 @@ class Ess_M2ePro_Helper_Server extends Mage_Core_Helper_Abstract
                 return $this->sendRequest($postData,$headers,$timeout,true);
             }
 
-            throw new Exception('Server connection is failed. Please try again later.');
+            throw new Ess_M2ePro_Model_Exception('Server connection is failed. Please try again later.',
+                                                 array('curl_info' => $curlInfo, 'curl_error_number' => $errorNumber));
         }
 
-        return $response;
+        return array(
+            'response'          => $response,
+            'curl_error_number' => $errorNumber,
+            'curl_info'         => $curlInfo
+        );
     }
 
     // ########################################
 
-    private function getBaseUrl()
+    private function getCurrentBaseUrl()
     {
-        $index = $this->getBaseUrlIndex();
-
-        $baseUrl = Mage::helper('M2ePro/Primary')->getConfig()
-                        ->getGroupValue('/server/','baseurl_'.$index);
-
-        if (empty($baseUrl) || ($index > 1 && $this->isBaseUrlEmergencyTimeExceeded())) {
-
-            $index = 1;
-            $this->setBaseUrlIndex($index);
-
-            $baseUrl = Mage::helper('M2ePro/Primary')->getConfig()
-                            ->getGroupValue('/server/','baseurl_'.$index);
-        }
-
-        return $baseUrl;
-    }
-
-    private function switchBaseUrl()
-    {
-        $currentIndex = $this->getBaseUrlIndex();
-        $nextIndex = $currentIndex + 1;
-
-        $baseUrl = Mage::helper('M2ePro/Primary')->getConfig()
-                        ->getGroupValue('/server/','baseurl_'.$nextIndex);
-
-        if (!empty($baseUrl)) {
-            $this->setBaseUrlIndex($nextIndex);
-            return true;
-        }
-
-        if ($currentIndex > 1) {
-            $this->setBaseUrlIndex(1);
-            return true;
-        }
-
-        return false;
+        return $this->getBaseUrlByIndex($this->getCurrentBaseUrlIndex());
     }
 
     // ----------------------------------------
 
-    private function getBaseUrlIndex()
+    private function getDefaultBaseUrlIndex()
     {
-        $index = Mage::helper('M2ePro/Module')->getCacheConfig()
+        $index = (int)Mage::helper('M2ePro/Primary')->getConfig()
+                        ->getGroupValue('/server/','default_baseurl_index');
+
+        if ($index <= 0 || $index > $this->getMaxBaseUrlIndex()) {
+            $this->setDefaultBaseUrlIndex($index = 1);
+        }
+
+        return $index;
+    }
+
+    private function getCurrentBaseUrlIndex()
+    {
+        $index = (int)Mage::helper('M2ePro/Module')->getCacheConfig()
                         ->getGroupValue('/server/baseurl/','current_index');
-        is_null($index) && $this->setBaseUrlIndex($index = 1);
-        return (int)$index;
-    }
 
-    private function setBaseUrlIndex($index)
-    {
-        $cacheConfig = Mage::helper('M2ePro/Module')->getCacheConfig();
-        $currentIndex = $cacheConfig->getGroupValue('/server/baseurl/','current_index');
-
-        if (!is_null($currentIndex) && $currentIndex == $index) {
-            return;
+        if ($index <= 0 || $index > $this->getMaxBaseUrlIndex()) {
+            $this->setCurrentBaseUrlIndex($index = $this->getDefaultBaseUrlIndex());
         }
 
-        $cacheConfig->setGroupValue('/server/baseurl/','current_index',$index);
-
-        if ((is_null($currentIndex) || $currentIndex == 1) && $index > 1) {
-            $cacheConfig->setGroupValue('/server/baseurl/','date_of_emergency_state',
-                                        Mage::helper('M2ePro/Data')->getCurrentGmtDate());
-        }
-
-        if (!is_null($currentIndex) && $currentIndex > 1 && $index == 1) {
-            $cacheConfig->deleteGroupValue('/server/baseurl/','date_of_emergency_state');
-        }
+        return $index;
     }
 
     // ----------------------------------------
 
-    private function isBaseUrlEmergencyTimeExceeded()
+    private function setDefaultBaseUrlIndex($index)
     {
-        $currentTimestamp = Mage::helper('M2ePro/Data')->getCurrentGmtDate(true);
+        Mage::helper('M2ePro/Primary')->getConfig()
+                ->getGroupValue('/server/','default_baseurl_index',$index);
+    }
 
-        $emergencyDateTime = Mage::helper('M2ePro/Module')->getCacheConfig()
-                                    ->getGroupValue('/server/baseurl/','date_of_emergency_state');
+    private function setCurrentBaseUrlIndex($index)
+    {
+        Mage::helper('M2ePro/Module')->getCacheConfig()
+                ->setGroupValue('/server/baseurl/','current_index',$index);
+    }
 
-        return is_null($emergencyDateTime) || strtotime($emergencyDateTime) + 86400 < $currentTimestamp;
+    // ########################################
+
+    private function getMaxBaseUrlIndex()
+    {
+        $index = 1;
+
+        for ($tempIndex=2; $tempIndex<100; $tempIndex++) {
+
+            $tempBaseUrl = $this->getBaseUrlByIndex($tempIndex);
+
+            if (!is_null($tempBaseUrl)) {
+                $index = $tempIndex;
+            } else {
+                break;
+            }
+        }
+
+        return $index;
+    }
+
+    private function getBaseUrlByIndex($index)
+    {
+        return Mage::helper('M2ePro/Primary')->getConfig()->getGroupValue('/server/','baseurl_'.$index);
     }
 
     // ########################################

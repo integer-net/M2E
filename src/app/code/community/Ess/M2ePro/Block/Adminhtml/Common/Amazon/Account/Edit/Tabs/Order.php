@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit_Tabs_Order extends M
 {
     protected $_possibleMagentoStatuses = null;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -82,4 +84,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Account_Edit_Tabs_Order extends M
 
         return $this->_possibleMagentoStatuses;
     }
+
+    // ####################################
 }

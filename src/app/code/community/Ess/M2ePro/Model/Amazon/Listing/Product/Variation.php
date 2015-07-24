@@ -197,6 +197,31 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
             }
         }
 
+        if (!empty($sku)) {
+            return $this->applySkuModification($sku);
+        }
+
+        return $sku;
+    }
+
+    //-----------------------------------------
+
+    protected function applySkuModification($sku)
+    {
+        if ($this->getAmazonListing()->isSkuModificationModeNone()) {
+            return $sku;
+        }
+
+        $source = $this->getAmazonListing()->getSkuModificationSource();
+
+        if ($this->getAmazonListing()->isSkuModificationModePrefix()) {
+            $sku = $source['value'] . $sku;
+        } elseif ($this->getAmazonListing()->isSkuModificationModePostfix()) {
+            $sku = $sku . $source['value'];
+        } elseif ($this->getAmazonListing()->isSkuModificationModeTemplate()) {
+            $sku = str_replace('%value%', $sku, $source['value']);
+        }
+
         return $sku;
     }
 

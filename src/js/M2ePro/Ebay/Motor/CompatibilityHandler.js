@@ -385,8 +385,8 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
     switchNoteEditMode: function(id, isCancel)
     {
         if ($('note_view_' + id).getStyle('display') == 'none') {
-            var value = $('note_edit_' + id).value;
-            value = value.trim();
+
+            var value = $('note_edit_' + id).value.trim();
 
             if (!isCancel) {
                 $('note_view_' + id).innerHTML = value;
@@ -407,7 +407,9 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
 
             $('note_edit_' + id + '_container').hide();
             $('note_view_' + id).show();
+
         } else {
+
             if ($('note_view_' + id).innerHTML != '') {
                 $('note_edit_' + id).value = $('note_view_' + id).innerHTML;
             }
@@ -429,8 +431,8 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
         self.switchNoteEditMode(id);
 
         if (self.mode == 'add') {
-            window[self.compatibilityGridId + 'JsObject'].massaction.updateCount();
             self.savedNotes[id] = $('note_view_' + id).innerHTML;
+            window[self.compatibilityGridId + 'JsObject'].massaction.updateCount();
         } else {
             new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/setNoteToCompatibilityList'), {
                 method: 'post',
@@ -443,6 +445,90 @@ EbayMotorCompatibilityHandler.prototype = Object.extend(new CommonHandler(), {
                 }
             });
         }
+    },
+
+    //-- Add Custom Compatible Vehicle
+    //----------------------------------
+
+    openAddRecordPopup: function()
+    {
+        var self = EbayMotorCompatibilityHandlerObj;
+
+        Dialog.info(null, {
+            id: 'add_custom_compatibility_record_popup',
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: M2ePro.translator.translate('Add Custom Compatible Vehicle'),
+            top: 50,
+            width: 500,
+            height: 320,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show,
+            onOk: self.addCustomCompatibilityRecord
+        });
+
+        var content = $('add_custom_compatibility_record_pop_up_content');
+
+        $('modal_dialog_message').insert(content.innerHTML);
+        $('modal_dialog_message').innerHTML.evalScripts();
+    },
+
+    addCustomCompatibilityRecord: function()
+    {
+        var validationResult = $$('#modal_dialog_message form *.popup-validate-entry').collect(Validation.validate);
+
+        if (validationResult.indexOf(false) != -1) {
+            return;
+        }
+
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/addCustomCompatibilityRecord'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: $$('#modal_dialog_message form').first().serialize(true),
+            onSuccess: function(transport) {
+
+                var result = transport.responseText.evalJSON();
+
+                if (!result.result) {
+                    return alert(result.message);
+                }
+
+                Windows.getFocusedWindow().close();
+                EbayMotorCompatibilityHandlerObj.reloadCompatibilityGrid();
+            }
+        });
+    },
+
+    removeCustomCompatibilityRecord: function(compatibilityType, keyId)
+    {
+        new Ajax.Request(M2ePro.url.get('adminhtml_ebay_listing/removeCustomCompatibilityRecord'), {
+            method: 'post',
+            asynchronous: true,
+            parameters: {
+                compatibility_type: compatibilityType,
+                key_id: keyId
+            },
+            onSuccess: function(transport) {
+
+                var result = transport.responseText.evalJSON();
+
+                if (!result.result) {
+                    return alert(result.message);
+                }
+
+                EbayMotorCompatibilityHandlerObj.reloadCompatibilityGrid();
+            }
+        });
+    },
+
+    reloadCompatibilityGrid: function()
+    {
+        var grid = eval(EbayMotorCompatibilityHandlerObj.compatibilityGridId + 'JsObject');
+        grid.reload();
     }
 
     //----------------------------------

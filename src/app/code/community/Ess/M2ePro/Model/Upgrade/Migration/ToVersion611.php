@@ -8,8 +8,6 @@ class Ess_M2ePro_Model_Upgrade_Migration_ToVersion611
 {
     const BACKUP_TABLE_PREFIX = '__backup_v611';
 
-    //####################################
-
     /** @var Ess_M2ePro_Model_Upgrade_MySqlSetup */
     private $installer = NULL;
 

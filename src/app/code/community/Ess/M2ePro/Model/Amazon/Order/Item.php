@@ -14,8 +14,6 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
     // Product for Amazon Item "%id%" was Created in Magento Catalog.
     // Product for Amazon Item "%title%" was Created in Magento Catalog.
 
-    // ########################################
-
     /** @var $channelItem Ess_M2ePro_Model_Amazon_Item */
     private $channelItem = NULL;
 

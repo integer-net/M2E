@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Synchronization_Edit_Tabs_Relist
     extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -18,4 +20,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Synchronization_Edit_Tab
 
         $this->setTemplate('M2ePro/common/amazon/template/synchronization/relist.phtml');
     }
+
+    // ####################################
 }

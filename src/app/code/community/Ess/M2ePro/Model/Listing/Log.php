@@ -67,8 +67,8 @@ class Ess_M2ePro_Model_Listing_Log extends Ess_M2ePro_Model_Log_Abstract
     const ACTION_MOVE_FROM_OTHER_LISTING = 22;
     const _ACTION_MOVE_FROM_OTHER_LISTING = 'Move from other Listing';
 
-    const ACTION_CHANGE_STATUS_ON_CHANNEL = 25;
-    const _ACTION_CHANGE_STATUS_ON_CHANNEL = 'Change Item Status on Channel';
+    const ACTION_CHANNEL_CHANGE = 25;
+    const _ACTION_CHANNEL_CHANGE = 'Change Item on Channel';
 
     const ACTION_TRANSLATE_PRODUCT = 28;
     const _ACTION_TRANSLATE_PRODUCT = 'Translation';

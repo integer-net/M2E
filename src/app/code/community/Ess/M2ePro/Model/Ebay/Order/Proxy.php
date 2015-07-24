@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
 {
-    // ########################################
-
     /** @var $order Ess_M2ePro_Model_Ebay_Order */
     protected $order = NULL;
 

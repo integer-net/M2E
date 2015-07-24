@@ -38,6 +38,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Defaults
         $result = true;
 
         $result = !$this->processTask('Defaults_RunParentProcessors') ? false : $result;
+        $result = !$this->processTask('Defaults_UpdateDefectedListingsProducts') ? false : $result;
         $result = !$this->processTask('Defaults_UpdateListingsProducts') ? false : $result;
 
         return $result;

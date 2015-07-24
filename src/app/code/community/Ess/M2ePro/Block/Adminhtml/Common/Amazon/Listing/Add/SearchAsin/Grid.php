@@ -13,6 +13,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin_Grid
     const SEARCH_SETTINGS_STATUS_NONE = 'none';
     const SEARCH_SETTINGS_STATUS_COMPLETED = 'completed';
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();

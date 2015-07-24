@@ -108,7 +108,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Magento_Grid
                 'ebay_item_id'          => 'ebay_item_id',
                 'online_category'       => 'online_category',
                 'online_qty_sold'       => 'online_qty_sold',
+                'online_start_price'    => 'online_start_price',
+                'online_current_price'  => 'online_current_price',
+                'online_reserve_price'  => 'online_reserve_price',
                 'online_buyitnow_price' => 'online_buyitnow_price',
+                'min_online_price'      => 'online_current_price'
             ),
             NULL,
             'left'

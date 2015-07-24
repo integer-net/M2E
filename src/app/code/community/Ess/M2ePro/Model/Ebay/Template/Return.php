@@ -9,8 +9,6 @@
  */
 class Ess_M2ePro_Model_Ebay_Template_Return extends Ess_M2ePro_Model_Component_Abstract
 {
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Marketplace
      */

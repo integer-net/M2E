@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Edit_ShippingAddress_Form exte
 {
     private $order;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -53,4 +55,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Edit_ShippingAddress_Form exte
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

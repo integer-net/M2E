@@ -530,8 +530,7 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         $modes = array(
             Ess_M2ePro_Model_Ebay_Template_Manager::MODE_PARENT,
             Ess_M2ePro_Model_Ebay_Template_Manager::MODE_CUSTOM,
-            Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE,
-            Ess_M2ePro_Model_Ebay_Template_Manager::MODE_POLICY
+            Ess_M2ePro_Model_Ebay_Template_Manager::MODE_TEMPLATE
         );
 
         unset($modes[array_search($mode, $modes)]);

@@ -17,7 +17,7 @@
         'Ess_M2ePro_Helper_Component_Amazon'
     );
 
-    AmazonListingChannelSettingsHandlerObj = new AmazonListingChannelSettingsHandler();
+    AmazonListingChannelSettingsHandlerObj = new CommonAmazonListingChannelSettingsHandler();
     AmazonListingChannelSettingsHandlerObj.setConstants('<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Amazon_Listing'); ?>');
 
     $('general_id_mode').observe('change', AmazonListingChannelSettingsHandlerObj.general_id_mode_change);
