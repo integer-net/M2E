@@ -25,6 +25,8 @@ class Ess_M2ePro_Adminhtml_Common_SynchronizationController
 
         $this->_initPopUp();
 
+        $this->setComponentPageHelpLink('Synchronization');
+
         return $this;
     }
 

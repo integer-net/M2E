@@ -2,6 +2,110 @@ EbayListingVariationProductManageVariationsGridHandler = Class.create(GridHandle
 
     //----------------------------------
 
+    initialize: function($super, gridId)
+    {
+        $super(gridId);
+
+        Validation.add('M2ePro-upc', M2ePro.translator.translate('Please enter valid UPC'), function(value, el) {
+
+            if (value.length == 0) {
+                return true;
+            }
+
+            if (value.length != 12) {
+                return false;
+            }
+
+            var barcode = value.substr(0, value.length-1);
+
+            var sum = 0;
+            var length  = barcode.length-1;
+
+            for (var i = 0; i <= length; i++) {
+                if ((i % 2) === 0) {
+                    sum += parseInt(barcode.charAt(length - i) * 3);
+                } else {
+                    sum += parseInt(barcode.charAt(length - i));
+                }
+            }
+
+            var calc  = sum % 10;
+            var checksum = (calc === 0) ? 0 : (10 - calc);
+
+            return value.charAt(length+1) == checksum;
+        });
+
+        Validation.add('M2ePro-ean', M2ePro.translator.translate('Please enter valid EAN'), function(value, el) {
+
+            if (value.length == 0) {
+                return true;
+            }
+
+            if (value.length != 13) {
+                return false;
+            }
+
+            var barcode = value.substr(0, value.length-1);
+
+            var sum = 0;
+            var length  = barcode.length-1;
+
+            for (var i = 0; i <= length; i++) {
+                if ((i % 2) === 0) {
+                    sum += parseInt(barcode.charAt(length - i) * 3);
+                } else {
+                    sum += parseInt(barcode.charAt(length - i));
+                }
+            }
+
+            var calc  = sum % 10;
+            var checksum = (calc === 0) ? 0 : (10 - calc);
+
+            return value.charAt(length+1) == checksum;
+
+        });
+
+        Validation.add('M2ePro-isbn', M2ePro.translator.translate('Please enter valid ISBN'), function(value, el) {
+
+            if (value.length == 0) {
+                return true;
+            }
+
+            if (value.length == 10) {
+
+                var a = 0;
+                for (var i = 0; i < 10; i++) {
+                    if (value.charAt(i) == "X" || value.charAt(i) == "x") {
+                        a += 10 * parseInt(10 - i);
+                    } else {
+                        a += parseInt(value.charAt(i)) * parseInt(10 - i);
+                    }
+                }
+                return (a % 11 == 0);
+
+            } else if (value.length == 13) {
+
+                if (value.substr(0,3) != '978') {
+                    return false;
+                }
+
+                var check = 0;
+                for (var i = 0; i < 13; i += 2) {
+                    check += parseInt(value.substr(i,1));
+                }
+                for (var i = 1; i < 12; i += 2) {
+                    check += 3 * parseInt(value.substr(i,1));
+                }
+
+                return check % 10 == 0;
+            }
+
+            return false;
+        });
+    },
+
+    //----------------------------------
+
     getComponent: function()
     {
         return 'ebay';
@@ -143,7 +247,11 @@ EbayListingVariationProductManageVariationsGridHandler = Class.create(GridHandle
     confirmVariationIdentifiers: function(editBtn, variationId)
     {
         var self = this,
-            form = $('variation_identifiers_edit_'+variationId);
+            form = $('variation_identifiers_edit_'+variationId)
+
+        if (!self.isValid(form)) {
+            return;
+        }
 
         var data = form.serialize(true);
 
@@ -162,10 +270,32 @@ EbayListingVariationProductManageVariationsGridHandler = Class.create(GridHandle
 
     cancelVariationIdentifiers: function(variationId)
     {
-        $('variation_identifiers_edit_'+variationId).reset();
-        $('variation_identifiers_edit_'+variationId).hide();
+        var form = $('variation_identifiers_edit_'+variationId);
+        form.reset();
+        this.isValid(form);
+        form.hide();
         $('variation_identifiers_'+variationId).show();
         $('edit_variations_'+variationId).show();
+    },
+
+    isValid: function (form)
+    {
+        var result = true,
+            upc = form.down('.M2ePro-upc'),
+            ean = form.down('.M2ePro-ean'),
+            isbn = form.down('.M2ePro-isbn'),
+            mpn = form.down('.M2ePro-mpn');
+
+        upc.value = trim(upc.value);
+        ean.value = trim(ean.value);
+        isbn.value = trim(isbn.value.replace('-',''));
+        mpn.value = trim(mpn.value);
+
+        result = Validation.test('M2ePro-upc', upc) ? result : false;
+        result = Validation.test('M2ePro-ean', ean) ? result : false;
+        result = Validation.test('M2ePro-isbn', isbn) ? result : false;
+
+        return result;
     }
 
 });

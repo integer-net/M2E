@@ -18,6 +18,8 @@ class Ess_M2ePro_Adminhtml_Ebay_LogController extends Ess_M2ePro_Controller_Admi
 
         $this->_initPopUp();
 
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367088');
+
         return $this;
     }
 
@@ -48,6 +50,8 @@ class Ess_M2ePro_Adminhtml_Ebay_LogController extends Ess_M2ePro_Controller_Admi
         }
 
         $this->_initAction();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367088#Logs.-ListingsLog');
 
         if (!empty($id)) {
             $logBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_log');
@@ -128,6 +132,9 @@ class Ess_M2ePro_Adminhtml_Ebay_LogController extends Ess_M2ePro_Controller_Admi
 
         $this->_initAction();
 
+        $this->setPageHelpLink(NULL,
+            'pages/viewpage.action?pageId=17367088#Logs.-3rdPartyListingsLog(advancedmodeonly)');
+
         if (!empty($id)) {
             $logBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_other_log');
         } else {
@@ -160,8 +167,11 @@ class Ess_M2ePro_Adminhtml_Ebay_LogController extends Ess_M2ePro_Controller_Admi
 
     public function synchronizationAction()
     {
-        $this->_initAction()
-             ->_addContent(
+        $this->_initAction();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367088#Logs.-SynchronizationLog');
+
+        $this->_addContent(
                  $this->getLayout()->createBlock(
                      'M2ePro/adminhtml_ebay_log', '',
                      array('active_tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs::TAB_ID_SYNCHRONIZATION)
@@ -180,8 +190,11 @@ class Ess_M2ePro_Adminhtml_Ebay_LogController extends Ess_M2ePro_Controller_Admi
 
     public function orderAction()
     {
-        $this->_initAction()
-             ->_addContent(
+        $this->_initAction();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367088#Logs.-OrdersLog');
+
+        $this->_addContent(
                  $this->getLayout()->createBlock(
                      'M2ePro/adminhtml_ebay_log', '',
                      array('active_tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Log_Tabs::TAB_ID_ORDER)

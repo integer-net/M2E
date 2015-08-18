@@ -8,7 +8,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Update_ItemsResponser
     extends Ess_M2ePro_Model_Connector_Amazon_Responser
 {
     // M2ePro_TRANSLATIONS
-    //Amazon Order status was not updated. Reason: %msg%
+    // Amazon Order status was not updated. Reason: %msg%
     // M2ePro_TRANSLATIONS
     // Amazon Order status was updated to Shipped.
     // M2ePro_TRANSLATIONS

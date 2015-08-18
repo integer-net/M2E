@@ -22,6 +22,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             ->addCss('M2ePro/css/Plugin/DropDown.css')
             ->addCss('M2ePro/css/Plugin/AutoComplete.css')
             ->addJs('mage/adminhtml/rules.js')
+            ->addJs('M2ePro/Plugin/ActionColumn.js')
             ->addJs('M2ePro/Plugin/DropDown.js')
             ->addJs('M2ePro/Plugin/ProgressBar.js')
             ->addJs('M2ePro/Plugin/AreaWrapper.js')
@@ -52,6 +53,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
             ->addJs('M2ePro/Common/Listing/Product/VariationHandler.js');
 
         $this->_initPopUp();
+
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Edit+M2E+Pro+Listing+Settings');
 
         return $this;
     }
@@ -151,8 +154,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_ListingController
         $this->setRuleData('amazon_rule_listing_view');
         // ---------------------------
 
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_view'))
+        $this->_initAction();
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Manage+M2E+Pro+Listings');
+
+        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_view'))
             ->renderLayout();
     }
 

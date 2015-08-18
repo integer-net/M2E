@@ -22,7 +22,7 @@ class Ess_M2ePro_Block_Adminhtml_Development extends Mage_Adminhtml_Block_Widget
 
         // Set header text
         //------------------------------
-        $this->_headerText = Mage::helper('M2ePro')->__(Ess_M2ePro_Helper_View_Development::TITLE);
+        $this->_headerText = Mage::helper('M2ePro/View_Development')->getTitle();
         //------------------------------
 
         // Set buttons actions

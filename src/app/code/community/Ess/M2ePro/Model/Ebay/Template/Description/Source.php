@@ -166,6 +166,10 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Source
 
     public function getProductDetail($type)
     {
+        if (!$this->getEbayDescriptionTemplate()->isProductDetailsModeAttribute($type)) {
+            return NULL;
+        }
+
         $attribute = $this->getEbayDescriptionTemplate()->getProductDetailAttribute($type);
 
         if (!$attribute) {
@@ -197,7 +201,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Source
         return $this->addWatermarkIfNeed($imageLink);
     }
 
-    public function getImagesForEbay()
+    public function getGalleryImages()
     {
         if ($this->getEbayDescriptionTemplate()->isImageMainModeNone()) {
             return array();
@@ -285,7 +289,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Source
         $baseMediaUrl = Mage::app()->getStore($this->getMagentoProduct()->getStoreId())
                                    ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).'catalog/product';
 
-        $baseMediaUrl = str_replace('https://', 'http://', $baseMediaUrl);
+        $imageLink = preg_replace('/^http(s)?:\/\//i', '', $imageLink);
+        $baseMediaUrl = preg_replace('/^http(s)?:\/\//i', '', $baseMediaUrl);
 
         $baseMediaPath = Mage::getSingleton('catalog/product_media_config')->getBaseMediaPath();
 

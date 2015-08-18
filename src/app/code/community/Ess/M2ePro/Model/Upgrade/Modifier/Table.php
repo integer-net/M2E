@@ -13,23 +13,24 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
     const COMMIT_KEY_DROP_INDEX    = 'drop_index';
 
     protected $sqlForCommit = array();
+    protected $columnsForCheckBeforeCommit = array();
 
     //####################################
 
     public function addColumn($nick, $type, $default = NULL, $after = NULL, $addIndex = false, $autoCommit = true)
     {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
-        $definition = $this->getDefinition($type, $default, $after);
+        if (!$this->isTableExists()) {
+            return $this;
+        }
+
+        $definition = $this->buildColumnDefinition($type, $default, $after, $autoCommit);
 
         if ($this->isColumnExists($nick) === false && !empty($definition)) {
             if (!$autoCommit) {
-                $this->addQueryToCommit(self::COMMIT_KEY_ADD_COLUMN, sprintf('ADD COLUMN %s %s',
-                    $connection->quoteIdentifier($nick),
-                    $definition
-                ));
+                $this->addQueryToCommit(self::COMMIT_KEY_ADD_COLUMN,
+                                        'ADD COLUMN %s %s', array($nick), $definition);
             } else {
-                $connection->addColumn($tableName, $nick, $definition);
+                $this->getConnection()->addColumn($this->getTableName(), $nick, $definition);
             }
 
             $addIndex && $this->addIndex($nick, $autoCommit);
@@ -38,67 +39,42 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
         return $this;
     }
 
-    //####################################
-
-    public function dropColumn($nick, $dropIndex = true, $autoCommit = true)
-    {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
-
-        if ($this->isColumnExists($nick) !== false) {
-            if (!$autoCommit) {
-                $this->addQueryToCommit(self::COMMIT_KEY_DROP_COLUMN, sprintf('DROP COLUMN %s',
-                    $connection->quoteIdentifier($nick)
-                ));
-            } else {
-                $connection->dropColumn($tableName, $nick);
-            }
-
-            $dropIndex && $this->dropIndex($nick, $autoCommit);
-        }
-
-        return $this;
-    }
-
-    //####################################
-
     public function changeColumn($nick, $type, $default = NULL, $after = NULL, $autoCommit = true)
     {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
-        $definition = $this->getDefinition($type, $default, $after);
+        if (!$this->isTableExists()) {
+            return $this;
+        }
+
+        $definition = $this->buildColumnDefinition($type, $default, $after, $autoCommit);
 
         if ($this->isColumnExists($nick) !== false && !empty($definition)) {
             if (!$autoCommit) {
-                $this->addQueryToCommit(self::COMMIT_KEY_CHANGE_COLUMN, sprintf('MODIFY COLUMN %s %s',
-                    $connection->quoteIdentifier($nick),
-                    $definition)
-                );
+                $this->addQueryToCommit(self::COMMIT_KEY_CHANGE_COLUMN,
+                                        'MODIFY COLUMN %s %s', array($nick), $definition);
             } else {
-                $connection->modifyColumn($tableName, $nick ,$definition);
+                $this->getConnection()->modifyColumn($this->getTableName(), $nick ,$definition);
             }
         }
 
         return $this;
     }
 
-    //####################################
+    // ----------------------------------
 
     public function renameColumn($from, $to, $renameIndex = true, $autoCommit = true)
     {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
-        $definition = $this->getColumnDefinition($from);
+        if (!$this->isTableExists()) {
+            return $this;
+        }
+
+        $definition = $this->getColumnDefinitionFromDescribe($from);
 
         if ($this->isColumnExists($from) !== false && $this->isColumnExists($to) === false && !empty($definition)) {
             if (!$autoCommit) {
-                $this->addQueryToCommit(self::COMMIT_KEY_CHANGE_COLUMN, sprintf('CHANGE COLUMN %s %s %s',
-                    $connection->quoteIdentifier($from),
-                    $connection->quoteIdentifier($to),
-                    $definition
-                ));
+                $this->addQueryToCommit(self::COMMIT_KEY_CHANGE_COLUMN,
+                                        'CHANGE COLUMN %s %s %s', array($from, $to), $definition);
             } else {
-                $connection->changeColumn($tableName, $from, $to, $definition);
+                $this->getConnection()->changeColumn($this->getTableName(), $from, $to, $definition);
             }
 
             if ($renameIndex) {
@@ -110,22 +86,20 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
         return $this;
     }
 
-    //####################################
-
-    public function addIndex($nick, $autoCommit = true)
+    public function dropColumn($nick, $dropIndex = true, $autoCommit = true)
     {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
+        if (!$this->isTableExists()) {
+            return $this;
+        }
 
-        if (!$this->isIndexExists($nick)) {
+        if ($this->isColumnExists($nick) !== false) {
             if (!$autoCommit) {
-                $this->addQueryToCommit(self::COMMIT_KEY_ADD_INDEX, sprintf('ADD INDEX %s (%s)',
-                    $connection->quoteIdentifier($nick),
-                    $connection->quoteIdentifier($nick)
-                ));
+                $this->addQueryToCommit(self::COMMIT_KEY_DROP_COLUMN, 'DROP COLUMN %s', array($nick));
             } else {
-                $connection->addKey($tableName, $nick, $nick);
+                $this->getConnection()->dropColumn($this->getTableName(), $nick);
             }
+
+            $dropIndex && $this->dropIndex($nick, $autoCommit);
         }
 
         return $this;
@@ -133,18 +107,34 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
 
     //####################################
 
+    public function addIndex($nick, $autoCommit = true)
+    {
+        if (!$this->isTableExists()) {
+            return $this;
+        }
+
+        if (!$this->isIndexExists($nick)) {
+            if (!$autoCommit) {
+                $this->addQueryToCommit(self::COMMIT_KEY_ADD_INDEX, 'ADD INDEX %s (%s)', array($nick, $nick));
+            } else {
+                $this->getConnection()->addKey($this->getTableName(), $nick, $nick);
+            }
+        }
+
+        return $this;
+    }
+
     public function dropIndex($nick, $autoCommit = true)
     {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
+        if (!$this->isTableExists()) {
+            return $this;
+        }
 
         if ($this->isIndexExists($nick)) {
             if (!$autoCommit) {
-                $this->addQueryToCommit(self::COMMIT_KEY_DROP_INDEX, sprintf('DROP KEY %s',
-                    $connection->quoteIdentifier($nick)
-                ));
+                $this->addQueryToCommit(self::COMMIT_KEY_DROP_INDEX, 'DROP KEY %s', array($nick));
             } else {
-                $connection->dropKey($tableName, $nick);
+                $this->getConnection()->dropKey($this->getTableName(), $nick);
             }
         }
 
@@ -155,13 +145,11 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
 
     public function truncate()
     {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
-
-        if ($connection->isTableExists($tableName)) {
-            $connection->truncateTable($tableName);
+        if (!$this->isTableExists()) {
+            return $this;
         }
 
+        $this->getConnection()->truncate($this->getTableName());
         return $this;
     }
 
@@ -169,12 +157,9 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
 
     public function commit()
     {
-        if (empty($this->sqlForCommit)) {
+        if (empty($this->sqlForCommit) || !$this->isTableExists()) {
             return $this;
         }
-
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
 
         $order = array(
             self::COMMIT_KEY_ADD_COLUMN,
@@ -198,35 +183,21 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
         }
 
         $resultSql = sprintf('ALTER TABLE %s %s',
-            $connection->quoteIdentifier($tableName),
+            $this->getConnection()->quoteIdentifier($this->getTableName()),
             $tempSql
         );
 
-        $this->runQuery($resultSql);
+        if ($this->checkColumnsBeforeCommit()) {
+            $this->runQuery($resultSql);
+        }
+
         $this->sqlForCommit = array();
         return $this;
     }
 
     //####################################
 
-    private function getColumnDefinition($nick)
-    {
-        $connection = $this->getConnection();
-        $tableName = $this->getTableName();
-        $columnDefinition = '';
-
-        if ($this->isColumnExists($nick) !== false) {
-            $tableColumns = $connection->describeTable($tableName);
-
-            if (isset($tableColumns[$nick])) {
-                $columnDefinition = $connection->getColumnDefinitionFromDescribe($tableColumns[$nick]);
-            }
-        }
-
-        return $columnDefinition;
-    }
-
-    private function getDefinition($type, $default = NULL, $after = NULL)
+    private function buildColumnDefinition($type, $default = NULL, $after = NULL, $autoCommit = true)
     {
         $definition = $type;
 
@@ -238,21 +209,101 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Table extends Ess_M2ePro_Model_Upgrade_M
             }
         }
 
-        if (!empty($after) && $this->isColumnExists($after)) {
+        if (!empty($after) && !$autoCommit) {
+            $this->columnsForCheckBeforeCommit[] = $after;
+            $definition .= ' AFTER ' . $this->getConnection()->quoteIdentifier($after);
+        } elseif (!empty($after) && $this->isColumnExists($after)) {
             $definition .= ' AFTER ' . $this->getConnection()->quoteIdentifier($after);
         }
 
         return $definition;
     }
 
-    private function addQueryToCommit($key, $query)
+    // ----------------------------------
+
+    private function getColumnDefinitionFromDescribe($nick)
     {
-        if (isset($this->sqlForCommit[$key]) && in_array($query, $this->sqlForCommit[$key])) {
-            return $this->sqlForCommit;
+        $columnDefinition = '';
+
+        if ($this->isColumnExists($nick) !== false) {
+            $tableColumns = $this->getConnection()->describeTable($this->getTableName());
+
+            if (isset($tableColumns[$nick])) {
+                $columnInfo = $tableColumns[$nick];
+                $type = $columnInfo['DATA_TYPE'];
+
+                if (is_numeric($columnInfo['LENGTH']) && $columnInfo['LENGTH'] > 0) {
+                    $type .= '('.$columnInfo['LENGTH'].')';
+                } elseif (is_numeric($columnInfo['PRECISION']) && is_numeric($columnInfo['SCALE'])) {
+                    $type .= sprintf('(%d,%d)', $columnInfo['PRECISION'], $columnInfo['SCALE']);
+                }
+
+                $default = '';
+                if ($columnInfo['DEFAULT'] !== false) {
+                    $this->getConnection()->quoteInto('DEFAULT ?', $columnInfo['DEFAULT']);
+                }
+
+                $columnDefinition = sprintf('%s %s %s %s %s',
+                    $type,
+                    $columnInfo['UNSIGNED'] ? 'UNSIGNED' : '',
+                    $columnInfo['NULLABLE'] ? 'NULL' : 'NOT NULL',
+                    $default,
+                    $columnInfo['IDENTITY'] ? 'AUTO_INCREMENT' : ''
+                );
+            }
         }
 
-        $this->sqlForCommit[$key][] = $query;
-        return $this->sqlForCommit;
+        return $columnDefinition;
+    }
+
+    //####################################
+
+    private function addQueryToCommit($key, $queryPattern, array $columns, $definition = NULL)
+    {
+        foreach ($columns as &$column) {
+            $column = $this->getConnection()->quoteIdentifier($column);
+        }
+
+        $queryArgs = !is_null($definition) ? array_merge($columns, array($definition)) : $columns;
+        $tempQuery = vsprintf($queryPattern, $queryArgs);
+
+        if (isset($this->sqlForCommit[$key]) && in_array($tempQuery, $this->sqlForCommit[$key])) {
+            return $this;
+        }
+
+        $this->sqlForCommit[$key][] = $tempQuery;
+        return $this;
+    }
+
+    // ----------------------------------
+
+    private function checkColumnsBeforeCommit()
+    {
+        foreach ($this->columnsForCheckBeforeCommit as $index => $columnForCheck) {
+            if ($this->isColumnExists($columnForCheck)) {
+                unset($this->columnsForCheckBeforeCommit[$index]);
+                continue;
+            }
+
+            foreach ($this->sqlForCommit as $key => $sqlData) {
+                if (!is_array($sqlData) || in_array($key, array(self::COMMIT_KEY_ADD_INDEX,
+                                                                self::COMMIT_KEY_DROP_INDEX,
+                                                                self::COMMIT_KEY_DROP_COLUMN))
+                ) {
+                    continue;
+                }
+
+                $pattern = '/COLUMN\s(`'.$columnForCheck.'`|`[^`]+`\s`'.$columnForCheck.'`)/';
+                $tempSql = implode(', ', $sqlData);
+
+                if (preg_match($pattern, $tempSql)) {
+                    unset($this->columnsForCheckBeforeCommit[$index]);
+                    break;
+                }
+            }
+        }
+
+        return empty($this->columnsForCheckBeforeCommit);
     }
 
     //####################################

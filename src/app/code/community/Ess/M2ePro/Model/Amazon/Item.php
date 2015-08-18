@@ -139,9 +139,14 @@ class Ess_M2ePro_Model_Amazon_Item extends Ess_M2ePro_Model_Component_Abstract
         return (int)$this->getData('store_id');
     }
 
-    public function getVariationOptions()
+    public function getVariationProductOptions()
     {
-        return (array)json_decode($this->getData('variation_options'), true);
+        return $this->getSettings('variation_product_options');
+    }
+
+    public function getVariationChannelOptions()
+    {
+        return $this->getSettings('variation_channel_options');
     }
 
     // ########################################

@@ -11,7 +11,6 @@ class Ess_M2ePro_Model_Observer_Shipment extends Ess_M2ePro_Model_Observer_Abstr
     public function process()
     {
         if (Mage::helper('M2ePro/Data_Global')->getValue('skip_shipment_observer')) {
-            // Not process invoice observer when set such flag
             Mage::helper('M2ePro/Data_Global')->unsetValue('skip_shipment_observer');
             return;
         }

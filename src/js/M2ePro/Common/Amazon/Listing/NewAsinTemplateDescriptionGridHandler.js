@@ -9,7 +9,6 @@ CommonAmazonListingNewAsinTemplateDescriptionGridHandler = Class.create(CommonLi
 
     //----------------------------------
 
-    // todo getSelectedItemsParts
     getMaxProductsInPart: function()
     {
         return 1000;

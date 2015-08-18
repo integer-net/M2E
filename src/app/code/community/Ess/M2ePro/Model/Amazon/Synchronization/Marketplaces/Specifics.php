@@ -141,10 +141,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Specifics
                 'xml_tag'            => $data['xml_tag'],
                 'xpath'              => $data['xpath'],
                 'type'               => (int)$data['type'],
-                'values'             => $data['values'],
-                'recommended_values' => $data['recommended_values'],
-                'params'             => $data['params'],
-                'data_definition'    => $data['data_definition'],
+                'values'             => json_encode($data['values']),
+                'recommended_values' => json_encode($data['recommended_values']),
+                'params'             => json_encode($data['params']),
+                'data_definition'    => json_encode($data['data_definition']),
                 'min_occurs'         => (int)$data['min_occurs'],
                 'max_occurs'         => (int)$data['max_occurs']
             );

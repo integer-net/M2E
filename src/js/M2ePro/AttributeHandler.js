@@ -22,13 +22,19 @@ AttributeHandler.prototype = {
 
     appendToText: function(ddId, targetId)
     {
-        var suffix = ' #' + $(ddId).value + '#';
+        if ($(ddId).value == '') {
+            return;
+        }
+
+        var suffix = '#' + $(ddId).value + '#';
         $(targetId).value = $(targetId).value + suffix;
     },
 
     appendToTextarea: function(value)
     {
-        value = ' ' + value;
+        if (value == '') {
+            return;
+        }
 
         if (wysiwygtext.isEnabled()) {
 

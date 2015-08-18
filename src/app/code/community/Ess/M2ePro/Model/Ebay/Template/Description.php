@@ -44,6 +44,10 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
     const CUT_LONG_TITLE_DISABLED = 0;
     const CUT_LONG_TITLE_ENABLED  = 1;
 
+    const PRODUCT_DETAILS_MODE_NONE           = 0;
+    const PRODUCT_DETAILS_MODE_DOES_NOT_APPLY = 1;
+    const PRODUCT_DETAILS_MODE_ATTRIBUTE      = 2;
+
     const HIT_COUNTER_NONE          = 'NoHitCounter';
     const HIT_COUNTER_BASIC_STYLE   = 'BasicStyle';
     const HIT_COUNTER_GREEN_LED     = 'GreenLED';
@@ -86,9 +90,9 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
     const GALLERY_IMAGES_COUNT_MAX = 11;
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Template_Description_Source
+     * @var Ess_M2ePro_Model_Ebay_Template_Description_Source[]
      */
-    private $descriptionSourceModel = NULL;
+    private $descriptionSourceModels = array();
 
     // ########################################
 
@@ -140,7 +144,7 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
         // ----------------------------------
 
         $temp = parent::deleteInstance();
-        $temp && $this->descriptionSourceModel = NULL;
+        $temp && $this->descriptionSourceModels = array();
         return $temp;
     }
 
@@ -152,15 +156,17 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
      */
     public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
-        if (!empty($this->descriptionSourceModel)) {
-            return $this->descriptionSourceModel;
+        $productId = $magentoProduct->getProductId();
+
+        if (!empty($this->descriptionSourceModels[$productId])) {
+            return $this->descriptionSourceModels[$productId];
         }
 
-        $this->descriptionSourceModel = Mage::getModel('M2ePro/Ebay_Template_Description_Source');
-        $this->descriptionSourceModel->setMagentoProduct($magentoProduct);
-        $this->descriptionSourceModel->setDescriptionTemplate($this->getParentObject());
+        $this->descriptionSourceModels[$productId] = Mage::getModel('M2ePro/Ebay_Template_Description_Source');
+        $this->descriptionSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->descriptionSourceModels[$productId]->setDescriptionTemplate($this->getParentObject());
 
-        return $this->descriptionSourceModel;
+        return $this->descriptionSourceModels[$productId];
     }
 
     // ########################################
@@ -367,6 +373,37 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     // ---------------------------------------
 
+    public function isProductDetailsModeNone($type)
+    {
+        return $this->getProductDetailsMode($type) == self::PRODUCT_DETAILS_MODE_NONE;
+    }
+
+    public function isProductDetailsModeDoesNotApply($type)
+    {
+        return $this->getProductDetailsMode($type) == self::PRODUCT_DETAILS_MODE_DOES_NOT_APPLY;
+    }
+
+    public function isProductDetailsModeAttribute($type)
+    {
+        return $this->getProductDetailsMode($type) == self::PRODUCT_DETAILS_MODE_ATTRIBUTE;
+    }
+
+    public function getProductDetailsMode($type)
+    {
+        if (!in_array($type, array('isbn', 'epid', 'upc', 'ean', 'brand', 'mpn'))) {
+            throw new InvalidArgumentException('Unknown Product details name');
+        }
+
+        $productDetails = $this->getProductDetails();
+
+        if (!is_array($productDetails) || !isset($productDetails[$type]) ||
+            !isset($productDetails[$type]['mode'])) {
+            return NULL;
+        }
+
+        return $productDetails[$type]['mode'];
+    }
+
     public function getProductDetailAttribute($type)
     {
         if (!in_array($type, array('isbn', 'epid', 'upc', 'ean', 'brand', 'mpn'))) {
@@ -375,11 +412,12 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
         $productDetails = $this->getProductDetails();
 
-        if (!is_array($productDetails) || !isset($productDetails[$type])) {
+        if (!is_array($productDetails) || !isset($productDetails[$type]) ||
+            !isset($productDetails[$type]['attribute'])) {
             return NULL;
         }
 
-        return $productDetails[$type];
+        return $productDetails[$type]['attribute'];
     }
 
     public function getProductDetailAttributes()
@@ -744,12 +782,12 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             'condition_note_template' => '',
 
             'product_details' => json_encode(array(
-                'isbn'  => '',
-                'epid'  => '',
-                'upc'   => '',
-                'ean'   => '',
-                'brand' => '',
-                'mpn'   => '',
+                'isbn'  => array('mode' => self::PRODUCT_DETAILS_MODE_NONE, 'attribute' => ''),
+                'epid'  => array('mode' => self::PRODUCT_DETAILS_MODE_NONE, 'attribute' => ''),
+                'upc'   => array('mode' => self::PRODUCT_DETAILS_MODE_NONE, 'attribute' => ''),
+                'ean'   => array('mode' => self::PRODUCT_DETAILS_MODE_NONE, 'attribute' => ''),
+                'brand' => array('mode' => self::PRODUCT_DETAILS_MODE_NONE, 'attribute' => ''),
+                'mpn'   => array('mode' => self::PRODUCT_DETAILS_MODE_DOES_NOT_APPLY, 'attribute' => ''),
                 'include_description' => 1,
                 'include_image'       => 1,
             )),

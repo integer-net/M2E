@@ -6,7 +6,9 @@
 
         You can select Amazon Category, in which Amazon Products should be placed. Category must be selected to Create New ASIN/ISBN. <br/>
 
-        In case you are planning to use Description Policy for New ASIN/ISBN Creation, you should enable New ASIN/ISBN Creation feature.'
+        In case you are planning to use Description Policy for New ASIN/ISBN Creation, you should enable New ASIN/ISBN Creation feature.</br></br>
+        More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
+        Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Description+Policy')
     ); ?>
 </div>
 
@@ -85,7 +87,10 @@
         'Please enter a valid number value in a specified range.'                              => Mage::helper('M2ePro')->__('Please enter a valid number value in a specified range.'),
 
         'You should select Marketplace first.' => Mage::helper('M2ePro')->__('You should select Marketplace first.'),
-        'You should select Category first'     => Mage::helper('M2ePro')->__('You should select Category first'),
+        'You should select Category and Product Type first' => Mage::helper('M2ePro')->__('You should select Category and Product Type first'),
+
+        'Recommended' => Mage::helper('M2ePro')->__('Recommended'),
+        'Recent'      => Mage::helper('M2ePro')->__('Recent'),
     )); ?>);
 
     M2ePro.formData.general = <?php echo json_encode($formData['general']); ?>;
@@ -94,7 +99,7 @@
 
     M2ePro.customData.category_locked             = <?php echo json_encode($this->getData('category_locked')); ?>;
     M2ePro.customData.marketplace_locked          = <?php echo json_encode($this->getData('marketplace_locked')); ?>;
-    M2ePro.customData.marketplace_force_set       = <?php echo json_encode($this->getData('marketplace_locked')); ?>;
+    M2ePro.customData.marketplace_force_set       = <?php echo json_encode((bool)(int)$this->getRequest()->getParam('marketplace_id')); ?>;
     M2ePro.customData.new_asin_switcher_locked    = <?php echo json_encode($this->getData('new_asin_switcher_locked')); ?>;
     M2ePro.customData.new_asin_switcher_force_set = <?php echo json_encode((bool)(int)$this->getRequest()->getParam('is_new_asin_accepted')); ?>;
 
@@ -115,6 +120,7 @@
         $('new_asin_accepted').observe('change', AmazonTemplateDescriptionHandlerObj.onChangeNewAsinAccepted);
 
         $('edit_category_link').observe('click', AmazonTemplateDescriptionHandlerObj.onClickEditCategory);
+        $('product_data_nick_select').observe('change', AmazonTemplateDescriptionHandlerObj.onChangeProductDataNick);
 
         $('worldwide_id_mode')
             .observe('change', AmazonTemplateDescriptionHandlerObj.onChangeWorldwideId)
@@ -223,13 +229,15 @@
         <div class="hor-scroll">
 
             <div id="block_notice_template_description_edit_category" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Category'); ?>">
-                <?php echo Mage::helper('M2ePro')->__('You can choose Amazon Category, in which your Amazon Products should be shown. <br/><br/>
-
-                Selection of Category is necessary in case you are going to create New ASIN/ISBN using this Description Policy. <br/><br/>
-
-                Since Amazon does not have a single structural Categories Tree and there are several of them, a tree that is presented in M2E Pro can be rather different from those you are used earlier on Amazon or in other applications. <br/><br/>
-
-                <b>Note:</b> Possibility to specify Product Specifics on Specifics Tab becomes available only when Category is selected. A list of Specifics depends on a particular chosen Category.'); ?>
+                <?php echo Mage::helper('M2ePro')->__('
+                You can choose <strong>Amazon Category</strong>, in which your Amazon Products should be shown and the <strong>Product Type</strong>.</br></br>
+                Selection of Category is necessary in case you are going to create New ASIN/ISBN using this Description Policy.</br></br>
+                Since Amazon does not have a single structural Categories Tree and there are several of them, a tree that
+                is presented in M2E Pro can be rather different from those you are used earlier on Amazon or in other Applications.</br>
+                The list of available Specifics on Specifics tab depends on the selected Product Type.</br></br>
+                <strong>Note:</strong> Possibility to specify Product Specifics becomes available only when Category
+                and Product Type are selected.
+                '); ?>
             </div>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -241,7 +249,7 @@
 
                     <td class="value" style="min-width: 280px;">
                         <span id="category_path_span">
-                            <?php if (!empty($formData['general']['category_path']) && !empty($formData['general']['product_data_nick']) && !empty($formData['general']['browsenode_id'])) { ?>
+                            <?php if (!empty($formData['general']['category_path']) && !empty($formData['general']['browsenode_id'])) { ?>
                                 <span><?php echo Mage::helper('M2ePro')->escapeHtml("{$formData['general']['category_path']} ({$formData['general']['browsenode_id']})"); ?></span>
                             <?php } else { ?>
                                 <span style="font-style: italic; color: grey;"><?php echo Mage::helper('M2ePro')->__('Not Selected'); ?></span>
@@ -249,7 +257,6 @@
                         </span>
 
                         <input type="hidden" name="general[category_path]" id="category_path" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['general']['category_path']); ?>" />
-                        <input type="hidden" name="general[product_data_nick]" id="product_data_nick" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['general']['product_data_nick']); ?>" />
                         <input type="hidden" name="general[browsenode_id]" id="browsenode_id" value="<?php echo $formData['general']['browsenode_id']; ?>" />
                     </td>
 
@@ -277,6 +284,22 @@
 
                         <a id="edit_category_link" href="#" style="margin-left: 10px;"><?php echo Mage::helper('M2ePro')->__('Edit'); ?></a>
                     </td>
+
+                </tr>
+
+                <tr id="product_data_nick_tr" style="display: none;">
+
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Product Type'); ?>: <span class="required">*</span></label>
+                    </td>
+
+                    <td class="value" style="min-width: 280px;">
+                        <select id="product_data_nick_select" class="select M2ePro-required-when-visible">
+                        </select>
+                        <input type="hidden" name="general[product_data_nick]" id="product_data_nick" value="<?php echo Mage::helper('M2ePro')->escapeHtml($formData['general']['product_data_nick']); ?>" />
+                    </td>
+
+                </tr>
 
             </table>
 

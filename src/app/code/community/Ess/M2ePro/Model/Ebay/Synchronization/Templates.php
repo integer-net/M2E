@@ -135,6 +135,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates
             return;
         }
 
+        // M2ePro_TRANSLATIONS
+        // Task "Inventory Synchronization" has completed with %result%. View Listings Log for details.
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                 'Task "Inventory Synchronization" has completed with %result%. View Listings Log for details.',
@@ -142,7 +144,9 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates
             ), $resultType, $resultPriority
         );
 
-        $this->getActualOperationHistory()->addText('Updating Products on eBay ended with '.$resultString.'.');
+        // M2ePro_TRANSLATIONS
+        // Updating Products on eBay ended with
+        $this->getActualOperationHistory()->addText('Updating Products on eBay ended with'.' '.$resultString.'.');
     }
 
     //####################################

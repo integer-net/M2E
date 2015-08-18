@@ -10,10 +10,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation extends Ess_M2ePro_B
 
     protected function _beforeToHtml()
     {
-        //-------------------------------
-        $this->appendWizardCompleteButton();
-        //-------------------------------
-
         // Steps
         //-------------------------------
         $this->setChild(
@@ -40,8 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_Amazon_Installation extends Ess_M2ePro_B
     {
         return parent::_toHtml()
             . $this->getChildHtml('step_marketplace')
-            . $this->getChildHtml('step_account')
-            . $this->getChildHtml('end_button');
+            . $this->getChildHtml('step_account');
     }
 
     // ########################################

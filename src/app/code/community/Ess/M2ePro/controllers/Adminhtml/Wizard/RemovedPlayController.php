@@ -20,10 +20,7 @@ class Ess_M2ePro_Adminhtml_Wizard_RemovedPlayController
     {
         Mage::helper('M2ePro/Magento')->clearMenuCache();
 
-        Mage::helper('M2ePro/Module_Wizard')->setStatus(
-            $this->getNick(),
-            Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED
-        );
+        $this->setStatus(Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED);
 
         return $this->_redirect('*/adminhtml_common_listing/index/');
     }

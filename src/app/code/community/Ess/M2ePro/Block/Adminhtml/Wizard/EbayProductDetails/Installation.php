@@ -11,10 +11,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_EbayProductDetails_Installation
 
     protected function _beforeToHtml()
     {
-        //-------------------------------
-        $this->appendWizardCompleteButton();
-        //-------------------------------
-
         // Steps
         //-------------------------------
         $this->setChild(
@@ -35,8 +31,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_EbayProductDetails_Installation
         return 'eBay Integration Upgrade Wizard';
     }
 
-    protected function appendButtons() {}
-
     protected function _toHtml()
     {
         $urls = json_encode(array(
@@ -52,8 +46,7 @@ JS
 ;
         return parent::_toHtml()
         . $js
-        . $this->getChildHtml('step_marketplaces_synchronization')
-        . $this->getChildHtml('end_button');
+        . $this->getChildHtml('step_marketplaces_synchronization');
     }
 
     // ########################################

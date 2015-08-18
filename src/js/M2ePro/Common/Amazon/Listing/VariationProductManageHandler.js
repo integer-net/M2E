@@ -94,6 +94,8 @@ CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
 
     openVocabularyAttributesPopUp: function (attributes)
     {
+        var self = this;
+
         vocabularyAttributesPopUp = Dialog.info(null, {
             draggable: true,
             resizable: true,
@@ -108,8 +110,7 @@ CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
             hideEffect: Element.hide,
             showEffect: Element.show,
             onClose: function() {
-                this.reloadSettings();
-                this.reloadVariationsGrid();
+                self.reloadVariationsGrid();
             }.bind(this)
         });
         vocabularyAttributesPopUp.options.destroyOnClose = true;
@@ -159,6 +160,8 @@ CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
 
     openVocabularyOptionsPopUp: function (options)
     {
+        var self = this;
+
         vocabularyOptionsPopUp = Dialog.info(null, {
             draggable: true,
             resizable: true,
@@ -173,8 +176,7 @@ CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
             hideEffect: Element.hide,
             showEffect: Element.show,
             onClose: function() {
-                this.reloadSettings();
-                this.reloadVariationsGrid();
+                self.reloadVariationsGrid();
             }.bind(this)
         });
         vocabularyOptionsPopUp.options.destroyOnClose = true;
@@ -248,8 +250,7 @@ CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
 
                 var response = self.parseResponse(transport);
                 if(response.success) {
-                    self.reloadVariationsGrid();
-                    return self.reloadSettings();
+                    return self.reloadVariationsGrid();
                 }
 
                 if (response.empty_sku) {
@@ -530,7 +531,6 @@ CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
             onSuccess: function (transport) {
                 var response = self.parseResponse(transport);
                 if (response.success) {
-                    self.reloadSettings();
                     self.reloadVariationsGrid();
 
                     if (response['vocabulary_attributes']) {
@@ -635,6 +635,81 @@ CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
     openVariationsTab: function (createNewAsin) {
         amazonVariationProductManageTabsJsTabs.showTabContent(amazonVariationProductManageTabsJsTabs.tabs[0]);
         $('amazonVariationsProductManageVariationsGridIframe').contentWindow.ListingGridHandlerObj.showNewChildForm(createNewAsin);
+    },
+
+    //---------------------------------
+
+    reloadVocabulary: function(callback, hideMask)
+    {
+        var self = this;
+
+        new Ajax.Request(this.options.url.viewVocabularyAjax, {
+            method: 'post',
+            parameters: {
+                product_id : variationProductManagePopup.productId
+            },
+            onSuccess: function (transport) {
+                $('amazonVariationProductManageTabs_vocabulary_content').update(transport.responseText);
+
+                if(callback) {
+                    callback.call();
+                }
+            }
+        });
+
+        hideMask && $('loading-mask').hide();
+    },
+
+    saveAutoActionSettings: function()
+    {
+        new Ajax.Request(this.options.url.saveAutoActionSettings, {
+            method: 'post',
+            parameters: $('auto_action_settings_form').serialize(true)
+        });
+    },
+
+    removeAttributeFromVocabulary: function (el)
+    {
+        var self = this,
+            attrRowEl = el.up('.matched-attributes-pair');
+
+        if(!confirm(self.options.text.confirm)) {
+            return;
+        }
+
+        new Ajax.Request(this.options.url.removeAttributeFromVocabulary, {
+            method: 'post',
+            parameters: {
+                magento_attr : decodeHtmlentities(el.up().down('.magento-attribute-name').innerHTML),
+                channel_attr : decodeHtmlentities(el.up().down('.channel-attribute-name').innerHTML)
+            },
+            onSuccess: function (transport) {
+                self.reloadVocabulary();
+            }
+        });
+    },
+
+    removeOptionFromVocabulary: function (el)
+    {
+        var self = this,
+            optionGroupRowEl = el.up('.channel-attribute-options-group'),
+            attrOptionsRowEl = el.up('.magento-attribute-options');
+
+        if(!confirm(self.options.text.confirm)) {
+            return;
+        }
+
+        new Ajax.Request(this.options.url.removeOptionFromVocabulary, {
+            method: 'post',
+            parameters: {
+                product_option : decodeHtmlentities(optionGroupRowEl.down('.product-option').innerHTML),
+                product_options_group : decodeHtmlentities(optionGroupRowEl.down('.product-options-group').innerHTML),
+                channel_attr : decodeHtmlentities(optionGroupRowEl.down('.channel-attribute-name').innerHTML)
+            },
+            onSuccess: function (transport) {
+                self.reloadVocabulary();
+            }
+        });
     }
 
     //---------------------------------

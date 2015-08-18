@@ -9,11 +9,34 @@ abstract class Ess_M2ePro_Controller_Adminhtml_BaseController
 {
     protected $generalBlockWasAppended = false;
 
+    protected $pageHelpLink = NULL;
+
     //#############################################
 
     public function indexAction()
     {
         $this->_redirect(Mage::helper('M2ePro/Module_Support')->getPageRoute());
+    }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isLoggedIn();
+    }
+
+    //#############################################
+
+    protected function setPageHelpLink($component = NULL, $article = NULL)
+    {
+        $this->pageHelpLink = Mage::helper('M2ePro/Module_Support')->getDocumentationUrl($component, $article);
+    }
+
+    protected function getPageHelpLink()
+    {
+        if (is_null($this->pageHelpLink)) {
+            return Mage::helper('M2ePro/Module_Support')->getDocumentationUrl();
+        }
+
+        return $this->pageHelpLink;
     }
 
     //#############################################
@@ -193,6 +216,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_BaseController
 
         $generalBlockPath = Ess_M2ePro_Helper_View::GENERAL_BLOCK_PATH;
         $blockGeneral = $this->getLayout()->createBlock($generalBlockPath);
+        $blockGeneral->setData('page_help_link', $this->getPageHelpLink());
 
         $block->append($blockGeneral);
         $this->generalBlockWasAppended = true;

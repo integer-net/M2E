@@ -302,10 +302,24 @@ HTML;
             return array();
         }
 
-        $detailsModel = Mage::getModel('M2ePro/Amazon_Marketplace_Details');
-        $detailsModel->setMarketplaceId($this->getListingProduct()->getListing()->getMarketplaceId());
+        $marketPlaceId = $this->getListingProduct()->getListing()->getMarketplaceId();
 
-        return $this->channelThemes = $detailsModel->getVariationThemes($descriptionTemplate->getProductDataNick());
+        $detailsModel = Mage::getModel('M2ePro/Amazon_Marketplace_Details');
+        $detailsModel->setMarketplaceId($marketPlaceId);
+
+        $channelThemes = $detailsModel->getVariationThemes($descriptionTemplate->getProductDataNick());
+
+        $variationHelper = Mage::helper('M2ePro/Component_Amazon_Variation');
+        $themesUsageData = $variationHelper->getThemesUsageData();
+        $usedThemes = array();
+
+        foreach ($themesUsageData[$marketPlaceId] as $theme => $count) {
+            if (!empty($channelThemes[$theme])) {
+                $usedThemes[$theme] = $channelThemes[$theme];
+            }
+        }
+
+        return $this->channelThemes = array_merge($usedThemes, $channelThemes);
     }
 
     public function getChannelThemeAttr()

@@ -129,12 +129,14 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
                 return;
             }
 
-            $this->processListingProductVariation($variationsSnapshot,$change['variations']);
+            $this->processListingProductVariation($variationsSnapshot,$change['variations'], $listingProduct);
         }
     }
 
     private function processListingProduct(Ess_M2ePro_Model_Listing_Product $listingProduct, array $change)
     {
+        $oldStatus = $listingProduct->getStatus();
+
         $updateData = array_merge(
             $this->getProductPriceChanges($listingProduct, $change),
             $this->getProductQtyChanges($listingProduct, $change),
@@ -144,21 +146,14 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
 
         $listingProduct->addData($updateData)->save();
 
-        foreach ($listingProduct->getVariations(true) as $variation) {
-
-            if ($listingProduct->getStatus() != Ess_M2ePro_Model_Listing_Product::STATUS_LISTED &&
-                $listingProduct->getStatus() != Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED) {
-                $variation->setData('status',$listingProduct->getStatus())->save();
-            }
-
-            if ($listingProduct->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED &&
-                $listingProduct->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
-                $variation->setData('status',Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED)->save();
-            }
+        if ($oldStatus !== $updateData['status']) {
+            $listingProduct->getChildObject()->updateVariationsStatus();
         }
     }
 
-    private function processListingProductVariation(array $variationsSnapshot, array $changeVariations)
+    private function processListingProductVariation(array $variationsSnapshot,
+                                                    array $changeVariations,
+                                                    Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         foreach ($changeVariations as $changeVariation) {
             foreach ($variationsSnapshot as $variationSnapshot) {
@@ -174,15 +169,16 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
                                                                 0 : (int)$changeVariation['quantitySold']
                 );
 
-                if ($updateData['online_qty'] <= $updateData['online_qty_sold']) {
-                    $updateData['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_SOLD;
-                }
-                if ($updateData['online_qty'] <= 0) {
-                    $updateData['status'] = Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED;
-                }
+                /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Variation $ebayVariationObj */
+                $ebayVariationObj = $variationSnapshot['variation']->getChildObject();
 
-                $variationSnapshot['variation']->addData($updateData)->save();
+                if ($ebayVariationObj->getOnlinePrice() != $updateData['online_price'] ||
+                    $ebayVariationObj->getOnlineQty() != $updateData['online_qty'] ||
+                    $ebayVariationObj->getOnlineQtySold() != $updateData['online_qty_sold']) {
 
+                    $variationSnapshot['variation']->addData($updateData)->save();
+                    $variationSnapshot['variation']->getChildObject()->setStatus($listingProduct->getStatus());
+                }
                 break;
             }
         }
@@ -256,6 +252,10 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_UpdateListingsProduct
     private function processResponseMessages(Ess_M2ePro_Model_Connector_Protocol $connectorObj)
     {
         foreach ($connectorObj->getErrorMessages() as $message) {
+
+            if ($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_CODE_KEY] == 21917062) {
+                continue;
+            }
 
             if (!$connectorObj->isMessageError($message) && !$connectorObj->isMessageWarning($message)) {
                 continue;

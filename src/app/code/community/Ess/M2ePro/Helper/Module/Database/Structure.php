@@ -62,7 +62,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_order_change',
             'm2epro_order_item',
             'm2epro_order_log',
-            'm2epro_order_repair',
+            'm2epro_order_matching',
 
             'm2epro_ebay_account',
             'm2epro_ebay_account_store_category',
@@ -99,6 +99,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
 
             'm2epro_amazon_account',
             'm2epro_amazon_dictionary_category',
+            'm2epro_amazon_dictionary_category_product_data',
             'm2epro_amazon_dictionary_marketplace',
             'm2epro_amazon_dictionary_specific',
             'm2epro_amazon_item',

@@ -57,7 +57,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
 
             $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
             $configurator->setPartialMode();
-            $configurator->allowSelling();
+            $configurator->allowQty();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
                 $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
@@ -92,7 +92,7 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates_Revise
 
             $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
             $configurator->setPartialMode();
-            $configurator->allowSelling();
+            $configurator->allowPrice();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
                 $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator

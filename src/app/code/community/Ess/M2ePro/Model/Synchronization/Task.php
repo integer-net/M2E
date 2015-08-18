@@ -537,6 +537,8 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
         $this->getActualLockItem()->setPercents($this->getPercentsEnd());
 
+        // M2ePro_TRANSLATIONS
+        // Task "%task_title%" is finished. Please wait...
         $status = 'Task "%task_title%" is finished. Please wait...';
         $title = ($this->isComponentLauncherTask() || $this->isContainerTask()) ?
                     $this->getTitle().' '.$suffix : $this->getTitle();

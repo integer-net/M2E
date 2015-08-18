@@ -137,7 +137,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Item extends Mage_Adminhtml_Blo
     {
         $html = '<b>'.Mage::helper('M2ePro')->escapeHtml($row->getTitle()).'</b><br/>';
 
-        $variation = $row->getChildObject()->getVariation();
+        $variation = $row->getChildObject()->getVariationOptions();
         if (!empty($variation)) {
             foreach ($variation as $optionName => $optionValue) {
                 $optionNameHtml = Mage::helper('M2ePro')->escapeHtml($optionName);

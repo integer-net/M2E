@@ -491,6 +491,10 @@ HTML;
 
     public function callbackColumnEbayItemId($value, $row, $column, $isExport)
     {
+        if ($row->getData('ebay_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -511,6 +515,10 @@ HTML;
 
     public function callbackColumnOnlineAvailableQty($value, $row, $column, $isExport)
     {
+        if ($row->getData('ebay_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -524,6 +532,10 @@ HTML;
 
     public function callbackColumnOnlineQtySold($value, $row, $column, $isExport)
     {
+        if ($row->getData('ebay_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -537,6 +549,10 @@ HTML;
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
+        if ($row->getData('ebay_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         $onlineMinPrice = $row->getData('min_online_price');
         $onlineMaxPrice = $row->getData('max_online_price');
         $onlineStartPrice = $row->getData('online_start_price');
@@ -609,14 +625,49 @@ HTML;
                 $resultHtml = $intervalHtml.'&nbsp;'.'<span class="product-price-value">'.$onlineStartStr.'</span>';
             }
 
-            return $resultHtml;
+        } else {
+            $onlineMinPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMinPrice);
+            $onlineMaxPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMaxPrice);
+
+            $resultHtml = '<span class="product-price-value">' . $onlineMinPriceStr . '</span>' .
+                (($onlineMinPrice != $onlineMaxPrice) ? ' - ' . $onlineMaxPriceStr :  '');
         }
 
-        $onlineMinPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMinPrice);
-        $onlineMaxPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMaxPrice);
+        $listingProductId = (int)$row->getData('listing_product_id');
+        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+        $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getObject('Listing_Product',$listingProductId);
+        $onlineBids = $listingProduct->getChildObject()->getOnlineBids();
 
-        return '<span class="product-price-value">' . $onlineMinPriceStr . '</span>' .
-            (($onlineMinPrice != $onlineMaxPrice) ? ' - ' . $onlineMaxPriceStr :  '');
+        if ($onlineBids) {
+            $title = $row->getName();
+
+            $onlineTitle = $row->getData('online_title');
+            !empty($onlineTitle) && $title = $onlineTitle;
+
+            $bidsPopupTitle = Mage::helper('M2ePro')->__('Bids of &quot;%s&quot;', $title);
+            $bidsPopupTitle = addslashes($bidsPopupTitle);
+
+            $bidsTitle = Mage::helper('M2ePro')->__('Show bids list');
+            $bidsText = Mage::helper('M2ePro')->__('Bid(s)');
+
+            if ($listingProduct->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED) {
+                $resultHtml .= '<br><br><span style="font-size: 10px; color: gray;">' .
+                    $onlineBids. ' ' . $bidsText . '</span>';
+            } else {
+                $resultHtml .= <<<HTML
+<br>
+<br>
+<a class="m2ePro-ebay-auction-bids-link"
+    href="javascript:void(0)"
+    title="{$bidsTitle}"
+    onclick="EbayListingEbayGridHandlerObj
+        .listingProductBidsHandler.openPopUp({$listingProductId},'{$bidsPopupTitle}')"
+>{$onlineBids} {$bidsText}</a>
+HTML;
+            }
+        }
+
+        return $resultHtml;
     }
 
     public function callbackColumnStatus($value, $row, $column, $isExport)
@@ -692,6 +743,10 @@ HTML;
 
     public function callbackColumnEndTime($value, $row, $column, $isExport)
     {
+        if ($row->getData('ebay_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -730,11 +785,11 @@ HTML;
 
         $condition = '';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition = 'min_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'min_online_price <= \''.$value['to'].'\'';
@@ -742,11 +797,11 @@ HTML;
 
         $condition = '(' . $condition . ') OR (';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition .= 'max_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'max_online_price <= \''.$value['to'].'\'';
@@ -1188,6 +1243,7 @@ HTML;
 
         EbayListingEbayGridHandlerObj.actionHandler.setOptions(M2ePro);
         EbayListingEbayGridHandlerObj.variationProductManageHandler.setOptions(M2ePro);
+        EbayListingEbayGridHandlerObj.listingProductBidsHandler.setOptions(M2ePro);
 
         ListingProgressBarObj = new ProgressBar('listing_view_progress_bar');
         GridWrapperObj = new AreaWrapper('listing_view_content_container');

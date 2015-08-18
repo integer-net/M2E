@@ -162,12 +162,28 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
     {
         $description = Mage::getModel('M2ePro/Log_Abstract')->decodeDescription($logMessage);
 
-        preg_match_all('/[^(href=")](http|https)\:\/\/[a-z0-9\-\._\/+\?\&\%=;]+/i', $description, $matches);
+        preg_match_all('/[^(href=")](http|https)\:\/\/[a-z0-9\-\._\/+\?\&\%=;\(\)]+/i', $description, $matches);
         $matches = array_unique($matches[0]);
 
+        foreach ($matches as &$url) {
+            $url = trim($url, '.()[] ');
+        }
+        unset($url);
+
         foreach ($matches as $url) {
-            $url = rtrim($url, '.() ');
-            $description = str_replace($url, "<a target=\"_blank\" href=\"{$url}\">{$url}</a>", $logMessage);
+
+            $nestingLinks = 0;
+            foreach ($matches as $value) {
+                if (strpos($value, $url) !== false) {
+                    $nestingLinks++;
+                }
+            }
+
+            if ($nestingLinks > 1) {
+                continue;
+            }
+
+            $description = str_replace($url, "<a target=\"_blank\" href=\"{$url}\">{$url}</a>", $description);
         }
 
         return Mage::helper('M2ePro')->escapeHtml($description, array('a'), ENT_NOQUOTES);

@@ -107,7 +107,17 @@ class Ess_M2ePro_Helper_Server extends Mage_Core_Helper_Abstract
                 return $this->sendRequest($postData,$headers,$timeout,true);
             }
 
-            throw new Ess_M2ePro_Model_Exception('Server connection is failed. Please try again later.',
+            $errorMsg = 'The Action was not completed because connection with M2E Pro Server was not set.
+            There are several possible reasons:  temporary connection problem – please wait and try again later;
+            block of outgoing connection by firewall – please, ensure that connection to s1.m2epro.com and
+            s2.m2epro.com, port 443 is allowed; CURL library is not installed or it does not support HTTPS Protocol –
+            please, install/update CURL library on your server and ensure it supports HTTPS Protocol.
+            More information you can find <a target="_blank" href="'.
+            Mage::helper('M2ePro/Module_Support')
+                ->getKnowledgebaseUrl('664870-issues-with-m2e-pro-server-connection')
+                .'">here</a>';
+
+            throw new Ess_M2ePro_Model_Exception($errorMsg,
                                                  array('curl_info' => $curlInfo, 'curl_error_number' => $errorNumber));
         }
 

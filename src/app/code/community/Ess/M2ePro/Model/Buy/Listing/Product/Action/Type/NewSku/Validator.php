@@ -23,6 +23,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_NewSku_Validator
         $generalId = $this->getBuyListingProduct()->getGeneralId();
         if (!empty($generalId)) {
 
+            // M2ePro_TRANSLATIONS
+            // General id must be empty
             $this->addMessage('General id must be empty');
 
             return false;

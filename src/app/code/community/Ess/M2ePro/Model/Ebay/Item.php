@@ -139,5 +139,10 @@ class Ess_M2ePro_Model_Ebay_Item extends Ess_M2ePro_Model_Component_Abstract
         return (int)$this->getData('store_id');
     }
 
+    public function getVariations()
+    {
+        return $this->getSettings('variations');
+    }
+
     // ########################################
 }

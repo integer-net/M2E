@@ -20,6 +20,8 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SynchronizationController
 
         $this->_initPopUp();
 
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Buy::NICK, 'Synchronization+Policy');
+
         return $this;
     }
 

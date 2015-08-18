@@ -35,7 +35,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
         $this->addNewVariations($listingProduct,$addedVariations);
         $this->markAsDeletedVariations($deletedVariations);
 
-        $this->saveVariationsSets($listingProduct,$rawMagentoVariations);
+        $this->saveVariationsData($listingProduct,$rawMagentoVariations);
     }
 
     // ########################################
@@ -119,18 +119,19 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Updater
         return $sourceVariations;
     }
 
-    protected function saveVariationsSets(Ess_M2ePro_Model_Listing_Product $listingProduct,$variations)
+    protected function saveVariationsData(Ess_M2ePro_Model_Listing_Product $listingProduct, $variationsData)
     {
-        if (!isset($variations['set'])) {
-            return;
+        $additionalData = $listingProduct->getData('additional_data');
+        $additionalData = is_null($additionalData) ? array()
+                                                   : (array)json_decode($additionalData,true);
+
+        if (isset($variationsData['set'])) {
+            $additionalData['variations_sets'] = $variationsData['set'];
         }
 
-        $additionalData = $listingProduct->getData('additional_data');
-        $additionalData = is_null($additionalData)
-                          ? array()
-                          : json_decode($additionalData,true);
-
-        $additionalData['variations_sets'] = $variations['set'];
+        if (isset($variationsData['additional']['attributes'])) {
+            $additionalData['configurable_attributes'] = $variationsData['additional']['attributes'];
+        }
 
         $listingProduct->setData('additional_data',json_encode($additionalData))
                        ->save();

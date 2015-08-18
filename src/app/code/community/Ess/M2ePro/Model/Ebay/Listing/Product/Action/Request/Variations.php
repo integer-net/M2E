@@ -49,15 +49,18 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
         foreach ($variations as $variation) {
 
             /** @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
+            /** @var $ebayVariation Ess_M2ePro_Model_Ebay_Listing_Product_Variation */
+
+            $ebayVariation = $variation->getChildObject();
 
             $item = array(
                 '_instance_' => $variation,
-                'price' => $variation->getChildObject()->getPrice(),
-                'qty' => $variation->getChildObject()->isDelete() ? 0 : $variation->getChildObject()->getQty(),
-                'sku' => $variation->getChildObject()->getSku(),
-                'add' => $variation->getChildObject()->isAdd(),
-                'delete' => $variation->getChildObject()->isDelete(),
-                'specifics' => array()
+                'price'      => $ebayVariation->getPrice(),
+                'qty'        => $ebayVariation->isDelete() ? 0 : $ebayVariation->getQty(),
+                'sku'        => $ebayVariation->getSku(),
+                'add'        => $ebayVariation->isAdd(),
+                'delete'     => $ebayVariation->isDelete(),
+                'specifics'  => array()
             );
 
             if (($qtyMode == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED ||
@@ -72,7 +75,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
             if ($this->getEbayListingProduct()->isPriceDiscountStp()) {
 
                 $priceDiscountData = array(
-                    'original_retail_price' => $variation->getChildObject()->getPriceDiscountStp()
+                    'original_retail_price' => $ebayVariation->getPriceDiscountStp()
                 );
 
                 if ($this->getEbayMarketplace()->isStpAdvancedEnabled()) {
@@ -88,11 +91,10 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
             if ($this->getEbayListingProduct()->isPriceDiscountMap()) {
                 $priceDiscountMapData = array(
-                    'minimum_advertised_price' => $variation->getChildObject()->getPriceDiscountMap(),
+                    'minimum_advertised_price' => $ebayVariation->getPriceDiscountMap(),
                 );
 
-                $exposure = $variation->getChildObject()->
-                    getEbaySellingFormatTemplate()->getPriceDiscountMapExposureType();
+                $exposure = $ebayVariation->getEbaySellingFormatTemplate()->getPriceDiscountMapExposureType();
                 $priceDiscountMapData['minimum_advertised_price_exposure'] =
                     Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Selling::
                         getPriceDiscountMapExposureType($exposure);
@@ -299,7 +301,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
                 $attributeLabel = $foundAttributeLabel;
 
-                $optionImages = $option->getChildObject()->getImagesForEbay();
+                $optionImages = $option->getChildObject()->getGalleryImages();
 
                 if (count($optionImages) <= 0) {
                     continue;
@@ -385,14 +387,21 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
     private function getVariationDetails(Ess_M2ePro_Model_Listing_Product_Variation $variation)
     {
         $data = array();
+        /** @var Ess_M2ePro_Model_Ebay_Template_Description $ebayDescriptionTemplate */
+        $ebayDescriptionTemplate = $this->getEbayListingProduct()->getEbayDescriptionTemplate();
 
         $this->searchNotFoundAttributes();
 
-        $tempValue = $this->getEbayListingProduct()
-                          ->getDescriptionTemplateSource()
-                          ->getProductDetail('brand');
+        $tempValue = NULL;
 
-        if ($this->processNotFoundAttributes(strtoupper('brand')) && $tempValue) {
+        if ($ebayDescriptionTemplate->isProductDetailsModeDoesNotApply('brand')) {
+            $tempValue = Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::PRODUCT_DETAILS_UNBRANDED;
+        } elseif ($ebayDescriptionTemplate->isProductDetailsModeAttribute('brand') &&
+                  $this->processNotFoundAttributes(strtoupper('brand'))) {
+            $tempValue = $this->getEbayListingProduct()->getDescriptionTemplateSource()->getProductDetail('brand');
+        }
+
+        if ($tempValue) {
             $data['brand'] = $tempValue;
         }
 
@@ -411,9 +420,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
                 continue;
             }
 
-            $attribute = $this->getEbayListingProduct()
-                              ->getEbayDescriptionTemplate()
-                              ->getProductDetailAttribute($tempType);
+            if ($ebayDescriptionTemplate->isProductDetailsModeDoesNotApply($tempType)) {
+                $data[$tempType] = Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::
+                                                                            PRODUCT_DETAILS_DOES_NOT_APPLY;
+                continue;
+            }
+
+            $attribute = $ebayDescriptionTemplate->getProductDetailAttribute($tempType);
 
             if (!$attribute) {
                 continue;

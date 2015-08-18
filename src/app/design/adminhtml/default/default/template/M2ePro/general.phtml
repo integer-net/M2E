@@ -24,6 +24,8 @@
         'm2epro_skin_url' => $this->getSkinUrl('M2ePro')
     )); ?>);
 
+    setPageHelpLink('<?php echo $this->getPageHelpLink(); ?>');
+
     M2ePro.translator.add(<?php echo Zend_Json::encode(array(
 
         'Are you sure?' => Mage::helper('M2ePro')->__('Are you sure?'),
@@ -46,6 +48,9 @@
         'Please select Action.' => Mage::helper('M2ePro')->__('Please select Action.'),
         'View All Product Log' => Mage::helper('M2ePro')->__('View All Product Log'),
         'This is a required field.' => Mage::helper('M2ePro')->__('This is a required field.'),
+        'Please enter valid UPC' => Mage::helper('M2ePro')->__('Please enter valid UPC'),
+        'Please enter valid EAN' => Mage::helper('M2ePro')->__('Please enter valid EAN'),
+        'Please enter valid ISBN' => Mage::helper('M2ePro')->__('Please enter valid ISBN'),
         'Invalid input data. Decimal value required. Example 12.05' => Mage::helper('M2ePro')->__('Invalid input data. Decimal value required. Example 12.05'),
 
         'You should select Attribute Set first.' => Mage::helper('M2ePro')->__('You should select Attribute Set first.'),

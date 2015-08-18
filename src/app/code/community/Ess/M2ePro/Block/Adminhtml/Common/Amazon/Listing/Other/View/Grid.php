@@ -292,7 +292,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         }
 
         $tempSku = $row->getData('sku');
-        empty($tempSku) && $tempSku = 'N/A';
+        empty($tempSku) && $tempSku = Mage::helper('M2ePro')->__('N/A');
 
         $value .= '<br/><strong>'
                   .Mage::helper('M2ePro')->__('SKU')
@@ -362,10 +362,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         switch ($row->getData('status')) {
 
             case Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN:
-            case Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED:
-                $value = '<span style="color: gray;">' . $value . '</span>';
-                break;
-
             case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
                 $value = '<span style="color: green;">' . $value . '</span>';
                 break;

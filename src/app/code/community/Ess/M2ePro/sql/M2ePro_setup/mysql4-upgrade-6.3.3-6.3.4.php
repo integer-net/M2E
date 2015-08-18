@@ -443,19 +443,19 @@ $installer->run(<<<SQL
         `buyitnow_price_coefficient` = NULL,
         `buyitnow_price_custom_attribute` = NULL
     WHERE
-        listing_type = 2;
+        listing_type = 2 AND buyitnow_price_mode IS NOT NULL;
 
     UPDATE `m2epro_ebay_template_selling_format`
     SET `fixed_price_mode` = `buyitnow_price_mode`,
         `fixed_price_coefficient` = `buyitnow_price_coefficient`,
         `fixed_price_custom_attribute` = `buyitnow_price_custom_attribute`
     WHERE
-        listing_type = 3;
+        listing_type = 3 AND buyitnow_price_mode IS NOT NULL;
 
     UPDATE `m2epro_ebay_listing_product`
         SET `online_current_price` = `online_buyitnow_price`,
             `online_buyitnow_price` = NULL
-        WHERE `online_start_price` IS NULL AND `online_reserve_price` IS NULL;
+        WHERE `online_start_price` IS NULL AND `online_reserve_price` IS NULL AND online_buyitnow_price IS NOT NULL;
 
     UPDATE `m2epro_ebay_listing_product`
         SET `online_current_price` = `online_start_price`

@@ -18,6 +18,8 @@ class Ess_M2ePro_Adminhtml_Common_AccountController
         $this->getLayout()->getBlock('head')->addJs('M2ePro/Plugin/DropDown.js')
                                             ->addCss('M2ePro/css/Plugin/DropDown.css');
 
+        $this->setComponentPageHelpLink('Accounts');
+
         return $this;
     }
 

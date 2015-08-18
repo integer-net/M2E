@@ -14,6 +14,11 @@ abstract class Ess_M2ePro_Controller_Adminhtml_Development_CommandController
         $this->_redirect(Mage::helper('M2ePro/View_Development')->getPageRoute());
     }
 
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isLoggedIn();
+    }
+
     //#############################################
 
     protected function getStyleHtml()

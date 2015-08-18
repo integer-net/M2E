@@ -1,3 +1,22 @@
+<?php
+    /* @var Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_ModeConfirmation_Content $this*/
+?>
+
+<script type="text/javascript">
+
+    var init = function() {
+
+        InstallationEbayWizardObj.initAccountMode('<?php echo $this->getMode(); ?>');
+
+        $('continue_button').observe('click', function() {
+            InstallationEbayWizardObj.saveAccountMode();
+        });
+    };
+
+    Event.observe(window, 'load', init);
+
+</script>
+
 <div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Please select an M2E Pro Mode'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
     <?php
         echo Mage::helper('M2ePro')->__(
@@ -34,48 +53,3 @@
         <?php echo $this->getChildHtml('continue_button'); ?>
     </div>
 </div>
-
-<script type="text/javascript">
-
-    var init = function() {
-
-        var initMode = function(mode) {
-            $(mode + '_mode_input').checked = true;
-            $(mode + '_mode_label').setStyle({fontWeight: 'bold'});
-        };
-
-        initMode('<?php echo $this->getMode(); ?>');
-
-        $('continue_button').observe('click',function() {
-
-            var mode = null;
-            Form.getElements($('mode_confirmation_form')).each(function(element) {
-                element.checked && (mode = element.value);
-            });
-
-            MagentoMessageObj.clearAll();
-            new Ajax.Request('<?php echo $this->getUrl('*/*/setModeAndUpdateAccount'); ?>',{
-                method: 'post',
-                parameters: {
-                    mode: mode
-                },
-                onSuccess: function(transport) {
-
-                    var response = transport.responseText.evalJSON();
-
-                    if (response.result == 'error') {
-                        return MagentoMessageObj.addError(response.message);
-                    }
-
-                    WizardHandlerObj.setStep(
-                        '<?php echo Mage::helper('M2ePro/Module_Wizard')->getWizard($this->getNick())->getNextStep(); ?>',
-                        setLocation.bind(window, location.href)
-                    );
-                }
-            });
-        });
-    };
-
-    Event.observe(window,'load',init);
-
-</script>

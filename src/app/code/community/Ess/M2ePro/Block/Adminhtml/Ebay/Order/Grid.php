@@ -445,7 +445,7 @@ HTML;
 HTML;
             }
 
-            $variation = $item->getChildObject()->getVariation();
+            $variation = $item->getChildObject()->getVariationOptions();
             $variationHtml = '';
 
             if (!empty($variation)) {

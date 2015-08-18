@@ -81,6 +81,16 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
 
         $productSearchBlock = $this->getLayout()
             ->createBlock('M2ePro/adminhtml_common_amazon_listing_productSearch_main');
+        //------------------------------
+        $data = array(
+            'id'      => 'productSearch_cleanSuggest_button',
+            'label'   => Mage::helper('M2ePro')->__('Search ASIN/ISBN Manually'),
+            'class'   => 'productSearch_cleanSuggest_button',
+            'onclick' => 'ListingGridHandlerObj.productSearchHandler.clearSearchResultsAndManualSearch()'
+        );
+        $buttonResetBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
+        $productSearchBlock->setChild('productSearch_cleanSuggest_button', $buttonResetBlock);
+        //------------------------------
 
         return $helpBlock->toHtml()
                . $viewHeaderBlock->toHtml()

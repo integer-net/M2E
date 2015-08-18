@@ -1,3 +1,27 @@
+<?php
+    /* @var Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_Account_Content $this*/
+?>
+
+<script type="text/javascript">
+
+    M2ePro.url.add(<?php echo json_encode(array(
+        'adminhtml_ebay_account/edit' => $this->getUrl('*/adminhtml_ebay_account/edit', array('id' => $this->getData('account_id'), 'wizard' => true, 'close_on_save' => true)),
+        '*/*/getAccountSettings'      => $this->getUrl('*/*/getAccountSettings',array('account_id' => $this->getData('account_id')))
+    )); ?>);
+
+    var init = function() {
+
+        InstallationEbayWizardObj.initAccountSettings();
+
+        $('edit_account').observe('click', function() {
+            InstallationEbayWizardObj.openEditAccountPage();
+        });
+    };
+
+    Event.observe(window, 'load', init);
+
+</script>
+
 <div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Congratulations, you have successfully linked your eBay Account to M2E Pro.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
     <div style="padding: 5px"></div>
@@ -53,51 +77,3 @@
     </div>
 
 </div>
-
-<script type="text/javascript">
-
-    var init = function() {
-
-        var initAccountSettings = function() {
-            new Ajax.Request('<?php echo $this->getUrl('*/*/getAccountSettings',array('account_id' => $this->getData('account_id'))); ?>', {
-                method: 'get',
-                onSuccess: function(transport) {
-                    var response = transport.responseText.evalJSON();
-
-                    if (response.result == 'error') {
-                        return MagentoMessageObj.addError(response.message);
-                    }
-
-                    $H(response.text).each(function(item) {
-                        $(item.key).update(item.value);
-                    });
-
-                }
-            });
-        };
-
-        initAccountSettings();
-
-        $('edit_account').observe('click',function() {
-            var win = window.open('<?php echo $this->getUrl('*/adminhtml_ebay_account/edit',array(
-                'id' => $this->getData('account_id'),
-                'wizard' => true,
-                'close_on_save' => true
-            )); ?>');
-
-            var intervalId = setInterval(function() {
-
-                if (!win.closed) {
-                    return;
-                }
-
-                clearInterval(intervalId);
-
-                initAccountSettings();
-
-            }, 1000);
-        });
-    };
-
-    Event.observe(window, 'load', init);
-</script>

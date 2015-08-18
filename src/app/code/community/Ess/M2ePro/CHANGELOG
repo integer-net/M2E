@@ -1,3 +1,38 @@
+* 6.3.5 (r9311) (09/08/2015)
+
+* Added: Hyperlinks to the certain documentation part into Help Block at the top of each Page Content
+* Added: "Get help for this page" (in magento admin panel header) redirects to appropriate documentations page
+* Added: Ability to send Tracking Number to the Channel by saving track model in programmatic way
+* Added: Ability to disable sending of Order Emails in Account settings for customers created by M2E Pro
+* Added: [eBay] Strike Through Price feature for all Canadian Marketplaces
+* Added: [eBay] Amount of Bids for auction Items and the bidding history
+* Added: [eBay] Ability to set Magento Attribute as source for Country/Postal Code/City in Shipping Policy
+* Added: [eBay] "Unbranded" or "Does not Apply" as value of Catalog Identifier (Brand/MPN/UPC/EAN/ISBN)
+* Added: [eBay] Status column in Manage Variations Pop-up for each Variation
+* Added: [Amazon] Settings view mode of Listing (management of Description Policy, Moving, etc.)
+* Added: [Amazon] Swatch image for Child Products in images block of Description Policy
+* Added: [Amazon] Ability to manage associations of Attributes/Options which were saved manually
+* Added: [Amazon] A lot of Categories which were not supported earlier (almost all of them)
+* Added: [Amazon] Ability to select any Product Type regardless of selected Category
+* Improvement: Fast navigation to the Magento Child Product(s) from Manage Variations Popup
+* Improvement: "Not Listed" label instead of "N/A" for Items/Products if their status is "Not Listed"
+* Improvement: [eBay] Replacement of Variation Attribute Label by Item Specific Label for Configurable Products
+* Improvement: [eBay] Automatic Mapping of 3rd party item if manual mapping for Order Item is performed
+* Improvement: [eBay] Added Validators for EAN/UPC/ISBN values in Manage Variations Pop-up
+* Improvement: [Amazon] AFN offers are not relisted and stopped (prevention of switching to MFN by revise of QTY)
+* Improvement: [Amazon] Warning if some Child Products are not matched to certain Magento Variation
+* Improvement: [Amazon] Manually selected Variations Themes will have priority for automatic matching in future
+* Improvement: [Amazon] Assigning ASIN/ISBN for products during Products adding process
+* Improvement: [Rakuten.com] Ability to revise QTY and Price separately (earlier only together)
+* Fix: "Access Denied" message on the some pages after applying a magento security patch
+* Fix: Notice ob_end_clean(): failed to delete buffer in the error_log during of synchronization
+* Fix: [eBay] Additional prevention of Marketplace Items duplicating
+* Fix: [eBay] Constant "This call resulted in [number] records, but on ..." error message
+* Fix: [eBay] Duplicate of Magento Products can be created during Magento Order Creation process
+* Fix: [Amazon] Ability to remember Variations Options association when Child Product Options are saved/changed
+* Fix: [Amazon] CAD currency instead of USD for Canada Marketplace (right usage of conversion tool)
+* Fix: [Amazon] Space at the beginning of some values in Description Policy (bullet point etc.)
+
 * 6.3.4 (r9154) (16/07/2015)
 
 * Added: Min-Max intervals for Variational Products Prices

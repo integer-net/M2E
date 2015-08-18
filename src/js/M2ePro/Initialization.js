@@ -11,6 +11,20 @@ ServerNoticeObj = new BlockNotice('Server');
 MagentoFieldTipObj = new MagentoFieldTip();
 // ----------------------------------
 
+function setPageHelpLink(url)
+{
+    if (!url) {
+        return;
+    }
+
+    var heplLink = $('page-help-link');
+
+    if (heplLink) {
+        heplLink.href = url;
+        heplLink.target = '_blank'
+    }
+}
+
 function initializationMagentoBlocks()
 {
     CommonHandlerObj.initCommonValidators();

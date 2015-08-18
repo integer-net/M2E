@@ -49,12 +49,14 @@ class Ess_M2ePro_Model_Magento_Product_Variation
     {
         $variations = array();
         $variationsSet = array();
+        $additional = array();
 
         if ($this->getMagentoProduct()->isConfigurableType()) {
 
             $tempInfo = $this->getConfigurableVariationsTypeStandard();
             isset($tempInfo['set']) && $variationsSet = $tempInfo['set'];
             isset($tempInfo['variations']) && $variations = $tempInfo['variations'];
+            isset($tempInfo['additional']) && $additional = $tempInfo['additional'];
 
         } else {
 
@@ -95,6 +97,7 @@ class Ess_M2ePro_Model_Magento_Product_Variation
         return array(
             'set'        => $variationsSet,
             'variations' => $variations,
+            'additional' => $additional
         );
     }
 
@@ -244,7 +247,10 @@ class Ess_M2ePro_Model_Magento_Product_Variation
 
         return array(
             'set'        => $resultSet,
-            'variations' => $variations
+            'variations' => $variations,
+            'additional' => array(
+                'attributes' => $attributes
+            )
         );
     }
 

@@ -290,10 +290,11 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Cancellation
         if ($order->canCreateMagentoOrder()) {
             try {
                 $order->createMagentoOrder();
-            } catch (Exception $e) {
-                Mage::helper('M2ePro/Module_Exception')->process($e);
+            } catch (Exception $exception) {
+                return;
             }
         }
+
         if ($order->getChildObject()->canCreatePaymentTransaction()) {
             $order->getChildObject()->createPaymentTransactions();
         }

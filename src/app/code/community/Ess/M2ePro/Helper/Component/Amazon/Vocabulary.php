@@ -6,6 +6,10 @@
 
 class Ess_M2ePro_Helper_Component_Amazon_Vocabulary extends Mage_Core_Helper_Abstract
 {
+    const VOCABULARY_AUTO_ACTION_NOT_SET = 0;
+    const VOCABULARY_AUTO_ACTION_YES = 1;
+    const VOCABULARY_AUTO_ACTION_NO = 2;
+
     const VALUE_TYPE_ATTRIBUTE = 'attribute';
     const VALUE_TYPE_OPTION    = 'option';
 
@@ -60,6 +64,10 @@ class Ess_M2ePro_Helper_Component_Amazon_Vocabulary extends Mage_Core_Helper_Abs
         $vocabularyData = $registry->getSettings('value');
         $vocabularyData[$channelAttribute]['names'][] = $productAttribute;
 
+        if (!isset($vocabularyData[$channelAttribute]['options'])) {
+            $vocabularyData[$channelAttribute]['options'] = array();
+        }
+
         $registry->setData('key', self::LOCAL_DATA_REGISTRY_KEY);
         $registry->setSettings('value', $vocabularyData)->save();
 
@@ -105,6 +113,8 @@ class Ess_M2ePro_Helper_Component_Amazon_Vocabulary extends Mage_Core_Helper_Abs
         }
 
         unset($vocabularyData[$channelAttribute]['names'][$nameKey]);
+
+        $vocabularyData[$channelAttribute]['names'] = array_values($vocabularyData[$channelAttribute]['names']);
 
         $registry->setData('key', self::LOCAL_DATA_REGISTRY_KEY);
         $registry->setSettings('value', $vocabularyData)->save();
@@ -237,6 +247,10 @@ class Ess_M2ePro_Helper_Component_Amazon_Vocabulary extends Mage_Core_Helper_Abs
 
         $vocabularyData = $registry->getSettings('value');
 
+        if (!isset($vocabularyData[$channelAttribute]['names'])) {
+            $vocabularyData[$channelAttribute]['names'] = array();
+        }
+
         if (!isset($vocabularyData[$channelAttribute]['options'])) {
             $vocabularyData[$channelAttribute]['options'] = array();
         }
@@ -285,6 +299,42 @@ class Ess_M2ePro_Helper_Component_Amazon_Vocabulary extends Mage_Core_Helper_Abs
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
+    }
+
+    // ----------------------------------------
+
+    public function removeOptionFromLocalStorage($productOption, $productOptionsGroup, $channelAttribute)
+    {
+        /** @var Ess_M2ePro_Model_Registry $registry */
+        $registry = Mage::getModel('M2ePro/Registry')->load(self::LOCAL_DATA_REGISTRY_KEY, 'key');
+
+        $vocabularyData = $registry->getSettings('value');
+        if (empty($vocabularyData[$channelAttribute]['options'])) {
+            return;
+        }
+
+        foreach ($vocabularyData[$channelAttribute]['options'] as $optionsGroupKey => &$options) {
+
+            $comparedOptions = array_diff($productOptionsGroup, $options);
+            $nameKey = array_search($productOption, $options);
+
+            if (empty($comparedOptions) && $nameKey !== false) {
+
+                unset($options[$nameKey]);
+
+                $vocabularyData[$channelAttribute]['options'][$optionsGroupKey] = array_values($options);
+
+                if (count($options) == 1) {
+                    unset($vocabularyData[$channelAttribute]['options'][$optionsGroupKey]);
+                }
+                break;
+            }
+        }
+
+        $registry->setData('key', self::LOCAL_DATA_REGISTRY_KEY);
+        $registry->setSettings('value', $vocabularyData)->save();
+
+        $this->removeLocalDataCache();
     }
 
     // ----------------------------------------

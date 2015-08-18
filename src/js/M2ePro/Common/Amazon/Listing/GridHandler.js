@@ -30,8 +30,14 @@ CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
             movingAction: this.movingHandler.run.bind(this.movingHandler),
             deleteAndRemoveAction: this.actionHandler.deleteAndRemoveAction.bind(this.actionHandler),
 
-            assignTemplateDescriptionIdAction: (function() { this.templateDescriptionHandler.validateProductsForTemplateDescriptionAssign(this.getSelectedProductsString())}).bind(this),
-            unassignTemplateDescriptionIdAction: (function() { this.templateDescriptionHandler.unassignFromTemplateDescrition(this.getSelectedProductsString())}).bind(this),
+            assignTemplateDescriptionIdAction: (function(id) {
+                id = id || this.getSelectedProductsString();
+                this.templateDescriptionHandler.validateProductsForTemplateDescriptionAssign(id)
+            }).bind(this),
+            unassignTemplateDescriptionIdAction: (function(id) {
+                id = id || this.getSelectedProductsString();
+                this.templateDescriptionHandler.unassignFromTemplateDescrition(id)
+            }).bind(this),
 
             assignGeneralIdAction: (function() { this.productSearchHandler.searchGeneralIdAuto(this.getSelectedProductsString())}).bind(this),
             newGeneralIdAction: (function() { this.productSearchHandler.addNewGeneralId(this.getSelectedProductsString())}).bind(this),

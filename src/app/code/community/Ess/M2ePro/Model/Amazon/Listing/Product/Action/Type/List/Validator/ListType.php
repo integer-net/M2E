@@ -148,7 +148,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
         if (empty($generalId)) {
             return null;
         }
-
+// M2ePro_TRANSLATIONS
+// 'M2E Pro did not use New ASIN/ISBN Creation feature assigned because settings for ASIN/ISBN Search were specified in Listing Search Settings and a value %general_id% were set in Magento Attribute for that Product.'
         if ($this->getAmazonListingProduct()->isGeneralIdOwner()) {
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
@@ -292,6 +293,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
             return null;
         }
 
+// M2ePro_TRANSLATIONS
+// 'M2E Pro did not use New ASIN/ISBN Creation feature assigned because settings for UPC/EAN Search were specified in Listing Search Settings and a value %worldwide_id% were set in Magento Attribute for that Product.'
         $changingListTypeMessage = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
             'M2E Pro did not use New ASIN/ISBN Creation feature assigned because settings
             for UPC/EAN Search were specified in Listing Search Settings and a value

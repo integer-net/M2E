@@ -208,7 +208,7 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Physica
             'sku' => $this->getAmazonListingProduct()->getSku(),
             'product_id' => (int)$this->getListingProduct()->getProductId(),
             'store_id' => (int)$this->getListing()->getStoreId(),
-            'variation_options' => json_encode($options),
+            'variation_product_options' => json_encode($options),
         );
 
         Mage::getModel('M2ePro/Amazon_Item')->setData($data)->save();

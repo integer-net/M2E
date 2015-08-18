@@ -525,7 +525,8 @@ HTML;
             Mage::getSingleton('core/resource')->getTableName('m2epro_wizard'),
             array('status' => 0, 'step' => null),
             '`nick` <> \'migrationToV6\' AND `nick` <> \'migrationNewAmazon\'
-              AND `nick` <> \'removedPay\' AND `nick` <> \'ebayProductDetails\''
+              AND `nick` <> \'removedPay\' AND `nick` <> \'ebayProductDetails\'
+              AND `nick` <> \'fullAmazonCategories\''
         );
 
         Mage::helper('M2ePro/Magento')->clearCache();

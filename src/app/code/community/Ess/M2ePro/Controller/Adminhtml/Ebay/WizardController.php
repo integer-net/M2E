@@ -14,19 +14,14 @@ abstract class Ess_M2ePro_Controller_Adminhtml_Ebay_WizardController
         return Ess_M2ePro_Helper_View_Ebay::NICK;
     }
 
-    //#############################################
-
-    protected function _isAllowed()
+    protected function getMenuRootNodeNick()
     {
-        return Mage::getSingleton('admin/session')->isAllowed(Ess_M2ePro_Helper_View_Ebay::MENU_ROOT_NODE_NICK);
+        return Ess_M2ePro_Helper_View_Ebay::MENU_ROOT_NODE_NICK;
     }
 
-    public function loadLayout($ids=null, $generateBlocks=true, $generateXml=true)
+    protected function getMenuRootNodeLabel()
     {
-        $tempResult = parent::loadLayout($ids, $generateBlocks, $generateXml);
-        $tempResult->_setActiveMenu(Ess_M2ePro_Helper_View_Ebay::MENU_ROOT_NODE_NICK);
-        $tempResult->_title(Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel());
-        return $tempResult;
+        return Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
     }
 
     //#############################################

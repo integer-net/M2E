@@ -50,8 +50,6 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation
         return 'Configuration Wizard (Magento Multi-Channels Integration)';
     }
 
-    protected function appendButtons() {}
-
     protected function _toHtml()
     {
         $urls = json_encode(Mage::helper('M2ePro')->getControllerActions('adminhtml_wizard_installationCommon'));

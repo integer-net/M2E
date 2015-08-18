@@ -459,11 +459,28 @@ class Ess_M2ePro_Model_Ebay_Listing_Product extends Ess_M2ePro_Model_Component_C
         return $this->getEbayDescriptionTemplate()->getSource($this->getMagentoProduct());
     }
 
+    /**
+     * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Source
+     */
+    public function getShippingTemplateSource()
+    {
+        return $this->getShippingTemplate()->getSource($this->getMagentoProduct());
+    }
+
     // ########################################
 
     public function getVariations($asObjects = false, array $filters = array())
     {
         return $this->getParentObject()->getVariations($asObjects,$filters);
+    }
+
+    // ########################################
+
+    public function updateVariationsStatus()
+    {
+        foreach ($this->getVariations(true) as $variation) {
+            $variation->getChildObject()->setStatus($this->getParentObject()->getStatus());
+        }
     }
 
     // ########################################

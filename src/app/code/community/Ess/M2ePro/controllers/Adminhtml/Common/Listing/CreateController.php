@@ -85,9 +85,17 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
         }
 
         $this->_initAction();
+
+        $component = $this->getComponent();
+        if (!$component) {
+            $this->setComponentPageHelpLink('Step+1%3A+General+Settings');
+        } else {
+            $this->setPageHelpLink($component, 'Step+1%3A+General+Settings');
+        }
+
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_add_stepOne', '',
             array(
-                'component' => $this->getComponent()
+                'component' => $component
             )
         ));
 
@@ -120,9 +128,17 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
         }
 
         $this->_initAction();
+
+        $component = $this->getComponent();
+        if (!$component) {
+            $this->setComponentPageHelpLink('Step+2%3A+Selling+Settings');
+        } else {
+            $this->setPageHelpLink($component, 'Step+2%3A+Selling+Settings');
+        }
+
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_add_stepTwo', '',
             array(
-                'component' => $this->getComponent()
+                'component' => $component
             )
         ));
         $this->renderLayout();
@@ -184,9 +200,17 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
         }
 
         $this->_initAction();
+
+        $component = $this->getComponent();
+        if (!$component) {
+            $this->setComponentPageHelpLink('Step+3%3A+Search+Settings');
+        } else {
+            $this->setPageHelpLink($component, 'Step+3%3A+Search+Settings');
+        }
+
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_listing_add_stepThree', '',
             array(
-                'component' => $this->getComponent()
+                'component' => $component
             )
         ));
         $this->renderLayout();

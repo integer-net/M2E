@@ -50,7 +50,7 @@ class Ess_M2ePro_CronController extends Mage_Core_Controller_Varien_Action
 
     private function closeConnection()
     {
-        ob_end_clean();
+        @ob_end_clean();
         ob_start();
 
         ignore_user_abort(true);

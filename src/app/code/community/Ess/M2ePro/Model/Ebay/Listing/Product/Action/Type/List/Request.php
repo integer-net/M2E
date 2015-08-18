@@ -80,4 +80,50 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Request
     }
 
     // ########################################
+
+    protected function replaceVariationSpecificsNames(array $data)
+    {
+        if (!$this->getIsVariationItem() || !$this->getMagentoProduct()->isConfigurableType() ||
+            empty($data['variations_sets']) || !is_array($data['variations_sets'])) {
+
+            return $data;
+        }
+
+        $configurableAttributes = array();
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+        if (!empty($additionalData['configurable_attributes'])) {
+            $configurableAttributes = $additionalData['configurable_attributes'];
+        }
+
+        if (empty($configurableAttributes)) {
+            return $data;
+        }
+
+        $replacements = array();
+
+        foreach ($this->getEbayListingProduct()->getCategoryTemplate()->getSpecifics(true) as $specific) {
+
+            if (!$specific->isItemSpecificsMode() || !$specific->isCustomAttributeValueMode()) {
+                continue;
+            }
+
+            $attributeCode = $specific->getData('value_custom_attribute');
+
+            if (array_key_exists($attributeCode, $configurableAttributes)) {
+                $replacements[$configurableAttributes[$attributeCode]] = $specific->getData('attribute_title');
+            }
+        }
+
+        if (empty($replacements)) {
+            return $data;
+        }
+
+        $data = $this->doReplaceVariationSpecifics($data, $replacements);
+
+        $data['variations_specifics_replacements'] = $replacements;
+
+        return $data;
+    }
+
+    // ########################################
 }

@@ -6,49 +6,9 @@
 
 class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 {
-    private $moduleTables = array();
-    private $modifiersCache = array();
+    private $cache = array();
 
     //####################################
-
-    public function __construct($resourceName)
-    {
-        // Get needed mysql tables
-        $tempTables = Mage::helper('M2ePro/Module_Database_Structure')->getMySqlTables();
-        $tempTables = array_merge($this->getMySqlTablesV4(),$tempTables);
-        $tempTables = array_merge($this->getMySqlTablesV5(),$tempTables);
-        $tempTables = array_merge($this->getRemovedMySqlTables(),$tempTables);
-        $tempTables = array_values(array_unique($tempTables));
-
-        // Sort by length tables
-        do {
-            $hasChanges = false;
-            for ($i=0;$i<count($tempTables)-1; $i++) {
-                if (strlen($tempTables[$i]) < strlen($tempTables[$i+1])) {
-                    $temp = $tempTables[$i];
-                    $tempTables[$i] = $tempTables[$i+1];
-                    $tempTables[$i+1] = $temp;
-                    $hasChanges = true;
-                }
-            }
-        } while ($hasChanges);
-
-        // Prepare sql tables
-        //--------------------
-        foreach ($tempTables as $table) {
-            $this->moduleTables[$table] = $this->getTable($table);
-        }
-        //--------------------
-
-        parent::__construct($resourceName);
-    }
-
-    //####################################
-
-    public function startSetup()
-    {
-        return parent::startSetup();
-    }
 
     public function endSetup()
     {
@@ -86,62 +46,73 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
         if (trim($sql) == '') {
             return $this;
         }
-        $sql = $this->prepareSql($sql);
+
+        foreach ($this->getTablesObject()->getAllHistoryEntities() as $tableFrom => $tableTo) {
+            $sql = str_replace(' `'.$tableFrom.'`',' `'.$tableTo.'`',$sql);
+            $sql = str_replace(' '.$tableFrom,' `'.$tableTo.'`',$sql);
+        }
+
         return parent::run($sql);
     }
 
-    public function runSqlFile($path)
+    //####################################
+
+    /**
+     * @return Ess_M2ePro_Model_Upgrade_Tables
+     */
+    public function getTablesObject()
     {
-        if (!is_file($path)) {
-            return $this;
+        $cacheKey = 'tablesObject';
+        if (isset($this->cache[$cacheKey])) {
+            return $this->cache[$cacheKey];
         }
-        $sql = file_get_contents($path);
-        return $this->run($sql);
+
+        /** @var Ess_M2ePro_Model_Upgrade_Tables $tablesObjectModel */
+        $tablesObjectModel = Mage::getModel('M2ePro/Upgrade_Tables');
+        $tablesObjectModel->setInstaller($this);
+
+        $this->cache[$cacheKey] = $tablesObjectModel;
+        return $tablesObjectModel;
     }
 
-    //####################################
-
-    public function getModuleTables()
-    {
-        return $this->moduleTables;
-    }
-
-    public function getRelatedSqlFilePath($pathPhpFile)
-    {
-        return dirname($pathPhpFile).DS.basename($pathPhpFile,'.php').'.sql';
-    }
-
-    //####################################
-
+    /**
+     * @param $tableName
+     * @return Ess_M2ePro_Model_Upgrade_Modifier_Table
+     */
     public function getTableModifier($tableName)
     {
-        /** @var Ess_M2ePro_Model_Upgrade_Modifier_Table|false $tableModifier */
-        $tableModifier = $this->getModifier($tableName, 'table', 'modifier_table');
-        return $tableModifier;
+        return $this->getModifier($tableName, 'table');
     }
 
+    /**
+     * @param $tableName
+     * @return Ess_M2ePro_Model_Upgrade_Modifier_Config
+     */
+    // todo next
     public function getConfigUpdater($tableName)
     {
-        /** @var Ess_M2ePro_Model_Upgrade_Modifier_ConfigUpdater|false $configUpdater */
-        $configUpdater = $this->getModifier($tableName, 'configUpdater', 'modifier_config_updater');
-        return $configUpdater;
+        return $this->getModifier($tableName, 'config');
     }
 
-    private function getModifier($tableName, $modifierModelName, $cacheKey = NULL)
+    /**
+     * @param $tableName
+     * @param $modifierModelName
+     * @return Ess_M2ePro_Model_Upgrade_Modifier_Abstract
+     */
+    private function getModifier($tableName, $modifierModelName)
     {
-        $cacheKey = !is_null($cacheKey) ? $cacheKey . $tableName : $tableName;
-        if (isset($this->modifiersCache[$cacheKey])) {
-            return $this->modifiersCache[$cacheKey];
+        $cacheKey = $tableName . '_' . $modifierModelName;
+        if (isset($this->cache[$cacheKey])) {
+            return $this->cache[$cacheKey];
         }
 
-        $modifierModelName = 'M2ePro/Upgrade_Modifier_' . ucfirst($modifierModelName);
         /** @var Ess_M2ePro_Model_Upgrade_Modifier_Abstract $tableModifier */
-        $tableModifier = Mage::getModel($modifierModelName);
+        $tableModifier = Mage::getModel('M2ePro/Upgrade_Modifier_' . ucfirst($modifierModelName));
         $tableModifier->setInstaller($this);
         $tableModifier->setConnection($this->getConnection());
         $tableModifier->setTableName($tableName);
 
-        $this->modifiersCache[$cacheKey] = $tableModifier;
+        $this->cache[$cacheKey] = $tableModifier;
         return $tableModifier;
     }
 
@@ -149,317 +120,40 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
     public function removeConfigDuplicates()
     {
-        $tables = $this->getConfigTablesV5();
-        $tables = array_merge($this->getConfigTablesV6(),$tables);
-        $tables = array_values(array_unique($tables));
-
-        foreach ($tables as $table) {
-            $this->removeConfigDuplicatesByTable($table);
-        }
-    }
-
-    private function removeConfigDuplicatesByTable($tableName)
-    {
+        $tables = $this->getTablesObject()->getAllHistoryConfigEntities();
         $connection = $this->getConnection();
-        $tableName = $this->getTable($tableName);
 
-        if (!in_array($tableName, $connection->listTables())) {
-            return;
-        }
+        foreach ($tables as $tableName) {
 
-        $configRows = $connection->query("SELECT `id`, `group`, `key`
-                                          FROM `{$tableName}`
-                                          ORDER BY `id` ASC")
-                                 ->fetchAll();
+            // todo next
+            if (!in_array($tableName, $connection->listTables())) {
+                return;
+            }
 
-        $tempData = array();
-        $deleteData = array();
+            $configRows = $connection->query("SELECT `id`, `group`, `key`
+                                              FROM `{$tableName}`
+                                              ORDER BY `id` ASC")
+                                     ->fetchAll();
 
-        foreach ($configRows as $configRow) {
+            $tempData = array();
+            $deleteData = array();
 
-            $tempName = strtolower($configRow['group'] .'|'. $configRow['key']);
+            foreach ($configRows as $configRow) {
 
-            if (in_array($tempName, $tempData)) {
-                $deleteData[] = (int)$configRow['id'];
-            } else {
-                $tempData[] = $tempName;
+                $tempName = strtolower($configRow['group'] .'|'. $configRow['key']);
+
+                if (in_array($tempName, $tempData)) {
+                    $deleteData[] = (int)$configRow['id'];
+                } else {
+                    $tempData[] = $tempName;
+                }
+            }
+
+            if (!empty($deleteData)) {
+                $connection->query("DELETE FROM `{$tableName}`
+                                    WHERE `id` IN (".implode(',', $deleteData).')');
             }
         }
-
-        if (!empty($deleteData)) {
-            $connection->query("DELETE FROM `{$tableName}`
-                                WHERE `id` IN (".implode(',', $deleteData).')');
-        }
-    }
-
-    //####################################
-
-    private function prepareSql($sql)
-    {
-        foreach ($this->moduleTables as $tableFrom=>$tableTo) {
-            $sql = str_replace(' `'.$tableFrom.'`',' `'.$tableTo.'`',$sql);
-            $sql = str_replace(' '.$tableFrom,' `'.$tableTo.'`',$sql);
-        }
-        return $sql;
-    }
-
-    //------------------------------------
-
-    private function getMySqlTablesV4()
-    {
-        return array(
-            'ess_config',
-            'm2epro_config',
-
-            'm2epro_lock_item',
-            'm2epro_locked_object',
-            'm2epro_product_change',
-            'm2epro_processing_request',
-
-            'm2epro_account',
-            'm2epro_marketplace',
-            'm2epro_attribute_set',
-
-            'm2epro_order',
-            'm2epro_order_item',
-            'm2epro_order_log',
-
-            'm2epro_synchronization_log',
-            'm2epro_synchronization_run',
-
-            'm2epro_listing',
-            'm2epro_listing_category',
-            'm2epro_listing_log',
-            'm2epro_listing_other',
-            'm2epro_listing_other_log',
-            'm2epro_listing_product',
-            'm2epro_listing_product_variation',
-            'm2epro_listing_product_variation_option',
-
-            'm2epro_template_description',
-            'm2epro_template_general',
-            'm2epro_template_selling_format',
-            'm2epro_template_synchronization',
-
-            'm2epro_translation_custom_suggestion',
-            'm2epro_translation_language',
-            'm2epro_translation_text',
-
-            'm2epro_amazon_account',
-            'm2epro_amazon_category',
-            'm2epro_amazon_category_description',
-            'm2epro_amazon_category_specific',
-            'm2epro_amazon_dictionary_category',
-            'm2epro_amazon_dictionary_marketplace',
-            'm2epro_amazon_dictionary_specific',
-            'm2epro_amazon_item',
-            'm2epro_amazon_listing',
-            'm2epro_amazon_listing_other',
-            'm2epro_amazon_listing_product',
-            'm2epro_amazon_listing_product_variation',
-            'm2epro_amazon_listing_product_variation_option',
-            'm2epro_amazon_marketplace',
-            'm2epro_amazon_order',
-            'm2epro_amazon_order_item',
-            'm2epro_amazon_processed_inventory',
-            'm2epro_amazon_template_description',
-            'm2epro_amazon_template_general',
-            'm2epro_amazon_template_selling_format',
-            'm2epro_amazon_template_synchronization',
-
-            'm2epro_ebay_account',
-            'm2epro_ebay_account_store_category',
-            'm2epro_ebay_dictionary_category',
-            'm2epro_ebay_dictionary_marketplace',
-            'm2epro_ebay_dictionary_shipping',
-            'm2epro_ebay_dictionary_shipping_category',
-            'm2epro_ebay_feedback',
-            'm2epro_ebay_feedback_template',
-            'm2epro_ebay_item',
-            'm2epro_ebay_listing',
-            'm2epro_ebay_listing_other',
-            'm2epro_ebay_listing_product',
-            'm2epro_ebay_listing_product_variation',
-            'm2epro_ebay_listing_product_variation_option',
-            'm2epro_ebay_marketplace',
-            'm2epro_ebay_message',
-            'm2epro_ebay_motor_specific',
-            'm2epro_ebay_order',
-            'm2epro_ebay_order_item',
-            'm2epro_ebay_order_external_transaction',
-            'm2epro_ebay_template_description',
-            'm2epro_ebay_template_general',
-            'm2epro_ebay_template_general_calculated_shipping',
-            'm2epro_ebay_template_general_payment',
-            'm2epro_ebay_template_general_shipping',
-            'm2epro_ebay_template_general_specific',
-            'm2epro_ebay_template_selling_format',
-            'm2epro_ebay_template_synchronization'
-        );
-    }
-
-    private function getMySqlTablesV5()
-    {
-        return array(
-            'ess_config',
-            'm2epro_config',
-            'm2epro_exceptions_filters',
-
-            'm2epro_lock_item',
-            'm2epro_locked_object',
-            'm2epro_product_change',
-            'm2epro_processing_request',
-
-            'm2epro_account',
-            'm2epro_marketplace',
-            'm2epro_attribute_set',
-
-            'm2epro_order',
-            'm2epro_order_change',
-            'm2epro_order_item',
-            'm2epro_order_log',
-            'm2epro_order_repair',
-
-            'm2epro_synchronization_log',
-            'm2epro_synchronization_run',
-
-            'm2epro_listing',
-            'm2epro_listing_category',
-            'm2epro_listing_log',
-            'm2epro_listing_other',
-            'm2epro_listing_other_log',
-            'm2epro_listing_product',
-            'm2epro_listing_product_variation',
-            'm2epro_listing_product_variation_option',
-
-            'm2epro_template_description',
-            'm2epro_template_general',
-            'm2epro_template_selling_format',
-            'm2epro_template_synchronization',
-
-            'm2epro_translation_custom_suggestion',
-            'm2epro_translation_language',
-            'm2epro_translation_text',
-
-            'm2epro_amazon_account',
-            'm2epro_amazon_dictionary_category',
-            'm2epro_amazon_dictionary_marketplace',
-            'm2epro_amazon_dictionary_specific',
-            'm2epro_amazon_item',
-            'm2epro_amazon_listing',
-            'm2epro_amazon_listing_other',
-            'm2epro_amazon_listing_product',
-            'm2epro_amazon_listing_product_variation',
-            'm2epro_amazon_listing_product_variation_option',
-            'm2epro_amazon_marketplace',
-            'm2epro_amazon_order',
-            'm2epro_amazon_order_item',
-            'm2epro_amazon_processed_inventory',
-            'm2epro_amazon_template_description',
-            'm2epro_amazon_template_general',
-            'm2epro_amazon_template_new_product',
-            'm2epro_amazon_template_new_product_description',
-            'm2epro_amazon_template_new_product_specific',
-            'm2epro_amazon_template_selling_format',
-            'm2epro_amazon_template_synchronization',
-
-            'm2epro_ebay_account',
-            'm2epro_ebay_account_store_category',
-            'm2epro_ebay_dictionary_category',
-            'm2epro_ebay_dictionary_marketplace',
-            'm2epro_ebay_dictionary_shipping',
-            'm2epro_ebay_dictionary_shipping_category',
-            'm2epro_ebay_feedback',
-            'm2epro_ebay_feedback_template',
-            'm2epro_ebay_item',
-            'm2epro_ebay_listing',
-            'm2epro_ebay_listing_other',
-            'm2epro_ebay_listing_product',
-            'm2epro_ebay_listing_product_variation',
-            'm2epro_ebay_listing_product_variation_option',
-            'm2epro_ebay_marketplace',
-            'm2epro_ebay_message',
-            'm2epro_ebay_motor_specific',
-            'm2epro_ebay_order',
-            'm2epro_ebay_order_item',
-            'm2epro_ebay_order_external_transaction',
-            'm2epro_ebay_template_description',
-            'm2epro_ebay_template_general',
-            'm2epro_ebay_template_general_calculated_shipping',
-            'm2epro_ebay_template_general_payment',
-            'm2epro_ebay_template_general_shipping',
-            'm2epro_ebay_template_general_specific',
-            'm2epro_ebay_template_selling_format',
-            'm2epro_ebay_template_synchronization',
-
-            'm2epro_buy_account',
-            'm2epro_buy_dictionary_category',
-            'm2epro_buy_item',
-            'm2epro_buy_listing',
-            'm2epro_buy_listing_other',
-            'm2epro_buy_listing_product',
-            'm2epro_buy_listing_product_variation',
-            'm2epro_buy_listing_product_variation_option',
-            'm2epro_buy_marketplace',
-            'm2epro_buy_order',
-            'm2epro_buy_order_item',
-            'm2epro_buy_template_description',
-            'm2epro_buy_template_general',
-            'm2epro_buy_template_new_product',
-            'm2epro_buy_template_new_product_core',
-            'm2epro_buy_template_new_product_attribute',
-            'm2epro_buy_template_selling_format',
-            'm2epro_buy_template_synchronization',
-
-            'm2epro_play_account',
-            'm2epro_play_item',
-            'm2epro_play_listing',
-            'm2epro_play_listing_other',
-            'm2epro_play_listing_product',
-            'm2epro_play_listing_product_variation',
-            'm2epro_play_listing_product_variation_option',
-            'm2epro_play_marketplace',
-            'm2epro_play_order',
-            'm2epro_play_order_item',
-            'm2epro_play_processed_inventory',
-            'm2epro_play_template_description',
-            'm2epro_play_template_general',
-            'm2epro_play_template_selling_format',
-            'm2epro_play_template_synchronization'
-        );
-    }
-
-    private function getRemovedMySqlTables()
-    {
-        return array(
-            'm2epro_ebay_listing_auto_filter',
-            'm2epro_synchronization_run',
-            'm2epro_ebay_listing_auto_category',
-            'm2epro_ebay_dictionary_policy',
-            'm2epro_ebay_template_policy',
-            'm2epro_ebay_account_policy',
-            'm2epro_play_listing_auto_category_group'
-        );
-    }
-
-    //------------------------------------
-
-    private function getConfigTablesV5()
-    {
-        return array(
-            'ess_config',
-            'm2epro_config'
-        );
-    }
-
-    private function getConfigTablesV6()
-    {
-        return array(
-            'm2epro_primary_config',
-            'm2epro_config',
-            'm2epro_cache_config',
-            'm2epro_synchronization_config'
-        );
     }
 
     //####################################
@@ -517,7 +211,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
     //####################################
 
-    public function generateHash()
+    public function generateRandomHash()
     {
         return sha1(microtime(1));
     }

@@ -34,6 +34,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
             (!$ebaySynchronizationTemplate->isScheduleIntervalNow() ||
              !$ebaySynchronizationTemplate->isScheduleWeekNow())
         ) {
+            // M2ePro_TRANSLATIONS
+            // Product was not automatically Listed according to the Schedule Settings in Synchronization Policy.
             $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                 'Product was not automatically Listed according to the Schedule Settings in Synchronization Policy.',
                 array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
@@ -54,6 +56,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
         if ($ebaySynchronizationTemplate->isListStatusEnabled()) {
 
             if (!$listingProduct->getMagentoProduct()->isStatusEnabled()) {
+                // M2ePro_TRANSLATIONS
+                // Product was not automatically Listed according to the List Rules in Synchronization Policy. Status of Magento Product is Disabled (%date%) though in Synchronization Rules “Product Status” is set to Enabled.
                 $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                     'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                      Status of Magento Product is Disabled (%date%) though in Synchronization Rules “Product Status”
@@ -73,6 +77,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 );
 
                 if (!is_null($temp) && $temp) {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Status of Magento Product Variation is Disabled (%date%) though in Synchronization Rules “Product Status“ is set to Enabled.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Status of Magento Product Variation is Disabled (%date%) though in Synchronization Rules
@@ -91,6 +97,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
         if ($ebaySynchronizationTemplate->isListIsInStock()) {
 
             if (!$listingProduct->getMagentoProduct()->isStockAvailability()) {
+                // M2ePro_TRANSLATIONS
+                // Product was not automatically Listed according to the List Rules in Synchronization Policy. Stock Availability of Magento Product is Out of Stock though in Synchronization Rules “Stock Availability” is set to In Stock.
                 $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                     'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                      Stock Availability of Magento Product is Out of Stock though in
@@ -110,6 +118,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 );
 
                 if (!is_null($temp) && $temp) {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Stock Availability of Magento Product Variation is Out of Stock though in Synchronization Rules “Stock Availability” is set to In Stock.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Stock Availability of Magento Product Variation is Out of Stock though
@@ -140,6 +150,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 if ($productQty <= $minQty) {
                     $result = true;
                 } else {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Quantity of Magento Product is %product_qty% though in Synchronization Rules “Magento Quantity“ is set to less then  %template_min_qty%.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
@@ -157,6 +169,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 if ($productQty >= $minQty) {
                     $result = true;
                 } else {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Quantity of Magento Product is %product_qty% though in Synchronization Rules “Magento Quantity” is set to more then  %template_min_qty%.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
@@ -174,10 +188,12 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 if ($productQty >= $minQty && $productQty <= $maxQty) {
                     $result = true;
                 } else {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Quantity of Magento Product is %product_qty% though in Synchronization Rules “Magento Quantity” is set between  %template_min_qty% and %template_max_qty%.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
-                         “Magento Quantity” is set between  %template_min_qty% and %template_max_qty%',
+                         “Magento Quantity” is set between  %template_min_qty% and %template_max_qty%.',
                         array(
                             '!template_min_qty' => $minQty,
                             '!template_max_qty' => $maxQty,
@@ -213,10 +229,12 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 if ($productQty <= $minQty) {
                     $result = true;
                 } else {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Quantity of Magento Product is %product_qty% though in Synchronization Rules “Calculated Quantity” is set to less then %template_min_qty%.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
-                         “Calculated Quantity” is set to less then %template_min_qty%',
+                         “Calculated Quantity” is set to less then %template_min_qty%.',
                         array(
                             '!template_min_qty' => $minQty,
                             '!product_qty' => $productQty,
@@ -230,6 +248,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 if ($productQty >= $minQty) {
                     $result = true;
                 } else {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Quantity of Magento Product is %product_qty% though in Synchronization Rules “Calculated Quantity” is set to more then  %template_min_qty%.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules
@@ -247,6 +267,8 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
                 if ($productQty >= $minQty && $productQty <= $maxQty) {
                     $result = true;
                 } else {
+                    // M2ePro_TRANSLATIONS
+                    // Product was not automatically Listed according to the List Rules in Synchronization Policy. Quantity of Magento Product is %product_qty% though in Synchronization Rules “Calculated Quantity” is set between  %template_min_qty% and %template_max_qty%.
                     $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                         'Product was not automatically Listed according to the List Rules in Synchronization Policy.
                          Quantity of Magento Product is %product_qty% though in Synchronization Rules

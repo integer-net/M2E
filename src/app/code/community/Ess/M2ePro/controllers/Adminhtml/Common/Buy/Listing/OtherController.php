@@ -37,6 +37,8 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Listing_OtherController
 
         $this->_initPopUp();
 
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Buy::NICK, '3rd+Party+Listings');
+
         return $this;
     }
 

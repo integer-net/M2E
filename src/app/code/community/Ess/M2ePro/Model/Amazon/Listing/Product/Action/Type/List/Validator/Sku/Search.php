@@ -69,6 +69,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_Sea
             return true;
         }
 
+        // M2ePro_TRANSLATIONS
+        // SKU generating is not successful.
         $this->addMessage('SKU generating is not successful.');
 
         return false;

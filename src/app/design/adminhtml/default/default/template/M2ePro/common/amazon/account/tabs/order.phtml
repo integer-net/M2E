@@ -9,7 +9,12 @@
 
         <b>Note:</b> The Product Stock QTY only reduces after Magento Order Creation.<br/>
         These type of Orders can be managed as typical <i class="underline">Magento Orders</i> in (Magento > Sales > Orders).<br/><br/>
-        <b>Note:</b> To receive Orders from Amazon, Order Synchronization must be enabled in (%menu_synchronization_path%).', $menuSalesPath, $menuSynchronizationPath);
+        <b>Note:</b> To receive Orders from Amazon, Order Synchronization must be enabled in (%menu_synchronization_path%).</br></br>
+        More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
+        $menuSalesPath,
+        $menuSynchronizationPath,
+        Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Orders')
+        );
     ?>
 </div>
 
@@ -578,7 +583,7 @@
                         <label for="magento_orders_customer_new_notifications"><?php echo Mage::helper('M2ePro')->__('Send Emails When The Following Is Created'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="magento_orders_customer_new_notifications" name="magento_orders_settings[customer][notifications][]" multiple="multiple" class="M2ePro-required-when-visible" >
+                        <select id="magento_orders_customer_new_notifications" name="magento_orders_settings[customer][notifications][]" multiple="multiple">
 <!--                            <option value="customer_created" --><?php //if ($formData['magento_orders_settings']['customer']['notifications']['customer_created']) echo ' selected="selected"'; ?><!-->--><?php //echo Mage::helper('M2ePro')->__('Customer Account'); ?><!--</option>-->
                             <option value="order_created" <?php if ($formData['magento_orders_settings']['customer']['notifications']['order_created']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Magento Order'); ?></option>
                             <option value="invoice_created" <?php if ($formData['magento_orders_settings']['customer']['notifications']['invoice_created']) echo ' selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Invoice'); ?></option>

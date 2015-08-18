@@ -83,6 +83,18 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
         return parent::isAllowed($dataType);
     }
 
+    public function allow($dataType)
+    {
+        $this->validateDataType($dataType);
+
+        if ($this->isAllowed($dataType) || $this->isEmptyMode()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = $dataType;
+        return $this;
+    }
+
     // ########################################
 
     public function isGeneralAllowed()
@@ -92,12 +104,12 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     public function allowGeneral()
     {
-        if ($this->isGeneralAllowed() || $this->isEmptyMode()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_GENERAL);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_GENERAL;
-        return $this;
+    public function disallowGeneral()
+    {
+        return $this->disallow(self::DATA_TYPE_GENERAL);
     }
 
     // ----------------------------------------
@@ -109,12 +121,12 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     public function allowQty()
     {
-        if ($this->isQtyAllowed() || $this->isEmptyMode()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_QTY);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_QTY;
-        return $this;
+    public function disallowQty()
+    {
+        return $this->disallow(self::DATA_TYPE_QTY);
     }
 
     // ----------------------------------------
@@ -126,12 +138,12 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     public function allowPrice()
     {
-        if ($this->isPriceAllowed() || $this->isEmptyMode()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_PRICE);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_PRICE;
-        return $this;
+    public function disallowPrice()
+    {
+        return $this->disallow(self::DATA_TYPE_PRICE);
     }
 
     // ----------------------------------------
@@ -143,12 +155,12 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     public function allowTitle()
     {
-        if ($this->isTitleAllowed() || $this->isEmptyMode()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_TITLE);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_TITLE;
-        return $this;
+    public function disallowTitle()
+    {
+        return $this->disallow(self::DATA_TYPE_TITLE);
     }
 
     // ----------------------------------------
@@ -160,12 +172,12 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     public function allowSubtitle()
     {
-        if ($this->isSubtitleAllowed() || $this->isEmptyMode()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_SUBTITLE);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_SUBTITLE;
-        return $this;
+    public function disallowSubtitle()
+    {
+        return $this->disallow(self::DATA_TYPE_SUBTITLE);
     }
 
     // ----------------------------------------
@@ -177,12 +189,12 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
 
     public function allowDescription()
     {
-        if ($this->isDescriptionAllowed() || $this->isEmptyMode()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_DESCRIPTION);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_DESCRIPTION;
-        return $this;
+    public function disallowDescription()
+    {
+        return $this->disallow(self::DATA_TYPE_DESCRIPTION);
     }
 
     // ########################################

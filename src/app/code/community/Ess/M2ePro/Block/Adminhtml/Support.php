@@ -184,7 +184,7 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
             'url'    => Mage::helper('M2ePro/Module_Support')->getVideoTutorialsUrl(
                     Ess_M2ePro_Helper_Component_Amazon::NICK
                 ),
-            'label'  => Mage::helper('M2ePro/Component_Amazon')->getChannelTitle(),
+            'label'  => Mage::helper('M2ePro/Component_Amazon')->getTitle(),
             'target' => '_blank'
         );
         //------------------------------
@@ -194,7 +194,7 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
             'url'    => Mage::helper('M2ePro/Module_Support')->getVideoTutorialsUrl(
                     Ess_M2ePro_Helper_Component_Buy::NICK
                 ),
-            'label'  => Mage::helper('M2ePro/Component_Buy')->getChannelTitle(),
+            'label'  => Mage::helper('M2ePro/Component_Buy')->getTitle(),
             'target' =>'_blank'
         );
         //------------------------------
@@ -211,7 +211,7 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
             'url'    => Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(
                     Ess_M2ePro_Helper_Component_Amazon::NICK
                 ),
-            'label'  => Mage::helper('M2ePro/Component_Amazon')->getChannelTitle(),
+            'label'  => Mage::helper('M2ePro/Component_Amazon')->getTitle(),
             'target' => '_blank'
         );
         //------------------------------
@@ -221,7 +221,7 @@ class Ess_M2ePro_Block_Adminhtml_Support extends Mage_Adminhtml_Block_Widget_For
             'url'    => Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(
                     Ess_M2ePro_Helper_Component_Buy::NICK
                 ),
-            'label'  => Mage::helper('M2ePro/Component_Buy')->getChannelTitle(),
+            'label'  => Mage::helper('M2ePro/Component_Buy')->getTitle(),
             'target' =>'_blank'
         );
         //------------------------------

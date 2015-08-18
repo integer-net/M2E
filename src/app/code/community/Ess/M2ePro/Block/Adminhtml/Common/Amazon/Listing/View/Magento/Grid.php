@@ -192,14 +192,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Magento_Grid
 
         $store = $this->_getStore();
 
-        $this->addColumn('magento_price', array(
+        $priceAttributeAlias = 'price';
+        if ($store->getId()) {
+            $priceAttributeAlias = 'magento_price';
+        }
+
+        $this->addColumn($priceAttributeAlias, array(
             'header'    => Mage::helper('M2ePro')->__('Price'),
             'align'     => 'right',
             'width'     => '100px',
             'type'      => 'price',
             'currency_code' => $store->getBaseCurrency()->getCode(),
-            'index'     => 'magento_price',
-            'filter_index' => 'magento_price',
+            'index'     => $priceAttributeAlias,
+            'filter_index' => $priceAttributeAlias,
             'frame_callback' => array($this, 'callbackColumnPrice')
         ));
 
@@ -259,10 +264,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Magento_Grid
     {
         $rowVal = $row->getData();
 
-        if (!isset($rowVal['magento_price']) || (float)$rowVal['magento_price'] <= 0) {
-            $value = 0;
-            $value = '<span style="color: red;">'.$value.'</span>';
+        if ($column->getId() == 'magento_price' &&
+            (!isset($rowVal['magento_price']) || (float)$rowVal['magento_price'] <= 0)
+        ) {
+            $value = '<span style="color: red;">0</span>';
         }
+
+        if ($column->getId() == 'price' &&
+            (!isset($rowVal['price']) || (float)$rowVal['price'] <= 0)
+        ) {
+            $value = '<span style="color: red;">0</span>';
+        }
+
         return $value;
     }
 

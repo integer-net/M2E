@@ -33,12 +33,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
 
     public function allowQty()
     {
-        if ($this->isQtyAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_QTY);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_QTY;
-        return $this;
+    public function disallowQty()
+    {
+        return $this->disallow(self::DATA_TYPE_QTY);
     }
 
     // ----------------------------------------
@@ -50,12 +50,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
 
     public function allowPrice()
     {
-        if ($this->isPriceAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_PRICE);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_PRICE;
-        return $this;
+    public function disallowPrice()
+    {
+        return $this->disallow(self::DATA_TYPE_PRICE);
     }
 
     // ----------------------------------------
@@ -67,12 +67,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
 
     public function allowDetails()
     {
-        if ($this->isDetailsAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_DETAILS);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_DETAILS;
-        return $this;
+    public function disallowDetails()
+    {
+        return $this->disallow(self::DATA_TYPE_DETAILS);
     }
 
     // ----------------------------------------
@@ -84,12 +84,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
 
     public function allowImages()
     {
-        if ($this->isImagesAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_IMAGES);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_IMAGES;
-        return $this;
+    public function disallowImages()
+    {
+        return $this->disallow(self::DATA_TYPE_IMAGES);
     }
 
     // ########################################

@@ -169,6 +169,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_MotorsSpecifics
 
     protected function logSuccessfulOperation()
     {
+        // M2ePro_TRANSLATIONS
+        // The "Parts Compatibility" Action for eBay Motors Site has been successfully completed.
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Parts Compatibility" Action for eBay Motors Site has been successfully completed.'
         );

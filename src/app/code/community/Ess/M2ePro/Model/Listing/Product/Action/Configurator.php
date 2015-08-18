@@ -98,11 +98,44 @@ abstract class Ess_M2ePro_Model_Listing_Product_Action_Configurator
 
     public function isAllowed($dataType)
     {
+        $this->validateDataType($dataType);
+
         if ($this->isFullMode()) {
             return true;
         }
 
         return in_array($dataType, $this->allowedDataTypes);
+    }
+
+    public function allow($dataType)
+    {
+        $this->validateDataType($dataType);
+
+        if ($this->isAllowed($dataType)) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = $dataType;
+        return $this;
+    }
+
+    public function disallow($dataType)
+    {
+        $this->validateDataType($dataType);
+
+        if (!$this->isAllowed($dataType)) {
+            return $this;
+        }
+
+        if ($this->isFullMode()) {
+            $this->setPartialMode();
+            $this->allowedDataTypes = array_diff($this->getAllDataTypes(), array($dataType));
+
+            return $this;
+        }
+
+        $this->allowedDataTypes = array_diff($this->allowedDataTypes, array($dataType));
+        return $this;
     }
 
     // ########################################
@@ -211,6 +244,15 @@ abstract class Ess_M2ePro_Model_Listing_Product_Action_Configurator
         }
 
         return $this;
+    }
+
+    // ########################################
+
+    protected function validateDataType($dataType)
+    {
+        if (!in_array($dataType, $this->getAllDataTypes())) {
+            throw new LogicException('Data type is invalid');
+        }
     }
 
     // ########################################

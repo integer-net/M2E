@@ -84,7 +84,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Linking
 
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_PhysicalUnit $typeModel */
             $typeModel = $this->getVariationManager()->getTypeModel();
-            $data['variation_options'] = json_encode($typeModel->getProductOptions());
+            $data['variation_product_options'] = json_encode($typeModel->getProductOptions());
+        }
+
+        if ($this->getVariationManager()->isRelationChildType() &&
+            $this->getVariationManager()->getTypeModel()->isVariationChannelMatched()
+        ) {
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $typeModel */
+            $typeModel = $this->getVariationManager()->getTypeModel();
+            $data['variation_channel_options'] = json_encode($typeModel->getChannelOptions());
         }
 
         /** @var Ess_M2ePro_Model_Amazon_Item $object */

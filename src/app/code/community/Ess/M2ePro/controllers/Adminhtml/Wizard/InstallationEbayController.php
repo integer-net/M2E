@@ -9,6 +9,16 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
 {
     //#############################################
 
+    protected function _initAction()
+    {
+        $result = parent::_initAction();
+
+        $this->getLayout()->getBlock('head')
+             ->addJs('M2ePro/Wizard/InstallationEbay.js');
+
+        return $result;
+    }
+
     protected function getNick()
     {
         return Ess_M2ePro_Helper_View_Ebay::WIZARD_INSTALLATION_NICK;
@@ -18,9 +28,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
 
     public function indexAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-        $wizardHelper->setStatus(
+        $this->getWizardHelper()->setStatus(
             'ebayProductDetails', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
         );
 
@@ -29,37 +37,27 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
 
     public function installationAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if ($wizardHelper->isFinished($this->getNick()) ||
-            $wizardHelper->isNotStarted($this->getNick())) {
+        if ($this->isFinished() || $this->isNotStarted()) {
             return $this->_redirect('*/*/index');
         }
 
-        if (!$wizardHelper->getStep($this->getNick())) {
-            $wizardHelper->setStep(
-                $this->getNick(),
-                $wizardHelper->getWizard($this->getNick())->getFirstStep()
-            );
+        if (!$this->getCurrentStep()) {
+            $this->setStep($this->getFirstStep());
         }
 
-        $currentStep = $wizardHelper->getStep($this->getNick());
-
-        $this->_forward($currentStep);
+        $this->_forward($this->getCurrentStep());
     }
 
     //#############################################
 
     private function renderSimpleStep()
     {
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        $currentStep = $wizardHelper->getStep($this->getNick());
-
         return $this->_initAction()
-            ->_addContent($wizardHelper->createBlock('installation_'.$currentStep,$this->getNick()))
-            ->renderLayout();
+                    ->_addContent($this->getWizardHelper()->createBlock(
+                        'installation_' . $this->getCurrentStep(),
+                        $this->getNick())
+                    )
+                    ->renderLayout();
     }
 
     //#############################################
@@ -222,7 +220,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         // Get and save session id
         //-------------------------------
 
-        $keys = array(
+        $requiredKeys = array(
             'email',
             'firstname',
             'lastname',
@@ -231,23 +229,32 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
             'postal_code',
         );
 
-        $post = $this->getRequest()->getPost();
-        unset($post['form_key']);
-        foreach ($keys as $key) {
-            (!isset($post[$key]) || !$post[$key]) && $post[$key] = 'undefined';
+        $licenseData = array();
+        foreach ($requiredKeys as $key) {
+
+            if ($tempValue = $this->getRequest()->getParam($key)) {
+                $licenseData[$key] = $tempValue;
+                continue;
+            }
+
+            $response = array(
+                'url'     => null,
+                'message' => Mage::helper('M2ePro')->__('You should fill all required fields.')
+            );
+            return $this->getResponse()->setBody(json_encode($response));
         }
 
         $registry = Mage::getModel('M2ePro/Registry')->load('/wizard/license_form_data/', 'key');
         $registry->setData('key', '/wizard/license_form_data/');
-        $registry->setData('value', json_encode($post));
+        $registry->setData('value', json_encode($licenseData));
         $registry->save();
 
         if (!Mage::helper('M2ePro/Module_License')->getKey()) {
 
             $licenseResult = Mage::helper('M2ePro/Module_License')->obtainRecord(
-                $post['email'],
-                $post['firstname'], $post['lastname'],
-                $post['country'], $post['city'], $post['postal_code']
+                $licenseData['email'],
+                $licenseData['firstname'], $licenseData['lastname'],
+                $licenseData['country'], $licenseData['city'], $licenseData['postal_code']
             );
 
             if (!$licenseResult) {
@@ -342,9 +349,7 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationEbayController
         $accountModel = Mage::helper('M2ePro/Component_Ebay')->getModel('Account')->setData($data)->save();
         $accountModel->getChildObject()->updateEbayStoreInfo();
 
-        $nextStep = Mage::helper('M2ePro/Module_Wizard')->getWizard($this->getNick())->getNextStep();
-
-        Mage::helper('M2ePro/Module_Wizard')->setStep($this->getNick(),$nextStep);
+        $this->setStep($this->getNextStep());
 
         return $this->_redirect('*/*/installation');
     }

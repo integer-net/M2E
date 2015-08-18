@@ -10,10 +10,16 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
     // Sell On Multi-Channels
 
     const NICK  = 'common';
-    const TITLE = 'Sell On Multi-Channels';
 
     const WIZARD_INSTALLATION_NICK = 'installationCommon';
     const MENU_ROOT_NODE_NICK = 'm2epro_common';
+
+    // ########################################
+
+    public function getTitle()
+    {
+        return Mage::helper('M2ePro')->__('Sell On Multi-Channels');
+    }
 
     // ########################################
 
@@ -22,7 +28,7 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         $activeComponents = $this->getActiveComponentsLabels();
 
         if (count($activeComponents) <= 0 || count($activeComponents) > 1) {
-            return Mage::helper('M2ePro')->__(self::TITLE);
+            return $this->getTitle();
         }
 
         return array_shift($activeComponents);
@@ -62,7 +68,7 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         $pathParts['menu'] = $menuLabel;
 
         if ($tabName) {
-            $pathParts['tab'] = $tabName . ' ' . Mage::helper('M2ePro')->__('Tab');
+            $pathParts['tab'] = Mage::helper('M2ePro')->__($tabName) . ' ' . Mage::helper('M2ePro')->__('Tab');
         } else {
             $pathParts['tab'] = NULL;
         }
@@ -99,7 +105,7 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
 
         $pathParts['channel'] = $channelLabel;
 
-        $pathParts['additional'] = $additionalEnd;
+        $pathParts['additional'] = Mage::helper('M2ePro')->__($additionalEnd);
 
         $resultPath = array();
 

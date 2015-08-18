@@ -10,7 +10,6 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
     // Sell On eBay
 
     const NICK  = 'ebay';
-    const TITLE = 'Sell On eBay';
 
     const WIZARD_INSTALLATION_NICK = 'installationEbay';
     const MENU_ROOT_NODE_NICK = 'm2epro_ebay';
@@ -20,9 +19,16 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
 
     // ########################################
 
+    public function getTitle()
+    {
+        return Mage::helper('M2ePro')->__('Sell On eBay');
+    }
+
+    // ########################################
+
     public function getMenuRootNodeLabel()
     {
-        return Mage::helper('M2ePro')->__(self::TITLE);
+        return $this->getTitle();
     }
 
     // ########################################
@@ -41,11 +47,11 @@ class Ess_M2ePro_Helper_View_Ebay extends Mage_Core_Helper_Abstract
         $resultPath['menu'] = $menuLabel;
 
         if ($tabName) {
-            $resultPath['tab'] = $tabName . ' ' . Mage::helper('M2ePro')->__('Tab');
+            $resultPath['tab'] = Mage::helper('M2ePro')->__($tabName) . ' ' . Mage::helper('M2ePro')->__('Tab');
         }
 
         if ($additionalEnd) {
-            $resultPath['additional'] = $additionalEnd;
+            $resultPath['additional'] = Mage::helper('M2ePro')->__($additionalEnd);
         }
 
         return join($resultPath, ' > ');

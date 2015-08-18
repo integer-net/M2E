@@ -18,6 +18,8 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
 
         $this->_initPopUp();
 
+        $this->setComponentPageHelpLink('General');
+
         return $this;
     }
 
@@ -40,8 +42,11 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
 
     public function globalAction()
     {
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock(
+        $this->_initAction();
+
+        $this->setComponentPageHelpLink('Global+Settings');
+
+        $this->_addContent($this->getLayout()->createBlock(
                     'M2ePro/adminhtml_ebay_configuration', '',
                     array('active_tab' => Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs::TAB_ID_GLOBAL)
                 )

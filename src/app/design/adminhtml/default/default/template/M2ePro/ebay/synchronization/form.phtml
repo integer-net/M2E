@@ -164,6 +164,8 @@ $translations = json_encode($translations);
 
     </div>
 
+    <?php if (!Mage::helper('M2ePro/View_Ebay')->isSimpleMode()) { ?>
+
     <div class="entry-edit" id="magento_block_ebay_synchronization_templates_text">
 
         <div class="entry-edit-head">
@@ -209,6 +211,8 @@ $translations = json_encode($translations);
         </div>
 
     </div>
+
+    <?php } ?>
 
 </div>
 

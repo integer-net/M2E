@@ -93,6 +93,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                 'product_id'                    => 'main_table.product_id',
                 'listing_id'                    => 'main_table.listing_id',
                 'status'                        => 'main_table.status',
+                'is_general_id_owner'           => 'second_table.is_general_id_owner',
                 'general_id'                    => 'second_table.general_id',
                 'is_afn_channel'                => 'second_table.is_afn_channel',
                 'is_variation_parent'           => 'second_table.is_variation_parent',
@@ -200,6 +201,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                 'product_id'                    => 'main_table.product_id',
                 'listing_id'                    => new Zend_Db_Expr('NULL'),
                 'status'                        => 'main_table.status',
+                'is_general_id_owner'           => new Zend_Db_Expr('NULL'),
                 'general_id'                    => 'second_table.general_id',
                 'is_afn_channel'                => 'second_table.is_afn_channel',
                 'is_variation_parent'           => new Zend_Db_Expr('NULL'),
@@ -243,6 +245,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                 'product_id',
                 'listing_id',
                 'status',
+                'is_general_id_owner',
                 'general_id',
                 'is_afn_channel',
                 'is_variation_parent',
@@ -333,7 +336,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         $this->addColumn('general_id', array(
             'header' => Mage::helper('M2ePro')->__('ASIN / ISBN'),
             'align' => 'left',
-            'width' => '90px',
+            'width' => '100px',
             'type' => 'text',
             'index' => 'general_id',
             'filter_index' => 'general_id',
@@ -541,43 +544,58 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
 
     public function callbackColumnAmazonSku($value, $row, $column, $isExport)
     {
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
+
         return $value;
     }
 
     public function callbackColumnGeneralId($value, $row, $column, $isExport)
     {
-        if ((int)$row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
-            if (is_null($value) || $value === '') {
-                return Mage::helper('M2ePro')->__('N/A');
+        if (empty($value)) {
+
+            if ((int)$row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+                return '<i style="color:gray;">'.Mage::helper('M2ePro')->__('receiving...').'</i>';
             }
-        } else {
-            if (is_null($value) || $value === '') {
-                return '<i style="color:gray;">receiving...</i>';
+
+            if ($row->getData('is_general_id_owner')) {
+                return Mage::helper('M2ePro')->__('New ASIN/ISBN');
             }
+
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
         $url = Mage::helper('M2ePro/Component_Amazon')->getItemUrl($value, $row->getData('marketplace_id'));
-
         return '<a href="'.$url.'" target="_blank">'.$value.'</a>';
     }
 
     public function callbackColumnAvailableQty($value, $row, $column, $isExport)
     {
-        if ((int)$row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
-            if (is_null($value) || $value === '') {
-                return Mage::helper('M2ePro')->__('N/A');
-            }
-        } else {
-            if (is_null($value) || $value === '') {
-                return '<i style="color:gray;">receiving...</i>';
-            }
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
         }
 
-        if ((bool)$row->getData('is_afn_channel')) {
-            return '--';
+        if ($row->getData('is_afn_channel')) {
+            return Mage::helper('M2ePro')->__('N/A');
+        }
+
+        if (is_null($value) || $value === '') {
+            if ($row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+                return '<i style="color:gray;">receiving...</i>';
+            }
+
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
         if ($value <= 0) {
@@ -589,11 +607,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         $onlineMinPrice = $row->getData('min_online_price');
         $onlineMaxPrice = $row->getData('max_online_price');
 
         if (is_null($onlineMinPrice) || $onlineMinPrice === '') {
-            if ($row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
+            if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
                 $row->getData('is_variation_parent')
             ) {
                 return Mage::helper('M2ePro')->__('N/A');
@@ -682,17 +707,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
 
     public function callbackColumnAfnChannel($value, $row, $column, $isExport)
     {
-        if (is_null($value) || $value === '') {
-            return Mage::helper('M2ePro')->__('N/A');
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
         }
 
-        switch ($row->getData('is_afn_channel')) {
-            case Ess_M2ePro_Model_Amazon_Listing_Product::IS_ISBN_GENERAL_ID_YES:
-                $value = '<span style="font-weight: bold;">' . $value . '</span>';
-                break;
-
-            default:
-                break;
+        if (is_null($value) || $value === '') {
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
         return $value;
@@ -826,11 +849,11 @@ HTML;
 
         $condition = '';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition = 'min_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'min_online_price <= \''.$value['to'].'\'';
@@ -838,11 +861,11 @@ HTML;
 
         $condition = '(' . $condition . ') OR (';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition .= 'max_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'max_online_price <= \''.$value['to'].'\'';

@@ -49,6 +49,8 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
 
         $this->_initPopUp();
 
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Buy::NICK, 'Edit+M2E+Pro+Listing+Settings');
+
         return $this;
     }
 
@@ -136,8 +138,10 @@ class Ess_M2ePro_Adminhtml_Common_Buy_ListingController
         $this->setRuleData('buy_rule_listing_view');
         // ---------------------------
 
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_view'))
+        $this->_initAction();
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Buy::NICK, 'Manage+M2E+Pro+Listings');
+
+        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_listing_view'))
             ->renderLayout();
     }
 

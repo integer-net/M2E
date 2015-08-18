@@ -23,7 +23,7 @@ if ($tempRow === false) {
     $installer->run(<<<SQL
 
 INSERT INTO `m2epro_primary_config` (`group`,`key`,`value`,`notice`,`update_date`,`create_date`) VALUES
-('/M2ePro/server/', 'installation_key', '{$installer->generateHash()}', 'Unique identifier of M2E instance',
+('/M2ePro/server/', 'installation_key', '{$installer->generateRandomHash()}', 'Unique identifier of M2E instance',
  '2013-05-08 00:00:00', '2013-05-08 00:00:00');
 
 SQL

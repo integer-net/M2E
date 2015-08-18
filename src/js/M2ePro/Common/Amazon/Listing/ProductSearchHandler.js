@@ -161,6 +161,17 @@ CommonAmazonListingProductSearchHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
+    clearSearchResultsAndManualSearch: function() {
+        var self = this;
+
+        popUp.close();
+        self.unmapFromGeneralId(self.params.productId, function() {
+            self.showSearchManualPrompt(self.params.title, self.params.productId);
+        });
+    },
+
+    //----------------------------------
+
     showSearchManualPrompt: function(title, listingProductId)
     {
         var self = this,

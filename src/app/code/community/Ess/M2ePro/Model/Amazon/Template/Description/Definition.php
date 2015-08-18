@@ -53,6 +53,10 @@ class Ess_M2ePro_Model_Amazon_Template_Description_Definition extends Ess_M2ePro
     const IMAGE_MAIN_MODE_PRODUCT    = 1;
     const IMAGE_MAIN_MODE_ATTRIBUTE  = 2;
 
+    const IMAGE_VARIATION_DIFFERENCE_MODE_NONE      = 0;
+    const IMAGE_VARIATION_DIFFERENCE_MODE_PRODUCT   = 1;
+    const IMAGE_VARIATION_DIFFERENCE_MODE_ATTRIBUTE = 2;
+
     const GALLERY_IMAGES_MODE_NONE      = 0;
     const GALLERY_IMAGES_MODE_PRODUCT   = 1;
     const GALLERY_IMAGES_MODE_ATTRIBUTE = 2;
@@ -995,6 +999,50 @@ class Ess_M2ePro_Model_Amazon_Template_Description_Definition extends Ess_M2ePro
 
     //-------------------------
 
+    public function getImageVariationDifferenceMode()
+    {
+        return (int)$this->getData('image_variation_difference_mode');
+    }
+
+    public function isImageVariationDifferenceModeNone()
+    {
+        return $this->getImageVariationDifferenceMode() == self::IMAGE_VARIATION_DIFFERENCE_MODE_NONE;
+    }
+
+    public function isImageVariationDifferenceModeProduct()
+    {
+        return $this->getImageVariationDifferenceMode() == self::IMAGE_VARIATION_DIFFERENCE_MODE_PRODUCT;
+    }
+
+    public function isImageVariationDifferenceModeAttribute()
+    {
+        return $this->getImageVariationDifferenceMode() == self::IMAGE_VARIATION_DIFFERENCE_MODE_ATTRIBUTE;
+    }
+
+    public function getImageVariationDifferenceSource()
+    {
+        return array(
+            'mode'     => $this->getImageVariationDifferenceMode(),
+            'attribute' => $this->getData('image_variation_difference_attribute')
+        );
+    }
+
+    public function getImageVariationDifferenceAttributes()
+    {
+        $attributes = array();
+        $src = $this->getImageVariationDifferenceSource();
+
+        if ($src['mode'] == self::IMAGE_VARIATION_DIFFERENCE_MODE_PRODUCT) {
+            $attributes[] = 'image';
+        } else if ($src['mode'] == self::IMAGE_VARIATION_DIFFERENCE_MODE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
+    //-------------------------
+
     public function getGalleryImagesMode()
     {
         return (int)$this->getData('gallery_images_mode');
@@ -1086,6 +1134,7 @@ class Ess_M2ePro_Model_Amazon_Template_Description_Definition extends Ess_M2ePro
     {
         return array_unique(array_merge(
             $this->getImageMainAttributes(),
+            $this->getImageVariationDifferenceAttributes(),
             $this->getGalleryImagesAttributes()
         ));
     }

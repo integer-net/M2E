@@ -166,18 +166,23 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Responser
                 continue;
             }
 
-            if (!$inspector->isMeetReviseQtyRequirements($listingProduct) &&
-                !$inspector->isMeetRevisePriceRequirements($listingProduct)
-            ) {
-                continue;
+            if ($inspector->isMeetReviseQtyRequirements($listingProduct)) {
+                $configurator->setPartialMode();
+                $configurator->allowQty();
+
+                $runner->addProduct(
+                    $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
+                );
             }
 
-            $configurator->setPartialMode();
-            $configurator->allowSelling();
+            if ($inspector->isMeetRevisePriceRequirements($listingProduct)) {
+                $configurator->setPartialMode();
+                $configurator->allowPrice();
 
-            $runner->addProduct(
-                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
-            );
+                $runner->addProduct(
+                    $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
+                );
+            }
         }
 
         foreach ($listingsProductsByStatus[Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED] as $listingProduct) {

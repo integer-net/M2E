@@ -488,6 +488,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnEbayItemId($value, $row, $column, $isExport)
     {
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -506,6 +510,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnOnlineAvailableQty($value, $row, $column, $isExport)
     {
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -519,6 +527,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnOnlineQtySold($value, $row, $column, $isExport)
     {
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -532,6 +544,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Search_Grid extends Mage_Adminhtml
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         $onlineMinPrice = $row->getData('min_online_price');
         $onlineMaxPrice = $row->getData('max_online_price');
         $onlineStartPrice = $row->getData('online_start_price');
@@ -714,11 +730,11 @@ HTML;
 
         $condition = '';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition = 'min_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'min_online_price <= \''.$value['to'].'\'';
@@ -726,11 +742,11 @@ HTML;
 
         $condition = '(' . $condition . ') OR (';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition .= 'max_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'max_online_price <= \''.$value['to'].'\'';

@@ -13,7 +13,7 @@ class Ess_M2ePro_Adminhtml_Wizard_EbayProductDetailsController
     {
         parent::_initAction();
         $this->getLayout()->getBlock('head')
-            ->addJs('M2ePro/Wizard/EbayProductDetails.js');
+                          ->addJs('M2ePro/Wizard/EbayProductDetails.js');
 
         return $this;
     }
@@ -29,35 +29,24 @@ class Ess_M2ePro_Adminhtml_Wizard_EbayProductDetailsController
 
     public function welcomeAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-        $wizardHelper->setStatus(
-            $this->getNick(),
-            Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE
-        );
+        $this->setStatus(Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE);
 
-        return $this->_redirect('*/*/index');
+        return $this->_redirect('*/adminhtml_ebay_listing/index/');
     }
 
     public function installationAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if ($wizardHelper->isFinished($this->getNick())) {
+        if ($this->isFinished()) {
             return $this->_redirect('*/*/congratulation');
         }
 
-        if (!$wizardHelper->getStep($this->getNick())) {
-            $wizardHelper->setStep(
-                $this->getNick(),
-                $wizardHelper->getWizard($this->getNick())->getFirstStep()
-            );
+        if (!$this->getCurrentStep()) {
+            $this->setStep($this->getFirstStep());
         }
 
         return $this->_initAction()
-            ->_addContent($wizardHelper->createBlock('installation',$this->getNick()))
-            ->renderLayout();
+                    ->_addContent($this->getWizardHelper()->createBlock('installation',$this->getNick()))
+                    ->renderLayout();
     }
 
     public function congratulationAction()

@@ -83,20 +83,66 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Request
             $data['out_of_stock_control'] = $this->getOutOfStockControlMode();
         }
 
-        if ($this->getIsVariationItem() &&
-            !empty($data['item_specifics']) && is_array($data['item_specifics'])  &&
-            !empty($data['variations_sets']) && is_array($data['variations_sets'])) {
+        $data = $this->replaceVariationSpecificsNames($data);
+        $data = $this->resolveVariationAndItemSpecificsConflict($data);
+        $data = $this->removeVariationsInstances($data);
 
-            $variationAttributes = array_keys($data['variations_sets']);
-            $variationAttributes = array_map('strtolower',$variationAttributes);
+        return $data;
+    }
 
-            foreach ($data['item_specifics'] as $key => $itemSpecific) {
-                if (in_array(strtolower($itemSpecific['name']), $variationAttributes)) {
-                    unset($data['item_specifics'][$key]);
-                }
-            }
+    protected function replaceVariationSpecificsNames(array $data)
+    {
+        if (!$this->getIsVariationItem() || !$this->getMagentoProduct()->isConfigurableType() ||
+            empty($data['variations_sets']) || !is_array($data['variations_sets'])) {
+
+            return $data;
         }
 
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+
+        if (empty($additionalData['variations_specifics_replacements'])) {
+            return $data;
+        }
+
+        $data = $this->doReplaceVariationSpecifics($data, $additionalData['variations_specifics_replacements']);
+        return $data;
+    }
+
+    protected function resolveVariationAndItemSpecificsConflict(array $data)
+    {
+        if (!$this->getIsVariationItem() ||
+            empty($data['item_specifics']) || !is_array($data['item_specifics']) ||
+            empty($data['variations_sets']) || !is_array($data['variations_sets'])) {
+
+            return $data;
+        }
+
+        $variationAttributes = array_keys($data['variations_sets']);
+        $variationAttributes = array_map('strtolower', $variationAttributes);
+
+        foreach ($data['item_specifics'] as $key => $itemSpecific) {
+
+            if (!in_array(strtolower($itemSpecific['name']), $variationAttributes)) {
+                continue;
+            }
+
+            unset($data['item_specifics'][$key]);
+
+            $this->addWarningMessage(
+                Mage::helper('M2ePro')->__(
+                    'Item Specific "%specific_name%" will not be sent to eBay, because your Variational Product varies
+                    by the Attribute with the same Label. In case M2E Pro will send this information twice, eBay will
+                    return an error. So M2E Pro ignores the Value of this Item Specific to prevent the error message.',
+                    $itemSpecific['name']
+                )
+            );
+        }
+
+        return $data;
+    }
+
+    protected function removeVariationsInstances(array $data)
+    {
         if (isset($data['variation']) && is_array($data['variation'])) {
             foreach ($data['variation'] as &$variation) {
                 unset($variation['_instance_']);
@@ -105,6 +151,58 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Request
 
         return $data;
     }
+
+    protected function doReplaceVariationSpecifics(array $data, array $replacements)
+    {
+        if (isset($data['variation_image']['specific'])) {
+
+            foreach ($replacements as $findIt => $replaceBy) {
+
+                if ($data['variation_image']['specific'] == $findIt) {
+                    $data['variation_image']['specific'] = $replaceBy;
+                }
+            }
+        }
+
+        foreach ($data['variation'] as &$variationItem) {
+            foreach ($replacements as $findIt => $replaceBy) {
+
+                if (!isset($variationItem['specifics'][$findIt])) {
+                   continue;
+                }
+
+                $variationItem['specifics'][$replaceBy] = $variationItem['specifics'][$findIt];
+                unset($variationItem['specifics'][$findIt]);
+            }
+        }
+
+        foreach ($replacements as $findIt => $replaceBy) {
+
+            if (!isset($data['variations_sets'][$findIt])) {
+                continue;
+            }
+
+            $data['variations_sets'][$replaceBy] = $data['variations_sets'][$findIt];
+            unset($data['variations_sets'][$findIt]);
+
+            // M2ePro_TRANSLATIONS
+            // The Variational Attribute Label "%replaced_it%" was changed to "%replaced_by%". For Item Specific "%replaced_by%" you select an Attribute by which your Variational Item varies. As it is impossible to send a correct Value for this Item Specific, it’s Label will be used as Variational Attribute Label instead of "%replaced_it%". This replacement cannot be edit in future by Relist/Revise Actions.
+            $this->addWarningMessage(
+                Mage::helper('M2ePro')->__(
+                    'The Variational Attribute Label "%replaced_it%" was changed to "%replaced_by%". For Item Specific
+                    "%replaced_by%" you select an Attribute by which your Variational Item varies. As it is impossible
+                    to send a correct Value for this Item Specific, it’s Label will be used as Variational Attribute
+                    Label instead of "%replaced_it%". This replacement cannot be edit in future by
+                    Relist/Revise Actions.',
+                    $findIt, $replaceBy
+                )
+            );
+        }
+
+        return $data;
+    }
+
+    // -----------------------------------------
 
     protected function collectRequestsWarningMessages()
     {

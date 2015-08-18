@@ -411,6 +411,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
             'additional_data' => json_encode($additionalData),
         ))->save();
 
+        $listingProduct->getChildObject()->updateVariationsStatus();
+
         if (is_null($duplicateItemId)) {
             return;
         }

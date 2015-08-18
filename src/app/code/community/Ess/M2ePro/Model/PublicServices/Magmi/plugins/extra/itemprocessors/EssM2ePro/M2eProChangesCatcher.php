@@ -27,7 +27,7 @@ class M2eProChangesCatcher extends Magmi_ItemProcessor
         return array(
             "name"    => "Ess M2ePro Product Changes Inspector",
             "author"  => "ESS",
-            "version" => "1.0.3",
+            "version" => "1.0.4",
             "url"     => "http://docs.m2epro.com/display/BestPractice/Plugin+for+Magmi+Import+Tool"
         );
     }
@@ -50,12 +50,12 @@ class M2eProChangesCatcher extends Magmi_ItemProcessor
         return $result;
     }
 
-    public function afterImport()
+    public function endImport()
     {
         $this->filterOnlyAffectedChanges();
         $this->insertChanges();
 
-        return parent::afterImport();
+        return true;
     }
 
     // ########################################
@@ -156,8 +156,8 @@ class M2eProChangesCatcher extends Magmi_ItemProcessor
 
     protected function saveStatistics()
     {
-        $message  = "Not presented (skipped): {$this->statistics['not_presented']}## ";
-        $message .= "Existed (skipped): {$this->statistics['existed']}## ";
+        $message  = "Not presented (skipped): {$this->statistics['not_presented']} ## ";
+        $message .= "Existed (skipped): {$this->statistics['existed']} ## ";
         $message .= "Processed: {$this->statistics['inserted']}.";
 
         $this->log($message);

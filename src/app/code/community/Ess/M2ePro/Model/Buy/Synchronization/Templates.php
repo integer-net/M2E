@@ -136,6 +136,8 @@ final class Ess_M2ePro_Model_Buy_Synchronization_Templates
             return;
         }
 
+        // M2ePro_TRANSLATIONS
+        // Task "Inventory Synchronization" has completed with %result%. View Listings Log for details.
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
                 'Task "Inventory Synchronization" has completed with %result%. View Listings Log for details.',

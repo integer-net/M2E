@@ -15,6 +15,8 @@ class Ess_M2ePro_Adminhtml_Common_ConfigurationController
             ->_title(Mage::helper('M2ePro')->__('Configuration'))
             ->_title(Mage::helper('M2ePro')->__('Global'));
 
+        $this->setComponentPageHelpLink('Global+Settings');
+
         return $this;
     }
 

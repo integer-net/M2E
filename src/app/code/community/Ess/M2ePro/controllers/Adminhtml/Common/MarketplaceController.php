@@ -23,6 +23,8 @@ class Ess_M2ePro_Adminhtml_Common_MarketplaceController
              ->addJs('M2ePro/SynchProgressHandler.js')
              ->addJs('M2ePro/MarketplaceHandler.js');
 
+        $this->setComponentPageHelpLink('Marketplaces');
+
         return $this;
     }
 

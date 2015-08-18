@@ -226,7 +226,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Source
         return $imageLink;
     }
 
-    public function getImages()
+    public function getGalleryImages()
     {
         if ($this->getAmazonListing()->isImageMainModeNone()) {
             return array();

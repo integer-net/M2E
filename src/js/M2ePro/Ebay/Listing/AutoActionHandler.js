@@ -45,7 +45,7 @@ EbayListingAutoActionHandler = Class.create(ListingAutoActionHandler, {
 
     loadSpecific: function(callback)
     {
-        var category = EbayListingCategoryChooserHandlerObj.getSelectedCategory(0); // todo constant
+        var category = EbayListingCategoryChooserHandlerObj.getSelectedCategory(0); // todo next
 
         if (!category.mode) {
             return;
