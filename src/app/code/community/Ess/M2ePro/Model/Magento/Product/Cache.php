@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Magento_Product_Cache extends Ess_M2ePro_Model_Magento_Product
 {
-    // ########################################
-
     private $isCacheEnabled = false;
 
     // ########################################

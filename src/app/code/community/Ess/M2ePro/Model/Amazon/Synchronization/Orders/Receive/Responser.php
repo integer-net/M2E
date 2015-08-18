@@ -7,9 +7,43 @@
 class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive_Responser
     extends Ess_M2ePro_Model_Connector_Amazon_Orders_Get_ItemsResponser
 {
+    protected $synchronizationLog = NULL;
+
     // ##########################################################
 
-    protected $synchronizationLog = NULL;
+    protected function processResponseMessages(array $messages = array())
+    {
+        parent::processResponseMessages($messages);
+
+        foreach ($this->messages as $message) {
+
+            if (!$this->isMessageError($message) && !$this->isMessageWarning($message)) {
+                continue;
+            }
+
+            $logType = $this->isMessageError($message) ? Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
+                                                       : Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING;
+
+            $this->getSynchronizationLog()->addMessage(
+                Mage::helper('M2ePro')->__($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]),
+                $logType,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+            );
+        }
+    }
+
+    protected function isNeedToParseResponseData($responseBody)
+    {
+        if (!parent::isNeedToParseResponseData($responseBody)) {
+            return false;
+        }
+
+        if ($this->hasErrorMessages()) {
+            return false;
+        }
+
+        return true;
+    }
 
     // ##########################################################
 
@@ -53,12 +87,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive_Responser
 
         try {
 
-            $account = $this->getAccount();
-            if (!$account->getChildObject()->isOrdersModeEnabled()) {
-                return;
-            }
-
-            $amazonOrders = $this->processAmazonOrders($response, $account);
+            $amazonOrders = $this->processAmazonOrders($response, $this->getAccount());
             if (empty($amazonOrders)) {
                 return;
             }

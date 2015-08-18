@@ -14,8 +14,6 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
     // M2ePro_TRANSLATIONS
     // Tracking number "%num%" for "%code%" has been sent to Rakuten.com.
 
-    // ########################################
-
     private $orders = array();
 
     // ########################################

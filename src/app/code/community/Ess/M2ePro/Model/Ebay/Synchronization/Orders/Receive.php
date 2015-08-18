@@ -99,8 +99,6 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
     {
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account');
-        $accountsCollection->addFieldToFilter('orders_mode', Ess_M2ePro_Model_Ebay_Account::ORDERS_MODE_YES);
-
         return $accountsCollection->getItems();
     }
 
@@ -110,16 +108,13 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
     {
         $fromTime = $this->prepareFromTime($account);
 
-        $request = array(
-            'last_update' => $fromTime,
-        );
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('sales', 'get', 'list',
+                                                            array('last_update' => $fromTime),
+                                                            NULL, NULL, $account);
 
-        $entity = 'sales';
-        $type   = 'get';
-        $name   = 'list';
-
-        $response = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-            ->processVirtual($entity, $type, $name, $request, NULL, NULL, $account);
+        $response = $dispatcherObj->process($connectorObj);
+        $this->processResponseMessages($connectorObj);
 
         $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$account->getId());
 
@@ -149,6 +144,25 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
         $this->saveLastUpdateTime($account, $toTime);
 
         return array_filter($orders);
+    }
+
+    private function processResponseMessages(Ess_M2ePro_Model_Connector_Protocol $connectorObj)
+    {
+        foreach ($connectorObj->getErrorMessages() as $message) {
+
+            if (!$connectorObj->isMessageError($message) && !$connectorObj->isMessageWarning($message)) {
+                continue;
+            }
+
+            $logType = $connectorObj->isMessageError($message) ? Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR
+                                                               : Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING;
+
+            $this->getLog()->addMessage(
+                Mage::helper('M2ePro')->__($message[Ess_M2ePro_Model_Connector_Protocol::MESSAGE_TEXT_KEY]),
+                $logType,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_HIGH
+            );
+        }
     }
 
     private function createMagentoOrders($ebayOrders, $percentsForOneOrder)

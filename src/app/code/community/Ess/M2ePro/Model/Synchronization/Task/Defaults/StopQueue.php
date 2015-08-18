@@ -136,7 +136,8 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_StopQueue
             }
 
             $dispatcher = Mage::getModel('M2ePro/Connector_'.ucwords($component).'_Dispatcher');
-            $dispatcher->processVirtual($entity, $type, $name, $requestData);
+            $connectorObj = $dispatcher->getVirtualConnector($entity, $type, $name, $requestData);
+            $dispatcher->process($connectorObj);
 
         } catch (Exception $exception) {}
     }

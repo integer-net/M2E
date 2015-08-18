@@ -5,91 +5,91 @@
  */
 
 class Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
+    extends Ess_M2ePro_Model_Listing_Product_Action_Configurator
 {
-    const ALL_DATA_KEY      = 'all_data';
-    const ONLY_DATA_KEY     = 'only_data';
-
-    const TYPE_DETAILS      = 'details';
-    const TYPE_SELLING      = 'selling';
-    const TYPE_SHIPPING     = 'shipping';
-    const TYPE_NEW_PRODUCT  = 'new_product';
-
-    /**
-     * @var array
-     */
-    private $params = array();
+    const DATA_TYPE_SELLING      = 'selling';
+    const DATA_TYPE_DETAILS      = 'details';
+    const DATA_TYPE_SHIPPING     = 'shipping';
+    const DATA_TYPE_NEW_PRODUCT  = 'new_product';
 
     // ########################################
 
-    public function setParams(array $params = array())
+    public function getAllDataTypes()
     {
-        $this->params = $params;
-    }
-
-    public function getParams()
-    {
-        return $this->params;
+        return array(
+            self::DATA_TYPE_SELLING,
+            self::DATA_TYPE_DETAILS,
+            self::DATA_TYPE_SHIPPING,
+            self::DATA_TYPE_NEW_PRODUCT,
+        );
     }
 
     // ########################################
 
-    public function isAll()
+    public function isSellingAllowed()
     {
-        return isset($this->params[self::ALL_DATA_KEY]) &&
-               (bool)$this->params[self::ALL_DATA_KEY];
+        return $this->isAllowed(self::DATA_TYPE_SELLING);
     }
 
-    public function isOnly()
+    public function allowSelling()
     {
-        return isset($this->params[self::ONLY_DATA_KEY]) &&
-               is_array($this->params[self::ONLY_DATA_KEY]) &&
-               count($this->params[self::ONLY_DATA_KEY]) > 0;
+        if ($this->isSellingAllowed()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_SELLING;
+        return $this;
     }
 
     // ----------------------------------------
 
-    public function isAllPermitted()
+    public function isDetailsAllowed()
     {
-        return $this->isShipping() && $this->isSelling() &&
-               $this->isDetails() && $this->isNewProduct();
+        return $this->isAllowed(self::DATA_TYPE_DETAILS);
     }
 
-    // ########################################
-
-    public function isDetails()
+    public function allowDetails()
     {
-        return $this->isAllowed(self::TYPE_DETAILS);
-    }
-
-    public function isSelling()
-    {
-        return $this->isAllowed(self::TYPE_SELLING);
-    }
-
-    public function isShipping()
-    {
-        return $this->isAllowed(self::TYPE_SHIPPING);
-    }
-
-    public function isNewProduct()
-    {
-        return $this->isAllowed(self::TYPE_NEW_PRODUCT);
-    }
-
-    // ########################################
-
-    private function isAllowed($type)
-    {
-        if ($this->isAll()) {
-            return true;
+        if ($this->isDetailsAllowed()) {
+            return $this;
         }
 
-        if (!$this->isOnly()) {
-            return true;
+        $this->allowedDataTypes[] = self::DATA_TYPE_DETAILS;
+        return $this;
+    }
+
+    // ----------------------------------------
+
+    public function isShippingAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_SHIPPING);
+    }
+
+    public function allowShipping()
+    {
+        if ($this->isShippingAllowed()) {
+            return $this;
         }
 
-        return isset($this->params[self::ONLY_DATA_KEY][$type]) &&
-               (bool)$this->params[self::ONLY_DATA_KEY][$type];
+        $this->allowedDataTypes[] = self::DATA_TYPE_SHIPPING;
+        return $this;
+    }
+
+    // ----------------------------------------
+
+    public function isNewProductAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_NEW_PRODUCT);
+    }
+
+    public function allowNewProduct()
+    {
+        if ($this->isNewProductAllowed()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_NEW_PRODUCT;
+        return $this;
     }
 
     // ########################################

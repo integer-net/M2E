@@ -113,11 +113,6 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
         return $this->getComponentMode() == Ess_M2ePro_Helper_Component_Buy::NICK;
     }
 
-    public function isComponentModePlay()
-    {
-        return $this->getComponentMode() == Ess_M2ePro_Helper_Component_Play::NICK;
-    }
-
     //----------------------------------------
 
     public function getComponentTitle()
@@ -132,10 +127,6 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
 
         if ($this->isComponentModeBuy()) {
             return Mage::helper('M2ePro/Component_Buy')->getTitle();
-        }
-
-        if ($this->isComponentModePlay()) {
-            return Mage::helper('M2ePro/Component_Play')->getTitle();
         }
 
         return '';

@@ -31,6 +31,8 @@ class Ess_M2ePro_Model_OperationHistory extends Ess_M2ePro_Model_Abstract
             $this->object = Mage::getModel('M2ePro/OperationHistory')->load($value);
             !$this->object->getId() && $this->object = NULL;
         }
+
+        return $this;
     }
 
     /**
@@ -131,7 +133,17 @@ class Ess_M2ePro_Model_OperationHistory extends Ess_M2ePro_Model_Abstract
         $functionCode =
             '$object = Mage::getModel(\'M2ePro/OperationHistory\');
              $object->setObject('.$this->object->getId().');
-             $object->stop();
+
+             if(!$object->stop()) {
+                return;
+             }
+
+             $collection = $object->getCollection()
+                     ->addFieldToFilter(\'parent_id\', '.$this->object->getId().');
+
+             if ($collection->getSize()) {
+                return;
+             }
 
              $error = error_get_last();
 

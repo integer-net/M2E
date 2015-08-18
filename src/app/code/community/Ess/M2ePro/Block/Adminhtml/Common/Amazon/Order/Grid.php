@@ -9,6 +9,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_Grid extends Mage_Adminhtml
     /** @var $itemsCollection Ess_M2ePro_Model_Mysql4_Order_Item_Collection */
     private $itemsCollection = NULL;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -152,7 +154,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_Grid extends Mage_Adminhtml
             'index'  => 'reservation_state',
             'type'   => 'options',
             'options' => array(
-                Ess_M2ePro_Model_Order_Reserve::STATE_UNKNOWN  => Mage::helper('M2ePro')->__('N/A'),
+                Ess_M2ePro_Model_Order_Reserve::STATE_UNKNOWN  => Mage::helper('M2ePro')->__('Not Reserved'),
                 Ess_M2ePro_Model_Order_Reserve::STATE_PLACED   => Mage::helper('M2ePro')->__('Reserved'),
                 Ess_M2ePro_Model_Order_Reserve::STATE_RELEASED => Mage::helper('M2ePro')->__('Released'),
                 Ess_M2ePro_Model_Order_Reserve::STATE_CANCELED => Mage::helper('M2ePro')->__('Canceled'),
@@ -464,9 +466,20 @@ HTML;
 
     public function callbackColumnTotal($value, $row, $column, $isExport)
     {
-        return Mage::getSingleton('M2ePro/Currency')->formatPrice(
-            $row->getData('currency'), $row->getData('paid_amount')
-        );
+        $currency = $row->getData('currency');
+
+        if (empty($currency)) {
+            /** @var Ess_M2ePro_Model_Marketplace $marketplace */
+            $marketplace = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
+                'Marketplace', $row->getData('marketplace_id')
+            );
+            /** @var Ess_M2ePro_Model_Amazon_Marketplace $amazonMarketplace */
+            $amazonMarketplace = $marketplace->getChildObject();
+
+            $currency = $amazonMarketplace->getDefaultCurrency();
+        }
+
+        return Mage::getSingleton('M2ePro/Currency')->formatPrice($currency, $row->getData('paid_amount'));
     }
 
     public function callbackColumnAfnChannel($value, $row, $column, $isExport)
@@ -554,5 +567,5 @@ HTML;
         return $this->getUrl('*/adminhtml_common_amazon_order/view', array('id' => $row->getId(), 'back' => $back));
     }
 
-    //##############################################################
+    // ####################################
 }

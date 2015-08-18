@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Wizard extends Ess_M2ePro_Model_Abstract
 {
-    // ########################################
-
     protected $steps = array();
 
     // ########################################

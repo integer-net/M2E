@@ -5,8 +5,10 @@
  */
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Specific_GenerateAttributeValue
-    extends Mage_Adminhtml_Block_Widget_Container
+    extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -20,4 +22,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Specific_GenerateAttributeValue
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

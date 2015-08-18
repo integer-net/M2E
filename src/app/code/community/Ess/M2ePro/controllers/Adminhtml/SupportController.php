@@ -71,10 +71,21 @@ class Ess_M2ePro_Adminhtml_SupportController
     {
         $referrer = $this->getRequest()->getParam('referrer');
 
-        $url = Mage::helper('M2ePro/View_Ebay')->getDocumentationUrl();
+        $url = Mage::helper('M2ePro/Module_Support')->getDocumentationUrl();
 
-        if (isset($referrer) && $referrer == Ess_M2ePro_Helper_View_Common::NICK) {
-            $url = Mage::helper('M2ePro/View_Common')->getDocumentationUrl();
+        if ($referrer == Ess_M2ePro_Helper_View_Ebay::NICK) {
+
+            $url = Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(
+                Ess_M2ePro_Helper_Component_Ebay::NICK
+            );
+
+        } elseif ($referrer == Ess_M2ePro_Helper_View_Common::NICK) {
+
+            $activeComponents = Mage::helper('M2ePro/View_Common_Component')->getActiveComponents();
+
+            if (count($activeComponents) == 1) {
+                $url = Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(array_shift($activeComponents));
+            }
         }
 
         $html = '<iframe src="' .$url . '" width="100%" height="650"></iframe>';

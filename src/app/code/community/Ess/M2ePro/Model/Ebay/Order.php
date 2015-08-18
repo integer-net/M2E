@@ -10,8 +10,6 @@
  */
 class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
-    // ##########################################################
-
     const ORDER_STATUS_ACTIVE     = 0;
     const ORDER_STATUS_COMPLETED  = 1;
     const ORDER_STATUS_CANCELLED  = 2;
@@ -545,7 +543,7 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
 
     public function canCreatePaymentTransaction()
     {
-        if ($this->hasExternalTransactions()) {
+        if (!$this->hasExternalTransactions()) {
             return false;
         }
 
@@ -818,10 +816,12 @@ class Ess_M2ePro_Model_Ebay_Order extends Ess_M2ePro_Model_Component_Child_Ebay_
             'transaction_id' => $firstItem->getChildObject()->getTransactionId(),
         );
 
-        $buyerInfo = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-            ->processVirtual('sales', 'get', 'itemTransactions',
-                $params, 'buyer_info',
-                NULL, $this->getParentObject()->getAccount(), NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('sales', 'get', 'itemTransactions',
+                                                            $params, 'buyer_info',
+                                                            NULL, $this->getParentObject()->getAccount(), NULL);
+
+        $buyerInfo = $dispatcherObj->process($connectorObj);
 
         return $buyerInfo;
     }

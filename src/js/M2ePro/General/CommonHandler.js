@@ -22,7 +22,7 @@ CommonHandler.prototype = {
                 }
             }
 
-            return hidden ? true : !!value;
+            return hidden ? true : value != null && value.length > 0;
         });
 
         Validation.add('M2ePro-required-when-visible-and-enabled', M2ePro.translator.translate('This is a required field.'), function(value, el) {
@@ -44,7 +44,7 @@ CommonHandler.prototype = {
                 return true;
             }
 
-            return hidden ? true : !!value;
+            return hidden ? true : value != null && value.length > 0;
         });
 
         Validation.add('M2ePro-validation-float', M2ePro.translator.translate('Invalid input data. Decimal value required. Example 12.05'), function(value, element) {
@@ -241,6 +241,16 @@ CommonHandler.prototype = {
 
             return checkResult;
         });
+    },
+
+    //----------------------------------
+
+    autoHeightFix: function()
+    {
+        setTimeout(function() {
+            Windows.getFocusedWindow().content.style.height = '';
+            Windows.getFocusedWindow().content.style.maxHeight = '650px';
+        }, 50);
     }
 
     //----------------------------------

@@ -93,7 +93,7 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Source
                     return Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_AUCTION;
             }
 
-            throw new LogicException('Invalid Listing type in Attribute.');
+            return Ess_M2ePro_Model_Ebay_Template_SellingFormat::LISTING_TYPE_FIXED;
         }
 
         return $src['mode'];

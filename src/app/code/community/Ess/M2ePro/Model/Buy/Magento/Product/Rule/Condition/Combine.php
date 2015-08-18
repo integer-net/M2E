@@ -38,8 +38,8 @@ class Ess_M2ePro_Model_Buy_Magento_Product_Rule_Condition_Combine
         return array(
             'buy_sku' => Mage::helper('M2ePro')->__('Reference ID'),
             'buy_general_id' => Mage::helper('M2ePro')->__('SKU'),
-            'buy_online_qty' => Mage::helper('M2ePro')->__('Online QTY'),
-            'buy_online_price' => Mage::helper('M2ePro')->__('Online Price'),
+            'buy_online_qty' => Mage::helper('M2ePro')->__('QTY'),
+            'buy_online_price' => Mage::helper('M2ePro')->__('Price'),
             'buy_status' => Mage::helper('M2ePro')->__('Status')
         );
     }

@@ -114,7 +114,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         ));
 
         $this->addColumn('item_id', array(
-            'header' => Mage::helper('M2ePro')->__('eBay Item ID'),
+            'header' => Mage::helper('M2ePro')->__('Item ID'),
             'align' => 'left',
             'width' => '100px',
             'type' => 'text',
@@ -124,7 +124,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         ));
 
         $this->addColumn('online_qty', array(
-            'header' => Mage::helper('M2ePro')->__('eBay Available QTY'),
+            'header' => Mage::helper('M2ePro')->__('Available QTY'),
             'align' => 'right',
             'width' => '50px',
             'type' => 'number',
@@ -134,7 +134,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         ));
 
         $this->addColumn('online_qty_sold', array(
-            'header' => Mage::helper('M2ePro')->__('eBay Sold QTY'),
+            'header' => Mage::helper('M2ePro')->__('Sold QTY'),
             'align' => 'right',
             'width' => '50px',
             'type' => 'number',
@@ -144,7 +144,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
         ));
 
         $this->addColumn('online_price', array(
-            'header' => Mage::helper('M2ePro')->__('eBay Price'),
+            'header' => Mage::helper('M2ePro')->__('Price'),
             'align' => 'right',
             'width' => '50px',
             'type' => 'number',
@@ -574,8 +574,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View_Grid extends Mage_Admin
             case Ess_M2ePro_Model_Listing_Other_Log::ACTION_STOP_PRODUCT:
                 $string = Mage::helper('M2ePro')->__('Stop');
                 break;
-            case Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_STATUS_ON_CHANNEL:
-                $string = Mage::helper('M2ePro')->__('Status Change');
+            case Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANNEL_CHANGE:
+                $string = Mage::helper('M2ePro')->__('Channel Change');
                 break;
         }
 

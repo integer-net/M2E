@@ -7,8 +7,6 @@
 class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
     extends Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
 {
-    //#############################################
-
     protected $sessionKey = 'ebay_listing_category_settings';
 
     //#############################################
@@ -272,7 +270,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             $this->getListingFromRequest()->getAddedListingProductsIds()
         );
 
-        if (empty($categoriesIds) && !$this->getRequest()->isAjax()) {
+        if (empty($categoriesIds) && !$this->getRequest()->isXmlHttpRequest()) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__(
                 'Magento Categories are not specified on Products you are adding.')
             );
@@ -442,14 +440,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             }
 
             try {
-                $suggestions = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                    ->processConnector(
-                        'category',
-                        'get',
-                        'suggested',
-                        array('query' => $query),
-                        $marketplaceId
-                    );
+
+                $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+                $connectorObj = $dispatcherObject->getConnector('category','get','suggested',
+                                                                array('query' => $query), $marketplaceId);
+
+                $suggestions = $dispatcherObject->process($connectorObj);
+
             } catch (Exception $e) {
                 $result['failed']++;
                 continue;

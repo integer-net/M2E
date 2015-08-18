@@ -7,8 +7,6 @@
 final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Update
     extends Ess_M2ePro_Model_Ebay_Synchronization_Orders_Abstract
 {
-    // ##########################################################
-
     const MAX_UPDATES_PER_TIME = 200;
 
     // ##########################################################
@@ -82,8 +80,6 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Update
     {
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account');
-        $accountsCollection->addFieldToFilter('orders_mode', Ess_M2ePro_Model_Ebay_Account::ORDERS_MODE_YES);
-
         return $accountsCollection->getItems();
     }
 

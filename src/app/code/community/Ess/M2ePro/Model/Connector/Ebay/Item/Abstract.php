@@ -157,7 +157,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
         $request->setParams($this->params);
         $request->setListingProduct($listingProduct);
-        $request->setConfigurator($this->getConfigurator());
+        $request->setConfigurator($listingProduct->getActionConfigurator());
 
         return $request;
     }
@@ -176,7 +176,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
 
         $response->setParams($this->params);
         $response->setListingProduct($listingProduct);
-        $response->setConfigurator($this->getConfigurator());
+        $response->setConfigurator($listingProduct->getActionConfigurator());
         $response->setRequestData($requestData);
 
         return $response;

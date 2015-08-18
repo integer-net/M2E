@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs extends Mage_Adminhtml_Block_Widget_Tabs
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -69,4 +71,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs extends Mage_Adminhtml_B
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

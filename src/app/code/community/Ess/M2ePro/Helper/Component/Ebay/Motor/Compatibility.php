@@ -6,13 +6,12 @@
 
 class Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility extends Mage_Core_Helper_Abstract
 {
-    // ##########################################################
-
     const TYPE_SPECIFIC   = 'specific';
     const TYPE_KTYPE      = 'ktype';
 
     const PRODUCT_TYPE_VEHICLE    = 0;
     const PRODUCT_TYPE_MOTORCYCLE = 1;
+    const PRODUCT_TYPE_ATV        = 2;
 
     // ##########################################################
 

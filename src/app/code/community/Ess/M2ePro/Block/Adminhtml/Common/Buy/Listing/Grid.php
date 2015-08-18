@@ -76,7 +76,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Grid extends Ess_M2ePro_Bloc
         $backUrl = Mage::helper('M2ePro')->makeBackUrlParam(
             '*/adminhtml_common_listing/index',
             array(
-                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY
+                'tab' => Ess_M2ePro_Block_Adminhtml_Common_ManageListings::TAB_ID_LISTING,
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY
             )
         );
 
@@ -91,7 +92,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Grid extends Ess_M2ePro_Bloc
         //--------------------------------
         $this->getMassactionBlock()->addItem('delete_listings', array(
             'label'    => Mage::helper('M2ePro')->__('Delete Listing(s)'),
-            'url'      => $this->getUrl('*/adminhtml_common_buy_listing/delete'),
+            'url'      => $this->getUrl('*/adminhtml_common_buy_listing/delete', array('back' => $backUrl)),
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
         //--------------------------------
@@ -107,7 +108,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Grid extends Ess_M2ePro_Bloc
         $backUrl = $helper->makeBackUrlParam(
             '*/adminhtml_common_listing/index',
             array(
-                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY
+                'tab' => Ess_M2ePro_Block_Adminhtml_Common_ManageListings::TAB_ID_LISTING,
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY
             )
         );
 
@@ -173,7 +175,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Grid extends Ess_M2ePro_Bloc
                     'base'   => '*/adminhtml_common_log/listing',
                     'params' => array(
                         'back' => $backUrl,
-                        'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_BUY
+                        'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_BUY
                     )
                 )
             ),
@@ -198,6 +200,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Grid extends Ess_M2ePro_Bloc
                 'field'   => 'id',
                 'url'     => array(
                     'base' => '*/adminhtml_common_buy_listing/delete',
+                    'params' => array(
+                        'back' => $backUrl
+                    )
                 )
             ),
 
@@ -287,8 +292,7 @@ HTML;
             return;
         }
 
-        $where = "main_table.title LIKE '%{$value}%' OR a.title LIKE '%{$value}%'";
-        $collection->getSelect()->where($where);
+        $collection->getSelect()->where('main_table.title LIKE ? OR a.title LIKE ?','%'. $value .'%');
     }
 
     // ####################################
@@ -303,7 +307,8 @@ HTML;
         $backUrl = Mage::helper('M2ePro')->makeBackUrlParam(
             '*/adminhtml_common_listing/index',
             array(
-                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY
+                'tab' => Ess_M2ePro_Block_Adminhtml_Common_ManageListings::TAB_ID_LISTING,
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_BUY
             )
         );
 

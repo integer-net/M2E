@@ -38,7 +38,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Other_Log_Grid extends Ess_M2ePr
             Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_SPECIAL_PRICE_TO_DATE => '',
             Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STATUS => '',
             Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_PRODUCT_STOCK_AVAILABILITY => '',
-            Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANGE_STATUS_ON_CHANNEL => '',
         );
 
         return array_diff_key($allActions, $excludeActions);

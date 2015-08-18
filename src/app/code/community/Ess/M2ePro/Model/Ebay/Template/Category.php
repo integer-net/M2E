@@ -13,8 +13,6 @@ class Ess_M2ePro_Model_Ebay_Template_Category extends Ess_M2ePro_Model_Component
     const CATEGORY_MODE_EBAY       = 1;
     const CATEGORY_MODE_ATTRIBUTE  = 2;
 
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Marketplace
      */

@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_ListingOther extends Mag
 {
     public $marketplaces;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -66,4 +68,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Account_Edit_Tabs_ListingOther extends Mag
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

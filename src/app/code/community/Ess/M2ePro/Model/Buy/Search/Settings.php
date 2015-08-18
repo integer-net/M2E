@@ -111,12 +111,13 @@ class Ess_M2ePro_Model_Buy_Search_Settings
             return $this->process();
         }
 
-        $result = Mage::getModel('M2ePro/Connector_Buy_Dispatcher')->processConnector(
-            'settings', $this->getSearchMethod(), 'requester', $this->getConnectorParams(),
-            $this->getListingProduct()->getAccount(), 'Ess_M2ePro_Model_Buy_Search'
-        );
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Buy_Dispatcher');
+        $connectorObj = $dispatcherObject->getConnector('settings', $this->getSearchMethod(), 'requester',
+                                                        $this->getConnectorParams(),
+                                                        $this->getListingProduct()->getAccount(),
+                                                        'Ess_M2ePro_Model_Buy_Search');
 
-        return $result;
+        return $dispatcherObject->process($connectorObj);
     }
 
     // ########################################
@@ -148,7 +149,7 @@ class Ess_M2ePro_Model_Buy_Search_Settings
                 'search_settings_status',
                 Ess_M2ePro_Model_Buy_Listing_Product::SEARCH_SETTINGS_STATUS_ACTION_REQUIRED
             );
-            $this->getListingProduct()->setSettings('search_settings_data', $searchSettingsData);;
+            $this->getListingProduct()->setSettings('search_settings_data', $searchSettingsData);
 
             $this->getListingProduct()->save();
 

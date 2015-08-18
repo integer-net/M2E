@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Help extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -17,4 +19,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Settings_Help extends Mage_Adminht
 
         $this->setTemplate('M2ePro/ebay/listing/settings/help.phtml');
     }
+
+    // ####################################
 }

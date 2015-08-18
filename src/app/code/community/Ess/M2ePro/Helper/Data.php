@@ -180,11 +180,16 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             // process single item
             if (strlen($data)) {
-                if (is_array($allowedTags) and !empty($allowedTags)) {
+                if (is_array($allowedTags) && !empty($allowedTags)) {
                     $allowed = implode('|', $allowedTags);
-                    $result = preg_replace('/<([\/\s\r\n]*)(' . $allowed . ')([\/\s\r\n]*)>/si', '##$1$2$3##', $data);
+
+                    $pattern = '/<([\/\s\r\n]*)(' . $allowed . ')((\s+\w+="[\w\s%#\/\.;:_-]*")*[\/\s\r\n]*)>/si';
+                    $result = preg_replace($pattern, '##$1$2$3##', $data);
+
                     $result = htmlspecialchars($result, $flags);
-                    $result = preg_replace('/##([\/\s\r\n]*)(' . $allowed . ')([\/\s\r\n]*)##/si', '<$1$2$3>', $result);
+
+                    $pattern = '/##([\/\s\r\n]*)(' . $allowed . ')((\s+\w+="[\w\s%#\/\.;:_-]*")*[\/\s\r\n]*)##/si';
+                    $result = preg_replace($pattern, '<$1$2$3>', $result);
                 } else {
                     $result = htmlspecialchars($data, $flags);
                 }

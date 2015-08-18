@@ -3,6 +3,10 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
 
     //----------------------------------
 
+    componentsTitles: [],
+
+    //----------------------------------
+
     initialize: function()
     {
         Validation.add('M2ePro-check-default-component', M2ePro.translator.translate('Default Component should be enabled.'), function(value) {
@@ -48,8 +52,6 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
                 defaultComponent = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Amazon::NICK');
             } else if ($('component_buy_mode').value == 1) {
                 defaultComponent = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Buy::NICK');
-            } else if ($('component_play_mode').value == 1) {
-                defaultComponent = M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK');
             }
 
             $('view_common_component_default').value = defaultComponent;
@@ -59,13 +61,14 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
 
     updateDefaultComponentSelect: function()
     {
+        var self = this;
+
         var html       = '',
             selected   = '',
 
             components = [
                 M2ePro.php.constant('Ess_M2ePro_Helper_Component_Amazon::NICK'),
-                M2ePro.php.constant('Ess_M2ePro_Helper_Component_Buy::NICK'),
-                M2ePro.php.constant('Ess_M2ePro_Helper_Component_Play::NICK')
+                M2ePro.php.constant('Ess_M2ePro_Helper_Component_Buy::NICK')
             ];
 
         components.each(function(nick) {
@@ -77,7 +80,7 @@ ConfigurationComponentsHandler.prototype = Object.extend(new CommonHandler(), {
                     : selected = '';
 
                 html += '<option value="' + nick + '"' + selected + '>' +
-                            M2ePro.php.constant('Ess_M2ePro_Helper_Component_' + nick[0].toUpperCase() + nick.slice(1) + '::TITLE') +
+                            self.componentsTitles[nick] +
                         '</option>';
             }
         });

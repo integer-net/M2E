@@ -9,8 +9,6 @@
  */
 class Ess_M2ePro_Model_Ebay_Listing_Auto_Category_Group extends Ess_M2ePro_Model_Component_Child_Ebay_Abstract
 {
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Ebay_Template_Category
      */

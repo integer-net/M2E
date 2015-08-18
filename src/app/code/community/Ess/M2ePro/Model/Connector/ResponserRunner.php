@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Connector_ResponserRunner
 {
-    // ##################################
-
     /** @var Ess_M2ePro_Model_Processing_Request $processingRequest */
     private $processingRequest = null;
 

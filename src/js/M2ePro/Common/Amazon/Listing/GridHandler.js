@@ -1,4 +1,4 @@
-AmazonListingGridHandler = Class.create(CommonListingGridHandler, {
+CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
 
     //----------------------------------
 
@@ -20,10 +20,10 @@ AmazonListingGridHandler = Class.create(CommonListingGridHandler, {
     {
         $super();
         this.movingHandler = new ListingMovingHandler(this);
-        this.actionHandler = new AmazonListingActionHandler(this);
-        this.productSearchHandler = new AmazonListingProductSearchHandler(this);
-        this.templateDescriptionHandler = new AmazonListingTemplateDescriptionHandler(this);
-        this.variationProductManageHandler = new AmazonListingVariationProductManageHandler(this);
+        this.actionHandler = new CommonAmazonListingActionHandler(this);
+        this.productSearchHandler = new CommonAmazonListingProductSearchHandler(this);
+        this.templateDescriptionHandler = new CommonAmazonListingTemplateDescriptionHandler(this);
+        this.variationProductManageHandler = new CommonAmazonListingVariationProductManageHandler(this);
 
         this.actions = Object.extend(this.actions, {
 

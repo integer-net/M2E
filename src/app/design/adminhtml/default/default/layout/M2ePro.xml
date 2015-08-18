@@ -29,4 +29,10 @@
         <remove name="menu"/>
         <remove name="notifications"/>
     </m2epro_adminhtml_ebay_listing_motorviewgrid>
+    <m2epro_adminhtml_ebay_listing_variation_product_manage_viewvariationsgrid>
+        <remove name="footer"/>
+        <remove name="header"/>
+        <remove name="menu"/>
+        <remove name="notifications"/>
+    </m2epro_adminhtml_ebay_listing_variation_product_manage_viewvariationsgrid>
 </layout>

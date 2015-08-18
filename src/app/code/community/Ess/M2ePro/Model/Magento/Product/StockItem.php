@@ -9,6 +9,8 @@ class Ess_M2ePro_Model_Magento_Product_StockItem
     /** @var Mage_CatalogInventory_Model_Stock_Item */
     private $stockItem = null;
 
+    // ########################################
+
     public function setStockItem(Mage_CatalogInventory_Model_Stock_Item $stockItem)
     {
         $this->stockItem = $stockItem;
@@ -59,4 +61,6 @@ class Ess_M2ePro_Model_Magento_Product_StockItem
             $stockItem->save();
         }
     }
+
+    // ########################################
 }

@@ -283,7 +283,6 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
     {
         if ($('product_details_ean').value == ''
             && $('product_details_upc').value == ''
-            && $('product_details_gtin').value == ''
             && $('product_details_epid').value == ''
             && $('product_details_isbn').value == ''
             && $('product_details_brand').value == ''

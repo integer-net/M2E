@@ -51,6 +51,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_Tabs_Selling
         return array(
             'sku_mode' => Ess_M2ePro_Model_Buy_Listing::SKU_MODE_DEFAULT,
             'sku_custom_attribute' => '',
+            'sku_modification_mode' => Ess_M2ePro_Model_Buy_Listing::SKU_MODIFICATION_MODE_NONE,
+            'sku_modification_custom_value' => '',
             'generate_sku_mode' => Ess_M2ePro_Model_Buy_Listing::GENERATE_SKU_MODE_NO,
 
             'template_selling_format_id' => '',

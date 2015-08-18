@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View_Item extends Mage_Adminhtml_Block_Widget_Grid
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -235,4 +237,6 @@ HTML;
     {
         return $this->getUrl('*/*/orderItemGrid', array('_current' => true));
     }
+
+    // ####################################
 }

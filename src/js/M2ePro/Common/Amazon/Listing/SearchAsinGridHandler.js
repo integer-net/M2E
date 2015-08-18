@@ -1,4 +1,4 @@
-SearchAsinGridHandler = Class.create(CommonListingGridHandler, {
+CommonAmazonListingSearchAsinGridHandler = Class.create(CommonListingGridHandler, {
 
     //----------------------------------
 
@@ -20,8 +20,8 @@ SearchAsinGridHandler = Class.create(CommonListingGridHandler, {
     prepareActions: function($super)
     {
         $super();
-        this.actionHandler = new AmazonListingActionHandler(this);
-        this.productSearchHandler = new AmazonListingProductSearchHandler(this);
+        this.actionHandler = new CommonAmazonListingActionHandler(this);
+        this.productSearchHandler = new CommonAmazonListingProductSearchHandler(this);
 
         this.actions = Object.extend(this.actions, {
 
@@ -202,6 +202,32 @@ SearchAsinGridHandler = Class.create(CommonListingGridHandler, {
                     return setLocation(response.redirect);
                 }
             }
+        });
+    },
+
+    //----------------------------------
+
+    showNotCompletedPopup: function()
+    {
+        var self = this;
+
+        notCompletedPopup = Dialog.info($('asin_search_not_completed_popup').innerHTML, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: M2ePro.text.not_completed_popup_title,
+            height: 230,
+            width: 500,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show
+        });
+        notCompletedPopup.options.destroyOnClose = true;
+
+        $('modal_dialog_message').setStyle({
+            padding: '10px'
         });
     }
 

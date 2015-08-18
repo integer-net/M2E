@@ -9,8 +9,6 @@
  */
 class Ess_M2ePro_Model_Buy_Order extends Ess_M2ePro_Model_Component_Child_Buy_Abstract
 {
-    // ########################################
-
     private $subTotalPrice = NULL;
 
     private $grandTotalPrice = NULL;

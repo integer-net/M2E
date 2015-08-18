@@ -137,13 +137,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates
 
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Task "Inventory Synchronization" has completed with %result%. View %sl%Listings Log%el% for details.',
-                array(
-                    '!sl'=>'<a target="_blank" href="route:*/adminhtml_ebay_log/listing/;'.
-                             'back:*/adminhtml_ebay_log/synchronization/;">',
-                    '!el'=>'</a>',
-                    '!result'=>$resultString
-                )
+                'Task "Inventory Synchronization" has completed with %result%. View Listings Log for details.',
+                array('!result'=>$resultString)
             ), $resultType, $resultPriority
         );
 

@@ -7,7 +7,6 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_AutoAction_Mode_Category_Form
     extends Ess_M2ePro_Block_Adminhtml_Listing_AutoAction_Mode_Category_Form
 {
-
     // ####################################
 
     public function __construct()

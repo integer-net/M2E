@@ -111,7 +111,6 @@
 
         $('product_details_ean',
           'product_details_upc',
-          'product_details_gtin',
           'product_details_epid',
           'product_details_isbn'
         ).each(function(element) {
@@ -170,9 +169,9 @@
 
 <?php if($showBlockedAdvancedMode): ?>
     <p style="font-size: 15px; font-weight: bolder; color: red;">
-        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration');
+        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration', 'General', 'Mode > Advanced');
         echo Mage::helper('M2ePro')->__(
-            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
+            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path%).', $menuPath);
         ?>
     </p>
 <?php endif; ?>
@@ -293,7 +292,7 @@
 
 <div id="block_notice_ebay_template_description_image" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Images & Watermark'); ?>">
     <?php echo Mage::helper('M2ePro')->__('The images your potential Buyers will see on your eBay Listing. Using lots of high-quality pictures provides a great shopping experience and helps to sell your Items.<br/>'); ?>
-    <?php echo Mage::helper('M2ePro')->__('You can add a watermark to your images. <br/><b>Note:</b> The watermark option is only available for the images hosted on Magento.'); ?>
+    <?php echo Mage::helper('M2ePro')->__('You can add a watermark to your images. <br/><b>Note:</b> The watermark Option is only available for the images hosted on Magento.'); ?>
 </div>
 
 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -536,7 +535,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="title_mode" name="description[title_mode]" class="select">
@@ -655,7 +654,7 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Description'); ?>:</label>
                     </td>
                     <td class="value">
                         <select id="description_mode" name="description[description_mode]" class="required-entry">
@@ -695,6 +694,7 @@
 
             <tr class="c-custom_description_tr">
                 <td class="label">
+                    <label><?php echo Mage::helper('M2ePro')->__('Description Value'); ?>: <span class="required">*</span></label>
                 </td>
                 <td class="value">
                     <?php if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()): ?>
@@ -1015,37 +1015,35 @@
 <div class="entry-edit simple_mode_disallowed" id="magento_block_ebay_template_description_form_data_product_details">
 
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('eBay Catalog Identifier'); ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('M2ePro')->__('eBay Catalog Identifiers'); ?></h4>
     </div>
 
     <div class="fieldset">
         <div class="hor-scroll">
 
-            <table class="form-list" cellspacing="0" cellpadding="0">
+            <div id="block_notice_ebay_template_description_form_data_product_details" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('eBay Catalog Identifiers'); ?>">
+                <?php echo Mage::helper('M2ePro')->__('
+                    In this section you can specify a <strong>Magento Attribute</strong> that contains Product UPC/EAN/ISBN/Brand/MPN Value.
+                    If selected Value will be sent on eBay and according Product will be found in eBay Catalog, Title,
+                    Subtitle, Images and other data will be taken from eBay Catalog.<br/><br/>
 
-                <tr id="product_details_ean_tr">
-                    <td class="label">
-                        <label for="product_details_ean"><?php echo Mage::helper('M2ePro')->__('EAN'); ?>:</label>
-                    </td>
-                    <td class="value" style="width: auto;">
-                        <select id="product_details_ean" name="description[product_details][ean]">
-                            <option value=""><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
-                            <optgroup label="Magento Attributes">
-                                <?php foreach($generalAttributesByTypes['text'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['ean'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
-                                <?php endforeach; ?>
-                            </optgroup>
-                        </select>
-                        <p class="note">
-                            <span>
-                                <?php echo Mage::helper('M2ePro')->__(
-                                    'Choose the Magento Attribute that contains the EAN for a Product.<br/><br/>
-                                    The EAN or European Article Number, now renamed International Article Number, is the 13 digit unique Identifier for a Product.'
-                                ); ?>
-                            </span>
-                        </p>
-                    </td>
-                </tr>
+                    If you are going to list Variational Item, Brand Value will be the same for all Item. However,
+                    UPC/EAN/ISBN/MPN Value will be taken for each Variation separately.<br/>
+                    If your Item is Configurable Magento Product or Grouped Magento Product, the Value will be taken as
+                    an Attribute Value for each Child Product.<br/>
+                    If your Item is Bundle Magento Product or Simple Magento Product with Custom Options, the Value
+                    should be provided in Manage Variations Grid, which you can find by clicking on Manage Variations
+                    Option for your Product on eBay View Mode of the Listing.<br/><br/>
+
+                    <strong>Note:</strong> if UPC/EAN/ISBN etc. value is specified for particular Variation in Manage
+                    Variations pop-up, only for that Variation the Settings of this section will be ignored.<br/><br/>
+
+                    <strong>Note:</strong> some eBay Categories require some of these Values. Once you select such
+                    eBay Primary Category, you will see a notification which will show what Identifier(s) must be specified.
+                '); ?>
+            </div>
+
+            <table class="form-list" cellspacing="0" cellpadding="0">
 
                 <tr id="product_details_upc_tr">
                     <td class="label">
@@ -1071,22 +1069,25 @@
                     </td>
                 </tr>
 
-                <tr id="product_details_epid_tr">
+                <tr id="product_details_ean_tr">
                     <td class="label">
-                        <label for="product_details_epid"><?php echo Mage::helper('M2ePro')->__('ePID (Product Reference ID)'); ?>:</label>
+                        <label for="product_details_ean"><?php echo Mage::helper('M2ePro')->__('EAN'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="product_details_epid" name="description[product_details][epid]">
+                        <select id="product_details_ean" name="description[product_details][ean]">
                             <option value=""><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <optgroup label="Magento Attributes">
                                 <?php foreach($generalAttributesByTypes['text'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['epid'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['ean'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
                                 <?php endforeach; ?>
                             </optgroup>
                         </select>
                         <p class="note">
                             <span>
-                                <?php echo Mage::helper('M2ePro')->__('An eBay Product ID is eBay\'s global reference ID for a Catalog Product.'); ?>
+                                <?php echo Mage::helper('M2ePro')->__(
+                                    'Choose the Magento Attribute that contains the EAN for a Product.<br/><br/>
+                                    The EAN or European Article Number, now renamed International Article Number, is the 13 digit unique Identifier for a Product.'
+                                ); ?>
                             </span>
                         </p>
                     </td>
@@ -1116,25 +1117,22 @@
                     </td>
                 </tr>
 
-                <tr id="product_details_gtin_tr">
+                <tr id="product_details_epid_tr">
                     <td class="label">
-                        <label for="product_details_gtin"><?php echo Mage::helper('M2ePro')->__('GTIN'); ?>:</label>
+                        <label for="product_details_epid"><?php echo Mage::helper('M2ePro')->__('ePID (Product Reference ID)'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="product_details_gtin" name="description[product_details][gtin]">
+                        <select id="product_details_epid" name="description[product_details][epid]">
                             <option value=""><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                             <optgroup label="Magento Attributes">
                                 <?php foreach($generalAttributesByTypes['text'] as $attribute) : ?>
-                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['gtin'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
+                                    <option value="<?php echo $attribute['code']; ?>" <?php if ($formData['product_details']['epid'] == $attribute['code']): ?>selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
                                 <?php endforeach; ?>
                             </optgroup>
                         </select>
                         <p class="note">
                             <span>
-                                <?php echo Mage::helper('M2ePro')->__(
-                                    'Choose the Magento Attribute that contains the GTIN for a Product.<br/><br/>
-                                    GTIN is a unique 8, 12, 13, or 14-digit Identifier that some Catalogs use instead of ISBN, UPC, EAN, or other values.'
-                                ); ?>
+                                <?php echo Mage::helper('M2ePro')->__('An eBay Product ID is eBay\'s global reference ID for a Catalog Product.'); ?>
                             </span>
                         </p>
                     </td>
@@ -1222,23 +1220,6 @@
                         <p class="note">
                             <span>
                                 <?php echo Mage::helper('M2ePro')->__('If true, indicates that the Item Listing includes the Stock photo.'); ?>
-                            </span>
-                        </p>
-                    </td>
-                </tr>
-
-                <tr id="product_details_list_if_no_product_tr" class="product-details-specification">
-                    <td class="label">
-                        <label for="product_details_list_if_no_product"><?php echo Mage::helper('M2ePro')->__('List If Product Not Found'); ?>:</label>
-                    </td>
-                    <td class="value" style="width: auto;">
-                        <select id="product_details_list_if_no_product" name="description[product_details][list_if_no_product]">
-                            <option value="0"<?php if ($formData['product_details']['list_if_no_product'] == 0): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
-                            <option value="1"<?php if ($formData['product_details']['list_if_no_product'] == 1): ?> selected="selected"<?php endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
-                        </select>
-                        <p class="note">
-                            <span>
-                                <?php echo Mage::helper('M2ePro')->__('Indicates what eBay should do if no Product match has been found.'); ?>
                             </span>
                         </p>
                     </td>

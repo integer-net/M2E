@@ -38,35 +38,42 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Marketplace_Form extends Mage_Adm
                                                         ->getItems();
         $groups = array();
         $storedStatuses = array();
-        $previewGroup = '';
         $idGroup = 1;
-        foreach($marketplaces as $marketplace) {
 
-            if ($marketplace->getGroupTitle() != $previewGroup) {
-                $previewGroup = $marketplace->getGroupTitle();
-                $groups[] = array(
-                    'id'           => $idGroup,
-                    'title'        => $previewGroup,
-                    'marketplaces' => array()
+        $groupsOrder = array(
+            'america' => 'America',
+            'europe' => 'Europe',
+            'asia_pacific' => 'Asia / Pacific'
+        );
+
+        foreach ($groupsOrder as $key => $groupOrderTitle) {
+            $groups[$key] = array(
+                'id'           => $idGroup++,
+                'title'        => $groupOrderTitle,
+                'marketplaces' => array()
+            );
+
+            foreach($marketplaces as $marketplace) {
+                if ($marketplace->getGroupTitle() != $groupOrderTitle) {
+                    continue;
+                }
+
+                $storedStatuses[] = array(
+                    'marketplace_id' => $marketplace->getId(),
+                    'status' => $marketplace->getStatus()
                 );
-                $idGroup++;
+
+                $isLocked = (bool)Mage::helper('M2ePro/Component_Amazon')->getCollection('Account')
+                    ->addFieldToFilter('marketplace_id', $marketplace->getId())
+                    ->getSize();
+
+                $marketplace = array(
+                    'instance' => $marketplace,
+                    'params'   => array('locked' => $isLocked)
+                );
+
+                $groups[$key]['marketplaces'][] = $marketplace;
             }
-
-            $storedStatuses[] = array(
-                'marketplace_id' => $marketplace->getId(),
-                'status' => $marketplace->getStatus()
-            );
-
-            $isLocked = (bool)Mage::helper('M2ePro/Component_Amazon')->getCollection('Account')
-                ->addFieldToFilter('marketplace_id', $marketplace->getId())
-                ->getSize();
-
-            $marketplace = array(
-                'instance' => $marketplace,
-                'params'   => array('locked' => $isLocked)
-            );
-
-            $groups[count($groups)-1]['marketplaces'][] = $marketplace;
         }
 
         $this->groups = $groups;

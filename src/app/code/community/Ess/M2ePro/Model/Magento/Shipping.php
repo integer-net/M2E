@@ -10,6 +10,8 @@ class Ess_M2ePro_Model_Magento_Shipping
 {
     protected $_code = 'm2eproshipping';
 
+    // ########################################
+
     public function collectRates(Mage_Shipping_Model_Rate_Request $request)
     {
         $shippingData = Mage::helper('M2ePro/Data_Global')->getValue('shipping_data');
@@ -64,4 +66,6 @@ class Ess_M2ePro_Model_Magento_Shipping
     {
         return false;
     }
+
+    // ########################################
 }

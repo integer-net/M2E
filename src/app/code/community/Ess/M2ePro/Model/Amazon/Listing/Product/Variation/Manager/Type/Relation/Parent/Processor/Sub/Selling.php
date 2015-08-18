@@ -16,7 +16,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         $qty = null;
         $price = null;
 
-        foreach ($this->getProcessor()->getChildListingProducts() as $listingProduct) {
+        foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $listingProduct) {
             if ($listingProduct->isNotListed()) {
                 continue;
             }

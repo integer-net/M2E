@@ -14,7 +14,7 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Logical
         $productAttributes = array_map('strtolower', (array)$this->getProductAttributes());
         $magentoAttributes = array_map('strtolower', (array)$this->getCurrentMagentoAttributes());
 
-        return !array_diff($productAttributes, $magentoAttributes);
+        return $productAttributes == $magentoAttributes;
     }
 
     // ########################################

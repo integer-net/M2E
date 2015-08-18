@@ -9,6 +9,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_Grid extends Mage_Adminhtml_Bl
     /** @var $itemsCollection Ess_M2ePro_Model_Mysql4_Order_Item_Collection */
     private $itemsCollection = NULL;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -430,5 +432,5 @@ HTML;
         return $this->getUrl('*/adminhtml_common_buy_order/view', array('id' => $row->getId(), 'back' => $back));
     }
 
-    //##############################################################
+    // ####################################
 }

@@ -51,12 +51,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Stop
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            $actionParams = array('only_data'=>array('qty'=>true));
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_STOP, $configurator
             );
 
             if ($isExistInRunner) {
@@ -68,9 +66,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Stop
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_STOP,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_STOP, $configurator
             );
         }
 

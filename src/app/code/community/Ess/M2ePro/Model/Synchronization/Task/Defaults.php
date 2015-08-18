@@ -38,6 +38,7 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults
         $result = true;
 
         $result = !$this->processTask('Defaults_DeletedProducts') ? false : $result;
+        $result = !$this->processTask('Defaults_AddedProducts') ? false : $result;
         $result = !$this->processTask('Defaults_StopQueue') ? false : $result;
         $result = !$this->processTask('Defaults_Inspector') ? false : $result;
 

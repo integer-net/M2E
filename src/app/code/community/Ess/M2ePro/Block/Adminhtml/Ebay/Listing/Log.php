@@ -154,5 +154,4 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Log extends Mage_Adminhtml_Block_W
     }
 
     // ########################################
-
 }

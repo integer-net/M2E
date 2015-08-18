@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
     extends Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
 {
-    // ####################################
-
     protected $_useCustomOptions = true;
 
     static protected $_conditionModels = array();

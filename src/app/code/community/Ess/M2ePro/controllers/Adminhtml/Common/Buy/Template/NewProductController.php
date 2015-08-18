@@ -43,7 +43,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/listings/listing');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/listings');
     }
 
     //#############################################
@@ -220,7 +220,11 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
         // Saving attributes info
         //----------------------------
-        $attributes = $buyTemplateNewProductInstance->getAttributesTemplate();
+        /* @var $templateAttributesInstance Ess_M2ePro_Model_Buy_Template_NewProduct */
+        $templateAttributesInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct')
+            ->loadInstance($buyTemplateNewProductInstance->getId());
+
+        $attributes = $templateAttributesInstance->getAttributes(true);
 
         foreach ($attributes as $attribute) {
             $attribute->deleteInstance();
@@ -312,13 +316,13 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
         /* @var $buyTemplateNewProductInstance Ess_M2ePro_Model_Buy_Template_NewProduct */
         $buyTemplateNewProductInstance = Mage::getModel('M2ePro/Buy_Template_NewProduct')->loadInstance($id);
 
-        $formData['category']  = $buyTemplateNewProductInstance->getCoreTemplate()->getData();
-        $formData['category'] = array_merge($formData['category'], $buyTemplateNewProductInstance->getData());
+        $formData['category']   = $buyTemplateNewProductInstance->getCoreTemplate()->getData();
+        $formData['category']   = array_merge($formData['category'], $buyTemplateNewProductInstance->getData());
         $formData['attributes'] = array();
 
-        $attributesTemplates = $buyTemplateNewProductInstance->getAttributesTemplate();
-        foreach ($attributesTemplates as $attributeTemplate) {
-            $formData['attributes'][] = $attributeTemplate->getData();
+        $attributes = $buyTemplateNewProductInstance->getAttributes(true);
+        foreach ($attributes as $attribute) {
+            $formData['attributes'][] = $attribute->getData();
         }
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data',$formData);
@@ -381,6 +385,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
             $connRead->select()
                 ->from($table,'*')
                 ->where('node_id = ?', $nodeId)
+                ->order('title ASC')
                 ->query()
                 ->fetchAll()
         ));
@@ -419,7 +424,7 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_NewProductController
 
         $select = $connRead->select()->limit(1000);
         $select->from(Mage::getSingleton('core/resource')->getTableName('m2epro_buy_dictionary_category'),'*');
-        $select->where('is_listable = 1');
+        $select->where('is_leaf = 1');
 
         $where = '';
         $parts = explode(' ', $keywords);

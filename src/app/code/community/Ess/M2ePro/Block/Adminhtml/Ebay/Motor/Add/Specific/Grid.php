@@ -47,6 +47,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Specific_Grid extends Ess_M2ePro
                     => Mage::helper('M2ePro')->__('Car / Truck'),
                 Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::PRODUCT_TYPE_MOTORCYCLE
                     => Mage::helper('M2ePro')->__('Motorcycle'),
+                Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility::PRODUCT_TYPE_ATV
+                    => Mage::helper('M2ePro')->__('ATV / Snowmobiles'),
             )
         ));
 

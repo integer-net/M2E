@@ -16,7 +16,7 @@ class Ess_M2ePro_Model_Buy_Magento_Product_Rule_Custom_BuyOnlinePrice
 
     public function getLabel()
     {
-        return Mage::helper('M2ePro')->__('Online Price');
+        return Mage::helper('M2ePro')->__('Price');
     }
 
     public function getValueByProductInstance(Mage_Catalog_Model_Product $product)

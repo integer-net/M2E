@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Transferring_FailedProducts
     extends Ess_M2ePro_Block_Adminhtml_Listing_Moving_FailedProducts
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -39,4 +41,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Transferring_FailedProducts
 
         parent::_beforeToHtml();
     }
+
+    // ####################################
 }

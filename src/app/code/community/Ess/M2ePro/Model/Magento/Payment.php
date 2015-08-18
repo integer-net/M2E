@@ -14,6 +14,8 @@ class Ess_M2ePro_Model_Magento_Payment extends Mage_Payment_Model_Method_Abstrac
 
     protected $_infoBlockType = 'M2ePro/adminhtml_magento_payment_info';
 
+    // ########################################
+
     public function assignData($data)
     {
         if ($data instanceof Varien_Object) {
@@ -33,4 +35,6 @@ class Ess_M2ePro_Model_Magento_Payment extends Mage_Payment_Model_Method_Abstrac
 
         return $this;
     }
+
+    // ########################################
 }

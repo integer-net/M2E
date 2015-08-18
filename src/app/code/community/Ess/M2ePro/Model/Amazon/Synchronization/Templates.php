@@ -138,14 +138,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates
 
         $this->getLog()->addMessage(
             Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
-                'Task "Inventory Synchronization" has completed with %result%. View %sl%Listings Log%el% for details.',
-                array(
-                    '!sl'=>'<a target="_blank" href="route:*/adminhtml_common_log/listing/;'.
-                             'back:*/adminhtml_common_log/synchronization/;'.
-                             'channel:' . Ess_M2ePro_Helper_Component_Amazon::NICK . '">',
-                    '!el'=>'</a>',
-                    '!result'=>$resultString
-                )
+                'Task "Inventory Synchronization" has completed with %result%. View Listings Log for details.',
+                array('!result'=>$resultString)
             ), $resultType, $resultPriority
         );
 

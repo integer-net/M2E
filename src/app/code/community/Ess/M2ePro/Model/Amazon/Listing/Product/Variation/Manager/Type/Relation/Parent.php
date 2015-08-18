@@ -8,7 +8,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
     extends Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_LogicalUnit
 {
     /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor $processor */
-    private $processor;
+    private $processor = null;
+
+    /** @var Ess_M2ePro_Model_Listing_Product[] $childListingsProducts */
+    private $childListingsProducts = null;
 
     // ########################################
 
@@ -28,9 +31,26 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
      */
     public function getChildListingsProducts()
     {
+        if ($this->isCacheEnabled() && !is_null($this->childListingsProducts)) {
+            return $this->childListingsProducts;
+        }
+
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
-        $collection->addFieldToFilter('variation_parent_id',$this->getListingProduct()->getId());
-        return $collection->getItems();
+        $collection->addFieldToFilter('variation_parent_id', $this->getListingProduct()->getId());
+
+        $childListingsProducts = $collection->getItems();
+
+        if (!$this->isCacheEnabled()) {
+            return $childListingsProducts;
+        }
+
+        foreach ($childListingsProducts as $childListingProduct) {
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonChildListingProduct */
+            $amazonChildListingProduct = $childListingProduct->getChildObject();
+            $amazonChildListingProduct->getVariationManager()->getTypeModel()->enableCache();
+        }
+
+        return $this->childListingsProducts = $childListingsProducts;
     }
 
     // ########################################
@@ -363,7 +383,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     // ########################################
 
-    public function createChildListingProduct(array $productOptions = array(),
+    public function createChildListingProduct(array $productOptions,
                                               array $channelOptions = array(),
                                               $generalId = null)
     {
@@ -384,8 +404,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         $childListingProduct = Mage::helper('M2ePro/Component_Amazon')->getModel('Listing_Product')->setData($data);
         $childListingProduct->save();
 
-        if (empty($productOptions) && empty($channelOptions)) {
-            return $childListingProduct;
+        if ($this->isCacheEnabled()) {
+            $this->childListingsProducts[$childListingProduct->getId()] = $childListingProduct;
         }
 
         /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonChildListingProduct */
@@ -407,6 +427,24 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         }
 
         return $childListingProduct;
+    }
+
+    public function removeChildListingProduct($listingProductId)
+    {
+        $childListingsProducts = $this->getChildListingsProducts();
+        if (!isset($childListingsProducts[$listingProductId])) {
+            return false;
+        }
+
+        if (!$childListingsProducts[$listingProductId]->deleteInstance()) {
+            return false;
+        }
+
+        if ($this->isCacheEnabled()) {
+            unset($this->childListingsProducts[$listingProductId]);
+        }
+
+        return true;
     }
 
     // ########################################

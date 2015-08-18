@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Helper_View_Development_Controller extends Mage_Core_Helper_Abstract
 {
-    // ########################################
-
     const REAL_MODULE = 'Ess_M2ePro';
 
     // ########################################

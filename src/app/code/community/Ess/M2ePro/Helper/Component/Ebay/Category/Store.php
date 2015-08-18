@@ -10,14 +10,6 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Store extends Mage_Core_Helper_A
 
     public function getPath($categoryId, $accountId, $delimiter = ' > ')
     {
-        $pathData = $this->getPathData($categoryId, $accountId, 'title');
-        return implode($delimiter, $pathData);
-    }
-
-    // ########################################
-
-    protected function getPathData($categoryId, $accountId, $dataField)
-    {
         $account = Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Account', $accountId);
         $categories = $account->getChildObject()->getEbayStoreCategories();
 
@@ -38,7 +30,7 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Store extends Mage_Core_Helper_A
                 break;
             }
 
-            $pathData[] = $currentCategory[$dataField];
+            $pathData[] = $currentCategory['title'];
 
             if ($currentCategory['parent_id'] == 0) {
                 break;
@@ -47,7 +39,8 @@ class Ess_M2ePro_Helper_Component_Ebay_Category_Store extends Mage_Core_Helper_A
             $categoryId = $currentCategory['parent_id'];
         }
 
-        return array_reverse($pathData);
+        array_reverse($pathData);
+        return implode($delimiter, $pathData);
     }
 
     // ########################################

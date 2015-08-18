@@ -275,7 +275,9 @@ HTML;
             array('runSynchNow' =>
                 $this->getUrl('M2ePro/adminhtml_common_marketplace/runSynchNow')),
             array('synchCheckProcessingNow' =>
-                $this->getUrl('M2ePro/adminhtml_common_synchronization/synchCheckProcessingNow'))
+                $this->getUrl('M2ePro/adminhtml_common_synchronization/synchCheckProcessingNow')),
+            array('variationProductManage' =>
+                $this->getUrl('*/adminhtml_ebay_listing_variation_product_manage/index'))
         ));
         //------------------------------
 

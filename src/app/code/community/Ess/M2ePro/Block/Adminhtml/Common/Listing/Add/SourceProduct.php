@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_SourceProduct
     extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    // ####################################
+
     public function __construct($attributes)
     {
         parent::__construct($attributes);
@@ -123,4 +125,6 @@ HTML;
             parent::_toHtml().
             '</div>';
     }
+
+    // ####################################
 }

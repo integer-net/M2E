@@ -4,10 +4,8 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
-    // ##########################################################
-
     public $shippingAddress = array();
 
     public $ebayWarehouseAddress = array();
@@ -19,7 +17,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
     /** @var $order Ess_M2ePro_Model_Order */
     public $order = null;
 
-    // ##########################################################
+    // ####################################
 
     public function __construct()
     {
@@ -170,5 +168,5 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Order_View_Form extends Mage_Adminhtml_Blo
         return $taxAmount + $shippingTaxAmount;
     }
 
-    // ##########################################################
+    // ####################################
 }

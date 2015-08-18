@@ -4,8 +4,11 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Main extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Main
+    extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -58,4 +61,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_ProductSearch_Main extend
 
         parent::_beforeToHtml();
     }
+
+    protected function _toHtml()
+    {
+        $vocabularyAttributesBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_common_amazon_listing_variation_product_vocabularyAttributesPopup'
+        );
+
+        $vocabularyOptionsBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_common_amazon_listing_variation_product_vocabularyOptionsPopup'
+        );
+
+        return $vocabularyAttributesBlock->toHtml() . $vocabularyOptionsBlock->toHtml() . parent::_toHtml();
+    }
+
+    // ####################################
 }

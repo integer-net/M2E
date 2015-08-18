@@ -28,12 +28,17 @@ class Ess_M2ePro_Model_Amazon_Template_Synchronization extends Ess_M2ePro_Model_
     const REVISE_UPDATE_QTY_YES  = 1;
 
     const REVISE_MAX_AFFECTED_QTY_MODE_OFF = 0;
-    const REVISE_MAX_AFFECTED_QTY_MODE_ON = 1;
+    const REVISE_MAX_AFFECTED_QTY_MODE_ON  = 1;
 
-    const REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT = 10;
+    const REVISE_UPDATE_QTY_MAX_APPLIED_VALUE_DEFAULT = 5;
 
     const REVISE_UPDATE_PRICE_NONE = 0;
     const REVISE_UPDATE_PRICE_YES  = 1;
+
+    const REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_OFF = 0;
+    const REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_ON  = 1;
+
+    const REVISE_UPDATE_PRICE_MAX_ALLOWED_DEVIATION_DEFAULT = 3;
 
     const REVISE_UPDATE_DETAILS_NONE = 0;
     const REVISE_UPDATE_DETAILS_YES  = 1;
@@ -153,6 +158,31 @@ class Ess_M2ePro_Model_Amazon_Template_Synchronization extends Ess_M2ePro_Model_
     public function getReviseUpdateQtyMaxAppliedValue()
     {
         return (int)$this->getData('revise_update_qty_max_applied_value');
+    }
+
+    //------------------------
+
+    public function getReviseUpdatePriceMaxAllowedDeviationMode()
+    {
+        return (int)$this->getData('revise_update_price_max_allowed_deviation_mode');
+    }
+
+    public function isReviseUpdatePriceMaxAllowedDeviationModeOn()
+    {
+        return $this->getReviseUpdatePriceMaxAllowedDeviationMode() == self::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_ON;
+    }
+
+    public function isReviseUpdatePriceMaxAllowedDeviationModeOff()
+    {
+        return $this->getReviseUpdatePriceMaxAllowedDeviationMode()
+                    == self::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_OFF;
+    }
+
+    //------------------------
+
+    public function getReviseUpdatePriceMaxAllowedDeviation()
+    {
+        return (int)$this->getData('revise_update_price_max_allowed_deviation');
     }
 
     //------------------------

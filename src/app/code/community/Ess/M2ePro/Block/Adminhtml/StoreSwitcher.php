@@ -6,20 +6,60 @@
 
 class Ess_M2ePro_Block_Adminhtml_StoreSwitcher extends Mage_Adminhtml_Block_Template
 {
-    // ########################################
+    const DISPLAY_DEFAULT_STORE_MODE_UP   = 'up';
+    const DISPLAY_DEFAULT_STORE_MODE_DOWN = 'down';
 
     protected $_storeIds;
     protected $_hasDefaultOption = true;
 
     // ########################################
 
-    public function __construct()
+    public function __construct($params)
     {
-        parent::__construct();
+        parent::__construct($params);
         $this->setTemplate('M2ePro/store_switcher.phtml');
         $this->setUseConfirm(true);
         $this->setUseAjax(true);
         $this->setDefaultStoreName(Mage::helper('M2ePro')->__('Admin (Default Values)'));
+    }
+
+    // ########################################
+
+    public function isDisplayDefaultStoreModeUp()
+    {
+        if (!$this->getData('display_default_store_mode')) {
+            return true;
+        }
+
+        return $this->getData('display_default_store_mode') == self::DISPLAY_DEFAULT_STORE_MODE_UP;
+    }
+
+    public function isDisplayDefaultStoreModeDown()
+    {
+        return $this->getData('display_default_store_mode') == self::DISPLAY_DEFAULT_STORE_MODE_DOWN;
+    }
+
+    // ########################################
+
+    public function isRequiredOption()
+    {
+        return $this->getData('required_option') === true;
+    }
+
+    public function hasEmptyOption()
+    {
+        return $this->getData('empty_option') === true;
+    }
+
+    // ########################################
+
+    public function getDefaultStoreName()
+    {
+        if ($this->getData('default_store_title')) {
+            return $this->getData('default_store_title');
+        }
+
+        return parent::getDefaultStoreName();
     }
 
     // ########################################

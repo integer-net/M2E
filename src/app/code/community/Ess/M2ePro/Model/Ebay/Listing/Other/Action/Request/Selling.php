@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Request_Selling
 
     public function getQtyData()
     {
-        if (!$this->getConfigurator()->isQty()) {
+        if (!$this->getConfigurator()->isQtyAllowed()) {
             return array();
         }
 
@@ -38,7 +38,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Request_Selling
 
     public function getPriceData()
     {
-        if (!$this->getConfigurator()->isPrice()) {
+        if (!$this->getConfigurator()->isPriceAllowed()) {
             return array();
         }
 

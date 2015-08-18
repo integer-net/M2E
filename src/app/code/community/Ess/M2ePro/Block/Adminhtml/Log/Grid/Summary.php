@@ -9,6 +9,8 @@ class Ess_M2ePro_Block_Adminhtml_Log_Grid_Summary extends Mage_Adminhtml_Block_W
     protected $iconSrc = NULL;
     protected $rows = array();
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -161,4 +163,6 @@ class Ess_M2ePro_Block_Adminhtml_Log_Grid_Summary extends Mage_Adminhtml_Block_W
 
         return parent::_toHtml();
     }
+
+    // ####################################
 }

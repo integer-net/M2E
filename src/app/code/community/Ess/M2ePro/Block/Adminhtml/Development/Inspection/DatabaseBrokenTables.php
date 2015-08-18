@@ -105,8 +105,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Inspection_DatabaseBrokenTables
             'm2epro_marketplace',
             'm2epro_amazon_marketplace',
             'm2epro_ebay_marketplace',
-            'm2epro_buy_marketplace',
-            'm2epro_play_marketplace'
+            'm2epro_buy_marketplace'
         );
     }
 

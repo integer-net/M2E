@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit_Tabs extends Mage_Adminhtml_Block_Widget_Tabs
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -49,4 +51,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Account_Edit_Tabs extends Mage_Admin
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

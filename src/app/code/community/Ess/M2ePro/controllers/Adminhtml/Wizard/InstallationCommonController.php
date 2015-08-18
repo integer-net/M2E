@@ -66,8 +66,8 @@ class Ess_M2ePro_Adminhtml_Wizard_InstallationCommonController
             (!isset($post[$key]) || !$post[$key]) && $post[$key] = 'undefined';
         }
 
-        $registry = Mage::getModel('M2ePro/Registry')->load('wizard_license_form_data', 'key');
-        $registry->setData('key', 'wizard_license_form_data');
+        $registry = Mage::getModel('M2ePro/Registry')->load('/wizard/license_form_data/', 'key');
+        $registry->setData('key', '/wizard/license_form_data/');
         $registry->setData('value', json_encode($post));
         $registry->save();
 

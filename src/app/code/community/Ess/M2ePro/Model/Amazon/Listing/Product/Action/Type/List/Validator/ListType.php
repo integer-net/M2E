@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListType
     extends Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
 {
-    // ########################################
-
     private $childGeneralIdsForParent = array();
 
     private $cachedData = array();
@@ -201,12 +199,12 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (count($amazonData) > 1) {
 // M2ePro_TRANSLATIONS
-// There is more than one Product found on Amazon using Search by %general_id_type% %general_id%. This situation is not supported by M2E PRO.
+// There is more than one Product found on Amazon using Search by %general_id_type% %general_id%. First, you should select certain one using manual search.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                     'There is more than one Product found on Amazon using Search
                      by %general_id_type% %general_id%.
-                     This situation is not supported by M2E Pro.',
+                     First, you should select certain one using manual search.',
                     array('!general_id_type' => $generalIdType, '!general_id' => $generalId)
                 )
             );
@@ -346,11 +344,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
 
         if (count($amazonData) > 1) {
 // M2ePro_TRANSLATIONS
-// There is more than one Product found on Amazon using Search by %worldwide_id_type% %worldwide_id%. This situation is not supported by M2E Pro.
+// There is more than one Product found on Amazon using Search by %worldwide_id_type% %worldwide_id%. First, you should select certain one using manual search.
             $this->addMessage(
                 Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
                     'There is more than one Product found on Amazon using Search by %worldwide_id_type% %worldwide_id%.
-                     This situation is not supported by M2E Pro.',
+                     First, you should select certain one using manual search.',
                     array('!worldwide_id_type' => $worldwideIdType, '!worldwide_id' => $worldwideId)
                 )
             );
@@ -724,12 +722,23 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_ListTyp
             'variation_child_modification' => 'parent',
         );
 
-        $result = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher')->processVirtual(
-            'product', 'search', 'byIdentifier', $params, 'items',
-            $this->getListingProduct()->getListing()->getAccount()
-        );
+        $searchMethod = 'byIdentifier';
+        if ($idType == 'ASIN') {
+            $searchMethod = 'byAsin';
+            unset($params['id_type']);
+        }
 
-        return $this->cachedData['amazon_data'][$identifier] = $result;
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('product', 'search', $searchMethod,
+                                                               $params, null,
+                                                               $this->getListingProduct()->getListing()->getAccount());
+
+        $result = $dispatcherObject->process($connectorObj);
+        if ($searchMethod == 'byAsin') {
+            return $this->cachedData['amazon_data'][$identifier] = array($result['item']);
+        }
+
+        return $this->cachedData['amazon_data'][$identifier] = $result['items'];
     }
 
     // ########################################

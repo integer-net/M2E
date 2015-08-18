@@ -15,7 +15,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_LISTED
         );
 
-        if ($this->getConfigurator()->isAllPermitted()) {
+        if ($this->getConfigurator()->isAllAllowed()) {
             $data['synch_status'] = Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_OK;
             $data['synch_reasons'] = NULL;
         }
@@ -67,7 +67,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
 
     public function getSuccessfulMessage()
     {
-        if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
+        if ($this->getConfigurator()->isAllAllowed()) {
             // M2ePro_TRANSLATIONS
             // Item was successfully Revised
             return 'Item was successfully Revised';
@@ -75,43 +75,43 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
 
         $sequenceString = '';
 
-        if ($this->getRequestData()->hasVariations()) {
+        if ($this->getConfigurator()->isVariationsAllowed() && $this->getRequestData()->isVariationItem()) {
             // M2ePro_TRANSLATIONS
             // Variations
             $sequenceString .= 'Variations,';
+        } else {
+            if ($this->getConfigurator()->isQtyAllowed()) {
+                // M2ePro_TRANSLATIONS
+                // QTY
+                $sequenceString .= 'QTY,';
+            }
+
+            if ($this->getConfigurator()->isPriceAllowed()) {
+                // M2ePro_TRANSLATIONS
+                // Price
+                $sequenceString .= 'Price,';
+            }
         }
 
-        if ($this->getRequestData()->hasQty()) {
-            // M2ePro_TRANSLATIONS
-            // QTY
-            $sequenceString .= 'QTY,';
-        }
-
-        if ($this->getRequestData()->hasPrice()) {
-            // M2ePro_TRANSLATIONS
-            // Price
-            $sequenceString .= 'Price,';
-        }
-
-        if ($this->getRequestData()->hasTitle()) {
+        if ($this->getConfigurator()->isTitleAllowed()) {
             // M2ePro_TRANSLATIONS
             // Title
             $sequenceString .= 'Title,';
         }
 
-        if ($this->getRequestData()->hasSubtitle()) {
+        if ($this->getConfigurator()->isSubtitleAllowed()) {
             // M2ePro_TRANSLATIONS
             // Subtitle
             $sequenceString .= 'Subtitle,';
         }
 
-        if ($this->getRequestData()->hasDescription()) {
+        if ($this->getConfigurator()->isDescriptionAllowed()) {
             // M2ePro_TRANSLATIONS
             // Description
             $sequenceString .= 'Description,';
         }
 
-        if ($this->getRequestData()->hasImages()) {
+        if ($this->getConfigurator()->isImagesAllowed()) {
             // M2ePro_TRANSLATIONS
             // Images
             $sequenceString .= 'Images,';
@@ -152,7 +152,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
     {
         $data = parent::appendOnlinePriceValues($data);
 
-        $params = $this->getParams();
+        if ($this->getRequestData()->hasPriceStart() &&
+            $this->getEbayListingProduct()->isListingTypeAuction() &&
+            $this->getEbayListingProduct()->getOnlineBids()) {
+            unset($data['online_current_price']);
+        }
+
+        $params = $this->getConfigurator()->getParams();
 
         if (!isset($params['replaced_action']) ||
             $params['replaced_action'] != Ess_M2ePro_Model_Listing_Product::ACTION_STOP) {
@@ -161,11 +167,11 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Revise_Response
 
         if (!$this->getEbayListingProduct()->isListingTypeFixed() ||
             !$this->getRequestData()->hasVariations() ||
-            !isset($data['online_buyitnow_price'])) {
+            !isset($data['online_current_price'])) {
             return $data;
         }
 
-        $data['online_buyitnow_price'] = $this->getRequestData()->getVariationPrice(true);
+        $data['online_current_price'] = $this->getRequestData()->getVariationPrice(true);
 
         return $data;
     }

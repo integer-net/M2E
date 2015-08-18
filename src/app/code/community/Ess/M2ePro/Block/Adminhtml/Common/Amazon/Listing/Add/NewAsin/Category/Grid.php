@@ -10,6 +10,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin_Category_Grid
     /** @var Ess_M2ePro_Model_Listing */
     private $listing = NULL;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();

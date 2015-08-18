@@ -1,4 +1,4 @@
-AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
+CommonAmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
 
     //----------------------------------
 
@@ -88,6 +88,144 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
     closeManageVariationsPopup: function()
     {
         variationProductManagePopup.close();
+    },
+
+    //----------------------------------
+
+    openVocabularyAttributesPopUp: function (attributes)
+    {
+        vocabularyAttributesPopUp = Dialog.info(null, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: 'Vocabulary',
+            top: 5,
+            width: 400,
+            height: 220,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show,
+            onClose: function() {
+                this.reloadSettings();
+                this.reloadVariationsGrid();
+            }.bind(this)
+        });
+        vocabularyAttributesPopUp.options.destroyOnClose = true;
+
+        $('vocabulary_attributes_data').value = Object.toJSON(attributes);
+
+        var attributesHtml = '';
+        $H(attributes).each(function(element) {
+            attributesHtml += '<li>'+element.key+' > '+element.value+'</li>';
+        });
+
+        attributesHtml = '<ul>'+attributesHtml+'</ul>';
+
+        var bodyHtml = str_replace('%attributes%', attributesHtml, $('vocabulary_attributes_pupup_template').innerHTML);
+
+        $('modal_dialog_message').update(bodyHtml);
+
+        setTimeout(function() {
+            Windows.getFocusedWindow().content.style.height = '';
+            Windows.getFocusedWindow().content.style.maxHeight = '630px';
+        }, 50);
+    },
+
+    addAttributesToVocabulary: function(needAdd)
+    {
+        var self = this;
+
+        var isRemember = $('vocabulary_attributes_remember_checkbox').checked;
+
+        if (!needAdd && !isRemember) {
+            Windows.getFocusedWindow().close();
+            return;
+        }
+
+        new Ajax.Request(self.options.url.addAttributesToVocabulary, {
+            method: 'post',
+            parameters: {
+                attributes : $('vocabulary_attributes_data').value,
+                need_add:    needAdd ? 1 : 0,
+                is_remember: isRemember ? 1 : 0
+            },
+            onSuccess: function (transport) {
+                vocabularyAttributesPopUp.close();
+            }
+        });
+    },
+
+    openVocabularyOptionsPopUp: function (options)
+    {
+        vocabularyOptionsPopUp = Dialog.info(null, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: 'Vocabulary',
+            top: 15,
+            width: 400,
+            height: 220,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show,
+            onClose: function() {
+                this.reloadSettings();
+                this.reloadVariationsGrid();
+            }.bind(this)
+        });
+        vocabularyOptionsPopUp.options.destroyOnClose = true;
+
+        $('vocabulary_options_data').value = Object.toJSON(options);
+
+        var optionsHtml = '';
+        $H(options).each(function(element) {
+
+            var valuesHtml = '';
+            $H(element.value).each(function (value) {
+                valuesHtml += value.key + ' > ' + value.value;
+            });
+
+            optionsHtml += '<li>'+element.key+': '+valuesHtml+'</li>';
+        });
+
+        optionsHtml = '<ul>'+optionsHtml+'</ul>';
+
+        var bodyHtml = str_replace('%options%', optionsHtml, $('vocabulary_options_pupup_template').innerHTML);
+
+        $('modal_dialog_message').update(bodyHtml);
+
+        setTimeout(function() {
+            Windows.getFocusedWindow().content.style.height = '';
+            Windows.getFocusedWindow().content.style.maxHeight = '500px';
+        }, 50);
+    },
+
+    addOptionsToVocabulary: function(needAdd)
+    {
+        var self = this;
+
+        var isRemember = $('vocabulary_options_remember_checkbox').checked;
+
+        if (!needAdd && !isRemember) {
+            Windows.getFocusedWindow().close();
+            return;
+        }
+
+        new Ajax.Request(self.options.url.addOptionsToVocabulary, {
+            method: 'post',
+            parameters: {
+                options_data : $('vocabulary_options_data').value,
+                need_add:    needAdd ? 1 : 0,
+                is_remember: isRemember ? 1 : 0
+            },
+            onSuccess: function (transport) {
+                vocabularyOptionsPopUp.close();
+            }
+        });
     },
 
     //----------------------------------
@@ -281,8 +419,12 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
                 },
                 onSuccess: function (transport) {
                     var response = self.parseResponse(transport);
-                    if(response.success) {
+                    if (response.success) {
                         self.reloadSettings();
+
+                        if (response['vocabulary_attributes']) {
+                            self.openVocabularyAttributesPopUp(response['vocabulary_attributes']);
+                        }
                     }
                 }
             });
@@ -387,9 +529,13 @@ AmazonListingVariationProductManageHandler = Class.create(ActionHandler,{
             parameters: data,
             onSuccess: function (transport) {
                 var response = self.parseResponse(transport);
-                if(response.success) {
+                if (response.success) {
                     self.reloadSettings();
                     self.reloadVariationsGrid();
+
+                    if (response['vocabulary_attributes']) {
+                        self.openVocabularyAttributesPopUp(response['vocabulary_attributes']);
+                    }
                 }
             }
         });

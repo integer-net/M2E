@@ -7,6 +7,7 @@
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher
     extends Ess_M2ePro_Block_Adminhtml_Listing_View_ModeSwitcher_Abstract
 {
+    // ####################################
 
     public function __construct()
     {
@@ -47,13 +48,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher
             )
         );
 
-        /** @var  $collection Mage_Core_Model_Mysql4_Collection_Abstract */
-        $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
-        $collection->addFieldToFilter('translation_status', array('neq' =>
+        /** @var  $collection Mage_Core_Model_Mysql4_Collection_Abstract $listingProductCollection */
+        $listingProductCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product');
+        $listingProductCollection->addFieldToFilter('listing_id', (int)$this->getRequest()->getParam('id'));
+        $listingProductCollection->addFieldToFilter('translation_status', array('neq' =>
             Ess_M2ePro_Model_Ebay_Listing_Product::TRANSLATION_STATUS_NONE
         ));
 
-        if ($collection->getSize()) {
+        if ($listingProductCollection->getSize()) {
             $data[] = array(
                 'value' => 'translation',
                 'label' => Mage::helper('M2ePro')->__('Translation')
@@ -63,4 +65,5 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_ModeSwitcher
         return $data;
     }
 
+    // ####################################
 }

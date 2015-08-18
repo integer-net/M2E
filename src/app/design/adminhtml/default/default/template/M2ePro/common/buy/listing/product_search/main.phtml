@@ -1,5 +1,5 @@
 <div id="productSearch_pop_up_content" style="display: none;">
-    <div class="hor-scroll" style="padding-top: 15px; ">
+    <div class="hor-scroll" style="padding-top: 15px; margin-bottom: 0px;">
 
         <div id="productSearch_error_block" class="error-msg" style="display:none; margin-bottom: 10px;">
             <div style="margin: 10px 0px 10px 35px">
@@ -18,7 +18,10 @@
         <div id="productSearch_grid" style="margin: 10px auto; height: 380px !important; overflow-y: auto; overflow-x: hidden;">
         </div>
 
-        <div id="productSearch_buttons" style="position:absolute; top:480px; right:23px; display:none; text-align: right; margin: 10px 0px;">
+        <div class="clear"></div>
+
+        <div id="productSearch_buttons" style="top:480px; right:23px; display:none; text-align: right; margin: 10px 0px;">
+            <?php echo $this->getChildHtml('productSearch_cleanSuggest_button'); ?>
             <?php echo $this->getChildHtml('productSearch_back_button'); ?>&nbsp;&nbsp;
             <?php echo $this->getChildHtml('productSearch_cancel_button'); ?>
         </div>

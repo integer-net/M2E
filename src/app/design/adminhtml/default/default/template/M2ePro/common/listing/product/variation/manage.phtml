@@ -1,15 +1,16 @@
 <?php /* @var $this Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation_Manage */?>
-<div style="margin-top: 10px; height: 415px;">
+<div style="margin-top: 10px;">
 
     <div id="block_notice_listing_product_variation_manage" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Manage Magento Product Variations'); ?>">
-        <?php echo Mage::helper('M2ePro')->__('On this Tab the specific Magento Variation can be chosen for selling on Amazon as an Individual Product.
+        <?php echo Mage::helper('M2ePro')->__('On this Tab the specific Magento Variation can be chosen for selling on %component% as an Individual Product.
         To do so, you need to set values for all the Configurable Attributes that exist in this Magento Variation Product. You can add multiple Variations at the same time. <br/><br/>
 
         There are two shortcut Options available to speed up the process of Adding Specific Variations to the list:
         <ul style="margin: 10px 0px !important; padding-left: 30px !important;list-style-type: decimal;">
             <li><strong>Generate All Variations</strong> – generates all the unique combinations of Configurable Attributes values of this Magento Variational Product.</li>
             <li><strong>Generate Non-Existing Variations</strong> – generates all the Variations of this Magento Product that are not presented in this Listing.</li>
-        </ul>'); ?>
+        </ul>',
+        $this->getComponentTitle()); ?>
     </div>
 
     <div style="margin-bottom: 10px">
@@ -21,7 +22,7 @@
     </div>
 
     <form id="variation_manage_form">
-        <div style="height: 275px; overflow-y: auto;">
+        <div style="overflow-y: auto;">
             <table id="variation_manage" class="form-list" cellspacing="0" cellpadding="0" style="margin: 0 auto; width: 100%">
 
                 <tr>
@@ -67,7 +68,7 @@
 
 <div style="clear: both"></div>
 
-<div class="right">
+<div style="padding: 7px 0px; text-align: right">
     <a href="javascript:void(0);" id="variation_manage_close" class="close" onclick="ListingProductVariationHandlerObj.managePopup.close();"><?php echo Mage::helper('M2ePro')->__('Cancel'); ?></a>
     &nbsp;
     <?php echo $this->getChildHtml('variation_manage_confirm'); ?>

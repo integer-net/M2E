@@ -8,12 +8,13 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
 {
     private $items = array();
 
-    private $lockItem = NULL;
+    /** @var Ess_M2ePro_Model_Synchronization_LockItem $lockItem */
+    private $lockItem      = NULL;
     private $percentsStart = 0;
-    private $percentsEnd = 100;
+    private $percentsEnd   = 100;
 
     private $maxProductsPerStep = 10;
-    private $connectorModel = NULL;
+    private $connectorModel     = NULL;
 
     // ########################################
 
@@ -77,7 +78,9 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
 
     // ########################################
 
-    public function addProduct($product, $action, array $params = array())
+    public function addProduct($product,
+                               $action,
+                               Ess_M2ePro_Model_Listing_Product_Action_Configurator $configurator)
     {
         if (isset($this->items[$product->getId()])) {
 
@@ -85,8 +88,10 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
 
             if ($existedItem['action'] == $action) {
 
-                $this->items[$product->getId()]['params'] =
-                    $this->mergeParams($this->items[$product->getId()]['params'],$params);
+                /** @var Ess_M2ePro_Model_Listing_Product_Action_Configurator $existedConfigurator */
+                $existedConfigurator = $existedItem['product']->getActionConfigurator();
+                $existedConfigurator->mergeData($configurator);
+                $existedConfigurator->mergeParams($configurator);
 
                 return true;
             }
@@ -123,10 +128,11 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
             } while (false);
         }
 
+        $product->setActionConfigurator($configurator);
+
         $this->items[$product->getId()] = array(
             'product' => $product,
-            'action' => $action,
-            'params' => $params
+            'action'  => $action,
         );
 
         return true;
@@ -144,14 +150,19 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
 
     //-----------------------------------------
 
-    public function isExistProduct($product, $action, array $params = array())
+    public function isExistProduct($product,
+                                   $action,
+                                   Ess_M2ePro_Model_Listing_Product_Action_Configurator $configurator)
     {
-        if (!isset($this->items[$product->getId()]) ||
-            $this->items[$product->getId()]['action'] != $action) {
+        if (!isset($this->items[$product->getId()]) || $this->items[$product->getId()]['action'] != $action) {
             return false;
         }
 
-        return $this->isConsistsParams($this->items[$product->getId()]['params'],$params);
+        /** @var Ess_M2ePro_Model_Listing_Product_Action_Configurator $existedConfigurator */
+        $existedConfigurator = $this->items[$product->getId()]['product']->getActionConfigurator();
+
+        return $existedConfigurator->isDataConsists($configurator) &&
+               $existedConfigurator->isParamsConsists($configurator);
     }
 
     public function resetProducts()
@@ -194,55 +205,47 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
     {
         $this->setPercents($percentsFrom);
 
-        $results = array();
-        $combinations = $this->getCombinations($action);
+        $products = $this->getActionProducts($action);
+        if (empty($products)) {
+            return array();
+        }
 
-        $totalProductsCount = 0;
+        $totalProductsCount = count($products);
         $processedProductsCount = 0;
-
-        foreach ($combinations as $combination) {
-            $totalProductsCount += count($combination['products']);
-        }
-
-        if (!$totalProductsCount) {
-            return $results;
-        }
 
         $percentsOneProduct = ($percentsTo - $percentsFrom)/$totalProductsCount;
 
-        foreach ($combinations as $combination) {
+        $results = array();
 
-            $combination['params']['status_changer'] = Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_SYNCH;
+        foreach (array_chunk($products, $this->getMaxProductsPerStep()) as $stepProducts) {
 
-            foreach (array_chunk($combination['products'],$this->getMaxProductsPerStep()) as $products) {
+            $countString = count($stepProducts).' '.Mage::helper('M2ePro')->__('Product(s).');
 
-                $productsCount = count($products);
-                $countString = $productsCount.' '.Mage::helper('M2ePro')->__('Product(s).');
+            if (count($stepProducts) < 10) {
 
-                if ($productsCount < 10) {
-
-                    $productsIds = array();
-                    foreach ($products as $product) {
-                        $productsIds[] = $product->getData('product_id');
-                    }
-
-                    $productsIds = implode('", "',$productsIds);
-                    $countString = Mage::helper('M2ePro')->__('Product(s) with ID(s)')." \"{$productsIds}\".";
+                $productsIds = array();
+                foreach ($stepProducts as $product) {
+                    $productsIds[] = $product->getProductId();
                 }
 
-                $this->setStatus(Ess_M2ePro_Model_Listing_Product::getActionTitle($action).
-                                 ' '.$countString.
-                                 ' '.Mage::helper('M2ePro')->__('Please wait...'));
-
-                $results[] = Mage::getModel('M2ePro/'.$this->getConnectorModel())
-                                        ->process($action, $products, $combination['params']);
-
-                $processedProductsCount += count($products);
-                $tempPercents = $percentsFrom + ($processedProductsCount * $percentsOneProduct);
-
-                $this->setPercents($tempPercents > $percentsTo ? $percentsTo : $tempPercents);
-                $this->activate();
+                $productsIds = implode('", "',$productsIds);
+                $countString = Mage::helper('M2ePro')->__('Product(s) with ID(s)')." \"{$productsIds}\".";
             }
+
+            $this->setStatus(Ess_M2ePro_Model_Listing_Product::getActionTitle($action).
+                             ' '.$countString.
+                             ' '.Mage::helper('M2ePro')->__('Please wait...'));
+
+            $results[] = Mage::getModel('M2ePro/'.$this->getConnectorModel())->process(
+                $action, $stepProducts,
+                array('status_changer' => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_SYNCH)
+            );
+
+            $processedProductsCount += count($stepProducts);
+            $tempPercents = $percentsFrom + ($processedProductsCount * $percentsOneProduct);
+
+            $this->setPercents($tempPercents > $percentsTo ? $percentsTo : $tempPercents);
+            $this->activate();
         }
 
         $this->setPercents($percentsTo);
@@ -251,69 +254,19 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
 
     // ########################################
 
-    private function getParamsHash($params)
+    private function getActionProducts($action)
     {
-        $hash = '';
-        ksort($params);
+        $resultProducts = array();
 
-        foreach ($params as $key => $value) {
-            if (is_array($value)) {
-                ksort($value);
-                foreach ($value as $key2 => $value2) {
-                    $hash .= (string)$key.(string)$key2.(string)$value2;
-                }
-            } else {
-                $hash .= (string)$key.(string)$value;
+        foreach ($this->items as $item) {
+            if ($item['action'] != $action) {
+                continue;
             }
+
+            $resultProducts[] = $item['product'];
         }
 
-        return $hash ? md5($hash) : '';
-    }
-
-    private function mergeParams($existedParams, $newParams)
-    {
-        foreach ($newParams as $key => $value) {
-
-            if (isset($existedParams[$key]) && is_array($existedParams[$key]) && is_array($value)) {
-                $existedParams[$key] = array_merge($existedParams[$key],$value);
-            } else {
-                $existedParams[$key] = $value;
-            }
-        }
-
-        return $existedParams;
-    }
-
-    private function isConsistsParams($existedParams, $checkedParams)
-    {
-        foreach ($checkedParams as $key => $value) {
-
-            if (!isset($existedParams[$key])) {
-                return false;
-            }
-
-            if (is_array($existedParams[$key]) && is_array($value)) {
-
-                foreach ($value as $key2 => $value2) {
-
-                    if (!isset($existedParams[$key][$key2])) {
-                        return false;
-                    }
-
-                    if ($existedParams[$key][$key2] != $value2) {
-                        return false;
-                    }
-                }
-
-            } else {
-
-                if ($existedParams[$key] != $value) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return $resultProducts;
     }
 
     // ----------------------------------------
@@ -346,40 +299,6 @@ class Ess_M2ePro_Model_Synchronization_Templates_Runner
     }
 
     // ----------------------------------------
-
-    private function getCombinations($action)
-    {
-        $combinations = array();
-
-        foreach ($this->items as $item) {
-
-            if ($item['action'] != $action) {
-                continue;
-            }
-
-            $combinationIndex = NULL;
-            $paramsHash = $this->getParamsHash($item['params']);
-
-            for ($i=0; $i<count($combinations); $i++) {
-                if ($combinations[$i]['params_hash'] == $paramsHash) {
-                    $combinationIndex = $i;
-                    break;
-                }
-            }
-
-            if (is_null($combinationIndex)) {
-                $combinations[] = array(
-                    'products' => array($item['product']),
-                    'params' => $item['params'],
-                    'params_hash' => $paramsHash
-                );
-            } else {
-                $combinations[$combinationIndex]['products'][] = $item['product'];
-            }
-        }
-
-        return $combinations;
-    }
 
     private function getPercentsInterval()
     {

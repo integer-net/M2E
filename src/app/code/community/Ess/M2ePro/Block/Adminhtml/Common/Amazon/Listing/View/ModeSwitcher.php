@@ -7,6 +7,7 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_ModeSwitcher
     extends Ess_M2ePro_Block_Adminhtml_Listing_View_ModeSwitcher_Abstract
 {
+    // ####################################
 
     public function __construct()
     {
@@ -38,4 +39,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_ModeSwitcher
             )
         );
     }
+
+    // ####################################
 }

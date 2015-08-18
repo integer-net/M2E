@@ -62,10 +62,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
 
     protected function receiveFromEbay(Ess_M2ePro_Model_Marketplace $marketplace)
     {
-        $details = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('marketplace','get','info',
-                                             array('include_details'=>1),'info',
-                                             $marketplace->getId(),NULL,NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('marketplace','get','info',
+                                                            array('include_details' => 1),'info',
+                                                            $marketplace->getId(),NULL,NULL);
+
+        $details = $dispatcherObj->process($connectorObj);
 
         if (is_null($details)) {
             return array();
@@ -83,7 +85,6 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
 
         $tableMarketplaces = $coreResourceModel->getTableName('m2epro_ebay_dictionary_marketplace');
         $tableShipping = $coreResourceModel->getTableName('m2epro_ebay_dictionary_shipping');
-        $tableShippingCategories = $coreResourceModel->getTableName('m2epro_ebay_dictionary_shipping_category');
 
         // Save marketplaces
         //-----------------------
@@ -100,10 +101,13 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
             'payments'                        => json_encode($details['payments']),
             'shipping_locations'              => json_encode($details['shipping_locations']),
             'shipping_locations_exclude'      => json_encode($details['shipping_locations_exclude']),
-            'categories_features_defaults'    => json_encode($details['categories_features_defaults']),
             'tax_categories'                  => json_encode($details['tax_categories']),
             'charities'                       => json_encode($details['charities']),
         );
+
+        if (isset($details['additional_data'])) {
+            $insertData['additional_data'] = json_encode($details['additional_data']);
+        }
 
         unset($details['categories_version']);
         $connWrite->insert($tableMarketplaces, $insertData);
@@ -118,27 +122,13 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
                 'marketplace_id'   => $marketplace->getId(),
                 'ebay_id'          => $data['ebay_id'],
                 'title'            => $data['title'],
-                'category'         => $data['category'],
+                'category'         => json_encode($data['category']),
                 'is_flat'          => $data['is_flat'],
                 'is_calculated'    => $data['is_calculated'],
                 'is_international' => $data['is_international'],
-                'data'             => $data['data']
+                'data'             => json_encode($data['data']),
             );
             $connWrite->insert($tableShipping, $insertData);
-        }
-        //-----------------------
-
-        // Save shipping categories
-        //-----------------------
-        $connWrite->delete($tableShippingCategories, array('marketplace_id = ?' => $marketplace->getId()));
-
-        foreach ($details['shipping_categories'] as $data) {
-            $insertData = array(
-                'marketplace_id' => $marketplace->getId(),
-                'ebay_id'        => $data['ebay_id'],
-                'title'          => $data['title']
-            );
-            $connWrite->insert($tableShippingCategories, $insertData);
         }
         //-----------------------
     }
@@ -150,7 +140,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Details
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Details" Action for eBay Site: "%mrk%" has been successfully completed.',
-            array('mrk'=>$marketplace->getTitle())
+            array('mrk' => $marketplace->getTitle())
         );
 
         $this->getLog()->addMessage($tempString,

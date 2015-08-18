@@ -139,7 +139,7 @@ CommonAmazonTemplateDescriptionCategoryChooserHandler.prototype = Object.extend(
                         self.browseClickCategory.call(self, selectEl, category.category_id);
                     });
 
-                    var arrowString = category.is_listable == 0 ? ' > ' : '';
+                    var arrowString = category.is_leaf == 0 ? ' > ' : '';
                     selectEl.appendChild(option).update(category.title + arrowString);
                 });
 
@@ -157,7 +157,7 @@ CommonAmazonTemplateDescriptionCategoryChooserHandler.prototype = Object.extend(
 
             var categoryInfo = transport.responseText.evalJSON();
 
-            if (categoryInfo.is_listable == 1) {
+            if (categoryInfo.is_leaf == 1) {
 
                 this.selectedCategoryId           = categoryInfo.category_id;
                 this.preloadedSelectedCategoryObj = categoryInfo;

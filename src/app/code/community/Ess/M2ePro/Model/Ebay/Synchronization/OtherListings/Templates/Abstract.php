@@ -12,6 +12,11 @@ abstract class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Abs
      */
     protected $runner = NULL;
 
+    /**
+     * @var Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Inspector $inspector
+     */
+    protected $inspector = NULL;
+
     protected $cache = array();
 
     //####################################
@@ -31,6 +36,18 @@ abstract class Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Abs
     public function getRunner()
     {
         return $this->runner;
+    }
+
+    //------------------------------------
+
+    public function setInspector(Ess_M2ePro_Model_Ebay_Synchronization_OtherListings_Templates_Inspector $object)
+    {
+        $this->inspector = $object;
+    }
+
+    public function getInspector()
+    {
+        return $this->inspector;
     }
 
     //------------------------------------

@@ -360,9 +360,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
 
     //-----------------------------------------
 
-    public function isIgnoreNextInventorySynch()
+    public function getDefectedMessages()
     {
-        return (bool)$this->getData('ignore_next_inventory_synch');
+        return $this->getSettings('defected_messages');
     }
 
     // ########################################
@@ -458,20 +458,23 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
         $price = $this->getPrice();
         $salePrice = $this->getSalePrice();
 
-        if ($salePrice >= $price) {
+        if ($salePrice <= 0 || $salePrice >= $price) {
             return false;
         }
 
         $startDate = $this->getSalePriceStartDate();
         $endDate = $this->getSalePriceEndDate();
 
+        if (!$startDate || !$endDate) {
+            return false;
+        }
+
         $startDateTimestamp = strtotime($startDate);
         $endDateTimestamp = strtotime($endDate);
 
         $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
 
-        if ($salePrice <= 0 || !$startDate || !$endDate ||
-            $currentTimestamp > $endDateTimestamp ||
+        if ($currentTimestamp > $endDateTimestamp ||
             $startDateTimestamp >= $endDateTimestamp
         ) {
             return false;
@@ -537,7 +540,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
 
             $tempDate = new DateTime($date, new DateTimeZone('UTC'));
             $tempDate->modify('-1 day');
-            $date = Mage::helper('M2ePro')->getDate($tempDate->format('U'),false,'Y-m-d 00:00:00');
+            $date = Mage::helper('M2ePro')->getDate($tempDate->format('U'));
 
         } else {
             $src = $this->getAmazonSellingFormatTemplate()->getSalePriceEndDateSource();
@@ -547,15 +550,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
             if ($src['mode'] == Ess_M2ePro_Model_Amazon_Template_SellingFormat::DATE_ATTRIBUTE) {
                 $date = $magentoProduct->getAttributeValue($src['attribute']);
             }
-
-            $date = Mage::helper('M2ePro')->getDate($date,false,'Y-m-d 00:00:00');
         }
 
         if (strtotime($date) === false) {
             return false;
         }
 
-        return $date;
+        return Mage::helper('M2ePro')->getDate($date,false,'Y-m-d 00:00:00');
     }
 
     // ########################################

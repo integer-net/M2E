@@ -36,13 +36,15 @@ class Ess_M2ePro_Helper_Component_Ebay_Category extends Mage_Core_Helper_Abstrac
     public function getRecent($marketplaceOrAccountId, $categoryType, $excludeCategory = null)
     {
         $configPath = $this->getRecentConfigPath($categoryType);
-        $cacheValue = Mage::helper('M2ePro/Module')->getCacheConfig()->getGroupValue(
-            $configPath, $marketplaceOrAccountId
-        );
+        $allRecentCategories = Mage::getModel('M2ePro/Registry')->load('/ebay/category/recent/', 'key')
+                                                                ->getValueFromJson();
 
-        if (empty($cacheValue)) {
+        if (!isset($allRecentCategories[$configPath]) ||
+            !isset($allRecentCategories[$configPath][$marketplaceOrAccountId])) {
             return array();
         }
+
+        $recentCategories = $allRecentCategories[$configPath][$marketplaceOrAccountId];
 
         if (in_array($categoryType, $this->getEbayCategoryTypes())) {
             $categoryHelper = Mage::helper('M2ePro/Component_Ebay_Category_Ebay');
@@ -50,7 +52,7 @@ class Ess_M2ePro_Helper_Component_Ebay_Category extends Mage_Core_Helper_Abstrac
             $categoryHelper = Mage::helper('M2ePro/Component_Ebay_Category_Store');
         }
 
-        $categoryIds = (array)explode(',', $cacheValue);
+        $categoryIds = (array)explode(',', $recentCategories);
         $result = array();
         foreach ($categoryIds as $categoryId) {
             if ($categoryId === $excludeCategory) {
@@ -73,14 +75,16 @@ class Ess_M2ePro_Helper_Component_Ebay_Category extends Mage_Core_Helper_Abstrac
 
     public function addRecent($categoryId, $marketplaceOrAccountId, $categoryType)
     {
+        $key = '/ebay/category/recent/';
         $configPath = $this->getRecentConfigPath($categoryType);
-        $cacheValue = Mage::helper('M2ePro/Module')->getCacheConfig()->getGroupValue(
-            $configPath, $marketplaceOrAccountId
-        );
+
+        /** @var $registryModel Ess_M2ePro_Model_Registry */
+        $registryModel = Mage::getModel('M2ePro/Registry')->load($key, 'key');
+        $allRecentCategories = $registryModel->getValueFromJson();
 
         $categories = array();
-        if (!empty($cacheValue)) {
-            $categories = (array)explode(',', $cacheValue);
+        if (isset($allRecentCategories[$configPath][$marketplaceOrAccountId])) {
+            $categories = (array)explode(',', $allRecentCategories[$configPath][$marketplaceOrAccountId]);
         }
 
         if (count($categories) >= self::RECENT_MAX_COUNT) {
@@ -90,9 +94,11 @@ class Ess_M2ePro_Helper_Component_Ebay_Category extends Mage_Core_Helper_Abstrac
         array_unshift($categories, $categoryId);
         $categories = array_unique($categories);
 
-        Mage::helper('M2ePro/Module')->getCacheConfig()->setGroupValue(
-            $configPath, $marketplaceOrAccountId, implode(',', $categories)
-        );
+        $allRecentCategories[$configPath][$marketplaceOrAccountId] = implode(',' ,$categories);
+        $registryModel->addData(array(
+            'key' => $key,
+            'value' => json_encode($allRecentCategories)
+        ))->save();
     }
 
     //-----------------------------------------
@@ -100,10 +106,10 @@ class Ess_M2ePro_Helper_Component_Ebay_Category extends Mage_Core_Helper_Abstrac
     protected function getRecentConfigPath($categoryType)
     {
         $configPaths = array(
-            self::TYPE_EBAY_MAIN => '/ebay/category/recent/ebay/main/',
-            self::TYPE_EBAY_SECONDARY => '/ebay/category/recent/ebay/secondary/',
-            self::TYPE_STORE_MAIN => '/ebay/category/recent/store/main/',
-            self::TYPE_STORE_SECONDARY => 'ebay/category/recent/store/secondary/',
+            self::TYPE_EBAY_MAIN       => '/ebay/main/',
+            self::TYPE_EBAY_SECONDARY  => '/ebay/secondary/',
+            self::TYPE_STORE_MAIN      => '/store/main/',
+            self::TYPE_STORE_SECONDARY => '/store/secondary/',
         );
 
         return $configPaths[$categoryType];

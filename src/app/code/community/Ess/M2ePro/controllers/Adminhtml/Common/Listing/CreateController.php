@@ -10,14 +10,16 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
     protected $component;
     protected $sessionKeyPostfix = '_listing_create';
 
+    //#############################################
+
     protected function _initAction()
     {
         $component = $this->getComponent();
-        $componentTitle = constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE');
+        $componentTitle = Mage::helper('M2ePro/Component_'.ucfirst($component))->getTitle();
 
         $this->loadLayout()
             ->_title(Mage::helper('M2ePro')->__('Manage Listings'))
-            ->_title(Mage::helper('M2ePro')->__($componentTitle.' Listings'));
+            ->_title(Mage::helper('M2ePro')->__('%component_title% Listings', $componentTitle));
 
         $this->getLayout()->getBlock('head')
             ->setCanLoadExtJs(true)
@@ -106,7 +108,7 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
 
             $this->setSessionValue('marketplace_id', $this->getMarketplaceId());
 
-            $dataKeys = $this->getStepTwoFields();;
+            $dataKeys = $this->getStepTwoFields();
 
             $post = $this->getRequest()->getPost();
             foreach ($dataKeys as $key) {
@@ -135,9 +137,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
             case Ess_M2ePro_Helper_Component_Buy::NICK:
                 $vals = Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_Tabs_Selling::getDefaultFieldsValues();
                 break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $vals = Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Add_Tabs_Selling::getDefaultFieldsValues();
-                break;
             default:
                 return array();
                 break;
@@ -158,7 +157,7 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
 
         if ($this->getRequest()->isPost()) {
 
-            $dataKeys = $this->getStepThreeFields();;
+            $dataKeys = $this->getStepThreeFields();
 
             $post = $this->getRequest()->getPost();
             foreach ($dataKeys as $key) {
@@ -201,9 +200,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
                 break;
             case Ess_M2ePro_Helper_Component_Buy::NICK:
                 $vals = Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_Tabs_Search::getDefaultFieldsValues();
-                break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $vals = Ess_M2ePro_Block_Adminhtml_Common_Play_Listing_Add_Tabs_Search::getDefaultFieldsValues();
                 break;
             default:
                 return array();
@@ -274,9 +270,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
                 return Ess_M2ePro_Helper_Component_Buy::MARKETPLACE_ID;
                 break;
 
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                return Ess_M2ePro_Helper_Component_Play::MARKETPLACE_ID;
-                break;
         }
     }
 

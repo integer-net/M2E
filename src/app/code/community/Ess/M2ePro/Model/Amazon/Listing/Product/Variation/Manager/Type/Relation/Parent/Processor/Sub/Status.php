@@ -13,7 +13,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     protected function execute()
     {
-        $childListingProducts = $this->getProcessor()->getChildListingProducts();
+        $childListingProducts = $this->getProcessor()->getTypeModel()->getChildListingsProducts();
 
         if (!$this->getProcessor()->isGeneralIdSet() || empty($childListingProducts)) {
             $this->getProcessor()->getListingProduct()->addData(array(

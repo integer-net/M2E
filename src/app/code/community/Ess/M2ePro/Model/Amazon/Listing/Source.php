@@ -71,7 +71,32 @@ class Ess_M2ePro_Model_Amazon_Listing_Source
 
         is_string($result) && $result = trim($result);
 
+        if (!empty($result)) {
+            return $this->applySkuModification($result);
+        }
+
         return $result;
+    }
+
+    // ----------------------------------------
+
+    protected function applySkuModification($sku)
+    {
+        if ($this->getAmazonListing()->isSkuModificationModeNone()) {
+            return $sku;
+        }
+
+        $source = $this->getAmazonListing()->getSkuModificationSource();
+
+        if ($this->getAmazonListing()->isSkuModificationModePrefix()) {
+            $sku = $source['value'] . $sku;
+        } elseif ($this->getAmazonListing()->isSkuModificationModePostfix()) {
+            $sku = $sku . $source['value'];
+        } elseif ($this->getAmazonListing()->isSkuModificationModeTemplate()) {
+            $sku = str_replace('%value%', $sku, $source['value']);
+        }
+
+        return $sku;
     }
 
     // ----------------------------------------
@@ -283,6 +308,64 @@ class Ess_M2ePro_Model_Amazon_Listing_Source
 
         $galleryImages = array_slice($galleryImages,0,$limitGalleryImages);
         return array_merge($mainImage, $galleryImages);
+    }
+
+    //-----------------------------------------
+
+    public function getGiftWrap()
+    {
+        $result = NULL;
+        $src = $this->getAmazonListing()->getGiftWrapSource();
+
+        if ($this->getAmazonListing()->isGiftWrapModeYes()) {
+            $result = true;
+        }
+
+        if ($this->getAmazonListing()->isGiftWrapModeNo()) {
+            $result = false;
+        }
+
+        if ($this->getAmazonListing()->isGiftWrapModeAttribute()) {
+            $attributeValue = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('Yes')) {
+                $result = true;
+            }
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('No')) {
+                $result = false;
+            }
+        }
+
+        return $result;
+    }
+
+    public function getGiftMessage()
+    {
+        $result = NULL;
+        $src = $this->getAmazonListing()->getGiftMessageSource();
+
+        if ($this->getAmazonListing()->isGiftMessageModeYes()) {
+            $result = true;
+        }
+
+        if ($this->getAmazonListing()->isGiftMessageModeNo()) {
+            $result = false;
+        }
+
+        if ($this->getAmazonListing()->isGiftMessageModeAttribute()) {
+            $attributeValue = $this->getMagentoProduct()->getAttributeValue($src['attribute']);
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('Yes')) {
+                $result = true;
+            }
+
+            if ($attributeValue == Mage::helper('M2ePro')->__('No')) {
+                $result = false;
+            }
+        }
+
+        return $result;
     }
 
     // ########################################

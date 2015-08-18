@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_ProductSearch_Grid extends M
 {
     private $productId;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -224,18 +226,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_ProductSearch_Grid extends M
 </script>
 JAVASCRIPT;
 
-        //------------------------------
-        $data = array(
-            'id'    => 'productSearch_cleanSuggest_button',
-            'label' => Mage::helper('M2ePro')->__('Clear Search Results'),
-            'class' => 'productSearch_cleanSuggest_button'
-        );
-        $buttonBlock = $this->getLayout()->createBlock('adminhtml/widget_button')->setData($data);
-        //------------------------------
-
-        $buttonBlockHtml = Mage::helper('M2ePro/Data_Global')->getValue('is_suggestion') ? $buttonBlock->toHtml() : '';
-
-        return $buttonBlockHtml . parent::_toHtml() . $javascriptsMain;
+        return parent::_toHtml() . $javascriptsMain;
     }
 
     // ####################################

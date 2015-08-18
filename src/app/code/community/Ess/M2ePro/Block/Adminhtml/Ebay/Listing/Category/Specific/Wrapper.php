@@ -4,7 +4,8 @@
  * @copyright  Copyright (c) 2011 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific_Wrapper extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific_Wrapper
+    extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // ####################################
 
@@ -49,11 +50,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Specific_Wrapper extends 
     }
 
     // ####################################
-
-    public function getHeaderCssClass()
-    {
-        return 'icon-head ' . parent::getHeaderCssClass();
-    }
 
     public function getHeaderWidth()
     {

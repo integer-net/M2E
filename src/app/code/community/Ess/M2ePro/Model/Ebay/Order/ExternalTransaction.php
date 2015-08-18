@@ -6,11 +6,7 @@
 
 class Ess_M2ePro_Model_Ebay_Order_ExternalTransaction extends Mage_Core_Model_Abstract
 {
-    // ##########################################################
-
     const NOT_PAYPAL_TRANSACTION = 'SIS';
-
-    // ##########################################################
 
     /** @var $order Ess_M2ePro_Model_Order */
     private $order = NULL;

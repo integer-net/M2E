@@ -42,74 +42,117 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
 
     protected function performActions()
     {
-        $params = $this->getParams();
+        $partNumber = 1;
+        $params     = $this->getParams();
 
         /** @var $marketplace Ess_M2ePro_Model_Marketplace **/
         $marketplace = Mage::helper('M2ePro/Component_Ebay')
                             ->getObject('Marketplace', (int)$params['marketplace_id']);
 
+        $this->deleteAllCategories($marketplace);
+
         $this->getActualOperationHistory()->addText('Starting Marketplace "'.$marketplace->getTitle().'"');
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
-                                                         'Get Categories from eBay');
-        $categories = $this->receiveFromEbay($marketplace);
-        $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
+        for ($i = 0; $i < 100; $i++) {
+            $this->getActualLockItem()->setPercents($this->getPercentsStart());
 
-        $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
-        $this->getActualLockItem()->activate();
+            $this->getActualOperationHistory()->addTimePoint(__METHOD__.'get'.$marketplace->getId(),
+                'Get Categories from eBay, part № ' . $partNumber);
+            $response = $this->receiveFromEbay($marketplace, $partNumber);
+            $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'get'.$marketplace->getId());
 
-        $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
-                                                         'Save Categories to DB');
-        $this->saveCategoriesToDb($marketplace,$categories);
-        $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
+            if (empty($response)) {
+                break;
+            }
+
+            $this->getActualLockItem()->setStatus(
+                'Processing Categories data ('.(int)$partNumber.'/'.(int)$response['total_parts'].')'
+            );
+            $this->getActualLockItem()->setPercents($this->getPercentsStart() + $this->getPercentsInterval()/2);
+            $this->getActualLockItem()->activate();
+
+            $this->getActualOperationHistory()->addTimePoint(__METHOD__.'save'.$marketplace->getId(),
+                'Save Categories to DB');
+            $this->saveCategoriesToDb($marketplace, $response['data']);
+            $this->getActualOperationHistory()->saveTimePoint(__METHOD__.'save'.$marketplace->getId());
+
+            $this->getActualLockItem()->setPercents($this->getPercentsEnd());
+            $this->getActualLockItem()->activate();
+
+            $partNumber = $response['next_part'];
+
+            if (is_null($partNumber)) {
+                break;
+            }
+        }
 
         $this->logSuccessfulOperation($marketplace);
     }
 
     //####################################
 
-    protected function receiveFromEbay(Ess_M2ePro_Model_Marketplace $marketplace)
+    protected function receiveFromEbay(Ess_M2ePro_Model_Marketplace $marketplace, $partNumber)
     {
-        $categories = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-                            ->processVirtual('marketplace','get','info',
-                                             array('include_categories'=>1),'info',
-                                             $marketplace->getId(),NULL,NULL);
-        if (is_null($categories)) {
-            $categories = array();
-        } else {
-            $categories = $categories['categories'];
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj  = $dispatcherObj->getVirtualConnector('marketplace','get','categories',
+                                                            array('part_number' => $partNumber),
+                                                            NULL,$marketplace->getId());
+
+        $response = $dispatcherObj->process($connectorObj);
+
+        if (is_null($response) || empty($response['data'])) {
+            $response = array();
         }
 
-        $this->getActualOperationHistory()->addText('Total received Categories from eBay: '.count($categories));
+        $dataCount = isset($response['data']) ? count($response['data']) : 0;
+        $this->getActualOperationHistory()->addText("Total received Categories from eBay: {$dataCount}");
 
-        return $categories;
+        return $response;
     }
 
-    protected function saveCategoriesToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $categories)
+    protected function deleteAllCategories(Ess_M2ePro_Model_Marketplace $marketplace)
     {
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tableCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_category');
 
         $connWrite->delete($tableCategories,array('marketplace_id = ?' => $marketplace->getId()));
+    }
 
-        $iteration = 0;
+    protected function saveCategoriesToDb(Ess_M2ePro_Model_Marketplace $marketplace, array $categories)
+    {
+        if (count($categories) <= 0) {
+            return;
+        }
+
+        /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
+        $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $tableCategories = Mage::getSingleton('core/resource')->getTableName('m2epro_ebay_dictionary_category');
+
+        $iteration            = 0;
         $iterationsForOneStep = 1000;
-        $percentsForOneStep = ($this->getPercentsInterval()/2) / (count($categories)/$iterationsForOneStep);
+        $categoriesCount      = count($categories);
+        $percentsForOneStep   = ($this->getPercentsInterval()/2) / ($categoriesCount/$iterationsForOneStep);
+        $insertData           = array();
 
-        foreach ($categories as $data) {
+        for ($i = 0; $i < $categoriesCount; $i++) {
 
-            $insertData = array(
-                'marketplace_id' => $marketplace->getId(),
-                'category_id' => $data['category_id'],
-                'title' => $data['title'],
+            $data = $categories[$i];
+
+            $insertData[] = array(
+                'marketplace_id'     => $marketplace->getId(),
+                'category_id'        => $data['category_id'],
                 'parent_category_id' => $data['parent_id'],
-                'level' => $data['level'],
-                'is_leaf' => $data['is_leaf'],
-                'features' => json_encode($data['features'])
+                'title'              => $data['title'],
+                'path'               => $data['path'],
+                'is_leaf'            => $data['is_leaf'],
+                'features'           => ($data['is_leaf'] ? json_encode($data['features']) : NULL)
             );
 
-            $connWrite->insert($tableCategories, $insertData);
+            if (count($insertData) >= 100 || $i >= ($categoriesCount - 1)) {
+                $connWrite->insertMultiple($tableCategories, $insertData);
+                $insertData = array();
+            }
 
             if (++$iteration % $iterationsForOneStep == 0) {
                 $percentsShift = ($iteration/$iterationsForOneStep) * $percentsForOneStep;
@@ -127,7 +170,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Marketplaces_Categories
 
         $tempString = Mage::getModel('M2ePro/Log_Abstract')->encodeDescription(
             'The "Categories" Action for eBay Site: "%mrk%" has been successfully completed.',
-            array('mrk'=>$marketplace->getTitle())
+            array('mrk' => $marketplace->getTitle())
         );
 
         $this->getLog()->addMessage($tempString,

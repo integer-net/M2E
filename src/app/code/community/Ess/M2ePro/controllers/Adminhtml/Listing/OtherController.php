@@ -24,7 +24,7 @@ class Ess_M2ePro_Adminhtml_Listing_OtherController
         }
 
         $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The 3rd party listing(s) Log has been successfully cleaned.')
+            Mage::helper('M2ePro')->__('The 3rd party listing(s) Log has been successfully cleared.')
         );
         $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list'));
     }

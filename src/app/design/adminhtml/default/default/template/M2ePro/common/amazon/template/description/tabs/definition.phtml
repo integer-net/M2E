@@ -296,7 +296,7 @@ $allAttributesByInputTypes = array(
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>: <span class="required">*</span></label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Title'); ?>: </label>
                     </td>
                     <td class="value">
                         <select id="title_mode" name="definition[title_mode]" class="select required-entry">
@@ -461,7 +461,7 @@ $allAttributesByInputTypes = array(
 
                 <tr>
                     <td class="label">
-                        <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>: <span class="required">*</span></label>
+                        <label for="image_main_mode"><?php echo Mage::helper('M2ePro')->__('Main Image'); ?>:</label>
                     </td>
                     <td class="value" style="width: auto;">
                         <input type="hidden" id="image_main_attribute" name="definition[image_main_attribute]" value="<?php echo $formData['definition']['image_main_attribute']; ?>" />
@@ -553,7 +553,9 @@ $allAttributesByInputTypes = array(
                 </tr>
 
                 <tr class="c-custom_description_tr" style="display: none;">
-                    <td class="label"></td>
+                    <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Description Value'); ?>: <span class="required">*</span></label>
+                    </td>
                     <td class="value">
 
                         <script type="text/javascript">
@@ -1084,7 +1086,7 @@ $allAttributesByInputTypes = array(
                 <?php for ($i = 0; $i < 4; $i++): ?>
                     <tr class="target_audience_tr" style="display: none;">
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Target Audience Value #%s', $i + 1); ?>:</label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Target Audience Value #%s', $i + 1); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value">
                             <input id="target_audience_<?php echo $i; ?>" onkeyup="AmazonTemplateDescriptionDefinitionHandlerObj.multi_element_keyup('target_audience',this)"
@@ -1142,7 +1144,7 @@ $allAttributesByInputTypes = array(
                 <?php for ($i = 0; $i < 5; $i++): ?>
                     <tr class="search_terms_tr" style="display: none;">
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Search Terms Value #%s', $i + 1); ?>:</label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Search Terms Value #%s', $i + 1); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value">
                             <input id="search_terms_<?php echo $i; ?>" onkeyup="AmazonTemplateDescriptionDefinitionHandlerObj.multi_element_keyup('search_terms',this)"
@@ -1200,7 +1202,7 @@ $allAttributesByInputTypes = array(
                 <?php for ($i = 0; $i < 5; $i++): ?>
                     <tr class="bullet_points_tr" style="display: none;">
                         <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Bullet Points Value #%s', $i + 1); ?>:</label>
+                            <label><?php echo Mage::helper('M2ePro')->__('Bullet Points Value #%s', $i + 1); ?>: <span class="required">*</span></label>
                         </td>
                         <td class="value">
                             <input id="bullet_points_<?php echo $i; ?>" onkeyup="AmazonTemplateDescriptionDefinitionHandlerObj.multi_element_keyup('bullet_points',this)"

@@ -18,8 +18,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
     /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent $typeModel */
     private $typeModel = null;
 
-    private $childListingProducts = null;
-
     /** @var Ess_M2ePro_Model_Amazon_Template_Description $descriptionTemplate */
     private $descriptionTemplate = null;
 
@@ -54,7 +52,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             throw new Exception('Listing Product was not set.');
         }
 
-        $this->listingProduct->getMagentoProduct()->enableCache();
+        $this->getTypeModel()->enableCache();
 
         foreach ($this->getSortedProcessors() as $processor) {
             $this->getProcessorModel($processor)->process();
@@ -143,30 +141,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     // ##########################################################
 
-    /**
-     * @return Ess_M2ePro_Model_Listing_Product[]
-     */
-    public function getChildListingProducts()
-    {
-        if (!is_null($this->childListingProducts)) {
-            return $this->childListingProducts;
-        }
-
-        return $this->childListingProducts = $this->getTypeModel()->getChildListingsProducts();
-    }
-
-    public function createChildListingProduct(array $productOptions = array(),
-                                              array $channelOptions = array(),
-                                              $generalId = null)
-    {
-        $childListingProduct = $this->getTypeModel()->createChildListingProduct(
-            $productOptions, $channelOptions, $generalId
-        );
-
-        $this->childListingProducts[$childListingProduct->getId()] = $childListingProduct;
-    }
-
-    public function tryToDeleteChildListingProduct(Ess_M2ePro_Model_Listing_Product $childListingProduct)
+    public function tryToRemoveChildListingProduct(Ess_M2ePro_Model_Listing_Product $childListingProduct)
     {
         if ($childListingProduct->isLocked()) {
             return false;
@@ -176,8 +151,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             Mage::getModel('M2ePro/StopQueue')->add($childListingProduct);
         }
 
-        $childListingProduct->deleteInstance();
-        unset($this->childListingProducts[$childListingProduct->getId()]);
+        $this->getTypeModel()->removeChildListingProduct($childListingProduct->getId());
 
         return true;
     }

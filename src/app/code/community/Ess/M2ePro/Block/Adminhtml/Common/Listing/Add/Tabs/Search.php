@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Tabs_Search extends Mage_Adm
 {
     protected $sessionKey = 'listing_create';
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();

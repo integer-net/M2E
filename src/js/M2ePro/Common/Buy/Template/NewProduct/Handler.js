@@ -159,7 +159,7 @@ CommonBuyTemplateNewProductHandler.prototype = Object.extend(new CommonHandler()
             category.parent_category_id === self.parentId && categories.push(category)
         });
 
-        if (categories.length == 0 || self.getCategoryInfo('category_id',self.parentId).is_listable == 1) {
+        if (categories.length == 0 || self.getCategoryInfo('category_id',self.parentId).is_leaf == 1) {
             self.confirmButton.show();
             if (categories.length == 0) {
                 selectEl.hide();

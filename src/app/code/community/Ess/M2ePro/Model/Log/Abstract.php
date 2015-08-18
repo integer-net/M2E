@@ -67,18 +67,19 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
 
     //-----------------------------------
 
-    public function encodeDescription($string, array $params = array())
+    public function encodeDescription($string, array $params = array(), array $links = array())
     {
-        if (count($params) <= 0) {
+        if (count($params) <= 0 && count($links) <= 0) {
             return $string;
         }
 
-        $tempArray = array(
+        $descriptionData = array(
             'string' => $string,
-            'params' => $params
+            'params' => $params,
+            'links'  => $links
         );
 
-        return json_encode($tempArray);
+        return json_encode($descriptionData);
     }
 
     public function decodeDescription($string)
@@ -91,10 +92,25 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
             return Mage::helper('M2ePro')->__($string);
         }
 
-        $tempArray = json_decode($string,true);
-        $string = Mage::helper('M2ePro')->__($tempArray['string']);
+        $descriptionData = json_decode($string,true);
+        $string = Mage::helper('M2ePro')->__($descriptionData['string']);
 
-        foreach ($tempArray['params'] as $key=>$value) {
+        if (!empty($descriptionData['params'])) {
+            $string = $this->addPlaceholdersToMessage($string, $descriptionData['params']);
+        }
+
+        if (!empty($descriptionData['links'])) {
+            $string = $this->addLinksToMessage($string, $descriptionData['links']);
+        }
+
+        return $string;
+    }
+
+    //-----------------------------------
+
+    protected function addPlaceholdersToMessage($string, $params)
+    {
+        foreach ($params as $key=>$value) {
 
             if (isset($value{0}) && $value{0} == '{') {
                 $tempValueArray = json_decode($value, true);
@@ -111,6 +127,53 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
         }
 
         return $string;
+    }
+
+    protected function addLinksToMessage($string, $links)
+    {
+        $readMoreLinks = array();
+        $resultString = $string;
+
+        foreach ($links as $link) {
+            preg_match('/!\w*_start!/', $resultString, $foundedStartMatches);
+
+            if (count($foundedStartMatches) == 0) {
+                $readMoreLinks[] = $link;
+                continue;
+            } else {
+
+                $startPart = $foundedStartMatches[0];
+                $endPart = str_replace('start', 'end', $startPart);
+
+                $wasFoundEndMatches = strpos($resultString, $endPart);
+
+                if ($wasFoundEndMatches !== false) {
+
+                    $openLinkTag = '<a href="' . $link . '" target="_blank">';
+                    $closeLinkTag = '</a>';
+
+                    $resultString = str_replace($startPart, $openLinkTag, $resultString);
+                    $resultString = str_replace($endPart, $closeLinkTag, $resultString);
+
+                } else {
+                    $readMoreLinks[] = $link;
+                }
+            }
+        }
+
+        if (count($readMoreLinks) > 0) {
+
+            foreach ($readMoreLinks as &$link) {
+                $link = '<a href="' . $link . '" target="_blank">' . Mage::helper('M2ePro')->__('here') . '</a>';
+            }
+
+            $delimiter = Mage::helper('M2ePro')->__('or');
+            $readMoreString = Mage::helper('M2ePro')->__('Details').' '.implode(' '.$delimiter.' ', $readMoreLinks).'.';
+
+            $resultString .= ' ' . $readMoreString;
+        }
+
+        return $resultString;
     }
 
     //####################################

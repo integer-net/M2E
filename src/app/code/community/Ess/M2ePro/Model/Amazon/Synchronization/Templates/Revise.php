@@ -58,12 +58,12 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
         foreach ($changedListingsProducts as $listingProduct) {
 
-            $actionParams = array('only_data'=>array('qty'=>true));
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
+            $configurator->setPartialMode();
+            $configurator->allowQty();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -75,9 +75,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -94,12 +92,13 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         );
 
         foreach ($changedListingsProducts as $listingProduct) {
-            $actionParams = array('only_data'=>array('price'=>true));
+
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
+            $configurator->setPartialMode();
+            $configurator->allowPrice();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -111,9 +110,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -147,7 +144,9 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
             $attributesForProductChange = array_merge(
                 $attributesForProductChange,
-                $listing->getConditionNoteAttributes()
+                $listing->getConditionNoteAttributes(),
+                $listing->getGiftWrapAttributes(),
+                $listing->getGiftMessageAttributes()
             );
         }
 
@@ -156,7 +155,11 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
             $amazonListingProduct = $listingProduct->getChildObject();
 
-            $detailsAttributes = $amazonListingProduct->getAmazonListing()->getConditionNoteAttributes();
+            $detailsAttributes = array_merge(
+                $amazonListingProduct->getAmazonListing()->getConditionNoteAttributes(),
+                $amazonListingProduct->getAmazonListing()->getGiftWrapAttributes(),
+                $amazonListingProduct->getAmazonListing()->getGiftMessageAttributes()
+            );
 
             if ($amazonListingProduct->isExistDescriptionTemplate()) {
                 $descriptionTemplateDetailsAttributes = $amazonListingProduct->getAmazonDescriptionTemplate()
@@ -180,12 +183,12 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
                 continue;
             }
 
-            $actionParams = array('only_data'=>array('details'=>true));
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
+            $configurator->setPartialMode();
+            $configurator->allowDetails();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -197,9 +200,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -256,12 +257,12 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
                 continue;
             }
 
-            $actionParams = array('only_data'=>array('images'=>true));
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
+            $configurator->setPartialMode();
+            $configurator->allowImages();
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -273,9 +274,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -300,12 +299,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
 
             $listingProduct->setData('synch_status',Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_SKIP)->save();
 
-            $actionParams = array('all_data'=>true);
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -317,9 +314,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 
@@ -353,12 +348,10 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
         /* @var $listingProduct Ess_M2ePro_Model_Listing_Product */
         foreach ($collection->getItems() as $listingProduct) {
 
-            $actionParams = array('all_data'=>true);
+            $configurator = Mage::getModel('M2ePro/Amazon_Listing_Product_Action_Configurator');
 
             $isExistInRunner = $this->getRunner()->isExistProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
 
             if ($isExistInRunner) {
@@ -370,9 +363,7 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Revise
             }
 
             $this->getRunner()->addProduct(
-                $listingProduct,
-                Ess_M2ePro_Model_Listing_Product::ACTION_REVISE,
-                $actionParams
+                $listingProduct, Ess_M2ePro_Model_Listing_Product::ACTION_REVISE, $configurator
             );
         }
 

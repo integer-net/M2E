@@ -216,5 +216,39 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_Delete_MultipleRequester
         return $resultListingProducts;
     }
 
+    protected function filterLockedListingsProducts()
+    {
+        parent::filterLockedListingsProducts();
+
+        if (empty($this->params['remove'])) {
+            return;
+        }
+
+        foreach ($this->listingsProducts as $key => $listingProduct) {
+
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $listingProduct->getChildObject();
+
+            if (!$amazonListingProduct->getVariationManager()->isRelationParentType()) {
+                continue;
+            }
+
+            if (!$listingProduct->isLockedObject('child_products_in_action')) {
+                continue;
+            }
+
+            // M2ePro_TRANSLATIONS
+            // Another Action is being processed. Try again when the Action is completed.
+            $this->getLogger()->logListingProductMessage(
+                $listingProduct,
+                'Delete and Remove action is not supported if Child Products are in Action.',
+                Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
+                Ess_M2ePro_Model_Log_Abstract::PRIORITY_MEDIUM
+            );
+
+            unset($this->listingsProducts[$key]);
+        }
+    }
+
     // ########################################
 }

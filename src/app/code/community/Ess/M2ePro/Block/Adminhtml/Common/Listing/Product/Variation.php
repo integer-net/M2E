@@ -6,8 +6,6 @@
 
 abstract class Ess_M2ePro_Block_Adminhtml_Common_Listing_Product_Variation extends Mage_Adminhtml_Block_Widget
 {
-    //##############################################################
-
     private $magentoVariationsSets = NULL;
     private $magentoVariationsCombinations = NULL;
 

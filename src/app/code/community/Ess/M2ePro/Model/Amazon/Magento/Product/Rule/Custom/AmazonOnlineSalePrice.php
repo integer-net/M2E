@@ -19,6 +19,11 @@ class Ess_M2ePro_Model_Amazon_Magento_Product_Rule_Custom_AmazonOnlineSalePrice
         return Mage::helper('M2ePro')->__('Sale Price');
     }
 
+    public function getInputType()
+    {
+        return 'price';
+    }
+
     public function getValueByProductInstance(Mage_Catalog_Model_Product $product)
     {
         return $product->getData('online_sale_price');

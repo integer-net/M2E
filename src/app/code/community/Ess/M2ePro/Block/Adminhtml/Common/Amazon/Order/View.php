@@ -9,6 +9,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View extends Mage_Adminhtml
     /** @var $order Ess_M2ePro_Model_Order */
     protected $order = null;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -102,4 +104,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Order_View extends Mage_Adminhtml
             //------------------------------
         }
     }
+
+    // ####################################
 }

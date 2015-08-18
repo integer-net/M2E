@@ -12,6 +12,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
     protected $usedProductVariations = null;
 
     protected $listingProductId;
+
+    // ####################################
+
     /**
      * @param mixed $listingProductId
      */
@@ -356,12 +359,39 @@ HTML;
         return $html;
     }
 
-    public function callbackColumnAmazonSku($sku, $row, $column, $isExport)
+    public function callbackColumnAmazonSku($value, $row, $column, $isExport)
     {
-        if (is_null($sku) || $sku === '') {
-            return Mage::helper('M2ePro')->__('N/A');
+        if (is_null($value) || $value === '') {
+            $value = Mage::helper('M2ePro')->__('N/A');
         }
-        return $sku;
+
+        if ($row->getData('defected_messages')) {
+            $defectedMessages = json_decode($row->getData('defected_messages'), true);
+
+            $msg = '';
+            foreach ($defectedMessages as $message) {
+                $msg .= '<p>'.$message['message'] . '&nbsp;';
+                if (!empty($message['value'])) {
+                    $msg .= Mage::helper('M2ePro')->__('Current Value') . ': "' . $message['value'] . '"';
+                }
+                $msg .= '</p>';
+            }
+
+            $value .= <<<HTML
+<span style="float:right;">
+    <img id="map_link_defected_message_icon_{$row->getId()}"
+         class="tool-tip-image"
+         style="vertical-align: middle;"
+         src="{$this->getSkinUrl('M2ePro/images/warning.png')}">
+    <span class="tool-tip-message tool-tip-warning tip-left" style="display:none;">
+        <img src="{$this->getSkinUrl('M2ePro/images/i_notice.gif')}">
+        <span>{$msg}</span>
+    </span>
+</span>
+HTML;
+        }
+
+        return $value;
     }
 
     public function callbackColumnGeneralId($generalId, $row, $column, $isExport)
@@ -409,36 +439,50 @@ HTML;
 
         $salePrice = $row->getData('online_sale_price');
         if ((float)$salePrice > 0) {
+            $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+
             $startDateTimestamp = strtotime($row->getData('online_sale_price_start_date'));
             $endDateTimestamp   = strtotime($row->getData('online_sale_price_end_date'));
 
-            $iconHelpPath = $this->getSkinUrl('M2ePro/images/help.png');
-            $toolTipIconPath = $this->getSkinUrl('M2ePro/images/tool-tip-icon.png');
+            if ($currentTimestamp <= $endDateTimestamp) {
+                $iconHelpPath = $this->getSkinUrl('M2ePro/images/i_logo.png');
+                $toolTipIconPath = $this->getSkinUrl('M2ePro/images/i_icon.png');
 
-            $intervalHtml = '<img class="tool-tip-image"
+                $dateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM);
+
+                $fromDate = Mage::app()->getLocale()->date(
+                    $row->getData('online_sale_price_start_date'), $dateFormat
+                )->toString($dateFormat);
+                $toDate = Mage::app()->getLocale()->date(
+                    $row->getData('online_sale_price_end_date'), $dateFormat
+                )->toString($dateFormat);
+
+                $intervalHtml = '<img class="tool-tip-image"
                                  style="vertical-align: middle;"
-                                 src="'.$toolTipIconPath.'">
-                            <span class="tool-tip-message tip-left" style="display:none;">
+                                 src="'.$toolTipIconPath.'"><span class="tool-tip-message" style="display:none;
+                                                                  text-align: left;
+                                                                  width: 120px;
+                                                                  background: #E3E3E3;">
                                 <img src="'.$iconHelpPath.'">
-                                <span style="color:gray; font-size: 10px;">
-                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
-                                    To: '.date('Y-m-d', $endDateTimestamp).'
+                                <span style="color:gray;">
+                                    <strong>From:</strong> '.$fromDate.'<br/>
+                                    <strong>To:</strong> '.$toDate.'
                                 </span>
                             </span>';
 
-            $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+                $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePrice);
 
-            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePrice);
-
-            if ($currentTimestamp >= $startDateTimestamp &&
-                $currentTimestamp <= $endDateTimestamp &&
-                $salePrice < (float)$value
-            ) {
-                $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>';
-                $resultHtml .= '<br/>'.$intervalHtml.$salePriceValue;
-            } else {
-                $resultHtml .= $priceValue;
-                $resultHtml .= '<br/>'.$intervalHtml.'<span style="color:gray;">'.$salePriceValue.'</span>';
+                if ($currentTimestamp >= $startDateTimestamp &&
+                    $currentTimestamp <= $endDateTimestamp &&
+                    $salePrice < (float)$value
+                ) {
+                    $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>';
+                    $resultHtml .= '<br/>'.$intervalHtml.'&nbsp;'.$salePriceValue;
+                } else {
+                    $resultHtml .= $priceValue;
+                    $resultHtml .= '<br/>'.$intervalHtml.
+                        '<span style="color:gray;">'.'&nbsp;'.$salePriceValue.'</span>';
+                }
             }
         }
 
@@ -743,8 +787,8 @@ HTML;
             case Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_AND_REMOVE_PRODUCT:
                 $string = Mage::helper('M2ePro')->__('Remove from Channel & Listing');
                 break;
-            case Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL:
-                $string = Mage::helper('M2ePro')->__('Status Change');
+            case Ess_M2ePro_Model_Listing_Log::ACTION_CHANNEL_CHANGE:
+                $string = Mage::helper('M2ePro')->__('Channel Change');
                 break;
         }
 
@@ -986,7 +1030,7 @@ HTML;
 
         $logViewUrl = $this->getUrl('*/adminhtml_common_log/listing', array(
             'id' =>$listingId,
-            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON,
+            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON,
             'back'=>$helper->makeBackUrlParam('*/adminhtml_common_amazon_listing/view', array('id' => $listingId))
         ));
 
@@ -1144,11 +1188,38 @@ HTML;
     M2ePro.customData.componentMode = '{$component}';
     M2ePro.customData.gridId = 'amazonVariationProductManageGrid';
 
+    // fix for tool tip position in iframe
+    MagentoFieldTip.prototype.changeToolTipPosition = function(element)
+    {
+        var toolTip = element.up().select('.tool-tip-message')[0];
+
+        var settings = {
+            setHeight: false,
+            setWidth: false,
+            setLeft: true,
+            offsetTop: 25,
+            offsetLeft: -20
+        };
+
+        if (element.up().getStyle('float') == 'right') {
+            settings.offsetLeft += 18;
+        }
+        if (element.up().match('span')) {
+            settings.offsetLeft += 15;
+        }
+
+        toolTip.clonePosition(element, settings);
+
+        if (toolTip.hasClassName('tip-left')) {
+            toolTip.style.left = (parseInt(toolTip.style.left) - toolTip.getWidth() - 10) + 'px';
+        }
+    };
+
     Event.observe(window, 'load', function() {
 
         CommonHandler.prototype.scroll_page_to_top = function() { return; }
 
-        ListingGridHandlerObj = new AmazonListingVariationProductManageVariationsGridHandler(
+        ListingGridHandlerObj = new CommonAmazonListingVariationProductManageVariationsGridHandler(
             'amazonVariationProductManageGrid',
             {$listingId}
         );
@@ -1174,7 +1245,7 @@ HTML;
 </script>
 JAVASCRIPT;
 
-        $additionalCss = <<<CSS
+        $additionalCss = <<<HTML
 <style>
     body {
         background: none;
@@ -1202,7 +1273,7 @@ JAVASCRIPT;
     }
 
 </style>
-CSS;
+HTML;
 
         return  '<div id="messages"></div>' .
                 '<div id="listing_view_progress_bar"></div>' .

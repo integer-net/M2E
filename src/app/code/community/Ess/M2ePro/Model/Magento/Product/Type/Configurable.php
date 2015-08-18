@@ -7,6 +7,8 @@
 
 class Ess_M2ePro_Model_Magento_Product_Type_Configurable extends Mage_Catalog_Model_Product_Type_Configurable
 {
+    // ########################################
+
     /**
      * Retrieve related products collection
      *
@@ -23,4 +25,6 @@ class Ess_M2ePro_Model_Magento_Product_Type_Configurable extends Mage_Catalog_Mo
 
         return $collection;
     }
+
+    // ########################################
 }

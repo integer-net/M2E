@@ -1,4 +1,4 @@
-AmazonListingTemplateDescriptionHandler = Class.create(ActionHandler, {
+CommonAmazonListingTemplateDescriptionHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
@@ -81,7 +81,9 @@ AmazonListingTemplateDescriptionHandler = Class.create(ActionHandler, {
                 var response = transport.responseText.evalJSON();
 
                 MagentoMessageObj.clearAll();
-                MagentoMessageObj['add' + response.type[0].toUpperCase() + response.type.slice(1)](response.message);
+                response.messages.each(function(msg) {
+                    MagentoMessageObj['add' + msg.type[0].toUpperCase() + msg.type.slice(1)](msg.text);
+                });
             }
         });
     },

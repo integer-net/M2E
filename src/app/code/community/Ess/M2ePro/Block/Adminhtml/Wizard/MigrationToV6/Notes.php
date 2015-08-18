@@ -4,7 +4,7 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Notes extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Notes extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     // #################################################
 
@@ -28,7 +28,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationToV6_Notes extends Mage_Adminht
 
     protected function _toHtml()
     {
-        $html = Mage::getModel('M2ePro/Registry')->load('wizard_migrationToV6_notes_html', 'key')
+        $html = Mage::getModel('M2ePro/Registry')->load('/wizard/migrationToV6_notes_html/', 'key')
                                                  ->getData('value');
 
         return parent::_toHtml() . $html;

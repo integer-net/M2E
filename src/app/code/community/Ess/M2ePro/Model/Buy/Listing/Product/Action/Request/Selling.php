@@ -11,7 +11,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Request_Selling
 
     public function getData()
     {
-        if (!$this->getConfigurator()->isSelling()) {
+        if (!$this->getConfigurator()->isSellingAllowed()) {
             return array();
         }
 

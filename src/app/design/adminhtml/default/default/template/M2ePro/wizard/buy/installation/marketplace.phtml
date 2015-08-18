@@ -1,8 +1,11 @@
 <div id="block_notice_wizard_installation_step_marketplaces" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Marketplaces Set Up'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes" style="display:none;">
     <div>
         <div class="step_container_description">
-            <?php echo Mage::helper('M2ePro')->__('In this Section you can synchronize Marketplace data for Rakuten.com. <br/>
-             <b>Please Note:</b> you can always synchronize Marketplace data in %marketplaces_path%.', Mage::helper('M2ePro/View_Common')->getMenuPath('configuration/marketplace')); ?>
+            <?php echo Mage::helper('M2ePro')->__('At this Step Marketplace data will be synchronized for Rakuten.com Integration. <br/>
+             <b>Please Note:</b> you can always resynchronize Marketplace data in %marketplaces_path%.', Mage::helper('M2ePro/View_Common')->getPageNavigationPath('configuration', 'Marketplaces', 'buy')); ?>
+        </div>
+        <div id="marketplaces_container">
+            <?php echo $this->getChildHtml('wizard_marketplace_form');?>
         </div>
         <div class="step_container_completed">
             <span class="step_completed" style="display:none;"><?php echo Mage::helper('M2ePro')->__('Completed'); ?></span>

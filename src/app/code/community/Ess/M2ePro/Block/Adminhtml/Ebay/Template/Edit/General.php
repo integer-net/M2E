@@ -11,6 +11,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit_General extends Mage_Adminht
 {
     private $enabledMarketplaces = NULL;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -76,4 +78,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit_General extends Mage_Adminht
         $this->setChild('confirm', $this->getLayout()->createBlock('M2ePro/adminhtml_widget_dialog_confirm'));
         //------------------------------
     }
+
+    // ####################################
 }

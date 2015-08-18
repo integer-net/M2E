@@ -52,40 +52,6 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
             '/ebay/templates/', 'mode',
             (int)$this->getRequest()->getParam('ebay_templates_mode')
         );
-        Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
-            '/ebay/orders/', 'mode',
-            (int)$this->getRequest()->getParam('ebay_orders_mode')
-        );
-
-        if (Mage::helper('M2ePro/View_Ebay')->isAdvancedMode()) {
-            Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
-                '/ebay/feedbacks/', 'mode',
-                (int)$this->getRequest()->getParam('ebay_feedbacks_mode')
-            );
-            Mage::helper('M2ePro/Module')->getSynchronizationConfig()->setGroupValue(
-                '/ebay/other_listings/', 'mode',
-                (int)$this->getRequest()->getParam('ebay_other_listings_mode')
-            );
-        }
-    }
-
-    public function clearLogAction()
-    {
-        $task = $this->getRequest()->getParam('task');
-
-        if (is_null($task)) {
-            $this->_getSession()->addError(Mage::helper('M2ePro')->__('Please select Item(s) to clear'));
-            return $this->_redirect('*/*/index');
-        }
-
-        Mage::getModel('M2ePro/Synchronization_Log')
-            ->setComponentMode(Ess_M2ePro_Helper_Component_Ebay::NICK)
-            ->clearMessages($task);
-
-        $this->_getSession()->addSuccess(
-            Mage::helper('M2ePro')->__('The Synchronization Task Log has been successfully cleaned.')
-        );
-        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('index'));
     }
 
     //#############################################
@@ -116,84 +82,6 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
         $dispatcher->process();
     }
 
-    //------------------------
-
-    public function runNowTemplatesAction()
-    {
-        session_write_close();
-
-        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
-        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-
-        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $dispatcher->setAllowedTasksTypes(array(
-            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Task::TEMPLATES
-        ));
-
-        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
-        $dispatcher->setParams(array());
-
-        $dispatcher->process();
-    }
-
-    public function runNowOrdersAction()
-    {
-        session_write_close();
-
-        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
-        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-
-        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $dispatcher->setAllowedTasksTypes(array(
-            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Task::ORDERS
-        ));
-
-        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
-        $dispatcher->setParams(array());
-
-        $dispatcher->process();
-    }
-
-    public function runNowOtherListingsAction()
-    {
-        session_write_close();
-
-        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
-        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-
-        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $dispatcher->setAllowedTasksTypes(array(
-            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Task::OTHER_LISTINGS
-        ));
-
-        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
-        $dispatcher->setParams(array());
-
-        $dispatcher->process();
-    }
-
-    public function runNowFeedbacksAction()
-    {
-        session_write_close();
-
-        /** @var $dispatcher Ess_M2ePro_Model_Synchronization_Dispatcher */
-        $dispatcher = Mage::getModel('M2ePro/Synchronization_Dispatcher');
-
-        $dispatcher->setAllowedComponents(array(Ess_M2ePro_Helper_Component_Ebay::NICK));
-        $dispatcher->setAllowedTasksTypes(array(
-            Ess_M2ePro_Model_Synchronization_Task::DEFAULTS,
-            Ess_M2ePro_Model_Synchronization_Task::FEEDBACKS
-        ));
-
-        $dispatcher->setInitiator(Ess_M2ePro_Helper_Data::INITIATOR_USER);
-        $dispatcher->setParams(array());
-
-        $dispatcher->process();
-    }
-
     //#############################################
 
     public function synchCheckProcessingNowAction()
@@ -201,7 +89,7 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
         $warningMessages = array();
 
         $synchronizationEbayOtherListingsProcessing = Mage::getModel('M2ePro/LockItem')->getCollection()
-            ->addFieldToFilter('nick', array('like' => 'synchronization_ebay_other_listings%'))
+            ->addFieldToFilter('nick', array('like' => 'synchronization_ebay_other_listings_update%'))
             ->getSize();
 
         // M2ePro_TRANSLATIONS
@@ -211,7 +99,7 @@ class Ess_M2ePro_Adminhtml_Ebay_SynchronizationController extends Ess_M2ePro_Con
                 'eBay 3rd Party Listings are being downloaded now. ' .
                 'They will be available soon in %menu_root% > 3rd Party. ' .
                 'You can continue working with M2E Pro.',
-                Mage::helper('M2ePro/View_Ebay')->getMenuPath('listings')
+                Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('listings', '3rd Party')
             );
         }
 

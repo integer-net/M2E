@@ -189,7 +189,7 @@ class Ess_M2ePro_Adminhtml_OrderController
                 'html' => $block->toHtml(),
                 'pop_up_config' => array(
                     'height' => 500,
-                    'width'  => 750
+                    'width'  => 900
                 ),
             )));
 

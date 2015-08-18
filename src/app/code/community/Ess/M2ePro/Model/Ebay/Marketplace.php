@@ -206,8 +206,10 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
                              ->select()
                              ->from($tableCategories,array('category_id','title','is_leaf'))
                              ->where('`marketplace_id` = ?',(int)$this->getId())
-                             ->where('`parent_category_id` = ?',(int)$parentId)
                              ->order(array('title ASC'));
+
+        empty($parentId) ? $dbSelect->where('parent_category_id IS NULL')
+                         : $dbSelect->where('parent_category_id = ?', (int)$parentId);
 
         $categories = Mage::getResourceModel('core/config')
                                 ->getReadConnection()
@@ -230,7 +232,6 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
 
         $tableDictMarketplace = $coreResource->getTableName('m2epro_ebay_dictionary_marketplace');
         $tableDictShipping = $coreResource->getTableName('m2epro_ebay_dictionary_shipping');
-        $tableDictShippingCategory = $coreResource->getTableName('m2epro_ebay_dictionary_shipping_category');
 
         // table m2epro_ebay_dictionary_marketplace
         //------------------------------
@@ -257,30 +258,28 @@ class Ess_M2ePro_Model_Ebay_Marketplace extends Ess_M2ePro_Model_Component_Child
             $shippingMethods = array();
         }
 
-        // table m2epro_ebay_dictionary_shipping_category
-        //------------------------------
-        $dbSelect = $connRead->select()
-                             ->from($tableDictShippingCategory,'*')
-                             ->where('`marketplace_id` = ?',(int)$this->getId())
-                             ->order(array('title ASC'));
-        $shippingCategories = $connRead->fetchAll($dbSelect);
-
         $categoryShippingMethods = array();
+        foreach ($shippingMethods as $shippingMethod) {
 
-        if (is_array($shippingCategories)) {
+            $category = json_decode($shippingMethod['category'], true);
 
-            foreach ($shippingCategories as $category) {
+            if (empty($category)) {
+                $shippingMethod['data'] = json_decode($shippingMethod['data'], true);
+                $categoryShippingMethods['']['methods'][] = $shippingMethod;
+                continue;
+            }
+
+            if (!isset($categoryShippingMethods[$category['ebay_id']])) {
                 $categoryShippingMethods[$category['ebay_id']] = array(
                     'title'   => $category['title'],
                     'methods' => array(),
                 );
             }
 
-            foreach ($shippingMethods as $shippingMethod) {
-                $shippingMethod['data'] = json_decode($shippingMethod['data'], true);
-                $categoryShippingMethods[$shippingMethod['category']]['methods'][] = $shippingMethod;
-            }
+            $shippingMethod['data'] = json_decode($shippingMethod['data'], true);
+            $categoryShippingMethods[$category['ebay_id']]['methods'][] = $shippingMethod;
         }
+
         //------------------------------
 
         return $this->info = array(

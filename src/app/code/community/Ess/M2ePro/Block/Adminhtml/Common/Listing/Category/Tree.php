@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Listing_Category_Tree extends Mage_Adminhtml_Block_Catalog_Category_Abstract
 {
-    // #############################################
-
     protected $listing;
 
     protected $selectedIds = array();

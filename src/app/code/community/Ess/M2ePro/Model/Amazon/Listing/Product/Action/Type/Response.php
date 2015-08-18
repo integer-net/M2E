@@ -222,15 +222,36 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Response
             $salePrice = (float)$this->getRequestData()->getSalePrice();
 
             if ($salePrice > 0) {
-                $data['online_sale_price'] = $salePrice;
+                $data['online_sale_price']            = $salePrice;
                 $data['online_sale_price_start_date'] = $this->getRequestData()->getSalePriceStartDate();
-                $data['online_sale_price_end_date'] = $this->getRequestData()->getSalePriceEndDate();
+                $data['online_sale_price_end_date']   = $this->getRequestData()->getSalePriceEndDate();
             } else {
                 $data['online_sale_price'] = 0;
             }
         }
 
         return $data;
+    }
+
+    // ########################################
+
+    protected function setLastSynchronizationDates()
+    {
+        if (!$this->getConfigurator()->isQtyAllowed() && !$this->getConfigurator()->isPriceAllowed()) {
+            return;
+        }
+
+        $additionalData = $this->getListingProduct()->getAdditionalData();
+
+        if ($this->getConfigurator()->isQtyAllowed()) {
+            $additionalData['last_synchronization_dates']['qty'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+        }
+
+        if ($this->getConfigurator()->isPriceAllowed()) {
+            $additionalData['last_synchronization_dates']['price'] = Mage::helper('M2ePro')->getCurrentGmtDate();
+        }
+
+        $this->getListingProduct()->setSettings('additional_data', $additionalData);
     }
 
     // ########################################

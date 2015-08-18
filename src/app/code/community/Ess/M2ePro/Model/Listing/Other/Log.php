@@ -50,8 +50,8 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
     const ACTION_CHANGE_CUSTOM_ATTRIBUTE = 17;
     const _ACTION_CHANGE_CUSTOM_ATTRIBUTE = 'Change of Product Custom Attribute in Magento Store';
 
-    const ACTION_CHANGE_STATUS_ON_CHANNEL = 18;
-    const _ACTION_CHANGE_STATUS_ON_CHANNEL = 'Change Item status on Channel';
+    const ACTION_CHANNEL_CHANGE = 18;
+    const _ACTION_CHANNEL_CHANGE = 'Change Item on Channel';
 
     //####################################
 
@@ -144,8 +144,7 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
             }
 
             if ($this->componentMode == Ess_M2ePro_Helper_Component_Amazon::NICK ||
-                $this->componentMode == Ess_M2ePro_Helper_Component_Buy::NICK ||
-                $this->componentMode == Ess_M2ePro_Helper_Component_Play::NICK) {
+                $this->componentMode == Ess_M2ePro_Helper_Component_Buy::NICK) {
                 $dataForAdd['identifier'] = $listingOther->getChildObject()->getGeneralId();
             }
         }

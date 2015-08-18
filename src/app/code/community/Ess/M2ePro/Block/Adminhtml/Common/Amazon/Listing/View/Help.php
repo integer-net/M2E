@@ -6,7 +6,9 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Help extends Mage_Adminhtml_Block_Widget
 {
-   public function __construct()
+    // ####################################
+
+    public function __construct()
     {
         parent::__construct();
 
@@ -17,4 +19,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Help extends Mage_Ad
 
         $this->setTemplate('M2ePro/common/amazon/listing/view/help.phtml');
     }
+
+    // ####################################
 }

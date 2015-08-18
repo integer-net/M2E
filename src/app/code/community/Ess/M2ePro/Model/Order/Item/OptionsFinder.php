@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Order_Item_OptionsFinder
 {
-    // ##########################################################
-
     private $channelOptions = array();
 
     private $productId = null;

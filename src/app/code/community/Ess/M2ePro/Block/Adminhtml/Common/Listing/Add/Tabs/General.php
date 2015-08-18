@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Tabs_General extends Mage_Ad
 {
     protected $sessionKey = 'listing_create';
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -44,11 +46,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Tabs_General extends Mage_Ad
         $this->setChild(
             'store_switcher',
             $this->getLayout()->createBlock(
-                'M2ePro/adminhtml_storeSwitcher', '', array('id'=>'store_id','selected' => $this->getData('store_id'))
+                'M2ePro/adminhtml_storeSwitcher', '', array(
+                    'id'=>'store_id',
+                    'selected' => $this->getData('store_id'),
+                    'display_default_store_mode' => 'down',
+                    'required_option' => true,
+                    'empty_option' => true
+                )
             )
         );
         //------------------------------
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

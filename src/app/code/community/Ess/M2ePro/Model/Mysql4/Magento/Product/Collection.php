@@ -33,13 +33,18 @@ class Ess_M2ePro_Model_Mysql4_Magento_Product_Collection
         $idsSelect->reset(Zend_Db_Select::ORDER);
         $idsSelect->reset(Zend_Db_Select::LIMIT_COUNT);
         $idsSelect->reset(Zend_Db_Select::LIMIT_OFFSET);
-        $idsSelect->reset(Zend_Db_Select::COLUMNS);
 
         $idsSelect->columns('lp.' . $this->getIdFieldName());
         $idsSelect->limit($limit, $offset);
-        $idsSelect->resetJoinLeft();
 
-        return $this->getConnection()->fetchCol($idsSelect, $this->_bindParams);
+        $data = $this->getConnection()->fetchAll($idsSelect, $this->_bindParams);
+
+        $ids = array();
+        foreach ($data as $row) {
+            $ids[] = $row[$this->getIdFieldName()];
+        }
+
+        return $ids;
     }
 
     // ########################################
@@ -52,20 +57,67 @@ class Ess_M2ePro_Model_Mysql4_Magento_Product_Collection
         $countSelect->reset(Zend_Db_Select::ORDER);
         $countSelect->reset(Zend_Db_Select::LIMIT_COUNT);
         $countSelect->reset(Zend_Db_Select::LIMIT_OFFSET);
-        $countSelect->reset(Zend_Db_Select::COLUMNS);
+        //$countSelect->reset(Zend_Db_Select::COLUMNS);
 
         if ($this->listingProductMode) {
-            $countSelect->columns('COUNT(lp.id)');
+            $countSelect->columns('COUNT(lp.id) as total_count');
         } else {
-            $countSelect->columns('COUNT(DISTINCT e.entity_id)');
+            $countSelect->columns('COUNT(DISTINCT e.entity_id) as total_count');
             $countSelect->reset(Zend_Db_Select::GROUP);
         }
 
-        $countSelect->resetJoinLeft();
+        //$countSelect->resetJoinLeft();
 
         return $countSelect;
     }
 
+    public function getSize()
+    {
+        if (is_null($this->_totalRecords)) {
+            $this->_renderFilters();
+
+            $countSelect = clone $this->getSelect();
+            $countSelect->reset(Zend_Db_Select::ORDER);
+            $countSelect->reset(Zend_Db_Select::LIMIT_COUNT);
+            $countSelect->reset(Zend_Db_Select::LIMIT_OFFSET);
+
+            if ($this->listingProductMode) {
+                $query = $countSelect->__toString();
+                $query = <<<SQL
+SELECT COUNT(id) FROM ({$query}) t
+SQL;
+            } else {
+                $countSelect->reset(Zend_Db_Select::GROUP);
+                $query = $countSelect->__toString();
+                $query = <<<SQL
+SELECT COUNT(DISTINCT entity_id) FROM ({$query}) t
+SQL;
+            }
+
+            $this->_totalRecords = $this->getConnection()->fetchOne($query, $this->_bindParams);
+        }
+        return intval($this->_totalRecords);
+    }
+
     // ########################################
 
+    /*
+     * Price Sorting Hack
+     */
+    protected function _renderOrders()
+    {
+        if (!$this->_isOrdersRendered) {
+            foreach ($this->_orders as $attribute => $direction) {
+                if ($attribute == 'min_online_price' || $attribute == 'max_online_price') {
+                    $this->getSelect()->order($attribute . ' ' . $direction);
+                } else {
+                    $this->addAttributeToSort($attribute, $direction);
+                }
+            }
+            $this->_isOrdersRendered = true;
+        }
+        return $this;
+    }
+
+    // ########################################
 }

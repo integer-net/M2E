@@ -8,6 +8,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
     extends Mage_Adminhtml_Block_Widget_Tabs
 {
     protected $listingProductId;
+
+    // ####################################
+
     /**
      * @param mixed $listingProductId
      */
@@ -140,4 +143,6 @@ JAVASCRIPT;
             $additionalJavascript .
             $closeBtn->toHtml();
     }
+
+    // ####################################
 }

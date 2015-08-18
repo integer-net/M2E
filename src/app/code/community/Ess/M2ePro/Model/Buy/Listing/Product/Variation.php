@@ -175,6 +175,31 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation extends Ess_M2ePro_Model_Co
             }
         }
 
+        if (!empty($sku)) {
+            return $this->applySkuModification($sku);
+        }
+
+        return $sku;
+    }
+
+    //-----------------------------------------
+
+    protected function applySkuModification($sku)
+    {
+        if ($this->getBuyListing()->isSkuModificationModeNone()) {
+            return $sku;
+        }
+
+        $source = $this->getBuyListing()->getSkuModificationSource();
+
+        if ($this->getBuyListing()->isSkuModificationModePrefix()) {
+            $sku = $source['value'] . $sku;
+        } elseif ($this->getBuyListing()->isSkuModificationModePostfix()) {
+            $sku = $sku . $source['value'];
+        } elseif ($this->getBuyListing()->isSkuModificationModeTemplate()) {
+            $sku = str_replace('%value%', $sku, $source['value']);
+        }
+
         return $sku;
     }
 

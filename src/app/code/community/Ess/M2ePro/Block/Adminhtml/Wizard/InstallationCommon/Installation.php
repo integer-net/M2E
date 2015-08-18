@@ -16,7 +16,7 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_InstallationCommon_Installation
         /** @var Ess_M2ePro_Helper_Module_Wizard $wizardHelper */
         $wizardHelper = $this->helper('M2ePro/Module_Wizard');
 
-        $earlierFormData = Mage::getModel('M2ePro/Registry')->load('wizard_license_form_data', 'key')
+        $earlierFormData = Mage::getModel('M2ePro/Registry')->load('/wizard/license_form_data/', 'key')
                                                             ->getData('value');
 
         if (Mage::helper('M2ePro/Module_License')->getKey() && $earlierFormData) {

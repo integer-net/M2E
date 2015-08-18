@@ -24,9 +24,6 @@ class Ess_M2ePro_Block_Adminhtml_Template_Messages extends Mage_Adminhtml_Block_
                 if ($componentMode == Ess_M2ePro_Helper_Component_Ebay::NICK) {
                     $block = $this->getLayout()
                         ->createBlock('M2ePro/adminhtml_ebay_template_sellingFormat_messages');
-                } else if ($componentMode == Ess_M2ePro_Helper_Component_Play::NICK) {
-                    $block = $this->getLayout()
-                        ->createBlock('M2ePro/adminhtml_common_play_template_sellingFormat_messages');
                 } else {
                     $block = $this->getLayout()
                         ->createBlock('M2ePro/adminhtml_template_sellingFormat_messages');

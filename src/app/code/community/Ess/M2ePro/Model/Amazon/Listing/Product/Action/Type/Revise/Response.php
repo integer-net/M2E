@@ -11,13 +11,15 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
 
     public function processSuccess($params = array())
     {
-        $data = array(
-            'ignore_next_inventory_synch' => 1
-        );
+        $data = array();
 
-        if ($this->getConfigurator()->isAllPermitted()) {
+        if ($this->getConfigurator()->isAllAllowed()) {
             $data['synch_status'] = Ess_M2ePro_Model_Listing_Product::SYNCH_STATUS_OK;
             $data['synch_reasons'] = NULL;
+        }
+
+        if ($this->getConfigurator()->isDetailsAllowed() || $this->getConfigurator()->isImagesAllowed()) {
+            $data['defected_messages'] = null;
         }
 
         $data = $this->appendStatusChangerValue($data);
@@ -27,6 +29,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
         $data = $this->appendPriceValues($data);
 
         $this->getListingProduct()->addData($data);
+
+        $this->setLastSynchronizationDates();
+
         $this->getListingProduct()->save();
     }
 
@@ -34,7 +39,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
 
     public function getSuccessfulMessage()
     {
-        if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
+        if ($this->getConfigurator()->isAllAllowed()) {
             // M2ePro_TRANSLATIONS
             // Item was successfully Revised
             return 'Item was successfully Revised';
@@ -42,29 +47,25 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Revise_Response
 
         $sequenceString = '';
 
-        if ($this->getRequestData()->hasQty()) {
+        if ($this->getConfigurator()->isQtyAllowed()) {
             // M2ePro_TRANSLATIONS
             // QTY
             $sequenceString .= 'QTY,';
         }
 
-        if ($this->getRequestData()->hasPrice()) {
+        if ($this->getConfigurator()->isPriceAllowed()) {
             // M2ePro_TRANSLATIONS
             // Price
             $sequenceString .= 'Price,';
         }
 
-        if ($this->getRequestData()->hasProductData() ||
-            $this->getRequestData()->hasDescriptionData() ||
-            $this->getRequestData()->hasBrowsenodeId() ||
-            $this->getRequestData()->hasCondition()
-        ) {
+        if ($this->getConfigurator()->isDetailsAllowed()) {
             // M2ePro_TRANSLATIONS
             // details
             $sequenceString .= 'details,';
         }
 
-        if ($this->getRequestData()->hasImagesData()) {
+        if ($this->getConfigurator()->isImagesAllowed()) {
             // M2ePro_TRANSLATIONS
             // images
             $sequenceString .= 'images,';

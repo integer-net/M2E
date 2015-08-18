@@ -1,4 +1,4 @@
-BuyListingProductSearchHandler = Class.create(ActionHandler, {
+CommonBuyListingProductSearchHandler = Class.create(ActionHandler, {
 
     //----------------------------------
 
@@ -8,9 +8,25 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
 
         $super(gridHandler);
 
+        self.searchBlock = $('productSearch_pop_up_content').outerHTML;
+        $('productSearch_pop_up_content').remove();
+
+        self.menuBlock = $('productSearchMenu_pop_up_content').outerHTML;
+        $('productSearchMenu_pop_up_content').remove();
+    },
+
+    //----------------------------------
+
+    initMenuEvents: function()
+    {
         $('productSearchMenu_cancel_button').observe('click', function() {
             popUp.close();
         });
+    },
+
+    initSearchEvents: function()
+    {
+        var self = this;
 
         $('productSearch_submit_button').observe('click',function(event) {
             self.searchGeneralIdManual(self.params.productId);
@@ -18,7 +34,7 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
 
         $('productSearch_reset_button').observe('click',function(event) {
             $('query').value = '';
-            $('productSearch_grid').hide();
+            $('productSearch_grid').innerHTML = '';
         });
 
         $('productSearch_back_button').observe('click',function(event) {
@@ -88,20 +104,24 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
             hideEffect: Element.hide,
             showEffect: Element.show
         });
-        popUp.options.destroyOnClose = false;
+        popUp.options.destroyOnClose = true;
 
         if (mode == 0) {
-            $('modal_dialog_message').insert($('productSearchMenu_pop_up_content').show());
+            $('modal_dialog_message').insert(self.menuBlock);
+            $('productSearchMenu_pop_up_content').show();
+            self.initMenuEvents();
             $('productSearchMenu_error_block').hide();
             if (errorMsg != undefined) {
                 $('productSearchMenu_error_message').update(errorMsg);
                 $('productSearchMenu_error_block').show();
             }
         } else {
-            $('modal_dialog_message').insert($('productSearch_pop_up_content').show());
+            $('modal_dialog_message').insert(self.searchBlock);
+            $('productSearch_pop_up_content').show();
             $('productSearch_form').hide();
             $('productSearch_back_button').hide();
             $('productSearch_buttons').show();
+            $('productSearch_cleanSuggest_button').show();
             new Ajax.Request(self.options.url.suggestedBuyComSkuGrid, {
                 method: 'post',
                 parameters: {
@@ -110,18 +130,14 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
                 onSuccess: function(transport) {
 
                     $('productSearch_grid').update(transport.responseText);
-                    $('productSearch_grid').show();
-                    $('productSearch_cleanSuggest_button').observe('click', function() {
-                        if (confirm(M2ePro.translator.translate('Are you sure?'))) {
-                            popUp.close();
-                            self.unmapFromGeneralId(productId, function() {
-                                self.openPopUp(0, self.params.title, self.params.productId);
-                            });
-                        }
+                    $('productSearch_cancel_button').observe('click',function() {
+                        popUp.close();
                     });
                 }
             });
         }
+
+        self.autoHeightFix();
     },
 
     //----------------------------------
@@ -146,16 +162,20 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
             hideEffect: Element.hide,
             showEffect: Element.show
         });
-        popUp.options.destroyOnClose = false;
+        popUp.options.destroyOnClose = true;
 
-        $('modal_dialog_message').insert($('productSearch_pop_up_content').show());
+        $('modal_dialog_message').insert(self.searchBlock);
+        $('productSearch_pop_up_content').show();
+        self.initSearchEvents();
         //search manual
         $('productSearch_form').show();
         $('productSearch_back_button').show();
         $('productSearch_buttons').show();
         $('productSearch_error_block').hide();
-        $('productSearch_grid').hide();
+        $('productSearch_cleanSuggest_button').hide();
         $('query').value = '';
+
+        self.autoHeightFix();
     },
 
     showSearchGeneralIdAutoPrompt: function()
@@ -178,11 +198,6 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
 
     addNewGeneralId: function(listingProductIds)
     {
-        if (!this.options.customData.isMarketplaceSynchronized) {
-            alert(this.options.text.not_synchronized_marketplace.replace('%code%',this.options.customData.marketplace.code));
-            return setLocation(this.options.url.marketplace_synch);
-        }
-
         listingProductIds = listingProductIds || this.params.productId;
 
         this.postForm(
@@ -208,7 +223,6 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
             return;
         }
 
-        $('productSearch_grid').hide();
         $('productSearch_error_block').hide();
         new Ajax.Request(self.options.url.searchBuyComSkuManual, {
             method: 'post',
@@ -222,7 +236,6 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
 
                 if(transport.result == 'success') {
                     $('productSearch_grid').update(transport.data);
-                    $('productSearch_grid').show();
                 } else {
                     $('productSearch_error_message').update(transport.data);
                     $('productSearch_error_block').show();
@@ -332,8 +345,6 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
         if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
             return;
         }
-
-        $('productSearch_grid').hide();
 
         new Ajax.Request(self.options.url.mapToBuyComSku, {
             method: 'post',
@@ -455,7 +466,20 @@ BuyListingProductSearchHandler = Class.create(ActionHandler, {
         var buyLinkTemplate = $('template_buy_link_' + id).innerHTML;
         buyLinkTemplate = str_replace('%general_id%', selectedSku, buyLinkTemplate);
         $('buy_link_' + id).innerHTML = buyLinkTemplate;
-    }
+    },
+
+    //----------------------------------
+
+    clearSearchResultsAndOpenSearchMenu: function() {
+        var self = this;
+
+        if (confirm(self.options.text.confirm)) {
+            popUp.close();
+            self.unmapFromGeneralId(self.params.productId, function() {
+                self.openPopUp(0, self.params.title, self.params.productId);
+            });
+        }
+    },
 
     //----------------------------------
 });

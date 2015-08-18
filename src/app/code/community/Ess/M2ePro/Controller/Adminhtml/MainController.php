@@ -29,17 +29,22 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
             // run servicing code
             try {
-                Mage::getModel('M2ePro/Servicing_Dispatcher')->process(
-                    Ess_M2ePro_Model_Servicing_Dispatcher::DEFAULT_INTERVAL
-                );
+
+                $dispatcher = Mage::getModel('M2ePro/Servicing_Dispatcher');
+                $dispatcher->process(Ess_M2ePro_Model_Servicing_Dispatcher::DEFAULT_INTERVAL,
+                                     $dispatcher->getFastTasks());
+
             } catch (Exception $exception) {}
         }
 
-        if (Mage::helper('M2ePro/Module_Maintenance')->isEnabled()) {
-            if (Mage::helper('M2ePro/Module_Maintenance')->isOwner()) {
-                Mage::helper('M2ePro/Module_Maintenance')->prolongRestoreDate();
-            } elseif (Mage::helper('M2ePro/Module_Maintenance')->isExpired()) {
-                Mage::helper('M2ePro/Module_Maintenance')->disable();
+        $maintenanceHelper = Mage::helper('M2ePro/Module_Maintenance');
+
+        if ($maintenanceHelper->isEnabled()) {
+
+            if ($maintenanceHelper->isOwner()) {
+                $maintenanceHelper->prolongRestoreDate();
+            } elseif ($maintenanceHelper->isExpired()) {
+                $maintenanceHelper->disable();
             }
         }
 
@@ -326,7 +331,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
                 $message .= 'Go to the <a href="%url%" target="_blank">License Page</a>.';
                 $message = Mage::helper('M2ePro')->__(
                     $message,
-                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
+                    Mage::helper('M2ePro/Component_'.ucfirst($component))->getTitle(),
                     $url
                 );
 
@@ -344,7 +349,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
                 $message = Mage::helper('M2ePro')->__(
                     $message,
-                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
+                    Mage::helper('M2ePro/Component_'.ucfirst($component))->getTitle(),
                     $url
                 );
 
@@ -361,7 +366,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
                 $message = Mage::helper('M2ePro')->__(
                     $message,
-                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
+                    Mage::helper('M2ePro/Component_'.ucfirst($component))->getTitle(),
                     $url
                 );
 
@@ -395,7 +400,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
                 $message .= 'Go to the <a href="%url%" target="_blank">License Page</a>';
                 $message = Mage::helper('M2ePro')->__(
                     $message,
-                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
+                    Mage::helper('M2ePro/Component_'.ucfirst($component))->getTitle(),
                     $url
                 );
 
@@ -427,7 +432,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
                 $message .= 'that will expire on %date%.';
                 $message = Mage::helper('M2ePro')->__(
                     $message,
-                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
+                    Mage::helper('M2ePro/Component_'.ucfirst($component))->getTitle(),
                     $expirationDate
                 );
 
@@ -467,7 +472,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
                 $message = Mage::helper('M2ePro')->__(
                     $message,
                     $expirationDate,
-                    constant('Ess_M2ePro_Helper_Component_'.ucfirst($component).'::TITLE'),
+                    Mage::helper('M2ePro/Component_'.ucfirst($component))->getTitle(),
                     $url
                 );
 

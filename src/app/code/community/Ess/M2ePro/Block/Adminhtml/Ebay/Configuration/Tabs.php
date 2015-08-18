@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_Block_Widget_Tabs
 {
-    // ########################################
-
     const TAB_ID_SYNCHRONIZATION        = 'synchronization';
     const TAB_ID_TEMPLATE               = 'template';
     const TAB_ID_CATEGORY               = 'category';
@@ -142,8 +140,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_Tabs extends Mage_Adminhtml_
     protected function prepareTabAccount()
     {
         $tab = array(
-            'label' => Mage::helper('M2ePro')->__('Account Settings'),
-            'title' => Mage::helper('M2ePro')->__('Account Settings')
+            'label' => Mage::helper('M2ePro')->__('Accounts'),
+            'title' => Mage::helper('M2ePro')->__('Accounts')
         );
 
         if ($this->getData('active_tab') == self::TAB_ID_ACCOUNT) {

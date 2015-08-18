@@ -480,5 +480,4 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
     }
 
     //#############################################
-
 }

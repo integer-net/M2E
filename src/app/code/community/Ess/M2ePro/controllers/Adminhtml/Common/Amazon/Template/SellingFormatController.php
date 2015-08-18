@@ -23,14 +23,16 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/templates/selling_format');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration');
     }
 
     //#############################################
 
     public function indexAction()
     {
-        return $this->_redirect('*/adminhtml_common_template_sellingFormat/index');
+        return $this->_redirect('*/adminhtml_common_template/index', array(
+            'channel' => Ess_M2ePro_Helper_Component_Amazon::NICK
+        ));
     }
 
     //#############################################
@@ -47,7 +49,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
 
         if (!$model->getId() && $id) {
             $this->_getSession()->addError(Mage::helper('M2ePro')->__('Policy does not exist'));
-            return $this->_redirect('*/*/index');
+            return $this->_redirect('*/adminhtml_common_template/index', array(
+                'channel' => Ess_M2ePro_Helper_Component_Amazon::NICK
+            ));
         }
 
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $model);
@@ -159,7 +163,10 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
         $id = $model->getId();
 
         $this->_getSession()->addSuccess(Mage::helper('M2ePro')->__('Policy was successfully saved'));
-        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('list',array(),array('edit'=>array('id'=>$id))));
+        $this->_redirectUrl(Mage::helper('M2ePro')->getBackUrl('*/adminhtml_common_template/index', array(), array(
+            'edit' => array('id'=>$id),
+            'channel' => Ess_M2ePro_Helper_Component_Amazon::NICK
+        )));
     }
 
     //#############################################

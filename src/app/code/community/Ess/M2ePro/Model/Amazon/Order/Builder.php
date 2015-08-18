@@ -160,6 +160,11 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
         $this->createOrUpdateOrder();
         $this->createOrUpdateItems();
 
+        if ($this->isNew()) {
+            $this->processListingsProductsUpdates();
+            $this->processOtherListingsUpdates();
+        }
+
         if ($this->isUpdated()) {
             $this->processMagentoOrderUpdates();
         }
@@ -190,24 +195,6 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
     }
 
     // ########################################
-
-    /**
-     * @return bool
-     */
-    private function isSingle()
-    {
-        return count($this->items) == 1;
-    }
-
-    /**
-     * @return bool
-     */
-    private function isCombined()
-    {
-        return count($this->items) > 1;
-    }
-
-    // ----------------------------------------
 
     /**
      * @return bool
@@ -341,6 +328,233 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
         $magentoOrderUpdater->setMagentoOrder($this->order->getMagentoOrder());
         $magentoOrderUpdater->updateComments($magentoOrderComments);
         $magentoOrderUpdater->finishUpdate();
+    }
+
+    // ########################################
+
+    private function processListingsProductsUpdates()
+    {
+        $logger = Mage::getModel('M2ePro/Listing_Log');
+        $logger->setComponentMode(Ess_M2ePro_Helper_Component_Amazon::NICK);
+
+        $logsActionId = Mage::getModel('M2ePro/Listing_Log')->getNextActionId();
+
+        $parentsForProcessing = array();
+
+        foreach ($this->items as $orderItem) {
+            /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
+            $listingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
+            $listingProductCollection->getSelect()->join(
+                array('l' => Mage::getModel('M2ePro/Listing')->getResource()->getMainTable()),
+                'main_table.listing_id=l.id',
+                array('account_id')
+            );
+            $listingProductCollection->addFieldToFilter('sku', $orderItem['sku']);
+            $listingProductCollection->addFieldToFilter('l.account_id', $this->account->getId());
+
+            /** @var Ess_M2ePro_Model_Listing_Product[] $listingsProducts */
+            $listingsProducts = $listingProductCollection->getItems();
+            if (empty($listingsProducts)) {
+                continue;
+            }
+
+            foreach ($listingsProducts as $listingProduct) {
+
+                if (!$listingProduct->isListed() && !$listingProduct->isStopped()) {
+                    continue;
+                }
+
+                /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+                $amazonListingProduct = $listingProduct->getChildObject();
+                $variationManager = $amazonListingProduct->getVariationManager();
+
+                if ($variationManager->isRelationChildType()) {
+                    $parentListingProduct = $variationManager->getTypeModel()->getParentListingProduct();
+                    $parentsForProcessing[$parentListingProduct->getId()] = $parentListingProduct;
+                }
+
+                Mage::getModel('M2ePro/ProductChange')->addUpdateAction(
+                    $listingProduct->getProductId(), Ess_M2ePro_Model_ProductChange::INITIATOR_SYNCHRONIZATION
+                );
+
+                $currentOnlineQty = $listingProduct->getData('online_qty');
+
+                if ($currentOnlineQty > $orderItem['qty_purchased']) {
+                    $listingProduct->setData('online_qty', $currentOnlineQty - $orderItem['qty_purchased']);
+
+                    // M2ePro_TRANSLATIONS
+                    // Item QTY was successfully changed from %from% to %to% .
+                    $tempLogMessage = Mage::helper('M2ePro')->__(
+                        'Item QTY was successfully changed from %from% to %to% .',
+                        $currentOnlineQty,
+                        ($currentOnlineQty - $orderItem['qty_purchased'])
+                    );
+
+                    $logger->addProductMessage(
+                        $listingProduct->getListingId(),
+                        $listingProduct->getProductId(),
+                        $listingProduct->getId(),
+                        Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
+                        $logsActionId,
+                        Ess_M2ePro_Model_Listing_Log::ACTION_CHANNEL_CHANGE,
+                        $tempLogMessage,
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                    );
+
+                    $listingProduct->save();
+
+                    continue;
+                }
+
+                $listingProduct->setData('online_qty', 0);
+
+                $tempLogMessages = array(Mage::helper('M2ePro')->__(
+                    'Item QTY was successfully changed from %from% to %to% .',
+                    $currentOnlineQty, 0
+                ));
+
+                if (!$listingProduct->isStopped()) {
+                    $statusChangedFrom = Mage::helper('M2ePro/Component_Amazon')
+                        ->getHumanTitleByListingProductStatus($listingProduct->getStatus());
+                    $statusChangedTo = Mage::helper('M2ePro/Component_Amazon')
+                        ->getHumanTitleByListingProductStatus(Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED);
+
+                    if (!empty($statusChangedFrom) && !empty($statusChangedTo)) {
+                        // M2ePro_TRANSLATIONS
+                        // Item Status was successfully changed from "%from%" to "%to%" .
+                        $tempLogMessages[] = Mage::helper('M2ePro')->__(
+                            'Item Status was successfully changed from "%from%" to "%to%" .',
+                            $statusChangedFrom,
+                            $statusChangedTo
+                        );
+                    }
+
+                    $listingProduct->setData('status', Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED);
+                }
+
+                foreach($tempLogMessages as $tempLogMessage) {
+                    $logger->addProductMessage(
+                        $listingProduct->getListingId(),
+                        $listingProduct->getProductId(),
+                        $listingProduct->getId(),
+                        Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
+                        $logsActionId,
+                        Ess_M2ePro_Model_Listing_Log::ACTION_CHANNEL_CHANGE,
+                        $tempLogMessage,
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                    );
+                }
+
+                $listingProduct->save();
+            }
+        }
+
+        if (empty($parentsForProcessing)) {
+            return;
+        }
+
+        $massProcessor = Mage::getModel(
+            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Mass'
+        );
+        $massProcessor->setListingsProducts($parentsForProcessing);
+        $massProcessor->execute();
+    }
+
+    private function processOtherListingsUpdates()
+    {
+        $logger = Mage::getModel('M2ePro/Listing_Other_Log');
+        $logger->setComponentMode(Ess_M2ePro_Helper_Component_Amazon::NICK);
+
+        $logsActionId = Mage::getModel('M2ePro/Listing_Other_Log')->getNextActionId();
+
+        foreach ($this->items as $orderItem) {
+            /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingOtherCollection */
+            $listingOtherCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other');
+            $listingOtherCollection->addFieldToFilter('sku', $orderItem['sku']);
+            $listingOtherCollection->addFieldToFilter('account_id', $this->account->getId());
+
+            /** @var Ess_M2ePro_Model_Listing_Other[] $otherListings */
+            $otherListings = $listingOtherCollection->getItems();
+            if (empty($otherListings)) {
+                continue;
+            }
+
+            foreach ($otherListings as $otherListing) {
+
+                if (!$otherListing->isListed() && !$otherListing->isStopped()) {
+                    continue;
+                }
+
+                $currentOnlineQty = $otherListing->getData('online_qty');
+
+                if ($currentOnlineQty > $orderItem['qty_purchased']) {
+                    $otherListing->setData('online_qty', $currentOnlineQty - $orderItem['qty_purchased']);
+
+                    // M2ePro_TRANSLATIONS
+                    // Item QTY was successfully changed from %from% to %to% .
+                    $tempLogMessage = Mage::helper('M2ePro')->__(
+                        'Item QTY was successfully changed from %from% to %to% .',
+                        $currentOnlineQty,
+                        ($currentOnlineQty - $orderItem['qty_purchased'])
+                    );
+
+                    $logger->addProductMessage(
+                        $otherListing->getId(),
+                        Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
+                        $logsActionId,
+                        Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANNEL_CHANGE,
+                        $tempLogMessage,
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                    );
+
+                    $otherListing->save();
+
+                    continue;
+                }
+
+                $otherListing->setData('online_qty', 0);
+
+                $tempLogMessages = array(Mage::helper('M2ePro')->__(
+                    'Item qty was successfully changed from %from% to %to% .',
+                    $currentOnlineQty, 0
+                ));
+
+                if (!$otherListing->isStopped()) {
+                    $statusChangedFrom = Mage::helper('M2ePro/Component_Amazon')
+                        ->getHumanTitleByListingProductStatus($otherListing->getStatus());
+                    $statusChangedTo = Mage::helper('M2ePro/Component_Amazon')
+                        ->getHumanTitleByListingProductStatus(Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED);
+
+                    if (!empty($statusChangedFrom) && !empty($statusChangedTo)) {
+                        // M2ePro_TRANSLATIONS
+                        // Item Status was successfully changed from "%from%" to "%to%" .
+                        $tempLogMessages[] = Mage::helper('M2ePro')->__(
+                            'Item Status was successfully changed from "%from%" to "%to%" .',
+                            $statusChangedFrom, $statusChangedTo
+                        );
+                    }
+
+                    $otherListing->setData('status', Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED);
+                }
+
+                foreach($tempLogMessages as $tempLogMessage) {
+                    $logger->addProductMessage(
+                        $otherListing->getId(),
+                        Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION,
+                        $logsActionId,
+                        Ess_M2ePro_Model_Listing_Other_Log::ACTION_CHANNEL_CHANGE,
+                        $tempLogMessage,
+                        Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
+                        Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
+                    );
+                }
+
+                $otherListing->save();
+            }
+        }
     }
 
     // ########################################

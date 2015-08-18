@@ -28,12 +28,12 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
             $params['variation_sku'] = $variationSku;
         }
 
-        $itemData = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher')
-            ->processVirtual('item', 'get', 'info',
-                $params, 'result',
-                NULL, $this->item->getParentObject()->getOrder()->getAccount(), NULL);
+        $dispatcherObj = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObj->getVirtualConnector('item', 'get', 'info',
+                                                            $params, 'result', NULL,
+                                                            $this->item->getParentObject()->getOrder()->getAccount());
 
-        return $itemData;
+        return $dispatcherObj->process($connectorObj);
     }
 
     // ########################################

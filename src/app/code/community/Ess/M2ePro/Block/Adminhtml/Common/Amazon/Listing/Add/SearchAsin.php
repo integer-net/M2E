@@ -7,6 +7,8 @@
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
     extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -136,6 +138,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
         );
 
         $newAsinPopupTitle = $helper->escapeJs($helper->__('New ASIN/ISBN creation'));
+        $notCompletedPopupTitle = $helper->escapeJs(
+            $helper->__('Adding of New Products to the Listing was not competed')
+        );
         // -------------------------------
 
         // ---------URL-------------------
@@ -160,9 +165,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
             'id' => $this->getListing()->getId()
         ));
 
-        $getProductsUrl = $this->getUrl(
-            '*/adminhtml_common_' . $this->getData('component') . '_listing/getProductsFromCategories'
-        );
         $addProductsUrl = $this->getUrl(
             '*/adminhtml_common_listing_productAdd/addProducts', array(
                 'component' => $this->getData('component')
@@ -170,6 +172,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
         );
         $backUrl = $this->getUrl('*/*/index');
         // -------------------------------
+
+        $showNotCompletedPopup = '';
+        if ($this->getRequest()->getParam('not_completed', false)) {
+            $showNotCompletedPopup = 'ListingGridHandlerObj.showNotCompletedPopup();';
+        }
 
         $javascript = <<<JAVASCRIPT
 <script type="text/javascript">
@@ -203,8 +210,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
     M2ePro.text.confirm = '{$textConfirm}';
 
     M2ePro.text.new_asin_popup_title = '{$newAsinPopupTitle}';
+    M2ePro.text.not_completed_popup_title = '{$notCompletedPopupTitle}';
 
-    M2ePro.url.get_products_from_categories = '{$getProductsUrl}';
     M2ePro.url.add_products = '{$addProductsUrl}';
     M2ePro.url.back = '{$backUrl}';
 
@@ -228,7 +235,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
 
         CommonHandler.prototype.scroll_page_to_top = function() { return; }
 
-        ListingGridHandlerObj = new SearchAsinGridHandler(
+        ListingGridHandlerObj = new CommonAmazonListingSearchAsinGridHandler(
             '{$this->getChild('grid')->getId()}',
             {$this->getListing()->getId()}
         );
@@ -239,12 +246,20 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_SearchAsin
 
         ListingProgressBarObj = new ProgressBar('search_asin_progress_bar');
         GridWrapperObj = new AreaWrapper('search_asin_products_container');
+
+        {$showNotCompletedPopup}
     });
 
 </script>
 JAVASCRIPT;
 
-        return $javascript .
+        //------------------------------
+        $notCompletedPopup = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_common_amazon_listing_add_searchAsin_notCompleted');
+        //------------------------------
+
+        return $notCompletedPopup->toHtml() .
+            $javascript .
             '<div id="search_asin_progress_bar"></div>' .
                 '<div id="search_asin_products_container">' .
                 parent::_toHtml() .
@@ -268,5 +283,4 @@ JAVASCRIPT;
     }
 
     // ####################################
-
 }

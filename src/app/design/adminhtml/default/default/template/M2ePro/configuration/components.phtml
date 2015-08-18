@@ -4,7 +4,6 @@
     //-----------------------------
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Amazon'); ?>,'Ess_M2ePro_Helper_Component_Amazon');
     M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Buy'); ?>,'Ess_M2ePro_Helper_Component_Buy');
-    M2ePro.php.setConstants(<?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Play'); ?>,'Ess_M2ePro_Helper_Component_Play');
 
     M2ePro.translator.add(<?php echo json_encode(array(
         'Default Component should be enabled.' => Mage::helper('M2ePro')->__('Default Component should be enabled.')
@@ -13,11 +12,12 @@
     Event.observe(window, 'load', function() {
         ComponentsHandlerObj = new ConfigurationComponentsHandler();
 
-        ControlPanelHandlerObj = new ControlPanelHandler();
+        ControlPanelHandlerObj = new DevelopmentControlPanelHandler();
+
+        ComponentsHandlerObj.componentsTitles = <?php echo $this->getComponentsTitles(); ?>
 
         $('component_amazon_mode').observe('change', ComponentsHandlerObj.component_mode_change);
         $('component_buy_mode').observe('change', ComponentsHandlerObj.component_mode_change);
-        $('component_play_mode').observe('change', ComponentsHandlerObj.component_mode_change);
 
         ComponentsHandlerObj.component_mode_change();
     });
@@ -166,22 +166,19 @@
                                     </tr>
                                 <?php } ?>
 
-                                <?php if ($this->component_play_allowed) { ?>
-                                    <tr>
-                                        <td class="label">
-                                            <label><?php echo Mage::helper('M2ePro/Component_Play')->getTitle(); ?>: </label>
-                                        </td>
-                                        <td class="value">
-                                            <select id="component_play_mode" name="component_play_mode" class="M2ePro-component-other">
-                                                <option value="0" <?php if (!$this->component_play_mode) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Disabled') ?></option>
-                                                <option value="1" <?php if ($this->component_play_mode) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro')->__('Enabled') ?></option>
-                                            </select>
-                                            <p class="note">
-                                                <span><?php echo Mage::helper('M2ePro')->__('Play.com Channel Status.') ?></span>
-                                            </p>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
+                                <tr>
+                                    <td class="label">
+                                        <label><?php echo Mage::helper('M2ePro')->__('Rakuten.co.uk'); ?>: </label>
+                                    </td>
+                                    <td class="value">
+                                        <select id="component_rde_mode" name="component_rde_mode" disabled="disabled" class="M2ePro-component-other">
+                                            <option value="0"><?php echo Mage::helper('M2ePro')->__('Disabled - Coming Soon...') ?></option>
+                                        </select>
+                                        <p class="note">
+                                            <span><?php echo Mage::helper('M2ePro')->__('Rakuten.co.uk Channel Status.') ?></span>
+                                        </p>
+                                    </td>
+                                </tr>
 
                                 <tr>
                                     <td class="label">
@@ -222,7 +219,6 @@
                             <select id="view_common_component_default" name="view_common_component_default">
                                 <option value="<?php echo Ess_M2ePro_Helper_Component_Amazon::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Amazon::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro/Component_Amazon')->getTitle(); ?></option>
                                 <option value="<?php echo Ess_M2ePro_Helper_Component_Buy::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Buy::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro/Component_Buy')->getTitle(); ?></option>
-                                <option value="<?php echo Ess_M2ePro_Helper_Component_Play::NICK; ?>" <?php if ($this->view_common_component_default == Ess_M2ePro_Helper_Component_Play::NICK) echo 'selected="selected"'; ?>><?php echo Mage::helper('M2ePro/Component_Play')->getTitle(); ?></option>
                             </select>
                             <p class="note">
                                 <span><?php echo Mage::helper('M2ePro')->__('Open Tab by default.'); ?></span>

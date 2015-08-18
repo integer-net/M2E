@@ -39,7 +39,7 @@ abstract class Ess_M2ePro_Model_Cron_Type_Abstract
         try {
 
             // local tasks
-            $result = !$this->processTask(Ess_M2ePro_Model_Cron_Task_LogsCleaning::NICK) ? false : $result;
+            $result = !$this->processTask(Ess_M2ePro_Model_Cron_Task_LogsClearing::NICK) ? false : $result;
 
             // request tasks
             $result = !$this->processTask(Ess_M2ePro_Model_Cron_Task_Servicing::NICK) ? false : $result;

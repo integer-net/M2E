@@ -8,6 +8,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_SellingFormat_Edit_Form ext
 {
     const QTY_MODE_PRODUCT_FIXED_VIRTUAL_ATTRIBUTE_VALUE = 'qty_mode_product_fixed';
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -47,4 +49,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_SellingFormat_Edit_Form ext
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

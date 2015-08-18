@@ -12,8 +12,6 @@ class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Shipping
     // Tracking number "%num%" for "%code%" has been sent to eBay.
     // Shipping Status for eBay Order was updated to Shipped.
 
-    // ########################################
-
     private $carrierCode = NULL;
     private $trackingNumber = NULL;
 

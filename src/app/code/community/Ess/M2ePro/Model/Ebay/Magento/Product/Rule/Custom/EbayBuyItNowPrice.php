@@ -19,6 +19,11 @@ class Ess_M2ePro_Model_Ebay_Magento_Product_Rule_Custom_EbayBuyItNowPrice
         return Mage::helper('M2ePro')->__('"Buy It Now" Price');
     }
 
+    public function getInputType()
+    {
+        return 'price';
+    }
+
     public function getValueByProductInstance(Mage_Catalog_Model_Product $product)
     {
         return $product->getData('online_buyitnow_price');

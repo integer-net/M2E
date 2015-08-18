@@ -16,6 +16,8 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Update_Status
     /** @var $orderItem Ess_M2ePro_Model_Order_Item */
     private $orderItem;
 
+    // ########################################
+
     public function __construct(array $params = array(), Ess_M2ePro_Model_Order_Item $orderItem)
     {
         parent::__construct($params, null, $orderItem->getOrder()->getAccount(), null);
@@ -124,4 +126,6 @@ class Ess_M2ePro_Model_Connector_Ebay_OrderItem_Update_Status
 
         return true;
     }
+
+    // ########################################
 }

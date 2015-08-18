@@ -8,8 +8,6 @@ class Ess_M2ePro_Model_Magento_Customer extends Mage_Core_Model_Abstract
 {
     const FAKE_EMAIL_POSTFIX = '@dummy.email';
 
-    // ########################################
-
     /** @var $customer Mage_Customer_Model_Customer */
     private $customer = NULL;
 

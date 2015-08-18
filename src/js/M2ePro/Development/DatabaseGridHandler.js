@@ -1,4 +1,4 @@
-DatabaseGridHandler = Class.create(GridHandler, {
+DevelopmentDatabaseGridHandler = Class.create(GridHandler, {
 
     //----------------------------------
 
@@ -201,6 +201,16 @@ DatabaseGridHandler = Class.create(GridHandler, {
                 DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
             }
         });
+    },
+
+    onKeyDownEdit: function(rowId, columnName, event)
+    {
+        if (event.keyCode != 13) {
+            return false;
+        }
+
+        DevelopmentDatabaseGridHandlerObj.saveTableCell(rowId, columnName);
+        return false;
     },
 
     //----------------------------------

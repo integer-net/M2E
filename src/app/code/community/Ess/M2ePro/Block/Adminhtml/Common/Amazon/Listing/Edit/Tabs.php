@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Edit_Tabs extends Mage_Adminhtml_Block_Widget_Tabs
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -41,4 +43,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Edit_Tabs extends Mage_Ad
 
         return parent::_beforeToHtml();
     }
+
+    // ####################################
 }

@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-    // ####################################
-
     private $cacheData = array();
 
     // ####################################

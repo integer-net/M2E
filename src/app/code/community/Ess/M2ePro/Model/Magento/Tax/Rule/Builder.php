@@ -12,8 +12,6 @@ class Ess_M2ePro_Model_Magento_Tax_Rule_Builder
     const TAX_RATE_CODE = 'M2E Pro Tax Rate';
     const TAX_RULE_CODE = 'M2E Pro Tax Rule';
 
-    // ########################################
-
     /** @var $rule Mage_Tax_Model_Calculation_Rule */
     private $rule = NULL;
 

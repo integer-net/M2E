@@ -19,6 +19,8 @@ class Ess_M2ePro_Model_Order_Reserve
 
     private $flags = array();
 
+    // ########################################
+
     public function __construct(Ess_M2ePro_Model_Order $order)
     {
         $this->order = $order;
@@ -62,10 +64,6 @@ class Ess_M2ePro_Model_Order_Reserve
     {
         if ($this->isPlaced()) {
             throw new LogicException('QTY is already reserved.');
-        }
-
-        if ($this->order->getAccount()->getChildObject()->getQtyReservationDays() <= 0) {
-            throw new LogicException('QTY Reservation is disabled in Account Settings.');
         }
 
         $this->order->associateWithStore(false);
@@ -199,11 +197,6 @@ class Ess_M2ePro_Model_Order_Reserve
 
                 $productsAffectedCount++;
 
-                if ($this->getFlag('order_reservation')) {
-                    $magentoStockItem->getStockItem()
-                        ->setData(Ess_M2ePro_Helper_Data::CUSTOM_IDENTIFIER . '_order_reservation', true);
-                }
-
                 $transaction->addObject($magentoStockItem->getStockItem());
             }
 
@@ -293,4 +286,6 @@ class Ess_M2ePro_Model_Order_Reserve
 
         return $products;
     }
+
+    // ########################################
 }

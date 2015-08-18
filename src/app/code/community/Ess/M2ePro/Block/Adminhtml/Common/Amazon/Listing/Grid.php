@@ -78,7 +78,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Grid extends Ess_M2ePro_B
         $backUrl = Mage::helper('M2ePro')->makeBackUrlParam(
             '*/adminhtml_common_listing/index',
             array(
-                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON
+                'tab' => Ess_M2ePro_Block_Adminhtml_Common_ManageListings::TAB_ID_LISTING,
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON
             )
         );
 
@@ -93,7 +94,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Grid extends Ess_M2ePro_B
         //--------------------------------
         $this->getMassactionBlock()->addItem('delete_listings', array(
             'label'    => Mage::helper('M2ePro')->__('Delete Listing(s)'),
-            'url'      => $this->getUrl('*/adminhtml_common_amazon_listing/delete'),
+            'url'      => $this->getUrl('*/adminhtml_common_amazon_listing/delete', array('back' => $backUrl)),
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ));
         //--------------------------------
@@ -109,7 +110,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Grid extends Ess_M2ePro_B
         $backUrl = $helper->makeBackUrlParam(
             '*/adminhtml_common_listing/index',
             array(
-                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON
+                'tab' => Ess_M2ePro_Block_Adminhtml_Common_ManageListings::TAB_ID_LISTING,
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON
             )
         );
 
@@ -175,7 +177,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Grid extends Ess_M2ePro_B
                     'base'   => '*/adminhtml_common_log/listing',
                     'params' => array(
                         'back' => $backUrl,
-                        'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON
+                        'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON
                     )
                 )
             ),
@@ -200,6 +202,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Grid extends Ess_M2ePro_B
                 'field'   => 'id',
                 'url'     => array(
                     'base' => '*/adminhtml_common_amazon_listing/delete',
+                    'params' => array(
+                        'back' => $backUrl
+                    )
                 )
             ),
 
@@ -292,8 +297,8 @@ HTML;
             return;
         }
 
-        $where = "main_table.title LIKE '%{$value}%' OR m.title LIKE '%{$value}%' OR a.title LIKE '%{$value}%'";
-        $collection->getSelect()->where($where);
+        $collection->getSelect()->where('main_table.title LIKE ? OR m.title LIKE ? OR a.title LIKE ?',
+                                        '%'. $value .'%');
     }
 
     // ####################################
@@ -308,7 +313,8 @@ HTML;
         $backUrl = Mage::helper('M2ePro')->makeBackUrlParam(
             '*/adminhtml_common_listing/index',
             array(
-                'tab' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON
+                'tab' => Ess_M2ePro_Block_Adminhtml_Common_ManageListings::TAB_ID_LISTING,
+                'channel' => Ess_M2ePro_Block_Adminhtml_Common_Component_Abstract::TAB_ID_AMAZON
             )
         );
 

@@ -40,8 +40,6 @@ final class Ess_M2ePro_Model_Synchronization_Task_Defaults_Inspector
         $type = $this->getConfigValue($this->getFullSettingsPath().'product_changes/','type');
         $result = !$this->processTask('Inspector_ProductChanges_'.ucfirst($type)) ? false : $result;
 
-        $result = !$this->processTask('Inspector_AutoActions') ? false : $result;
-
         return $result;
     }
 

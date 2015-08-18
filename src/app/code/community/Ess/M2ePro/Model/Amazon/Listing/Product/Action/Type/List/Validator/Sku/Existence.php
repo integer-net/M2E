@@ -7,8 +7,6 @@
 class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_Existence
     extends Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Validator
 {
-    // ########################################
-
     private $existenceResult = array();
 
     // ########################################
@@ -25,6 +23,15 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_Exi
     {
         if (empty($this->existenceResult['asin'])) {
             return true;
+        }
+
+        if (empty($this->existenceResult['info'])) {
+            // M2ePro_TRANSLATIONS
+            // There is an unexpected error appeared during the process of linking Magento Product to Amazon Product. The data was not sent back from Amazon.
+            $this->addMessage(
+                'There is an unexpected error appeared during the process of linking Magento Product
+                 to Amazon Product. The data was not sent back from Amazon.'
+            );
         }
 
         if (!$this->getVariationManager()->isRelationMode()) {
@@ -87,17 +94,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_Exi
     {
         $asin = $this->existenceResult['asin'];
         $info = $this->existenceResult['info'];
-
-        if (empty($info)) {
-// M2ePro_TRANSLATIONS
-// There is an unexpected error appeared during the process of linking Magento Product to Amazon Product. The data was not sent back from Amazon.
-            $this->addMessage(
-                'There is an unexpected error appeared during the process of linking Magento Product
-                 to Amazon Product. The data was not sent back from Amazon.'
-            );
-
-            return;
-        }
 
         if (empty($info['type']) || $info['type'] != 'parent') {
 // M2ePro_TRANSLATIONS

@@ -217,7 +217,7 @@ HTML;
 
     M2ePro.url.add({$urls});
 
-    ProductSourceCategoriesSummaryGridHandlerObj = new ProductSourceCategoriesSummaryGridHandler(
+    ProductSourceCategoriesSummaryGridHandlerObj = new CommonListingSummaryGridHandler(
         '{$this->getId()}'
     );
 </script>

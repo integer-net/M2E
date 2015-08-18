@@ -5,105 +5,210 @@
  */
 
 abstract class Ess_M2ePro_Model_Ebay_Listing_Action_Configurator
+    extends Ess_M2ePro_Model_Listing_Product_Action_Configurator
 {
-    const ALL_DATA_KEY     = 'all_data';
-    const ONLY_DATA_KEY    = 'only_data';
+    const MODE_EMPTY = 'empty';
 
-    const TYPE_GENERAL     = 'general';
-
-    const TYPE_QTY         = 'qty';
-    const TYPE_PRICE       = 'price';
-
-    const TYPE_TITLE       = 'title';
-    const TYPE_SUBTITLE    = 'subtitle';
-    const TYPE_DESCRIPTION = 'description';
-
-    /**
-     * @var array
-     */
-    private $params = array();
+    const DATA_TYPE_GENERAL     = 'general';
+    const DATA_TYPE_QTY         = 'qty';
+    const DATA_TYPE_PRICE       = 'price';
+    const DATA_TYPE_TITLE       = 'title';
+    const DATA_TYPE_SUBTITLE    = 'subtitle';
+    const DATA_TYPE_DESCRIPTION = 'description';
 
     // ########################################
 
-    public function setParams(array $params = array())
+    public function getAllModes()
     {
-        $this->params = $params;
-    }
-
-    public function getParams()
-    {
-        return $this->params;
+        return array_merge(
+            parent::getAllModes(),
+            array(self::MODE_EMPTY)
+        );
     }
 
     // ########################################
 
-    public function isAll()
+    public function isEmptyMode()
     {
-        return isset($this->params[self::ALL_DATA_KEY]) &&
-               (bool)$this->params[self::ALL_DATA_KEY];
+        return $this->mode == self::MODE_EMPTY;
     }
 
-    public function isOnly()
+    public function setEmptyMode()
     {
-        return isset($this->params[self::ONLY_DATA_KEY]) &&
-               is_array($this->params[self::ONLY_DATA_KEY]) &&
-               count($this->params[self::ONLY_DATA_KEY]) > 0;
+        return $this->setMode(self::MODE_EMPTY);
+    }
+
+    // ########################################
+
+    public function getAllDataTypes()
+    {
+        return array(
+            self::DATA_TYPE_GENERAL,
+            self::DATA_TYPE_QTY,
+            self::DATA_TYPE_PRICE,
+            self::DATA_TYPE_TITLE,
+            self::DATA_TYPE_SUBTITLE,
+            self::DATA_TYPE_DESCRIPTION,
+        );
+    }
+
+    // ########################################
+
+    public function isAllAllowed()
+    {
+        if ($this->isEmptyMode()) {
+            return false;
+        }
+
+        return parent::isAllAllowed();
+    }
+
+    public function getAllowedDataTypes()
+    {
+        if ($this->isEmptyMode()) {
+            return array();
+        }
+
+        return parent::getAllowedDataTypes();
+    }
+
+    // ########################################
+
+    public function isAllowed($dataType)
+    {
+        if ($this->isEmptyMode()) {
+            return false;
+        }
+
+        return parent::isAllowed($dataType);
+    }
+
+    // ########################################
+
+    public function isGeneralAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_GENERAL);
+    }
+
+    public function allowGeneral()
+    {
+        if ($this->isGeneralAllowed() || $this->isEmptyMode()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_GENERAL;
+        return $this;
     }
 
     // ----------------------------------------
 
-    abstract public function isAllPermitted();
+    public function isQtyAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_QTY);
+    }
+
+    public function allowQty()
+    {
+        if ($this->isQtyAllowed() || $this->isEmptyMode()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_QTY;
+        return $this;
+    }
+
+    // ----------------------------------------
+
+    public function isPriceAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_PRICE);
+    }
+
+    public function allowPrice()
+    {
+        if ($this->isPriceAllowed() || $this->isEmptyMode()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_PRICE;
+        return $this;
+    }
+
+    // ----------------------------------------
+
+    public function isTitleAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_TITLE);
+    }
+
+    public function allowTitle()
+    {
+        if ($this->isTitleAllowed() || $this->isEmptyMode()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_TITLE;
+        return $this;
+    }
+
+    // ----------------------------------------
+
+    public function isSubtitleAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_SUBTITLE);
+    }
+
+    public function allowSubtitle()
+    {
+        if ($this->isSubtitleAllowed() || $this->isEmptyMode()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_SUBTITLE;
+        return $this;
+    }
+
+    // ----------------------------------------
+
+    public function isDescriptionAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_DESCRIPTION);
+    }
+
+    public function allowDescription()
+    {
+        if ($this->isDescriptionAllowed() || $this->isEmptyMode()) {
+            return $this;
+        }
+
+        $this->allowedDataTypes[] = self::DATA_TYPE_DESCRIPTION;
+        return $this;
+    }
 
     // ########################################
 
-    public function isGeneral()
+    public function isDataConsists(Ess_M2ePro_Model_Listing_Product_Action_Configurator $configurator)
     {
-        return $this->isAllowed(self::TYPE_GENERAL);
+        if ($configurator->isEmptyMode()) {
+            return true;
+        }
+
+        if ($this->isEmptyMode()) {
+            return false;
+        }
+
+        return parent::isDataConsists($configurator);
     }
 
     // -----------------------------------------
 
-    public function isQty()
+    public function mergeData(Ess_M2ePro_Model_Listing_Product_Action_Configurator $configurator)
     {
-        return $this->isAllowed(self::TYPE_QTY);
-    }
-
-    public function isPrice()
-    {
-        return $this->isAllowed(self::TYPE_PRICE);
-    }
-
-    // -----------------------------------------
-
-    public function isTitle()
-    {
-        return $this->isAllowed(self::TYPE_TITLE);
-    }
-
-    public function isSubtitle()
-    {
-        return $this->isAllowed(self::TYPE_SUBTITLE);
-    }
-
-    public function isDescription()
-    {
-        return $this->isAllowed(self::TYPE_DESCRIPTION);
-    }
-
-    // ########################################
-
-    public function isAllowed($type)
-    {
-        if ($this->isAll()) {
-            return true;
+        if ($configurator->isEmptyMode()) {
+            return $this;
         }
 
-        if (!$this->isOnly()) {
-            return true;
-        }
-
-        return isset($this->params[self::ONLY_DATA_KEY][$type]) &&
-               (bool)$this->params[self::ONLY_DATA_KEY][$type];
+        return parent::mergeData($configurator);
     }
 
     // ########################################

@@ -457,12 +457,12 @@ a.custom-button {
     white-space: nowrap;
 }
 
-a.custom-button span {
-    line-height: 1.35em
-}
-
 a.custom-button:hover {
     background: url("../../images/btn_over_bg.gif") repeat-x scroll 0px 0px #F77C16;
+}
+
+a.custom-button span {
+    line-height: 1.35em
 }
 
 a.hover-underline {
@@ -475,11 +475,46 @@ a.hover-underline:hover {
 
 /* ================================================ */
 
-/* second lvl tabs */
+/* Second level tabs */
 /* ================================================ */
 
-.m2epro-link-tabs a.active{
+.m2epro-link-tabs a {
     color: grey;
+    text-decoration: none;
+    display: inline-flex;
+    background-color: #f6f6f6;
+}
+
+.m2epro-link-tabs a.active{
+    color: black;
+    font-weight: bold;
+    background-color: #e3eff1;
+}
+
+.m2epro-link-tabs a:hover {
+    color: black;
+    background-color: #e2e2e2;
+}
+
+/* ================================================ *
+
+/* Floating Toolbar Fixes */
+/* ================================================ */
+
+.content-header-floating .drop_down {
+    display: none;
+}
+
+.content-header-floating .disabled {
+    display: none;
+}
+
+.content-header-floating a {
+    pointer-events: none;
+}
+
+.content-header-floating a span {
+    background: none;
 }
 
 /* ================================================ */

@@ -37,16 +37,19 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_DescriptionController
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/templates/description');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration');
     }
 
     //#############################################
 
     public function indexAction()
     {
-        $this->_initAction()
-             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_template_description'))
-             ->renderLayout();
+        $block = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_common_configuration', '',
+            array('active_tab' => Ess_M2ePro_Block_Adminhtml_Common_Configuration_Tabs::TAB_ID_DESCRIPTION_TEMPLATE)
+        );
+
+        $this->_initAction()->_addContent($block)->renderLayout();
     }
 
     public function gridAction()
@@ -573,7 +576,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_DescriptionController
 
         $select = $connRead->select()
             ->from(Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_category'))
-            ->where('is_listable = 1')
+            ->where('is_leaf = 1')
             ->where('marketplace_id = ?', $this->getRequest()->getParam('marketplace_id'));
 
         $where = array();

@@ -10,6 +10,8 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Product_Grid
     /** @var Ess_M2ePro_Model_Listing */
     private $listing = NULL;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();

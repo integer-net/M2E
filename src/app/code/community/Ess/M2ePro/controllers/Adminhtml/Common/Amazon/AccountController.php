@@ -24,7 +24,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
 
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration/account');
+        return Mage::getSingleton('admin/session')->isAllowed('m2epro_common/configuration');
     }
 
     //#############################################
@@ -175,15 +175,6 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
 
         // tab: orders
         //--------------------
-        $keys = array(
-            'orders_mode'
-        );
-        foreach ($keys as $key) {
-            if (isset($post[$key])) {
-                $data[$key] = $post[$key];
-            }
-        }
-
         $data['magento_orders_settings'] = array();
 
         // m2e orders settings
@@ -426,7 +417,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
                         'related_store_id' => (int)$post['related_store_id']
                     );
 
-                    $dispatcherObject->processConnector('account', 'add' ,'entityRequester', $params, $id);
+                    $connectorObj = $dispatcherObject->getConnector('account', 'add' ,'entityRequester',
+                                                                    $params, $id);
+                    $dispatcherObject->process($connectorObj);
 
                 } else {
 
@@ -441,7 +434,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
                     $params = array_diff_assoc($newData, $oldData);
 
                     if (!empty($params)) {
-                        $dispatcherObject->processConnector('account', 'update' ,'entityRequester', $params, $id);
+                        $connectorObj = $dispatcherObject->getConnector('account', 'update' ,'entityRequester',
+                                                                        $params, $id);
+                        $dispatcherObject->process($connectorObj);
                     }
                 }
             }
@@ -510,9 +505,11 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_AccountController
             try {
 
                 $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');
-                $response = $dispatcherObject->processVirtual('account','check','access',$params);
+                $connectorObj = $dispatcherObject->getVirtualConnector('account','check','access',$params);
+                $response = $dispatcherObject->process($connectorObj);
 
-                $result['result'] = isset($response['status']) ? $response['status'] : null;
+                $result['result'] = isset($response['status']) ? $response['status']
+                                                               : null;
                 if (isset($response['reason'])) {
                     $result['reason'] = Mage::helper('M2ePro')->escapeJs($response['reason']);
                 }

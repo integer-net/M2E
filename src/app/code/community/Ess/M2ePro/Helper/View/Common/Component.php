@@ -109,11 +109,6 @@ class Ess_M2ePro_Helper_View_Common_Component extends Mage_Core_Helper_Abstract
         return $this->getDefaultComponent() == Ess_M2ePro_Helper_Component_Buy::NICK;
     }
 
-    public function isPlayDefault()
-    {
-        return $this->getDefaultComponent() == Ess_M2ePro_Helper_Component_Play::NICK;
-    }
-
     //----------------------------------------
 
     public function isRakutenDefault()

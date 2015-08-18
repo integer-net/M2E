@@ -33,6 +33,8 @@ abstract class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
      */
     protected $_arrayInputTypes = array();
 
+    // ########################################
+
     public function __construct()
     {
         parent::__construct();
@@ -651,4 +653,6 @@ abstract class Ess_M2ePro_Model_Magento_Product_Rule_Condition_Abstract
     {
         return $this->getOperator();
     }
+
+    // ########################################
 }

@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Listing_Product_Rule extends Mage_Adminhtml_Block_Widget_Form
 {
-    // #################################################
-
     protected $_isShowHideProductsOption = false;
 
     // #################################################

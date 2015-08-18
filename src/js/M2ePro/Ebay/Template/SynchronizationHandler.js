@@ -296,13 +296,119 @@ EbayTemplateSynchronizationHandler.prototype = Object.extend(new CommonHandler()
         }
     },
 
-    reviseQtyMaxAppliedValueMode_change: function()
+    reviseQtyMaxAppliedValueMode_change: function(event)
     {
+        var self = EbayTemplateSynchronizationHandlerObj;
+
         $('revise_update_qty_max_applied_value_tr').hide();
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_MAX_AFFECTED_QTY_MODE_ON')) {
             $('revise_update_qty_max_applied_value_tr').show();
+        } else if (!event.cancelable) {
+            self.openReviseMaxAppliedQtyDisableConfirmationPopUp();
         }
+    },
+
+    openReviseMaxAppliedQtyDisableConfirmationPopUp: function()
+    {
+        Dialog.info(null, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: 'Are you sure?',
+            width: 600,
+            height: 400,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show,
+            onClose: function() {
+                $('revise_update_qty_max_applied_value_mode').selectedIndex = 1;
+                $('revise_update_qty_max_applied_value_mode').simulate('change');
+            }
+        });
+
+        $('modal_dialog_message').update($('revise_qty_max_applied_value_confirmation_popup_template').innerHTML);
+
+        setTimeout(function() {
+            Windows.getFocusedWindow().content.style.height = '';
+            Windows.getFocusedWindow().content.style.maxHeight = '630px';
+        }, 50);
+    },
+
+    reviseQtyMaxAppliedValueDisableConfirm: function()
+    {
+        Windows.getFocusedWindow().close();
+
+        $('revise_update_qty_max_applied_value_mode').selectedIndex = 0;
+        $('revise_update_qty_max_applied_value_mode').simulate('change');
+    },
+
+    //----------------------------------
+
+    revisePrice_change: function()
+    {
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_UPDATE_PRICE_YES')) {
+            $('revise_update_price_max_allowed_deviation_mode_tr').show();
+            $('revise_update_price_max_allowed_deviation_tr').show();
+            $('revise_update_price_line').show();
+            $('revise_update_price_max_allowed_deviation_mode').simulate('change');
+        } else {
+            $('revise_update_price_max_allowed_deviation_mode_tr').hide();
+            $('revise_update_price_max_allowed_deviation_tr').hide();
+            $('revise_update_price_line').hide();
+            $('revise_update_price_max_allowed_deviation_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_OFF');
+        }
+    },
+
+    revisePriceMaxAllowedDeviationMode_change: function(event)
+    {
+        var self = EbayTemplateSynchronizationHandlerObj;
+
+        $('revise_update_price_max_allowed_deviation_tr').hide();
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Synchronization::REVISE_MAX_ALLOWED_PRICE_DEVIATION_MODE_ON')) {
+            $('revise_update_price_max_allowed_deviation_tr').show();
+        } else if (!event.cancelable) {
+            self.openReviseMaxAllowedDeviationPriceDisableConfirmationPopUp();
+        }
+    },
+
+    openReviseMaxAllowedDeviationPriceDisableConfirmationPopUp: function()
+    {
+        Dialog.info(null, {
+            draggable: true,
+            resizable: true,
+            closable: true,
+            className: "magento",
+            windowClassName: "popup-window",
+            title: 'Are you sure?',
+            width: 600,
+            height: 400,
+            zIndex: 100,
+            hideEffect: Element.hide,
+            showEffect: Element.show,
+            onClose: function() {
+                $('revise_update_price_max_allowed_deviation_mode').selectedIndex = 1;
+                $('revise_update_price_max_allowed_deviation_mode').simulate('change');
+            }
+        });
+
+        $('modal_dialog_message').update($('revise_price_max_max_allowed_deviation_confirmation_popup_template').innerHTML);
+
+        setTimeout(function() {
+            Windows.getFocusedWindow().content.style.height = '';
+            Windows.getFocusedWindow().content.style.maxHeight = '630px';
+        }, 50);
+    },
+
+    revisePriceMaxAllowedDeviationDisableConfirm: function()
+    {
+        Windows.getFocusedWindow().close();
+
+        $('revise_update_price_max_allowed_deviation_mode').selectedIndex = 0;
+        $('revise_update_price_max_allowed_deviation_mode').simulate('change');
     },
 
     //----------------------------------

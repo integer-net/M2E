@@ -48,7 +48,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Revise_Response
 
     public function getSuccessfulMessage()
     {
-        if ($this->getConfigurator()->isAll() || !$this->getConfigurator()->isOnly()) {
+        if ($this->getConfigurator()->isAllAllowed()) {
             // M2ePro_TRANSLATIONS
             // Item was successfully Revised
             return 'Item was successfully Revised';
@@ -89,12 +89,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Revise_Response
         if (empty($sequenceString)) {
             // M2ePro_TRANSLATIONS
             // Item was Successfully Revised
-            return 'Item was Successfully Revised';
+            return 'Item was successfully Revised';
         }
 
         // M2ePro_TRANSLATIONS
         // was Successfully Revised
-        return ucfirst(trim($sequenceString,',')).' was Successfully Revised';
+        return ucfirst(trim($sequenceString,',')).' was successfully Revised';
     }
 
     // ########################################

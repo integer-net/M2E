@@ -98,8 +98,6 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Reserve_Cancellation
     {
         /** @var $accountsCollection Mage_Core_Model_Mysql4_Collection_Abstract */
         $accountsCollection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Account');
-        $accountsCollection->addFieldToFilter('orders_mode', Ess_M2ePro_Model_Ebay_Account::ORDERS_MODE_YES);
-
         return $accountsCollection->getItems();
     }
 
@@ -124,15 +122,12 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Reserve_Cancellation
             ->addFieldToFilter('reservation_state', Ess_M2ePro_Model_Order_Reserve::STATE_PLACED);
 
         $reservationDays = (int)$account->getChildObject()->getQtyReservationDays();
-        if ($reservationDays > 0) {
-            $minReservationStartDate = new DateTime(
-                Mage::helper('M2ePro')->getCurrentGmtDate(), new DateTimeZone('UTC')
-            );
-            $minReservationStartDate->modify('- ' . $reservationDays . ' days');
-            $minReservationStartDate = $minReservationStartDate->format('Y-m-d H:i');
 
-            $collection->addFieldToFilter('reservation_start_date', array('lteq' => $minReservationStartDate));
-        }
+        $minReservationStartDate = new DateTime(Mage::helper('M2ePro')->getCurrentGmtDate(), new DateTimeZone('UTC'));
+        $minReservationStartDate->modify('- ' . $reservationDays . ' days');
+        $minReservationStartDate = $minReservationStartDate->format('Y-m-d H:i');
+
+        $collection->addFieldToFilter('reservation_start_date', array('lteq' => $minReservationStartDate));
 
         return $collection->getItems();
     }

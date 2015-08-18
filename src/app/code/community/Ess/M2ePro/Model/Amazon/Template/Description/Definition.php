@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Amazon_Template_Description_Definition extends Ess_M2ePro_Model_Component_Abstract
 {
-    // ########################################
-
     const TITLE_MODE_CUSTOM  = 1;
     const TITLE_MODE_PRODUCT = 2;
 

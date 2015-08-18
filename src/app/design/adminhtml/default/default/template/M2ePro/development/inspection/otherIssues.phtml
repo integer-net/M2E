@@ -26,4 +26,15 @@
         </tr>
     <?php endif; ?>
 
+    <?php if ($this->isZendOpcacheAvailable()) : ?>
+        <tr>
+            <td class="label">
+                <label><?php echo Mage::helper('M2ePro')->__('Zend Opcache'); ?>: </label>
+            </td>
+            <td class="value">
+                <span style="color: red"><b>Enabled</b></span>
+            </td>
+        </tr>
+    <?php endif; ?>
+
 </table>

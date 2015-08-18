@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Ebay_Order_Helper
 {
-    // ##########################################################
-
     const EBAY_ORDER_STATUS_ACTIVE    = 'Active';
     const EBAY_ORDER_STATUS_COMPLETED = 'Completed';
     const EBAY_ORDER_STATUS_CANCELLED = 'Cancelled';

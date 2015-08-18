@@ -17,7 +17,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Delete_Response
             'is_general_id_owner' => Ess_M2ePro_Model_Amazon_Listing_Product::IS_GENERAL_ID_OWNER_NO,
             'template_description_id' => null,
             'online_qty' => 0,
-            'ignore_next_inventory_synch' => 1
         );
 
         $data = $this->appendStatusChangerValue($data);

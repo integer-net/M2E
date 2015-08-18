@@ -4,11 +4,13 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
-class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View_Form extends Mage_Adminhtml_Block_Widget_Container
+class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View_Form extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     public $shippingAddress = array();
 
     public $realMagentoOrderId = NULL;
+
+    // ####################################
 
     public function __construct()
     {
@@ -109,4 +111,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Order_View_Form extends Mage_Adminht
 
         return $currencyHelper->getConvertRateFromBase($this->order->getChildObject()->getCurrency(), $store) != 0;
     }
+
+    // ####################################
 }

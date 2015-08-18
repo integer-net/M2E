@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Model_Listing_Product_Variation extends Ess_M2ePro_Model_Component_Parent_Abstract
 {
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Listing_Product
      */
@@ -117,6 +115,13 @@ class Ess_M2ePro_Model_Listing_Product_Variation extends Ess_M2ePro_Model_Compon
     public function getListingProductId()
     {
         return (int)$this->getData('listing_product_id');
+    }
+
+     // ########################################
+
+    public function getAdditionalData()
+    {
+        return $this->getSettings('additional_data');
     }
 
      // ########################################

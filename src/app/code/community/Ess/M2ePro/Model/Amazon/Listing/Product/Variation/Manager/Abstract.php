@@ -6,8 +6,6 @@
 
 abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Abstract
 {
-    // ########################################
-
     /**
      * @var Ess_M2ePro_Model_Listing_Product
      */
@@ -17,6 +15,8 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Abstrac
      * @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager
      */
     private $variationManager = NULL;
+
+    private $isCacheEnabled = false;
 
     // ########################################
 
@@ -89,6 +89,33 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Abstrac
     public function getActualMagentoProduct()
     {
         return $this->getAmazonListingProduct()->getActualMagentoProduct();
+    }
+
+    // ########################################
+
+    public function isCacheEnabled()
+    {
+        return $this->isCacheEnabled;
+    }
+
+    public function enableCache()
+    {
+        $this->isCacheEnabled = true;
+
+        $this->getMagentoProduct()->enableCache();
+        $this->getActualMagentoProduct()->enableCache();
+
+        return $this;
+    }
+
+    public function disableCache()
+    {
+        $this->isCacheEnabled = false;
+
+        $this->getMagentoProduct()->disableCache();
+        $this->getActualMagentoProduct()->disableCache();
+
+        return $this;
     }
 
     // ########################################

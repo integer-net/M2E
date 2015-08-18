@@ -6,6 +6,8 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -58,4 +60,6 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Feedback extends Mage_Adminhtml_Block_Widg
 
         return $helpBlock->toHtml() . $formBlock->toHtml() . parent::getGridHtml();
     }
+
+    // ####################################
 }

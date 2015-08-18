@@ -7,6 +7,8 @@
 abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
     extends Ess_M2ePro_Block_Adminhtml_Magento_Product_Grid_Abstract
 {
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -142,6 +144,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Product_Grid
         );
 
         //exit($collection->getSelect()->__toString());
+
         // Set collection to grid
         $this->setCollection($collection);
 

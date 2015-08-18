@@ -14,7 +14,7 @@ class Ess_M2ePro_Model_Amazon_Template_SellingFormat extends Ess_M2ePro_Model_Co
     const QTY_MODIFICATION_MODE_ON = 1;
 
     const QTY_MIN_POSTED_DEFAULT_VALUE = 1;
-    const QTY_MAX_POSTED_DEFAULT_VALUE = 10;
+    const QTY_MAX_POSTED_DEFAULT_VALUE = 100;
 
     const PRICE_VARIATION_MODE_PARENT   = 1;
     const PRICE_VARIATION_MODE_CHILDREN = 2;

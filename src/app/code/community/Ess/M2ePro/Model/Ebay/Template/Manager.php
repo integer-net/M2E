@@ -13,7 +13,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
     const MODE_PARENT   = 0;
     const MODE_CUSTOM   = 1;
     const MODE_TEMPLATE = 2;
-    const MODE_POLICY   = 3;
 
     const COLUMN_PREFIX = 'template';
 
@@ -83,22 +82,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
             self::TEMPLATE_DESCRIPTION,
             self::TEMPLATE_SELLING_FORMAT,
             self::TEMPLATE_SYNCHRONIZATION
-        );
-    }
-
-    // ----------------------------------------
-
-    public function isPolicyTemplate()
-    {
-        return in_array($this->getTemplate(),$this->getPolicyTemplates());
-    }
-
-    public function getPolicyTemplates()
-    {
-        return array(
-            self::TEMPLATE_RETURN,
-            self::TEMPLATE_SHIPPING,
-            self::TEMPLATE_PAYMENT
         );
     }
 
@@ -185,11 +168,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         return self::COLUMN_PREFIX.'_'.$this->getTemplate().'_id';
     }
 
-    public function getPolicyIdColumnName()
-    {
-        return self::COLUMN_PREFIX.'_'.$this->getTemplate().'_policy_id';
-    }
-
     // #######################################
 
     public function getIdColumnNameByMode($mode)
@@ -202,9 +180,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
                 break;
             case self::MODE_CUSTOM:
                 $name = $this->getCustomIdColumnName();
-                break;
-            case self::MODE_POLICY:
-                $name = $this->getPolicyIdColumnName();
                 break;
         }
 
@@ -237,14 +212,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
     public function getTemplateIdValue()
     {
         return $this->getOwnerObject()->getData($this->getTemplateIdColumnName());
-    }
-
-    public function getPolicyIdValue()
-    {
-        if (!$this->isPolicyTemplate()) {
-            return NULL;
-        }
-        return $this->getOwnerObject()->getData($this->getPolicyIdColumnName());
     }
 
     // ########################################
@@ -283,23 +250,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         }
 
         return $this->makeResultObject($id);
-    }
-
-    public function getPolicyResultObject()
-    {
-        if (!$this->isPolicyTemplate()) {
-            return NULL;
-        }
-
-        $id = $this->getPolicyIdValue();
-
-        if (is_null($id)) {
-            return NULL;
-        }
-
-        return $object = Mage::helper('M2ePro')->getCachedObject(
-            'Ebay_Template_Policy', $id
-        );
     }
 
     // --------------------------------------
@@ -342,11 +292,6 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         return $this->getModeValue() == self::MODE_TEMPLATE;
     }
 
-    public function isModePolicy()
-    {
-        return $this->getModeValue() == self::MODE_POLICY;
-    }
-
     // ########################################
 
     public function getResultObject()
@@ -367,33 +312,11 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
             $this->resultObject = $this->getTemplateResultObject();
         }
 
-        if ($this->isModePolicy()) {
-            $this->resultObject = $this->getPolicyResultObject();
-        }
-
         if (is_null($this->resultObject)) {
             throw new Exception('Unable to get result object.');
         }
 
         return $this->resultObject;
-    }
-
-    // --------------------------------------
-
-    public function isResultObjectTemplate()
-    {
-        if (is_null($this->resultObject)) {
-            return false;
-        }
-        return !$this->isResultObjectPolicy();
-    }
-
-    public function isResultObjectPolicy()
-    {
-        if (is_null($this->resultObject)) {
-            return false;
-        }
-        return ($this->resultObject instanceof Ess_M2ePro_Model_Ebay_Template_Policy);
     }
 
     // #######################################
@@ -573,11 +496,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
                 $templateId = $data[$this->getIdColumnNameByMode($templateMode)];
             }
 
-            if ($templateMode == self::MODE_POLICY) {
-                $templateModelName = 'Ebay_Template_Policy';
-            } else {
-                $templateModelName = $this->getTemplateModelName();
-            }
+            $templateModelName = $this->getTemplateModelName();
 
             if ($this->isHorizontalTemplate()) {
                 $templateModel = Mage::helper('M2ePro/Component')

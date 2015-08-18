@@ -7,5 +7,7 @@
 abstract class Ess_M2ePro_Model_Mysql4_Collection_Component_Abstract
     extends Ess_M2ePro_Model_Mysql4_Collection_Abstract
 {
+    // ########################################
 
+    // ########################################
 }

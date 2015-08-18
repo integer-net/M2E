@@ -90,8 +90,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
         //--------------------------------
         // Get collection
         //----------------------------
-        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
-        $collection = Mage::getModel('catalog/product')->getCollection();
+        /* @var $collection Ess_M2ePro_Model_Mysql4_Magento_Product_Collection */
+        $collection = Mage::getConfig()->getModelInstance('Ess_M2ePro_Model_Mysql4_Magento_Product_Collection',
+            Mage::getModel('catalog/product')->getResource());
+        $collection->setListingProductModeOn();
         $collection->addAttributeToSelect('sku');
         $collection->addAttributeToSelect('name');
         //--------------------------------
@@ -118,12 +120,22 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
                 'start_date'            => 'start_date',
                 'online_title'          => 'online_title',
                 'online_sku'            => 'online_sku',
-                'available_qty'         => new Zend_Db_Expr('(online_qty - online_qty_sold)'),
+                'available_qty'         => new Zend_Db_Expr('(elp.online_qty - elp.online_qty_sold)'),
                 'ebay_item_id'          => 'ebay_item_id',
                 'online_category'       => 'online_category',
                 'online_qty_sold'       => 'online_qty_sold',
+                'online_bids'           => 'online_bids',
+                'online_start_price'    => 'online_start_price',
+                'online_current_price'  => 'online_current_price',
+                'online_reserve_price'  => 'online_reserve_price',
                 'online_buyitnow_price' => 'online_buyitnow_price',
-                'template_category_id'  => 'template_category_id'
+                'template_category_id'  => 'template_category_id',
+                'min_online_price'      => 'online_current_price',
+                'max_online_price'      => 'IF(
+                    (`t`.`variation_max_price` IS NULL),
+                    `elp`.`online_current_price`,
+                    `t`.`variation_max_price`
+                )'
             )
         );
         $collection->joinTable(
@@ -134,6 +146,24 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             ),
             NULL,
             'left'
+        );
+        $collection->getSelect()->joinLeft(
+            new Zend_Db_Expr('(
+                SELECT
+                    `mlpv`.`listing_product_id`,
+                    MAX(`melpv`.`online_price`) as variation_max_price
+                FROM `'. Mage::getResourceModel('M2ePro/Listing_Product_Variation')->getMainTable() .'` AS `mlpv`
+                INNER JOIN `' .
+                        Mage::getResourceModel('M2ePro/Ebay_Listing_Product_Variation')->getMainTable() .
+                    '` AS `melpv`
+                    ON (`mlpv`.`id` = `melpv`.`listing_product_variation_id`)
+                WHERE `melpv`.`status` != ' . Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED . '
+                GROUP BY `mlpv`.`listing_product_id`
+            )'),
+            'elp.listing_product_id=t.listing_product_id',
+            array(
+                'variation_max_price' => 'variation_max_price',
+            )
         );
         //----------------------------
 //        exit($collection->getSelect()->__toString());
@@ -194,13 +224,23 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
             'frame_callback' => array($this, 'callbackColumnOnlineQtySold')
         ));
 
-        $this->addColumn('online_buyitnow_price', array(
-            'header'    => Mage::helper('M2ePro')->__('"Buy It Now" Price'),
+        $dir = $this->getParam($this->getVarNameDir(), $this->_defaultDir);
+
+        if ($dir == 'desc') {
+            $priceSortField = 'max_online_price';
+        } else {
+            $priceSortField = 'min_online_price';
+        }
+
+        $this->addColumn('price', array(
+            'header'    => Mage::helper('M2ePro')->__('Price'),
             'align'     =>'right',
             'width'     => '50px',
             'type'      => 'number',
-            'index'     => 'online_buyitnow_price',
-            'frame_callback' => array($this, 'callbackColumnOnlineBuyItNowPrice')
+            'index'     => $priceSortField,
+            'filter_index' => $priceSortField,
+            'frame_callback' => array($this, 'callbackColumnPrice'),
+            'filter_condition_callback' => array($this, 'callbackFilterPrice')
         ));
 
         $this->addColumn('end_date', array(
@@ -334,7 +374,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
                       Mage::helper('M2ePro')->escapeHtml($sku);
 
         if ($category = $row->getData('online_category')) {
-            $valueHtml .= '<br><br>' .
+            $valueHtml .= '<br/><br/>' .
                           '<strong>' . Mage::helper('M2ePro')->__('Category') . ':</strong>&nbsp;'.
                           Mage::helper('M2ePro')->escapeHtml($category);
         }
@@ -342,6 +382,43 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Ebay_Grid
         $valueHtml .= '<br/>' .
                       '<strong>' . Mage::helper('M2ePro')->__('eBay Fee') . ':</strong>&nbsp;' .
                       $this->getItemFeeHtml($row);
+
+        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+        $listingProduct = Mage::helper('M2ePro/Component_Ebay')
+            ->getObject('Listing_Product',$row->getData('listing_product_id'));
+
+        if (!$listingProduct->getChildObject()->isVariationsReady()) {
+            return $valueHtml;
+        }
+
+        $additionalData = (array)json_decode($row->getData('additional_data'), true);
+
+        $productAttributes = array_keys($additionalData['variations_sets']);
+
+        $valueHtml .= '<div style="font-size: 11px; font-weight: bold; color: grey; margin: 7px 0 0 7px">';
+        $valueHtml .= implode(', ', $productAttributes);
+        $valueHtml .= '</div>';
+
+        $linkContent = Mage::helper('M2ePro')->__('Manage Variations');
+        $vpmt = Mage::helper('M2ePro')->__('Manage Variations of &quot;%s&quot; ', $title);
+        $vpmt = addslashes($vpmt);
+
+        $itemId = $this->getData('item_id');
+
+        if (!empty($itemId)) {
+            $vpmt .= '('. $itemId .')';
+        }
+
+        $linkTitle = Mage::helper('M2ePro')->__('Open Manage Variations Tool');
+        $listingProductId = (int)$row->getData('listing_product_id');
+
+        $valueHtml .= <<<HTML
+<div style="float: left; margin: 0 0 0 7px">
+<a href="javascript:"
+onclick="EbayListingEbayGridHandlerObj.variationProductManageHandler.openPopUp({$listingProductId}, '{$vpmt}')"
+title="{$linkTitle}">{$linkContent}</a>&nbsp;
+</div>
+HTML;
 
         return $valueHtml;
     }
@@ -458,23 +535,88 @@ HTML;
         return $value;
     }
 
-    public function callbackColumnOnlineBuyItNowPrice($value, $row, $column, $isExport)
+    public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        if (is_null($value) || $value === '') {
+        $onlineMinPrice = $row->getData('min_online_price');
+        $onlineMaxPrice = $row->getData('max_online_price');
+        $onlineStartPrice = $row->getData('online_start_price');
+        $onlineCurrentPrice = $row->getData('online_current_price');
+
+        if (is_null($onlineMinPrice) || $onlineMinPrice === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        if ((float)$value <= 0) {
+        if ((float)$onlineMinPrice <= 0) {
             return '<span style="color: #f00;">0</span>';
         }
 
         /* @var $listing Ess_M2ePro_Model_Listing */
         $listing = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
-        $valueWithCurrency = Mage::app()->getLocale()
-                                 ->currency($listing->getMarketplace()->getChildObject()->getCurrency())
-                                 ->toCurrency($value);
+        $currency = $listing->getMarketplace()->getChildObject()->getCurrency();
 
-        return '<span class="product-price-value">' . $valueWithCurrency . '</span>';
+        if (!empty($onlineStartPrice)) {
+
+            $onlineReservePrice = $row->getData('online_reserve_price');
+            $onlineBuyItNowPrice = $row->getData('online_buyitnow_price');
+
+            $onlineStartStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineStartPrice);
+
+            $startPriceText = Mage::helper('M2ePro')->__('Start Price');
+
+            $iconHelpPath = $this->getSkinUrl('M2ePro/images/i_logo.png');
+            $toolTipIconPath = $this->getSkinUrl('M2ePro/images/i_icon.png');
+            $onlineCurrentPriceHtml = '';
+            $onlineReservePriceHtml = '';
+            $onlineBuyItNowPriceHtml = '';
+
+            if ($row->getData('online_bids') > 0) {
+                $currentPriceText = Mage::helper('M2ePro')->__('Current Price');
+                $onlineCurrentStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineCurrentPrice);
+                $onlineCurrentPriceHtml = '<strong>'.$currentPriceText.':</strong> '.$onlineCurrentStr.'<br/><br/>';
+            }
+
+            if ($onlineReservePrice > 0) {
+                $reservePriceText = Mage::helper('M2ePro')->__('Reserve Price');
+                $onlineReserveStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineReservePrice);
+                $onlineReservePriceHtml = '<strong>'.$reservePriceText.':</strong> '.$onlineReserveStr.'<br/>';
+            }
+
+            if ($onlineBuyItNowPrice > 0) {
+                $buyItNowText = Mage::helper('M2ePro')->__('Buy It Now Price');
+                $onlineBuyItNowStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineBuyItNowPrice);
+                $onlineBuyItNowPriceHtml = '<strong>'.$buyItNowText.':</strong> '.$onlineBuyItNowStr;
+            }
+
+            $intervalHtml = <<<HTML
+<img class="tool-tip-image"
+     style="vertical-align: middle;"
+     src="{$toolTipIconPath}"><span class="tool-tip-message" style="display:none; text-align: left; min-width: 140px;">
+    <img src="{$iconHelpPath}"><span style="color:gray;">
+        {$onlineCurrentPriceHtml}
+        <strong>{$startPriceText}:</strong> {$onlineStartStr}<br/>
+        {$onlineReservePriceHtml}
+        {$onlineBuyItNowPriceHtml}
+    </span>
+</span>
+HTML;
+
+            if ($onlineCurrentPrice > $onlineStartPrice) {
+                $resultHtml = '<span style="color: grey; text-decoration: line-through;">'.$onlineStartStr.'</span>';
+                $resultHtml .= '<br/>'.$intervalHtml.'&nbsp;'.
+                    '<span class="product-price-value">'.$onlineCurrentStr.'</span>';
+
+            } else {
+                $resultHtml = $intervalHtml.'&nbsp;'.'<span class="product-price-value">'.$onlineStartStr.'</span>';
+            }
+
+            return $resultHtml;
+        }
+
+        $onlineMinPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMinPrice);
+        $onlineMaxPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMaxPrice);
+
+        return '<span class="product-price-value">' . $onlineMinPriceStr . '</span>' .
+            (($onlineMinPrice != $onlineMaxPrice) ? ' - ' . $onlineMaxPriceStr :  '');
     }
 
     public function callbackColumnStatus($value, $row, $column, $isExport)
@@ -497,8 +639,8 @@ HTML;
     <img id="map_link_error_icon_{$row->getId()}"
          class="tool-tip-image"
          style="vertical-align: middle;"
-         src="{$this->getSkinUrl('M2ePro/images/warning.png')}">
-    <span class="tool-tip-message tool-tip-warning tip-left" style="display:none;">
+         src="{$this->getSkinUrl('M2ePro/images/warning.png')}"><span
+         class="tool-tip-message tool-tip-warning tip-left" style="display:none;">
         <img src="{$this->getSkinUrl('M2ePro/images/i_notice.gif')}">
         <span>{$synchNote}</span>
     </span>
@@ -506,7 +648,7 @@ HTML;
 HTML;
             } else {
                 $html .= <<<HTML
-<div id="synch_template_list_rules_note_{$listingProductId}" style="display: none">{$synchNote}</div>
+&nbsp;<div id="synch_template_list_rules_note_{$listingProductId}" style="display: none">{$synchNote}</div>
 HTML;
             }
         }
@@ -576,6 +718,43 @@ HTML;
                 array('attribute'=>'online_category', 'like'=>'%'.$value.'%')
             )
         );
+    }
+
+    protected function callbackFilterPrice($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if (empty($value)) {
+            return;
+        }
+
+        $condition = '';
+
+        if (!empty($value['from'])) {
+            $condition = 'min_online_price >= \''.$value['from'].'\'';
+        }
+        if (!empty($value['to'])) {
+            if (!empty($value['from'])) {
+                $condition .= ' AND ';
+            }
+            $condition .= 'min_online_price <= \''.$value['to'].'\'';
+        }
+
+        $condition = '(' . $condition . ') OR (';
+
+        if (!empty($value['from'])) {
+            $condition .= 'max_online_price >= \''.$value['from'].'\'';
+        }
+        if (!empty($value['to'])) {
+            if (!empty($value['from'])) {
+                $condition .= ' AND ';
+            }
+            $condition .= 'max_online_price <= \''.$value['to'].'\'';
+        }
+
+        $condition .= ')';
+
+        $collection->getSelect()->having($condition);
     }
 
     //----------------------------------------
@@ -699,8 +878,8 @@ HTML;
             case Ess_M2ePro_Model_Listing_Log::ACTION_STOP_AND_REMOVE_PRODUCT:
                 $string = Mage::helper('M2ePro')->__('Stop on Channel / Remove from Listing');
                 break;
-            case Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL:
-                $string = Mage::helper('M2ePro')->__('Status Change');
+            case Ess_M2ePro_Model_Listing_Log::ACTION_CHANNEL_CHANGE:
+                $string = Mage::helper('M2ePro')->__('Channel Change');
                 break;
             case Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT:
                 $string = Mage::helper('M2ePro')->__('Translation');
@@ -768,16 +947,21 @@ HTML;
 
     protected function _toHtml()
     {
+        $allIdsStr = implode(',', $this->getCollection()->getAllIds());
+
         if ($this->getRequest()->isXmlHttpRequest()) {
+
             $javascriptsMain = <<<HTML
 
 <script type="text/javascript">
     EbayListingEbayGridHandlerObj.afterInitPage();
-    EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
+    EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$allIdsStr}');
 </script>
 
 HTML;
-            return parent::_toHtml().$javascriptsMain;
+            return parent::_toHtml() .
+                   $javascriptsMain .
+                   $this->getInitTerapeakWidgetHtml();
         }
 
         // todo next (change)
@@ -1000,9 +1184,10 @@ HTML;
             {$listingData['id']}
         );
         EbayListingEbayGridHandlerObj.afterInitPage();
-        EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
+        EbayListingEbayGridHandlerObj.getGridMassActionObj().setGridIds('{$allIdsStr}');
 
         EbayListingEbayGridHandlerObj.actionHandler.setOptions(M2ePro);
+        EbayListingEbayGridHandlerObj.variationProductManageHandler.setOptions(M2ePro);
 
         ListingProgressBarObj = new ProgressBar('listing_view_progress_bar');
         GridWrapperObj = new AreaWrapper('listing_view_content_container');
@@ -1025,10 +1210,19 @@ HTML;
 </script>
 
 HTML;
-        $terapeakInit = '';
 
-        if ($this->isTerapeakWidgetEnabled) {
-            $terapeakInit = <<<HTML
+        return parent::_toHtml() .
+               $javascriptsMain .
+               $this->getInitTerapeakWidgetHtml();
+    }
+
+    private function getInitTerapeakWidgetHtml()
+    {
+        if (!$this->isTerapeakWidgetEnabled) {
+            return '';
+        }
+
+        return <<<HTML
 <style>
     div.tp-research { display: inline-block; }
     a.tp-button { cursor: pointer; text-decoration: none; }
@@ -1057,29 +1251,6 @@ HTML;
 
 </script>
 HTML;
-        }
-
-        return parent::_toHtml() .
-               $javascriptsMain .
-               $terapeakInit;
-    }
-
-    // ####################################
-
-    private function getGridIdsJson()
-    {
-        $select = clone $this->getCollection()->getSelect();
-        $select->reset(Zend_Db_Select::ORDER);
-        $select->reset(Zend_Db_Select::LIMIT_COUNT);
-        $select->reset(Zend_Db_Select::LIMIT_OFFSET);
-        $select->reset(Zend_Db_Select::COLUMNS);
-        $select->resetJoinLeft();
-
-        $select->columns('elp.listing_product_id');
-
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        return implode(',',$connRead->fetchCol($select));
     }
 
     // ####################################

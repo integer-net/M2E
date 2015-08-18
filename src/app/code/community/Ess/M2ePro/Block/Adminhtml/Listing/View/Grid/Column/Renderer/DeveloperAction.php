@@ -36,6 +36,8 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
     extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
     implements Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Interface
 {
+    // ####################################
+
     /**
      * Renders grid column
      *
@@ -130,4 +132,6 @@ class Ess_M2ePro_Block_Adminhtml_Listing_View_Grid_Column_Renderer_DeveloperActi
         $html .= "<br/>{$id}";
         return $html;
     }
+
+    // ####################################
 }

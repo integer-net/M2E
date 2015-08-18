@@ -16,11 +16,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log_Grid extends Ess_M2ePro_Bloc
             Ess_M2ePro_Model_Listing_Log::ACTION_TRANSLATE_PRODUCT => ''
         );
 
-        if ($this->getChannel() != Ess_M2ePro_Helper_Component_Buy::NICK) {
+        if ($this->getRequest()->getParam('channel') == Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON ||
+            !Mage::helper('M2ePro/Component_Buy')->isActive()) {
+
             $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_NEW_SKU_PRODUCT_ON_COMPONENT] = '';
         }
 
-        if ($this->getChannel() != Ess_M2ePro_Helper_Component_Amazon::NICK) {
+        if ($this->getRequest()->getParam('channel') == Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_BUY ||
+            !Mage::helper('M2ePro/Component_Amazon')->isActive()) {
+
             $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_COMPONENT] = '';
             $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_AND_REMOVE_PRODUCT] = '';
         }
@@ -39,14 +43,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log_Grid extends Ess_M2ePro_Bloc
         $value = Mage::helper('M2ePro')->escapeHtml($value);
 
         if ($row->getData('listing_id')) {
+
             $url = $this->getUrl(
                 '*/adminhtml_common_'.$row->getData('component_mode').'_listing/view',
                 array('id' => $row->getData('listing_id'))
             );
 
             $value = '<a target="_blank" href="'.$url.'">' .
-                Mage::helper('M2ePro')->escapeHtml($value) .
-                '</a><br/>ID: '.$row->getData('listing_id');
+                        $value .
+                     '</a><br/>ID: '.$row->getData('listing_id');
         }
 
         return $value;

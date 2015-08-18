@@ -73,6 +73,10 @@ abstract class Ess_M2ePro_Model_Connector_Requester extends Ess_M2ePro_Model_Con
             )
         );
 
+        if ($processingRequestData['perform_type'] == Ess_M2ePro_Model_Processing_Request::PERFORM_TYPE_PARTIAL) {
+            $processingRequestData['next_part'] = 1;
+        }
+
         /** @var Ess_M2ePro_Model_Processing_Request $processingRequest */
         $processingRequest = Mage::getModel('M2ePro/Processing_Request');
         $processingRequest->setData($processingRequestData);

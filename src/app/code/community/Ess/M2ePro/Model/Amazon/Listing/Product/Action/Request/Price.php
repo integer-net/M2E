@@ -11,7 +11,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Price
 
     public function getData()
     {
-        if (!$this->getConfigurator()->isPrice()) {
+        if (!$this->getConfigurator()->isPriceAllowed()) {
             return array();
         }
 

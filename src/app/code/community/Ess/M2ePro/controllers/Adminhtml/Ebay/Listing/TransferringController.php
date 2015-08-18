@@ -7,8 +7,6 @@
 class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
     extends Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
 {
-    //#############################################
-
     protected $sessionKey = 'ebay_listing_transferring';
 
     //#############################################
@@ -187,8 +185,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
         );
 
         try {
-            $response = Mage::getModel('M2ePro/Connector_Translation_Dispatcher')
-                ->processVirtual('account', 'add', 'entity', $params);
+
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Translation_Dispatcher');
+            $connectorObj = $dispatcherObject->getVirtualConnector('account', 'add', 'entity', $params);
+            $response = $dispatcherObject->process($connectorObj);
+
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
@@ -218,8 +219,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
             : $this->getSourceListingFromRequest()->getAccount();
 
         try {
-            $response = Mage::getModel('M2ePro/Connector_Translation_Dispatcher')
-                ->processVirtual('account', 'get', 'info', array(), NULL, $account);
+
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Translation_Dispatcher');
+            $connectorObj = $dispatcherObject->getVirtualConnector('account', 'get', 'info',
+                                                                   array(), NULL, $account);
+
+            $response = $dispatcherObject->process($connectorObj);
+
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);
         }
@@ -600,8 +606,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
         );
 
         try {
-            $response = Mage::getModel('M2ePro/Connector_Translation_Dispatcher')
-                ->processVirtual('account', 'add', 'balance', $params, NULL, $account);
+
+            $dispatcherObject = Mage::getModel('M2ePro/Connector_Translation_Dispatcher');
+            $connectorObj = $dispatcherObject->getVirtualConnector('account', 'add', 'balance',
+                                                                   $params, NULL, $account);
+
+            $response = $dispatcherObject->process($connectorObj);
+
         } catch (Exception $exception) {
             Mage::helper('M2ePro/Module_Exception')->process($exception);
         }

@@ -1,4 +1,4 @@
-AmazonListingOtherGridHandler = Class.create(CommonListingOtherGridHandler, {
+CommonAmazonListingOtherGridHandler = Class.create(CommonListingOtherGridHandler, {
 
     //----------------------------------
 

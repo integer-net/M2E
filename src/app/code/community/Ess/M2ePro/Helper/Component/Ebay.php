@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 {
-    // M2ePro_TRANSLATIONS
-    // eBay
     const NICK  = 'ebay';
     const TITLE = 'eBay';
 
@@ -25,7 +23,32 @@ class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 
     public function getTitle()
     {
-        return Mage::helper('M2ePro')->__(self::TITLE);
+        return Mage::helper('M2ePro')->__('eBay');
+    }
+
+    public function getChannelTitle()
+    {
+        return Mage::helper('M2ePro')->__('eBay');
+    }
+
+    // ########################################
+
+    public function getHumanTitleByListingProductStatus($status) {
+        $statuses = array(
+            Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED => Mage::helper('M2ePro')->__('Not Listed'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_LISTED     => Mage::helper('M2ePro')->__('Listed'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN     => Mage::helper('M2ePro')->__('Listed (Hidden)'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_SOLD       => Mage::helper('M2ePro')->__('Sold'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED    => Mage::helper('M2ePro')->__('Stopped'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED   => Mage::helper('M2ePro')->__('Finished'),
+            Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED    => Mage::helper('M2ePro')->__('Pending')
+        );
+
+        if (!isset($statuses[$status])) {
+            return NULL;
+        }
+
+        return $statuses[$status];
     }
 
     // ########################################

@@ -6,8 +6,6 @@
 
 abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
 {
-    // ########################################
-
     /**
      * @var null|array
      */

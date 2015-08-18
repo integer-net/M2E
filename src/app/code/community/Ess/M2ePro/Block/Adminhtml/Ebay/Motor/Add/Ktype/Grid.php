@@ -17,10 +17,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Ktype_Grid extends Ess_M2ePro_Bl
 
     protected function _prepareCollection()
     {
-        $listing = Mage::getModel('M2ePro/Listing')->load($this->getListingId());
-
         $collection = new Ess_M2ePro_Model_Mysql4_Ebay_Motor_Ktypes_Collection('ktype');
-        $collection->addFieldToFilter('marketplace_id', $listing->getMarketplaceId());
 
         $this->setCollection($collection);
 
@@ -32,7 +29,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Ktype_Grid extends Ess_M2ePro_Bl
     protected function _prepareColumns()
     {
         $this->addColumn('ktype', array(
-            'header' => Mage::helper('M2ePro')->__('KType'),
+            'header' => Mage::helper('M2ePro')->__('kType'),
             'align'  => 'left',
             'type'   => 'text',
             'index'  => 'ktype',
@@ -80,20 +77,13 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Ktype_Grid extends Ess_M2ePro_Bl
             'width'  => '150px'
         ));
 
-        $this->addColumn('from_year', array(
-            'header' => Mage::helper('M2ePro')->__('From Year'),
+        $this->addColumn('year', array(
+            'header' => Mage::helper('M2ePro')->__('Year'),
             'align'  => 'left',
-            'type'   => 'number',
-            'index'  => 'from_year',
-            'width'  => '150px'
-        ));
-
-        $this->addColumn('to_year', array(
-            'header' => Mage::helper('M2ePro')->__('To Year'),
-            'align'  => 'left',
-            'type'   => 'number',
-            'index'  => 'to_year',
-            'width'  => '150px'
+            'type'   => 'text',
+            'width'  => '150px',
+            'frame_callback'            => array($this, 'callbackYearColumn'),
+            'filter_condition_callback' => array($this, 'yearColumnFilter'),
         ));
 
         $this->addColumn('engine', array(
@@ -106,6 +96,28 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add_Ktype_Grid extends Ess_M2ePro_Bl
         ));
 
         return parent::_prepareColumns();
+    }
+
+    // ##########################################################
+
+    public function callbackYearColumn($value, $row, $column, $isExport)
+    {
+        return $row['from_year'] . ' - ' . $row['to_year'];
+    }
+
+    public function yearColumnFilter($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if ($value == null) {
+            return $this;
+        }
+
+        /** @var Varien_Data_Collection_Db $collection */
+        $collection->addFieldToFilter('from_year', array('to' => $value));
+        $collection->addFieldToFilter('to_year', array('from' => $value));
+
+        return $this;
     }
 
     // ##########################################################

@@ -45,8 +45,6 @@ class Ess_M2ePro_Model_Magento_Product
 
     private $statisticId;
 
-    // ########################################
-
     private $_productId = 0;
 
     private $_storeId = Mage_Core_Model_App::ADMIN_STORE_ID;
@@ -58,8 +56,6 @@ class Ess_M2ePro_Model_Magento_Product
 
     /** @var Ess_M2ePro_Model_Magento_Product_Variation */
     protected $_variationInstance = NULL;
-
-    // ########################################
 
     public $notFoundAttributes = array();
 
@@ -270,97 +266,68 @@ class Ess_M2ePro_Model_Magento_Product
             return $typeId;
         }
 
-        $productId = (int)$productId;
-        $table  = Mage::getSingleton('core/resource')->getTableName('catalog_product_entity');
+        $resource = Mage::getSingleton('core/resource');
 
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from($table,'type_id')
-                             ->where('`entity_id` = ?',(int)$productId);
+        $typeId = $resource->getConnection('core_read')
+             ->select()
+             ->from($resource->getTableName('catalog_product_entity'), array('type_id'))
+             ->where('`entity_id` = ?',(int)$productId)
+             ->query()
+             ->fetchColumn();
 
-        $typeId = Mage::getResourceModel('core/config')
-                        ->getReadConnection()
-                        ->fetchOne($dbSelect);
-
-        Mage::helper('M2ePro/Data_Global')->setValue($tempKey,$typeId);
-
+        Mage::helper('M2ePro/Data_Global')->setValue($tempKey, $typeId);
         return $typeId;
     }
 
     public static function getNameByProductId($productId, $storeId = Mage_Core_Model_App::ADMIN_STORE_ID)
     {
-        $tempKey = 'product_id_' . (int)$productId . '_' . (int)$storeId . '_name';
+        $nameCacheKey = 'product_id_' . (int)$productId . '_' . (int)$storeId . '_name';
 
-        if (!is_null($name = Mage::helper('M2ePro/Data_Global')->getValue($tempKey))) {
+        if (!is_null($name = Mage::helper('M2ePro/Data_Global')->getValue($nameCacheKey))) {
             return $name;
         }
 
-        // Prepare tables names
-        //-----------------------------
-        $catalogProductEntityVarCharTable  = Mage::getSingleton('core/resource')->getTableName(
-            'catalog_product_entity_varchar'
-        );
-        $eavAttributeTable  = Mage::getSingleton('core/resource')->getTableName('eav_attribute');
-        //-----------------------------
+        $resource = Mage::getSingleton('core/resource');
 
-        // Make query for select
-        //-----------------------------
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-            ->select()->from(array('cpev'=>$catalogProductEntityVarCharTable),array('name'=>'value'))
-            ->join(
-                array('ea'=>$eavAttributeTable),
-                '`cpev`.`attribute_id` = `ea`.`attribute_id` AND `ea`.`attribute_code` = \'name\'',
-                array()
-            )
-            ->where('`cpev`.`entity_id` = ?',(int)$productId)->where('`cpev`.`store_id` = ?',(int)$storeId);
-        //-----------------------------
+        $cacheHelper = Mage::helper('M2ePro/Data_Cache_Permanent');
+        $attributeCacheKey = '_name_attribute_id_';
 
-        // Get row of product name
-        //-----------------------------
-        $name = Mage::getResourceModel('core/config')
-                        ->getReadConnection()
-                        ->fetchOne($dbSelect);
-        //-----------------------------
+        if (($attributeId = $cacheHelper->getValue($attributeCacheKey)) === false) {
 
-        if ($name) {
-            Mage::helper('M2ePro/Data_Global')->setValue($tempKey,$name);
-            return $name;
+            $attributeId = $resource->getConnection('core_read')
+                ->select()
+                ->from($resource->getTableName('eav_attribute'), array('attribute_id'))
+                ->where('attribute_code = ?', 'name')
+                ->where('entity_type_id = ?', Mage::getModel('catalog/product')->getResource()->getTypeId())
+                ->query()
+                ->fetchColumn();
+
+            $cacheHelper->setValue($attributeCacheKey, $attributeId);
         }
 
-        if ($storeId == Mage_Core_Model_App::ADMIN_STORE_ID) {
-            Mage::helper('M2ePro/Data_Global')->setValue($tempKey,'');
-            return '';
+        $storeIds = array((int)$storeId, Mage_Core_Model_App::ADMIN_STORE_ID);
+        $storeIds = array_unique($storeIds);
+
+        $queryStmt = $resource->getConnection('core_read')
+              ->select()
+              ->from($resource->getTableName('catalog_product_entity_varchar'), array('value'))
+              ->where('store_id IN (?)', $storeIds)
+              ->where('entity_id = ?', (int)$productId)
+              ->where('attribute_id = ?', (int)$attributeId)
+              ->order('store_id DESC')
+              ->query();
+
+        $nameValue = '';
+        while ($tempValue = $queryStmt->fetchColumn()) {
+
+            if (!empty($tempValue)) {
+                $nameValue = $tempValue;
+                break;
+            }
         }
 
-        // Make query for select
-        //-----------------------------
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-            ->select()
-            ->from(array('cpev'=>$catalogProductEntityVarCharTable),array('name'=>'value'))
-            ->join(
-                array('ea'=>$eavAttributeTable),
-                '`cpev`.`attribute_id` = `ea`.`attribute_id` AND `ea`.`attribute_code` = \'name\'',
-                array()
-            )
-            ->where('`cpev`.`entity_id` = ?',(int)$productId)
-            ->where('`cpev`.`store_id` = '.Mage_Core_Model_App::ADMIN_STORE_ID);
-        //-----------------------------
-
-        // Get row of product name
-        //-----------------------------
-        $name = Mage::getResourceModel('core/config')
-                        ->getReadConnection()
-                        ->fetchOne($dbSelect);
-        //-----------------------------
-
-        if ($name) {
-            Mage::helper('M2ePro/Data_Global')->setValue($tempKey,$name);
-            return $name;
-        }
-
-        Mage::helper('M2ePro/Data_Global')->setValue($tempKey,'');
-
-        return '';
+        Mage::helper('M2ePro/Data_Global')->setValue($nameCacheKey, (string)$nameValue);
+        return (string)$nameValue;
     }
 
     public static function getSkuByProductId($productId)
@@ -371,28 +338,16 @@ class Ess_M2ePro_Model_Magento_Product
             return $sku;
         }
 
-        // Prepare tables names
-        //-----------------------------
-        $catalogProductEntityTable  = Mage::getSingleton('core/resource')->getTableName('catalog_product_entity');
-        //-----------------------------
+        $resource = Mage::getSingleton('core/resource');
 
-        // Make query for select
-        //-----------------------------
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                             ->select()
-                             ->from($catalogProductEntityTable,'sku')
-                             ->where('`entity_id` = ?',(int)$productId);
-        //-----------------------------
+        $sku = $resource->getConnection('core_read')
+             ->select()
+             ->from($resource->getTableName('catalog_product_entity'), array('sku'))
+             ->where('`entity_id` = ?',(int)$productId)
+             ->query()
+             ->fetchColumn();
 
-        // Get row of product sku
-        //-----------------------------
-        $sku = Mage::getResourceModel('core/config')
-                        ->getReadConnection()
-                        ->fetchOne($dbSelect);
-        //-----------------------------
-
-        Mage::helper('M2ePro/Data_Global')->setValue($tempKey,$sku);
-
+        Mage::helper('M2ePro/Data_Global')->setValue($tempKey, $sku);
         return $sku;
     }
 
@@ -622,7 +577,7 @@ class Ess_M2ePro_Model_Magento_Product
         $toDate = strtotime($this->getSpecialPriceToDate());
         $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
 
-        return $currentTimeStamp >= $fromDate && $currentTimeStamp <= $toDate &&
+        return $currentTimeStamp >= $fromDate && $currentTimeStamp < $toDate &&
                (float)$this->getProduct()->getSpecialPrice() > 0;
     }
 
@@ -633,8 +588,10 @@ class Ess_M2ePro_Model_Magento_Product
         $fromDate = $this->getProduct()->getSpecialFromDate();
 
         if (is_null($fromDate) || $fromDate === false || $fromDate == '') {
-            $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-            $fromDate = Mage::helper('M2ePro')->getDate($currentTimeStamp - 60*60*24*30*12);
+            $currentDateTime = Mage::helper('M2ePro')->getCurrentGmtDate();
+            $fromDate = Mage::helper('M2ePro')->getDate($currentDateTime,false,'Y-01-01 00:00:00');
+        } else {
+            $fromDate = Mage::helper('M2ePro')->getDate($fromDate,false,'Y-m-d 00:00:00');
         }
 
         return $fromDate;
@@ -645,12 +602,20 @@ class Ess_M2ePro_Model_Magento_Product
         $toDate = $this->getProduct()->getSpecialToDate();
 
         if (is_null($toDate) || $toDate === false || $toDate == '') {
-            $currentTimeStamp = Mage::helper('M2ePro')->getCurrentGmtDate(true);
-            $toDate = Mage::helper('M2ePro')->getDate($currentTimeStamp + 60*60*24*30*12);
+
+            $currentDateTime = Mage::helper('M2ePro')->getCurrentGmtDate();
+
+            $toDate = new DateTime($currentDateTime, new DateTimeZone('UTC'));
+            $toDate->modify('+1 year');
+            $toDate = Mage::helper('M2ePro')->getDate($toDate->format('U'),false,'Y-01-01 00:00:00');
+
         } else {
+
+            $toDate = Mage::helper('M2ePro')->getDate($toDate,false,'Y-m-d 00:00:00');
+
             $toDate = new DateTime($toDate, new DateTimeZone('UTC'));
             $toDate->modify('+1 day');
-            $toDate = Mage::helper('M2ePro')->getDate($toDate->format('U'));
+            $toDate = Mage::helper('M2ePro')->getDate($toDate->format('U'),false,'Y-m-d 00:00:00');
         }
 
         return $toDate;
@@ -1004,34 +969,47 @@ class Ess_M2ePro_Model_Magento_Product
 
     public function getThumbnailImageLink()
     {
-        $eaTable = Mage::getSingleton('core/resource')->getTableName('eav_attribute');
-        $cpevTable = Mage::getSingleton('core/resource')->getTableName('catalog_product_entity_varchar');
+        $resource = Mage::getSingleton('core/resource');
 
-        $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                              ->select()
-                              ->from(array('cpev'=>$cpevTable),'value')
-                              ->joinInner(array('ea'=>$eaTable),'`ea`.`attribute_id` = `cpev`.`attribute_id`',array())
-                              ->where('`cpev`.`store_id` = ?',(int)$this->getStoreId())
-                              ->where('`cpev`.`entity_id` = ?',(int)$this->getProductId())
-                              ->where('`ea`.`attribute_code` = \'thumbnail\'');
+        $cacheHelper = Mage::helper('M2ePro/Data_Cache_Permanent');
+        $cacheKey = '_thumbnail_attribute_id_';
 
-        $tempPath = (string)Mage::getResourceModel('core/config')->getReadConnection()->fetchOne($dbSelect);
+        if (($attributeId = $cacheHelper->getValue($cacheKey)) === false) {
 
-        if ($tempPath == '' || $tempPath == 'no_selection' || $tempPath == '/') {
+            $attributeId = $resource->getConnection('core_read')
+                   ->select()
+                   ->from($resource->getTableName('eav_attribute'), array('attribute_id'))
+                   ->where('attribute_code = ?', 'thumbnail')
+                   ->where('entity_type_id = ?', Mage::getModel('catalog/product')->getResource()->getTypeId())
+                   ->query()
+                   ->fetchColumn();
 
-            $dbSelect = Mage::getResourceModel('core/config')->getReadConnection()
-                ->select()
-                ->from(array('cpev'=>$cpevTable),'value')
-                ->joinInner(array('ea'=>$eaTable),'`ea`.`attribute_id` = `cpev`.`attribute_id`',array())
-                ->where('`cpev`.`store_id` = ?',Mage_Core_Model_App::ADMIN_STORE_ID)
-                ->where('`cpev`.`entity_id` = ?',(int)$this->getProductId())
-                ->where('`ea`.`attribute_code` = \'thumbnail\'');
+            $cacheHelper->setValue($cacheKey, $attributeId);
+        }
 
-            $tempPath = (string)Mage::getResourceModel('core/config')->getReadConnection()->fetchOne($dbSelect);
+        $storeIds = array((int)$this->getStoreId(), Mage_Core_Model_App::ADMIN_STORE_ID);
+        $storeIds = array_unique($storeIds);
 
-            if ($tempPath == '' || $tempPath == 'no_selection' || $tempPath == '/') {
-                return NULL;
+        $queryStmt = $resource->getConnection('core_read')
+              ->select()
+              ->from($resource->getTableName('catalog_product_entity_varchar'), array('value'))
+              ->where('store_id IN (?)', $storeIds)
+              ->where('entity_id = ?', (int)$this->getProductId())
+              ->where('attribute_id = ?', (int)$attributeId)
+              ->order('store_id DESC')
+              ->query();
+
+        $thumbnailTempPath = null;
+        while ($tempPath = $queryStmt->fetchColumn()) {
+
+            if ($tempPath != '' && $tempPath != 'no_selection' && $tempPath != '/') {
+                $thumbnailTempPath = $tempPath;
+                break;
             }
+        }
+
+        if (is_null($thumbnailTempPath)) {
+            return NULL;
         }
 
         $imagePathOriginal = Mage::getBaseDir('media').DS.'catalog/product'.$tempPath;
@@ -1040,21 +1018,27 @@ class Ess_M2ePro_Model_Magento_Product
             return NULL;
         }
 
-        $width = 100;
+        $width  = 100;
         $height = 100;
 
         $prefixResizedImage = 'resized-'.$width.'px-'.$height.'px-';
-        $imagePathResized = dirname($imagePathOriginal).DS.$prefixResizedImage.basename($imagePathOriginal);
+        $imagePathResized   = dirname($imagePathOriginal).DS.$prefixResizedImage.basename($imagePathOriginal);
+
+        $baseUrl = Mage::app()->getStore($this->getStoreId())
+                              ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false);
 
         if (is_file($imagePathResized)) {
+
             $currentTime = Mage::helper('M2ePro')->getCurrentGmtDate(true);
+
             if (filemtime($imagePathResized) + self::THUMBNAIL_IMAGE_CACHE_TIME > $currentTime) {
+
                 $tempValue = str_replace(basename($imagePathOriginal),$prefixResizedImage.basename($imagePathOriginal),
                                          $tempPath);
-                return Mage::app()->getStore($this->getStoreId())
-                                        ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
-                                        'catalog/product/'.ltrim($tempValue,'/');
+
+                return $baseUrl.'catalog/product/'.ltrim($tempValue, '/');
             }
+
             @unlink($imagePathResized);
         }
 
@@ -1078,9 +1062,7 @@ class Ess_M2ePro_Model_Magento_Product
         $tempValue = str_replace(basename($imagePathOriginal),$prefixResizedImage.basename($imagePathOriginal),
                                  $tempPath);
 
-        return Mage::app()->getStore($this->getStoreId())
-                                        ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
-                                        'catalog/product/'.ltrim($tempValue,'/');
+        return $baseUrl.'catalog/product/'.ltrim($tempValue,'/');
     }
 
     public function getImageLink($attribute = 'image')

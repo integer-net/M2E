@@ -38,7 +38,7 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
 
     // ########################################
 
-    public function process($minInterval = NULL)
+    public function process($minInterval = NULL, $taskCodes = NULL)
     {
         $timeLastUpdate = $this->getLastUpdateTimestamp();
 
@@ -48,43 +48,47 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
         }
 
         $this->setLastUpdateDateTime();
-        return $this->processTasks($this->getRegisteredTasks());
+
+        !is_array($taskCodes) && $taskCodes = $this->getRegisteredTasks();
+        return $this->processTasks($taskCodes);
     }
 
     // ----------------------------------------
 
-    public function processTask($allowedTask)
+    public function processTask($taskCode)
     {
-        return $this->processTasks(array($allowedTask));
+        return $this->processTasks(array($taskCode));
     }
 
-    public function processTasks(array $allowedTasks = array())
+    public function processTasks(array $taskCodes)
     {
         Mage::helper('M2ePro/Client')->setMemoryLimit(self::MAX_MEMORY_LIMIT);
         Mage::helper('M2ePro/Module_Exception')->setFatalErrorHandler();
 
-        $responseData = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher')
-                                    ->processVirtual('servicing','update','data',
-                                                     $this->getRequestData($allowedTasks));
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('servicing','update','data',
+                                                               $this->getRequestData($taskCodes));
+
+        $responseData = $dispatcherObject->process($connectorObj);
 
         if (!is_array($responseData)) {
             return false;
         }
 
-        $this->dispatchResponseData($responseData,$allowedTasks);
+        $this->dispatchResponseData($responseData,$taskCodes);
 
         return true;
     }
 
     // ########################################
 
-    private function getRequestData(array $allowedTasks = array())
+    private function getRequestData(array $taskCodes)
     {
         $requestData = array();
 
         foreach ($this->getRegisteredTasks() as $taskName) {
 
-            if (!in_array($taskName,$allowedTasks)) {
+            if (!in_array($taskName,$taskCodes)) {
                 continue;
             }
 
@@ -102,11 +106,11 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
         return $requestData;
     }
 
-    private function dispatchResponseData(array $responseData, array $allowedTasks = array())
+    private function dispatchResponseData(array $responseData, array $taskCodes)
     {
         foreach ($this->getRegisteredTasks() as $taskName) {
 
-            if (!in_array($taskName,$allowedTasks)) {
+            if (!in_array($taskName,$taskCodes)) {
                 continue;
             }
 
@@ -125,7 +129,7 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
 
     // ########################################
 
-    private function getRegisteredTasks()
+    public function getRegisteredTasks()
     {
         return array(
             'license',
@@ -134,8 +138,23 @@ final class Ess_M2ePro_Model_Servicing_Dispatcher
             'backups',
             'exceptions',
             'marketplaces',
-            'cron'
+            'cron',
+            'statistic'
         );
+    }
+
+    public function getSlowTasks()
+    {
+        return array(
+            'backups',
+            'exceptions',
+            'statistic'
+        );
+    }
+
+    public function getFastTasks()
+    {
+        return array_diff($this->getRegisteredTasks(), $this->getSlowTasks());
     }
 
     // ----------------------------------------

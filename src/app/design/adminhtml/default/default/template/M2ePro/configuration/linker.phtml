@@ -9,7 +9,7 @@
     <div class="content-header">
         <table cellspacing="0">
             <tr>
-                <td><h3><?php echo $this->getHeaderText() ?></h3></td>
+                <td><?php echo $this->getHeaderHtml() ?></td>
                 <td class="form-buttons">
                     <?php echo $this->getButtonsHtml() ?>
                 </td>
@@ -32,7 +32,11 @@
 
             <div class="global_node">
                 <a href="<?php echo Mage::helper('M2ePro/View_Configuration')->getComponentsUrl(); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Channels');?></a>
-                <p><?php echo Mage::helper('M2ePro')->__('eBay, Amazon, Rakuten.com, Play.com Channels activation.');?></p>
+                <p><?php echo Mage::helper('M2ePro')->__('%ebay%, %amazon%, %rakuten% Channels activation.',
+                    Mage::helper('M2ePro/Component_Ebay')->getTitle(),
+                    Mage::helper('M2ePro/Component_Amazon')->getTitle(),
+                    Mage::helper('M2ePro/Component_Buy')->getTitle()
+                    );?></p>
             </div>
 
             <div class="global_node">
@@ -41,7 +45,7 @@
             </div>
 
             <div class="global_node">
-                <a href="<?php echo Mage::helper('M2ePro/View_Configuration')->getLogsCleaningUrl(); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Logs Clearing');?></a>
+                <a href="<?php echo Mage::helper('M2ePro/View_Configuration')->getLogsClearingUrl(); ?>" target="_blank"><?php echo Mage::helper('M2ePro')->__('Logs Clearing');?></a>
                 <p><?php echo Mage::helper('M2ePro')->__('Preferences for Logs history clearing.');?></p>
             </div>
 

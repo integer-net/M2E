@@ -65,11 +65,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Template_SellingFormat
         return $this->getUrl('*/adminhtml_common_buy_template_sellingFormat/new');
     }
 
-    protected function getPlayNewUrl()
-    {
-        return $this->getUrl('*/adminhtml_common_play_template_sellingFormat/new');
-    }
-
     // ########################################
 
     public function getGridHtml()

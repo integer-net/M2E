@@ -21,11 +21,6 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
      */
     protected $logger = NULL;
 
-    /**
-     * @var Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
-     */
-    protected $configurator = NULL;
-
     // ---------------------------------------
 
     /**
@@ -63,7 +58,8 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
         /** @var Ess_M2ePro_Model_Account $account */
         $account = reset($listingsProducts)->getListing()->getAccount();
 
-        $listingProductIds = array();
+        $listingProductIds   = array();
+        $actionConfigurators = array();
 
         foreach($listingsProducts as $listingProduct) {
 
@@ -76,19 +72,31 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
             }
 
             $listingProductIds[] = $listingProduct->getId();
+
+            if (!is_null($listingProduct->getActionConfigurator())) {
+                $actionConfigurators[$listingProduct->getId()] = $listingProduct->getActionConfigurator();
+            } else {
+                $actionConfigurators[$listingProduct->getId()] = Mage::getModel(
+                    'M2ePro/Buy_Listing_Product_Action_Configurator'
+                );
+            }
         }
 
         /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $listingProductCollection */
         $listingProductCollection = Mage::helper('M2ePro/Component_Buy')->getCollection('Listing_Product');
         $listingProductCollection->addFieldToFilter('id', array('in' => array_unique($listingProductIds)));
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $actualListingsProducts */
         $actualListingsProducts = $listingProductCollection->getItems();
 
         if (empty($actualListingsProducts)) {
             throw new Exception('All products were removed before connector processing');
         }
 
-        $this->listingsProducts = $actualListingsProducts;
+        foreach ($actualListingsProducts as $actualListingProduct) {
+            $actualListingProduct->setActionConfigurator($actionConfigurators[$actualListingProduct->getId()]);
+            $this->listingsProducts[$actualListingProduct->getId()] = $actualListingProduct;
+        }
 
         parent::__construct($params,$account);
     }
@@ -222,11 +230,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
             $lockItem = Mage::getModel('M2ePro/LockItem');
             $lockItem->setNick(Ess_M2ePro_Helper_Component_Buy::NICK.'_listing_product_'.$listingProduct->getId());
 
-            if ($listingProduct->isLockedObject(NULL) ||
-                $listingProduct->isLockedObject('in_action') ||
-                $listingProduct->isLockedObject($this->getLockIdentifier().'_action') ||
-                $lockItem->isExist()
-            ) {
+            if ($listingProduct->isLockedObject('in_action') || $lockItem->isExist()) {
 
                 // M2ePro_TRANSLATIONS
                 // Another Action is being processed. Try again when the Action is completed.
@@ -314,18 +318,21 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
         $products = array();
 
         foreach ($this->listingsProducts as $listingProduct) {
-            $products[$listingProduct->getId()] = $this->getRequestDataObject($listingProduct)->getData();
+            $products[$listingProduct->getId()] = array(
+                'request'      => $this->getRequestDataObject($listingProduct)->getData(),
+                'configurator' => $listingProduct->getActionConfigurator()->getData(),
+            );
         }
 
         return array(
-            'account_id' => $this->account->getId(),
-            'action_type' => $this->getActionType(),
+            'account_id'      => $this->account->getId(),
+            'action_type'     => $this->getActionType(),
             'lock_identifier' => $this->getLockIdentifier(),
-            'logs_action' => $this->getLogsAction(),
-            'logs_action_id' => $this->getLogger()->getActionId(),
-            'status_changer' => $this->params['status_changer'],
-            'params' => $this->params,
-            'products' => $products
+            'logs_action'     => $this->getLogsAction(),
+            'logs_action_id'  => $this->getLogger()->getActionId(),
+            'status_changer'  => $this->params['status_changer'],
+            'params'          => $this->params,
+            'products'        => $products
         );
     }
 
@@ -365,24 +372,6 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
         return $this->logger;
     }
 
-    /**
-     * @return Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
-     */
-    protected function getConfigurator()
-    {
-        if (is_null($this->configurator)) {
-
-            /** @var Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator $configurator */
-
-            $configurator = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Configurator');
-            $configurator->setParams($this->params);
-
-            $this->configurator = $configurator;
-        }
-
-        return $this->configurator;
-    }
-
     // ########################################
 
     /**
@@ -400,7 +389,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
 
             $validator->setParams($this->params);
             $validator->setListingProduct($listingProduct);
-            $validator->setConfigurator($this->getConfigurator());
+            $validator->setConfigurator($listingProduct->getActionConfigurator());
 
             $this->validatorsObjects[$listingProduct->getId()] = $validator;
         }
@@ -423,7 +412,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
 
             $request->setParams($this->params);
             $request->setListingProduct($listingProduct);
-            $request->setConfigurator($this->getConfigurator());
+            $request->setConfigurator($listingProduct->getActionConfigurator());
             $request->setValidatorsData($this->getValidatorObject($listingProduct)->getData());
 
             $this->requestsObjects[$listingProduct->getId()] = $request;

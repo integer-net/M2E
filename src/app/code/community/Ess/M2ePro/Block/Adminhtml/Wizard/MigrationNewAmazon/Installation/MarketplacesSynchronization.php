@@ -28,7 +28,11 @@ class Ess_M2ePro_Block_Adminhtml_Wizard_MigrationNewAmazon_Installation_Marketpl
         /** @var $marketplace Ess_M2ePro_Model_Marketplace */
         $marketplace = Mage::helper('M2ePro/Component_Amazon')->getModel('Marketplace');
         $collection = $marketplace->getCollection()
-            ->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE);
+                                  ->addFieldToFilter('status', Ess_M2ePro_Model_Marketplace::STATUS_ENABLE)
+                                  ->setOrder('group_title', 'ASC')
+                                  ->setOrder('sorder','ASC')
+                                  ->setOrder('title','ASC');
+
         //-------------------------------
         $buttonBlock = $this->getLayout()
             ->createBlock('adminhtml/widget_button')

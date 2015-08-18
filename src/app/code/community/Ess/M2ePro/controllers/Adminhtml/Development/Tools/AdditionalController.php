@@ -81,21 +81,32 @@ HTML;
     }
 
     /**
-     * @title "Clear APC Opcode"
-     * @description "Clear APC Opcode"
-     * @confirm "Are you sure?"
+     * @title "Clear Opcode"
+     * @description "Clear Opcode (APC and Zend Optcache Extension)"
      */
-    public function clearApcOpcodeAction()
+    public function clearOpcodeAction()
     {
-        if (!Mage::helper('M2ePro/Client_Cache')->isApcAvailable()) {
-            $this->_getSession()->addError('APC not installed');
+        $messages = array();
+
+        if (!Mage::helper('M2ePro/Client_Cache')->isApcAvailable() &&
+            !Mage::helper('M2ePro/Client_Cache')->isZendOpcacheAvailable()) {
+
+            $this->_getSession()->addError('Opcode extensions are not installed.');
             $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
             return;
         }
 
-        apc_clear_cache('system');
+        if (Mage::helper('M2ePro/Client_Cache')->isApcAvailable()) {
+            $messages[] = 'APC opcode';
+            apc_clear_cache('system');
+        }
 
-        $this->_getSession()->addSuccess('APC opcode cache has been cleared');
+        if (Mage::helper('M2ePro/Client_Cache')->isZendOpcacheAvailable()) {
+            $messages[] = 'Zend Optcache';
+            opcache_reset();
+        }
+
+        $this->_getSession()->addSuccess(implode(' and ', $messages) . ' caches are cleared.');
         $this->_redirectUrl(Mage::helper('M2ePro/View_Development')->getPageToolsTabUrl());
     }
 

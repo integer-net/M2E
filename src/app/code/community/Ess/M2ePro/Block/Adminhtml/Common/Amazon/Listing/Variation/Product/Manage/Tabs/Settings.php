@@ -5,7 +5,7 @@
  */
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_Tabs_Settings
-    extends Mage_Adminhtml_Block_Widget_Container
+    extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
 
     const MESSAGE_TYPE_ERROR = 'error';
@@ -22,6 +22,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
     //------------------------------
 
     protected $listingProductId;
+
+    // ####################################
 
     /**
      * @param mixed $listingProductId
@@ -109,9 +111,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
      */
     public function getMatcherAttributes()
     {
-        if(empty($this->matcherAttributes)) {
+        if (empty($this->matcherAttributes)) {
             $this->matcherAttributes = Mage::getModel('M2ePro/Amazon_Listing_Product_Variation_Matcher_Attribute');
-            $this->matcherAttributes->setMarketplaceId($this->getListingProduct()->getListing()->getMarketplaceId());
             $this->matcherAttributes->setMagentoProduct($this->getListingProduct()->getMagentoProduct());
             $this->matcherAttributes->setDestinationAttributes($this->getDestinationAttributes());
         }
@@ -192,6 +193,19 @@ HTML;
         $this->calculateWarnings();
 
         return parent::_beforeToHtml();
+    }
+
+    protected function _toHtml()
+    {
+        $vocabularyAttributesBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_common_amazon_listing_variation_product_vocabularyAttributesPopup'
+        );
+
+        $vocabularyOptionsBlock = $this->getLayout()->createBlock(
+            'M2ePro/adminhtml_common_amazon_listing_variation_product_vocabularyOptionsPopup'
+        );
+
+        return $vocabularyAttributesBlock->toHtml() . $vocabularyOptionsBlock->toHtml() . parent::_toHtml();
     }
 
     // ###########################################

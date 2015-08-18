@@ -1,4 +1,4 @@
-ProductSourceCategoriesSummaryGridHandler = Class.create(GridHandler, {
+CommonListingSummaryGridHandler = Class.create(GridHandler, {
 
     //----------------------------------
 

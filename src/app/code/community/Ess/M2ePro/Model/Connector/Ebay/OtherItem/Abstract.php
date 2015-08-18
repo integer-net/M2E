@@ -18,11 +18,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
     protected $logger = NULL;
 
     /**
-     * @var Ess_M2ePro_Model_Ebay_Listing_Other_Action_Configurator
-     */
-    protected $configurator = NULL;
-
-    /**
      * @var Ess_M2ePro_Model_Ebay_Listing_Other_Action_Type_Request
      */
     protected $requestObject = NULL;
@@ -41,9 +36,16 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
 
     public function __construct(array $params = array(), Ess_M2ePro_Model_Listing_Other $otherListing)
     {
-        $this->otherListing = $otherListing;
-        parent::__construct($params,$this->otherListing->getMarketplace(),
-                            $this->otherListing->getAccount(),NULL);
+        if (!is_null($otherListing->getActionConfigurator())) {
+            $actionConfigurator = $otherListing->getActionConfigurator();
+        } else {
+            $actionConfigurator = Mage::getModel('M2ePro/Ebay_Listing_Other_Action_Configurator');
+        }
+
+        $this->otherListing = $otherListing->loadInstance($otherListing->getId());
+        $this->otherListing->setActionConfigurator($actionConfigurator);
+
+        parent::__construct($params, $this->otherListing->getMarketplace(), $this->otherListing->getAccount(), NULL);
     }
 
     // ########################################
@@ -205,23 +207,6 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
         return $this->logger;
     }
 
-    /**
-     * @return Ess_M2ePro_Model_Ebay_Listing_Other_Action_Configurator
-     */
-    protected function getConfigurator()
-    {
-        if (is_null($this->configurator)) {
-
-            /** @var Ess_M2ePro_Model_Ebay_Listing_Other_Action_Configurator $configurator */
-            $configurator = Mage::getModel('M2ePro/Ebay_Listing_Other_Action_Configurator');
-            $configurator->setParams($this->params);
-
-            $this->configurator = $configurator;
-        }
-
-        return $this->configurator;
-    }
-
     // ########################################
 
     private function getOrmActionType()
@@ -252,7 +237,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
 
             $request->setParams($this->params);
             $request->setListingOther($this->otherListing);
-            $request->setConfigurator($this->getConfigurator());
+            $request->setConfigurator($this->otherListing->getActionConfigurator());
 
             $this->requestObject = $request;
         }
@@ -271,7 +256,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_OtherItem_Abstract
 
             $response->setParams($this->params);
             $response->setListingOther($this->otherListing);
-            $response->setConfigurator($this->getConfigurator());
+            $response->setConfigurator($this->otherListing->getActionConfigurator());
             $response->setRequestData($this->getRequestDataObject());
 
             $this->responseObject = $response;

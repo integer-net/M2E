@@ -58,7 +58,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
             Mage::helper('M2ePro/Module_Exception')->process($exception);
 
-            $this->getOperationHistory()->setContentData('exception', array(
+            $this->getActualOperationHistory()->setContentData('exception', array(
                 'message' => $exception->getMessage(),
                 'file'    => $exception->getFile(),
                 'line'    => $exception->getLine(),
@@ -203,10 +203,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
     //####################################
 
-    protected function initialize()
-    {
-        $this->intervalIsEnabled() && $this->intervalPrepareLastTime();
-    }
+    protected function initialize() {}
 
     protected function isPossibleToRun()
     {
@@ -492,11 +489,15 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
             }
 
             if ($this->isComponentTask() && count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-                $componentHelper = 'Ess_M2ePro_Helper_Component_'.ucfirst($this->getComponent());
-                $title = constant($componentHelper . '::TITLE').' '.$title;
-            }
 
-            $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($title));
+                $componentHelper = Mage::helper('M2ePro/Component_'.ucfirst($this->getComponent()));
+
+                $this->getActualLockItem()
+                    ->setTitle(Mage::helper('M2ePro')
+                    ->__('%component% ' . $title, $componentHelper->getTitle()));
+            } else {
+                $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($title));
+            }
         }
 
         $this->getActualLockItem()->setPercents($this->getPercentsStart());
@@ -523,11 +524,15 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
             }
 
             if ($this->isComponentTask() && count(Mage::helper('M2ePro/Component')->getActiveComponents()) > 1) {
-                $componentHelper = 'Ess_M2ePro_Helper_Component_'.ucfirst($this->getComponent());
-                $title = constant($componentHelper.'::TITLE').' '.$title;
-            }
 
-            $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($title));
+                $componentHelper = Mage::helper('M2ePro/Component_'.ucfirst($this->getComponent()));
+
+                $this->getActualLockItem()
+                    ->setTitle(Mage::helper('M2ePro')
+                    ->__('%component% ' . $title, $componentHelper->getTitle()));
+            } else {
+                $this->getActualLockItem()->setTitle(Mage::helper('M2ePro')->__($title));
+            }
         }
 
         $this->getActualLockItem()->setPercents($this->getPercentsEnd());
@@ -548,22 +553,16 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
     protected function intervalIsLocked()
     {
-        $lastTime = strtotime($this->getConfigValue($this->getFullSettingsPath(),'last_time'));
+        $lastTime = $this->intervalGetLastTime();
+        if (empty($lastTime)) {
+            return false;
+        }
+
         $interval = (int)$this->getConfigValue($this->getFullSettingsPath(),'interval');
-        return $lastTime + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true);
+        return strtotime($lastTime) + $interval > Mage::helper('M2ePro')->getCurrentGmtDate(true);
     }
 
     //------------------------------------
-
-    protected function intervalPrepareLastTime()
-    {
-        $lastTime = $this->getConfigValue($this->getFullSettingsPath(),'last_time');
-        if (empty($lastTime)) {
-            $lastTime = new DateTime('now', new DateTimeZone('UTC'));
-            $lastTime->modify("-1 year");
-            $this->intervalSetLastTime($lastTime);
-        }
-    }
 
     protected function intervalSetLastTime($time)
     {
@@ -579,6 +578,11 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
         }
 
         $this->setConfigValue($this->getFullSettingsPath(),'last_time',$time);
+    }
+
+    protected function intervalGetLastTime()
+    {
+        return $this->getConfigValue($this->getFullSettingsPath(),'last_time');
     }
 
     //####################################

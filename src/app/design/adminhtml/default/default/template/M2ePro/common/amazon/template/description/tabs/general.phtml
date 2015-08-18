@@ -190,15 +190,6 @@
                     </td>
 
                     <td class="value">
-                        <span>
-                            <img src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>" class="tool-tip-image" />
-                            <span class="tool-tip-message" style="font-size: 12px; display: none;">
-                                <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
-                                <span><?php echo Mage::helper('M2ePro')->__(
-                                    'Not all of Marketplaces in this drop-down menu are shown because of technical restrictions of Amazon API. Technical restrictions are caused by impossibility to send Amazon Product Information to Amazon.'
-                                ); ?></span>
-                            </span>
-                        </span>
 
                         <?php if($this->getData('marketplace_locked')) : ?>
                         <span id="marketplace_locked_warning_message">
@@ -315,7 +306,7 @@
 
                 <tr>
                     <td class="label">
-                        <label for="new_asin_accepted"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: <span class="required">*</span></label>
+                        <label for="new_asin_accepted"><?php echo Mage::helper('M2ePro')->__('Enabled'); ?>: </label>
                     </td>
                     <td class="value">
 
@@ -387,7 +378,7 @@
 
                 <tr class="hide-when-asin-is-disabled entry-edit">
                     <td class="label">
-                        <label for="registered_parameter"><?php echo Mage::helper('M2ePro')->__('Product ID Override'); ?>: <span class="required">*</span></label>
+                        <label for="registered_parameter"><?php echo Mage::helper('M2ePro')->__('Product ID Override'); ?>: </label>
                     </td>
                     <td class="value">
                         <select id="registered_parameter" name="general[registered_parameter]">

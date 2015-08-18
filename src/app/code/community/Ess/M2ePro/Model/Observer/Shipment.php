@@ -69,9 +69,6 @@ class Ess_M2ePro_Model_Observer_Shipment extends Ess_M2ePro_Model_Observer_Abstr
             case Ess_M2ePro_Helper_Component_Buy::NICK:
                 $message = Mage::helper('M2ePro')->__('Updating Rakuten.com Order Status to Shipped in Progress...');
                 break;
-            case Ess_M2ePro_Helper_Component_Play::NICK:
-                $message = Mage::helper('M2ePro')->__('Updating Play.com Order Status to Shipped in Progress...');
-                break;
         }
 
         if ($message) {

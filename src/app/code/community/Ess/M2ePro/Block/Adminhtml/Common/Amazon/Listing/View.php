@@ -12,6 +12,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
 
     const DEFAULT_VIEW_MODE = self::VIEW_MODE_AMAZON;
 
+    // ####################################
+
     public function __construct()
     {
         parent::__construct();
@@ -52,7 +54,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         //------------------------------
         $url = $this->getUrl('*/adminhtml_common_log/listing', array(
             'id' => $listingData['id'],
-            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON
+            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON
         ));
         $this->_addButton('view_log', array(
             'label'   => Mage::helper('M2ePro')->__('View Log'),
@@ -168,11 +170,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         $marketplaceInstance = Mage::helper('M2ePro/Component_Amazon')->getCachedObject('Marketplace',$marketplaceId);
         $marketplace = json_encode($marketplaceInstance->getData());
         $isNewAsinAvailable = json_encode($marketplaceInstance->getChildObject()->isNewAsinAvailable());
-        $isMarketplaceSynchronized = json_encode($marketplaceInstance->getChildObject()->isSynchronized());
 
         $logViewUrl = $this->getUrl('*/adminhtml_common_log/listing',array(
             'id' => $listingData['id'],
-            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::TAB_ID_AMAZON,
+            'channel' => Ess_M2ePro_Block_Adminhtml_Common_Log_Tabs::CHANNEL_ID_AMAZON,
             'back' => $helper->makeBackUrlParam('*/adminhtml_common_amazon_listing/view',
                                                 array('id' =>$listingData['id']))
         ));
@@ -297,6 +298,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
             '*/adminhtml_common_amazon_listing_variation_product_manage/viewTemplateDescriptionsGrid');
         $manageVariationMapToTemplateDescription = $this->getUrl(
             '*/adminhtml_common_amazon_listing_variation_product_manage/mapToTemplateDescription');
+        $addAttributesToVocabularyUrl = $this->getUrl(
+            '*/adminhtml_common_amazon_listing_variation_product_manage/addAttributesToVocabulary'
+        );
+        $addOptionsToVocabularyUrl = $this->getUrl(
+            '*/adminhtml_common_amazon_listing_variation_product_manage/addOptionsToVocabulary'
+        );
 
         $viewVariationsSettingsAjax = $this->getUrl(
             '*/adminhtml_common_amazon_listing_variation_product_manage/viewVariationsSettingsAjax');
@@ -398,6 +405,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
     M2ePro.url.manageVariationViewTemplateDescriptionsGrid = '{$manageVariationViewTemplateDescriptionsGrid}';
     M2ePro.url.manageVariationMapToTemplateDescription = '{$manageVariationMapToTemplateDescription}';
     M2ePro.url.viewVariationsSettingsAjax = '{$viewVariationsSettingsAjax}';
+    M2ePro.url.addAttributesToVocabulary = '{$addAttributesToVocabularyUrl}';
+    M2ePro.url.addOptionsToVocabulary = '{$addOptionsToVocabularyUrl}';
 
     M2ePro.url.newAsin = '{$newAsinUrl}';
 
@@ -492,11 +501,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
 
     M2ePro.customData.marketplace = {$marketplace};
     M2ePro.customData.isNewAsinAvailable = {$isNewAsinAvailable};
-    M2ePro.customData.isMarketplaceSynchronized = {$isMarketplaceSynchronized};
 
     Event.observe(window, 'load', function() {
 
-        ListingGridHandlerObj = new AmazonListingGridHandler(
+        ListingGridHandlerObj = new CommonAmazonListingGridHandler(
             '{$gridId}',
             {$listingData['id']}
         );
@@ -511,7 +519,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
         ListingProgressBarObj = new ProgressBar('listing_view_progress_bar');
         GridWrapperObj = new AreaWrapper('listing_view_content_container');
 
-        ListingProductVariationHandlerObj = new ListingProductVariationHandler(M2ePro,
+        ListingProductVariationHandlerObj = new CommonListingProductVariationHandler(M2ePro,
                                                                                ListingGridHandlerObj);
 
         if (M2ePro.productsIdsForList) {
@@ -743,4 +751,6 @@ HTML;
 
         return $items;
     }
+
+    // ####################################
 }

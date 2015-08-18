@@ -6,6 +6,7 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Chooser_Tabs_Attribute extends Mage_Adminhtml_Block_Widget
 {
+    // ####################################
 
     public function __construct()
     {
@@ -22,4 +23,5 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Category_Chooser_Tabs_Attribute ex
         // -----------------------------
     }
 
+    // ####################################
 }

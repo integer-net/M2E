@@ -1,4 +1,4 @@
-AmazonListingVariationProductManageVariationsGridHandler = Class.create(CommonListingGridHandler, {
+CommonAmazonListingVariationProductManageVariationsGridHandler = Class.create(CommonListingGridHandler, {
 
     //----------------------------------
 
@@ -19,8 +19,8 @@ AmazonListingVariationProductManageVariationsGridHandler = Class.create(CommonLi
     prepareActions: function($super)
     {
         $super();
-        this.actionHandler = new AmazonListingActionHandler(this);
-        this.templateDescriptionHandler = new AmazonListingTemplateDescriptionHandler(this);
+        this.actionHandler = new CommonAmazonListingActionHandler(this);
+        this.templateDescriptionHandler = new CommonAmazonListingTemplateDescriptionHandler(this);
 
         this.actions = Object.extend(this.actions, {
             deleteAndRemoveAction: this.actionHandler.deleteAndRemoveAction.bind(this.actionHandler)
@@ -459,10 +459,16 @@ AmazonListingVariationProductManageVariationsGridHandler = Class.create(CommonLi
             parameters: data,
             onSuccess: function(transport) {
                 var response = self.parseResponse(transport);
-                if(response.msg) {
+                if (response.msg) {
                     MagentoMessageObj.clearAll();
                     MagentoMessageObj['add' + response.type[0].toUpperCase() + response.type.slice(1)](response.msg);
                 }
+
+                if (response['vocabulary_attribute_options']) {
+                    window.parent.ListingGridHandlerObj.variationProductManageHandler.openVocabularyOptionsPopUp(response['vocabulary_attribute_options']);
+                    return;
+                }
+
                 self.actionHandler.gridHandler.unselectAllAndReload();
             }
         });

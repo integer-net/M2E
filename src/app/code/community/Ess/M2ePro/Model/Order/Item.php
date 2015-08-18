@@ -13,8 +13,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
     // Product is disabled.
     // Order Import does not support product type: %type%.
 
-    // ########################################
-
     /** @var Ess_M2ePro_Model_Order */
     private $order = NULL;
 
@@ -259,10 +257,10 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         $variation = $this->getChildObject()->getVariation();
         $magentoProduct = $this->getMagentoProduct();
 
-        // do nothing for amazon & buy & play order item, if it is mapped to product with required options,
+        // do nothing for amazon & buy order item, if it is mapped to product with required options,
         // but there is no information available about sold variation
         if (empty($variation)
-            && ($this->isComponentModeAmazon() || $this->isComponentModeBuy() || $this->isComponentModePlay())
+            && ($this->isComponentModeAmazon() || $this->isComponentModeBuy())
             && ($magentoProduct->isStrictVariationProduct() || $magentoProduct->isProductWithVariations())
         ) {
             return;

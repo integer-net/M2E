@@ -138,6 +138,22 @@ class Ess_M2ePro_Model_Ebay_Template_SellingFormat_Builder
 
         //------------------------------
 
+        if (isset($data['fixed_price_mode'])) {
+            $prepared['fixed_price_mode'] = (int)$data['fixed_price_mode'];
+        }
+
+        if (isset($data['fixed_price_coefficient'], $data['fixed_price_coefficient_mode'])) {
+
+            $prepared['fixed_price_coefficient'] = $this->getFormattedPriceCoefficient(
+                $data['fixed_price_coefficient'], $data['fixed_price_coefficient_mode']
+            );
+        }
+
+        if (isset($data['fixed_price_custom_attribute'])) {
+            $prepared['fixed_price_custom_attribute'] = $data['fixed_price_custom_attribute'];
+        }
+        //------------------------------
+
         if (isset($data['start_price_mode'])) {
             $prepared['start_price_mode'] = (int)$data['start_price_mode'];
         }

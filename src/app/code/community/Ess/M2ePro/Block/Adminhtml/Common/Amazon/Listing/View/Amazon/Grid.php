@@ -67,7 +67,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
 
         // Get collection
         //----------------------------
-        /* @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
+        /* @var $collection Ess_M2ePro_Model_Mysql4_Magento_Product_Collection */
         $collection = Mage::getConfig()->getModelInstance('Ess_M2ePro_Model_Mysql4_Magento_Product_Collection',
             Mage::getModel('catalog/product')->getResource());
         $collection->setListingProductModeOn();
@@ -109,15 +109,87 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
                 'amazon_sku'                     => 'sku',
                 'online_qty'                     => 'online_qty',
                 'online_price'                   => 'online_price',
-                'online_sale_price'              => 'online_sale_price',
+                'online_sale_price'              => 'IF(
+                  `alp`.`online_sale_price_start_date` IS NOT NULL AND
+                  `alp`.`online_sale_price_end_date` IS NOT NULL AND
+                  `alp`.`online_sale_price_end_date` >= CURRENT_DATE(),
+                  `alp`.`online_sale_price`,
+                  NULL
+                )',
                 'online_sale_price_start_date'   => 'online_sale_price_start_date',
                 'online_sale_price_end_date'     => 'online_sale_price_end_date',
                 'is_afn_channel'                 => 'is_afn_channel',
                 'is_general_id_owner'            => 'is_general_id_owner',
-                'is_variation_parent'            => 'is_variation_parent'
+                'is_variation_parent'            => 'is_variation_parent',
+                'defected_messages'              => 'defected_messages',
+                'min_online_price'                      => 'IF(
+                    (`t`.`variation_min_price` IS NULL),
+                    IF(
+                      `alp`.`online_sale_price_start_date` IS NOT NULL AND
+                      `alp`.`online_sale_price_end_date` IS NOT NULL AND
+                      `alp`.`online_sale_price_start_date` <= CURRENT_DATE() AND
+                      `alp`.`online_sale_price_end_date` >= CURRENT_DATE(),
+                      `alp`.`online_sale_price`,
+                      `alp`.`online_price`
+                    ),
+                    `t`.`variation_min_price`
+                )',
+                'max_online_price'                      => 'IF(
+                    (`t`.`variation_max_price` IS NULL),
+                    IF(
+                      `alp`.`online_sale_price_start_date` IS NOT NULL AND
+                      `alp`.`online_sale_price_end_date` IS NOT NULL AND
+                      `alp`.`online_sale_price_start_date` <= CURRENT_DATE() AND
+                      `alp`.`online_sale_price_end_date` >= CURRENT_DATE(),
+                      `alp`.`online_sale_price`,
+                      `alp`.`online_price`
+                    ),
+                    `t`.`variation_max_price`
+                )'
             ),
             '{{table}}.variation_parent_id is NULL'
         );
+
+        $collection->getSelect()->joinLeft(
+            new Zend_Db_Expr('(
+                SELECT
+                    `malp`.`variation_parent_id`,
+                    MIN(
+                        IF(
+                            `malp`.`online_sale_price_start_date` IS NOT NULL AND
+                            `malp`.`online_sale_price_end_date` IS NOT NULL AND
+                            `malp`.`online_sale_price_start_date` <= CURRENT_DATE() AND
+                            `malp`.`online_sale_price_end_date` >= CURRENT_DATE(),
+                            `malp`.`online_sale_price`,
+                            `malp`.`online_price`
+                        )
+                    ) as variation_min_price,
+                    MAX(
+                        IF(
+                            `malp`.`online_sale_price_start_date` IS NOT NULL AND
+                            `malp`.`online_sale_price_end_date` IS NOT NULL AND
+                            `malp`.`online_sale_price_start_date` <= CURRENT_DATE() AND
+                            `malp`.`online_sale_price_end_date` >= CURRENT_DATE(),
+                            `malp`.`online_sale_price`,
+                            `malp`.`online_price`
+                        )
+                    ) as variation_max_price
+                FROM `'. Mage::getResourceModel('M2ePro/Amazon_Listing_Product')->getMainTable() .'` as malp
+                INNER JOIN `'. Mage::getResourceModel('M2ePro/Listing_Product')->getMainTable() .'` AS `mlp`
+                    ON (`malp`.`listing_product_id` = `mlp`.`id`)
+                WHERE `mlp`.`status` IN (
+                    ' . Ess_M2ePro_Model_Listing_Product::STATUS_LISTED . ',
+                    ' . Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED . '
+                ) AND `malp`.`variation_parent_id` IS NOT NULL
+                GROUP BY `malp`.`variation_parent_id`
+            )'),
+            'alp.listing_product_id=t.variation_parent_id',
+            array(
+                'variation_min_price' => 'variation_min_price',
+                'variation_max_price' => 'variation_max_price',
+            )
+        );
+
         //----------------------------
 //        exit($collection->getSelect()->__toString());
 
@@ -180,13 +252,21 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             'frame_callback' => array($this, 'callbackColumnAvailableQty')
         ));
 
+        $dir = $this->getParam($this->getVarNameDir(), $this->_defaultDir);
+
+        if ($dir == 'desc') {
+            $priceSortField = 'max_online_price';
+        } else {
+            $priceSortField = 'min_online_price';
+        }
+
         $this->addColumn('online_price', array(
             'header' => Mage::helper('M2ePro')->__('Price'),
             'align' => 'right',
             'width' => '70px',
             'type' => 'number',
-            'index' => 'online_price',
-            'filter_index' => 'online_price',
+            'index' => $priceSortField,
+            'filter_index' => $priceSortField,
             'frame_callback' => array($this, 'callbackColumnPrice'),
             'filter_condition_callback' => array($this, 'callbackFilterPrice')
         ));
@@ -253,8 +333,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
         //--------------------------------
         $groups = array(
             'actions'            => Mage::helper('M2ePro')->__('Actions'),
-            'description_policy' => Mage::helper('M2ePro')->__('Description Policy'),
             'asin_isbn'          => Mage::helper('M2ePro')->__('ASIN / ISBN'),
+            'description_policy' => Mage::helper('M2ePro')->__('Description Policy'),
             'other'              => Mage::helper('M2ePro')->__('Other'),
         );
 
@@ -562,8 +642,35 @@ HTML;
     public function callbackColumnAmazonSku($value, $row, $column, $isExport)
     {
         if (is_null($value) || $value === '') {
-            return Mage::helper('M2ePro')->__('N/A');
+            $value = Mage::helper('M2ePro')->__('N/A');
         }
+
+        if (!$row->getData('is_variation_parent') && $row->getData('defected_messages')) {
+            $defectedMessages = json_decode($row->getData('defected_messages'), true);
+
+            $msg = '';
+            foreach ($defectedMessages as $message) {
+                $msg .= '<p>'.$message['message'] . '&nbsp;';
+                if (!empty($message['value'])) {
+                    $msg .= Mage::helper('M2ePro')->__('Current Value') . ': "' . $message['value'] . '"';
+                }
+                $msg .= '</p>';
+            }
+
+            $value .= <<<HTML
+<span style="float:right;">
+    <img id="map_link_defected_message_icon_{$row->getId()}"
+         class="tool-tip-image"
+         style="vertical-align: middle;"
+         src="{$this->getSkinUrl('M2ePro/images/warning.png')}">
+    <span class="tool-tip-message tool-tip-warning tip-left" style="display:none;">
+        <img src="{$this->getSkinUrl('M2ePro/images/i_notice.gif')}">
+        <span>{$msg}</span>
+    </span>
+</span>
+HTML;
+        }
+
         return $value;
     }
 
@@ -606,7 +713,10 @@ HTML;
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        if (is_null($value) || $value === '') {
+        $onlineMinPrice = $row->getData('min_online_price');
+        $onlineMaxPrice = $row->getData('max_online_price');
+
+        if (is_null($onlineMinPrice) || $onlineMinPrice === '') {
             if ($row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
                 $row->getData('is_variation_parent')
             ) {
@@ -622,46 +732,68 @@ HTML;
             ->getChildObject()
             ->getDefaultCurrency();
 
-        if ((float)$value <= 0) {
+        if ($row->getData('is_variation_parent')) {
+            $onlineMinPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMinPrice);
+            $onlineMaxPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMaxPrice);
+
+            return $onlineMinPriceStr . (($onlineMinPrice != $onlineMaxPrice) ? ' - ' . $onlineMaxPriceStr :  '');
+        }
+
+        $onlinePrice = $row->getData('online_price');
+        if ((float)$onlinePrice <= 0) {
             $priceValue = '<span style="color: #f00;">0</span>';
         } else {
-            $priceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($value);
+            $priceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($onlinePrice);
         }
 
         $resultHtml = '';
 
         $salePrice = $row->getData('online_sale_price');
-        if ((float)$salePrice > 0) {
+        if (!$row->getData('is_variation_parent') && (float)$salePrice > 0) {
+            $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+
             $startDateTimestamp = strtotime($row->getData('online_sale_price_start_date'));
             $endDateTimestamp   = strtotime($row->getData('online_sale_price_end_date'));
 
-            $iconHelpPath = $this->getSkinUrl('M2ePro/images/help.png');
-            $toolTipIconPath = $this->getSkinUrl('M2ePro/images/tool-tip-icon.png');
+            if ($currentTimestamp <= $endDateTimestamp) {
+                $iconHelpPath = $this->getSkinUrl('M2ePro/images/i_logo.png');
+                $toolTipIconPath = $this->getSkinUrl('M2ePro/images/i_icon.png');
 
-            $intervalHtml = '<img class="tool-tip-image"
+                $dateFormat = Mage::app()->getLocale()->getDateFormat(Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM);
+
+                $fromDate = Mage::app()->getLocale()->date(
+                    $row->getData('online_sale_price_start_date'), $dateFormat
+                )->toString($dateFormat);
+                $toDate = Mage::app()->getLocale()->date(
+                    $row->getData('online_sale_price_end_date'), $dateFormat
+                )->toString($dateFormat);
+
+                $intervalHtml = '<img class="tool-tip-image"
                                  style="vertical-align: middle;"
-                                 src="'.$toolTipIconPath.'">
-                            <span class="tool-tip-message tip-left" style="display:none;">
+                                 src="'.$toolTipIconPath.'"><span class="tool-tip-message" style="display:none;
+                                                                  text-align: left;
+                                                                  width: 120px;
+                                                                  background: #E3E3E3;">
                                 <img src="'.$iconHelpPath.'">
-                                <span style="color:gray; font-size: 10px;">
-                                    From: '.date('Y-m-d', $startDateTimestamp).'<br/>
-                                    To: '.date('Y-m-d', $endDateTimestamp).'
+                                <span style="color:gray;">
+                                    <strong>From:</strong> '.$fromDate.'<br/>
+                                    <strong>To:</strong> '.$toDate.'
                                 </span>
                             </span>';
 
-            $currentTimestamp = strtotime(Mage::helper('M2ePro')->getCurrentGmtDate(false,'Y-m-d 00:00:00'));
+                $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePrice);
 
-            $salePriceValue = Mage::app()->getLocale()->currency($currency)->toCurrency($salePrice);
-
-            if ($currentTimestamp >= $startDateTimestamp &&
-                $currentTimestamp <= $endDateTimestamp &&
-                $salePrice < (float)$value
-            ) {
-                $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>';
-                $resultHtml .= '<br/>'.$intervalHtml.$salePriceValue;
-            } else {
-                $resultHtml .= $priceValue;
-                $resultHtml .= '<br/>'.$intervalHtml.'<span style="color:gray;">'.$salePriceValue.'</span>';
+                if ($currentTimestamp >= $startDateTimestamp &&
+                    $currentTimestamp <= $endDateTimestamp &&
+                    $salePrice < (float)$onlinePrice
+                ) {
+                    $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>';
+                    $resultHtml .= '<br/>'.$intervalHtml.'&nbsp;'.$salePriceValue;
+                } else {
+                    $resultHtml .= $priceValue;
+                    $resultHtml .= '<br/>'.$intervalHtml.
+                        '<span style="color:gray;">'.'&nbsp;'.$salePriceValue.'</span>';
+                }
             }
         }
 
@@ -884,22 +1016,33 @@ HTML;
             return;
         }
 
-        $from = $value['from'];
-        $to   = $value['to'];
+        $condition = '';
 
-        $collection->getSelect()->where(
-            '(alp.online_price >= \''.$from.'\' AND alp.online_price <= \''.$to.'\' AND
-            (
-                alp.online_sale_price IS NULL OR
-                alp.online_sale_price_start_date > NOW() OR
-                alp.online_sale_price_end_date < NOW()
-            )) OR (alp.online_sale_price >= \''.$from.'\' AND alp.online_sale_price <= \''.$to.'\' AND
-            (
-                alp.online_sale_price IS NOT NULL AND
-                alp.online_sale_price_start_date < NOW() AND
-                alp.online_sale_price_end_date > NOW()
-            ))'
-        );
+        if (!empty($value['from'])) {
+            $condition = 'min_online_price >= \''.$value['from'].'\'';
+        }
+        if (!empty($value['to'])) {
+            if (!empty($value['from'])) {
+                $condition .= ' AND ';
+            }
+            $condition .= 'min_online_price <= \''.$value['to'].'\'';
+        }
+
+        $condition = '(' . $condition . ') OR (';
+
+        if (!empty($value['from'])) {
+            $condition .= 'max_online_price >= \''.$value['from'].'\'';
+        }
+        if (!empty($value['to'])) {
+            if (!empty($value['from'])) {
+                $condition .= ' AND ';
+            }
+            $condition .= 'max_online_price <= \''.$value['to'].'\'';
+        }
+
+        $condition .= ')';
+
+        $collection->getSelect()->having($condition);
     }
 
     protected function callbackFilterStatus($collection, $column)
@@ -1072,8 +1215,8 @@ HTML;
             case Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_AND_REMOVE_PRODUCT:
                 $string = Mage::helper('M2ePro')->__('Remove from Channel & Listing');
                 break;
-            case Ess_M2ePro_Model_Listing_Log::ACTION_CHANGE_STATUS_ON_CHANNEL:
-                $string = Mage::helper('M2ePro')->__('Status Change');
+            case Ess_M2ePro_Model_Listing_Log::ACTION_CHANNEL_CHANGE:
+                $string = Mage::helper('M2ePro')->__('Channel Change');
                 break;
         }
 
@@ -1448,4 +1591,6 @@ HTML;
 <br/>
 HTML;
     }
+
+    // ####################################
 }

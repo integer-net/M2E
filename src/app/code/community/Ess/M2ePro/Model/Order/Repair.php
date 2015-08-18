@@ -9,6 +9,8 @@ class Ess_M2ePro_Model_Order_Repair extends Ess_M2ePro_Model_Abstract
     const TYPE_UNKNOWN   = 0;
     const TYPE_VARIATION = 1;
 
+    // ########################################
+
     public function _construct()
     {
         parent::_construct();
@@ -92,4 +94,6 @@ class Ess_M2ePro_Model_Order_Repair extends Ess_M2ePro_Model_Abstract
 
         return sha1(serialize($input));
     }
+
+    // ########################################
 }

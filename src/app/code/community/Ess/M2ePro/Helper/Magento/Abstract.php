@@ -6,8 +6,6 @@
 
 abstract class Ess_M2ePro_Helper_Magento_Abstract extends Mage_Core_Helper_Abstract
 {
-    // ################################
-
     const RETURN_TYPE_IDS = 1;
     const RETURN_TYPE_ARRAYS = 2;
     const RETURN_TYPE_OBJECTS = 3;

@@ -5,9 +5,12 @@
  */
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_Tabs_Variations
-    extends Mage_Adminhtml_Block_Widget_Container
+    extends Ess_M2ePro_Block_Adminhtml_Widget_Container
 {
     protected $listingProductId;
+
+    // ####################################
+
     /**
      * @param mixed $listingProductId
      * @return $this

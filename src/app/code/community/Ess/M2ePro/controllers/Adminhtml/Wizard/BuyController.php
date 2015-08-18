@@ -9,6 +9,24 @@ class Ess_M2ePro_Adminhtml_Wizard_BuyController
 {
     //#############################################
 
+    protected function _initAction()
+    {
+        parent::_initAction();
+
+        $this->getLayout()->getBlock('head')
+            ->addJs('M2ePro/Plugin/ProgressBar.js')
+            ->addCss('M2ePro/css/Plugin/ProgressBar.css')
+            ->addJs('M2ePro/Plugin/AreaWrapper.js')
+            ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
+            ->addJs('M2ePro/SynchProgressHandler.js')
+            ->addJs('M2ePro/MarketplaceHandler.js')
+            ->addJs('M2ePro/Wizard/Buy/MarketplaceHandler.js');
+
+        return $this;
+    }
+
+    //#############################################
+
     protected function getNick()
     {
         return 'buy';

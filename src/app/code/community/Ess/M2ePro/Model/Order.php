@@ -24,11 +24,7 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
     // Payment method "M2E Pro Payment" is disabled in Magento Configuration.
     // Shipping method "M2E Pro Shipping" is disabled in Magento Configuration.
 
-    // ########################################
-
     const ADDITIONAL_DATA_KEY_IN_ORDER = 'm2epro_order';
-
-    // ########################################
 
     private $account = NULL;
 
@@ -270,34 +266,34 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
 
     // ########################################
 
-    public function addLog($message, $type, array $params = array())
+    public function addLog($message, $type, array $params = array(), array $links = array())
     {
         if (!empty($params)) {
-            $message = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription($message, $params);
+            $message = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription($message, $params, $links);
         }
 
         Mage::getSingleton('M2ePro/Order_Log_Manager')
             ->createLogRecord($this->getComponentMode(), $this->getId(), $message, $type);
     }
 
-    public function addSuccessLog($message, array $params = array())
+    public function addSuccessLog($message, array $params = array(), array $links = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS, $params, $links);
     }
 
-    public function addNoticeLog($message, array $params = array())
+    public function addNoticeLog($message, array $params = array(), array $links = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE, $params, $links);
     }
 
-    public function addWarningLog($message, array $params = array())
+    public function addWarningLog($message, array $params = array(), array $links = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_WARNING, $params, $links);
     }
 
-    public function addErrorLog($message, array $params = array())
+    public function addErrorLog($message, array $params = array(), array $links = array())
     {
-        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR, $params);
+        $this->addLog($message, Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR, $params, $links);
     }
 
     // ########################################
@@ -418,10 +414,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
             return false;
         }
 
-        if ($this->getAccount()->getChildObject()->getQtyReservationDays() <= 0) {
-            return false;
-        }
-
         if ($this->getReserve()->isPlaced()) {
             return false;
         }
@@ -483,12 +475,6 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
             /** @var $magentoQuoteBuilder Ess_M2ePro_Model_Magento_Quote */
             $magentoQuoteBuilder = Mage::getModel('M2ePro/Magento_Quote', $proxy);
             $magentoQuoteBuilder->buildQuote();
-
-            if ($this->getReserve()->getFlag('order_reservation')) {
-                foreach ($magentoQuoteBuilder->getQuote()->getAllItems() as $quoteItem) {
-                    $quoteItem->setData(Ess_M2ePro_Helper_Data::CUSTOM_IDENTIFIER . '_order_reservation', true);
-                }
-            }
 
             /** @var $magentoOrderBuilder Ess_M2ePro_Model_Magento_Order */
             $magentoOrderBuilder = Mage::getModel('M2ePro/Magento_Order', $magentoQuoteBuilder->getQuote());

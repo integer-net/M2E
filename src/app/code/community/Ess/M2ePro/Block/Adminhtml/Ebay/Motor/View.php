@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View extends Mage_Adminhtml_Block_Widget
 {
-    // ####################################
-
     private $listingProductId = null;
 
     private $compatibilityType = null;
@@ -79,32 +77,41 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_View extends Mage_Adminhtml_Block_Wi
         );
 
         return <<<HTML
-    <style type="text/css">
-        #compatibility_frame_container {
-            max-height: 380px;
-            overflow-y: scroll;
-        }
-        #compatibility_frame_container table td, #compatibility_frame_container table th {
-            padding: 5px;
-        }
-    </style>
-    <div id="compatibility_view_container" style="padding-top: 10px;">
-        <div style="margin: 2px 0;">
-            <span style="font-weight: bold;">{$helper->__('Product')}:</span>&nbsp;
-            <span style="color: grey;">{$productTitle}</span>
-        </div>
-        <div style="margin: 2px 0 6px 0;">
-            <span style="font-weight: bold;">{$helper->__('Attribute')}:</span>&nbsp;
-            <span style="color: grey;">{$attributeLabel}</span><br/>
-        </div>
-        <div id="compatibility_frame_container" style="overflow-y: hidden; overflow-x: hidden;">
-            <iframe id="compatibility_view_grid_container" src="{$gridUrl}"
-                    width="100%" height="200px" style="border: none;"></iframe>
-        </div>
+
+<style type="text/css">
+
+    #compatibility_frame_container {
+        max-height: 480px;
+        overflow-y: scroll;
+    }
+    #compatibility_frame_container table td, #compatibility_frame_container table th {
+        padding: 5px;
+    }
+
+</style>
+
+<div id="compatibility_view_container" style="padding-top: 10px;">
+
+    <div style="margin: 2px 0;">
+        <span style="font-weight: bold;">{$helper->__('Product')}:</span>&nbsp;
+        <span style="color: grey;">{$productTitle}</span>
     </div>
-    <div style="float: right; margin-top: 10px;">
-        <a href="javascript:void(0);" onclick="Windows.getFocusedWindow().close()">{$helper->__('Close')}<a/>
+
+    <div style="margin: 2px 0 6px 0;">
+        <span style="font-weight: bold;">{$helper->__('Attribute')}:</span>&nbsp;
+        <span style="color: grey;">{$attributeLabel}</span><br/>
     </div>
+
+    <div id="compatibility_frame_container" style="overflow-y: hidden; overflow-x: hidden;">
+        <iframe id="compatibility_view_grid_container" src="{$gridUrl}"
+                width="100%" height="340px" style="border: none;"></iframe>
+    </div>
+</div>
+
+<div style="float: right; margin-top: 10px;">
+    <a href="javascript:void(0);" onclick="Windows.getFocusedWindow().close()">{$helper->__('Close')}<a/>
+</div>
+
 HTML;
     }
 

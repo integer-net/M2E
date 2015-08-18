@@ -345,7 +345,7 @@ HTML;
         );
 
         EbayListingGridHandlerObj = new EbayListingGridHandler('{$this->getId()}');
-        EditListingTitleObj = new EditListingTitle('{$this->getId()}');
+        EditListingTitleObj = new ListingEditListingTitle('{$this->getId()}');
     });
 
 </script>

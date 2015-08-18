@@ -292,9 +292,9 @@
 
 <?php if($showBlockedAdvancedMode): ?>
     <p style="font-size: 15px; font-weight: bolder; color: red;">
-        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getMenuPath('configuration');
+        <?php $menuPath = Mage::helper('M2ePro/View_Ebay')->getPageNavigationPath('configuration', 'General', 'Mode > Advanced');
         echo Mage::helper('M2ePro')->__(
-            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path% > General > Mode > Advanced).', $menuPath);
+            'This set of Options cannot be edited in Simple Mode because it was set in Advanced Mode.<br/> To make the necessary changes you should switch to Advanced Mode (%menu_path%).', $menuPath);
         ?>
     </p>
 <?php endif; ?>
@@ -435,7 +435,7 @@
                             <thead>
                                 <tr class="headings">
                                     <th style="width: 260px"><?php echo Mage::helper('M2ePro')->__('Service'); ?><span class="required">*</span></th>
-                                    <th style="width: 130px"><?php echo Mage::helper('M2ePro')->__('Mode'); ?><span class="required">*</span></th>
+                                    <th style="width: 130px"><?php echo Mage::helper('M2ePro')->__('Mode'); ?></th>
                                     <th style="width: 155px"><?php echo Mage::helper('M2ePro')->__('Cost'); ?><span class="required">*</span></th>
                                     <th style="width: 155px"><?php echo Mage::helper('M2ePro')->__('Additional Cost'); ?><span class="required">*</span></th>
                                     <th><?php echo Mage::helper('M2ePro')->__('Currency'); ?></th>
@@ -592,7 +592,7 @@
                                 <thead>
                                     <tr class="headings">
                                         <th style="width: 130px">
-                                            <?php echo Mage::helper('M2ePro')->__('Account'); ?>
+                                            <?php echo Mage::helper('M2ePro')->__('eBay User ID'); ?>
                                         </th>
                                         <th colspan="3" style="width: 250px">
                                             <?php echo Mage::helper('M2ePro')->__('Combined Shipping Profile'); ?>
@@ -811,7 +811,7 @@
                             <thead>
                                 <tr class="headings">
                                     <th style="width: 260px"><?php echo Mage::helper('M2ePro')->__('Service'); ?><span class="required">*</span></th>
-                                    <th style="width: 130px;"><?php echo Mage::helper('M2ePro')->__('Mode'); ?><span class="required">*</span></th>
+                                    <th style="width: 130px;"><?php echo Mage::helper('M2ePro')->__('Mode'); ?></th>
                                     <th style="width: 155px;"><?php echo Mage::helper('M2ePro')->__('Cost'); ?><span class="required">*</span></th>
                                     <th style="width: 155px;"><?php echo Mage::helper('M2ePro')->__('Additional Cost'); ?><span class="required">*</span></th>
                                     <th><?php echo Mage::helper('M2ePro')->__('Currency'); ?></th>
