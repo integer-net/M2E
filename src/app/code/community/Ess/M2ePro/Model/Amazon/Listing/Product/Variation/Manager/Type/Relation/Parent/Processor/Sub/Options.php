@@ -84,7 +84,9 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             $this->createNewProductChildren();
         }
 
-        $this->setMatchedAttributesToChildren();
+        if ($this->getProcessor()->getTypeModel()->hasMatchedAttributes()) {
+            $this->setMatchedAttributesToChildren();
+        }
     }
 
     // ##########################################################

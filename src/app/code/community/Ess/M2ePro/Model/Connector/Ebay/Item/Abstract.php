@@ -7,7 +7,7 @@
 abstract class Ess_M2ePro_Model_Connector_Ebay_Item_Abstract
     extends Ess_M2ePro_Model_Connector_Ebay_Abstract
 {
-    const TIMEOUT_INCREMENT_FOR_ONE_IMAGE = 20; // seconds
+    const TIMEOUT_INCREMENT_FOR_ONE_IMAGE = 30; // seconds
 
     /**
      * @var Ess_M2ePro_Model_Ebay_Listing_Product_Action_Logger

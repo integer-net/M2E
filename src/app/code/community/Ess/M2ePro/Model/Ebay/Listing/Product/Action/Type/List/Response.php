@@ -29,6 +29,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Response
         $data = $this->appendStartDateEndDateValues($data, $response);
         $data = $this->appendGalleryImagesValues($data, $response, $responseParams);
 
+        $data = $this->appendSpecificsReplacementValues($data);
+
         if (isset($data['additional_data'])) {
             $data['additional_data'] = json_encode($data['additional_data']);
         }
@@ -55,6 +57,26 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Response
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED,
             'additional_data' => json_encode($additionalData),
         ))->save();
+
+        $this->getEbayListingProduct()->updateVariationsStatus();
+    }
+
+    protected function appendSpecificsReplacementValues($data)
+    {
+        if (!isset($data['additional_data'])) {
+            $data['additional_data'] = $this->getListingProduct()->getAdditionalData();
+        }
+
+        $tempKey = 'variations_specifics_replacements';
+        unset($data['additional_data'][$tempKey]);
+
+        $requestData = $this->getRequestData()->getData();
+        if (!isset($requestData[$tempKey])) {
+            return $data;
+        }
+
+        $data['additional_data'][$tempKey] = $requestData[$tempKey];
+        return $data;
     }
 
     // ########################################

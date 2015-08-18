@@ -10,30 +10,41 @@ class Ess_M2ePro_Model_Observer_Amazon_Order_Item extends Ess_M2ePro_Model_Obser
 
     public function process()
     {
-        $sku = $this->getEvent()->getData('sku');
+        /** @var Ess_M2ePro_Model_Order_Item $orderItem */
+        $orderItem  = $this->getEvent()->getData('order_item');
 
-        $accountId = (int)$this->getEvent()->getData('account_id');
-        $marketplaceId = (int)$this->getEvent()->getData('marketplace_id');
-        $productId = (int)$this->getEvent()->getData('product_id');
+        /** @var Ess_M2ePro_Model_Amazon_Order_Item $amazonOrderItem */
+        $amazonOrderItem = $orderItem->getChildObject();
 
-        /** @var $collection Mage_Core_Model_Mysql4_Collection_Abstract */
-        $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other');
+        /** @var Mage_Catalog_Model_Product $product */
+        $product = $this->getEvent()->getData('product');
 
-        $collection->addFieldToFilter('second_table.sku',$sku);
-        $collection->addFieldToFilter('main_table.account_id',$accountId);
-        $collection->addFieldToFilter('main_table.marketplace_id',$marketplaceId);
+        /** @var $listingOtherCollection Mage_Core_Model_Mysql4_Collection_Abstract */
+        $listingOtherCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Other');
+        $listingOtherCollection->addFieldToFilter('account_id', $orderItem->getOrder()->getAccountId());
+        $listingOtherCollection->addFieldToFilter('second_table.sku', $amazonOrderItem->getSku());
 
-        if ($collection->getSize() > 0 && is_null($collection->getFirstItem()->getData('product_id'))) {
+        $otherListings = $listingOtherCollection->getItems();
 
-            /** @var $productOtherInstance Ess_M2ePro_Model_Listing_Other */
-            $productOtherInstance = $collection->getFirstItem();
+        if (!empty($otherListings)) {
+            /** @var Ess_M2ePro_Model_Listing_Other $otherListing */
+            $otherListing = reset($otherListings);
 
-            if (!$productOtherInstance->getAccount()->getChildObject()->isOtherListingsSynchronizationEnabled() ||
-                !$productOtherInstance->getAccount()->getChildObject()->isOtherListingsMappingEnabled()) {
+            if (!is_null($otherListing->getProductId())) {
                 return;
             }
 
-            $productOtherInstance->mapProduct($productId, Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
+            $otherListing->mapProduct($product->getId(), Ess_M2ePro_Helper_Data::INITIATOR_EXTENSION);
+        } else {
+            $dataForAdd = array(
+                'account_id'     => $orderItem->getOrder()->getAccountId(),
+                'marketplace_id' => $orderItem->getOrder()->getMarketplaceId(),
+                'sku'            => $amazonOrderItem->getSku(),
+                'product_id'     => $product->getId(),
+                'store_id'       => $amazonOrderItem->getAmazonOrder()->getAssociatedStoreId(),
+            );
+
+            Mage::getModel('M2ePro/Amazon_Item')->setData($dataForAdd)->save();
         }
     }
 

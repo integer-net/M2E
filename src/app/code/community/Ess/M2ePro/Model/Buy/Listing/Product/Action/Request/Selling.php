@@ -11,22 +11,27 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Request_Selling
 
     public function getData()
     {
-        if (!$this->getConfigurator()->isSellingAllowed()) {
-            return array();
+        $data = array();
+
+        if ($this->getConfigurator()->isQtyAllowed()) {
+            if (!isset($this->validatorsData['qty'])) {
+                $this->validatorsData['qty'] = $this->getBuyListingProduct()->getQty();
+            }
+
+            $data['qty'] = $this->validatorsData['qty'];
+
+            $this->checkQtyWarnings();
         }
 
-        if (!isset($this->validatorsData['qty'])) {
-            $this->validatorsData['qty'] = $this->getBuyListingProduct()->getQty();
+        if ($this->getConfigurator()->isPriceAllowed()) {
+            if (!isset($this->validatorsData['price'])) {
+                $this->validatorsData['price'] = $this->getBuyListingProduct()->getPrice();
+            }
+
+            $data['price'] = $this->validatorsData['price'];
         }
 
-        if (!isset($this->validatorsData['price'])) {
-            $this->validatorsData['price'] = $this->getBuyListingProduct()->getPrice();
-        }
-
-        return array(
-            'qty'   => $this->validatorsData['qty'],
-            'price' => $this->validatorsData['price'],
-        );
+        return $data;
     }
 
     // ########################################

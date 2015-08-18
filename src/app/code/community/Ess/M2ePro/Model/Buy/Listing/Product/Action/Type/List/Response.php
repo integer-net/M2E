@@ -26,6 +26,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Response
 
         $this->getListingProduct()->addData($data);
         $this->getListingProduct()->save();
+
+        $this->createBuyItem();
     }
 
     // ########################################
@@ -41,6 +43,17 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Response
         }
 
         return $data;
+    }
+
+    // ########################################
+
+    private function createBuyItem()
+    {
+        /** @var Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Linking $linkingObject */
+        $linkingObject = Mage::getModel('M2ePro/Buy_Listing_Product_Action_Type_List_Linking');
+        $linkingObject->setListingProduct($this->getListingProduct());
+
+        $linkingObject->createBuyItem();
     }
 
     // ########################################

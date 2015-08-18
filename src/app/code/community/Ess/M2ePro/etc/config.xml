@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>6.3.4</version>
+            <version>6.3.5</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -380,6 +380,16 @@
                 </observers>
             </sales_order_shipment_save_after>
 
+            <sales_order_shipment_track_save_after>
+                <observers>
+                    <M2ePro_observer>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>salesOrderShipmentTrackSaveAfter</method>
+                    </M2ePro_observer>
+                </observers>
+            </sales_order_shipment_track_save_after>
+
             <sales_order_creditmemo_refund>
                 <observers>
                     <M2ePro_observer>
@@ -672,9 +682,9 @@
                     <Order_Change>
                         <table>m2epro_order_change</table>
                     </Order_Change>
-                    <Order_Repair>
-                        <table>m2epro_order_repair</table>
-                    </Order_Repair>
+                    <Order_Matching>
+                        <table>m2epro_order_matching</table>
+                    </Order_Matching>
 
                     <Order>
                         <table>m2epro_order</table>

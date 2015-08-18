@@ -124,6 +124,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Ch
 
         $parentTypeModel = $this->getAmazonParentListingProduct()->getVariationManager()->getTypeModel();
         $currentMatchedAttributes = $parentTypeModel->getMatchedAttributes();
+        if (empty($currentMatchedAttributes)) {
+            return false;
+        }
 
         return count(array_diff_assoc($correctMatchedAttributes, $currentMatchedAttributes)) <= 0;
     }

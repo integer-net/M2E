@@ -22,8 +22,9 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
 
     initialize: function()
     {
-        Validation.add('M2ePro-location-or-postal-required', M2ePro.translator.translate('Location or Zip/Postal Code should be specified.'), function(value) {
-            return $('address').value != '' || $('postal_code').value != '';
+        Validation.add('M2ePro-location-or-postal-required', M2ePro.translator.translate('Location or Zip/Postal Code should be specified.'), function() {
+            return $('address_mode').value != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::ADDRESS_MODE_NONE') ||
+                   $('postal_code_mode').value != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::POSTAL_CODE_MODE_NONE');
         });
 
         Validation.add('M2ePro-validate-international-ship-to-location', M2ePro.translator.translate('Select one or more international ship-to Locations.'), function(value, el) {
@@ -32,11 +33,11 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
             });
         });
 
-        Validation.add('M2ePro-required-if-calculated', M2ePro.translator.translate('This is a required field.'), function(value, el) {
+        Validation.add('M2ePro-required-if-calculated', M2ePro.translator.translate('This is a required field.'), function(value) {
 
             if(EbayTemplateShippingHandlerObj.isLocalShippingModeCalculated() ||
                 EbayTemplateShippingHandlerObj.isInternationalShippingModeCalculated()) {
-                return $('postal_code').value != '';
+                return value != M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::POSTAL_CODE_MODE_NONE');
             }
 
             return true;
@@ -84,6 +85,62 @@ EbayTemplateShippingHandler = Class.create(CommonHandler, {
     simple_mode_disallowed_hide: function()
     {
         $$('#template_shipping_data_container .simple_mode_disallowed').invoke('hide');
+    },
+
+    //----------------------------------
+
+    countryModeChange : function()
+    {
+        var elem = $('country_mode');
+        if (elem.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::COUNTRY_MODE_CUSTOM_VALUE')) {
+
+            var value = elem.options[elem.selectedIndex].getAttribute('country_id');
+            $('country_custom_value').value = value
+        }
+
+        if (elem.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::COUNTRY_MODE_CUSTOM_ATTRIBUTE')) {
+
+            var value = elem.options[elem.selectedIndex].getAttribute('attribute_code');
+            $('country_custom_attribute').value = value
+        }
+    },
+
+    //----------------------------------
+
+    postalCodeModeChange: function()
+    {
+        var elem = $('postal_code_mode');
+
+        if (elem.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::POSTAL_CODE_MODE_CUSTOM_VALUE')) {
+            $('postal_code_custom_value_tr').show();
+        } else {
+            $('postal_code_custom_value_tr').hide();
+        }
+
+        if (elem.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::POSTAL_CODE_MODE_CUSTOM_ATTRIBUTE')) {
+
+            var value = elem.options[elem.selectedIndex].getAttribute('attribute_code');
+            $('postal_code_custom_attribute').value = value
+        }
+    },
+
+    //----------------------------------
+
+    addressModeChange: function()
+    {
+        var elem = $('address_mode');
+
+        if (elem.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::ADDRESS_MODE_CUSTOM_VALUE')) {
+            $('address_custom_value_tr').show();
+        } else {
+            $('address_custom_value_tr').hide();
+        }
+
+        if (elem.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Shipping::ADDRESS_MODE_CUSTOM_ATTRIBUTE')) {
+
+            var value = elem.options[elem.selectedIndex].getAttribute('attribute_code');
+            $('address_custom_attribute').value = value;
+        }
     },
 
     //----------------------------------

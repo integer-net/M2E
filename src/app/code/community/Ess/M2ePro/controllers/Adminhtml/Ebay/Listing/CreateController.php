@@ -33,10 +33,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
             ->addJs('M2ePro/Ebay/Template/ShippingHandler.js')
             ->addJs('M2ePro/Ebay/Template/SellingFormatHandler.js')
             ->addJs('M2ePro/Ebay/Template/DescriptionHandler.js')
-            ->addJs('M2ePro/Ebay/Template/SynchronizationHandler.js')
-        ;
+            ->addJs('M2ePro/Ebay/Template/SynchronizationHandler.js');
 
         $this->_initPopUp();
+
+        $this->setComponentPageHelpLink('Creation+of+new+M2E+Pro+Listing');
 
         if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()) {
             $this->getLayout()->getBlock('head')->setCanLoadTinyMce(true);
@@ -123,6 +124,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
         Mage::helper('M2ePro/Data_Global')->setValue('ebay_marketplace_id', $this->getSessionValue('marketplace_id'));
 
         $this->_initAction();
+        $this->setComponentPageHelpLink('Step+1%3A+General+Settings');
+
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_accountMarketplace'));
         $this->renderLayout();
     }
@@ -183,6 +186,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
         //------------------------------
 
         $this->_initAction();
+        $this->setComponentPageHelpLink('Step+2%3A+Payment+and+Shipping+Settings');
+
         $this->_addContent($content);
         $this->renderLayout();
     }
@@ -244,6 +249,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
         //------------------------------
 
         $this->_initAction();
+        $this->setComponentPageHelpLink('Step+3%3A+Selling+Settings');
+
         $this->_addContent($content);
         $this->renderLayout();
     }
@@ -359,6 +366,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CreateController
         //------------------------------
 
         $this->_initAction();
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367081');
+
         $this->_addContent($content);
         $this->renderLayout();
     }

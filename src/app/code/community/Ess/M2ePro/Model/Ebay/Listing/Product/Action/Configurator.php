@@ -32,12 +32,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Configurator
 
     public function allowImages()
     {
-        if ($this->isImagesAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_IMAGES);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_IMAGES;
-        return $this;
+    public function disallowImages()
+    {
+        return $this->disallow(self::DATA_TYPE_IMAGES);
     }
 
     // ----------------------------------------
@@ -49,12 +49,12 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Configurator
 
     public function allowVariations()
     {
-        if ($this->isVariationsAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_VARIATIONS);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_VARIATIONS;
-        return $this;
+    public function disallowVariations()
+    {
+        return $this->disallow(self::DATA_TYPE_VARIATIONS);
     }
 
     // ########################################

@@ -14,13 +14,13 @@ class Ess_M2ePro_Adminhtml_Wizard_BuyController
         parent::_initAction();
 
         $this->getLayout()->getBlock('head')
-            ->addJs('M2ePro/Plugin/ProgressBar.js')
-            ->addCss('M2ePro/css/Plugin/ProgressBar.css')
-            ->addJs('M2ePro/Plugin/AreaWrapper.js')
-            ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
-            ->addJs('M2ePro/SynchProgressHandler.js')
-            ->addJs('M2ePro/MarketplaceHandler.js')
-            ->addJs('M2ePro/Wizard/Buy/MarketplaceHandler.js');
+             ->addCss('M2ePro/css/Plugin/ProgressBar.css')
+             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
+             ->addJs('M2ePro/Plugin/ProgressBar.js')
+             ->addJs('M2ePro/Plugin/AreaWrapper.js')
+             ->addJs('M2ePro/SynchProgressHandler.js')
+             ->addJs('M2ePro/MarketplaceHandler.js')
+             ->addJs('M2ePro/Wizard/Buy/MarketplaceHandler.js');
 
         return $this;
     }
@@ -36,16 +36,13 @@ class Ess_M2ePro_Adminhtml_Wizard_BuyController
 
     public function welcomeAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if (!$wizardHelper->isNotStarted($this->getNick())) {
+        if (!$this->isNotStarted()) {
             return $this->_redirect('*/*/index');
         }
 
         return $this->_initAction()
-            ->_addContent($wizardHelper->createBlock('welcome',$this->getNick()))
-            ->renderLayout();
+                    ->_addContent($this->getWizardHelper()->createBlock('welcome',$this->getNick()))
+                    ->renderLayout();
     }
 
     public function installationAction()

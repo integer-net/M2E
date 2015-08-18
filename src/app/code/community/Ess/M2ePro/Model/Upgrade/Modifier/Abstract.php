@@ -6,53 +6,71 @@
 
 class Ess_M2ePro_Model_Upgrade_Modifier_Abstract
 {
-    /** @var Varien_Db_Adapter_Interface */
-    protected $connection = null;
-    /** @var Mage_Core_Model_Resource_Setup */
-    protected $installer = null;
-    protected $tableName = '';
+    /** @var Ess_M2ePro_Model_Upgrade_MySqlSetup */
+    protected $installer = NULL;
+
+    /** @var Varien_Db_Adapter_Pdo_Mysql */
+    protected $connection = NULL;
+
+    protected $tableName = NULL;
     protected $queryLog = array();
 
     //####################################
-    public function getConnection()
-    {
-        return $this->connection;
-    }
 
-    public function setConnection(Varien_Db_Adapter_Interface $connection)
-    {
-        $this->connection = $connection;
-        return $this;
-    }
-
-    //####################################
-
-    public function getInstaller()
-    {
-        return $this->installer;
-    }
-
-    public function setInstaller(Mage_Core_Model_Resource_Setup $installer)
+    public function setInstaller(Ess_M2ePro_Model_Upgrade_MySqlSetup $installer)
     {
         $this->installer = $installer;
         return $this;
     }
 
-    //####################################
+    public function getInstaller()
+    {
+        if (is_null($this->installer)) {
+            throw new Zend_Db_Exception("Installer is not exists.");
+        }
+
+        return $this->installer;
+    }
+
+    // ----------------------------------
+
+    public function setConnection(Varien_Db_Adapter_Pdo_Mysql $connection)
+    {
+        $this->connection = $connection;
+        return $this;
+    }
+
+    public function getConnection()
+    {
+        if (is_null($this->connection)) {
+            throw new Zend_Db_Exception("Connection is not exists.");
+        }
+
+        return $this->connection;
+    }
+
+    // ----------------------------------
+
+    public function setTableName($tableName)
+    {
+        $result = $this->getConnection()->showTableStatus($tableName);
+
+        if ($result !== false) {
+            $this->tableName = $this->getInstaller()->getTable($tableName);
+        }
+
+        return $this;
+    }
 
     public function getTableName()
     {
         return $this->tableName;
     }
 
-    public function setTableName($tableName)
+    public function isTableExists()
     {
-        if (!$this->getConnection()->isTableExists($tableName)) {
-            throw new Zend_Db_Exception("Table \"{$tableName}\" is not exists");
-        }
-        $this->tableName = $this->getInstaller()->getTable($tableName);
-
-        return $this;
+        $tableName = $this->getTableName();
+        return !empty($tableName);
     }
 
     //####################################
@@ -60,21 +78,22 @@ class Ess_M2ePro_Model_Upgrade_Modifier_Abstract
     protected function runQuery($query)
     {
         $this->setQueryLog($query);
-        $this->getInstaller()->run($query);
+        $this->getConnection()->query($query);
+        $this->getConnection()->resetDdlCache();
         return $this;
     }
 
     //####################################
 
-    public function getQueryLog()
-    {
-        return $this->queryLog;
-    }
-
     public function setQueryLog($query)
     {
         $this->queryLog[] = $query;
         return $this;
+    }
+
+    public function getQueryLog()
+    {
+        return $this->queryLog;
     }
 
     //####################################

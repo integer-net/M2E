@@ -27,37 +27,35 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationNewAmazonController
 
     //#############################################
 
+    public function indexAction()
+    {
+        $this->getWizardHelper()->setStatus(
+            'fullAmazonCategories', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
+        );
+
+        parent::indexAction();
+    }
+
     public function welcomeAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-        $wizardHelper->setStatus(
-            $this->getNick(),
-            Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE
-        );
+        $this->setStatus(Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE);
 
         return $this->_redirect('*/*/index');
     }
 
     public function installationAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if ($wizardHelper->isFinished($this->getNick())) {
+        if ($this->isFinished()) {
             return $this->_redirect('*/*/congratulation');
         }
 
-        if (!$wizardHelper->getStep($this->getNick())) {
-            $wizardHelper->setStep(
-                $this->getNick(),
-                $wizardHelper->getWizard($this->getNick())->getFirstStep()
-            );
+        if (!$this->getCurrentStep()) {
+            $this->setStep($this->getFirstStep());
         }
 
         return $this->_initAction()
-            ->_addContent($wizardHelper->createBlock('installation',$this->getNick()))
-            ->renderLayout();
+                    ->_addContent($this->getWizardHelper()->createBlock('installation',$this->getNick()))
+                    ->renderLayout();
     }
 
     public function congratulationAction()

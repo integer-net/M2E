@@ -176,8 +176,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Orders_Receive
             if ($order->canCreateMagentoOrder()) {
                 try {
                     $order->createMagentoOrder();
-                } catch (Exception $e) {
-                    Mage::helper('M2ePro/Module_Exception')->process($e);
+                } catch (Exception $exception) {
+                    continue;
                 }
             }
 

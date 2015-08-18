@@ -235,7 +235,7 @@ abstract class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Validator
 
     protected function validateQty()
     {
-        if (!$this->getConfigurator()->isSellingAllowed()) {
+        if (!$this->getConfigurator()->isQtyAllowed()) {
             return true;
         }
 
@@ -258,7 +258,7 @@ abstract class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Validator
 
     protected function validatePrice()
     {
-        if (!$this->getConfigurator()->isSellingAllowed()) {
+        if (!$this->getConfigurator()->isPriceAllowed()) {
             return true;
         }
 

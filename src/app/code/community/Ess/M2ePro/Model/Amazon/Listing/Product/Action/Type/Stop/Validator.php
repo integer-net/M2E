@@ -25,6 +25,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Stop_Validator
             return false;
         }
 
+        if ($this->getAmazonListingProduct()->isAfnChannel()) {
+
+            // M2ePro_TRANSLATIONS
+            // Stop Action for FBA Items is impossible as their Quantity is unknown. You can run Revise Action for such Items, but the Quantity value will be ignored.
+            $this->addMessage('Stop Action for FBA Items is impossible as their Quantity is unknown. You can run
+            Revise Action for such Items, but the Quantity value will be ignored.');
+
+            return false;
+        }
+
         if (!$this->getListingProduct()->isListed() || !$this->getListingProduct()->isStoppable()) {
 
             if (empty($params['remove'])) {

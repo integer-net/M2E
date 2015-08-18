@@ -636,7 +636,6 @@ HTML;
         $constants = $helper->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Ebay_Category');
         //------------------------------
 
-        // todo next (change)
         $component = Ess_M2ePro_Helper_Component_Ebay::NICK;
 
         $temp = Mage::helper('M2ePro/Data_Session')->getValue('products_ids_for_list',true);

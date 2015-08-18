@@ -48,6 +48,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
 
         $this->_initPopUp();
 
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Add+Magento+Products');
+
         return $this;
     }
 
@@ -115,8 +117,11 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
             return $this->getResponse()->setBody($grid->toHtml());
         }
 
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_searchAsin'))
+        $this->_initAction();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=18188583');
+
+        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_searchAsin'))
             ->renderLayout();
     }
 
@@ -130,7 +135,11 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
 
         $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_newAsin');
 
-        $this->_initAction()->_addContent($block)->renderLayout();
+        $this->_initAction();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=18188583');
+
+        $this->_addContent($block)->renderLayout();
     }
 
     protected function review()
@@ -146,8 +155,9 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         $this->getListing()->setSetting('additional_data', 'auto_search_was_performed', 0);
         $this->getListing()->save();
 
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_review'))
+        $this->_initAction();
+
+        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_review'))
             ->renderLayout();
     }
 

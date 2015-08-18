@@ -193,14 +193,18 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
         $data['shipping_weight_unit_of_measure'] = $source->getShippingWeightUnitOfMeasure();
         $this->processNotFoundAttributes('Shipping Weight Units');
 
-        if (is_null($data['package_weight'])) {
+        if (is_null($data['package_weight']) || $data['package_weight'] === '' ||
+            $data['package_weight_unit_of_measure'] === ''
+        ) {
             unset(
                 $data['package_weight'],
                 $data['package_weight_unit_of_measure']
             );
         }
 
-        if (is_null($data['shipping_weight'])) {
+        if (is_null($data['shipping_weight']) || $data['shipping_weight'] === '' ||
+            $data['shipping_weight_unit_of_measure'] === ''
+        ) {
             unset(
                 $data['shipping_weight'],
                 $data['shipping_weight_unit_of_measure']
@@ -233,20 +237,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Details
             unset(
                 $data['package_dimensions_volume'],
                 $data['package_dimensions_volume_unit_of_measure']
-            );
-        }
-
-        if ($data['package_weight'] === '' || $data['package_weight_unit_of_measure'] === '') {
-            unset(
-                $data['package_weight'],
-                $data['package_weight_unit_of_measure']
-            );
-        }
-
-        if ($data['shipping_weight'] === '' || $data['shipping_weight_unit_of_measure'] === '') {
-            unset(
-                $data['shipping_weight'],
-                $data['shipping_weight_unit_of_measure']
             );
         }
 

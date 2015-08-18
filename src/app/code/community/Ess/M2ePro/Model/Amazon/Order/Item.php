@@ -155,14 +155,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
 
     // ----------------------------------------
 
-    public function getRepairInput()
-    {
-        return array(
-            'SKU' => trim($this->getSku())
-        );
-    }
-
-    public function getVariation()
+    public function getVariationProductOptions()
     {
         $channelItem = $this->getChannelItem();
 
@@ -170,7 +163,18 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
             return array();
         }
 
-        return $channelItem->getVariationOptions();
+        return $channelItem->getVariationProductOptions();
+    }
+
+    public function getVariationChannelOptions()
+    {
+        $channelItem = $this->getChannelItem();
+
+        if (is_null($channelItem)) {
+            return array();
+        }
+
+        return $channelItem->getVariationChannelOptions();
     }
 
     // ########################################
@@ -215,10 +219,8 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
 
             if ($product->getId()) {
                 Mage::dispatchEvent('m2epro_associate_amazon_order_item_to_product', array(
-                    'product_id'     => $product->getId(),
-                    'sku'            => $sku,
-                    'account_id'     => $this->getParentObject()->getOrder()->getAccountId(),
-                    'marketplace_id' => $this->getParentObject()->getOrder()->getMarketplaceId()
+                    'product'    => $product,
+                    'order_item' => $this->getParentObject(),
                 ));
 
                 return $product->getId();
@@ -229,10 +231,8 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         $product = $this->createProduct();
 
         Mage::dispatchEvent('m2epro_associate_amazon_order_item_to_product', array(
-            'product_id'     => $product->getId(),
-            'sku'            => $sku,
-            'account_id'     => $this->getParentObject()->getOrder()->getAccountId(),
-            'marketplace_id' => $this->getParentObject()->getOrder()->getMarketplaceId()
+            'product'    => $product,
+            'order_item' => $this->getParentObject(),
         ));
 
         return $product->getId();

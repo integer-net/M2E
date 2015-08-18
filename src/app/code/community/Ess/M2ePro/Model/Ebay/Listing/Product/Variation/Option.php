@@ -270,7 +270,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
         return $this->getEbayListingProduct()->getDescriptionTemplateSource()->addWatermarkIfNeed($imageLink);
     }
 
-    public function getImagesForEbay()
+    public function getGalleryImages()
     {
         if ($this->getEbayDescriptionTemplate()->isImageMainModeNone()) {
             return array();

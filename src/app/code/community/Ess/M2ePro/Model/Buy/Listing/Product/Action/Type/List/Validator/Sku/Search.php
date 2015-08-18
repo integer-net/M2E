@@ -67,6 +67,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Search
             return true;
         }
 
+        // M2ePro_TRANSLATIONS
+        // Unexpected error during Reference ID generation.
         $this->addMessage('Unexpected error during Reference ID generation.');
 
         return false;
@@ -115,19 +117,25 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Search
     {
         if ($this->isExistInRequestSkus($sku)) {
 
-            $addMessages && $this->addMessage('Product with the same Reference ID is being Listed on Rakuten.com .');
+            // M2ePro_TRANSLATIONS
+            // Product with the same Reference ID is being Listed on Rakuten.com.
+            $addMessages && $this->addMessage('Product with the same Reference ID is being Listed on Rakuten.com.');
             return true;
         }
 
         if ($this->isExistInQueueOfSkus($sku)) {
 
+            // M2ePro_TRANSLATIONS
+            // Product with the same Reference ID is in process of adding to Rakuten.com.
             $addMessages && $this->addMessage('Product with the same Reference ID is
-                                               in process of adding to Rakuten.com .');
+                                               in process of adding to Rakuten.com.');
             return true;
         }
 
         if ($this->isExistInM2eProListings($sku)) {
 
+            // M2ePro_TRANSLATIONS
+            // Product with the same Reference ID is found in the other M2E Pro Listing.
             $addMessages && $this->addMessage('Product with the same Reference ID is found
                                                in the other M2E Pro Listing.');
             return true;
@@ -135,6 +143,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Search
 
         if ($this->isExistInOtherListings($sku)) {
 
+            // M2ePro_TRANSLATIONS
+            // Product with the same Reference ID is found in M2E Pro 3rd Party Listing.
             $addMessages && $this->addMessage('Product with the same Reference ID is found
                                                in M2E Pro 3rd Party Listing.');
             return true;

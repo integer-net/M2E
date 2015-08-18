@@ -100,6 +100,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
                     ->toHtml()
         ));
 
+        $this->addTab('vocabulary', array(
+            'label'   => Mage::helper('M2ePro')->__('Advanced'),
+            'title'   => Mage::helper('M2ePro')->__('Advanced'),
+            'content' => $this->getLayout()
+                ->createBlock('M2ePro/adminhtml_common_amazon_listing_variation_product_manage_tabs_vocabulary')
+                ->setListingProductId($this->getListingProductId())
+                ->toHtml()
+        ));
+
         $generalId = $this->getListingProduct()->getChildObject()->getGeneralId();
         if(empty($generalId) && $this->getListingProduct()->getChildObject()->isGeneralIdOwner()) {
             $this->setActiveTab('settings');

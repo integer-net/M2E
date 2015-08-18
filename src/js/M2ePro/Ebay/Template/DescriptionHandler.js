@@ -281,18 +281,28 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
 
     product_details_specification_visibility_change: function()
     {
-        if ($('product_details_ean').value == ''
-            && $('product_details_upc').value == ''
-            && $('product_details_epid').value == ''
-            && $('product_details_isbn').value == ''
-            && $('product_details_brand').value == ''
+        var self = EbayTemplateDescriptionHandlerObj,
+            modeNone = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Description::PRODUCT_DETAILS_MODE_NONE'),
+            modeDoesNotApply = M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Description::PRODUCT_DETAILS_MODE_DOES_NOT_APPLY');
+
+        var isNotAttributeMode = function(element) {
+            return element.value == modeNone || element.value == modeDoesNotApply;
+        };
+
+        if ($('product_details_ean', 'product_details_upc', 'product_details_isbn', 'product_details_brand')
+                .every(isNotAttributeMode) && $('product_details_epid').value == modeNone
         ) {
             $$('.product-details-specification').each(function(element) {
                 element.hide();
                 element.down('.value').down().selectedIndex = 1;
             });
         } else {
+            var hiddenElement = $(this.id+'_attribute');
+            if (!hiddenElement) {
+                return;
+            }
             $$('.product-details-specification').invoke('show');
+            self.updateHiddenValue(this, hiddenElement);
         }
     },
 
@@ -300,14 +310,26 @@ EbayTemplateDescriptionHandler.prototype = Object.extend(new CommonHandler(), {
     {
         var self = EbayTemplateDescriptionHandlerObj;
 
-        if (this.value != '') {
-            $('product_details_mpn_tr').show();
-        } else {
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Description::PRODUCT_DETAILS_MODE_NONE') ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Description::PRODUCT_DETAILS_MODE_DOES_NOT_APPLY')) {
             $('product_details_mpn_tr').hide();
             $('product_details_mpn').selectedIndex = 0;
+        } else {
+            $('product_details_mpn_tr').show();
+            $$('.product-details-specification').invoke('show');
+            self.updateHiddenValue(this, $(this.id+'_attribute'));
         }
 
         self.product_details_specification_visibility_change();
+    },
+
+    product_details_mpn_change: function()
+    {
+        var self = EbayTemplateDescriptionHandlerObj;
+
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Ebay_Template_Description::PRODUCT_DETAILS_MODE_ATTRIBUTE')) {
+            self.updateHiddenValue(this, $(this.id+'_attribute'));
+        }
     },
 
     insertGallery: function()

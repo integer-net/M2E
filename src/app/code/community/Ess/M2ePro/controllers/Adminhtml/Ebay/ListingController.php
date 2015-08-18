@@ -35,6 +35,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             ->addJs('M2ePro/Listing/EditListingTitle.js')
             ->addJs('M2ePro/Ebay/Listing/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ViewGridHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/BidsHandler.js')
             ->addJs('M2ePro/Ebay/Listing/VariationProductManageHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Ebay/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Settings/GridHandler.js')
@@ -42,10 +43,11 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             ->addJs('M2ePro/Ebay/Listing/Transferring/PaymentHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Transferring/TranslateHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Transferring/InfoHandler.js')
-            ->addJs('M2ePro/Ebay/Motor/CompatibilityHandler.js')
-        ;
+            ->addJs('M2ePro/Ebay/Motor/CompatibilityHandler.js');
 
         $this->_initPopUp();
+
+        $this->setComponentPageHelpLink('Listings+Overview');
 
         return $this;
     }
@@ -193,6 +195,8 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
 
         $this->_initAction();
 
+        $this->setComponentPageHelpLink('Manage+M2E+Pro+Listings');
+
         //------------------------------
         $this->getLayout()->getBlock('head')
             ->addJs('M2ePro/Listing/Category/TreeHandler.js')
@@ -215,9 +219,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             ->addJs('M2ePro/MarketplaceHandler.js')
             ->addJs('M2ePro/Ebay/Listing/TransferringHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Transferring/ActionHandler.js')
-            ->addJs('M2ePro/Ebay/Listing/Transferring/BreadcrumbHandler.js')
-
-        ;
+            ->addJs('M2ePro/Ebay/Listing/Transferring/BreadcrumbHandler.js');
 
         if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()) {
             $this->getLayout()->getBlock('head')->setCanLoadTinyMce(true);
@@ -912,6 +914,41 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
 
     //#############################################
 
+    public function getListingProductBidsAction()
+    {
+        $productId = $this->getRequest()->getParam('product_id');
+
+        if (empty($productId)) {
+            return $this->getResponse()->setBody('You should provide correct parameters');
+        }
+
+        /** @var Ess_M2ePro_Model_Ebay_Listing_Product $listingProduct */
+        $listingProduct = Mage::helper('M2ePro/Component_Ebay')->getObject('Listing_Product', $productId);
+
+        /** @var $dispatcherObject Ess_M2ePro_Model_Connector_Ebay_Dispatcher */
+        $dispatcherObject = Mage::getModel('M2ePro/Connector_Ebay_Dispatcher');
+        $connectorObj = $dispatcherObject->getVirtualConnector('item','get','bids',
+            array('item_id' => $listingProduct->getChildObject()->getEbayItem()->getItemId()),
+            null,
+            null,
+            $listingProduct->getAccount()->getId());
+
+        $bidsData = $dispatcherObject->process($connectorObj);
+
+        $grid = $this->loadLayout()->getLayout()
+            ->createBlock('M2ePro/adminhtml_ebay_listing_bids_grid');
+
+        if (empty($bidsData['items'])) {
+            return $this->getResponse()->setBody(Mage::helper('M2ePro')->__('Bids not found.'));
+        }
+        $grid->setBidsData($bidsData['items']);
+        $grid->setListingProductId($productId);
+
+        return $this->getResponse()->setBody($grid->toHtml());
+    }
+
+    //#############################################
+
     protected function processConnector($action, array $params = array())
     {
         if (!$listingsProductsIds = $this->getRequest()->getParam('selected_products')) {
@@ -1125,8 +1162,11 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
             'products_count'=>count($ids)
         );
 
-        $this->_initAction()
-             ->_title(Mage::helper('M2ePro')->__('Listing Review'))
+        $this->_initAction();
+
+        $this->setComponentPageHelpLink('Creation+of+new+M2E+Pro+Listing');
+
+        $this->_title(Mage::helper('M2ePro')->__('Listing Review'))
              ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_product_review', '', $data))
              ->renderLayout();
     }

@@ -27,10 +27,11 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
             ->addJs('M2ePro/Ebay/Template/ShippingHandler.js')
             ->addJs('M2ePro/Ebay/Template/SellingFormatHandler.js')
             ->addJs('M2ePro/Ebay/Template/DescriptionHandler.js')
-            ->addJs('M2ePro/Ebay/Template/SynchronizationHandler.js')
-        ;
+            ->addJs('M2ePro/Ebay/Template/SynchronizationHandler.js');
 
         $this->_initPopUp();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367055');
 
         if (Mage::helper('M2ePro/Magento')->isTinyMceAvailable()) {
             $this->getLayout()->getBlock('head')->setCanLoadTinyMce(true);
@@ -285,6 +286,9 @@ class Ess_M2ePro_Adminhtml_Ebay_TemplateController extends Ess_M2ePro_Controller
         //------------------------------
 
         $this->_initAction();
+
+        $this->setComponentPageHelpLink('Edit+M2E+Pro+Listings+Settings');
+
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_template_edit'))
              ->renderLayout();
     }

@@ -24,6 +24,7 @@ CommonAmazonTemplateDescriptionCategorySpecificHandler.prototype = Object.extend
         // -------
 
         self.categoryInfo    = null;
+        self.productDataNick = null;
 
         self.formDataSpecifics = [];
         self.selectedSpecifics = {};
@@ -182,10 +183,12 @@ CommonAmazonTemplateDescriptionCategorySpecificHandler.prototype = Object.extend
 
     //###################################
 
-    run: function(categoryInfo)
+    run: function(categoryInfo, productDataNick)
     {
         this.specificsContainer.update();
-        this.categoryInfo = categoryInfo;
+
+        this.categoryInfo    = categoryInfo;
+        this.productDataNick = productDataNick;
 
         this.initThemeAttributes();
         this.initSpecifics();
@@ -193,7 +196,8 @@ CommonAmazonTemplateDescriptionCategorySpecificHandler.prototype = Object.extend
 
     reset: function()
     {
-        this.categoryInfo = null;
+        this.categoryInfo    = null;
+        this.productDataNick = null;
 
         this.selectedSpecifics = {};
         this.renderedSpecifics = [];
@@ -205,7 +209,7 @@ CommonAmazonTemplateDescriptionCategorySpecificHandler.prototype = Object.extend
 
     isReady: function()
     {
-        return this.categoryInfo != null;
+        return this.categoryInfo != null && this.productDataNick != null;
     },
 
     //###################################
@@ -219,7 +223,7 @@ CommonAmazonTemplateDescriptionCategorySpecificHandler.prototype = Object.extend
             asynchronous: false,
             parameters: {
                 marketplace_id:    $('marketplace_id').value,
-                product_data_nick: self.categoryInfo.product_data_nick
+                product_data_nick: self.productDataNick
             },
             onSuccess: function(transport) {
                 self.themeAttributes = transport.responseText.evalJSON();
@@ -236,7 +240,7 @@ CommonAmazonTemplateDescriptionCategorySpecificHandler.prototype = Object.extend
             asynchronous: true,
             parameters: {
                 marketplace_id:     $('marketplace_id').value,
-                product_data_nick:  self.categoryInfo.product_data_nick
+                product_data_nick:  self.productDataNick
             },
             onSuccess: function(transport) {
                 try {

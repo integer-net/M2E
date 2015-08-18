@@ -14,6 +14,24 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationToV6Controller
         return Ess_M2ePro_Helper_Module::WIZARD_MIGRATION_NICK;
     }
 
+    protected function getMenuRootNodeNick()
+    {
+        if (count(Mage::helper('M2ePro/View_Ebay_Component')->getActiveComponents()) > 0) {
+            return Ess_M2ePro_Helper_View_Ebay::NICK;
+        }
+
+        return Ess_M2ePro_Helper_View_Common::NICK;
+    }
+
+    protected function getMenuRootNodeLabel()
+    {
+        if (count(Mage::helper('M2ePro/View_Ebay_Component')->getActiveComponents()) > 0) {
+            return Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel();
+        }
+
+        return Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel();
+    }
+
     //#############################################
 
     protected function getCustomViewNick()
@@ -30,33 +48,15 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationToV6Controller
         return Mage::getSingleton('admin/session')->isAllowed($menuNickTemp);
     }
 
-    public function loadLayout($ids=null, $generateBlocks=true, $generateXml=true)
-    {
-        $tempResult = parent::loadLayout($ids, $generateBlocks, $generateXml);
-
-        if (count(Mage::helper('M2ePro/View_Ebay_Component')->getActiveComponents()) > 0) {
-            $tempResult->_setActiveMenu(Ess_M2ePro_Helper_View_Ebay::NICK);
-            $tempResult->_title(Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel());
-        } else {
-            $tempResult->_setActiveMenu(Ess_M2ePro_Helper_View_Common::NICK);
-            $tempResult->_title(Mage::helper('M2ePro/View_Common')->getMenuRootNodeLabel());
-        }
-
-        return $tempResult;
-    }
-
     //#############################################
 
     public function indexAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if ($wizardHelper->isNotStarted($this->getNick())) {
+        if ($this->isNotStarted()) {
             return $this->_redirect('*/*/welcome');
         }
 
-        if ($wizardHelper->isActive($this->getNick())) {
+        if ($this->isActive()) {
             return $this->_redirect('*/*/installation');
         }
 
@@ -71,36 +71,26 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationToV6Controller
 
     public function installationAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
         Mage::getSingleton('M2ePro/Wizard_MigrationToV6')->removeEmptySteps();
 
-        if ($wizardHelper->isFinished($this->getNick()) ||
-            $wizardHelper->isNotStarted($this->getNick())) {
+        if ($this->isFinished() || $this->isNotStarted()) {
             return $this->_redirect('*/*/index');
         }
 
-        if (!$wizardHelper->getStep($this->getNick())) {
-            $wizardHelper->setStep(
-                $this->getNick(),
-                $wizardHelper->getWizard($this->getNick())->getFirstStep()
-            );
+        if (!$this->getCurrentStep()) {
+            $this->setStep($this->getFirstStep());
         }
 
-        $currentStep = $wizardHelper->getStep($this->getNick());
-
-        $this->_forward($currentStep);
+        $this->_forward($this->getCurrentStep());
     }
 
     public function saveSellingFormatCurrenciesAction()
     {
         $postParam = $this->getRequest()->getPost('form_data');
-        $nextStep = Mage::helper('M2ePro/Module_Wizard')->getWizard($this->getNick())->getNextStep();
 
         $response = array(
             'success' => true,
-            'next_step' => $nextStep
+            'next_step' => $this->getNextStep()
         );
         $this->getResponse()->setBody(json_encode($response));
 
@@ -119,13 +109,12 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationToV6Controller
 
     private function renderSimpleStep()
     {
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        $currentStep = $wizardHelper->getStep($this->getNick());
-
         return $this->_initAction()
-            ->_addContent($wizardHelper->createBlock('installation_'.$currentStep,$this->getNick()))
-            ->renderLayout();
+                    ->_addContent($this->getWizardHelper()->createBlock(
+                        'installation_'.$this->getCurrentStep(),
+                        $this->getNick())
+                    )
+                    ->renderLayout();
     }
 
     //#############################################

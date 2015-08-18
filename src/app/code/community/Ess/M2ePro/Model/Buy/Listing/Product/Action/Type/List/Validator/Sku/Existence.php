@@ -28,6 +28,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Existe
         if ($this->getBuyListingProduct()->getGeneralId() &&
             $this->getBuyListingProduct()->getGeneralId() != $this->existenceResult['general_id']
         ) {
+            // M2ePro_TRANSLATIONS
+            // Product with the same Reference ID is found on Rakuten.com but the Rakuten.com SKU is different in Magento and on Rakuten.com.
             $this->addMessage(
                 'Product with the same Reference ID is found on Rakuten.com but the Rakuten.com SKU
                  is different in Magento and on Rakuten.com.'
@@ -52,6 +54,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_Sku_Existe
 
         $linkingObject->link();
 
+        // M2ePro_TRANSLATIONS
+        // Product was successfully found in Rakuten.com Inventory by Reference ID and linked to your Magento Product.
         $this->addMessage(
             'Product was successfully found in Rakuten.com Inventory
              by Reference ID and linked to your Magento Product.',

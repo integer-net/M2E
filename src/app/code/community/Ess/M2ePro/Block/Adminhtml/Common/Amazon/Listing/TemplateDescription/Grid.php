@@ -374,7 +374,11 @@ HTML;
             $collection->addFieldToFilter('is_variation_parent', 1);
 
             $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
-            $collection->addFieldToSelect('additional_data');
+            $collection->getSelect()->columns(
+                array(
+                    'main_table.additional_data'
+                )
+            );
 
             foreach ($collection->getData() as $row) {
                 $data = json_decode($row['additional_data'], true);

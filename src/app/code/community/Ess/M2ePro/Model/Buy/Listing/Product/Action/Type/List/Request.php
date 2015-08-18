@@ -12,8 +12,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Request
     protected function getActionData()
     {
         $data = array(
-            'sku'             => $this->validatorsData['sku'],
-            'product_id'      => $this->validatorsData['general_id'],
+            'sku'        => $this->validatorsData['sku'],
+            'product_id' => $this->validatorsData['general_id'],
         );
 
         if (!empty($this->validatorsData['general_id_mode'])) {

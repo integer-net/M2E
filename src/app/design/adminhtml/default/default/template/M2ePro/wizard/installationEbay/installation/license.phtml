@@ -1,72 +1,127 @@
+<?php
+    /* @var Ess_M2ePro_Block_Adminhtml_Wizard_InstallationEbay_Installation_License_Content $this*/
+?>
+
+<script type="text/javascript">
+
+    M2ePro.translator.add(<?php echo json_encode(array(
+        'An error during of license creation occurred.' => Mage::helper('M2ePro')->__('The eBay token obtaining is currently unavailable. Please try again later.'),
+        'Register Your Free M2E Pro Extension'          => Mage::helper('M2ePro')->__('Register Your Free M2E Pro Extension')
+    )); ?>);
+
+    var init = function() {
+
+        InstallationEbayWizardObj.initLicense();
+
+        $('edit_license').observe('click', function() {
+            InstallationEbayWizardObj.openPopupAction();
+        });
+
+        $('sign_into_ebay_button').observe('click',function() {
+            InstallationEbayWizardObj.createLicenseAndGetToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_PRODUCTION; ?>');
+        });
+        $('sign_into_ebay_sandbox').observe('click',function() {
+            InstallationEbayWizardObj.createLicenseAndGetToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_SANDBOX; ?>');
+        });
+
+        $('license_popup_cancel_link').observe('click', function() {
+            InstallationEbayWizardObj.closePopupAction();
+        });
+
+        $('license_popup_confirm_button').observe('click', function() {
+            InstallationEbayWizardObj.confirmPopupAction();
+        });
+
+        <?php if ($this->getData('isLicenseStepFinished')) : ?>
+            $('edit_license').hide();
+        <?php endif; ?>
+
+        InstallationEbayWizardObj.checkFormFilling();
+    };
+
+    Event.observe(window, 'load', init);
+
+</script>
+
 <div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Please ensure your personal information is correct'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes">
 
     <div class="clear" style="margin-bottom: 15px;"></div>
 
     <div style="border: 1px solid #CCCCCC; float: left; padding: 10px 25px 10px 25px; font-size: 13px">
 
-        <table id="license_table" class="form-list" cellspacing="0" cellpadding="0">
-            <tbody>
-                <tr>
-                    <td class="label" style="width: 150px">
-                        <?php echo Mage::helper('M2ePro')->__('Email') ?>:
-                    </td>
-                    <td id="email" class="value" style="width: 200px">
-                        <?php echo Mage::helper('M2ePro')->__($this->getData('email')); ?>
-                    </td>
-                </tr>
+        <form id="license_form">
 
-                <tr>
-                    <td class="label" style="width: 150px">
-                        <?php echo Mage::helper('M2ePro')->__('First Name') ?>:
-                    </td>
-                    <td id="firstname" class="value" style="width: 200px">
-                        <?php echo Mage::helper('M2ePro')->__($this->getData('firstname')); ?>
-                    </td>
-                </tr>
+            <table id="license_table" class="form-list" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td class="label" style="width: 150px">
+                            <?php echo Mage::helper('M2ePro')->__('Email') ?>:
+                        </td>
+                        <td id="email" class="value" style="width: 200px">
+                            <input type="hidden" name="form_email" class="required-entry" value="<?php echo $this->getUserInfoValue('email') ; ?>">
+                            <span><?php echo $this->getUserInfoValue('email', 'span'); ?></span>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td class="label" style="width: 150px">
-                        <?php echo Mage::helper('M2ePro')->__('Last Name') ?>:
-                    </td>
-                    <td id="lastname" class="value" style="width: 200px">
-                        <?php echo Mage::helper('M2ePro')->__($this->getData('lastname')); ?>
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="label" style="width: 150px">
+                            <?php echo Mage::helper('M2ePro')->__('First Name') ?>:
+                        </td>
+                        <td id="firstname" class="value" style="width: 200px">
+                            <input type="hidden" name="form_email" class="required-entry" value="<?php echo $this->getUserInfoValue('firstname') ; ?>">
+                            <span><?php echo $this->getUserInfoValue('firstname', 'span'); ?></span>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                </tr>
+                    <tr>
+                        <td class="label" style="width: 150px">
+                            <?php echo Mage::helper('M2ePro')->__('Last Name') ?>:
+                        </td>
+                        <td id="lastname" class="value" style="width: 200px">
+                            <input type="hidden" name="form_email" class="required-entry" value="<?php echo $this->getUserInfoValue('lastname') ; ?>">
+                            <span><?php echo $this->getUserInfoValue('lastname', 'span'); ?></span>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td class="label" style="width: 150px">
-                        <?php echo Mage::helper('M2ePro')->__('Country') ?>:
-                    </td>
-                    <td id="country" class="value" style="width: 200px">
-                        <?php echo Mage::helper('M2ePro')->__($this->getCountryLabelByCode($this->getData('country'))); ?>
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="2">&nbsp;</td>
+                    </tr>
 
-                <tr>
-                    <td class="label" style="width: 150px">
-                        <?php echo Mage::helper('M2ePro')->__('City') ?>:
-                    </td>
-                    <td id="city" class="value" style="width: 200px">
-                        <?php echo Mage::helper('M2ePro')->__($this->getData('city')); ?>
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="label" style="width: 150px">
+                            <?php echo Mage::helper('M2ePro')->__('Country') ?>:
+                        </td>
+                        <td id="country" class="value" style="width: 200px">
+                            <input type="hidden" name="form_country" class="required-entry" value="<?php echo $this->getUserInfoValue('country'); ?>">
+                            <span><?php echo $this->getUserInfoValue('country', 'span'); ?></span>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td class="label" style="width: 150px">
-                        <?php echo Mage::helper('M2ePro')->__('Postal Code') ?>:
-                    </td>
-                    <td id="postal_code" class="value" style="width: 200px">
-                        <?php echo Mage::helper('M2ePro')->__($this->getData('postal_code')); ?>
-                    </td>
-                </tr>
+                    <tr>
+                        <td class="label" style="width: 150px">
+                            <?php echo Mage::helper('M2ePro')->__('City') ?>:
+                        </td>
+                        <td id="city" class="value" style="width: 200px">
+                            <input type="hidden" name="form_email" class="required-entry" value="<?php echo $this->getUserInfoValue('city') ; ?>">
+                            <span><?php echo $this->getUserInfoValue('city', 'span'); ?></span>
+                        </td>
+                    </tr>
 
-            </tbody>
+                    <tr>
+                        <td class="label" style="width: 150px">
+                            <?php echo Mage::helper('M2ePro')->__('Postal Code') ?>:
+                        </td>
+                        <td id="postal_code" class="value" style="width: 200px">
+                            <input type="hidden" name="form_email" class="required-entry" value="<?php echo $this->getUserInfoValue('postal_code') ; ?>">
+                            <span><?php echo $this->getUserInfoValue('postal_code', 'span'); ?></span>
+                        </td>
+                    </tr>
 
-        </table>
+                </tbody>
+
+            </table>
+
+        </form>
 
         <div class="right">
             <a id="edit_license" href="javascript:"><?php echo Mage::helper('M2ePro')->__('Edit'); ?></a>
@@ -108,11 +163,13 @@
 
 </div>
 
+<!-- ### LICENSE EDIT POPUP ### -->
+
 <div id="license_popup_content" style="display: none;">
     <div style="padding: 10px; height: 250px">
         <div class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Please verify the information is valid before we register you with M2E Pro.'); ?>" subtitle="" collapseable="no" hideblock="no" always_show="yes"></div>
 
-        <form id="license_form">
+        <form id="popup_license_form">
             <div class="fieldset">
                 <div class="hor-scroll">
                     <table class="form-list" cellspacing="0" cellpadding="0">
@@ -194,128 +251,3 @@
     </div>
 
 </div>
-
-<script type="text/javascript">
-
-    var licenseForm;
-
-    var licenseInit = function() {
-
-        var licensePopUp;
-        licenseForm = new varienForm('license_form');
-
-        $('edit_license').observe('click', function() {
-
-            licensePopUp = Dialog.info(null, {
-                draggable: true,
-                resizable: true,
-                closable: true,
-                className: "magento",
-                windowClassName: "popup-window",
-                title: '<?php echo Mage::helper('M2ePro')->__('Register Your Free M2E Pro Extension'); ?>',
-                width: 640,
-                height: 315,
-                zIndex: 100,
-                recenterAuto: false,
-                hideEffect: Element.hide,
-                showEffect: Element.show
-            });
-
-            licensePopUp.options.destroyOnClose = false;
-            $('modal_dialog_message').insert($('license_popup_content').show());
-
-            Form.getElements($(licenseForm.formId)).each(function(element) {
-                element.setValue($(element.name).innerHTML.trim())
-            });
-        });
-
-        <?php if ($this->getData('isLicenseStepFinished')) : ?>
-            $('edit_license').hide();
-        <?php endif; ?>
-
-        $('license_popup_cancel_link').observe('click',function() {
-            licensePopUp.close();
-        });
-        $('license_popup_confirm_button').observe('click',function() {
-
-            if (!licenseForm.validate()) {
-                return;
-            }
-
-            Form.getElements($(licenseForm.formId)).each(function(element) {
-                $(element.readAttribute('name')).update(element.value);
-            });
-
-            licensePopUp.close();
-        });
-
-    };
-
-    var accountInit = function() {
-
-        var getToken = function(mode) {
-
-            if (!checkRequiredFields()) {
-                return;
-            }
-
-            MagentoMessageObj.clearAll();
-
-            var formData = {};
-
-            Form.getElements($('license_form')).each(function(element) {
-                var attribute = element.readAttribute('name');
-                element.value && (formData[attribute] = element.value);
-            });
-
-            var parameters = Object.extend(
-                {account_mode: mode},
-                formData
-            );
-
-            new Ajax.Request('<?php echo $this->getUrl('*/*/beforeToken'); ?>',
-            {
-                method: 'post',
-                asynchronous: true,
-                parameters: parameters,
-                onSuccess: function(transport) {
-                    var url = transport.responseText.evalJSON().url;
-                    if (!url) {
-                        MagentoMessageObj.addError('<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The eBay token obtaining is currently unavailable. Please try again later.')); ?>');
-                        return CommonHandlerObj.scroll_page_to_top();
-                    }
-                    return setLocation(url);
-                }
-            });
-        };
-
-        $('sign_into_ebay_button').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_PRODUCTION; ?>') });
-        $('sign_into_ebay_sandbox').observe('click',function() { getToken('<?php echo Ess_M2ePro_Model_Connector_Ebay_Abstract::MODE_SANDBOX; ?>') });
-    };
-
-    var checkRequiredFields = function()
-    {
-        Form.getElements($(licenseForm.formId)).each(function(element) {
-            element.setValue($(element.name).innerHTML.trim())
-        });
-
-        if (licenseForm.validate()) {
-            return true;
-        }
-
-        $('edit_license').simulate('click');
-        $('license_popup_confirm_button').click();
-
-        return false;
-    };
-
-    var init = function() {
-
-        licenseInit();
-        accountInit();
-        checkRequiredFields();
-    };
-
-    Event.observe(window, 'load', init);
-
-</script>

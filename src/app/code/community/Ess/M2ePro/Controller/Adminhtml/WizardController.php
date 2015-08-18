@@ -7,9 +7,16 @@
 abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
     extends Ess_M2ePro_Controller_Adminhtml_MainController
 {
+    /** @var Ess_M2ePro_Helper_Module_Wizard|null  */
+    protected $wizardHelper = NULL;
+
     //#############################################
 
     abstract protected function getNick();
+
+    abstract protected function getMenuRootNodeNick();
+
+    abstract protected function getMenuRootNodeLabel();
 
     //#############################################
 
@@ -31,14 +38,11 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
 
     public function indexAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if ($wizardHelper->isNotStarted($this->getNick())) {
+        if ($this->isNotStarted()) {
             return $this->_redirect('*/*/welcome');
         }
 
-        if ($wizardHelper->isActive($this->getNick())) {
+        if ($this->isActive()) {
             return $this->_redirect('*/*/installation');
         }
 
@@ -49,53 +53,34 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
 
     public function welcomeAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if (!$wizardHelper->isNotStarted($this->getNick())) {
+        if (!$this->isNotStarted()) {
             return $this->_redirect('*/*/index');
         }
 
-        $wizardHelper->setStatus(
-            $this->getNick(),
-            Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE
-        );
-        $wizardHelper->setStep(
-            $this->getNick(),
-            $wizardHelper->getWizard($this->getNick())->getFirstStep()
-        );
+        $this->setStatus(Ess_M2ePro_Helper_Module_Wizard::STATUS_ACTIVE)
+             ->setStep($this->getFirstStep());
 
         $this->_redirect('*/*/index');
     }
 
     public function installationAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if ($wizardHelper->isFinished($this->getNick()) ||
-            $wizardHelper->isNotStarted($this->getNick())) {
+        if ($this->isFinished() || $this->isNotStarted()) {
             return $this->_redirect('*/*/index');
         }
 
-        if (!$wizardHelper->getStep($this->getNick())) {
-            $wizardHelper->setStep(
-                $this->getNick(),
-                $wizardHelper->getWizard($this->getNick())->getFirstStep()
-            );
+        if (!$this->getCurrentStep()) {
+            $this->setStep($this->getFirstStep());
         }
 
         return $this->_initAction()
-            ->_addContent($wizardHelper->createBlock('installation',$this->getNick()))
-            ->renderLayout();
+                    ->_addContent($this->getWizardHelper()->createBlock('installation',$this->getNick()))
+                    ->renderLayout();
     }
 
     public function congratulationAction()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        if (!$wizardHelper->isFinished($this->getNick())) {
+        if (!$this->isFinished()) {
             $this->_redirect('*/*/index');
             return;
         }
@@ -103,7 +88,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
         Mage::helper('M2ePro/Magento')->clearMenuCache();
 
         $this->_initAction();
-        $this->_addContent($wizardHelper->createBlock('congratulation',$this->getNick()));
+        $this->_addContent($this->getWizardHelper()->createBlock('congratulation',$this->getNick()));
         $this->_addNextWizardPresentation();
         $this->renderLayout();
     }
@@ -114,10 +99,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
     {
         Mage::helper('M2ePro/Magento')->clearMenuCache();
 
-        Mage::helper('M2ePro/Module_Wizard')->setStatus(
-            $this->getNick(),
-            Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
-        );
+        $this->setStatus(Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED);
 
         $this->_redirect('*/*/index');
     }
@@ -126,12 +108,93 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
     {
         Mage::helper('M2ePro/Magento')->clearMenuCache();
 
-        Mage::helper('M2ePro/Module_Wizard')->setStatus(
-            $this->getNick(),
-            Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED
-        );
+        $this->setStatus(Ess_M2ePro_Helper_Module_Wizard::STATUS_COMPLETED);
 
         $this->_redirect('*/*/index');
+    }
+
+    //#############################################
+
+    protected function getWizardHelper()
+    {
+        if (is_null($this->wizardHelper)) {
+            $this->wizardHelper = Mage::helper('M2ePro/Module_Wizard');
+        }
+
+        return $this->wizardHelper;
+    }
+
+    //---------------------------------------------
+
+    protected function setStatus($status)
+    {
+        $this->getWizardHelper()->setStatus($this->getNick(), $status);
+        return $this;
+    }
+
+    protected function getStatus()
+    {
+        return $this->getWizardHelper()->getStatus($this->getNick());
+    }
+
+    //---------------------------------------------
+
+    protected function setStep($step)
+    {
+        $this->getWizardHelper()->setStep($this->getNick(), $step);
+        return $this;
+    }
+
+    protected function getSteps()
+    {
+        return $this->getWizardHelper()->getWizard($this->getNick())->getSteps();
+    }
+
+    protected function getFirstStep()
+    {
+        return $this->getWizardHelper()->getWizard($this->getNick())->getFirstStep();
+    }
+
+    protected function getPrevStep()
+    {
+        return $this->getWizardHelper()->getWizard($this->getNick())->getPrevStep();
+    }
+
+    protected function getCurrentStep()
+    {
+        return $this->getWizardHelper()->getStep($this->getNick());
+    }
+
+    protected function getNextStep()
+    {
+        return $this->getWizardHelper()->getWizard($this->getNick())->getNextStep();
+    }
+
+    //---------------------------------------------
+
+    protected function isNotStarted()
+    {
+        return $this->getWizardHelper()->isNotStarted($this->getNick());
+    }
+
+    protected function isActive()
+    {
+        return $this->getWizardHelper()->isActive($this->getNick());
+    }
+
+    public function isCompleted()
+    {
+        return $this->getWizardHelper()->isCompleted($this->getNick());
+    }
+
+    public function isSkipped()
+    {
+        return $this->getWizardHelper()->isSkipped($this->getNick());
+    }
+
+    protected function isFinished()
+    {
+        return $this->getWizardHelper()->isFinished($this->getNick());
     }
 
     //#############################################
@@ -147,9 +210,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
             )));
         }
 
-        Mage::helper('M2ePro/Module_Wizard')->setStep(
-            $this->getNick(),$step
-        );
+        $this->setStep($step);
 
         $this->getResponse()->setBody(json_encode(array(
             'type' => 'success'
@@ -167,9 +228,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
             )));
         }
 
-        Mage::helper('M2ePro/Module_Wizard')->setStatus(
-            $this->getNick(),$status
-        );
+        $this->setStatus($status);
 
         $this->getResponse()->setBody(json_encode(array(
             'type' => 'success'
@@ -180,16 +239,30 @@ abstract class Ess_M2ePro_Controller_Adminhtml_WizardController
 
     protected function _addNextWizardPresentation()
     {
-        /* @var $wizardHelper Ess_M2ePro_Helper_Module_Wizard */
-        $wizardHelper = Mage::helper('M2ePro/Module_Wizard');
-
-        $nextWizard = $wizardHelper->getActiveWizard($this->getCustomViewNick());
+        $nextWizard = $this->getWizardHelper()->getActiveWizard($this->getCustomViewNick());
         if ($nextWizard) {
-            $presentationBlock = $wizardHelper->createBlock('presentation',$wizardHelper->getNick($nextWizard));
+            $presentationBlock = $this->getWizardHelper()->createBlock(
+                'presentation',$this->getWizardHelper()->getNick($nextWizard)
+            );
             $presentationBlock && $this->_addContent($presentationBlock);
         }
 
         return $this;
+    }
+
+    //#############################################
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed($this->getMenuRootNodeNick());
+    }
+
+    public function loadLayout($ids=null, $generateBlocks=true, $generateXml=true)
+    {
+        $tempResult = parent::loadLayout($ids, $generateBlocks, $generateXml);
+        $tempResult->_setActiveMenu($this->getMenuRootNodeNick());
+        $tempResult->_title($this->getMenuRootNodeLabel());
+        return $tempResult;
     }
 
     //#############################################

@@ -38,6 +38,8 @@ class Ess_M2ePro_Model_Observer_Indexes_Enable extends Ess_M2ePro_Model_Observer
             return;
         }
 
+        // M2ePro_TRANSLATIONS
+        // Product reindex was executed.
         Mage::getModel('M2ePro/Synchronization_Log')->addMessage(
             Mage::helper('M2ePro')->__('Product reindex was executed.'),
             Ess_M2ePro_Model_Log_Abstract::TYPE_NOTICE,

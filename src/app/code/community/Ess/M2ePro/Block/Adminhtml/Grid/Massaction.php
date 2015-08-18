@@ -114,8 +114,12 @@ JAVASCRIPT;
                 continue;
             }
 
-            $option = $select->removeChild($option);
-            $select->appendChild($option);
+            try {
+
+                $option = $select->removeChild($option);
+                $select->appendChild($option);
+
+            } catch(DOMException $e) {}
         }
 
         // Removing doctype, html, body

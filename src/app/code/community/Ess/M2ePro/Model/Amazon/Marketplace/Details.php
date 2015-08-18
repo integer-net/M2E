@@ -26,6 +26,11 @@ class Ess_M2ePro_Model_Amazon_Marketplace_Details
 
     // ##########################################################
 
+    public function getProductData()
+    {
+       return $this->productData;
+    }
+
     public function getVariationThemes($productDataNick)
     {
         if (!isset($this->productData[$productDataNick])) {

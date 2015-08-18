@@ -18,6 +18,10 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_Components_Form extends Ess_M2ePr
         //------------------------------
 
         $this->setTemplate('M2ePro/configuration/components.phtml');
+
+        //------------------------------
+
+        $this->setPageHelpLink('Global+Settings#GlobalSettings-Channels');
     }
 
     // ########################################

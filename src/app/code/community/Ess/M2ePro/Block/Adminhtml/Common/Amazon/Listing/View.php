@@ -9,6 +9,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
     const VIEW_MODE_AMAZON   = 'amazon';
     const VIEW_MODE_MAGENTO  = 'magento';
     const VIEW_MODE_SELLERCENTRAL = 'sellercentral';
+    const VIEW_MODE_SETTINGS = 'settings';
 
     const DEFAULT_VIEW_MODE = self::VIEW_MODE_AMAZON;
 
@@ -84,7 +85,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
 
     public function getViewMode()
     {
-        $allowedModes = array(self::VIEW_MODE_AMAZON, self::VIEW_MODE_MAGENTO, self::VIEW_MODE_SELLERCENTRAL);
+        $allowedModes = array(
+            self::VIEW_MODE_AMAZON,
+            self::VIEW_MODE_SETTINGS,
+            self::VIEW_MODE_MAGENTO,
+            self::VIEW_MODE_SELLERCENTRAL
+        );
         $mode = $this->getParam('view_mode', self::DEFAULT_VIEW_MODE);
 
         if (in_array($mode, $allowedModes)) {
@@ -305,6 +311,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
             '*/adminhtml_common_amazon_listing_variation_product_manage/addOptionsToVocabulary'
         );
 
+        $viewVocabularyAjax = $this->getUrl(
+            '*/adminhtml_common_amazon_listing_variation_product_manage/viewVocabularyAjax'
+        );
+        $saveAutoActionSettings = $this->getUrl(
+            '*/adminhtml_common_amazon_listing_variation_product_manage/saveAutoActionSettings'
+        );
+        $removeAttributeFromVocabulary = $this->getUrl(
+            '*/adminhtml_common_amazon_listing_variation_product_manage/removeAttributeFromVocabulary'
+        );
+        $removeOptionFromVocabulary = $this->getUrl(
+            '*/adminhtml_common_amazon_listing_variation_product_manage/removeOptionFromVocabulary'
+        );
+
         $viewVariationsSettingsAjax = $this->getUrl(
             '*/adminhtml_common_amazon_listing_variation_product_manage/viewVariationsSettingsAjax');
 
@@ -360,7 +379,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
             'Rule with the same Title already exists.' => $helper->__('Rule with the same Title already exists.')
         ));
 
-        $javascriptsMain = <<<JAVASCRIPT
+        $javascriptsMain = <<<HTML
 <script type="text/javascript">
 
     if (typeof M2ePro == 'undefined') {
@@ -407,6 +426,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
     M2ePro.url.viewVariationsSettingsAjax = '{$viewVariationsSettingsAjax}';
     M2ePro.url.addAttributesToVocabulary = '{$addAttributesToVocabularyUrl}';
     M2ePro.url.addOptionsToVocabulary = '{$addOptionsToVocabularyUrl}';
+    M2ePro.url.viewVocabularyAjax = '{$viewVocabularyAjax}';
+    M2ePro.url.saveAutoActionSettings = '{$saveAutoActionSettings}';
+    M2ePro.url.removeAttributeFromVocabulary = '{$removeAttributeFromVocabulary}';
+    M2ePro.url.removeOptionFromVocabulary = '{$removeOptionFromVocabulary}';
 
     M2ePro.url.newAsin = '{$newAsinUrl}';
 
@@ -535,7 +558,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View extends Mage_Adminht
     });
 
 </script>
-JAVASCRIPT;
+HTML;
 
         $helpBlock = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_view_help');
         $productSearchBlock = $this->getLayout()

@@ -231,7 +231,13 @@ CommonAmazonListingVariationProductManageVariationsGridHandler = Class.create(Co
                 onSuccess: function(transport) {
 
                     var response = self.parseResponse(transport);
-                    if(response.success) {
+
+                    if (response['vocabulary_attribute_options']) {
+                        window.parent.ListingGridHandlerObj.variationProductManageHandler.openVocabularyOptionsPopUp(response['vocabulary_attribute_options']);
+                        return;
+                    }
+
+                    if (response.success) {
                         self.actionHandler.gridHandler.unselectAllAndReload();
                         $('loading-mask').hide();
 
@@ -522,6 +528,7 @@ CommonAmazonListingVariationProductManageVariationsGridHandler = Class.create(Co
         $super();
 
         window.parent.ListingGridHandlerObj.variationProductManageHandler.reloadSettings(null, true);
+        window.parent.ListingGridHandlerObj.variationProductManageHandler.reloadVocabulary(null, true);
     }
 
     //----------------------------------

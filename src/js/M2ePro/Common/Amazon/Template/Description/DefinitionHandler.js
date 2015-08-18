@@ -335,6 +335,16 @@ CommonAmazonTemplateDescriptionDefinitionHandler.prototype = Object.extend(new C
         }
     },
 
+    image_variation_difference_mode_change: function()
+    {
+        var self = AmazonTemplateDescriptionDefinitionHandlerObj;
+
+        $('image_variation_difference_attribute').value = '';
+        if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_ATTRIBUTE')) {
+            self.updateHiddenValue(this, $('image_variation_difference_attribute'));
+        }
+    },
+
     gallery_images_mode_change: function()
     {
         $('gallery_images_limit').value = '';

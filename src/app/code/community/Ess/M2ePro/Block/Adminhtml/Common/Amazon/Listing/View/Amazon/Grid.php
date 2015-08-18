@@ -12,6 +12,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
 
     private $lockedDataCache = array();
 
+    private $childProductsWarningsData;
+
     private $hideSwitchToIndividualConfirm;
     private $hideSwitchToParentConfirm;
 
@@ -376,18 +378,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ), 'actions');
 
-        $this->getMassactionBlock()->addItem('assignTemplateDescriptionId', array(
-            'label'    => Mage::helper('M2ePro')->__('Assign'),
-            'url'      => '',
-            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
-        ), 'description_policy');
-
-        $this->getMassactionBlock()->addItem('unassignTemplateDescriptionId', array(
-            'label'    => Mage::helper('M2ePro')->__('Unassign'),
-            'url'      => '',
-            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
-        ), 'description_policy');
-
         $this->getMassactionBlock()->addItem('assignGeneralId', array(
             'label'    => Mage::helper('M2ePro')->__('Search Automatically'),
             'url'      => '',
@@ -404,18 +394,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             'url'      => '',
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ), 'asin_isbn');
-
-        $this->getMassactionBlock()->addItem('moving', array(
-            'label'    => Mage::helper('M2ePro')->__('Move Item(s) to Another Listing'),
-            'url'      => '',
-            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
-        ), 'other');
-
-        $this->getMassactionBlock()->addItem('duplicate', array(
-            'label'    => Mage::helper('M2ePro')->__('Duplicate'),
-            'url'      => '',
-            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
-        ), 'other');
         //--------------------------------
 
         return parent::_prepareMassaction();
@@ -439,10 +417,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
         $listingProductId = (int)$row->getData('id');
         /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
         $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$listingProductId);
-
-        if ($listingProduct->getChildObject()->isExistDescriptionTemplate()) {
-            $value .= $this->getTemplateDescriptionLinkHtml($listingProduct);
-        }
 
         if (!$listingProduct->getChildObject()->getVariationManager()->isVariationProduct()) {
             return $value;
@@ -532,8 +506,9 @@ HTML;
                         $iconPath = $this->getSkinUrl('M2ePro/images/error.png');
                         $problemIcon = '<img style="vertical-align: middle;" src="'
                             . $iconPath . '" title="' . $linkTitle . '" alt="" width="16" height="16">';
-                    } elseif ($listingProduct->getChildObject()->isGeneralIdOwner() &&
-                              !$parentType->hasChannelTheme()) {
+                    } elseif (($listingProduct->getChildObject()->isGeneralIdOwner() &&
+                              !$parentType->hasChannelTheme()) ||
+                              $this->hasChildWithWarning($listingProductId)) {
 
                         $linkTitle = Mage::helper('M2ePro')->__('Action Required');
                         $problemStyle = 'style="font-weight: bold;" ';
@@ -641,6 +616,13 @@ HTML;
 
     public function callbackColumnAmazonSku($value, $row, $column, $isExport)
     {
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             $value = Mage::helper('M2ePro')->__('N/A');
         }
@@ -688,20 +670,25 @@ HTML;
 
     public function callbackColumnAvailableQty($value, $row, $column, $isExport)
     {
-        if ($row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
-            $row->getData('is_variation_parent')
-        ) {
-            if (is_null($value) || $value === '') {
-                return Mage::helper('M2ePro')->__('N/A');
-            }
-        } else {
-            if (is_null($value) || $value === '') {
-                return '<i style="color:gray;">receiving...</i>';
-            }
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
         }
 
         if ((bool)$row->getData('is_afn_channel')) {
-            return '--';
+            return Mage::helper('M2ePro')->__('N/A');
+        }
+
+        if (is_null($value) || $value === '') {
+            if ($row->getData('amazon_status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
+                !$row->getData('is_variation_parent')
+            ) {
+                return '<i style="color:gray;">receiving...</i>';
+            }
+
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
         if ($value <= 0) {
@@ -713,6 +700,13 @@ HTML;
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         $onlineMinPrice = $row->getData('min_online_price');
         $onlineMaxPrice = $row->getData('max_online_price');
 
@@ -806,17 +800,15 @@ HTML;
 
     public function callbackColumnAfnChannel($value, $row, $column, $isExport)
     {
-        if (is_null($value) || $value === '') {
-            return Mage::helper('M2ePro')->__('N/A');
+        if ((!$row->getData('is_variation_parent') &&
+            $row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
+            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
         }
 
-        switch ($row->getData('is_afn_channel')) {
-            case Ess_M2ePro_Model_Amazon_Listing_Product::IS_ISBN_GENERAL_ID_YES:
-                $value = '<span style="font-weight: bold;">' . $value . '</span>';
-                break;
-
-            default:
-                break;
+        if (is_null($value) || $value === '') {
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
         return $value;
@@ -919,6 +911,8 @@ HTML;
         switch ($status) {
 
             case Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN:
+                return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Unknown') . '</span>';
+
             case Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED:
                 return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
 
@@ -1018,11 +1012,11 @@ HTML;
 
         $condition = '';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition = 'min_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'min_online_price <= \''.$value['to'].'\'';
@@ -1030,11 +1024,11 @@ HTML;
 
         $condition = '(' . $condition . ') OR (';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition .= 'max_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'max_online_price <= \''.$value['to'].'\'';
@@ -1574,22 +1568,40 @@ HTML;
 
     // ####################################
 
-    protected function getTemplateDescriptionLinkHtml($listingProduct)
+    protected function getChildProductsWarningsData()
     {
-        $templateDescriptionEditUrl = $this->getUrl('*/adminhtml_common_amazon_template_description/edit', array(
-            'id' => $listingProduct->getChildObject()->getTemplateDescriptionId()
-        ));
+        if (is_null($this->childProductsWarningsData)) {
+            $this->childProductsWarningsData = array();
 
-        $helper = Mage::helper('M2ePro');
-        $templateTitle = $listingProduct->getChildObject()->getDescriptionTemplate()->getTitle();
+            $productsIds = array();
+            foreach ($this->getCollection()->getData() as $row) {
+                $productsIds[] = $row['id'];
+            }
 
-        return <<<HTML
-<span style="font-size: 9px;">{$helper->__('Description Policy')}:&nbsp;
-    <a target="_blank" href="{$templateDescriptionEditUrl}">
-        {$helper->escapeHtml($templateTitle)}</a>
-</span>
-<br/>
-HTML;
+            $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
+            $tableAmazonListingProduct = Mage::getSingleton('core/resource')
+                ->getTableName('m2epro_amazon_listing_product');
+
+            $select = $connRead->select();
+            $select->distinct(true);
+            $select->from(array('alp' => $tableAmazonListingProduct), array('variation_parent_id'))
+                ->where('variation_parent_id IN (?)', $productsIds)
+                ->where(
+                    'is_variation_product_matched = 0 OR
+                    (general_id IS NOT NULL AND is_variation_channel_matched = 0)'
+                );
+
+            $this->childProductsWarningsData = Mage::getResourceModel('core/config')
+                ->getReadConnection()
+                ->fetchCol($select);
+        }
+
+        return $this->childProductsWarningsData;
+    }
+
+    protected function hasChildWithWarning($listingProductId)
+    {
+        return in_array($listingProductId, $this->getChildProductsWarningsData());
     }
 
     // ####################################

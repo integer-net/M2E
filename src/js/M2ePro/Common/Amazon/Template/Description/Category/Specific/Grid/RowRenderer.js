@@ -135,10 +135,11 @@ CommonAmazonTemplateDescriptionCategorySpecificGridRowRenderer = Class.create(Co
             td.appendChild(toolTip);
         }
 
-        var notice = this.getSpecificOverritenNotice();
-        if (notice) {
-            td.appendChild(notice);
-        }
+        var notice = this.getSpecificOverriddenNotice();
+        if (notice) td.appendChild(notice);
+
+        notice = this.getSpecificParentageNotice();
+        if (notice) td.appendChild(notice);
 
         this.getRowContainer().appendChild(td);
     },
@@ -669,12 +670,33 @@ CommonAmazonTemplateDescriptionCategorySpecificGridRowRenderer = Class.create(Co
         return div.outerHTML;
     },
 
-    getSpecificOverritenNotice: function()
+    // --------------------------------
+
+    getSpecificOverriddenNotice: function()
     {
         if (!this.specificHandler.canSpecificBeOverwrittenByVariationTheme(this.specific)) {
             return null;
         }
 
+        var variationThemesList = this.specificHandler.themeAttributes[this.specific.xml_tag];
+
+        var message = '<b>' + M2ePro.translator.translate('Value of this Specific can be automatically overwritten by M2E Pro.') + '</b>';
+        message += '<br/><br/>' + variationThemesList.join(', ');
+
+        return this.constructNotice(message);
+    },
+
+    getSpecificParentageNotice: function()
+    {
+        if (this.specific.xml_tag != 'Parentage') {
+            return null;
+        }
+
+        return this.constructNotice(M2ePro.translator.translate('Amazon Parentage Specific will be overridden notice.'));
+    },
+
+    constructNotice: function(message)
+    {
         var container = new Element('div', {
             'style': 'float: right; margin-right: 3px; margin-top: 1px;'
         });
@@ -688,13 +710,6 @@ CommonAmazonTemplateDescriptionCategorySpecificGridRowRenderer = Class.create(Co
             'class' : 'tool-tip-message tip-left',
             'style' : 'display: none; max-width: 500px; border-color: #ffd967; background-color: #fffbf0;'
         }));
-
-        var variationThemesList = this.specificHandler.themeAttributes[this.specific.xml_tag];
-        var message = '<b>' + M2ePro.translator.translate('In case this Description Policy will ' +
-            'be used to create New Amazon Child Products, value of this Specific can be automatically' +
-            ' overwritten by M2E Pro. Below there is a list of Variation Themes for which the value of' +
-            ' this Specific will be overwritten if you are using one of them in your Listing.') + '</b>';
-        message += '<br/><br/>' + variationThemesList.join(', ');
 
         htmlCont.appendChild(new Element('img', {
             'src'   : M2ePro.url.get('m2epro_skin_url') + '/images/i_notice.gif',

@@ -183,12 +183,14 @@ class Ess_M2ePro_Helper_Data extends Mage_Core_Helper_Abstract
                 if (is_array($allowedTags) && !empty($allowedTags)) {
                     $allowed = implode('|', $allowedTags);
 
-                    $pattern = '/<([\/\s\r\n]*)(' . $allowed . ')((\s+\w+="[\w\s%#\/\.;:_-]*")*[\/\s\r\n]*)>/si';
+                    $pattern = '/<([\/\s\r\n]*)(' . $allowed . ')'.
+                        '((\s+\w+="[\w\s\%\?=&#\/\.;:_\-\(\)]*")*[\/\s\r\n]*)>/si';
                     $result = preg_replace($pattern, '##$1$2$3##', $data);
 
                     $result = htmlspecialchars($result, $flags);
 
-                    $pattern = '/##([\/\s\r\n]*)(' . $allowed . ')((\s+\w+="[\w\s%#\/\.;:_-]*")*[\/\s\r\n]*)##/si';
+                    $pattern = '/##([\/\s\r\n]*)(' . $allowed . ')'.
+                        '((\s+\w+="[\w\s\%\?=&#\/\.;:_\-\(\)]*")*[\/\s\r\n]*)##/si';
                     $result = preg_replace($pattern, '<$1$2$3>', $result);
                 } else {
                     $result = htmlspecialchars($data, $flags);

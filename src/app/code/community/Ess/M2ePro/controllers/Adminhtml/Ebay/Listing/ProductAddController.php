@@ -33,6 +33,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             ->addJs('M2ePro/GridHandler.js')
             ->addJs('M2ePro/Listing/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ViewGridHandler.js')
+            ->addJs('M2ePro/Ebay/Listing/BidsHandler.js')
             ->addJs('M2ePro/Ebay/Listing/VariationProductManageHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Settings/GridHandler.js')
             ->addJs('M2ePro/Ebay/Listing/ProductAdd/Settings/GridHandler.js')
@@ -51,8 +52,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
             ->addJs('M2ePro/Ebay/Listing/AutoActionHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Category/ChooserHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Category/SpecificHandler.js')
-            ->addJs('M2ePro/Ebay/Listing/Category/Chooser/BrowseHandler.js')
-        ;
+            ->addJs('M2ePro/Ebay/Listing/Category/Chooser/BrowseHandler.js');
 
         $this->getLayout()->getBlock('head')->setCanLoadExtJs(true);
 
@@ -61,6 +61,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
         }
 
         $this->_initPopUp();
+
+        $this->setComponentPageHelpLink('Add+Magento+Products');
 
         return $this;
     }
@@ -162,6 +164,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
 
         $this->_initAction();
 
+        $this->setComponentPageHelpLink('Adding+Products+from+the+List');
+
         $this->getLayout()->getBlock('head')->addJs('M2ePro/VideoTutorialHandler.js');
 
         $this->_title(Mage::helper('M2ePro')->__('Select Products'))
@@ -211,6 +215,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_ProductAddController
         }
 
         $this->_initAction();
+
+        $this->setComponentPageHelpLink('Adding+Products+from+Category');
 
         $this->getLayout()->getBlock('head')
              ->setCanLoadExtJs(true)

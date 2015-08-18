@@ -19,6 +19,8 @@ class Ess_M2ePro_Adminhtml_Common_Buy_AccountController
             ->setCanLoadExtJs(true)
             ->addJs('M2ePro/Common/Buy/AccountHandler.js');
 
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Buy::NICK, 'Accounts');
+
         return $this;
     }
 

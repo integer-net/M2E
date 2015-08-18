@@ -20,7 +20,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Images
         $this->searchNotFoundAttributes();
 
         $images = array(
-            'offer' => $this->getAmazonListingProduct()->getListingSource()->getImages(),
+            'offer' => $this->getAmazonListingProduct()->getListingSource()->getGalleryImages(),
         );
 
         if ($this->getAmazonListingProduct()->isExistDescriptionTemplate()) {
@@ -29,7 +29,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Images
                 $this->getAmazonListingProduct()->getActualMagentoProduct()
             );
 
-            $images['product'] = $definitionSource->getImages();
+            $images['product'] = $definitionSource->getGalleryImages();
+
+            if ($this->getVariationManager()->isRelationChildType()) {
+                $images['variation_difference'] = $definitionSource->getVariationDifferenceImages();
+            }
         }
 
         $this->processNotFoundAttributes('Images');
@@ -40,6 +44,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Images
 
         if (!empty($images['product'])) {
             $data['images_data']['product'] = $images['product'];
+        }
+
+        if (!empty($images['variation_difference'])) {
+            $data['images_data']['variation_difference'] = $images['variation_difference'];
         }
 
         return $data;

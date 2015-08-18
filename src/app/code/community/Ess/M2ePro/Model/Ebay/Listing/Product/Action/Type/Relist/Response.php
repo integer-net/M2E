@@ -68,6 +68,8 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Relist_Response
             'status' => Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED,
             'additional_data' => json_encode($additionalData),
         ))->save();
+
+        $this->getEbayListingProduct()->updateVariationsStatus();
     }
 
     public function markAsNotListedItem()

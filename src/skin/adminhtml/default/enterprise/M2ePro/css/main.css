@@ -518,3 +518,38 @@ a.hover-underline:hover {
 }
 
 /* ================================================ */
+
+/* eBay additional css */
+/* ================================================ */
+
+.m2ePro-ebay-auction-bids-link
+{
+    text-decoration: none;
+    color: grey;
+    font-size: 10px;
+}
+
+.m2ePro-ebay-auction-bids-link:hover
+{
+    text-decoration: underline;
+    color: grey;
+    font-size: 10px;
+}
+
+.m2ePro-variation-attributes
+{
+    font-size: 11px;
+}
+
+.m2ePro-variation-attributes a
+{
+    text-decoration: none;
+    color: grey;
+}
+
+.m2ePro-variation-attributes a
+{
+    text-decoration: underline;
+}
+
+/* ================================================ */

@@ -22,6 +22,8 @@ class Ess_M2ePro_Adminhtml_Ebay_MarketplaceController extends Ess_M2ePro_Control
             ->addCss('M2ePro/css/Plugin/ProgressBar.css')
             ->addCss('M2ePro/css/Plugin/AreaWrapper.css');
 
+        $this->setComponentPageHelpLink('eBay+Sites');
+
         return $this;
     }
 

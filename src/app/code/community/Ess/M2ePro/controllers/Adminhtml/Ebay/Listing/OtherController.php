@@ -36,6 +36,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_OtherController extends Ess_M2ePro_Contr
 
         $this->_initPopUp();
 
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367069');
+
         return $this;
     }
 

@@ -20,10 +20,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             ->addJs('M2ePro/Plugin/ActionColumn.js')
             ->addJs('M2ePro/Ebay/Listing/Category/ChooserHandler.js')
             ->addJs('M2ePro/Ebay/Listing/Category/SpecificHandler.js')
-            ->addJs('M2ePro/Ebay/Listing/Category/Chooser/BrowseHandler.js')
-        ;
+            ->addJs('M2ePro/Ebay/Listing/Category/Chooser/BrowseHandler.js');
 
         $this->_initPopUp();
+
+        $this->setComponentPageHelpLink('Set+eBay+Categories');
 
         return $this;
     }
@@ -255,8 +256,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
         !empty($sessionData['mode_same']['category']) && $internalData = $sessionData['mode_same']['category'];
 
-        $this->_initAction()
-            ->_title(Mage::helper('M2ePro')->__('Set Your eBay Categories'))
+        $this->_initAction();
+
+        $this->setComponentPageHelpLink('All+Products+Same+Category');
+
+        $this->_title(Mage::helper('M2ePro')->__('Set Your eBay Categories'))
             ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_category_same_chooser', '',
                 array(
                     'internal_data' => $internalData
@@ -330,6 +334,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
 
         $this->_initAction();
 
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367120');
+
         $this->_title(Mage::helper('M2ePro')->__('Select Products (eBay Categories)'));
 
         $this->getLayout()->getBlock('head')
@@ -372,8 +378,13 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             ->addCss('M2ePro/css/Plugin/ProgressBar.css')
             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
             ->addCss('M2ePro/css/Plugin/DropDown.css')
-            ->addCss('M2ePro/css/Plugin/AutoComplete.css')
-        ;
+            ->addCss('M2ePro/css/Plugin/AutoComplete.css');
+
+        if ($getSuggested) {
+            $this->setComponentPageHelpLink('Get+Suggested+Categories');
+        } else {
+            $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367077');
+        }
 
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_category_product'));
         $this->renderLayout();
@@ -779,6 +790,8 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             ->addCss('M2ePro/css/Plugin/AreaWrapper.css')
             ->addJs('M2ePro/Plugin/AreaWrapper.js')
             ->addJs('M2ePro/Ebay/Listing/Category/Specific/WrapperHandler.js');
+
+        $this->setComponentPageHelpLink('Set+Item+Specifics');
 
         $this->_title(Mage::helper('M2ePro')->__('Specifics'));
 

@@ -20,6 +20,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Validator_GeneralId
             }
         }
 
+        // M2ePro_TRANSLATIONS
+        // Product cannot be Listed because Rakuten.com SKU is not specified.
         if (empty($generalId)) {
             $this->addMessage('Product cannot be Listed because Rakuten.com SKU is not specified.');
             return false;

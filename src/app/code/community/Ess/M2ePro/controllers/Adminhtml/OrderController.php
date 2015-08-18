@@ -284,7 +284,7 @@ class Ess_M2ePro_Adminhtml_OrderController
     public function assignProductDetailsAction()
     {
         $orderItemId = $this->getRequest()->getPost('order_item_id');
-        $saveRepair = $this->getRequest()->getPost('save_repair');
+        $saveMatching = $this->getRequest()->getPost('save_matching');
 
         /** @var $orderItem Ess_M2ePro_Model_Order_Item */
         $orderItem = Mage::getModel('M2ePro/Order_Item')->load($orderItemId);
@@ -319,20 +319,19 @@ class Ess_M2ePro_Adminhtml_OrderController
             return;
         }
 
-        if ($saveRepair) {
+        if ($saveMatching) {
             $outputData = array(
                 'associated_options'  => $orderItem->getAssociatedOptions(),
                 'associated_products' => $orderItem->getAssociatedProducts()
             );
 
-            /** @var $orderRepair Ess_M2ePro_Model_Order_Repair */
-            $orderRepair = Mage::getModel('M2ePro/Order_Repair');
-            $orderRepair->create(
+            /** @var $orderMatching Ess_M2ePro_Model_Order_Matching */
+            $orderMatching = Mage::getModel('M2ePro/Order_Matching');
+            $orderMatching->create(
                 $orderItem->getProductId(),
-                $orderItem->getChildObject()->getRepairInput(),
+                $orderItem->getChildObject()->getVariationChannelOptions(),
                 $outputData,
-                $orderItem->getComponentMode(),
-                Ess_M2ePro_Model_Order_Repair::TYPE_VARIATION
+                $orderItem->getComponentMode()
             );
         }
 
@@ -363,18 +362,18 @@ class Ess_M2ePro_Adminhtml_OrderController
             return;
         }
 
-        $repairInput = $orderItem->getChildObject()->getRepairInput();
+        $channelOptions = $orderItem->getChildObject()->getVariationChannelOptions();
 
-        if (!empty($repairInput)) {
-            $hash = Ess_M2ePro_Model_Order_Repair::generateHash($repairInput);
+        if (!empty($channelOptions)) {
+            $hash = Ess_M2ePro_Model_Order_Matching::generateHash($channelOptions);
 
             /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
             $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
             $connWrite->delete(
-                Mage::getResourceModel('M2ePro/Order_Repair')->getMainTable(),
+                Mage::getResourceModel('M2ePro/Order_Matching')->getMainTable(),
                 array(
                     'product_id = ?' => $orderItem->getProductId(),
-                    'hash = ?' => $hash
+                    'hash = ?'       => $hash
                 )
             );
         }

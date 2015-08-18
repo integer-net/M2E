@@ -254,14 +254,13 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
      */
     private function associateVariationWithOptions()
     {
-        $variation = $this->getChildObject()->getVariation();
-        $magentoProduct = $this->getMagentoProduct();
+        $variationChannelOptions = $this->getChildObject()->getVariationChannelOptions();
+        $magentoProduct   = $this->getMagentoProduct();
 
         // do nothing for amazon & buy order item, if it is mapped to product with required options,
         // but there is no information available about sold variation
-        if (empty($variation)
-            && ($this->isComponentModeAmazon() || $this->isComponentModeBuy())
-            && ($magentoProduct->isStrictVariationProduct() || $magentoProduct->isProductWithVariations())
+        if (empty($variationChannelOptions) && $this->isComponentModeBuy() &&
+            ($magentoProduct->isStrictVariationProduct() || $magentoProduct->isProductWithVariations())
         ) {
             return;
         }
@@ -277,13 +276,38 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             return;
         }
 
+        if (!empty($variationChannelOptions)) {
+            $matchingHash = Ess_M2ePro_Model_Order_Matching::generateHash($variationChannelOptions);
+
+            /** @var Ess_M2ePro_Model_Mysql4_Order_Matching_Collection $matchingCollection */
+            $matchingCollection = Mage::getModel('M2ePro/Order_Matching')->getCollection();
+            $matchingCollection->addFieldToFilter('product_id', $this->getProductId());
+            $matchingCollection->addFieldToFilter('component', $this->getComponentMode());
+            $matchingCollection->addFieldToFilter('hash', $matchingHash);
+
+            /** @var $matching Ess_M2ePro_Model_Order_Matching */
+            $matching = $matchingCollection->getFirstItem();
+
+            if ($matching->getId()) {
+                $productDetails = $matching->getOutputVariationOptions();
+
+                $this->setAssociatedProducts($productDetails['associated_products']);
+                $this->setAssociatedOptions($productDetails['associated_options']);
+
+                $this->save();
+                return;
+            }
+        }
+
         $magentoOptions = $this->prepareMagentoOptions($magentoProduct->getVariationInstance()->getVariationsTypeRaw());
+
+        $variationProductOptions = $this->getChildObject()->getVariationProductOptions();
 
         /** @var $optionsFinder Ess_M2ePro_Model_Order_Item_OptionsFinder */
         $optionsFinder = Mage::getModel('M2ePro/Order_Item_OptionsFinder');
         $optionsFinder->setProductId($magentoProduct->getProductId());
         $optionsFinder->setProductType($magentoProduct->getTypeId());
-        $optionsFinder->setChannelOptions($variation);
+        $optionsFinder->setChannelOptions($variationProductOptions);
         $optionsFinder->setMagentoOptions($magentoOptions);
 
         $productDetails = $optionsFinder->getProductDetails();
@@ -337,13 +361,10 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         $magentoProduct = Mage::getModel('M2ePro/Magento_Product');
         $magentoProduct->setProductId($productId);
 
-        $associatedProducts = array();
-        $associatedOptions  = array();
-
         if (!$magentoProduct->exists()) {
             $this->setData('product_id', null);
-            $this->setAssociatedProducts($associatedProducts);
-            $this->setAssociatedOptions($associatedOptions);
+            $this->setAssociatedProducts(array());
+            $this->setAssociatedOptions(array());
             $this->save();
 
             throw new InvalidArgumentException('Product does not exist.');
@@ -351,30 +372,6 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         $this->setData('product_id', (int)$productId);
 
-        $repairInput = $this->getChildObject()->getRepairInput();
-
-        if (!empty($repairInput)) {
-            $orderRepairHash = Ess_M2ePro_Model_Order_Repair::generateHash($repairInput);
-
-            /** @var $orderRepair Ess_M2ePro_Model_Order_Repair */
-            $orderRepair = Mage::getModel('M2ePro/Order_Repair')
-                ->getCollection()
-                    ->addFieldToFilter('type', Ess_M2ePro_Model_Order_Repair::TYPE_VARIATION)
-                    ->addFieldToFilter('product_id', $productId)
-                    ->addFieldToFilter('component', $this->getComponentMode())
-                    ->addFieldToFilter('hash', $orderRepairHash)
-                    ->getFirstItem();
-
-            if ($orderRepair->getId()) {
-                $productDetails = $orderRepair->getOutputData();
-
-                $associatedOptions  = $productDetails['associated_options'];
-                $associatedProducts = $productDetails['associated_products'];
-            }
-        }
-
-        $this->setAssociatedProducts($associatedProducts);
-        $this->setAssociatedOptions($associatedOptions);
         $this->save();
     }
 

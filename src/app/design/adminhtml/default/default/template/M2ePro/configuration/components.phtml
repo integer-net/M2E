@@ -1,3 +1,7 @@
+<?php
+    $urlComponents = Mage::helper('M2ePro/Component')->getActiveComponents();
+    $componentForUrl = count($urlComponents) == 1 ? array_shift($urlComponents) : Ess_M2ePro_Helper_Component_Ebay::NICK;
+?>
 <script type="text/javascript">
 
     // General for all tabs
@@ -38,7 +42,11 @@
     <div id="magento_block_configuration_ebay_channel">
 
         <div id="block_notice_configuration_ebay_channel" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Channels'); ?>">
-            <p><?php echo Mage::helper('M2ePro')->__('<b>Enable</b> the Channels you want to sell on, then click <b>Save Config</b>.'); ?></p>
+            <p><?php echo Mage::helper('M2ePro')->__('
+                <b>Enable</b> the Channels you want to sell on, then click <b>Save Config</b>.</br></br>
+                More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
+                Mage::helper('M2ePro/Module_Support')->getDocumentationUrl($componentForUrl, 'Global+Settings#GlobalSettings-Channels')
+                ); ?></p>
         </div>
 
         <div class="entry-edit" id="magento_block_configuration_channel_status">

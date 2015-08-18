@@ -18,6 +18,8 @@ class Ess_M2ePro_Adminhtml_Common_TemplateController
         $this->getLayout()->getBlock('head')->addJs('M2ePro/Plugin/DropDown.js')
             ->addCss('M2ePro/css/Plugin/DropDown.css');
 
+        $this->setComponentPageHelpLink('Policies');
+
         return $this;
     }
 

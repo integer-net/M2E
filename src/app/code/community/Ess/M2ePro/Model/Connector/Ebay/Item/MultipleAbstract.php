@@ -181,6 +181,21 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
         return !empty($this->listingsProducts);
     }
 
+    protected function getRequestTimeout()
+    {
+        $imagesTimeout = 0;
+
+        foreach ($this->listingsProducts as $listingProduct) {
+
+            /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
+
+            $requestDataObject = $this->getRequestDataObject($listingProduct);
+            $imagesTimeout += self::TIMEOUT_INCREMENT_FOR_ONE_IMAGE * $requestDataObject->getTotalImagesCount();
+        }
+
+        return parent::getRequestTimeout() + $imagesTimeout;
+    }
+
     // -----------------------------------------
 
     protected function lockListingsProducts()

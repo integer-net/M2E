@@ -121,9 +121,14 @@ WizardInstallationCommon = Class.create(CommonHandler, {
             parameters   : formData,
             onSuccess: function(transport) {
 
-                var response = transport.responseText.evalJSON()['result'];
+                var response = transport.responseText.evalJSON();
 
-                if (!response) {
+                if (response && response['message']) {
+                    MagentoMessageObj.addError(response['message']);
+                    return CommonHandlerObj.scroll_page_to_top();
+                }
+
+                if (!response['result']) {
                     MagentoMessageObj.addError(M2ePro.translator.translate('Error create License.'));
                     return CommonHandlerObj.scroll_page_to_top();
                 }

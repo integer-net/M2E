@@ -19,6 +19,10 @@ class Ess_M2ePro_Block_Adminhtml_Configuration_LogsClearing_Form
         //------------------------------
 
         $this->setTemplate('M2ePro/configuration/logsClearing.phtml');
+
+        //------------------------------
+
+        $this->setPageHelpLink('Global+Settings#GlobalSettings-LogsClearing');
     }
 
     // ########################################

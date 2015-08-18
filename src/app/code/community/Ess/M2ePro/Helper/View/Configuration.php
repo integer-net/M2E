@@ -10,14 +10,20 @@ class Ess_M2ePro_Helper_View_Configuration extends Mage_Core_Helper_Abstract
     // Configuration
 
     const NICK  = 'configuration';
-    const TITLE = 'Configuration';
 
     const CONFIG_SECTION_COMPONENTS     = 'm2epro_components';
     const CONFIG_SECTION_SETTINGS       = 'm2epro_settings';
     const CONFIG_SECTION_LOGS_CLEARING  = 'm2epro_logs_clearing';
     const CONFIG_SECTION_LICENSE        = 'm2epro_license';
 
-   // ########################################
+    // ########################################
+
+    public function getTitle()
+    {
+        return Mage::helper('M2ePro')->__('Configuration');
+    }
+
+    // ########################################
 
     public function getComponentsUrl(array $params = array())
     {

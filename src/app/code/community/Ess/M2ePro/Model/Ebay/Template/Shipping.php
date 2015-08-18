@@ -9,6 +9,17 @@
  */
 class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component_Abstract
 {
+    const COUNTRY_MODE_CUSTOM_VALUE         = 1;
+    const COUNTRY_MODE_CUSTOM_ATTRIBUTE     = 2;
+
+    const POSTAL_CODE_MODE_NONE             = 0;
+    const POSTAL_CODE_MODE_CUSTOM_VALUE     = 1;
+    const POSTAL_CODE_MODE_CUSTOM_ATTRIBUTE = 2;
+
+    const ADDRESS_MODE_NONE                 = 0;
+    const ADDRESS_MODE_CUSTOM_VALUE         = 1;
+    const ADDRESS_MODE_CUSTOM_ATTRIBUTE     = 2;
+
     const SHIPPING_TYPE_FLAT                = 0;
     const SHIPPING_TYPE_CALCULATED          = 1;
     const SHIPPING_TYPE_FREIGHT             = 2;
@@ -28,6 +39,11 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
      * @var Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated
      */
     private $calculatedShippingModel = NULL;
+
+    /**
+     * @var Ess_M2ePro_Model_Ebay_Template_Shipping_Source[]
+     */
+    private $shippingSourceModels = array();
 
     // ########################################
 
@@ -82,6 +98,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
         $this->marketplaceModel = NULL;
         $this->calculatedShippingModel = NULL;
+        $this->shippingSourceModels = array();
 
         $this->delete();
         return true;
@@ -111,7 +128,28 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
          $this->marketplaceModel = $instance;
     }
 
-    //---------------------------------------
+    // ########################################
+
+    /**
+     * @param Ess_M2ePro_Model_Magento_Product $magentoProduct
+     * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Source
+     */
+    public function getSource(Ess_M2ePro_Model_Magento_Product $magentoProduct)
+    {
+        $productId = $magentoProduct->getProductId();
+
+        if (!empty($this->shippingSourceModels[$productId])) {
+            return $this->shippingSourceModels[$productId];
+        }
+
+        $this->shippingSourceModels[$productId] = Mage::getModel('M2ePro/Ebay_Template_Shipping_Source');
+        $this->shippingSourceModels[$productId]->setMagentoProduct($magentoProduct);
+        $this->shippingSourceModels[$productId]->setShippingTemplate($this);
+
+        return $this->shippingSourceModels[$productId];
+    }
+
+    // ########################################
 
     /**
      * @return Ess_M2ePro_Model_Ebay_Template_Shipping_Calculated
@@ -192,19 +230,80 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
 
     // #######################################
 
-    public function getCountry()
+    public function getCountryMode()
     {
-        return $this->getData('country');
+        return (int)$this->getData('country_mode');
     }
 
-    public function getPostalCode()
+    public function getCountryCustomValue()
     {
-        return $this->getData('postal_code');
+        return $this->getData('country_custom_value');
     }
 
-    public function getAddress()
+    public function getCountryCustomAttribute()
     {
-        return $this->getData('address');
+        return $this->getData('country_custom_attribute');
+    }
+
+    public function getCountrySource()
+    {
+        return array(
+            'mode'      => $this->getCountryMode(),
+            'value'     => $this->getCountryCustomValue(),
+            'attribute' => $this->getCountryCustomAttribute()
+        );
+    }
+
+    //---------------------------------------
+
+    public function getPostalCodeMode()
+    {
+        return (int)$this->getData('postal_code_mode');
+    }
+
+    public function getPostalCodeCustomValue()
+    {
+        return $this->getData('postal_code_custom_value');
+    }
+
+    public function getPostalCodeCustomAttribute()
+    {
+        return $this->getData('postal_code_custom_attribute');
+    }
+
+    public function getPostalCodeSource()
+    {
+        return array(
+            'mode'      => $this->getPostalCodeMode(),
+            'value'     => $this->getPostalCodeCustomValue(),
+            'attribute' => $this->getPostalCodeCustomAttribute()
+        );
+    }
+
+    //---------------------------------------
+
+    public function getAddressMode()
+    {
+        return (int)$this->getData('address_mode');
+    }
+
+    public function getAddressCustomValue()
+    {
+        return $this->getData('address_custom_value');
+    }
+
+    public function getAddressCustomAttribute()
+    {
+        return $this->getData('address_custom_attribute');
+    }
+
+    public function getAddressSource()
+    {
+        return array(
+            'mode'      => $this->getAddressMode(),
+            'value'     => $this->getAddressCustomValue(),
+            'attribute' => $this->getAddressCustomAttribute()
+        );
     }
 
     //---------------------------------------
@@ -470,9 +569,15 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping extends Ess_M2ePro_Model_Component
     public function getDefaultSettingsAdvancedMode()
     {
         return array(
-            'country' => 'US',
-            'postal_code' => '',
-            'address' => '',
+            'country_mode' => self::COUNTRY_MODE_CUSTOM_VALUE,
+            'country_custom_value' => 'US',
+            'country_custom_attribute' => '',
+            'postal_code_mode' => self::POSTAL_CODE_MODE_NONE,
+            'postal_code_custom_value' => '',
+            'postal_code_custom_attribute' => '',
+            'address_mode' => self::ADDRESS_MODE_NONE,
+            'address_custom_value' => '',
+            'address_custom_attribute' => '',
 
             'dispatch_time' => 1,
             'cash_on_delivery_cost' => NULL,

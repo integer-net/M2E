@@ -9,7 +9,6 @@ CommonAmazonListingSearchAsinGridHandler = Class.create(CommonListingGridHandler
 
     //----------------------------------
 
-    // todo getSelectedItemsParts
     getMaxProductsInPart: function()
     {
         return 1000;

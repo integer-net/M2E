@@ -94,7 +94,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Sellercentral_Grid
                 'status' => array(
                     Ess_M2ePro_Model_Listing_Product::STATUS_LISTED,
                     Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED,
-                    Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED
+                    Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED,
+                    Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN,
                 )
             )
         );
@@ -229,6 +230,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Sellercentral_Grid
             'type' => 'options',
             'sortable' => false,
             'options' => array(
+                Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN => Mage::helper('M2ePro')->__('Unknown'),
                 Ess_M2ePro_Model_Listing_Product::STATUS_LISTED => Mage::helper('M2ePro')->__('Active'),
                 Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED => Mage::helper('M2ePro')->__('Inactive'),
                 Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED => Mage::helper('M2ePro')->__('Inactive (Blocked)')
@@ -500,6 +502,10 @@ HTML;
 
     public function callbackColumnAvailableQty($value, $row, $column, $isExport)
     {
+        if ((bool)$row->getData('is_afn_channel')) {
+            return Mage::helper('M2ePro')->__('N/A');
+        }
+
         if ((int)$row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
             if (is_null($value) || $value === '') {
                 return Mage::helper('M2ePro')->__('N/A');
@@ -508,10 +514,6 @@ HTML;
             if (is_null($value) || $value === '') {
                 return '<i style="color:gray;">receiving...</i>';
             }
-        }
-
-        if ((bool)$row->getData('is_afn_channel')) {
-            return '--';
         }
 
         if ($value <= 0) {
@@ -607,15 +609,6 @@ HTML;
     {
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
-        }
-
-        switch ($row->getData('is_afn_channel')) {
-            case Ess_M2ePro_Model_Amazon_Listing_Product::IS_ISBN_GENERAL_ID_YES:
-                $value = '<span style="font-weight: bold;">' . $value . '</span>';
-                break;
-
-            default:
-                break;
         }
 
         return $value;
@@ -714,11 +707,11 @@ HTML;
 
         $condition = '';
 
-        if (!empty($value['from'])) {
+        if (isset($value['from']) && $value['from'] != '') {
             $condition = 'min_online_price >= \''.$value['from'].'\'';
         }
-        if (!empty($value['to'])) {
-            if (!empty($value['from'])) {
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
                 $condition .= ' AND ';
             }
             $condition .= 'min_online_price <= \''.$value['to'].'\'';

@@ -51,7 +51,7 @@ class Ess_M2ePro_Model_Ebay_Template_Category_Specific_Source
 
     // ########################################
 
-    public  function getLabel()
+    public function getLabel()
     {
         if ($this->getCategorySpecificTemplate()->isCustomItemSpecificsMode() &&
             $this->getCategorySpecificTemplate()->isCustomAttributeValueMode()) {

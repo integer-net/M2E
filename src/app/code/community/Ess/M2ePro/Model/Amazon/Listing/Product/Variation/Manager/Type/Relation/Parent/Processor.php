@@ -186,11 +186,25 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             return $this->possibleThemes;
         }
 
-        return $this->possibleThemes = Mage::getModel('M2ePro/Amazon_Marketplace_Details')
-            ->setMarketplaceId($this->getMarketplaceId())
+        $marketPlaceId = $this->getMarketplaceId();
+
+        $possibleThemes = Mage::getModel('M2ePro/Amazon_Marketplace_Details')
+            ->setMarketplaceId($marketPlaceId)
             ->getVariationThemes(
                 $this->getAmazonDescriptionTemplate()->getProductDataNick()
             );
+
+        $variationHelper = Mage::helper('M2ePro/Component_Amazon_Variation');
+        $themesUsageData = $variationHelper->getThemesUsageData();
+        $usedThemes = array();
+
+        foreach ($themesUsageData[$marketPlaceId] as $theme => $count) {
+            if (!empty($possibleThemes[$theme])) {
+                $usedThemes[$theme] = $possibleThemes[$theme];
+            }
+        }
+
+        return $this->possibleThemes = array_merge($usedThemes, $possibleThemes);
     }
 
     public function getMarketplaceId()

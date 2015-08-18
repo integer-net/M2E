@@ -99,6 +99,13 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
         return $this->filterManualListingProduct();
     }
 
+    protected function getRequestTimeout()
+    {
+        $requestDataObject = $this->getRequestDataObject($this->listingProduct);
+        $imagesTimeout = self::TIMEOUT_INCREMENT_FOR_ONE_IMAGE * $requestDataObject->getTotalImagesCount();
+        return parent::getRequestTimeout() + $imagesTimeout;
+    }
+
     // -----------------------------------------
 
     protected function lockListingProduct()

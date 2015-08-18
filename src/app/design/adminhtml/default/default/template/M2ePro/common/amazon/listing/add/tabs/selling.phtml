@@ -6,8 +6,10 @@
     Additional Settings - Handling Time and Restock Date.<br/><br/>
 
     In addition to, in this Section you can select Selling Format Policy that contains Settings connected with forming
-    of Price, Quantity etc. and Synchronization Policy that describes Rules of Automatic Synchronization of Magento Product and Amazon Item.
-'); ?>
+    of Price, Quantity etc. and Synchronization Policy that describes Rules of Automatic Synchronization of Magento Product and Amazon Item.</br></br>
+    More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
+    Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Edit+Selling+Settings')
+); ?>
 </div>
 
 <?php
@@ -62,13 +64,23 @@
     //-----------------------------
     M2ePro.text.condition_note_length_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('Must be not more than 2000 characters long.')); ?>';
     M2ePro.text.sku_modification_custom_value_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('%value% placeholder should be specified')); ?>';
+
+    M2ePro.text.sku_modification_custom_value_max_length_error = '<?php echo Mage::helper('M2ePro')->escapeJs(Mage::helper('M2ePro')->__('The SKU length must be less than %value%.',
+        Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_General::SKU_MAX_LENGTH)); ?>';
+
     M2ePro.php.setConstants(
         <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Helper_Component_Amazon'); ?>,
         'Ess_M2ePro_Helper_Component'
     );
+
     M2ePro.php.setConstants(
         <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Amazon_Listing'); ?>,
         'Ess_M2ePro_Model_Amazon_Listing'
+    );
+
+    M2ePro.php.setConstants(
+        <?php echo Mage::helper('M2ePro')->getClassConstantAsJson('Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_General'); ?>,
+        'Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Validator_Sku_General'
     );
 
     M2ePro.url.addNewSellingFormatTemplate = '<?php echo $this->getUrl('*/adminhtml_common_amazon_template_sellingFormat/new'); ?>';
@@ -242,7 +254,7 @@
                         <label for="sku_modification_custom_value"><?php echo Mage::helper('M2ePro')->__('Modification Value') ?>: <span class="required">*</span></label>
                     </td>
                     <td class="value">
-                        <input type="text" id="sku_modification_custom_value" name="sku_modification_custom_value" class="input-text M2ePro-required-when-visible M2ePro-validate-sku-modification-custom-value" value="<?php echo $this->getData('sku_modification_custom_value'); ?>" />
+                        <input type="text" id="sku_modification_custom_value" name="sku_modification_custom_value" class="input-text M2ePro-required-when-visible M2ePro-validate-sku-modification-custom-value M2ePro-validate-sku-modification-custom-value-max-length" value="<?php echo $this->getData('sku_modification_custom_value'); ?>" />
                     <td>
                 </tr>
 

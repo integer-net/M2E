@@ -23,6 +23,8 @@ class Ess_M2ePro_Adminhtml_Ebay_OrderController extends Ess_M2ePro_Controller_Ad
              ->addJs('M2ePro/Order/Edit/ShippingAddressHandler.js')
              ->addJs('M2ePro/Ebay/Order/MigrationToV611Handler.js');
 
+        $this->setComponentPageHelpLink('Sales+and+Orders+overview');
+
         return $this;
     }
 

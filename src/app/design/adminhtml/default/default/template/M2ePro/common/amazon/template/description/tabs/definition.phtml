@@ -3,7 +3,10 @@
         'On this Tab you can specify Settings for common Product Information. <br/>
         It is available to choose just those Magento Attributes that are used for all Attribute Sets. <br/><br/>
 
-        <b>Note:</b> Title value is required for creation of all Description Policies because of technical reasons.'
+        <b>Note:</b> Title value is required for creation of all Description Policies because of technical reasons.</br></br>
+
+        More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
+        Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Definition')
     ); ?>
 </div>
 
@@ -99,6 +102,9 @@ $default = array(
 
         'image_main_mode'      => Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_MAIN_MODE_PRODUCT,
         'image_main_attribute' => '',
+
+        'image_variation_difference_mode'      => Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_NONE,
+        'image_variation_difference_attribute' => '',
 
         'gallery_images_mode'      => Ess_M2ePro_Model_Amazon_Template_Description_Definition::GALLERY_IMAGES_MODE_NONE,
         'gallery_images_limit'     => 1,
@@ -244,6 +250,10 @@ $allAttributesByInputTypes = array(
 
         $('image_main_mode')
             .observe('change', AmazonTemplateDescriptionDefinitionHandlerObj.image_main_mode_change)
+            .simulate('change');
+
+        $('image_variation_difference_mode')
+            .observe('change', AmazonTemplateDescriptionDefinitionHandlerObj.image_variation_difference_mode_change)
             .simulate('change');
 
         $('gallery_images_mode')
@@ -517,6 +527,32 @@ $allAttributesByInputTypes = array(
                     </td>
                 </tr>
 
+                <tr>
+                    <td class="label">
+                        <label for="image_variation_difference_mode"><?php echo Mage::helper('M2ePro')->__('Swatch Image'); ?>:</label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <input type="hidden" id="image_variation_difference_attribute" name="definition[image_variation_difference_attribute]" value="<?php echo $formData['definition']['image_variation_difference_attribute']; ?>" />
+
+                        <select id="image_variation_difference_mode" name="definition[image_variation_difference_mode]">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_NONE; ?>" <?php if ($formData['definition']['image_variation_difference_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_PRODUCT; ?>" <?php if ($formData['definition']['image_variation_difference_mode'] == Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Product Base Image'); ?></option>
+
+                            <optgroup label="Magento Attribute">
+                                <?php echo $this->getForceAddedAttributeOptionHtml($formData['definition']['image_variation_difference_attribute'], $generalAttributesByInputTypes['text_images'], Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_ATTRIBUTE); ?>
+                                <?php foreach($generalAttributesByInputTypes['text_images'] as $attribute) : ?>
+                                    <option attribute_code="<?php echo $attribute['code']; ?>" value="<?php echo Ess_M2ePro_Model_Amazon_Template_Description_Definition::IMAGE_VARIATION_DIFFERENCE_MODE_ATTRIBUTE; ?>" <?php if ($attribute['code'] == $formData['definition']['image_variation_difference_attribute']): ?>selected="selected"<?php endif; ?>>
+                                        <?php echo Mage::helper('M2ePro')->escapeHtml($attribute['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Allows to display Variations of Amazon Product by the main images of Child Products.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
             </table>
 
         </div>
@@ -714,12 +750,6 @@ $allAttributesByInputTypes = array(
                                 <?php endforeach; ?>
                             </optgroup>
                         </select>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2" style="padding: 10px 0">
-                        <hr style="border: 1px solid silver; border-bottom: none;">
                     </td>
                 </tr>
 
@@ -977,12 +1007,6 @@ $allAttributesByInputTypes = array(
                                 <?php endforeach; ?>
                             </optgroup>
                         </select>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2" style="padding: 10px 0">
-                        <hr style="border: 1px solid silver; border-bottom: none;">
                     </td>
                 </tr>
 

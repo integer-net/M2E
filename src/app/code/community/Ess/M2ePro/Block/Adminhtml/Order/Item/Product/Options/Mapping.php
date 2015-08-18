@@ -76,13 +76,10 @@ class Ess_M2ePro_Block_Adminhtml_Order_Item_Product_Options_Mapping extends Ess_
     protected function _beforeToHtml()
     {
         //------------------------------
-        $repairInput = $this->getOrderItem()->getChildObject()->getRepairInput();
-
         $channelOptions = array();
-        if (!empty($repairInput)) {
-            foreach ($repairInput as $channelOptionLabel => $channelValueLabel) {
-                $channelOptions[] = array('label' => $channelOptionLabel, 'value' => $channelValueLabel);
-            }
+
+        foreach ($this->getOrderItem()->getChildObject()->getVariationChannelOptions() as $attribute => $value) {
+            $channelOptions[] = array('label' => $attribute, 'value' => $value);
         }
 
         $this->setData('channel_options', $channelOptions);

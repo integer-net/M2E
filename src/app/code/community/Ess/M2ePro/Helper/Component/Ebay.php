@@ -7,7 +7,6 @@
 class Ess_M2ePro_Helper_Component_Ebay extends Mage_Core_Helper_Abstract
 {
     const NICK  = 'ebay';
-    const TITLE = 'eBay';
 
     const MARKETPLACE_US     = 1;
     const MARKETPLACE_MOTORS = 9;

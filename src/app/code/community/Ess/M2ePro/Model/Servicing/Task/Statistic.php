@@ -175,7 +175,7 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
         $data['products']['qty']['max'] = 0;
         $data['products']['qty']['avg'] = 0;
 
-        $data['products']['stock_availability']['in'] = 0;
+        $data['products']['stock_availability']['min'] = 0;
         $data['products']['stock_availability']['out'] = 0;
 
         while ($row = $queryStmt->fetch()) {
@@ -184,7 +184,7 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
             $data['products']['qty']['max'] += (int)$row['max_qty'];
             $data['products']['qty']['avg'] += (int)$row['avg_qty'];
 
-            (int)$row['is_in_stock'] == 1 ? $data['products']['stock_availability']['in'] += (int)$row['count']
+            (int)$row['is_in_stock'] == 1 ? $data['products']['stock_availability']['min'] += (int)$row['count']
                                           : $data['products']['stock_availability']['out'] += (int)$row['count'];
         }
 
@@ -395,12 +395,17 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
 
         $data['listings']['total'] = 0;
 
-        foreach (Mage::helper('M2ePro/Component')->getComponents() as $nick) {
+        $availableComponents = Mage::helper('M2ePro/Component')->getComponents();
+        foreach ($availableComponents as $nick) {
             $data['listings'][$nick]['total'] = 0;
         }
 
         $helper = Mage::helper('M2ePro/Component');
         while ($row = $queryStmt->fetch()) {
+
+            if (!in_array($row['component'], $availableComponents)) {
+                continue;
+            }
 
             $data['listings']['total'] += (int)$row['count'];
             $data['listings'][$row['component']]['total'] += (int)$row['count'];
@@ -455,12 +460,17 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
 
         $data['listings_products']['total'] = 0;
 
-        foreach (Mage::helper('M2ePro/Component')->getComponents() as $nick) {
+        $availableComponents = Mage::helper('M2ePro/Component')->getComponents();
+        foreach ($availableComponents as $nick) {
             $data['listings_products'][$nick]['total'] = 0;
         }
 
         $helper = Mage::helper('M2ePro/Component');
         while ($row = $queryStmt->fetch()) {
+
+            if (!in_array($row['component'], $availableComponents)) {
+                continue;
+            }
 
             $data['listings_products']['total'] += (int)$row['products_count'];
             $data['listings_products'][$row['component']]['total'] += (int)$row['products_count'];
@@ -483,7 +493,7 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
             $data['listings_products'][$row['component']]['accounts'][$accountTitle] += (int)$row['products_count'];
         }
 
-        // todo append information by product types [count of simple, configurable, etc]
+        // todo next
 
         return $data;
     }
@@ -510,12 +520,17 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
 
         $data['listings_other']['total'] = 0;
 
-        foreach (Mage::helper('M2ePro/Component')->getComponents() as $nick) {
+        $availableComponents = Mage::helper('M2ePro/Component')->getComponents();
+        foreach ($availableComponents as $nick) {
             $data['listings_other'][$nick]['total'] = 0;
         }
 
         $helper = Mage::helper('M2ePro/Component');
         while ($row = $queryStmt->fetch()) {
+
+            if (!in_array($row['component'], $availableComponents)) {
+                continue;
+            }
 
             $data['listings_other']['total'] += (int)$row['count'];
             $data['listings_other'][$row['component']]['total'] += (int)$row['count'];
@@ -576,12 +591,17 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
 
         $data['orders']['total'] = 0;
 
-        foreach (Mage::helper('M2ePro/Component')->getComponents() as $nick) {
+        $availableComponents = Mage::helper('M2ePro/Component')->getComponents();
+        foreach ($availableComponents as $nick) {
             $data['orders'][$nick]['total'] = 0;
         }
 
         $helper = Mage::helper('M2ePro/Component');
         while ($row = $queryStmt->fetch()) {
+
+            if (!in_array($row['component'], $availableComponents)) {
+                continue;
+            }
 
             $data['orders']['total'] += (int)$row['count'];
             $data['orders'][$row['component']]['total'] += (int)$row['count'];
@@ -706,11 +726,16 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
 
         $data['logs']['types'][$type] = 0;
 
-        foreach (Mage::helper('M2ePro/Component')->getComponents() as $nick) {
+        $availableComponents = Mage::helper('M2ePro/Component')->getComponents();
+        foreach ($availableComponents as $nick) {
             $data['logs'][$nick]['types'][$type] = 0;
         }
 
         while ($row = $queryStmt->fetch()) {
+
+            if (!in_array($row['component'], $availableComponents)) {
+                continue;
+            }
 
             $data['logs']['total'] += (int)$row['count'];
             $data['logs']['types'][$type] += (int)$row['count'];
@@ -738,11 +763,16 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
 
         $data['policies'][$type]['total'] = 0;
 
-        foreach (Mage::helper('M2ePro/Component')->getComponents() as $nick) {
+        $availableComponents = Mage::helper('M2ePro/Component')->getComponents();
+        foreach ($availableComponents as $nick) {
             $data['policies'][$type][$nick] = 0;
         }
 
         while ($row = $queryStmt->fetch()) {
+
+            if (!in_array($row['component'], $availableComponents)) {
+                continue;
+            }
 
             $data['policies'][$type]['total'] += (int)$row['count'];
             $data['policies'][$type][$row['component']] += (int)$row['count'];

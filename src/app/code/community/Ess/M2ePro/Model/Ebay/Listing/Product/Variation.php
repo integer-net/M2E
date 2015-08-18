@@ -212,6 +212,57 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
         return (int)$this->getData('status');
     }
 
+    public function setStatus($status)
+    {
+        switch($status) {
+            case Ess_M2ePro_Model_Listing_Product::STATUS_LISTED:
+                $status = $this->calculateStatusByQty();
+                break;
+
+            case Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN:
+                if ($this->getStatus() == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
+                    $status = Ess_M2ePro_Model_Listing_Product::STATUS_HIDDEN;
+                }
+                break;
+
+            case Ess_M2ePro_Model_Listing_Product::STATUS_SOLD:
+                $status = $this->calculateStatusByQty();
+                if ($status == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
+                    $status = Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED;
+                }
+                break;
+
+            case Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED:
+                $status = $this->calculateStatusByQty();
+                if ($status == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
+                    $status = Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED;
+                }
+                break;
+
+            case Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED:
+                $status = $this->calculateStatusByQty();
+                if ($status == Ess_M2ePro_Model_Listing_Product::STATUS_LISTED) {
+                    $status = Ess_M2ePro_Model_Listing_Product::STATUS_FINISHED;
+                }
+                break;
+        }
+
+        $this->getParentObject()->setData('status' , $status)->save();
+    }
+
+    // ----------------------------------------
+
+    private function calculateStatusByQty()
+    {
+        if ($this->getOnlineQty() == 0) {
+            return Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED;
+        } else if ($this->getOnlineQty() <= $this->getOnlineQtySold()) {
+            return Ess_M2ePro_Model_Listing_Product::STATUS_SOLD;
+        }
+
+        return Ess_M2ePro_Model_Listing_Product::STATUS_LISTED;
+    }
+
     // ########################################
 
     public function isNotListed()
@@ -373,23 +424,25 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation extends Ess_M2ePro_Model_C
 
         $tempOrdersItemsCollection = Mage::getModel('M2ePro/Ebay_Order_Item')->getCollection();
         $tempOrdersItemsCollection->addFieldToFilter('item_id', $realEbayItemId);
+
+        /** @var Ess_M2ePro_Model_Ebay_Order_Item[] $ordersItems */
         $ordersItems = $tempOrdersItemsCollection->getItems();
 
         $findOrderItem = false;
 
         foreach ($ordersItems as $orderItem) {
 
-            $variationOrder = $orderItem->getVariation();
+            $orderItemVariationOptions = $orderItem->getVariationProductOptions();
 
-            if (empty($variationOrder)) {
+            if (empty($orderItemVariationOptions)) {
                 continue;
             }
 
-            ksort($variationOrder);
-            $orderItemVariationKeys = array_map('trim', array_keys($variationOrder));
-            $orderItemVariationValues = array_map('trim', array_values($variationOrder));
+            ksort($orderItemVariationOptions);
+            $orderItemVariationKeys = array_map('trim', array_keys($orderItemVariationOptions));
+            $orderItemVariationValues = array_map('trim', array_values($orderItemVariationOptions));
 
-            if (count($currentSpecifics) == count($variationOrder) &&
+            if (count($currentSpecifics) == count($orderItemVariationOptions) &&
                 count(array_diff($variationKeys,$orderItemVariationKeys)) <= 0 &&
                 count(array_diff($variationValues,$orderItemVariationValues)) <= 0) {
                 $findOrderItem = true;

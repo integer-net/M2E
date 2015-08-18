@@ -23,10 +23,19 @@ abstract class Ess_M2ePro_Controller_Adminhtml_Ebay_MainController
 
     public function loadLayout($ids=null, $generateBlocks=true, $generateXml=true)
     {
+        $this->setComponentPageHelpLink();
+
         $tempResult = parent::loadLayout($ids, $generateBlocks, $generateXml);
         $tempResult->_setActiveMenu(Ess_M2ePro_Helper_View_Ebay::MENU_ROOT_NODE_NICK);
         $tempResult->_title(Mage::helper('M2ePro/View_Ebay')->getMenuRootNodeLabel());
         return $tempResult;
+    }
+
+    //#############################################
+
+    protected function setComponentPageHelpLink($view = NULL)
+    {
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Ebay::NICK, $view);
     }
 
     //#############################################

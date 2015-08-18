@@ -87,6 +87,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
                 'product_id'                    => 'main_table.product_id',
                 'listing_id'                    => 'main_table.listing_id',
                 'status'                        => 'main_table.status',
+                'template_new_product_id'       => 'second_table.template_new_product_id',
                 'general_id'                    => 'second_table.general_id',
                 'online_sku'                    => 'second_table.sku',
                 'online_qty'                    => 'second_table.online_qty',
@@ -125,6 +126,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
                 'product_id'                    => 'main_table.product_id',
                 'listing_id'                    => new Zend_Db_Expr('NULL'),
                 'status'                        => 'main_table.status',
+                'template_new_product_id'       => new Zend_Db_Expr('NULL'),
                 'general_id'                    => 'second_table.general_id',
                 'online_sku'                    => 'second_table.sku',
                 'online_qty'                    => 'second_table.online_qty',
@@ -158,6 +160,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
                 'product_id',
                 'listing_id',
                 'status',
+                'template_new_product_id',
                 'general_id',
                 'online_sku',
                 'online_qty',
@@ -239,7 +242,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
         $this->addColumn('general_id', array(
             'header' => Mage::helper('M2ePro')->__('Rakuten.com SKU'),
             'align' => 'left',
-            'width' => '90px',
+            'width' => '100px',
             'type' => 'text',
             'index' => 'general_id',
             'filter_index' => 'general_id',
@@ -415,6 +418,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
 
     public function callbackColumnSku($value, $row, $column, $isExport)
     {
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
         if (is_null($value) || $value === '') {
             return Mage::helper('M2ePro')->__('N/A');
         }
@@ -423,14 +430,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
 
     public function callbackColumnGeneralId($value, $row, $column, $isExport)
     {
-        if ((int)$row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
-            if (is_null($value) || $value === '') {
-                return Mage::helper('M2ePro')->__('N/A');
-            }
-        } else {
-            if (is_null($value) || $value === '') {
+        if (empty($value)) {
+
+            if ($row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
                 return '<i style="color:gray;">receiving...</i>';
             }
+
+            if ($row->getData('template_new_product_id')) {
+                return Mage::helper('M2ePro')->__('New SKU');
+            }
+
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
         $url = Mage::helper('M2ePro/Component_Buy')->getItemUrl($value);
@@ -439,14 +449,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
 
     public function callbackColumnAvailableQty($value, $row, $column, $isExport)
     {
-        if ((int)$row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
-            if (is_null($value) || $value === '') {
-                return Mage::helper('M2ePro')->__('N/A');
-            }
-        } else {
-            if (is_null($value) || $value === '') {
-                return '<i style="color:gray;">'.Mage::helper('M2ePro')->__('receiving...').'</i>';
-            }
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
+        if (is_null($value) || $value === '') {
+            return '<i style="color:gray;">'.Mage::helper('M2ePro')->__('receiving...').'</i>';
         }
 
         if ($value <= 0) {
@@ -458,14 +466,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Search_Grid extends Mage_Adm
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
-        if ((int)$row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
-            if (is_null($value) || $value === '') {
-                return Mage::helper('M2ePro')->__('N/A');
-            }
-        } else {
-            if (is_null($value) || $value === '') {
-                return '<i style="color:gray;">'.Mage::helper('M2ePro')->__('receiving...').'</i>';
-            }
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
+        if (is_null($value) || $value === '') {
+            return '<i style="color:gray;">'.Mage::helper('M2ePro')->__('receiving...').'</i>';
         }
 
         if ((float)$value <= 0) {

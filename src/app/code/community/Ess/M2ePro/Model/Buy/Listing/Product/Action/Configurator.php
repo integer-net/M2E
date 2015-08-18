@@ -7,7 +7,8 @@
 class Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
     extends Ess_M2ePro_Model_Listing_Product_Action_Configurator
 {
-    const DATA_TYPE_SELLING      = 'selling';
+    const DATA_TYPE_QTY          = 'qty';
+    const DATA_TYPE_PRICE        = 'price';
     const DATA_TYPE_DETAILS      = 'details';
     const DATA_TYPE_SHIPPING     = 'shipping';
     const DATA_TYPE_NEW_PRODUCT  = 'new_product';
@@ -17,7 +18,8 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
     public function getAllDataTypes()
     {
         return array(
-            self::DATA_TYPE_SELLING,
+            self::DATA_TYPE_QTY,
+            self::DATA_TYPE_PRICE,
             self::DATA_TYPE_DETAILS,
             self::DATA_TYPE_SHIPPING,
             self::DATA_TYPE_NEW_PRODUCT,
@@ -26,19 +28,36 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
 
     // ########################################
 
-    public function isSellingAllowed()
+    public function isQtyAllowed()
     {
-        return $this->isAllowed(self::DATA_TYPE_SELLING);
+        return $this->isAllowed(self::DATA_TYPE_QTY);
     }
 
-    public function allowSelling()
+    public function allowQty()
     {
-        if ($this->isSellingAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_QTY);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_SELLING;
-        return $this;
+    public function disallowQty()
+    {
+        return $this->disallow(self::DATA_TYPE_QTY);
+    }
+
+    // ----------------------------------------
+
+    public function isPriceAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_PRICE);
+    }
+
+    public function allowPrice()
+    {
+        return $this->allow(self::DATA_TYPE_PRICE);
+    }
+
+    public function disallowPrice()
+    {
+        return $this->disallow(self::DATA_TYPE_PRICE);
     }
 
     // ----------------------------------------
@@ -50,12 +69,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
 
     public function allowDetails()
     {
-        if ($this->isDetailsAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_DETAILS);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_DETAILS;
-        return $this;
+    public function disallowDetails()
+    {
+        return $this->disallow(self::DATA_TYPE_DETAILS);
     }
 
     // ----------------------------------------
@@ -67,12 +86,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
 
     public function allowShipping()
     {
-        if ($this->isShippingAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_SHIPPING);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_SHIPPING;
-        return $this;
+    public function disallowShipping()
+    {
+        return $this->disallow(self::DATA_TYPE_SHIPPING);
     }
 
     // ----------------------------------------
@@ -84,12 +103,12 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Configurator
 
     public function allowNewProduct()
     {
-        if ($this->isNewProductAllowed()) {
-            return $this;
-        }
+        return $this->allow(self::DATA_TYPE_NEW_PRODUCT);
+    }
 
-        $this->allowedDataTypes[] = self::DATA_TYPE_NEW_PRODUCT;
-        return $this;
+    public function disallowNewProduct()
+    {
+        return $this->disallow(self::DATA_TYPE_NEW_PRODUCT);
     }
 
     // ########################################

@@ -152,14 +152,25 @@ class Ess_M2ePro_Model_Buy_Synchronization_Defaults_UpdateListingsProducts_Respo
 
             $existingAdditionalData = @json_decode($existingItem['additional_data'], true);
 
-            if (!empty($existingAdditionalData['last_synchronization_dates']['selling']) &&
+            if (!empty($existingAdditionalData['last_synchronization_dates']['qty']) &&
                 !empty($this->params['request_date'])
             ) {
-                $lastSellingSynchDate = $existingAdditionalData['last_synchronization_dates']['selling'];
+                $lastQtySynchDate = $existingAdditionalData['last_synchronization_dates']['qty'];
 
-                if (strtotime($lastSellingSynchDate) > strtotime($this->params['request_date'])) {
-                    unset($newData['online_qty'], $newData['online_price'], $newData['status']);
-                    unset($existingData['online_qty'], $existingData['online_price'], $existingData['status']);
+                if (strtotime($lastQtySynchDate) > strtotime($this->params['request_date'])) {
+                    unset($newData['online_qty'], $newData['status']);
+                    unset($existingData['online_qty'], $existingData['status']);
+                }
+            }
+
+            if (!empty($existingAdditionalData['last_synchronization_dates']['price']) &&
+                !empty($this->params['request_date'])
+            ) {
+                $lastPriceSynchDate = $existingAdditionalData['last_synchronization_dates']['price'];
+
+                if (strtotime($lastPriceSynchDate) > strtotime($this->params['request_date'])) {
+                    unset($newData['online_price']);
+                    unset($existingData['online_price']);
                 }
             }
 

@@ -62,7 +62,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_List_Linking
         if ($this->getVariationManager()->isVariationProduct() &&
             $this->getVariationManager()->isVariationProductMatched()
         ) {
-            $data['variation_options'] = json_encode($this->getVariationManager()->getProductOptions());
+            $data['variation_product_options'] = json_encode($this->getVariationManager()->getProductOptions());
         }
 
         /** @var Ess_M2ePro_Model_Buy_Item $object */

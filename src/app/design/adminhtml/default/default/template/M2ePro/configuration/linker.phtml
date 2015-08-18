@@ -20,9 +20,32 @@
 <?php } ?>
 
 <div id="block_notice_ebay_configuration_global" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Global Settings'); ?>">
-    <?php echo Mage::helper('M2ePro')->__(
-        'Settings are split into four Categories. Descriptions for each Category are below.'
-    ); ?>
+    <?php echo Mage::helper('M2ePro')->__('Settings are split into four Categories. Descriptions for each Category are below.');
+
+    if (Mage::helper('M2ePro/View')->isCurrentViewEbay()) : ?>
+        <?php echo Mage::helper('M2ePro')->__('
+            </br></br>More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
+            Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_View_Ebay::NICK, 'Global+Settings')
+        ); ?>
+    <?php else :
+
+        $components = Mage::helper('M2ePro/View_Common_Component')->getActiveComponents();
+        if (count($components) == 1) : ?>
+            <?php echo Mage::helper('M2ePro')->__('
+                </br></br>More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
+                Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(array_shift($components), 'Global+Settings')
+            ); ?>
+        <?php else : ?>
+            <?php echo Mage::helper('M2ePro')->__('
+                </br></br>More detailed information about ability to work with this page you can find on <a target="_blank" href="%url1%">%amazon%</a> and
+                <a target="_blank" href="%url2%">%buy%</a>.',
+                Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Global+Settings'),
+                Mage::helper('M2ePro/Component_Amazon')->getTitle(),
+                Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Buy::NICK, 'Global+Settings'),
+                Mage::helper('M2ePro/Component_Buy')->getTitle()
+            ); ?>
+        <?php endif; ?>
+    <?php endif; ?>
 </div>
 
 <div class="entry-edit" id="magento_block_ebay_configuration_global">

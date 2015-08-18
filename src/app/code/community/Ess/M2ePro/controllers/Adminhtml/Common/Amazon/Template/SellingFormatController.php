@@ -18,6 +18,8 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Template_SellingFormatController
         $this->getLayout()->getBlock('head')
              ->addJs('M2ePro/Common/Amazon/Template/SellingFormatHandler.js');
 
+        $this->setPageHelpLink(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Selling+Format+Policy');
+
         return $this;
     }
 

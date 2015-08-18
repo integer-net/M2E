@@ -16,6 +16,8 @@ class Ess_M2ePro_Adminhtml_Ebay_FeedbackController extends Ess_M2ePro_Controller
         $this->getLayout()->getBlock('head')
              ->addJs('M2ePro/Ebay/FeedbackHandler.js');
 
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=17367096');
+
         return $this;
     }
 

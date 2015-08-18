@@ -93,14 +93,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Categories
     {
         $data = array();
 
-        $filter = array('mode' => array(
-            Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_ITEM_SPECIFICS,
-            Ess_M2ePro_Model_Ebay_Template_Category_Specific::MODE_CUSTOM_ITEM_SPECIFICS
-        ));
-
-        $specifics = $this->getCategoryTemplate()->getSpecifics(true, $filter);
-
-        foreach ($specifics as $specific) {
+        foreach ($this->getCategoryTemplate()->getSpecifics(true) as $specific) {
 
             /** @var $specific Ess_M2ePro_Model_Ebay_Template_Category_Specific */
 
