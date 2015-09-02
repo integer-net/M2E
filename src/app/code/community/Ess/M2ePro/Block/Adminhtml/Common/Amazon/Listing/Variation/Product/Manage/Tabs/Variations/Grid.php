@@ -167,7 +167,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
             'type' => 'number',
             'index' => 'online_qty',
             'filter_index' => 'online_qty',
-            'frame_callback' => array($this, 'callbackColumnAvailableQty')
+            'frame_callback' => array($this, 'callbackColumnAvailableQty'),
+            'filter'   => 'M2ePro/adminhtml_common_amazon_grid_column_filter_qty',
+            'filter_condition_callback' => array($this, 'callbackFilterQty')
         ));
 
         $this->addColumn('online_price', array(
@@ -267,14 +269,34 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
             $productsIds = $this->parseGroupedData($row->getData('products_ids'));
             $uniqueProductsIds = count(array_unique($productsIds)) > 1;
 
+            $matchedAttributes = $typeModel->getParentTypeModel()->getMatchedAttributes();
+            if (!empty($matchedAttributes)) {
+
+                $sortedOptions = array();
+
+                foreach ($matchedAttributes as $magentoAttr => $amazonAttr) {
+                    $sortedOptions[$magentoAttr] = $productOptions[$magentoAttr];
+                }
+
+                $productOptions = $sortedOptions;
+            }
+
+            $virtualProductAttributes = array_keys($typeModel->getParentTypeModel()->getVirtualProductAttributes());
+
             $html .= '<div class="m2ePro-variation-attributes product-options-list">';
             if (!$uniqueProductsIds) {
                 $url = $this->getUrl('adminhtml/catalog_product/edit', array('id' => reset($productsIds)));
                 $html .= '<a href="' . $url . '" target="_blank">';
             }
             foreach ($productOptions as $attribute => $option) {
+
+                $style = '';
+                if (in_array($attribute, $virtualProductAttributes)) {
+                    $style = 'border-bottom: 2px dotted grey';
+                }
+
                 !$option && $option = '--';
-                $optionHtml = '<span class="attribute-row"><span class="attribute"><strong>' .
+                $optionHtml = '<span class="attribute-row" style="' . $style . '"><span class="attribute"><strong>' .
                     Mage::helper('M2ePro')->escapeHtml($attribute) .
                     '</strong></span>:&nbsp;<span class="value">' . Mage::helper('M2ePro')->escapeHtml($option) .
                     '</span></span>';
@@ -369,9 +391,16 @@ HTML;
 
         $generalId = $amazonListingProduct->getGeneralId();
 
+        $virtualChannelAttributes = array_keys($typeModel->getParentTypeModel()->getVirtualChannelAttributes());
+
         $html = '<div style="font-size: 11px; color: grey; margin-left: 7px">';
 
         foreach ($options as $attribute => $option) {
+            $style = '';
+            if (in_array($attribute, $virtualChannelAttributes)) {
+                $style = 'border-bottom: 2px dotted grey';
+            }
+
             !$option && $option = '--';
 
             $attrName = Mage::helper('M2ePro')->escapeHtml($attribute);
@@ -379,11 +408,11 @@ HTML;
 
             if (empty($generalId) && $amazonListingProduct->isGeneralIdOwner()) {
                 $html .= <<<HTML
-{$attrName}:&nbsp;{$optionName}<br/>
+<span style="{$style}">{$attrName}:&nbsp;{$optionName}</span><br/>
 HTML;
             } else {
                 $html .= <<<HTML
-<b>{$attrName}</b>:&nbsp;{$optionName}<br/>
+<span style="{$style}"><b>{$attrName}</b>:&nbsp;{$optionName}</span><br/>
 HTML;
             }
 
@@ -455,7 +484,7 @@ HTML;
         }
 
         if ((bool)$row->getData('is_afn_channel')) {
-            return Mage::helper('M2ePro')->__('N/A');
+            return Mage::helper('M2ePro')->__('AFN');
         }
 
         if (is_null($qty) || $qty === '') {
@@ -633,6 +662,14 @@ HTML;
                     $html .= '<br/><span style="color: #605fff">[Removing...]</span>';
                     break;
 
+                case 'switch_to_afn_action':
+                    $html .= '<br/><span style="color: #605fff">[Switch to AFN in Progress...]</span>';
+                    break;
+
+                case 'switch_to_mfn_action':
+                    $html .= '<br/><span style="color: #605fff">[Switch to MFN in Progress...]</span>';
+                    break;
+
                 default:
                     break;
 
@@ -680,6 +717,37 @@ HTML;
                 );
             }
         }
+    }
+
+    protected function callbackFilterQty($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if (empty($value)) {
+            return;
+        }
+
+        $where = '';
+
+        if (isset($value['from']) && $value['from'] != '') {
+            $where .= 'online_qty >= ' . $value['from'];
+        }
+
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
+                $where .= ' AND ';
+            }
+            $where .= 'online_qty <= ' . $value['to'];
+        }
+
+        if (!empty($value['afn'])) {
+            if (!empty($where)) {
+                $where = '(' . $where . ') OR ';
+            }
+            $where .= 'is_afn_channel = ' . Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_YES;;
+        }
+
+        $collection->getSelect()->where($where);
     }
 
     protected function callbackFilterPrice($collection, $column)
@@ -841,6 +909,12 @@ HTML;
                 break;
             case Ess_M2ePro_Model_Listing_Log::ACTION_CHANNEL_CHANGE:
                 $string = Mage::helper('M2ePro')->__('Channel Change');
+                break;
+            case Ess_M2ePro_Model_Listing_Log::ACTION_SWITCH_TO_AFN_ON_COMPONENT:
+                $string = Mage::helper('M2ePro')->__('Switch to AFN');
+                break;
+            case Ess_M2ePro_Model_Listing_Log::ACTION_SWITCH_TO_MFN_ON_COMPONENT:
+                $string = Mage::helper('M2ePro')->__('Switch to MFN');
                 break;
         }
 
@@ -1276,7 +1350,7 @@ HTML;
             {$listingId}
         );
 
-        // todo next (temp solution)
+        // TODO NEXT (temp solution)
         ListingGridHandlerObj.actionHandler.setOptions(M2ePro);
         ListingGridHandlerObj.templateDescriptionHandler.setOptions(M2ePro);
 
@@ -1645,6 +1719,10 @@ HTML;
     private function parseGroupedData($data)
     {
         $result = array();
+
+        if (empty($data)) {
+            return $result;
+        }
 
         $variationData = explode('|', $data);
         foreach ($variationData as $variationAttribute) {

@@ -19,7 +19,8 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Request
         'details',
         'images',
         'price',
-        'qty'
+        'qty',
+        'shippingOverride'
     );
 
     /**
@@ -114,6 +115,14 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Request
     public function getRequestQty()
     {
         return $this->getRequest('qty');
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_ShippingOverride
+     */
+    public function getRequestShippingOverride()
+    {
+        return $this->getRequest('shippingOverride');
     }
 
     // ########################################

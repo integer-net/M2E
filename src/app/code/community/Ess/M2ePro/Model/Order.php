@@ -354,7 +354,7 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
      * Find the store, where order should be placed
      *
      * @param bool $strict
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function associateWithStore($strict = true)
     {
@@ -362,7 +362,7 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         $store = Mage::getModel('core/store')->load($storeId);
 
         if (is_null($store->getId())) {
-            throw new Exception('Store does not exist.');
+            throw new Ess_M2ePro_Model_Exception('Store does not exist.');
         }
 
         if ($this->getStoreId() != $store->getId()) {
@@ -370,11 +370,13 @@ class Ess_M2ePro_Model_Order extends Ess_M2ePro_Model_Component_Parent_Abstract
         }
 
         if (!Mage::getStoreConfig('payment/m2epropayment/active', $store) && $strict) {
-            throw new Exception('Payment method "M2E Pro Payment" is disabled in Magento Configuration.');
+            throw new Ess_M2ePro_Model_Exception('Payment method "M2E Pro Payment" is disabled in
+                Magento Configuration.');
         }
 
         if (!Mage::getStoreConfig('carriers/m2eproshipping/active', $store) && $strict) {
-            throw new Exception('Shipping method "M2E Pro Shipping" is disabled in Magento Configuration.');
+            throw new Ess_M2ePro_Model_Exception('Shipping method "M2E Pro Shipping" is disabled in
+                Magento Configuration.');
         }
     }
 

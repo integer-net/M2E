@@ -44,7 +44,7 @@ class Ess_M2ePro_Helper_Module_Support extends Mage_Core_Helper_Abstract
             } elseif ($component == Ess_M2ePro_Helper_Component_Buy::NICK) {
                 $urlParts[] = 'RakutenMagentoV6X';
             } else {
-                throw new LogicException('Invalid Channel.');
+                throw new Ess_M2ePro_Model_Exception_Logic('Invalid Channel.');
             }
         }
 

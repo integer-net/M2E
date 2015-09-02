@@ -100,7 +100,7 @@ abstract class Ess_M2ePro_Model_Order_Proxy
     public function getStore()
     {
         if (is_null($this->store)) {
-            throw new Exception('Store is not set.');
+            throw new Ess_M2ePro_Model_Exception('Store is not set.');
         }
 
         return $this->store;

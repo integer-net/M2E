@@ -923,12 +923,12 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_TransferringController
     //#############################################
 
     /** @return Ess_M2ePro_Model_Listing
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     private function getSourceListingFromRequest()
     {
         if (!$listingId = $this->getRequest()->getParam('listing_id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         return Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing',(int)$listingId);

@@ -21,7 +21,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Motor_Add extends Ess_M2ePro_Block_Adminht
     protected function _beforeToHtml()
     {
         if (is_null($this->compatibilityType)) {
-            throw new LogicException('Compatibility type was not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Compatibility type was not set.');
         }
 
         //------------------------------

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>6.3.5</version>
+            <version>6.3.6</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -510,6 +510,10 @@
                         <table>m2epro_synchronization_log</table>
                     </Synchronization_Log>
 
+                    <Log_System>
+                        <table>m2epro_system_log</table>
+                    </Log_System>
+
                     <StopQueue>
                         <table>m2epro_stop_queue</table>
                     </StopQueue>
@@ -762,6 +766,13 @@
                     <Amazon_Item>
                         <table>m2epro_amazon_item</table>
                     </Amazon_Item>
+
+                    <Amazon_Template_ShippingOverride>
+                        <table>m2epro_amazon_template_shipping_override</table>
+                    </Amazon_Template_ShippingOverride>
+                    <Amazon_Template_ShippingOverride_Service>
+                        <table>m2epro_amazon_template_shipping_override_service</table>
+                    </Amazon_Template_ShippingOverride_Service>
 
                     <Amazon_Template_Description_Definition>
                         <table>m2epro_amazon_template_description_definition</table>

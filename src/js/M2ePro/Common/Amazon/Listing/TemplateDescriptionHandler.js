@@ -26,6 +26,10 @@ CommonAmazonListingTemplateDescriptionHandler = Class.create(ActionHandler, {
     {
         var self = this;
 
+        if (!confirm(M2ePro.translator.translate('Are you sure?'))) {
+            return;
+        }
+
         new Ajax.Request(self.options.url.mapToTemplateDescription, {
             method: 'post',
             parameters: {

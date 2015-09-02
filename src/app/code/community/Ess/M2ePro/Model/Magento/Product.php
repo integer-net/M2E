@@ -57,6 +57,16 @@ class Ess_M2ePro_Model_Magento_Product
     /** @var Ess_M2ePro_Model_Magento_Product_Variation */
     protected $_variationInstance = NULL;
 
+    // applied only for standard variations type
+    protected $variationVirtualAttributes = array();
+
+    protected $isIgnoreVariationVirtualAttributes = false;
+
+    // applied only for standard variations type
+    protected $variationFilterAttributes = array();
+
+    protected $isIgnoreVariationFilterAttributes = false;
+
     public $notFoundAttributes = array();
 
     // ########################################
@@ -81,7 +91,7 @@ class Ess_M2ePro_Model_Magento_Product
     /**
      * @param int|null $productId
      * @param int|null $storeId
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      * @return Ess_M2ePro_Model_Magento_Product | Ess_M2ePro_Model_Magento_Product_Cache
      */
     public function loadProduct($productId = NULL, $storeId = NULL)
@@ -90,7 +100,7 @@ class Ess_M2ePro_Model_Magento_Product
         $storeId = (is_null($storeId)) ? $this->_storeId : $storeId;
 
         if ($productId <= 0) {
-            throw new Exception('The Product ID is not set.');
+            throw new Ess_M2ePro_Model_Exception('The Product ID is not set.');
         }
 
         try {
@@ -100,7 +110,8 @@ class Ess_M2ePro_Model_Magento_Product
                  ->load($productId);
 
         } catch(Mage_Core_Model_Store_Exception $e) {
-            throw new Exception(Mage::helper('M2ePro')->__("Store ID '%store_id%' doesn't exist.", $storeId));
+            throw new Ess_M2ePro_Model_Exception(Mage::helper('M2ePro')->__("Store ID '%store_id%' doesn't exist.",
+                $storeId));
         }
 
         $this->setProductId($productId);
@@ -187,7 +198,7 @@ class Ess_M2ePro_Model_Magento_Product
             return $this->_productModel;
         }
 
-        throw new Exception('Load instance first');
+        throw new Ess_M2ePro_Model_Exception('Load instance first');
     }
 
     /**
@@ -208,12 +219,12 @@ class Ess_M2ePro_Model_Magento_Product
 
     /**
      * @return Mage_Catalog_Model_Product_Type_Abstract
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function getTypeInstance()
     {
         if (is_null($this->_productModel) && $this->_productId < 0) {
-            throw new Exception('Load instance first');
+            throw new Ess_M2ePro_Model_Exception('Load instance first');
         }
 
         /** @var Mage_Catalog_Model_Product_Type_Abstract $typeInstance */
@@ -240,12 +251,12 @@ class Ess_M2ePro_Model_Magento_Product
 
     /**
      * @return Mage_CatalogInventory_Model_Stock_Item
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function getStockItem()
     {
         if (is_null($this->_productModel) && $this->_productId < 0) {
-            throw new Exception('Load instance first');
+            throw new Ess_M2ePro_Model_Exception('Load instance first');
         }
 
         $productId = !is_null($this->_productModel) ?
@@ -254,6 +265,54 @@ class Ess_M2ePro_Model_Magento_Product
 
         return Mage::getModel('cataloginventory/stock_item')
                     ->loadByProduct($productId);
+    }
+
+    // ########################################
+
+    public function getVariationVirtualAttributes()
+    {
+        return $this->variationVirtualAttributes;
+    }
+
+    public function setVariationVirtualAttributes(array $attributes)
+    {
+        $this->variationVirtualAttributes = $attributes;
+        return $this;
+    }
+
+    public function isIgnoreVariationVirtualAttributes()
+    {
+        return $this->isIgnoreVariationVirtualAttributes;
+    }
+
+    public function setIgnoreVariationVirtualAttributes($isIgnore = true)
+    {
+        $this->isIgnoreVariationVirtualAttributes = $isIgnore;
+        return $this;
+    }
+
+    // --------------------------------------
+
+    public function getVariationFilterAttributes()
+    {
+        return $this->variationFilterAttributes;
+    }
+
+    public function setVariationFilterAttributes(array $attributes)
+    {
+        $this->variationFilterAttributes = $attributes;
+        return $this;
+    }
+
+    public function isIgnoreVariationFilterAttributes()
+    {
+        return $this->isIgnoreVariationFilterAttributes;
+    }
+
+    public function setIgnoreVariationFilterAttributes($isIgnore = true)
+    {
+        $this->isIgnoreVariationFilterAttributes = $isIgnore;
+        return $this;
     }
 
     // ########################################
@@ -943,7 +1002,6 @@ class Ess_M2ePro_Model_Magento_Product
                     $value = Mage::app()->getStore($this->getStoreId())
                                         ->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA, false).
                                         'catalog/product/'.ltrim($value,'/');
-                    $value = str_replace('https://','http://',$value);
                 }
             }
         }
@@ -1167,7 +1225,7 @@ class Ess_M2ePro_Model_Magento_Product
             return '';
         }
 
-        return str_replace(array('https://', ' '), array('http://', '%20'), $url);
+        return str_replace(' ', '%20', $url);
     }
 
     // ########################################
@@ -1191,11 +1249,10 @@ class Ess_M2ePro_Model_Magento_Product
 
     public function getVariationInstance()
     {
-        if (!is_null($this->_variationInstance)) {
-            return $this->_variationInstance;
+        if (is_null($this->_variationInstance)) {
+            $this->_variationInstance = Mage::getModel('M2ePro/Magento_Product_Variation')->setMagentoProduct($this);
         }
 
-        $this->_variationInstance = Mage::getModel('M2ePro/Magento_Product_Variation')->setMagentoProduct($this);
         return $this->_variationInstance;
     }
 

@@ -350,7 +350,9 @@ CommonBuyListingProductSearchHandler = Class.create(ActionHandler, {
             method: 'post',
             parameters: {
                 product_id: productId,
-                general_id: generalId
+                general_id: generalId,
+                search_type: $('buy_asin_search_type').value,
+                search_value: $('buy_asin_search_value').value
             },
             onSuccess: function(transport) {
                 if (transport.responseText == 0) {

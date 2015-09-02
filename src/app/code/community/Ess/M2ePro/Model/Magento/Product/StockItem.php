@@ -20,7 +20,7 @@ class Ess_M2ePro_Model_Magento_Product_StockItem
     public function getStockItem()
     {
         if (is_null($this->stockItem)) {
-            throw new LogicException('Stock Item is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Stock Item is not set.');
         }
 
         return $this->stockItem;
@@ -36,7 +36,7 @@ class Ess_M2ePro_Model_Magento_Product_StockItem
                 case Mage_CatalogInventory_Model_Stock::BACKORDERS_YES_NOTIFY:
                     break;
                 default:
-                    throw new Exception('The requested Quantity is not available.');
+                    throw new Ess_M2ePro_Model_Exception('The requested Quantity is not available.');
                     break;
             }
         }

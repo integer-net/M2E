@@ -19,9 +19,12 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Physica
     public function isActualProductAttributes()
     {
         $productAttributes = array_map('strtolower', array_keys($this->getProductOptions()));
-        $magentoAttributes = array_map('strtolower', $this->getCurrentMagentoAttributes());
+        $magentoAttributes = array_map('strtolower', $this->getMagentoAttributes());
 
-        return !array_diff($productAttributes, $magentoAttributes);
+        sort($productAttributes);
+        sort($magentoAttributes);
+
+        return $productAttributes == $magentoAttributes;
     }
 
     public function isActualProductVariation()
@@ -108,31 +111,25 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Physica
 
     public function getProductOptions()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-
-        if (empty($additionalData['variation_product_options'])) {
+        $productOptions = $this->getListingProduct()->getSetting('additional_data', 'variation_product_options', null);
+        if (empty($productOptions)) {
             return NULL;
         }
 
-        ksort($additionalData['variation_product_options']);
-
-        return $additionalData['variation_product_options'];
+        return $productOptions;
     }
 
     // ----------------------------------------
 
     private function setProductOptions(array $options, $save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_product_options'] = $options;
-
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setSetting('additional_data', 'variation_product_options', $options);
         $save && $this->getListingProduct()->save();
     }
 
     private function resetProductOptions($save = true)
     {
-        $options = array_fill_keys($this->getCurrentMagentoAttributes(), null);
+        $options = array_fill_keys($this->getMagentoAttributes(), null);
         $this->setProductOptions($options, $save);
     }
 
@@ -171,10 +168,10 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Physica
 
             $tempData = array(
                 'listing_product_variation_id' => $variationId,
-                'product_id' => $option['product_id'],
+                'product_id'   => $option['product_id'],
                 'product_type' => $option['product_type'],
-                'attribute' => $option['attribute'],
-                'option' => $option['option']
+                'attribute'    => $option['attribute'],
+                'option'       => $option['option']
             );
 
             Mage::helper('M2ePro/Component_Amazon')->getModel('Listing_Product_Variation_Option')
@@ -212,6 +209,18 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Physica
         );
 
         Mage::getModel('M2ePro/Amazon_Item')->setData($data)->save();
+    }
+
+    // ########################################
+
+    protected function getMagentoAttributes()
+    {
+        $magentoVariations = $this->getListingProduct()
+            ->getMagentoProduct()
+            ->getVariationInstance()
+            ->getVariationsTypeStandard();
+
+        return array_keys($magentoVariations['set']);
     }
 
     // ########################################

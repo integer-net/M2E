@@ -20,6 +20,8 @@ class Ess_M2ePro_Adminhtml_Common_OrderController
 
         $this->_initPopUp();
 
+        $this->setComponentPageHelpLink('Sales+and+Orders+Overview');
+
         return $this;
     }
 

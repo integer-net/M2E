@@ -19,7 +19,7 @@ abstract class Ess_M2ePro_Controller_Adminhtml_MainController
 
             // check rewrite menu
             if (count($this->getCustomViewComponentHelper()->getActiveComponents()) < 1) {
-                throw new Exception('At least 1 channel of current View should be enabled.');
+                throw new Ess_M2ePro_Model_Exception('At least 1 channel of current View should be enabled.');
             }
 
             // update client data

@@ -6,8 +6,6 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_SellingFormat_Edit_Form extends Mage_Adminhtml_Block_Widget_Form
 {
-    const QTY_MODE_PRODUCT_FIXED_VIRTUAL_ATTRIBUTE_VALUE = 'qty_mode_product_fixed';
-
     // ####################################
 
     public function __construct()

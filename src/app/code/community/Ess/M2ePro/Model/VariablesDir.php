@@ -87,7 +87,7 @@ class Ess_M2ePro_Model_VariablesDir
         }
 
         if (!@mkdir($this->getBasePath(), 0777, true)) {
-            throw new Exception('M2ePro base var dir creation is failed.');
+            throw new Ess_M2ePro_Model_Exception('M2ePro base var dir creation is failed.');
         }
     }
 
@@ -107,14 +107,14 @@ class Ess_M2ePro_Model_VariablesDir
             foreach ($tempChildFolders as $key=>$value) {
                 if (!is_dir($tempPath.$value.DS)) {
                     if (!@mkdir($tempPath.$value.DS, 0777, true)) {
-                        throw new Exception('Custom var dir creation is failed.');
+                        throw new Ess_M2ePro_Model_Exception('Custom var dir creation is failed.');
                     }
                 }
                 $tempPath = $tempPath.$value.DS;
             }
         } else {
             if (!@mkdir($this->getPath(), 0777, true)) {
-                throw new Exception('Custom var dir creation is failed.');
+                throw new Ess_M2ePro_Model_Exception('Custom var dir creation is failed.');
             }
         }
     }
@@ -128,7 +128,7 @@ class Ess_M2ePro_Model_VariablesDir
         }
 
         if (!@rmdir($this->getBasePath())) {
-            throw new Exception('M2ePro base var dir removing is failed.');
+            throw new Ess_M2ePro_Model_Exception('M2ePro base var dir removing is failed.');
         }
     }
 
@@ -146,7 +146,7 @@ class Ess_M2ePro_Model_VariablesDir
         }
 
         if (!@rmdir($this->getBasePath())) {
-            throw new Exception('M2ePro base var dir removing is failed.');
+            throw new Ess_M2ePro_Model_Exception('M2ePro base var dir removing is failed.');
         }
     }
 
@@ -157,7 +157,7 @@ class Ess_M2ePro_Model_VariablesDir
         }
 
         if (!@rmdir($this->getPath())) {
-            throw new Exception('Custom var dir removing is failed.');
+            throw new Ess_M2ePro_Model_Exception('Custom var dir removing is failed.');
         }
     }
 

@@ -219,7 +219,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
     /**
      * Associate order item with product in magento
      *
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function associateWithProduct()
     {
@@ -234,13 +234,13 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
                 )
             );
 
-            throw new Exception($message);
+            throw new Ess_M2ePro_Model_Exception($message);
         }
 
         $this->associateVariationWithOptions();
 
         if (!$this->getMagentoProduct()->isStatusEnabled()) {
-            throw new Exception('Product is disabled.');
+            throw new Ess_M2ePro_Model_Exception('Product is disabled.');
         }
     }
 
@@ -328,7 +328,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
             }
 
             if ($optionsFinder->hasFailedOptions()) {
-                throw new LogicException(
+                throw new Ess_M2ePro_Model_Exception_Logic(
                     sprintf('Product Option(s) "%s" not found.', implode(', ', $optionsFinder->getFailedOptions()))
                 );
             }
@@ -340,7 +340,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
 
         if (count(array_diff($foundOptionsIds, $existOptionsIds)) > 0) {
             // options were already mapped, but not all of them
-            throw new LogicException('Selected Options do not match the Product Options.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Selected Options do not match the Product Options.');
         }
     }
 
@@ -384,7 +384,7 @@ class Ess_M2ePro_Model_Order_Item extends Ess_M2ePro_Model_Component_Parent_Abst
         $magentoProduct->setProductId($this->getProductId());
 
         if (!$magentoProduct->exists()) {
-            throw new LogicException('Product does not exist.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Product does not exist.');
         }
 
         if (count($associatedProducts) == 0

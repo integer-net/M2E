@@ -39,7 +39,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
     public function indexAction()
     {
         if (!$listingId = $this->getRequest()->getParam('listing_id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         if (!$this->checkProductAddIds()) {
@@ -715,8 +715,11 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
             )
         );
 
-        $this->_initAction()
-            ->_title(Mage::helper('M2ePro')->__('Set Your eBay Categories'))
+        $this->_initAction();
+
+        $this->setComponentPageHelpLink('Set+Item+Specifics');
+
+        $this->_title(Mage::helper('M2ePro')->__('Set Your eBay Categories'))
             ->_addContent($specificBlock)
             ->renderLayout();
     }
@@ -1524,7 +1527,7 @@ class Ess_M2ePro_Adminhtml_Ebay_Listing_CategorySettingsController
     private function getListingFromRequest()
     {
         if (!$listingId = $this->getRequest()->getParam('listing_id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         return Mage::helper('M2ePro/Component_Ebay')->getCachedObject('Listing',$listingId)->getChildObject();

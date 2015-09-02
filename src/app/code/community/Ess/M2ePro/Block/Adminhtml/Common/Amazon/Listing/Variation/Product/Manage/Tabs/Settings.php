@@ -16,12 +16,19 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
     protected $channelThemes = null;
     protected $childListingProducts = null;
     protected $currentProductVariations = null;
-    protected $productVariationsTree = array();
-    protected $channelVariationsTree = array();
 
     //------------------------------
 
     protected $listingProductId;
+
+    // ####################################
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->setTemplate('M2ePro/common/amazon/listing/variation/product/manage/tabs/settings.phtml');
+    }
 
     // ####################################
 
@@ -85,6 +92,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
     }
 
     //------------------------------
+
     /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
     protected $listingProduct;
 
@@ -93,12 +101,32 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
      */
     public function getListingProduct()
     {
-        if(empty($this->listingProduct)) {
+        if(is_null($this->listingProduct)) {
             $this->listingProduct = Mage::helper('M2ePro/Component_Amazon')
                 ->getObject('Listing_Product', $this->getListingProductId());
         }
 
         return $this->listingProduct;
+    }
+
+    //------------------------------
+
+    /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+    protected $listingProductTypeModel;
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent|null
+     */
+    public function getListingProductTypeModel()
+    {
+        if(is_null($this->listingProductTypeModel)) {
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+            $amazonListingProduct = $this->getListingProduct()->getChildObject();
+            /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent $typeModel */
+            $this->listingProductTypeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
+        }
+
+        return $this->listingProductTypeModel;
     }
 
     //------------------------------
@@ -118,13 +146,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_
         }
 
         return $this->matcherAttributes;
-    }
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->setTemplate('M2ePro/common/amazon/listing/variation/product/manage/tabs/settings.phtml');
     }
 
     //------------------------------
@@ -220,8 +241,7 @@ HTML;
 
     public function getProductAttributes()
     {
-        return $this->getListingProduct()->getChildObject()
-            ->getVariationManager()->getTypeModel()->getProductAttributes();
+        return $this->getListingProductTypeModel()->getProductAttributes();
     }
 
     // -------------------------------------------
@@ -280,12 +300,12 @@ HTML;
 
     public function hasChannelTheme()
     {
-        return $this->getListingProduct()->getChildObject()->getVariationManager()->getTypeModel()->hasChannelTheme();
+        return $this->getListingProductTypeModel()->hasChannelTheme();
     }
 
     public function getChannelTheme()
     {
-        return $this->getListingProduct()->getChildObject()->getVariationManager()->getTypeModel()->getChannelTheme();
+        return $this->getListingProductTypeModel()->getChannelTheme();
     }
 
     public function getChannelThemes()
@@ -313,9 +333,11 @@ HTML;
         $themesUsageData = $variationHelper->getThemesUsageData();
         $usedThemes = array();
 
-        foreach ($themesUsageData[$marketPlaceId] as $theme => $count) {
-            if (!empty($channelThemes[$theme])) {
-                $usedThemes[$theme] = $channelThemes[$theme];
+        if (!empty($themesUsageData[$marketPlaceId])) {
+            foreach ($themesUsageData[$marketPlaceId] as $theme => $count) {
+                if (!empty($channelThemes[$theme])) {
+                    $usedThemes[$theme] = $channelThemes[$theme];
+                }
             }
         }
 
@@ -361,15 +383,13 @@ HTML;
 
     public function hasMatchedAttributes()
     {
-        return $this->getListingProduct()->getChildObject()
-            ->getVariationManager()->getTypeModel()->hasMatchedAttributes();
+        return $this->getListingProductTypeModel()->hasMatchedAttributes();
     }
 
     public function getMatchedAttributes()
     {
         if($this->hasMatchedAttributes()) {
-            return $this->getListingProduct()->getChildObject()
-                ->getVariationManager()->getTypeModel()->getMatchedAttributes();
+            return $this->getListingProductTypeModel()->getMatchedAttributes();
         }
         return $this->getMatcherAttributes()->getMatchedAttributes();
     }
@@ -379,8 +399,66 @@ HTML;
         if(!$this->hasGeneralId() && $this->isGeneralIdOwner() && $this->hasChannelTheme()) {
             return $this->getChannelThemeAttr();
         }
-        return array_keys($this->getListingProduct()->getChildObject()
-            ->getVariationManager()->getTypeModel()->getChannelAttributesSets());
+        return array_keys($this->getListingProductTypeModel()->getChannelAttributesSets());
+    }
+
+    // ----------------------------------------
+
+    public function getVirtualAttributes()
+    {
+        $typeModel = $this->getListingProductTypeModel();
+
+        if ($virtualProductAttributes = $typeModel->getVirtualProductAttributes()) {
+            return $virtualProductAttributes;
+        }
+
+        if ($virtualChannelAttributes = $typeModel->getVirtualChannelAttributes()) {
+            return $virtualChannelAttributes;
+        }
+
+        return array();
+    }
+
+    public function getVirtualProductAttributes()
+    {
+        $typeModel = $this->getListingProductTypeModel();
+
+        if ($virtualProductAttributes = $typeModel->getVirtualProductAttributes()) {
+            return $virtualProductAttributes;
+        }
+
+        return array();
+    }
+
+    public function getVirtualChannelAttributes()
+    {
+        $typeModel = $this->getListingProductTypeModel();
+
+        if ($virtualChannelAttributes = $typeModel->getVirtualChannelAttributes()) {
+            return $virtualChannelAttributes;
+        }
+
+        return array();
+    }
+
+    // ----------------------------------------
+
+    public function isChangeMatchedAttributesAllowed()
+    {
+        if ($this->isInAction() ) {
+            return false;
+        }
+        if ($this->hasMatchedAttributes()) {
+            $typeModel = $this->getListingProductTypeModel();
+
+            $realMatchedAttributes = $typeModel->getRealMatchedAttributes();
+
+            if (count($realMatchedAttributes) === 1) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // ###########################################
@@ -391,8 +469,7 @@ HTML;
             return $this->childListingProducts;
         }
 
-        return $this->childListingProducts = $this->getListingProduct()->getChildObject()
-            ->getVariationManager()->getTypeModel()->getChildListingsProducts();
+        return $this->childListingProducts = $this->getListingProductTypeModel()->getChildListingsProducts();
     }
 
     public function getCurrentProductVariations()
@@ -421,20 +498,37 @@ HTML;
         return $this->currentProductVariations = $productVariations;
     }
 
-    public function getChannelVariations()
-    {
-        if (!is_null($this->childListingProducts)) {
-            return $this->childListingProducts;
-        }
-
-        return $this->childListingProducts = $this->getListingProduct()->getChildObject()
-            ->getVariationManager()->getTypeModel()->getChildListingsProducts();
-    }
-
     public function getCurrentChannelVariations()
     {
-        return $this->getListingProduct()->getChildObject()
-            ->getVariationManager()->getTypeModel()->getChannelVariations();
+        return $this->getListingProductTypeModel()->getChannelVariations();
+    }
+
+    // ------------------------------------------
+
+    public function getAmazonVariationsSet()
+    {
+        $variations = $this->getCurrentChannelVariations();
+
+        if (is_null($variations)){
+            return false;
+        }
+
+        $attributesOptions = array();
+
+        foreach ($variations as $variation) {
+            foreach ($variation as $attr => $option) {
+                if (!isset($attributesOptions[$attr])) {
+                    $attributesOptions[$attr] = array();
+                }
+                if (!in_array($option, $attributesOptions[$attr])) {
+                    $attributesOptions[$attr][] = $option;
+                }
+            }
+        }
+
+        ksort($attributesOptions);
+
+        return $attributesOptions;
     }
 
     // ------------------------------------------

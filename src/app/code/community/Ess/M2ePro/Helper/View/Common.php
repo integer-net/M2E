@@ -94,7 +94,7 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
             } else {
 
                 if (!Mage::helper('M2ePro/Component_' . ucfirst($channel))->isActive()) {
-                    throw new Exception('Channel is not Active!');
+                    throw new Ess_M2ePro_Model_Exception('Channel is not Active!');
                 }
 
                 if (count($components) > 1) {
@@ -197,7 +197,7 @@ class Ess_M2ePro_Helper_View_Common extends Mage_Core_Helper_Abstract
         );
 
         if (!in_array($component, $components)) {
-            throw new LogicException('Invalid component nick.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Invalid component nick.');
         }
 
         $sessionKey = $component . '_is_3rd_party_should_be_shown';

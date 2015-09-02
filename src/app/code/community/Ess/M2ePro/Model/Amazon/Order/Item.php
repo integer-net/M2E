@@ -243,13 +243,13 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
         $channelItem = $this->getChannelItem();
 
         if (!is_null($channelItem) && !$this->getAmazonAccount()->isMagentoOrdersListingsModeEnabled()) {
-            throw new Exception(
+            throw new Ess_M2ePro_Model_Exception(
                 'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($channelItem) && !$this->getAmazonAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
-            throw new Exception(
+            throw new Ess_M2ePro_Model_Exception(
                 'Magento Order Creation for Items Listed by 3rd party software is disabled in Account Settings.'
             );
         }
@@ -258,7 +258,7 @@ class Ess_M2ePro_Model_Amazon_Order_Item extends Ess_M2ePro_Model_Component_Chil
     private function createProduct()
     {
         if (!$this->getAmazonAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product Import is disabled in Amazon Account Settings.');
+            throw new Ess_M2ePro_Model_Exception('Product Import is disabled in Amazon Account Settings.');
         }
 
         $storeId = $this->getAmazonAccount()->getMagentoOrdersListingsOtherStoreId();

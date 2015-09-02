@@ -11,6 +11,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
     const DATA_TYPE_PRICE   = 'price';
     const DATA_TYPE_IMAGES  = 'images';
     const DATA_TYPE_DETAILS = 'details';
+    const DATA_TYPE_SHIPPING_OVERRIDE = 'shipping_override';
 
     // ########################################
 
@@ -21,6 +22,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
             self::DATA_TYPE_PRICE,
             self::DATA_TYPE_DETAILS,
             self::DATA_TYPE_IMAGES,
+            self::DATA_TYPE_SHIPPING_OVERRIDE
         );
     }
 
@@ -90,6 +92,23 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Configurator
     public function disallowImages()
     {
         return $this->disallow(self::DATA_TYPE_IMAGES);
+    }
+
+    // ----------------------------------------
+
+    public function isShippingOverrideAllowed()
+    {
+        return $this->isAllowed(self::DATA_TYPE_SHIPPING_OVERRIDE);
+    }
+
+    public function allowShippingOverride()
+    {
+        return $this->allow(self::DATA_TYPE_SHIPPING_OVERRIDE);
+    }
+
+    public function disallowShippingOverride()
+    {
+        return $this->disallow(self::DATA_TYPE_SHIPPING_OVERRIDE);
     }
 
     // ########################################

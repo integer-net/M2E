@@ -175,17 +175,6 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Response
         return $data;
     }
 
-    protected function appendAfnChannelValues($data)
-    {
-        if (!$this->getRequestData()->hasQty()) {
-            return $data;
-        }
-
-        $data['is_afn_channel'] = Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_NO;
-
-        return $data;
-    }
-
     // ----------------------------------------
 
     protected function appendQtyValues($data)

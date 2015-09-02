@@ -196,5 +196,17 @@ class Ess_M2ePro_Helper_Module_Database_Repair extends Mage_Core_Helper_Abstract
         $writeConnection->changeColumn($tableName, $columnInfo['name'], $columnInfo['name'], $definition);
     }
 
+    public function dropColumn($tableName, array $columnInfo)
+    {
+        if (!isset($columnInfo['name'])) {
+            return;
+        }
+
+        $writeConnection = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $tableName = Mage::getSingleton('core/resource')->getTableName($tableName);
+
+        $writeConnection->dropColumn($tableName, $columnInfo['name']);
+    }
+
     //####################################
 }

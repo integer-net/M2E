@@ -180,21 +180,43 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Update_Responser
 
             if ($newData['online_price'] != $existingData['online_price']) {
                 // M2ePro_TRANSLATIONS
-                // Item Price was successfully changed from %from% to %to% .
+                // Item Price was successfully changed from %from% to %to%.
                 $tempLogMessages[] = Mage::helper('M2ePro')->__(
-                    'Item Price was successfully changed from %from% to %to% .',
+                    'Item Price was successfully changed from %from% to %to%.',
                     $existingData['online_price'],
                     $newData['online_price']
                 );
             }
 
-            if ($newData['online_qty'] != $existingData['online_qty']) {
+            if (!is_null($newData['online_qty']) && $newData['online_qty'] != $existingData['online_qty']) {
                 // M2ePro_TRANSLATIONS
-                // Item QTY was successfully changed from %from% to %to% .
+                // Item QTY was successfully changed from %from% to %to%.
                 $tempLogMessages[] = Mage::helper('M2ePro')->__(
-                    'Item QTY was successfully changed from %from% to %to% .',
+                    'Item QTY was successfully changed from %from% to %to%.',
                     $existingData['online_qty'],
                     $newData['online_qty']
+                );
+            }
+
+            if (is_null($newData['online_qty']) && $newData['is_afn_channel'] != $existingData['is_afn_channel']) {
+
+                $from = Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty::FULFILLMENT_MODE_MFN;
+                $to = Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty::FULFILLMENT_MODE_MFN;
+
+                if ($existingData['is_afn_channel']) {
+                    $from = Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty::FULFILLMENT_MODE_AFN;
+                }
+
+                if ($newData['is_afn_channel']) {
+                    $to = Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty::FULFILLMENT_MODE_AFN;
+                }
+
+                // M2ePro_TRANSLATIONS
+                // Item Fulfillment was successfully changed from %from% to %to%.
+                $tempLogMessages[] = Mage::helper('M2ePro')->__(
+                    'Item Fulfillment was successfully changed from %from% to %to%.',
+                    $from,
+                    $to
                 );
             }
 
@@ -208,9 +230,9 @@ class Ess_M2ePro_Model_Amazon_Synchronization_OtherListings_Update_Responser
 
                 if (!empty($statusChangedFrom) && !empty($statusChangedTo)) {
                     // M2ePro_TRANSLATIONS
-                    // Item Status was successfully changed from "%from%" to "%to%" .
+                    // Item Status was successfully changed from "%from%" to "%to%".
                     $tempLogMessages[] = Mage::helper('M2ePro')->__(
-                        'Item Status was successfully changed from "%from%" to "%to%" .',
+                        'Item Status was successfully changed from "%from%" to "%to%".',
                         $statusChangedFrom,
                         $statusChangedTo
                     );

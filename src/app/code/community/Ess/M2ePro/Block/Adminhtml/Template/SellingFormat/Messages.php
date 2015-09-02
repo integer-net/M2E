@@ -151,7 +151,7 @@ class Ess_M2ePro_Block_Adminhtml_Template_SellingFormat_Messages
         }
 
         if (is_null($model)) {
-            throw new LogicException('Policy model is unknown.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Policy model is unknown.');
         }
 
         return $model;

@@ -88,6 +88,8 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
         /** @var $connWrite Varien_Db_Adapter_Pdo_Mysql */
         $connWrite = Mage::getSingleton('core/resource')->getConnection('core_write');
         $tableMarketplaces = Mage::getSingleton('core/resource')->getTableName('m2epro_amazon_dictionary_marketplace');
+        $tableShippingOverride = Mage::getSingleton('core/resource')
+            ->getTableName('m2epro_amazon_dictionary_shipping_override');
 
         $connWrite->delete($tableMarketplaces,array('marketplace_id = ?' => $marketplace->getId()));
 
@@ -101,6 +103,18 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Marketplaces_Details
         $connWrite->insert($tableMarketplaces, $data);
 
         Mage::helper('M2ePro/Component_Amazon_Vocabulary')->setServerData($details['vocabulary']);
+
+        $connWrite->delete($tableShippingOverride, array('marketplace_id = ?' => $marketplace->getId()));
+
+        foreach ($details['shipping_overrides'] as $data) {
+            $insertData = array(
+                'marketplace_id'   => $marketplace->getId(),
+                'location'         => $data['location'],
+                'service'          => $data['service'],
+                'option'           => $data['option']
+            );
+            $connWrite->insert($tableShippingOverride, $insertData);
+        }
     }
 
     protected function logSuccessfulOperation(Ess_M2ePro_Model_Marketplace $marketplace)

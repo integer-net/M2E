@@ -1019,7 +1019,7 @@ HTML;
                    $this->getInitTerapeakWidgetHtml();
         }
 
-        // todo next (change)
+        // TODO NEXT (change)
 
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 

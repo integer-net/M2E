@@ -21,4 +21,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit_Synchronization_Help extends
     }
 
     // ####################################
+
+    public function isEditMode()
+    {
+        return !!$this->getRequest()->getParam('id');
+    }
+
+    // ####################################
 }

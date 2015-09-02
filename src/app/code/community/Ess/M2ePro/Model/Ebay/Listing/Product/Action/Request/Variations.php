@@ -301,13 +301,15 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
                 $attributeLabel = $foundAttributeLabel;
 
-                $optionImages = $option->getChildObject()->getGalleryImages();
+                $optionImages = $this->getEbayListingProduct()->getEbayDescriptionTemplate()
+                                     ->getSource($option->getMagentoProduct())
+                                     ->getVariationImages();
 
                 if (count($optionImages) <= 0) {
                     continue;
                 }
 
-                $images[$option->getOption()] = array_slice($optionImages,0,1);
+                $images[$option->getOption()] = $optionImages;
             }
         }
 

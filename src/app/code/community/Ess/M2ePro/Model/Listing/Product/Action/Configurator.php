@@ -251,7 +251,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_Action_Configurator
     protected function validateDataType($dataType)
     {
         if (!in_array($dataType, $this->getAllDataTypes())) {
-            throw new LogicException('Data type is invalid');
+            throw new Ess_M2ePro_Model_Exception_Logic('Data type is invalid');
         }
     }
 

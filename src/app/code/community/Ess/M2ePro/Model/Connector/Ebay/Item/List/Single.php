@@ -17,7 +17,13 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_List_Single
         $this->listingProduct->setData('synch_reasons', null);
 
         $additionalData = $this->listingProduct->getAdditionalData();
+
         unset($additionalData['synch_template_list_rules_note']);
+
+        if (isset($additionalData['add_to_schedule'])) {
+            unset($additionalData['add_to_schedule']);
+        }
+
         $this->listingProduct->setSettings('additional_data', $additionalData);
 
         $this->listingProduct->save();

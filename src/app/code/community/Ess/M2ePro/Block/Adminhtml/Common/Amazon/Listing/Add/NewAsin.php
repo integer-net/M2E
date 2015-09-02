@@ -81,7 +81,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin extends Ess_M
     public function getListing()
     {
         if (!$listingId = $this->getRequest()->getParam('id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         if (is_null($this->listing)) {

@@ -167,7 +167,7 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
     // ########################################
 
     /**
-     * @throws LogicException
+     * @throws Ess_M2ePro_Model_Exception_Logic
      * @return Ess_M2ePro_Model_Order[]
      */
     private function getOrders()
@@ -180,7 +180,7 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingResponser
 
         foreach ($this->params as $update) {
             if (!isset($update['order_id'])) {
-                throw new LogicException('Order ID is not defined.');
+                throw new Ess_M2ePro_Model_Exception_Logic('Order ID is not defined.');
             }
 
             $ordersIds[] = (int)$update['order_id'];

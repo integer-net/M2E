@@ -81,7 +81,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Order_Update_Abstract
             Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_SHIP,
             Ess_M2ePro_Model_Connector_Ebay_Order_Dispatcher::ACTION_SHIP_TRACK
         ))) {
-            throw new LogicException('Invalid Action.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Invalid Action.');
         }
 
         return true;

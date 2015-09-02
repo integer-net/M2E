@@ -493,7 +493,7 @@ class Ess_M2ePro_Model_Servicing_Task_Statistic extends Ess_M2ePro_Model_Servici
             $data['listings_products'][$row['component']]['accounts'][$accountTitle] += (int)$row['products_count'];
         }
 
-        // todo next
+        // TODO NEXT (append information by product types [count of simple, configurable, etc])
 
         return $data;
     }

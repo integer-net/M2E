@@ -286,7 +286,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Other extends Ess_M2ePro_Model_Component_Chi
     protected function processDispatcher($action, array $params = array())
     {
         if (is_null($this->getId())) {
-             throw new Exception('Method require loaded instance first');
+             throw new Ess_M2ePro_Model_Exception('Method require loaded instance first');
         }
 
         $dispatcher = Mage::getModel('M2ePro/Connector_Ebay_OtherItem_Dispatcher');

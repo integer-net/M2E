@@ -32,12 +32,12 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
     /**
      * @param array $params
      * @param Ess_M2ePro_Model_Listing_Product[] $listingsProducts
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function __construct(array $params = array(), array $listingsProducts)
     {
         if (empty($listingsProducts)) {
-            throw new Exception('Multiple Item Connector has received empty array');
+            throw new Ess_M2ePro_Model_Exception('Multiple Item Connector has received empty array');
         }
 
         /** @var Ess_M2ePro_Model_Account $account */
@@ -51,15 +51,17 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
         foreach($listingsProducts as $listingProduct) {
 
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
-                throw new Exception('Multiple Item Connector has received invalid Product data type');
+                throw new Ess_M2ePro_Model_Exception('Multiple Item Connector has received invalid Product data type');
             }
 
             if ($account->getId() != $listingProduct->getListing()->getAccountId()) {
-                throw new Exception('Multiple Item Connector has received Products from different Accounts');
+                throw new Ess_M2ePro_Model_Exception('Multiple Item Connector has received Products from
+                    different Accounts');
             }
 
             if ($marketplace->getId() != $listingProduct->getListing()->getMarketplaceId()) {
-                throw new Exception('Multiple Item Connector has received Products from different Marketplaces');
+                throw new Ess_M2ePro_Model_Exception('Multiple Item Connector has received Products from
+                    different Marketplaces');
             }
 
             $listingProductIds[] = $listingProduct->getId();
@@ -81,7 +83,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
         $actualListingsProducts = $listingProductCollection->getItems();
 
         if (empty($actualListingsProducts)) {
-            throw new Exception('All products were removed before connector processing');
+            throw new Ess_M2ePro_Model_Exception('All products were removed before connector processing');
         }
 
         foreach ($actualListingsProducts as $actualListingProduct) {
@@ -190,6 +192,15 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
             /** @var $listingProduct Ess_M2ePro_Model_Listing_Product */
 
             $requestDataObject = $this->getRequestDataObject($listingProduct);
+            $requestData = $requestDataObject->getData();
+
+            if ($requestData['is_eps_ebay_images_mode'] === false ||
+                (is_null($requestData['is_eps_ebay_images_mode']) &&
+                    $requestData['upload_images_mode'] ==
+                        Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_SELF)) {
+                continue;
+            }
+
             $imagesTimeout += self::TIMEOUT_INCREMENT_FOR_ONE_IMAGE * $requestDataObject->getTotalImagesCount();
         }
 
@@ -258,7 +269,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_MultipleAbstract
     protected function getListingProduct($id)
     {
         if (!isset($this->listingsProducts[$id])) {
-            throw new Exception('Listing Product was not found');
+            throw new Ess_M2ePro_Model_Exception('Listing Product was not found');
         }
 
         return $this->listingsProducts[$id];

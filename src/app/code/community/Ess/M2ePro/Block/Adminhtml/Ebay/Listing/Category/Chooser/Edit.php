@@ -79,7 +79,7 @@ HTML;
     public function getCategoryType()
     {
         if (is_null($this->_categoryType)) {
-            throw new LogicException('Category type is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Category type is not set.');
         }
 
         return $this->_categoryType;

@@ -65,7 +65,8 @@ class Ess_M2ePro_Model_Ebay_Order_Proxy extends Ess_M2ePro_Model_Order_Proxy
             $customer->load($this->order->getEbayAccount()->getMagentoOrdersCustomerId());
 
             if (is_null($customer->getId())) {
-                throw new Exception('Customer with ID specified in eBay Account Settings does not exist.');
+                throw new Ess_M2ePro_Model_Exception('Customer with ID specified in eBay Account
+                    Settings does not exist.');
             }
         }
 

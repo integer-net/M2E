@@ -47,8 +47,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log extends Mage_Adminhtml_Block
     public function getListing()
     {
         if (is_null($this->listing)) {
-            $this->listing = Mage::helper('M2ePro/Component')
-                ->getCachedUnknownObject('Listing', $this->getListingId());
+            $this->listing = Mage::helper('M2ePro/Component')->getCachedUnknownObject(
+                'Listing', $this->getListingId()
+            );
         }
 
         return $this->listing;

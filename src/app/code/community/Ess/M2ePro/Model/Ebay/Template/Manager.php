@@ -37,7 +37,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
     {
         if (!($object instanceof Ess_M2ePro_Model_Ebay_Listing) &&
             !($object instanceof Ess_M2ePro_Model_Ebay_Listing_Product)) {
-            throw new Exception('Owner object is out of knowledge range.');
+            throw new Ess_M2ePro_Model_Exception('Owner object is out of knowledge range.');
         }
         $this->ownerObject = $object;
         return $this;
@@ -65,7 +65,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
     public function setTemplate($nick)
     {
         if (!in_array(strtolower($nick),$this->getAllTemplates())) {
-            throw new Exception('Policy nick is out of knowledge range.');
+            throw new Ess_M2ePro_Model_Exception('Policy nick is out of knowledge range.');
         }
         $this->templateNick = strtolower($nick);
         return $this;
@@ -261,8 +261,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
                     'SellingFormat' : ucfirst($this->getTemplate());
 
         if ($this->isHorizontalTemplate()) {
-            $object = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                Ess_M2ePro_Helper_Component_Ebay::NICK,
+            $object = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
                 $modelName, $id, NULL, array('template')
             );
         } else {
@@ -313,7 +312,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         }
 
         if (is_null($this->resultObject)) {
-            throw new Exception('Unable to get result object.');
+            throw new Ess_M2ePro_Model_Exception('Unable to get result object.');
         }
 
         return $this->resultObject;
@@ -347,7 +346,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         }
 
         if (is_null($name)) {
-            throw new LogicException(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
+            throw new Ess_M2ePro_Model_Exception_Logic(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
         }
 
         return $name;
@@ -380,7 +379,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         }
 
         if (is_null($model)) {
-            throw new LogicException(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
+            throw new Ess_M2ePro_Model_Exception_Logic(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
         }
 
         return $model;
@@ -408,7 +407,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         }
 
         if (is_null($collection)) {
-            throw new LogicException(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
+            throw new Ess_M2ePro_Model_Exception_Logic(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
         }
 
         return $collection;
@@ -440,7 +439,7 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
         }
 
         if (is_null($model)) {
-            throw new LogicException(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
+            throw new Ess_M2ePro_Model_Exception_Logic(sprintf('Template nick "%s" is unknown.', $this->getTemplate()));
         }
 
         return $model;
@@ -499,8 +498,8 @@ class Ess_M2ePro_Model_Ebay_Template_Manager
             $templateModelName = $this->getTemplateModelName();
 
             if ($this->isHorizontalTemplate()) {
-                $templateModel = Mage::helper('M2ePro/Component')
-                    ->getCachedComponentObject('ebay', $templateModelName, $templateId, NULL, array('template'))
+                $templateModel = Mage::helper('M2ePro/Component_Ebay')
+                    ->getCachedObject($templateModelName, $templateId, NULL, array('template'))
                     ->getChildObject();
             } else {
                 $templateModel = Mage::helper('M2ePro')->getCachedObject(

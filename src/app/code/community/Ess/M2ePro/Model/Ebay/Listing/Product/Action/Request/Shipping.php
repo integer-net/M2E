@@ -204,7 +204,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             return self::SHIPPING_TYPE_CALCULATED;
         }
 
-        throw new LogicException('Unknown local shipping type.');
+        throw new Ess_M2ePro_Model_Exception_Logic('Unknown local shipping type.');
     }
 
     private function getLocalServices()
@@ -292,7 +292,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Shipping
             return self::SHIPPING_TYPE_CALCULATED;
         }
 
-        throw new LogicException('Unknown international shipping type.');
+        throw new Ess_M2ePro_Model_Exception_Logic('Unknown international shipping type.');
     }
 
     private function getInternationalServices()

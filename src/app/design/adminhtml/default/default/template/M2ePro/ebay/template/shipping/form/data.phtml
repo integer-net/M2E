@@ -875,6 +875,28 @@
                     </td>
                 </tr>
 
+                <?php if ($showAdvancedMode && $this->canDisplayInternationalShippingRateTable()): ?>
+                    <tr class="international-shipping-tr" id="international_shipping_rate_table_mode_tr">
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Use eBay Shipping Rate Table'); ?>:</label>
+                        </td>
+                        <td class="value" style="width: auto;">
+                            <select id="international_shipping_rate_table_mode" name="shipping[international_shipping_rate_table_mode]">
+                                <option value="0" <?php if (!$formData['international_shipping_rate_table_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                                <option value="1" <?php if ($formData['international_shipping_rate_table_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span>
+                                    <?php echo Mage::helper('M2ePro')->__(
+                                        'You can set up Shipping Rate Tables in eBay to set the amount you charge for postage by delivery method and destination and use them in your M2E Pro Listings. Shipping Rate Tables are set up directly on eBay, not in M2E Pro.
+                                        To set up or edit Shipping Rate Tables, Log in to your Seller Account on eBay.'
+                                    ); ?>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+
             </table>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
@@ -928,28 +950,6 @@
             </table>
 
             <table class="form-list" cellspacing="0" cellpadding="0">
-
-                <?php if ($showAdvancedMode && $this->canDisplayInternationalShippingRateTable()): ?>
-                    <tr class="international-shipping-tr">
-                        <td class="label">
-                            <label><?php echo Mage::helper('M2ePro')->__('Use eBay Shipping Rate Table'); ?>:</label>
-                        </td>
-                        <td class="value" style="width: auto;">
-                            <select id="international_shipping_rate_table_mode" name="shipping[international_shipping_rate_table_mode]">
-                                <option value="0" <?php if (!$formData['international_shipping_rate_table_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
-                                <option value="1" <?php if ($formData['international_shipping_rate_table_mode']): ?>selected="selected"<?php endif; ?> ><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
-                            </select>
-                            <p class="note">
-                                <span>
-                                    <?php echo Mage::helper('M2ePro')->__(
-                                        'You can set up Shipping Rate Tables in eBay to set the amount you charge for postage by delivery method and destination and use them in your M2E Pro Listings. Shipping Rate Tables are set up directly on eBay, not in M2E Pro.
-                                        To set up or edit Shipping Rate Tables, Log in to your Seller Account on eBay.'
-                                    ); ?>
-                                </span>
-                            </p>
-                        </td>
-                    </tr>
-                <?php endif; ?>
 
                 <tr id="international_handling_cost_cv_tr" class="international-shipping-tr">
                     <td class="label">

@@ -60,12 +60,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_Tabs_Search extends Mage_Adm
     protected function getListing()
     {
         if (!$listingId = $this->getRequest()->getParam('id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         if (is_null($this->listing)) {
-            $this->listing = Mage::helper('M2ePro/Component')
-                ->getCachedUnknownObject('Listing', $listingId);
+            $this->listing = Mage::helper('M2ePro/Component')->getCachedUnknownObject('Listing', $listingId);
         }
 
         return $this->listing;

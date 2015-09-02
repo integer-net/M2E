@@ -522,7 +522,7 @@ HTML;
             return parent::_toHtml().$javascriptsMain;
         }
 
-        // todo next (change)
+        // TODO NEXT (change)
 
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
@@ -665,7 +665,7 @@ HTML;
         EbayListingTranslationGridHandlerObj.afterInitPage();
         EbayListingTranslationGridHandlerObj.getGridMassActionObj().setGridIds('{$this->getGridIdsJson()}');
 
-        // todo next (temp solution)
+        // TODO NEXT (temp solution)
         EbayListingTranslationGridHandlerObj.actionHandler.setOptions(M2ePro);
 
         ListingProgressBarObj = new ProgressBar('listing_view_progress_bar');

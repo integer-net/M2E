@@ -137,7 +137,7 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
             return 0;
         }
 
-        $taxRate = ($taxAmount / $this->getSubtotalPrice()) * 100;
+        $taxRate = ($taxAmount / ($this->getSubtotalPrice() - $this->getPromotionDiscountAmount())) * 100;
 
         return round($taxRate, 4);
     }
@@ -149,7 +149,7 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
             return 0;
         }
 
-        $taxRate = ($taxAmount / $this->getShippingPrice()) * 100;
+        $taxRate = ($taxAmount / ($this->getShippingPrice() - $this->getShippingDiscountAmount())) * 100;
 
         return round($taxRate, 4);
     }
@@ -294,7 +294,10 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
             return false;
         }
 
-        if ($this->isFulfilledByAmazon() && !$this->getAmazonAccount()->isMagentoOrdersFbaModeEnabled()) {
+        if ($this->isFulfilledByAmazon() &&
+            (!$this->getAmazonAccount()->isMagentoOrdersFbaModeEnabled() ||
+             !$this->getAmazonAccount()->isMagentoOrdersFbaStockEnabled())
+        ) {
             return false;
         }
 
@@ -324,7 +327,8 @@ class Ess_M2ePro_Model_Amazon_Order extends Ess_M2ePro_Model_Component_Child_Ama
     public function beforeCreateMagentoOrder()
     {
         if ($this->isPending() || $this->isCanceled()) {
-            throw new Exception('Magento Order Creation is not allowed for pending and canceled Amazon Orders.');
+            throw new Ess_M2ePro_Model_Exception('Magento Order Creation is not allowed for pending and
+                canceled Amazon Orders.');
         }
     }
 

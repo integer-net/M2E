@@ -15,7 +15,7 @@ abstract class Ess_M2ePro_Model_Ebay_Template_Builder_Abstract
     protected function validate(array $data)
     {
         if (!isset($data['is_custom_template'])) {
-            throw new LogicException('Policy mode is empty.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Policy mode is empty.');
         }
     }
 

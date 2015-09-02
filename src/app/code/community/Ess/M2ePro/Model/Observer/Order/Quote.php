@@ -30,7 +30,7 @@ class Ess_M2ePro_Model_Observer_Order_Quote extends Ess_M2ePro_Model_Observer_Ab
         $product = $quoteItem->getProduct();
 
         if (!($product instanceof Mage_Catalog_Model_Product) || (int)$product->getId() <= 0) {
-            throw new Exception('Product ID should be greater than 0.');
+            throw new Ess_M2ePro_Model_Exception('Product ID should be greater than 0.');
         }
 
         $this->product = $product;
@@ -134,12 +134,12 @@ class Ess_M2ePro_Model_Observer_Order_Quote extends Ess_M2ePro_Model_Observer_Ab
 
     /**
      * @return Mage_Catalog_Model_Product
-     * @throws LogicException
+     * @throws Ess_M2ePro_Model_Exception_Logic
      */
     private function getProduct()
     {
         if (!($this->product instanceof Mage_Catalog_Model_Product)) {
-            throw new LogicException('Property "Product" should be set first.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Property "Product" should be set first.');
         }
 
         return $this->product;

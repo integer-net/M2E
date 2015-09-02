@@ -221,19 +221,19 @@ class Ess_M2ePro_Model_Connector_Amazon_Product_List_MultipleRequester
                     $response = $dispatcherObject->process($connectorObj);
 
                     if (is_null($response) && $connectorObj->hasErrorMessages()) {
-                        throw new Exception($connectorObj->getCombinedErrorMessage());
+                        throw new Ess_M2ePro_Model_Exception($connectorObj->getCombinedErrorMessage());
                     }
 
                 } while (is_null($response) && ++$countTriedTemp <= 3);
 
                 if (is_null($response)) {
-                    throw new Exception('Searching of SKU in your inventory on Amazon is not available now.
-                                         Please repeat the action later.');
+                    throw new Ess_M2ePro_Model_Exception('Searching of SKU in your inventory on Amazon is not
+                        available now. Please repeat the action later.');
                 }
 
             } catch (Exception $exception) {
 
-                Mage::helper('M2ePro/Module_Exception')->process($exception,true);
+                Mage::helper('M2ePro/Module_Exception')->process($exception);
 
                 foreach ($listingProductsPack as $listingProduct) {
 

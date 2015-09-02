@@ -80,6 +80,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
             array('alp' => 'M2ePro/Amazon_Listing_Product'),
             'listing_product_id=id',
             array(
+                'template_shipping_override_id'  => 'template_shipping_override_id',
                 'template_description_id'        => 'template_description_id',
                 'general_id'                     => 'general_id',
                 'general_id_search_info'         => 'general_id_search_info',
@@ -178,6 +179,15 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
             null,
             'left'
         );
+        $collection->joinTable(
+            array('tso' => 'M2ePro/Amazon_Template_ShippingOverride'),
+            'id=template_shipping_override_id',
+            array(
+                'template_shipping_override_title' => 'title'
+            ),
+            null,
+            'left'
+        );
 
         //----------------------------
 //        exit($collection->getSelect()->__toString());
@@ -224,11 +234,21 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
         $this->addColumn('description_template', array(
             'header' => Mage::helper('M2ePro')->__('Description Policy'),
             'align' => 'left',
-            'width' => '150px',
+            'width' => '170px',
             'type' => 'text',
             'index' => 'template_description_title',
             'filter_index' => 'template_description_title',
             'frame_callback' => array($this, 'callbackColumnTemplateDescription')
+        ));
+
+        $this->addColumn('shipping_override_template', array(
+            'header' => Mage::helper('M2ePro')->__('Shipping Override Policy'),
+            'align' => 'left',
+            'width' => '170px',
+            'type' => 'text',
+            'index' => 'template_shipping_override_title',
+            'filter_index' => 'template_shipping_override_title',
+            'frame_callback' => array($this, 'callbackColumnTemplateShippingOverride')
         ));
 
         $this->addColumn('actions', array(
@@ -253,7 +273,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
     protected function getGroupOrder()
     {
         return array(
-            'edit_template_description'  => Mage::helper('M2ePro')->__('Description Policy')
+            'edit_template_description' => Mage::helper('M2ePro')->__('Description Policy'),
+            'edit_template_shipping_override' => Mage::helper('M2ePro')->__('Shipping Override Policy'),
         );
     }
 
@@ -273,8 +294,22 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
                 'caption' => $helper->__('Unassign'),
                 'group'   => 'edit_template_description',
                 'field'   => 'id',
-                'onclick_action' => 'ListingGridHandlerObj.actions[\'unassignTemplateDescriptionIdAction\']'
+                'onclick_action' => 'ListingGridHandlerObj.unassignTemplateDescriptionIdActionConfrim'
             ),
+
+            'assignTemplateShippingOverride' => array(
+                'caption' => $helper->__('Assign'),
+                'group'   => 'edit_template_shipping_override',
+                'field'   => 'id',
+                'onclick_action' => 'ListingGridHandlerObj.actions[\'assignTemplateShippingOverrideIdAction\']'
+            ),
+
+            'unassignTemplateShippingOverride' => array(
+                'caption' => $helper->__('Unassign'),
+                'group'   => 'edit_template_shipping_override',
+                'field'   => 'id',
+                'onclick_action' => 'ListingGridHandlerObj.unassignTemplateShippingOverrideIdActionConfrim'
+            )
         );
 
         return $actions;
@@ -294,6 +329,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
         //--------------------------------
         $groups = array(
             'description_policy' => Mage::helper('M2ePro')->__('Description Policy'),
+            'shipping_override_policy' => Mage::helper('M2ePro')->__('Shipping Override Policy'),
             'other'              => Mage::helper('M2ePro')->__('Other'),
         );
 
@@ -310,6 +346,18 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
             'url'      => '',
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ), 'description_policy');
+
+        $this->getMassactionBlock()->addItem('assignTemplateShippingOverrideId', array(
+            'label'    => Mage::helper('M2ePro')->__('Assign'),
+            'url'      => '',
+            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
+        ), 'shipping_override_policy');
+
+        $this->getMassactionBlock()->addItem('unassignTemplateShippingOverrideId', array(
+            'label'    => Mage::helper('M2ePro')->__('Unassign'),
+            'url'      => '',
+            'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
+        ), 'shipping_override_policy');
 
         $this->getMassactionBlock()->addItem('moving', array(
             'label'    => Mage::helper('M2ePro')->__('Move Item(s) to Another Listing'),
@@ -392,10 +440,32 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
         if ($variationManager->isRelationParentType()) {
 
             $productAttributes = (array)$variationManager->getTypeModel()->getProductAttributes();
+            $virtualProductAttributes = $variationManager->getTypeModel()->getVirtualProductAttributes();
+            $virtualChannelAttributes = $variationManager->getTypeModel()->getVirtualChannelAttributes();
 
             $value .= '<div style="font-size: 11px; font-weight: bold; color: grey; margin-left: 7px"><br/>';
-            $value .= implode(', ', $productAttributes);
-            $value .= '</div>';
+            $attributesStr = '';
+            if (empty($virtualProductAttributes) && empty($virtualChannelAttributes)) {
+                $attributesStr = implode(', ', $productAttributes);
+            } else {
+                foreach($productAttributes as $attribute) {
+                    if (in_array($attribute, array_keys($virtualProductAttributes))) {
+
+                        $attributesStr .= '<span style="border-bottom: 2px dotted grey">' . $attribute .
+                            ' (' . $virtualProductAttributes[$attribute] . ')</span>, ';
+
+                    } else if (in_array($attribute, array_keys($virtualChannelAttributes))) {
+
+                        $attributesStr .= '<span>' . $attribute .
+                            ' (' . $virtualChannelAttributes[$attribute] . ')</span>, ';
+
+                    } else {
+                        $attributesStr .= $attribute . ', ';
+                    }
+                }
+                $attributesStr = rtrim($attributesStr, ', ');
+            }
+            $value .= $attributesStr;
 
             return $value;
         }
@@ -435,16 +505,42 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
     {
         $html = Mage::helper('M2ePro')->__('N/A');
 
-        $listingProductId = (int)$row->getData('id');
-        /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
-        $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$listingProductId);
+        if ($row->getData('template_description_id')) {
 
-        if ($listingProduct->getChildObject()->isExistDescriptionTemplate()) {
-            $html = $this->getTemplateDescriptionLinkHtml($listingProduct);
+            $url = $this->getUrl('*/adminhtml_common_amazon_template_description/edit', array(
+                'id' => $row->getData('template_description_id')
+            ));
+
+            $templateTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('template_description_title'));
+
+            return <<<HTML
+<a target="_blank" href="{$url}">{$templateTitle}</a>
+HTML;
         }
 
         return $html;
     }
+
+    public function callbackColumnTemplateShippingOverride($value, $row, $column, $isExport)
+    {
+        $html = Mage::helper('M2ePro')->__('N/A');
+
+        if ($row->getData('template_shipping_override_id')) {
+
+            $url = $this->getUrl('*/adminhtml_common_amazon_template_shippingOverride/edit', array(
+                'id' => $row->getData('template_shipping_override_id')
+            ));
+
+            $templateTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('template_shipping_override_title'));
+
+            return <<<HTML
+<a target="_blank" href="{$url}">{$templateTitle}</a>
+HTML;
+        }
+
+        return $html;
+    }
+
     // ####################################
 
     protected function callbackFilterTitle($collection, $column)
@@ -496,22 +592,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Settings_Grid
 JAVASCRIPT;
 
         return parent::_toHtml().$javascriptsMain;
-    }
-
-    // ####################################
-
-    protected function getTemplateDescriptionLinkHtml($listingProduct)
-    {
-        $templateDescriptionEditUrl = $this->getUrl('*/adminhtml_common_amazon_template_description/edit', array(
-            'id' => $listingProduct->getChildObject()->getTemplateDescriptionId()
-        ));
-
-        $helper = Mage::helper('M2ePro');
-        $templateTitle = $listingProduct->getChildObject()->getDescriptionTemplate()->getTitle();
-
-        return <<<HTML
-<a target="_blank" href="{$templateDescriptionEditUrl}">{$helper->escapeHtml($templateTitle)}</a>
-HTML;
     }
 
     // ####################################

@@ -92,7 +92,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Theme
     private function validate()
     {
         if (is_null($this->magentoProduct) && empty($this->sourceAttributes)) {
-            throw new Exception('Magento Product and Channel Attributes were not set.');
+            throw new Ess_M2ePro_Model_Exception('Magento Product and Channel Attributes were not set.');
         }
     }
 

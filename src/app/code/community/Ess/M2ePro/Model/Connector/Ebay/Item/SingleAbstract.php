@@ -102,6 +102,15 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Item_SingleAbstract
     protected function getRequestTimeout()
     {
         $requestDataObject = $this->getRequestDataObject($this->listingProduct);
+        $requestData = $requestDataObject->getData();
+
+        if ($requestData['is_eps_ebay_images_mode'] === false ||
+            (is_null($requestData['is_eps_ebay_images_mode']) &&
+                $requestData['upload_images_mode'] ==
+                    Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_SELF)) {
+            return parent::getRequestTimeout();
+        }
+
         $imagesTimeout = self::TIMEOUT_INCREMENT_FOR_ONE_IMAGE * $requestDataObject->getTotalImagesCount();
         return parent::getRequestTimeout() + $imagesTimeout;
     }

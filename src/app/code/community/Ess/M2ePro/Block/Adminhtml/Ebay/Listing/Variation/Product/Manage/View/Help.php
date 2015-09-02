@@ -15,7 +15,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Variation_Product_Manage_View_Help
 
         // Initialization block
         //------------------------------
-        $this->setId('amazonListingViewHelp');
+        $this->setId('ebayListingViewHelp');
         //------------------------------
 
         $this->setTemplate('M2ePro/ebay/listing/variation/product/manage/view/help.phtml');

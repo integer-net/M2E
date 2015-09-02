@@ -42,12 +42,12 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleRequester
         }
 
         if (count($listingsProducts) == 0) {
-            throw new Exception('Product Connector has received empty array');
+            throw new Ess_M2ePro_Model_Exception('Product Connector has received empty array');
         }
 
         foreach($listingsProducts as $listingProduct) {
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
-                throw new Exception('Product Connector has received invalid Product data type');
+                throw new Ess_M2ePro_Model_Exception('Product Connector has received invalid Product data type');
             }
         }
 
@@ -59,21 +59,24 @@ class Ess_M2ePro_Model_Connector_Translation_Product_Add_MultipleRequester
         $tempListing = $listingsProducts[0]->getListing();
         foreach($listingsProducts as $listingProduct) {
             if ($tempListing->getId() != $listingProduct->getListing()->getId()) {
-                throw new Exception('Product Connector has received Products from different Listings');
+                throw new Ess_M2ePro_Model_Exception('Product Connector has received Products from different Listings');
             }
 
             $translationData = $listingProduct->getSetting('additional_data',array('translation_service'),array());
 
             if ($tempSourceLanguage != $translationData['from']['language']) {
-                throw new Exception('Product Connector has received Products from different source languages');
+                throw new Ess_M2ePro_Model_Exception('Product Connector has received Products from different
+                    source languages');
             }
 
             if ($tempTargetLanguage != $translationData['to']['language']) {
-                throw new Exception('Product Connector has received Products from different target languages');
+                throw new Ess_M2ePro_Model_Exception('Product Connector has received Products from different
+                    target languages');
             }
 
             if ($tempService != $listingProduct->getTranslationService()) {
-                throw new Exception('Product Connector has received Products from different Translation Services');
+                throw new Ess_M2ePro_Model_Exception('Product Connector has received Products from different
+                    Translation Services');
             }
         }
 

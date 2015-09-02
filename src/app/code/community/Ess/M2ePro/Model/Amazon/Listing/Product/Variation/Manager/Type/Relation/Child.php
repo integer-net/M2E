@@ -36,6 +36,37 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Ch
         return $this->getParentListingProduct()->getChildObject();
     }
 
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent
+     */
+    public function getParentTypeModel()
+    {
+        return $this->getAmazonParentListingProduct()->getVariationManager()->getTypeModel();
+    }
+
+    // ########################################
+
+    public function getRealProductOptions()
+    {
+        $productOptions = $this->getProductOptions();
+
+        $virtualProductAttributes = $this->getParentTypeModel()->getVirtualProductAttributes();
+        if (empty($virtualProductAttributes)) {
+            return $productOptions;
+        }
+
+        $realProductOptions = array();
+        foreach ($productOptions as $attribute => $value) {
+            if (isset($virtualProductAttributes[$attribute])) {
+                continue;
+            }
+
+            $realProductOptions[$attribute] = $value;
+        }
+
+        return $realProductOptions;
+    }
+
     // ########################################
 
     public function isVariationChannelMatched()
@@ -71,23 +102,35 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Ch
 
     public function getChannelOptions()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
+        return $this->getListingProduct()->getSetting('additional_data', 'variation_channel_options', array());
+    }
 
-        if (empty($additionalData['variation_channel_options'])) {
-            return NULL;
+    public function getRealChannelOptions()
+    {
+        $channelOptions = $this->getChannelOptions();
+
+        $virtualChannelAttributes = $this->getParentTypeModel()->getVirtualChannelAttributes();
+        if (empty($virtualChannelAttributes)) {
+            return $channelOptions;
         }
 
-        return $additionalData['variation_channel_options'];
+        $realChannelOptions = array();
+        foreach ($channelOptions as $attribute => $value) {
+            if (isset($virtualChannelAttributes[$attribute])) {
+                continue;
+            }
+
+            $realChannelOptions[$attribute] = $value;
+        }
+
+        return $realChannelOptions;
     }
 
     // -----------------------------------------
 
     private function setChannelOptions(array $options, $save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_channel_options'] = $options;
-
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setSetting('additional_data', 'variation_channel_options', $options);
         $save && $this->getListingProduct()->save();
     }
 
@@ -95,22 +138,17 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Ch
 
     public function setCorrectMatchedAttributes(array $matchedAttributes, $save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_correct_matched_attributes'] = $matchedAttributes;
-
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_correct_matched_attributes', $matchedAttributes
+        );
         $save && $this->getListingProduct()->save();
     }
 
     public function getCorrectMatchedAttributes()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-
-        if (empty($additionalData['variation_correct_matched_attributes'])) {
-            return NULL;
-        }
-
-        return $additionalData['variation_correct_matched_attributes'];
+        return $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_correct_matched_attributes', array()
+        );
     }
 
     // -----------------------------------------

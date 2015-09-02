@@ -21,7 +21,7 @@ class Ess_M2ePro_Model_Observer_StockItem extends Ess_M2ePro_Model_Observer_Abst
         $productId = (int)$this->getEventObserver()->getData('item')->getData('product_id');
 
         if ($productId <= 0) {
-            throw new Exception('Product ID should be greater than 0.');
+            throw new Ess_M2ePro_Model_Exception('Product ID should be greater than 0.');
         }
 
         $this->productId = $productId;

@@ -68,16 +68,17 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
                                      $action = NULL,
                                      $description = NULL,
                                      $type = NULL,
-                                     $priority = NULL)
+                                     $priority = NULL,
+                                     array $additionalData = array())
     {
         $dataForAdd = $this->makeDataForAdd(NULL,
-                                            $this->makeAndGetCreator(),
                                             $initiator,
                                             $actionId,
                                             $action,
                                             $description,
                                             $type,
-                                            $priority);
+                                            $priority,
+                                            $additionalData);
 
         $this->createMessage($dataForAdd);
     }
@@ -91,7 +92,6 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
                                       $priority = NULL)
     {
         $dataForAdd = $this->makeDataForAdd($listingOtherId,
-                                            $this->makeAndGetCreator(),
                                             $initiator,
                                             $actionId,
                                             $action,
@@ -158,13 +158,13 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
     }
 
     protected function makeDataForAdd($listingOtherId,
-                                      $creator,
                                       $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
                                       $actionId = NULL,
                                       $action = NULL,
                                       $description = NULL,
                                       $type = NULL,
-                                      $priority = NULL)
+                                      $priority = NULL,
+                                      array $additionalData = array())
     {
         $dataForAdd = array();
 
@@ -174,7 +174,6 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
             $dataForAdd['listing_other_id'] = NULL;
         }
 
-        $dataForAdd['creator'] = $creator;
         $dataForAdd['initiator'] = $initiator;
 
         if (!is_null($actionId)) {
@@ -206,6 +205,8 @@ class Ess_M2ePro_Model_Listing_Other_Log extends Ess_M2ePro_Model_Log_Abstract
         } else {
             $dataForAdd['priority'] = self::PRIORITY_LOW;
         }
+
+        $dataForAdd['additional_data'] = json_encode($additionalData);
 
         return $dataForAdd;
     }

@@ -87,11 +87,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Option
     private function validate()
     {
         if (is_null($this->magentoProduct)) {
-            throw new Exception('Magento Product was not set.');
+            throw new Ess_M2ePro_Model_Exception('Magento Product was not set.');
         }
 
         if (empty($this->destinationOptions)) {
-            throw new Exception('Destination Options is empty.');
+            throw new Ess_M2ePro_Model_Exception('Destination Options is empty.');
         }
     }
 
@@ -139,10 +139,13 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Option
         $magentoOptionNames = $this->magentoProduct->getVariationInstance()->getTitlesVariationSet();
 
         $resultNames = array();
-        foreach ($magentoOptionNames as $attribute => $data) {
-            $resultNames[$attribute] = $this->prepareOptionNames(
-                $sourceOption[$attribute], $data['values'][$sourceOption[$attribute]]
-            );
+        foreach ($sourceOption as $attribute => $option) {
+            $names = array();
+            if (isset($magentoOptionNames[$attribute])) {
+                $names = $magentoOptionNames[$attribute]['values'][$option];
+            }
+
+            $resultNames[$attribute] = $this->prepareOptionNames($option, $names);
         }
 
         return $resultNames;

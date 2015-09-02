@@ -279,13 +279,13 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
         $ebayItem = $this->getChannelItem();
 
         if (!is_null($ebayItem) && !$this->getEbayAccount()->isMagentoOrdersListingsModeEnabled()) {
-            throw new Exception(
+            throw new Ess_M2ePro_Model_Exception(
                 'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($ebayItem) && !$this->getEbayAccount()->isMagentoOrdersListingsOtherModeEnabled()) {
-            throw new Exception(
+            throw new Ess_M2ePro_Model_Exception(
                 'Magento Order Creation for Items Listed by 3rd party Software is disabled in Account Settings.'
             );
         }
@@ -294,7 +294,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
     private function createProduct()
     {
         if (!$this->getEbayAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product Import is disabled in Account Settings.');
+            throw new Ess_M2ePro_Model_Exception('Product Import is disabled in Account Settings.');
         }
 
         $order = $this->getParentObject()->getOrder();
@@ -305,7 +305,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item extends Ess_M2ePro_Model_Component_Child_
         $rawItemData = $itemImporter->getDataFromChannel();
 
         if (empty($rawItemData)) {
-            throw new Exception('Data obtaining for eBay Item failed. Please try again later.');
+            throw new Ess_M2ePro_Model_Exception('Data obtaining for eBay Item failed. Please try again later.');
         }
 
         $productData = $itemImporter->prepareDataForProductCreation($rawItemData);

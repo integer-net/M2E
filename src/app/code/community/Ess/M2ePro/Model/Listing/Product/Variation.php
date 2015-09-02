@@ -94,15 +94,20 @@ class Ess_M2ePro_Model_Listing_Product_Variation extends Ess_M2ePro_Model_Compon
 
     // ########################################
 
+    /**
+     * @param bool $asObjects
+     * @param array $filters
+     * @return Ess_M2ePro_Model_Listing_Product_Variation_Option[]
+     */
     public function getOptions($asObjects = false, array $filters = array())
     {
+        /** @var $options Ess_M2ePro_Model_Listing_Product_Variation_Option[] */
         $options = $this->getRelatedComponentItems(
             'Listing_Product_Variation_Option','listing_product_variation_id',$asObjects,$filters
         );
 
         if ($asObjects) {
             foreach ($options as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
                 $option->setListingProductVariation($this);
             }
         }

@@ -178,6 +178,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation extends Ess_M2ePro_Model
 
             foreach ($options as $option) {
                 /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
+
+                if (!$option->getProductId()) {
+                    continue;
+                }
+
                 $sku != '' && $sku .= '-';
                 $sku .= $option->getChildObject()->getSku();
             }

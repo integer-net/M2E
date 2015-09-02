@@ -240,25 +240,6 @@ class Ess_M2ePro_Helper_Module_License extends Mage_Core_Helper_Abstract
 
     // ########################################
 
-    public function checkPresencePaidComponents()
-    {
-        $components = Mage::helper('M2ePro/Component')->getComponents();
-
-        $dispatcherObject = Mage::getModel('M2ePro/Connector_M2ePro_Dispatcher');
-        $connectorObj = $dispatcherObject->getVirtualConnector('license','get','feeStatus',
-                                                           array('components' => $components));
-
-        $response = $dispatcherObject->process($connectorObj);
-
-        foreach ($response['components'] as $isFree) {
-            if ($isFree === self::IS_FREE_NO) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function obtainRecord($email = NULL, $firstName = NULL, $lastName = NULL,
                                  $country = NULL, $city = NULL, $postalCode = NULL)
     {

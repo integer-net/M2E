@@ -44,6 +44,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
             ->addJs('M2ePro/Common/Amazon/Listing/SearchAsinGridHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/ProductSearchHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/VariationProductManageHandler.js')
+            ->addJs('M2ePro/Common/Amazon/Listing/FulfillmentHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/NewAsinTemplateDescriptionGridHandler.js');
 
         $this->_initPopUp();
@@ -601,12 +602,12 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
 
     /**
      * @return Ess_M2ePro_Model_Amazon_Listing
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function getListing()
     {
         if (!$listingId = $this->getRequest()->getParam('id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         if (is_null($this->listing)) {

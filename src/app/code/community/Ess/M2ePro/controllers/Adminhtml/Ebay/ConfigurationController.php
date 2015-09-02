@@ -72,6 +72,10 @@ class Ess_M2ePro_Adminhtml_Ebay_ConfigurationController extends Ess_M2ePro_Contr
             '/ebay/connector/listing/', 'check_the_same_product_already_listed',
             (int)$this->getRequest()->getParam('check_the_same_product_already_listed_mode')
         );
+        Mage::helper('M2ePro/Module')->getConfig()->setGroupValue(
+            '/ebay/description/', 'upload_images_mode',
+            (int)$this->getRequest()->getParam('upload_images_mode')
+        );
 
         $sellingCurrency = $this->getRequest()->getParam('selling_currency');
         if (!empty($sellingCurrency)) {

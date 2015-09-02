@@ -244,7 +244,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Other_View extends Mage_Admi
             'buy'
         );
 
-        // todo next (temp solution)
+        // TODO NEXT (temp solution)
         BuyListingOtherGridHandlerObj.movingHandler.setOptions(M2eProBuy);
         BuyListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProBuy);
         BuyListingOtherGridHandlerObj.removingHandler.setOptions(M2eProBuy);

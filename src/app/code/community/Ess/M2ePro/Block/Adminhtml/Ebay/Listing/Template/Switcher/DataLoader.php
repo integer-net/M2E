@@ -84,7 +84,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Template_Switcher_DataLoader
     {
         //------------------------------
         if (!isset($params['session_key'])) {
-            throw new LogicException('Session key is not defined.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Session key is not defined.');
         }
         $sessionKey = $params['session_key'];
         $sessionData = $source->getValue($sessionKey);

@@ -9,6 +9,20 @@ class Ess_M2ePro_Model_Connector_Ebay_Item_Relist_Single
 {
     // ########################################
 
+    public function __construct(array $params = array(), Ess_M2ePro_Model_Listing_Product $listingProduct)
+    {
+        parent::__construct($params, $listingProduct);
+
+        $additionalData = $this->listingProduct->getAdditionalData();
+
+        if (isset($additionalData['add_to_schedule'])) {
+            unset($additionalData['add_to_schedule']);
+            $this->listingProduct->setSettings('additional_data', $additionalData)->save();
+        }
+    }
+
+    // ########################################
+
     protected function getCommand()
     {
         return array('item','update','relist');

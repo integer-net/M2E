@@ -13,6 +13,7 @@ class Ess_M2ePro_Adminhtml_Wizard_FullAmazonCategoriesController
     {
         parent::_initAction();
         $this->getLayout()->getBlock('head')
+            ->addJs('M2ePro/Wizard/Amazon/CustomHandler.js')
             ->addJs('M2ePro/Wizard/FullAmazonCategories.js');
 
         return $this;
@@ -26,6 +27,15 @@ class Ess_M2ePro_Adminhtml_Wizard_FullAmazonCategoriesController
     }
 
     //#############################################
+
+    public function indexAction()
+    {
+        $this->getWizardHelper()->setStatus(
+            'amazonShippingOverridePolicy', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
+        );
+
+        return parent::indexAction();
+    }
 
     public function welcomeAction()
     {

@@ -15,6 +15,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
     {
         $qty = null;
         $price = null;
+        $afn = Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_NO;
 
         foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $listingProduct) {
             if ($listingProduct->isNotListed()) {
@@ -23,6 +24,11 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
             $amazonListingProduct = $listingProduct->getChildObject();
+
+            if ($amazonListingProduct->isAfnChannel()) {
+                $afn = Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_YES;
+                continue;
+            }
 
             $qty = (int)$qty + (int)$amazonListingProduct->getOnlineQty();
 
@@ -50,8 +56,9 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         }
 
         $this->getProcessor()->getListingProduct()->addData(array(
-            'online_qty'   => $qty,
-            'online_price' => $price,
+            'online_qty'        => $qty,
+            'online_price'      => $price,
+            'is_afn_channel'    => $afn
         ));
     }
 

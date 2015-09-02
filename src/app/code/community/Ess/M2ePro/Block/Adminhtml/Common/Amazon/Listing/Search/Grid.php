@@ -97,6 +97,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                 'general_id'                    => 'second_table.general_id',
                 'is_afn_channel'                => 'second_table.is_afn_channel',
                 'is_variation_parent'           => 'second_table.is_variation_parent',
+                'variation_child_statuses'      => 'second_table.variation_child_statuses',
                 'online_sku'                    => 'second_table.sku',
                 'online_qty'                    => 'second_table.online_qty',
                 'online_price'                  => 'second_table.online_price',
@@ -205,6 +206,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                 'general_id'                    => 'second_table.general_id',
                 'is_afn_channel'                => 'second_table.is_afn_channel',
                 'is_variation_parent'           => new Zend_Db_Expr('NULL'),
+                'variation_child_statuses'      => new Zend_Db_Expr('NULL'),
                 'online_sku'                    => 'second_table.sku',
                 'online_qty'                    => 'second_table.online_qty',
                 'online_price'                  => 'second_table.online_price',
@@ -249,6 +251,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                 'general_id',
                 'is_afn_channel',
                 'is_variation_parent',
+                'variation_child_statuses',
                 'online_sku',
                 'online_qty',
                 'online_price',
@@ -350,7 +353,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
             'type' => 'number',
             'index' => 'online_qty',
             'filter_index' => 'online_qty',
-            'frame_callback' => array($this, 'callbackColumnAvailableQty')
+            'frame_callback' => array($this, 'callbackColumnAvailableQty'),
+            'filter'   => 'M2ePro/adminhtml_common_amazon_grid_column_filter_qty',
+            'filter_condition_callback' => array($this, 'callbackFilterQty')
         ));
 
         $dir = $this->getParam($this->getVarNameDir(), $this->_defaultDir);
@@ -370,20 +375,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
             'filter_index' => $priceSortField,
             'frame_callback' => array($this, 'callbackColumnPrice'),
             'filter_condition_callback' => array($this, 'callbackFilterPrice')
-        ));
-
-        $this->addColumn('is_afn_channel', array(
-            'header' => Mage::helper('M2ePro')->__('Fulfillment'),
-            'width' => '90px',
-            'index' => 'is_afn_channel',
-            'filter_index' => 'is_afn_channel',
-            'type' => 'options',
-            'sortable' => false,
-            'options' => array(
-                0 => Mage::helper('M2ePro')->__('Merchant'),
-                1 => Mage::helper('M2ePro')->__('Amazon')
-            ),
-            'frame_callback' => array($this, 'callbackColumnAfnChannel')
         ));
 
         $this->addColumn('status', array(
@@ -499,21 +490,45 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         $listingProductId = (int)$row->getData('listing_product_id');
         /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
         $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$listingProductId);
+        $variationManager = $listingProduct->getChildObject()->getVariationManager();
 
-        if ($listingProduct->getChildObject()->getVariationManager()->isVariationParent()) {
-            $productOptions = $listingProduct->getChildObject()->getVariationManager()
+        if ($variationManager->isVariationParent()) {
+            $productAttributes = $listingProduct->getChildObject()->getVariationManager()
                 ->getTypeModel()->getProductAttributes();
 
+            $virtualProductAttributes = $variationManager->getTypeModel()->getVirtualProductAttributes();
+            $virtualChannelAttributes = $variationManager->getTypeModel()->getVirtualChannelAttributes();
+
             $value .= '<div style="font-size: 11px; font-weight: bold; color: grey;"><br/>';
-            $value .= implode(', ', $productOptions);
+            $attributesStr = '';
+            if (empty($virtualProductAttributes) && empty($virtualChannelAttributes)) {
+                $attributesStr = implode(', ', $productAttributes);
+            } else {
+                foreach($productAttributes as $attribute) {
+                    if (in_array($attribute, array_keys($virtualProductAttributes))) {
+
+                        $attributesStr .= '<span style="border-bottom: 2px dotted grey">' . $attribute .
+                            ' (' . $virtualProductAttributes[$attribute] . ')</span>, ';
+
+                    } else if (in_array($attribute, array_keys($virtualChannelAttributes))) {
+
+                        $attributesStr .= '<span>' . $attribute .
+                            ' (' . $virtualChannelAttributes[$attribute] . ')</span>, ';
+
+                    } else {
+                        $attributesStr .= $attribute . ', ';
+                    }
+                }
+                $attributesStr = rtrim($attributesStr, ', ');
+            }
+            $value .= $attributesStr;
             $value .= '</div>';
         }
 
-        if ($listingProduct->getChildObject()->getVariationManager()->isIndividualType() &&
-            $listingProduct->getChildObject()->getVariationManager()->getTypeModel()->isVariationProductMatched()
+        if ($variationManager->isIndividualType() &&
+            $variationManager->getTypeModel()->isVariationProductMatched()
         ) {
-            $productOptions = $listingProduct->getChildObject()
-                ->getVariationManager()->getTypeModel()->getProductOptions();
+            $productOptions = $variationManager->getTypeModel()->getProductOptions();
 
             $value .= '<br/>';
             $value .= '<div style="font-size: 11px; color: grey;"><br/>';
@@ -579,30 +594,55 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
 
     public function callbackColumnAvailableQty($value, $row, $column, $isExport)
     {
-        if ((!$row->getData('is_variation_parent') &&
-            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
-            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
+        if (!$row->getData('is_variation_parent')) {
 
-            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
-        }
+            if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+                return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+            }
 
-        if ($row->getData('is_afn_channel')) {
-            return Mage::helper('M2ePro')->__('N/A');
-        }
+            if ((bool)$row->getData('is_afn_channel')) {
+                return Mage::helper('M2ePro')->__('AFN');
+            }
 
-        if (is_null($value) || $value === '') {
-            if ($row->getData('status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+            if (is_null($value) || $value === '') {
                 return '<i style="color:gray;">receiving...</i>';
             }
 
+            if ($value <= 0) {
+                return '<span style="color: red;">0</span>';
+            }
+
+            return $value;
+        }
+
+        if ($row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
+            $row->getData('general_id') == '') {
+            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
+        }
+
+        $variationChildStatuses = json_decode($row->getData('variation_child_statuses'), true);
+
+        $activeChildrenCount = 0;
+        foreach ($variationChildStatuses as $childStatus => $count) {
+            if ($childStatus == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
+                continue;
+            }
+            $activeChildrenCount += (int)$count;
+        }
+
+        if ($activeChildrenCount == 0) {
             return Mage::helper('M2ePro')->__('N/A');
         }
 
-        if ($value <= 0) {
-            return '<span style="color: red;">0</span>';
+        if (!(bool)$row->getData('is_afn_channel')) {
+            return $value;
         }
 
-        return $value;
+        if ($value == 0 && (bool)$row->getData('is_afn_channel')) {
+            return Mage::helper('M2ePro')->__('AFN');
+        }
+
+        return $value . '<br>' . Mage::helper('M2ePro')->__('AFN');
     }
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
@@ -705,22 +745,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
         return $resultHtml;
     }
 
-    public function callbackColumnAfnChannel($value, $row, $column, $isExport)
-    {
-        if ((!$row->getData('is_variation_parent') &&
-            $row->getData('status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) ||
-            ($row->getData('is_variation_parent') && $row->getData('general_id') == '')) {
-
-            return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
-        }
-
-        if (is_null($value) || $value === '') {
-            return Mage::helper('M2ePro')->__('N/A');
-        }
-
-        return $value;
-    }
-
     public function callbackColumnStatus($value, $row, $column, $isExport)
     {
         switch ($row->getData('status')) {
@@ -784,6 +808,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Search_Grid extends Mage_
                     $value .= '<br/><span style="color: #605fff">[Remove in Progress...]</span>';
                     break;
 
+                case 'switch_to_afn_action':
+                    $value .= '<br/><span style="color: #605fff">[Switch to AFN in Progress...]</span>';
+                    break;
+
+                case 'switch_to_mfn_action':
+                    $value .= '<br/><span style="color: #605fff">[Switch to MFN in Progress...]</span>';
+                    break;
+
                 default:
                     break;
 
@@ -837,6 +869,37 @@ HTML;
 
         $collection->getSelect()
             ->where('product_name LIKE ? OR magento_sku LIKE ? OR listing_title LIKE ?', '%'.$value.'%');
+    }
+
+    protected function callbackFilterQty($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if (empty($value)) {
+            return;
+        }
+
+        $where = '';
+
+        if (isset($value['from']) && $value['from'] != '') {
+            $where .= 'online_qty >= ' . $value['from'];
+        }
+
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
+                $where .= ' AND ';
+            }
+            $where .= 'online_qty <= ' . $value['to'];
+        }
+
+        if (!empty($value['afn'])) {
+            if (!empty($where)) {
+                $where = '(' . $where . ') OR ';
+            }
+            $where .= 'is_afn_channel = ' . Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_YES;;
+        }
+
+        $collection->getSelect()->where($where);
     }
 
     protected function callbackFilterPrice($collection, $column)

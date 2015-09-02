@@ -69,6 +69,10 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
     const GALLERY_IMAGES_MODE_PRODUCT   = 1;
     const GALLERY_IMAGES_MODE_ATTRIBUTE = 2;
 
+    const VARIATION_IMAGES_MODE_NONE      = 0;
+    const VARIATION_IMAGES_MODE_PRODUCT   = 1;
+    const VARIATION_IMAGES_MODE_ATTRIBUTE = 2;
+
     const USE_SUPERSIZE_IMAGES_NO  = 0;
     const USE_SUPERSIZE_IMAGES_YES = 1;
 
@@ -602,6 +606,51 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
 
     //-------------------------
 
+    public function getVariationImagesMode()
+    {
+        return (int)$this->getData('variation_images_mode');
+    }
+
+    public function isVariationImagesModeNone()
+    {
+        return $this->getVariationImagesMode() == self::VARIATION_IMAGES_MODE_NONE;
+    }
+
+    public function isVariationImagesModeProduct()
+    {
+        return $this->getVariationImagesMode() == self::VARIATION_IMAGES_MODE_PRODUCT;
+    }
+
+    public function isVariationImagesModeAttribute()
+    {
+        return $this->getVariationImagesMode() == self::VARIATION_IMAGES_MODE_ATTRIBUTE;
+    }
+
+    public function getVariationImagesSource()
+    {
+        return array(
+            'mode'     => $this->getVariationImagesMode(),
+            'attribute' => $this->getData('variation_images_attribute'),
+            'limit' => $this->getData('variation_images_limit')
+        );
+    }
+
+    public function getVariationImagesAttributes()
+    {
+        $attributes = array();
+        $src = $this->getVariationImagesSource();
+
+        if ($src['mode'] == self::VARIATION_IMAGES_MODE_PRODUCT) {
+            $attributes[] = 'media_gallery';
+        } else if ($src['mode'] == self::VARIATION_IMAGES_MODE_ATTRIBUTE) {
+            $attributes[] = $src['attribute'];
+        }
+
+        return $attributes;
+    }
+
+    //-------------------------
+
     public function getDefaultImageUrl()
     {
         return $this->getData('default_image_url');
@@ -741,7 +790,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             $this->getSubTitleAttributes(),
             $this->getDescriptionAttributes(),
             $this->getImageMainAttributes(),
-            $this->getGalleryImagesAttributes()
+            $this->getGalleryImagesAttributes(),
+            $this->getVariationImagesAttributes()
         ));
     }
 
@@ -755,7 +805,8 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             $this->getConditionNoteAttributes(),
             $this->getProductDetailAttributes(),
             $this->getImageMainAttributes(),
-            $this->getGalleryImagesAttributes()
+            $this->getGalleryImagesAttributes(),
+            $this->getVariationImagesAttributes()
         ));
     }
 
@@ -804,6 +855,9 @@ class Ess_M2ePro_Model_Ebay_Template_Description extends Ess_M2ePro_Model_Compon
             'gallery_images_mode' => self::GALLERY_IMAGES_MODE_PRODUCT,
             'gallery_images_limit' => 3,
             'gallery_images_attribute' => '',
+            'variation_images_mode' => self::VARIATION_IMAGES_MODE_PRODUCT,
+            'variation_images_limit' => 1,
+            'variation_images_attribute' => '',
             'default_image_url' => '',
 
             'variation_configurable_images' => '',

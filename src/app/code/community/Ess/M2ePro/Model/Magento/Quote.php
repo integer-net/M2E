@@ -202,7 +202,7 @@ class Ess_M2ePro_Model_Magento_Quote
 
             $result = $this->quote->addProduct($product, $request);
             if (is_string($result)) {
-                throw new Exception($result);
+                throw new Ess_M2ePro_Model_Exception($result);
             }
 
             $quoteItem = $this->quote->getItemByProduct($product);

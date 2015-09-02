@@ -27,7 +27,6 @@ class Ess_M2ePro_Model_Buy_Listing_Log extends Ess_M2ePro_Model_Listing_Log
                                       $priority = NULL)
     {
         $dataForAdd = $this->makeDataForAdd($listingId,
-                                            $this->makeAndGetCreator(),
                                             $initiator,
                                             $productId,
                                             $listingProductId,

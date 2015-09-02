@@ -36,7 +36,7 @@ class Ess_M2ePro_Model_Connector_Buy_Orders_Update_ShippingRequester
 
         foreach ($this->params['items'] as $updateData) {
             if (!isset($updateData['order_id'])) {
-                throw new LogicException('Order ID is not defined.');
+                throw new Ess_M2ePro_Model_Exception_Logic('Order ID is not defined.');
             }
 
             $ordersIds[] = (int)$updateData['order_id'];

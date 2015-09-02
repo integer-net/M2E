@@ -92,7 +92,7 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
 
     /**
      * @return Ess_M2ePro_Model_Magento_Product_Cache
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function getMagentoProduct()
     {
@@ -101,7 +101,7 @@ class Ess_M2ePro_Model_Listing_Other extends Ess_M2ePro_Model_Component_Parent_A
         }
 
         if (is_null($this->getProductId())) {
-            throw new Exception('Product id is not set');
+            throw new Ess_M2ePro_Model_Exception('Product id is not set');
         }
 
         return $this->magentoProductModel = Mage::getModel('M2ePro/Magento_Product_Cache')

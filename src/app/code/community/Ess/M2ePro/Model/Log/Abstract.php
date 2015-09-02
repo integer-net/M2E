@@ -218,20 +218,6 @@ class Ess_M2ePro_Model_Log_Abstract extends Ess_M2ePro_Model_Abstract
 
     //-----------------------------------
 
-    protected function makeAndGetCreator()
-    {
-         $debugBackTrace = debug_backtrace();
-
-         if (!isset($debugBackTrace[2])) {
-             return 'unknown';
-         }
-
-         $creator = $debugBackTrace[2]['class'].'::'.$debugBackTrace[2]['function'].'()';
-         //$creator .= ' ['.$debugBackTrace[2]['line'].']';
-
-         return $creator;
-    }
-
     protected function clearMessagesByTable($tableNameOrModelName, $columnName = NULL, $columnId = NULL)
     {
         $logsTable  = Mage::getSingleton('core/resource')->getTableName($tableNameOrModelName);

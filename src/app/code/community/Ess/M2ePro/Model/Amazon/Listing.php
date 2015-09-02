@@ -176,10 +176,8 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
     public function getSellingFormatTemplate()
     {
         if (is_null($this->sellingFormatTemplateModel)) {
-            $this->sellingFormatTemplateModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getComponentMode(),'Template_SellingFormat',
-                $this->getData('template_selling_format_id'),NULL,
-                array('template')
+            $this->sellingFormatTemplateModel = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
+                'Template_SellingFormat',$this->getData('template_selling_format_id'),NULL,array('template')
             );
         }
 
@@ -202,10 +200,8 @@ class Ess_M2ePro_Model_Amazon_Listing extends Ess_M2ePro_Model_Component_Child_A
     public function getSynchronizationTemplate()
     {
         if (is_null($this->synchronizationTemplateModel)) {
-            $this->synchronizationTemplateModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getComponentMode(),'Template_Synchronization',
-                $this->getData('template_synchronization_id'),NULL,
-                array('template')
+            $this->synchronizationTemplateModel = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
+                'Template_Synchronization', $this->getData('template_synchronization_id'),NULL,array('template')
             );
         }
 

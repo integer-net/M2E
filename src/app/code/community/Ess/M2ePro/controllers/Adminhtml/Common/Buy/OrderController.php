@@ -59,6 +59,9 @@ class Ess_M2ePro_Adminhtml_Common_Buy_OrderController
         Mage::helper('M2ePro/Data_Global')->setValue('temp_data', $order);
 
         $this->_initAction();
+
+        $this->setComponentPageHelpLink('Manage+Order+Details', Ess_M2ePro_Helper_Component_Buy::NICK);
+
         $this->_initPopUp();
         $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_buy_order_view'))
              ->renderLayout();

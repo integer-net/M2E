@@ -10,7 +10,13 @@ class Ess_M2ePro_Model_Magento_Product_Variation_Cache extends Ess_M2ePro_Model_
 
     public function getVariationsTypeStandard()
     {
-        return $this->getMethodData(__FUNCTION__);
+        $params = array(
+            'virtual_attributes' => $this->getMagentoProduct()->getVariationVirtualAttributes(),
+            'filter_attributes'  => $this->getMagentoProduct()->getVariationFilterAttributes(),
+            'is_ignore_virtual_attributes' => $this->getMagentoProduct()->isIgnoreVariationVirtualAttributes(),
+            'is_ignore_filter_attributes'  => $this->getMagentoProduct()->isIgnoreVariationFilterAttributes(),
+        );
+        return $this->getMethodData(__FUNCTION__, $params);
     }
 
     public function getVariationsTypeRaw()
@@ -28,7 +34,7 @@ class Ess_M2ePro_Model_Magento_Product_Variation_Cache extends Ess_M2ePro_Model_
     protected function getMethodData($methodName, $params = null)
     {
         if (is_null($this->getMagentoProduct())) {
-            throw new Exception('Magento Product was not set.');
+            throw new Ess_M2ePro_Model_Exception('Magento Product was not set.');
         }
 
         $cacheKey = array(

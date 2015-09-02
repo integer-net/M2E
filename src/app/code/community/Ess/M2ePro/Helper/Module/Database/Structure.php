@@ -28,6 +28,8 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_cache_config',
             'm2epro_synchronization_config',
 
+            'm2epro_system_log',
+
             'm2epro_registry',
 
             'm2epro_lock_item',
@@ -118,6 +120,9 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
             'm2epro_amazon_template_description_specific',
             'm2epro_amazon_template_selling_format',
             'm2epro_amazon_template_synchronization',
+            'm2epro_amazon_dictionary_shipping_override',
+            'm2epro_amazon_template_shipping_override',
+            'm2epro_amazon_template_shipping_override_service',
 
             'm2epro_buy_account',
             'm2epro_buy_dictionary_category',
@@ -261,7 +266,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         if (!$this->isTableExists($tableName)) {
-            throw new Exception("Table '{$tableName}' is not exists.");
+            throw new Ess_M2ePro_Model_Exception("Table '{$tableName}' is not exists.");
         }
 
         $tableStatus = true;
@@ -416,6 +421,7 @@ class Ess_M2ePro_Helper_Module_Database_Structure extends Mage_Core_Helper_Abstr
 
             $codeHash = strtolower($item['group']).'#'.strtolower($item['key']);
             $result[$codeHash] = array(
+                'id'     => (int)$item['id'],
                 'group'  => $item['group'],
                 'key'    => $item['key'],
                 'value'  => $item['value'],

@@ -45,7 +45,7 @@ class Ess_M2ePro_Model_Connector_Amazon_Orders_Refund_ItemsRequester
 
         foreach ($this->params['items'] as $item) {
             if (!isset($item['order_id'])) {
-                throw new LogicException('Order ID is not defined.');
+                throw new Ess_M2ePro_Model_Exception_Logic('Order ID is not defined.');
             }
 
             $ordersIds[] = (int)$item['order_id'];

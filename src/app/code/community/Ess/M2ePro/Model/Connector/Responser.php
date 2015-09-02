@@ -31,7 +31,7 @@ abstract class Ess_M2ePro_Model_Connector_Responser
         }
 
         if (!$this->validateResponseData($responseBody)) {
-            throw new Exception('Validation Failed. The Server response data is not valid.');
+            throw new Ess_M2ePro_Model_Exception('Validation Failed. The Server response data is not valid.');
         }
 
         $this->parsedResponseData = $this->prepareResponseData($responseBody);
@@ -92,7 +92,7 @@ abstract class Ess_M2ePro_Model_Connector_Responser
         }
 
         if (!empty($internalServerErrorMessage)) {
-            throw new Exception(Mage::helper('M2ePro')->__(
+            throw new Ess_M2ePro_Model_Exception(Mage::helper('M2ePro')->__(
                 "Internal Server Error(s) [%error_message%]", implode(', ', $internalServerErrorMessage)
             ));
         }

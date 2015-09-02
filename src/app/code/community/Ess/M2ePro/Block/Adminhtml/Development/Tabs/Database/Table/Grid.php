@@ -48,7 +48,7 @@ class Ess_M2ePro_Block_Adminhtml_Development_Tabs_Database_Table_Grid
             $errorMsg = str_replace(
                 '%table_name%', $this->tableName, 'Specified table "%table_name%" cannot be managed.'
             );
-            throw new Exception($errorMsg);
+            throw new Ess_M2ePro_Model_Exception($errorMsg);
         }
 
         if (!$this->ifNeedToUseMergeMode()) {

@@ -26,10 +26,8 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
         //------------------------------
 
         //------------------------------
-        $marketplace = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            Ess_M2ePro_Helper_Component_Ebay::NICK,
-            'Marketplace',
-            $generalData['marketplace_id']
+        $marketplace = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
+            'Marketplace', $generalData['marketplace_id']
         );
         //------------------------------
 
@@ -69,7 +67,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
     {
         //------------------------------
         if (empty($data['marketplace_id'])) {
-            throw new LogicException('Marketplace ID is empty.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Marketplace ID is empty.');
         }
         //------------------------------
 
@@ -79,7 +77,7 @@ class Ess_M2ePro_Model_Ebay_Template_Shipping_Builder
             $data['country_mode'] == Ess_M2ePro_Model_Ebay_Template_Shipping::COUNTRY_MODE_CUSTOM_ATTRIBUTE &&
             empty($data['country_custom_attribute'])) {
 
-            throw new LogicException('Country is empty.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Country is empty.');
         }
         //------------------------------
 

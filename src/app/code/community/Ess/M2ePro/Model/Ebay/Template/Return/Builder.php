@@ -26,10 +26,8 @@ class Ess_M2ePro_Model_Ebay_Template_Return_Builder
         //------------------------------
 
         //------------------------------
-        $marketplace = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            Ess_M2ePro_Helper_Component_Ebay::NICK,
-            'Marketplace',
-            $data['marketplace_id']
+        $marketplace = Mage::helper('M2ePro/Component_Ebay')->getCachedObject(
+            'Marketplace', $data['marketplace_id']
         );
         //------------------------------
 
@@ -55,7 +53,7 @@ class Ess_M2ePro_Model_Ebay_Template_Return_Builder
     {
         //------------------------------
         if (empty($data['marketplace_id'])) {
-            throw new LogicException('eBay Site ID is empty.');
+            throw new Ess_M2ePro_Model_Exception_Logic('eBay Site ID is empty.');
         }
         //------------------------------
 

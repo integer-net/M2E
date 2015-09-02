@@ -26,7 +26,7 @@ class Ess_M2ePro_Model_Config_Abstract extends Ess_M2ePro_Model_Abstract
         $params = $args[0];
 
         if (empty($params['orm'])) {
-            throw new Exception('ORM for config is not defined.');
+            throw new Ess_M2ePro_Model_Exception('ORM for config is not defined.');
         }
 
         $this->_ormConfig = $params['orm'];

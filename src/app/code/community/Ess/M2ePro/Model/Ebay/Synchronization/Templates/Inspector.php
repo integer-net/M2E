@@ -30,23 +30,6 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
 
         $additionalData = $listingProduct->getAdditionalData();
 
-        if ($ebaySynchronizationTemplate->isScheduleEnabled() &&
-            (!$ebaySynchronizationTemplate->isScheduleIntervalNow() ||
-             !$ebaySynchronizationTemplate->isScheduleWeekNow())
-        ) {
-            // M2ePro_TRANSLATIONS
-            // Product was not automatically Listed according to the Schedule Settings in Synchronization Policy.
-            $note = Mage::getSingleton('M2ePro/Log_Abstract')->encodeDescription(
-                'Product was not automatically Listed according to the Schedule Settings in Synchronization Policy.',
-                array('date' => Mage::helper('M2ePro')->getCurrentGmtDate())
-            );
-            $additionalData['synch_template_list_rules_note'] = $note;
-
-            $listingProduct->setSettings('additional_data', $additionalData)->save();
-
-            return false;
-        }
-
         if (!$ebayListingProduct->isSetCategoryTemplate()) {
             return false;
         }
@@ -327,13 +310,6 @@ class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Inspector
         if ($listingProduct->isStopped() &&
             $ebaySynchronizationTemplate->isRelistFilterUserLock() &&
             $listingProduct->getStatusChanger() == Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_USER
-        ) {
-            return false;
-        }
-
-        if ($ebaySynchronizationTemplate->isScheduleEnabled() &&
-            (!$ebaySynchronizationTemplate->isScheduleIntervalNow() ||
-             !$ebaySynchronizationTemplate->isScheduleWeekNow())
         ) {
             return false;
         }

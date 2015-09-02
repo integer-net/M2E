@@ -156,7 +156,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         if (!(@is_dir($destinationFolder) || @mkdir($destinationFolder, 0777, true))) {
             // M2ePro_TRANSLATIONS
             // Unable to create directory '%directory%'.
-            throw new Exception("Unable to create directory '{$destinationFolder}'.");
+            throw new Ess_M2ePro_Model_Exception("Unable to create directory '{$destinationFolder}'.");
         }
 
         return $destinationFolder;
@@ -195,7 +195,7 @@ class Ess_M2ePro_Model_Ebay_Order_Item_Importer
         if (empty($imageInfo)) {
             // M2ePro_TRANSLATIONS
             // Image %url% was not downloaded.
-            throw new Exception("Image {$url} was not downloaded.");
+            throw new Ess_M2ePro_Model_Exception("Image {$url} was not downloaded.");
         }
         // ---------
     }

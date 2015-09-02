@@ -131,7 +131,7 @@ HTML;
     public function getTemplateNick()
     {
         if (!isset($this->_data['template_nick'])) {
-            throw new LogicException('Template nick is not defined.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Template nick is not defined.');
         }
 
         return $this->_data['template_nick'];
@@ -142,7 +142,7 @@ HTML;
         $templateMode = Mage::helper('M2ePro/Data_Global')->getValue('ebay_template_mode_' . $this->getTemplateNick());
 
         if (is_null($templateMode)) {
-            throw new LogicException('Template Mode is not initialized.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Template Mode is not initialized.');
         }
 
         return $templateMode;
@@ -223,7 +223,7 @@ HTML;
         }
 
         if (is_null($blockName)) {
-            throw new LogicException(
+            throw new Ess_M2ePro_Model_Exception_Logic(
                 sprintf('Form data Block for Template nick "%s" is unknown.', $this->getTemplateNick())
             );
         }

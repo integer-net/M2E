@@ -14,8 +14,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Stop_Response
         $data = array();
 
         $data = $this->appendStatusChangerValue($data);
-        $data = $this->appendAfnChannelValues($data);
-
         $data = $this->appendQtyValues($data);
 
         $this->getListingProduct()->addData($data);

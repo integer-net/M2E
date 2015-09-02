@@ -9,7 +9,7 @@ class Ess_M2ePro_Model_Magento_Product_Variation
     const GROUPED_PRODUCT_ATTRIBUTE_LABEL = 'Option';
 
     /** @var Ess_M2ePro_Model_Magento_Product $magentoProduct */
-    private $magentoProduct;
+    protected $magentoProduct = null;
 
     // ##########################################################
 
@@ -35,7 +35,7 @@ class Ess_M2ePro_Model_Magento_Product_Variation
                 $tempOption[$variationOption['attribute']] = $variationOption['option'];
             }
 
-            if (count(array_diff($options, $tempOption)) <= 0) {
+            if ($options == $tempOption) {
                 return $variation;
             }
         }
@@ -92,6 +92,18 @@ class Ess_M2ePro_Model_Magento_Product_Variation
                 $this->prepareVariationsScopeTypeStandard($variations);
                 $variations = $this->prepareVariationsTypeStandard($variations, $variationsSet);
             }
+        }
+
+        if ($this->getMagentoProduct()->getVariationVirtualAttributes() &&
+            !$this->getMagentoProduct()->isIgnoreVariationVirtualAttributes()
+        ) {
+            $this->injectVirtualAttributesTypeStandard($variations, $variationsSet);
+        }
+
+        if ($this->getMagentoProduct()->getVariationFilterAttributes() &&
+            !$this->getMagentoProduct()->isIgnoreVariationFilterAttributes()
+        ) {
+            $this->filterByAttributesTypeStandard($variations, $variationsSet);
         }
 
         return array(
@@ -418,6 +430,75 @@ class Ess_M2ePro_Model_Magento_Product_Variation
         }
 
         return $sortedOptions;
+    }
+
+    protected function injectVirtualAttributesTypeStandard(&$variations, &$set)
+    {
+        $virtualAttributes = $this->getMagentoProduct()->getVariationVirtualAttributes();
+        if (empty($virtualAttributes)) {
+            return;
+        }
+
+        foreach ($variations as $variationKey => $variation) {
+            foreach ($virtualAttributes as $virtualAttribute => $virtualValue) {
+                $existOption = reset($variation);
+
+                $virtualOption = array(
+                    'product_id'   => null,
+                    'product_type' => $existOption['product_type'],
+                    'attribute'    => $virtualAttribute,
+                    'option'       => $virtualValue,
+                );
+
+                $variations[$variationKey][] = $virtualOption;
+            }
+        }
+
+        foreach ($virtualAttributes as $virtualAttribute => $virtualValue) {
+            $set[$virtualAttribute] = array($virtualValue);
+        }
+    }
+
+    protected function filterByAttributesTypeStandard(&$variations, &$set)
+    {
+        $filterAttributes = $this->getMagentoProduct()->getVariationFilterAttributes();
+        if (empty($filterAttributes)) {
+            return;
+        }
+
+        foreach ($variations as $variationKey => $variation) {
+
+            foreach ($variation as $optionKey => $option) {
+
+                if (!isset($filterAttributes[$option['attribute']])) {
+                    continue;
+                }
+
+                $filterValue = $filterAttributes[$option['attribute']];
+                if ($option['option'] == $filterValue) {
+                    continue;
+                }
+
+                unset($variations[$variationKey]);
+                break;
+            }
+        }
+
+        $variations = array_values($variations);
+
+        foreach ($set as $attribute => $values) {
+            if (!isset($filterAttributes[$attribute])) {
+                continue;
+            }
+
+            $filterValue = $filterAttributes[$attribute];
+            if (!in_array($filterValue, $values)) {
+                $set[$attribute] = array();
+                continue;
+            }
+
+            $set[$attribute] = array($filterValue);
+        }
     }
 
     // ----------------------------------------------------------

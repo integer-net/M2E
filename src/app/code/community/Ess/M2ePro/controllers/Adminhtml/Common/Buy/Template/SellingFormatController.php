@@ -101,17 +101,6 @@ class Ess_M2ePro_Adminhtml_Common_Buy_Template_SellingFormatController
             }
         }
 
-        $tempConstant = Ess_M2ePro_Block_Adminhtml_Common_Buy_Template_SellingFormat_Edit_Form
-                            ::QTY_MODE_PRODUCT_FIXED_VIRTUAL_ATTRIBUTE_VALUE;
-
-        // virtual attribute for QTY_FIXED replacement
-        if ($data['qty_mode'] == Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE &&
-            $data['qty_custom_attribute'] == $tempConstant) {
-
-            $data['qty_mode'] = Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED;
-            $data['qty_custom_attribute'] = '';
-        }
-
         $data['title'] = strip_tags($data['title']);
         //--------------------
 

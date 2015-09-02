@@ -101,7 +101,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Updater
         /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $variationManager */
         $variationManager = $listingProduct->getChildObject()->getVariationManager();
 
-        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Abstract $typeModel */
         $typeModel = $variationManager->getTypeModel();
 
         if ($variationManager->isRelationParentType()) {
@@ -139,6 +138,17 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Updater
             }
 
             $typeModel->unsetProductVariation();
+        }
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $typeModel */
+
+        if ($variationManager->isRelationChildType() &&
+            $typeModel->getParentTypeModel()->getVirtualChannelAttributes()
+        ) {
+            if (!$typeModel->getParentTypeModel()->isActualVirtualChannelAttributes()) {
+                $this->parentListingsProductsForProcessing[$typeModel->getParentListingProduct()->getId()]
+                    = $typeModel->getParentListingProduct();
+            }
         }
     }
 

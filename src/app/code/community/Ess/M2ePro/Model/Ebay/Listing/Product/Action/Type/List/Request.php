@@ -89,13 +89,13 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Request
             return $data;
         }
 
-        $configurableAttributes = array();
+        $confAttributes = array();
         $additionalData = $this->getListingProduct()->getAdditionalData();
         if (!empty($additionalData['configurable_attributes'])) {
-            $configurableAttributes = $additionalData['configurable_attributes'];
+            $confAttributes = $additionalData['configurable_attributes'];
         }
 
-        if (empty($configurableAttributes)) {
+        if (empty($confAttributes)) {
             return $data;
         }
 
@@ -107,11 +107,14 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Request
                 continue;
             }
 
-            $attributeCode = $specific->getData('value_custom_attribute');
+            $attrCode  = $specific->getData('value_custom_attribute');
+            $attrTitle = $specific->getData('attribute_title');
 
-            if (array_key_exists($attributeCode, $configurableAttributes)) {
-                $replacements[$configurableAttributes[$attributeCode]] = $specific->getData('attribute_title');
+            if (!array_key_exists($attrCode, $confAttributes) || $confAttributes[$attrCode] == $attrTitle) {
+                continue;
             }
+
+            $replacements[$confAttributes[$attrCode]] = $attrTitle;
         }
 
         if (empty($replacements)) {

@@ -66,12 +66,12 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
 
     //####################################
 
-    public function addMessage($description = NULL, $type = NULL, $priority = NULL)
+    public function addMessage($description = NULL, $type = NULL, $priority = NULL, array $additionalData = array())
     {
-        $dataForAdd = $this->makeDataForAdd($this->makeAndGetCreator(),
-                                            $description,
+        $dataForAdd = $this->makeDataForAdd($description,
                                             $type,
-                                            $priority);
+                                            $priority,
+                                            $additionalData);
 
         $this->createMessage($dataForAdd);
     }
@@ -116,11 +116,10 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
                  ->getId();
     }
 
-    protected function makeDataForAdd($creator, $description = NULL, $type = NULL, $priority = NULL)
+    protected function makeDataForAdd($description = NULL, $type = NULL, $priority = NULL,
+                                      array $additionalData = array())
     {
         $dataForAdd = array();
-
-        $dataForAdd['creator'] = $creator;
 
         if (!is_null($description)) {
             $dataForAdd['description'] = Mage::helper('M2ePro')->__($description);
@@ -139,6 +138,8 @@ class Ess_M2ePro_Model_Synchronization_Log extends Ess_M2ePro_Model_Log_Abstract
         } else {
             $dataForAdd['priority'] = self::PRIORITY_LOW;
         }
+
+        $dataForAdd['additional_data'] = json_encode($additionalData);
 
         return $dataForAdd;
     }

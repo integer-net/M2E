@@ -51,12 +51,12 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
 
     /**
      * @return Ess_M2ePro_Model_Component_Child_Abstract
-     * @throws LogicException
+     * @throws Ess_M2ePro_Model_Exception_Logic
      */
     public function getChildObject()
     {
         if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
+            throw new Ess_M2ePro_Model_Exception_Logic('Method require loaded instance first');
         }
 
         if (!is_null($this->childObject)) {
@@ -72,7 +72,7 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
         }
 
         if (!$tempMode) {
-            throw new LogicException('Component Mode is not defined.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Component Mode is not defined.');
         }
 
         $modelName = str_replace('M2ePro/',ucwords($tempMode).'_',$this->_resourceName);
@@ -90,7 +90,7 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
     public function getComponentMode()
     {
         if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
+            throw new Ess_M2ePro_Model_Exception_Logic('Method require loaded instance first');
         }
 
         return $this->getData('component_mode');
@@ -137,7 +137,7 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
     public function isLocked()
     {
         if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
+            throw new Ess_M2ePro_Model_Exception_Logic('Method require loaded instance first');
         }
 
         if (parent::isLocked()) {
@@ -160,7 +160,7 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
     public function deleteInstance()
     {
         if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
+            throw new Ess_M2ePro_Model_Exception_Logic('Method require loaded instance first');
         }
 
         if ($this->isLocked()) {
@@ -178,7 +178,7 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
     protected function deleteChildInstance()
     {
         if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
+            throw new Ess_M2ePro_Model_Exception_Logic('Method require loaded instance first');
         }
 
         $childObject = $this->getChildObject();
@@ -206,7 +206,7 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
     public function delete()
     {
         if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
+            throw new Ess_M2ePro_Model_Exception_Logic('Method require loaded instance first');
         }
 
         $temp = parent::delete();
@@ -224,13 +224,13 @@ abstract class Ess_M2ePro_Model_Component_Parent_Abstract extends Ess_M2ePro_Mod
      * @param array $filters
      * @param array $sort
      * @return array
-     * @throws LogicException
+     * @throws Ess_M2ePro_Model_Exception_Logic
      */
     protected function getRelatedComponentItems($modelName, $fieldName, $asObjects = false,
                                                 array $filters = array(), array $sort = array())
     {
         if (is_null($this->getId())) {
-            throw new LogicException('Method require loaded instance first');
+            throw new Ess_M2ePro_Model_Exception_Logic('Method require loaded instance first');
         }
 
         $tempMode = NULL;

@@ -1,3 +1,6 @@
+<?php $url = $this->isEditMode() ? Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Edit+Selling+Settings') :
+    Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Step+2%3A+Selling+Settings');
+?>
 <div id="block_notice_amazon_listing_add_selling_settings" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Selling Settings'); ?>">
     <?php echo Mage::helper('M2ePro')->__('
     On this Page you can specify main <strong>Selling Settings</strong> for Amazon Items you are going to sell using this M2E Pro Listing.<br/><br/>
@@ -7,40 +10,39 @@
 
     In addition to, in this Section you can select Selling Format Policy that contains Settings connected with forming
     of Price, Quantity etc. and Synchronization Policy that describes Rules of Automatic Synchronization of Magento Product and Amazon Item.</br></br>
-    More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
-    Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Edit+Selling+Settings')
-); ?>
+    More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.', $url
+    ); ?>
 </div>
 
 <?php
-    $restockDateValue = $this->getData('restock_date_value');
-    if (!empty($restockDateValue) && strtotime($restockDateValue)) {
-        $this->setData('restock_date_value', Mage::helper('M2ePro')->gmtDateToTimezone($restockDateValue));
-    }
+$restockDateValue = $this->getData('restock_date_value');
+if (!empty($restockDateValue) && strtotime($restockDateValue)) {
+    $this->setData('restock_date_value', Mage::helper('M2ePro')->gmtDateToTimezone($restockDateValue));
+}
 
-    /** @var Ess_M2ePro_Helper_Magento_Attribute $magentoAttributeHelper */
-    $magentoAttributeHelper = Mage::helper('M2ePro/Magento_Attribute');
+/** @var Ess_M2ePro_Helper_Magento_Attribute $magentoAttributeHelper */
+$magentoAttributeHelper = Mage::helper('M2ePro/Magento_Attribute');
 
-    $attributesByInputTypes = array(
-        'text_textarea' => $magentoAttributeHelper->filterByInputTypes(
+$attributesByInputTypes = array(
+    'text_textarea' => $magentoAttributeHelper->filterByInputTypes(
             $this->getData('all_attributes'), array('text', 'textarea')
         ),
-    );
+);
 
-    $generalAttributesByInputTypes = array(
-        'boolean' => $magentoAttributeHelper->filterByInputTypes($this->getData('all_attributes'), array('boolean')),
-        'text' => $magentoAttributeHelper->filterByInputTypes($this->getData('general_attributes'), array('text')),
-        'text_date' => $magentoAttributeHelper->filterByInputTypes(
+$generalAttributesByInputTypes = array(
+    'boolean' => $magentoAttributeHelper->filterByInputTypes($this->getData('all_attributes'), array('boolean')),
+    'text' => $magentoAttributeHelper->filterByInputTypes($this->getData('general_attributes'), array('text')),
+    'text_date' => $magentoAttributeHelper->filterByInputTypes(
             $this->getData('general_attributes'), array('text', 'date', 'datetime')
         ),
-        'text_select' => $magentoAttributeHelper->filterByInputTypes(
+    'text_select' => $magentoAttributeHelper->filterByInputTypes(
             $this->getData('general_attributes'), array('text', 'select')
         ),
-        'text_images' => $magentoAttributeHelper->filterByInputTypes(
+    'text_images' => $magentoAttributeHelper->filterByInputTypes(
             $this->getData('general_attributes'),
             array('text', 'image', 'media_image', 'gallery', 'multiline', 'textarea', 'select', 'multiselect')
         )
-    );
+);
 
 ?>
 

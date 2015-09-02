@@ -49,6 +49,9 @@ class Ess_M2ePro_Model_Amazon_Template_Synchronization extends Ess_M2ePro_Model_
     const REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE = 0;
     const REVISE_CHANGE_DESCRIPTION_TEMPLATE_YES  = 1;
 
+    const REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_NONE = 0;
+    const REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_YES  = 1;
+
     const RELIST_FILTER_USER_LOCK_NONE = 0;
     const RELIST_FILTER_USER_LOCK_YES  = 1;
 
@@ -212,6 +215,14 @@ class Ess_M2ePro_Model_Amazon_Template_Synchronization extends Ess_M2ePro_Model_
     public function isReviseDescriptionTemplate()
     {
         return $this->getData('revise_change_description_template') != self::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE;
+    }
+
+    //------------------------
+
+    public function isReviseShippingOverrideTemplate()
+    {
+        return $this->getData('revise_change_shipping_override_template') !=
+            self::REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_NONE;
     }
 
     //------------------------

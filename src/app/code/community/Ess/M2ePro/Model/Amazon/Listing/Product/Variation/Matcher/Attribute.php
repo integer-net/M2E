@@ -67,6 +67,16 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Attribute
         return count($this->getSourceAttributes()) == count($this->getDestinationAttributes());
     }
 
+    public function isSourceAmountGreater()
+    {
+        return count($this->getSourceAttributes()) > count($this->getDestinationAttributes());
+    }
+
+    public function isDestinationAmountGreater()
+    {
+        return count($this->getSourceAttributes()) < count($this->getDestinationAttributes());
+    }
+
     // ----------------------------------------------------------
 
     public function getMatchedAttributes()
@@ -112,9 +122,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Attribute
 
     private function match()
     {
-        $this->validate();
-
-        if (!is_null($this->magentoProduct) && $this->magentoProduct->isGroupedType()) {
+        if (!is_null($this->magentoProduct) && $this->magentoProduct->isGroupedType() &&
+            !$this->magentoProduct->getVariationVirtualAttributes()
+        ) {
             $channelAttribute = reset($this->destinationAttributes);
 
             $this->matchedAttributes = array(
@@ -210,15 +220,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Attribute
 
     // ##########################################################
 
-    private function validate()
-    {
-        if (!$this->isAmountEqual()) {
-            throw new Exception('Amounts of Source and Destination Attributes are not equal.');
-        }
-    }
-
-    // ##########################################################
-
     private function getSourceAttributes()
     {
         if (!empty($this->sourceAttributes)) {
@@ -226,11 +227,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Attribute
         }
 
         if (!is_null($this->magentoProduct)) {
-            $magentoAttributesNames = $this->magentoProduct
+            $magentoVariations = $this->magentoProduct
                 ->getVariationInstance()
-                ->getTitlesVariationSet();
+                ->getVariationsTypeStandard();
 
-            $this->sourceAttributes = array_keys($magentoAttributesNames);
+            $this->sourceAttributes = array_keys($magentoVariations['set']);
         }
 
         return $this->sourceAttributes;
@@ -243,9 +244,18 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Matcher_Attribute
                 ->getVariationInstance()
                 ->getTitlesVariationSet();
 
+            $magentoStandardVariations = $this->magentoProduct
+                ->getVariationInstance()
+                ->getVariationsTypeStandard();
+
             $resultData = array();
-            foreach ($magentoAttributesNames as $attribute => $data) {
-                $resultData[$attribute] = $data['titles'];
+            foreach (array_keys($magentoStandardVariations['set']) as $attribute) {
+                $titles = array();
+                if (isset($magentoAttributesNames[$attribute])) {
+                    $titles = $magentoAttributesNames[$attribute]['titles'];
+                }
+
+                $resultData[$attribute] = $titles;
             }
 
             return $resultData;

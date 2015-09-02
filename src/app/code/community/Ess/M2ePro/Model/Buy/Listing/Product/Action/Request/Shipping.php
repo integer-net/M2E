@@ -40,7 +40,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Action_Request_Shipping
 
         if (!isset($this->validatorsData['shipping_expedited_rate'])) {
             $rate = $this->getBuyListingProduct()->getListingSource()->getShippingExpeditedRate();
-            !is_null($rate) && ($this->validatorsData['shipping_expedited_mode'] = $rate);
+            !is_null($rate) && ($this->validatorsData['shipping_expedited_rate'] = $rate);
         }
 
         if (isset($this->validatorsData['shipping_expedited_rate'])) {

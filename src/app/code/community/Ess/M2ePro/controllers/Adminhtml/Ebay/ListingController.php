@@ -1164,7 +1164,7 @@ class Ess_M2ePro_Adminhtml_Ebay_ListingController extends Ess_M2ePro_Controller_
 
         $this->_initAction();
 
-        $this->setComponentPageHelpLink('Creation+of+new+M2E+Pro+Listing');
+        $this->setComponentPageHelpLink('Add+Magento+Products');
 
         $this->_title(Mage::helper('M2ePro')->__('Listing Review'))
              ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_ebay_listing_product_review', '', $data))

@@ -38,7 +38,7 @@ class Ess_M2ePro_Helper_Magento_Store_Website
             $this->defaultWebsite = Mage::getModel('core/website')->load(0);
 
             if (is_null($this->defaultWebsite->getId())) {
-                throw new Exception('Getting default website is failed');
+                throw new Ess_M2ePro_Model_Exception('Getting default website is failed');
             }
         }
 
@@ -77,7 +77,7 @@ class Ess_M2ePro_Helper_Magento_Store_Website
 
        if ($website->getId()) {
            $error = Mage::helper('M2ePro')->__('Website with code %value% already exists', $code);
-           throw new Exception($error);
+           throw new Ess_M2ePro_Model_Exception($error);
        }
 
        $website->setCode($code);

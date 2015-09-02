@@ -35,12 +35,12 @@ abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
 
     /**
      * @return Ess_M2ePro_Model_Listing_Product
-     * @throws LogicException
+     * @throws Ess_M2ePro_Model_Exception_Logic
      */
     protected function getProduct()
     {
         if (is_null($this->product)) {
-            throw new LogicException('Initialize all parameters first.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Initialize all parameters first.');
         }
 
         return $this->product;
@@ -145,7 +145,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
                 break;
 
             default:
-                throw new LogicException('Unknown Mode in Database.');
+                throw new Ess_M2ePro_Model_Exception_Logic('Unknown Mode in Database.');
         }
 
         $value = $this->applySellingFormatTemplateModifications($value);
@@ -170,7 +170,10 @@ abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
 
             // grouping qty by product id
             foreach ($variation->getOptions(true) as $option) {
-                /** @var $option Ess_M2ePro_Model_Listing_Product_Variation_Option */
+                if (!$option->getProductId()) {
+                   continue;
+                }
+
                 $optionsQtyArray[$option->getProductId()][] = $this->getOptionBaseValue($option);
             }
 
@@ -181,7 +184,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
             $value = min($optionsQtyList);
 
         } else {
-            throw new LogicException('Unknown Product type.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Unknown Product type.');
         }
 
         $value = $this->applySellingFormatTemplateModifications($value);
@@ -216,7 +219,7 @@ abstract class Ess_M2ePro_Model_Listing_Product_QtyCalculator
                 break;
 
             default:
-                throw new LogicException('Unknown Mode in Database.');
+                throw new Ess_M2ePro_Model_Exception_Logic('Unknown Mode in Database.');
         }
 
         return $value;

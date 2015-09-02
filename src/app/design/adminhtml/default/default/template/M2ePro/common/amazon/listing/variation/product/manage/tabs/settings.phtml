@@ -2,17 +2,9 @@
     /** @var $this Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Variation_Product_Manage_Tabs_Settings */
 
     $channelThemes = $this->getChannelThemes();
-    $channelThemesAmountMismatch = array();
-
-    $productAttributesCount = count($this->getProductAttributes());
-    foreach($channelThemes as $key => $theme) {
-        if (count($theme['attributes']) !== $productAttributesCount) {
-            $channelThemesAmountMismatch[$key] = $theme;
-            unset($channelThemes[$key]);
-        }
-    }
-
     $channelThemeNote = $this->getChannelThemeNote();
+
+    $magentoProductVariations = $this->getListingProduct()->getMagentoProduct()->getVariationInstance()->getVariationsTypeStandard();
 
 ?>
 <div style="height: 510px; overflow: auto;">
@@ -20,7 +12,7 @@
 <div class="hor-scroll" style="padding-bottom: 15px; ">
     <div id="variation_settings_error_block">
         <ul class="messages">
-            <?php if (count($this->getMessages()) > 0) {
+                <?php if (count($this->getMessages()) > 0) {
                 echo $this->getWarnings();
             } ?>
         </ul>
@@ -176,9 +168,6 @@
                     <?php foreach($channelThemes as $key => $theme) { ?>
                         <option value="<?php echo $key; ?>" <?php echo $key == $this->getChannelTheme() ? 'selected="selected"' : '' ?> ><?php echo implode(', ', $theme['attributes']); ?></option>
                     <?php } ?>
-                    <?php foreach($channelThemesAmountMismatch as $key => $theme) { ?>
-                        <option value="<?php echo $key; ?>" disabled="disabled" <?php echo $key == $this->getChannelTheme() ? 'selected="selected"' : '' ?> ><?php echo implode(', ', $theme['attributes']); ?></option>
-                    <?php } ?>
                 </select>
 
                 <?php if (!empty($channelThemeNote)) { ?>
@@ -220,7 +209,43 @@
 <?php } ?>
 
 <?php if ($this->hasGeneralId() ||
-          (!$this->hasGeneralId() && $this->isGeneralIdOwner() && $this->hasChannelTheme())) { ?>
+          (!$this->hasGeneralId() && $this->isGeneralIdOwner() && $this->hasChannelTheme())) {
+
+    $magentoGreaterLeftSideText = Mage::helper('M2ePro')->__('This Amazon Attribute and its Value are virtualized based on the selected Magento Variational Attribute and its Value as physically this Amazon Attribute does not exist.');
+    $magentoGreaterRightSideText = Mage::helper('M2ePro')->__('Select a particular Option of the Attribute to fix it for virtualized Amazon Attribute. Please, be thoughtful as only those Variations of Magento Product which contains the selected Option can be sold on Amazon.');
+
+    $amazonGreaterLeftSideText = Mage::helper('M2ePro')->__('This Magento Attribute and its Value are virtualized based on the selected Amazon Variational Attribute and its Value as physically this Magento Attribute does not exist.');
+    $amazonGreaterRightSideText = Mage::helper('M2ePro')->__('Select a particular Option of the Attribute to fix it for virtualized Magento Attribute. Please, be thoughtful as your offer will be available only for those Buyers who selected the same Option.');
+
+    $duplicateMagentoAttributesError = Mage::helper('M2ePro')->__('The Magento Attributes which you selected in your settings have the same Labels. Such combination is invalid. Please, add the valid combination of Attributes.');
+    $duplicateAmazonAttributesError = Mage::helper('M2ePro')->__('The Amazon Attributes which you selected in your settings have the same Labels. Such combination is invalid. Please, add the valid combination of Attributes.');
+
+    $changeOption = Mage::helper('M2ePro')->__('Change option');
+?>
+
+<script type="application/javascript">
+    ListingGridHandlerObj.variationProductManageHandler.virtualAmazonMatchedAttributes = false;
+    ListingGridHandlerObj.variationProductManageHandler.amazonVariationSet = false;
+
+    M2ePro.text.help_icon_magento_greater_left = '<?php echo $magentoGreaterLeftSideText ?>';
+    M2ePro.text.help_icon_magento_greater_right = '<?php echo $magentoGreaterRightSideText ?>';
+
+    M2ePro.text.help_icon_amazon_greater_left = '<?php echo $amazonGreaterLeftSideText ?>';
+    M2ePro.text.help_icon_amazon_greater_right = '<?php echo $amazonGreaterRightSideText ?>';
+
+    M2ePro.text.duplicate_magento_attribute_error = '<?php echo $duplicateMagentoAttributesError ?>';
+    M2ePro.text.duplicate_amazon_attribute_error = '<?php echo $duplicateAmazonAttributesError ?>';
+
+    M2ePro.text.change_option = '<?php echo $changeOption ?>';
+</script>
+
+<div id="product_search_help_icon_tpl" style="display: none">
+    <img class="tool-tip-image" style="vertical-align: middle;" src="<?php echo $this->getSkinUrl('M2ePro/images/tool-tip-icon.png'); ?>">
+    <span class="tool-tip-message tip-right" style="display: none;">
+        <img src="<?php echo $this->getSkinUrl('M2ePro/images/help.png'); ?>">
+        <span class="tool-tip-message-text"></span>
+    </span>
+</div>
 
 <form id="variation_manager_attributes_form" action="javascript:void(0);">
 
@@ -240,8 +265,45 @@
 
             <?php if (!$this->hasMatchedAttributes() && !$this->getMatcherAttributes()->isAmountEqual()) { ?>
 
-            <p style="color: red;"><?php echo Mage::helper('M2ePro')->__('Number of Variation Attributes in Magento Product %attr% is different from the number of Variation Attributes in Amazon Product / Variation Theme %attr%', implode(', ', $this->getProductAttributes()), implode(', ', $this->getDestinationAttributes())); ?></p>
+            <table class="form-list" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <td class="label" style="font-weight: bold; border-bottom: 1px solid #D6D6D6 !important; border-right: 1px solid #D6D6D6 !important;">
+                            <?php echo Mage::helper('M2ePro')->__('Magento Attributes') ?>
+                        </td>
+                        <td class="value" style="font-weight: bold; border-bottom: 1px solid #D6D6D6 !important;">
+                            <?php echo Mage::helper('M2ePro')->__('Amazon Attributes') ?>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
 
+                <?php if ($this->getMatcherAttributes()->isSourceAmountGreater()) { ?>
+
+            <script type="application/javascript">
+                ListingGridHandlerObj.variationProductManageHandler.matchingType = ListingGridHandlerObj.variationProductManageHandler.MATCHING_TYPE_VIRTUAL_AMAZON;
+                ListingGridHandlerObj.variationProductManageHandler.matchedAttributes = <?php echo json_encode($this->getMatchedAttributes())?>;
+                ListingGridHandlerObj.variationProductManageHandler.productAttributes = <?php echo json_encode($this->getProductAttributes())?>;
+                ListingGridHandlerObj.variationProductManageHandler.destinationAttributes = <?php echo json_encode($this->getDestinationAttributes())?>;
+                ListingGridHandlerObj.variationProductManageHandler.magentoVariationSet = <?php echo json_encode($magentoProductVariations['set'])?>;
+
+                ListingGridHandlerObj.variationProductManageHandler.renderMatchedAttributesNotSetView();
+            </script>
+
+                <?php } elseif ($this->getMatcherAttributes()->isDestinationAmountGreater()) {?>
+
+            <script type="application/javascript">
+                ListingGridHandlerObj.variationProductManageHandler.matchingType = ListingGridHandlerObj.variationProductManageHandler.MATCHING_TYPE_VIRTUAL_MAGENTO;
+                ListingGridHandlerObj.variationProductManageHandler.matchedAttributes = <?php echo json_encode($this->getMatchedAttributes())?>;
+                ListingGridHandlerObj.variationProductManageHandler.destinationAttributes = <?php echo json_encode($this->getDestinationAttributes())?>;
+                ListingGridHandlerObj.variationProductManageHandler.amazonVariationSet = <?php echo json_encode($this->getAmazonVariationsSet())?>;
+
+                ListingGridHandlerObj.variationProductManageHandler.renderMatchedAttributesNotSetView();
+            </script>
+
+                <?php } ?>
             <?php } else { ?>
 
                 <table class="form-list" cellspacing="0" cellpadding="0">
@@ -256,18 +318,41 @@
 
                     <?php
                         $attrId = 0;
-                        foreach ($this->getMatchedAttributes() as $magentoAttr => $amazonAttr) {
-                    ?>
+                        $virtualAttributes = $this->getVirtualAttributes();
+                        $virtualProductAttributes = $this->getVirtualProductAttributes();
+                        $virtualChannelAttributes = $this->getVirtualChannelAttributes();
 
+                        foreach ($this->getMatchedAttributes() as $magentoAttr => $amazonAttr) {
+
+                            $isVirtual = ($magentoAttr == $amazonAttr) && in_array($magentoAttr, array_keys($virtualAttributes));
+                    ?>
                         <tr>
                             <td class="label" style="border-right: 1px solid #D6D6D6 !important;">
-                                <label for="variation_manager_attributes_amazon_<?php echo $attrId ?>"><?php echo $magentoAttr ?></label>
+                                <?php if (!$isVirtual) { ?>
+
+                                <label for="variation_manager_attributes_amazon_<?php echo $attrId ?>">
+                                    <?php echo $magentoAttr ?>
+                                </label>
+
+                                <?php } else { ?>
+
+                                <label for="variation_manager_attributes_amazon_<?php echo $attrId ?>">
+                                    <span style="<?php echo in_array($magentoAttr, array_keys($virtualProductAttributes)) ? 'border-bottom: 2px dotted grey;' : '' ?>">
+                                        <?php echo $magentoAttr ?> (<?php echo $virtualAttributes[$magentoAttr] ?>)
+                                    </span>
+                                </label>
+
+                                <?php } ?>
                             </td>
                             <td class="value">
+                                <input type="hidden" value="<?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttr) ?>" name="variation_attributes[magento_attributes][]">
+
+                                <?php if (!$isVirtual) { ?>
+
                                 <span class="variation_manager_attributes_amazon_value" <?php echo $this->hasMatchedAttributes() ? '' : 'style="color: red;"' ?>>
                                     <?php echo $this->hasMatchedAttributes() ? $amazonAttr : Mage::helper('M2ePro')->__('Not Set') ?>
                                 </span>
-                                <input type="hidden" value="<?php echo Mage::helper('M2ePro')->escapeHtml($magentoAttr) ?>" name="variation_attributes[magento_attributes][]">
+
                                 <select id="variation_manager_attributes_amazon_<?php echo $attrId ?>"
                                         name="variation_attributes[amazon_attributes][]"
                                         class="required-entry variation_manager_attributes_amazon_select"
@@ -280,9 +365,21 @@
                                         }
                                     ?>
                                     <?php foreach ($destinationAttributes as $attr) { ?>
+                                        <?php
+                                            if (in_array($attr, array_keys($virtualAttributes))) {
+                                                continue;
+                                            }
+                                        ?>
                                         <option value="<?php echo $attr; ?>" <?php echo $amazonAttr == $attr ? 'selected="selected"' : '' ?> ><?php echo $attr; ?></option>
                                     <?php } ?>
                                 </select>
+
+                                <?php } else { ?>
+
+                                    <span style="<?php echo in_array($amazonAttr, array_keys($virtualChannelAttributes)) ? 'border-bottom: 2px dotted grey;' : '' ?>"><?php echo $amazonAttr ?> (<?php echo $virtualAttributes[$amazonAttr] ?>)</span>
+                                    <input type="hidden" name="variation_attributes[amazon_attributes][]" value="<?php echo $amazonAttr ?>" />
+
+                                <?php } ?>
                                 <div id="variation_manager_attributes_error_<?php echo $attrId ?>" class="validation-advice" style="display: none;"></div>
                             </td>
                         </tr>
@@ -293,7 +390,7 @@
                     ?>
 
                     <tr>
-                        <td class="label" colspan="2" style="text-align: right; <?php echo ($this->isInAction() || ($this->hasMatchedAttributes() && count($destinationAttributes) === 1)) ? 'display: none;' : '' ?>">
+                        <td class="label" colspan="2" style="text-align: right; <?php echo $this->isChangeMatchedAttributesAllowed() ? '' : 'display: none;' ?>">
                             <button onclick="ListingGridHandlerObj.variationProductManageHandler.changeMatchedAttributes(this)">
                                 <?php echo $this->hasMatchedAttributes() ? Mage::helper('M2ePro')->__('Change') : Mage::helper('M2ePro')->__('Set Attributes'); ?>
                             </button>

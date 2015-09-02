@@ -96,18 +96,12 @@ class Ess_M2ePro_Model_Mysql4_Buy_Listing
 
     public function setSynchStatusNeedBySellingFormatTemplate($newData, $oldData, $listingsProducts)
     {
-        $newSellingFormatTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            Ess_M2ePro_Helper_Component_Buy::NICK,
-            'Template_SellingFormat',
-            $newData['template_selling_format_id'],
-            NULL, array('template')
+        $newSellingFormatTemplate = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
+            'Template_SellingFormat', $newData['template_selling_format_id'], NULL, array('template')
         );
 
-        $oldSellingFormatTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            Ess_M2ePro_Helper_Component_Buy::NICK,
-            'Template_SellingFormat',
-            $oldData['template_selling_format_id'],
-            NULL, array('template')
+        $oldSellingFormatTemplate = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
+            'Template_SellingFormat', $oldData['template_selling_format_id'], NULL, array('template')
         );
 
         Mage::getResourceModel('M2ePro/Buy_Template_SellingFormat')->setSynchStatusNeed(
@@ -119,18 +113,12 @@ class Ess_M2ePro_Model_Mysql4_Buy_Listing
 
     public function setSynchStatusNeedBySynchronizationTemplate($newData, $oldData, $listingsProducts)
     {
-        $newSynchTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            Ess_M2ePro_Helper_Component_Buy::NICK,
-            'Template_Synchronization',
-            $newData['template_synchronization_id'],
-            NULL, array('template')
+        $newSynchTemplate = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
+            'Template_Synchronization', $newData['template_synchronization_id'], NULL, array('template')
         );
 
-        $oldSynchTemplate = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            Ess_M2ePro_Helper_Component_Buy::NICK,
-            'Template_Synchronization',
-            $oldData['template_synchronization_id'],
-            NULL, array('template')
+        $oldSynchTemplate = Mage::helper('M2ePro/Component_Buy')->getCachedObject(
+            'Template_Synchronization', $oldData['template_synchronization_id'], NULL, array('template')
         );
 
         Mage::getResourceModel('M2ePro/Buy_Template_Synchronization')->setSynchStatusNeed(

@@ -112,7 +112,7 @@ DevelopmentDatabaseGridHandler = Class.create(GridHandler, {
             asynchronous: false,
             parameters: Form.serialize($('development_tabs_database_table_cells_popup_form')),
             onSuccess: function(transport) {
-                DevelopmentDatabaseGridHandlerObj.getGridObj().reload();
+                DevelopmentDatabaseGridHandlerObj.unselectAllAndReload();
                 Windows.getFocusedWindow().close();
             }
         });

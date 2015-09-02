@@ -12,7 +12,10 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Logical
     public function isActualProductAttributes()
     {
         $productAttributes = array_map('strtolower', (array)$this->getProductAttributes());
-        $magentoAttributes = array_map('strtolower', (array)$this->getCurrentMagentoAttributes());
+        $magentoAttributes = array_map('strtolower', (array)$this->getMagentoAttributes());
+
+        sort($productAttributes);
+        sort($magentoAttributes);
 
         return $productAttributes == $magentoAttributes;
     }
@@ -21,23 +24,15 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Logical
 
     public function getProductAttributes()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-
-        if (empty($additionalData['variation_product_attributes'])) {
-            return NULL;
-        }
-
-        sort($additionalData['variation_product_attributes']);
-
-        return $additionalData['variation_product_attributes'];
+        return $this->getListingProduct()->getSetting('additional_data', 'variation_product_attributes', array());
     }
 
     public function resetProductAttributes($save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_product_attributes'] = $this->getCurrentMagentoAttributes();
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_product_attributes', $this->getMagentoAttributes()
+        );
 
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
         $save && $this->getListingProduct()->save();
     }
 
@@ -50,6 +45,14 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Logical
         $this->getListingProduct()->setSettings('additional_data', $additionalData);
 
         $this->getListingProduct()->save();
+    }
+
+    // ########################################
+
+    protected function getMagentoAttributes()
+    {
+        $magentoVariations = $this->getMagentoProduct()->getVariationInstance()->getVariationsTypeStandard();
+        return array_keys($magentoVariations['set']);
     }
 
     // ########################################

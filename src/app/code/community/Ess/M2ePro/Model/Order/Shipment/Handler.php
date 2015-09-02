@@ -32,7 +32,7 @@ class Ess_M2ePro_Model_Order_Shipment_Handler
         }
 
         if (!$handler) {
-            throw new LogicException('Shipment handler not found.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Shipment handler not found.');
         }
 
         return $handler;

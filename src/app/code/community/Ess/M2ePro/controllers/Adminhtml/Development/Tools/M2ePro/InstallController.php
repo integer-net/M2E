@@ -250,38 +250,50 @@ HTML;
             foreach ($checkResult as $resultRow) {
 
                 $additionalInfo = '';
-                if (isset($resultRow['info']['diff_data'])) {
-                    foreach ($resultRow['info']['diff_data'] as $diffCode => $diffValue) {
+                $actionsHtml    = '';
+
+                if (!isset($resultRow['info'])) {
+                    continue;
+                }
+
+                $resultInfo = $resultRow['info'];
+                $diffData = isset($resultInfo['diff_data']) ? $resultInfo['diff_data'] : array();
+
+                if (isset($resultInfo['diff_data'])) {
+                    foreach ($resultInfo['diff_data'] as $diffCode => $diffValue) {
+
                         $additionalInfo .= "<b>{$diffCode}</b>: '{$diffValue}'. ";
-                        $additionalInfo .= "<b>original:</b> '{$resultRow['info']['original_data'][$diffCode]}'.";
+                        $additionalInfo .= "<b>original:</b> '{$resultInfo['original_data'][$diffCode]}'.";
                         $additionalInfo .= "<br/>";
                     }
                 }
 
-                $actionsHtml = '';
-                if (isset($resultRow['info'])) {
+                $urlParams = array(
+                    'table_name'  => $tableName,
+                    'column_info' => json_encode($resultInfo['original_data'])
+                );
 
-                    $urlParams = array(
-                        'table_name'  => $tableName,
-                        'column_info' => json_encode($resultRow['info']['original_data'])
-                    );
+                if (empty($resultInfo['current_data']) ||
+                    (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
 
-                    $diffData = isset($resultRow['info']['diff_data']) ? $resultRow['info']['diff_data'] : array();
+                    $urlParams['mode'] = 'properties';
+                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                    $actionsHtml .= "<a href=\"{$url}\">Fix Properties</a>";
+                }
 
-                    if (empty($resultRow['info']['current_data']) ||
-                        (isset($diffData['type']) || isset($diffData['default']) || isset($diffData['null']))) {
+                if (isset($diffData['key'])) {
 
-                        $urlParams['mode'] = 'properties';
-                        $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                        $actionsHtml .= "<a href=\"{$url}\">Fix Properties</a>";
-                    }
+                    $urlParams['mode'] = 'index';
+                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                    $actionsHtml .= "<a href=\"{$url}\">Fix Index</a>";
+                }
 
-                    if (isset($resultRow['info']['diff_data']) && isset($diffData['key'])) {
+                if (empty($resultInfo['original_data']) && !empty($resultInfo['current_data'])) {
 
-                        $urlParams['mode'] = 'index';
-                        $url = $this->getUrl('*/*/fixColumn', $urlParams);
-                        $actionsHtml .= "<a href=\"{$url}\">Fix Index</a>";
-                    }
+                    $urlParams['mode'] = 'drop';
+                    $urlParams['column_info'] = json_encode($resultInfo['current_data']);
+                    $url = $this->getUrl('*/*/fixColumn', $urlParams);
+                    $actionsHtml .= "<a href=\"{$url}\">Drop</a>";
                 }
 
                 $html .= <<<HTML
@@ -314,17 +326,40 @@ HTML;
             return;
         }
 
-        $helper = Mage::helper('M2ePro/Module_Database_Structure');
+        $originalData = $responseData['configs_info'];
+        $currentData = array();
+
+        foreach ($originalData as $tableName => $configInfo) {
+
+            $currentData[$tableName] = Mage::helper('M2ePro/Module_Database_Structure')
+                                                ->getConfigSnapshot($tableName);
+        }
+
         $differenses = array();
 
-        foreach ($responseData['configs_info'] as $tableName => $configInfo) {
-
-            $currentInfo = $helper->getConfigSnapshot($tableName);
+        foreach ($originalData as $tableName => $configInfo) {
             foreach ($configInfo as $codeHash => $item) {
-                !array_key_exists($codeHash, $currentInfo) && $differenses[] = array(
-                    'table' => $tableName,
-                    'item'  => $item
-                );
+
+                if (array_key_exists($codeHash, $currentData[$tableName])) {
+                    continue;
+                }
+
+                $differenses[] = array('table'    => $tableName,
+                                       'item'     => $item,
+                                       'solution' => 'insert');
+            }
+        }
+
+        foreach ($currentData as $tableName => $configInfo) {
+            foreach ($configInfo as $codeHash => $item) {
+
+                if (array_key_exists($codeHash, $originalData[$tableName])) {
+                    continue;
+                }
+
+                $differenses[] = array('table'    => $tableName,
+                                       'item'     => $item,
+                                       'solution' => 'drop');
             }
         }
 
@@ -341,29 +376,47 @@ HTML;
 </h2>
 <br/>
 
-<table class="grid" cellpadding="0" cellspacing="0">
+<table class="grid" cellpadding="0" cellspacing="0" style="width: 100%;">
     <tr>
         <th style="width: 400px">Table</th>
-        <th>Group</th>
-        <th>Key</th>
-        <th style="width: 100px">Actions</th>
+        <th style="width: 200px">Group</th>
+        <th style="width: 200px">Key</th>
+        <th style="width: 150px">Value</th>
+        <th style="width: 50px">Action</th>
     </tr>
 HTML;
 
         foreach ($differenses as $index => $row) {
 
-            $url = $this->getUrl('*/adminhtml_development_database/addTableRow', array(
-                'table'  => $row['table'],
-                'model'  => Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($row['table']),
-            ));
+            if ($row['solution'] == 'insert') {
+
+                $url = $this->getUrl('*/adminhtml_development_database/addTableRow', array(
+                    'table'  => $row['table'],
+                    'model'  => Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($row['table']),
+                ));
+
+            } else {
+
+                $url = $this->getUrl('*/adminhtml_development_database/deleteTableRows', array(
+                    'table'  => $row['table'],
+                    'model'  => Mage::helper('M2ePro/Module_Database_Structure')->getTableModel($row['table']),
+                    'ids'    => $row['item']['id']
+                ));
+            }
+
+            $actionWord = $row['solution'] == 'insert' ? 'Insert' : 'Drop';
+            $styles = $row['solution'] == 'insert' ? '' : 'color: red;';
 
             $onclickAction = <<<JS
-var elem = $(this.id);
+var elem     = $(this.id),
+    formData = Form.serialize(elem.up('tr').down('form'));
+
+elem.up('tr').remove();
+
 new Ajax.Request( '{$url}' , {
     method: 'get',
-    asynchronous : false,
-    parameters : Form.serialize(elem.up('form')),
-    onSuccess: function(transport) { elem.up('tr').remove(); }
+    asynchronous : true,
+    parameters : formData
 });
 JS;
         $html .= <<<HTML
@@ -380,9 +433,11 @@ JS;
             <input type="hidden" name="value_group" value="{$row['item']['group']}">
             <input type="hidden" name="value_key" value="{$row['item']['key']}">
             <input type="text" name="value_value" value="{$row['item']['value']}">
-
-            <a id="insert_id_{$index}" onclick="{$onclickAction}" href="javascript:void(0);">Insert</a>
         </form>
+    </td>
+    <td align="center">
+        <a id="insert_id_{$index}" style= "{$styles}"
+           onclick="{$onclickAction}" href="javascript:void(0);">{$actionWord}</a>
     </td>
 </tr>
 HTML;
@@ -405,7 +460,7 @@ HTML;
 
         $repairMode = $this->getRequest()->getParam('mode');
 
-        if (!$tableName || !$repairMode || empty($columnInfo)) {
+        if (!$tableName || !$repairMode) {
             $this->_redirect('*/*/checkTablesStructureValidity');
             return;
         }
@@ -413,6 +468,7 @@ HTML;
         $helper = Mage::helper('M2ePro/Module_Database_Repair');
         $repairMode == 'index' && $helper->fixColumnIndex($tableName, $columnInfo);
         $repairMode == 'properties' && $helper->fixColumnProperties($tableName, $columnInfo);
+        $repairMode == 'drop' && $helper->dropColumn($tableName, $columnInfo);
 
         $this->_redirect('*/*/checkTablesStructureValidity');
     }
@@ -514,19 +570,24 @@ HTML;
         $connWrite->update(
             Mage::getSingleton('core/resource')->getTableName('m2epro_primary_config'),
             array('value' => null),
-            '`group` LIKE \'%license%\''
+            "`group` LIKE '%license%'"
         );
         $connWrite->update(
             Mage::getSingleton('core/resource')->getTableName('m2epro_config'),
             array('value' => 1),
-            '`key` = \'mode\' AND `group` LIKE \'/component/%\''
+            "`key` = 'mode' AND `group` LIKE '/component/%'"
         );
+
+        $skipWizards = array('migrationToV6','migrationNewAmazon','removedPay','ebayProductDetails',
+                             'fullAmazonCategories','amazonShippingOverridePolicy');
+
+        array_walk($skipWizards, function(&$el, $key){ $el = "'{$el}'"; });
+        $skipWizards = implode(',', $skipWizards);
+
         $connWrite->update(
             Mage::getSingleton('core/resource')->getTableName('m2epro_wizard'),
             array('status' => 0, 'step' => null),
-            '`nick` <> \'migrationToV6\' AND `nick` <> \'migrationNewAmazon\'
-              AND `nick` <> \'removedPay\' AND `nick` <> \'ebayProductDetails\'
-              AND `nick` <> \'fullAmazonCategories\''
+            "nick NOT IN ({$skipWizards})"
         );
 
         Mage::helper('M2ePro/Magento')->clearCache();
@@ -551,7 +612,7 @@ HTML;
         $connWrite->update(
             Mage::getSingleton('core/resource')->getTableName('m2epro_config'),
             array('value' => 1),
-            '`key` = \'mode\' AND `group` LIKE \'/component/%\''
+            "`key` = 'mode' AND `group` LIKE '/component/%'"
         );
         $connWrite->update(
             Mage::getSingleton('core/resource')->getTableName('m2epro_wizard'),
