@@ -160,7 +160,9 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
         $this->createOrUpdateOrder();
         $this->createOrUpdateItems();
 
-        if ($this->isNew()) {
+        if ($this->isNew() && !$this->getData('is_afn_channel') &&
+            $this->getData('status') != Ess_M2ePro_Model_Amazon_Order::STATUS_CANCELED
+        ) {
             $this->processListingsProductsUpdates();
             $this->processOtherListingsUpdates();
         }
@@ -366,6 +368,11 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
 
                 /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
                 $amazonListingProduct = $listingProduct->getChildObject();
+
+                if ($amazonListingProduct->isAfnChannel()) {
+                    continue;
+                }
+
                 $variationManager = $amazonListingProduct->getVariationManager();
 
                 if ($variationManager->isRelationChildType()) {
@@ -484,6 +491,13 @@ class Ess_M2ePro_Model_Amazon_Order_Builder extends Mage_Core_Model_Abstract
             foreach ($otherListings as $otherListing) {
 
                 if (!$otherListing->isListed() && !$otherListing->isStopped()) {
+                    continue;
+                }
+
+                /** @var Ess_M2ePro_Model_Amazon_Listing_Other $amazonOtherListing */
+                $amazonOtherListing = $otherListing->getChildObject();
+
+                if ($amazonOtherListing->isAfnChannel()) {
                     continue;
                 }
 

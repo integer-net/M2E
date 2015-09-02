@@ -144,7 +144,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit extends Mage_Adminhtml_Block
     public function getTemplateNick()
     {
         if (!isset($this->_data['template_nick'])) {
-            throw new LogicException('Policy nick is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Policy nick is not set.');
         }
 
         return $this->_data['template_nick'];

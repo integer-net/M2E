@@ -18,7 +18,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_Relist_Request
             $this->getRequestQty()->getData(),
             $this->getRequestPrice()->getData(),
             $this->getRequestDetails()->getData(),
-            $this->getRequestImages()->getData()
+            $this->getRequestImages()->getData(),
+            $this->getRequestShippingOverride()->getData()
         );
 
         if ($this->getVariationManager()->isRelationChildType()) {

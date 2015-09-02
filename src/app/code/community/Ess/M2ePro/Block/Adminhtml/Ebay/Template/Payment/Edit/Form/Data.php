@@ -94,7 +94,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Payment_Edit_Form_Data extends Ma
         $marketplace = Mage::helper('M2ePro/Data_Global')->getValue('ebay_marketplace');
 
         if (!$marketplace instanceof Ess_M2ePro_Model_Marketplace) {
-            throw new LogicException('Marketplace is required for editing Payment Policy.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Marketplace is required for editing Payment Policy.');
         }
 
         $data = array(

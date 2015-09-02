@@ -51,8 +51,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Add_SourceMode
 
     protected function _toHtml()
     {
-        $listing = Mage::helper('M2ePro/Component')
-            ->getCachedUnknownObject('Listing', $this->getRequest()->getParam('id'));
+        $listing = Mage::helper('M2ePro/Component')->getCachedUnknownObject(
+            'Listing', $this->getRequest()->getParam('id')
+        );
 
         $viewHeaderBlock = $this->getLayout()->createBlock(
             'M2ePro/adminhtml_listing_view_header','',

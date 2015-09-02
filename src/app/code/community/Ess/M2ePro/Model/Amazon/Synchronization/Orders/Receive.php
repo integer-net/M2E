@@ -113,8 +113,11 @@ final class Ess_M2ePro_Model_Amazon_Synchronization_Orders_Receive
             'from_date' => $fromDate
         );
 
-        if (is_null($account->getData('orders_last_synchronization'))) {
-            $account->setData('orders_last_synchronization', $fromDate)->save();
+        /** @var Ess_M2ePro_Model_Amazon_Account $amazonAccount */
+        $amazonAccount = $account->getChildObject();
+
+        if (is_null($amazonAccount->getData('orders_last_synchronization'))) {
+            $amazonAccount->setData('orders_last_synchronization', $fromDate)->save();
         }
 
         $dispatcherObject = Mage::getModel('M2ePro/Connector_Amazon_Dispatcher');

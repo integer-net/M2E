@@ -1,7 +1,12 @@
 <div id="block_notice_common_sellingFormat_templates" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Policies'); ?>">
-    <?php echo Mage::helper('M2ePro')->__('In this Section you can Create, Edit, and Delete Selling Format or Synchronization Policies.<br/><br/>
-Selling Format Policies are used to work with values related to the offer part of the Listings, such as Price, Quantity and similar parameters.<br/>
-In the Synchronization Policy you can set the Rules by which the dynamic data Synchronization between Channel and Magento will be performed.');
+    <?php echo Mage::helper('M2ePro')->__('In this Section you can Create, Edit, and Delete Selling Format, Shipping Override
+    or Synchronization Policies.</br></br>
+    <strong>Selling Format Policies</strong> are used to work with Values related to the offer part of the Listings, such as Price,
+    Quantity and similar parameters.</br>
+    <strong>Shipping Override Policies</strong> are used to specify Settings for Shipping Services, Locale and Shipping Cost.</br>
+    In the <strong>Synchronization Policy</strong> you can set the Rules by which the dynamic data Synchronization between Channel
+    and Magento will be performed.
+');
 
     $components = Mage::helper('M2ePro/View_Common_Component')->getActiveComponents();
     if (count($components) == 1) : ?>

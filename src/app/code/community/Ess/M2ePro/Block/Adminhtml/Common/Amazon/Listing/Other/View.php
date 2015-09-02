@@ -238,7 +238,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View extends Mage_A
             'amazon'
         );
 
-        // todo next (temp solution)
+        // TODO NEXT (temp solution)
         AmazonListingOtherGridHandlerObj.movingHandler.setOptions(M2eProAmazon);
         AmazonListingOtherGridHandlerObj.autoMappingHandler.setOptions(M2eProAmazon);
         AmazonListingOtherGridHandlerObj.removingHandler.setOptions(M2eProAmazon);

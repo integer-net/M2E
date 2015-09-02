@@ -37,12 +37,12 @@ abstract class Ess_M2ePro_Model_Observer_Abstract
 
     /**
      * @return Varien_Event_Observer
-     * @throws LogicException
+     * @throws Ess_M2ePro_Model_Exception_Logic
      */
     protected function getEventObserver()
     {
         if (!($this->eventObserver instanceof Varien_Event_Observer)) {
-            throw new LogicException('Property "eventObserver" should be set first.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Property "eventObserver" should be set first.');
         }
 
         return $this->eventObserver;

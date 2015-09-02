@@ -199,6 +199,28 @@
                         </td>
                     </tr>
 
+                    <tr>
+                        <td class="label">
+                            <label><?php echo Mage::helper('M2ePro')->__('Upload Images to eBay')?>: </label>
+                        </td>
+
+                        <td class="value">
+                            <select name="upload_images_mode">
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_AUTO; ?>" <?php if ($this->upload_images_mode == Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_AUTO): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Automatic'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_SELF; ?>" <?php if ($this->upload_images_mode == Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_SELF): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Self-Hosted'); ?></option>
+                                <option value="<?php echo Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_EPS; ?>" <?php if ($this->upload_images_mode == Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_EPS): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('EPS-Hosted'); ?></option>
+                            </select>
+                            <p class="note">
+                                <span><?php echo Mage::helper('M2ePro')->__('
+                                    Select the Mode which you would like to use for uploading Images on eBay:</br>
+                                    <strong>Automatic</strong> — uses an EPS Service and/or the Images Links;</br>
+                                    <strong>Self-Hosted</strong> — uses direct links to the Images saved in your Magento;</br>
+                                    <strong>EPS-Hosted</strong> — uses eBay EPS Service.
+                                '); ?></span>
+                            </p>
+                        </td>
+                    </tr>
+
                     </tbody>
 
                 </table>

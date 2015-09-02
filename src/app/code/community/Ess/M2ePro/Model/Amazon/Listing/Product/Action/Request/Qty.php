@@ -7,12 +7,22 @@
 class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty
     extends Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Abstract
 {
+    const FULFILLMENT_MODE_AFN = 'AFN';
+    const FULFILLMENT_MODE_MFN = 'MFN';
+
     // ########################################
 
     public function getData()
     {
         if (!$this->getConfigurator()->isQtyAllowed()) {
             return array();
+        }
+
+        $params = $this->getParams();
+        if (!empty($params['switch_to']) && $params['switch_to'] === self::FULFILLMENT_MODE_AFN) {
+            return array(
+                'switch_to' => self::FULFILLMENT_MODE_AFN
+            );
         }
 
         if (!isset($this->validatorsData['qty'])) {
@@ -41,6 +51,10 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Request_Qty
 
         if (!empty($this->validatorsData['restock_date'])) {
             $data['restock_date'] = $this->validatorsData['restock_date'];
+        }
+
+        if (!empty($params['switch_to']) && $params['switch_to'] === self::FULFILLMENT_MODE_MFN) {
+            $data['switch_to'] = self::FULFILLMENT_MODE_MFN;
         }
 
         return $data;

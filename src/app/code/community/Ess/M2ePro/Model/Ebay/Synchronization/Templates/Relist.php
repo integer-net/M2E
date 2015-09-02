@@ -70,6 +70,24 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
                 continue;
             }
 
+            /**
+             * @var $synchronizationTemplate Ess_M2ePro_Model_Ebay_Template_Synchronization
+             */
+            $synchronizationTemplate = $listingProduct->getChildObject()->getEbaySynchronizationTemplate();
+            if ($synchronizationTemplate->isScheduleEnabled() &&
+                (!$synchronizationTemplate->isScheduleIntervalNow() ||
+                 !$synchronizationTemplate->isScheduleWeekNow())
+            ) {
+                $additionalData = $listingProduct->getAdditionalData();
+
+                if (!isset($additionalData['add_to_schedule'])) {
+                    $additionalData['add_to_schedule'] = true;
+                    $listingProduct->setSettings('additional_data', $additionalData)->save();
+                }
+
+                continue;
+            }
+
             $this->getRunner()->addProduct(
                 $listingProduct, $action, $configurator
             );
@@ -197,6 +215,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Relist
                     array('neq'=>Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED));
         $collection->addFieldToFilter('main_table.status',
                     array('neq'=>Ess_M2ePro_Model_Listing_Product::STATUS_LISTED));
+        $collection->addFieldToFilter('main_table.additional_data',
+                    array('like'=>'%"add_to_schedule":true%'));
         $collection->getSelect()->order('main_table.id', Zend_Db_Select::SQL_ASC);
         $collection->getSelect()->limit(100);
 

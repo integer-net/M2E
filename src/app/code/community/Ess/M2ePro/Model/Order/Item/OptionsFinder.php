@@ -39,7 +39,7 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
     public function setProductType($type)
     {
         if (!in_array($type, $this->getAllowedProductTypes())) {
-            throw new Exception(sprintf('Product type "%s" is not supported.', $type));
+            throw new Ess_M2ePro_Model_Exception(sprintf('Product type "%s" is not supported.', $type));
         }
 
         $this->productType = $type;
@@ -63,14 +63,14 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
     public function getProductDetails()
     {
         if (is_null($this->productType)) {
-            throw new Exception('Product type was not set.');
+            throw new Ess_M2ePro_Model_Exception('Product type was not set.');
         }
 
         if ($this->productType == Ess_M2ePro_Model_Magento_Product::TYPE_GROUPED) {
             $associatedProduct = $this->getGroupedAssociatedProduct();
 
             if (is_null($associatedProduct)) {
-                throw new Exception('There is no associated Product found for Grouped Product.');
+                throw new Ess_M2ePro_Model_Exception('There is no associated Product found for Grouped Product.');
             }
 
             return array(
@@ -115,7 +115,8 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
             }
 
             if (count($configurableAssociatedProducts) != 1) {
-                throw new LogicException('There is no associated Product found for Configurable Product.');
+                throw new Ess_M2ePro_Model_Exception_Logic('There is no associated Product found for
+                    Configurable Product.');
             }
 
             return $configurableAssociatedProducts;
@@ -202,7 +203,7 @@ class Ess_M2ePro_Model_Order_Item_OptionsFinder
         // ---------------
 
         if ($this->productType == Ess_M2ePro_Model_Magento_Product::TYPE_CONFIGURABLE && $this->hasFailedOptions()) {
-            throw new Exception('There is no associated Product found for Configurable Product.');
+            throw new Ess_M2ePro_Model_Exception('There is no associated Product found for Configurable Product.');
         }
 
         return array(

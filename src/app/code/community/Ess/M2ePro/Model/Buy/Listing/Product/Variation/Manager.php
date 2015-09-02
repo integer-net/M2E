@@ -60,7 +60,10 @@ class Ess_M2ePro_Model_Buy_Listing_Product_Variation_Manager
         $productAttributes = array_map('strtolower', array_keys($this->getProductOptions()));
         $magentoAttributes = array_map('strtolower', $this->getCurrentMagentoAttributes());
 
-        return !array_diff($productAttributes, $magentoAttributes);
+        sort($productAttributes);
+        sort($magentoAttributes);
+
+        return $productAttributes == $magentoAttributes;
     }
 
     public function isActualProductVariation()

@@ -6,16 +6,14 @@
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_TemplateDescription_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-
     const ACTION_STATUS_NEW_ASIN_NOT_ACCEPTED = 1;
     const ACTION_STATUS_VARIATIONS_NOT_SUPPORTED = 2;
-    const ACTION_STATUS_ATTRIBUTES_COUNT_MISMATCH = 3;
-    const ACTION_STATUS_READY_TO_BE_ASSIGNED = 4;
+    const ACTION_STATUS_READY_TO_BE_ASSIGNED = 3;
 
     protected $attributesSetsIds;
     protected $marketplaceId;
     protected $listingProduct;
-    protected $productsAttributesCountVariations;
+    protected $variationProductsIds;
 
     protected $checkNewAsinAccepted = false;
     protected $productsIds;
@@ -208,12 +206,6 @@ HTML;
                         'Selected Category doesn\'t support Variational Products'
                     ) . '</span>';
                 break;
-            case self::ACTION_STATUS_ATTRIBUTES_COUNT_MISMATCH:
-                return '<span style="color: #808080;">' .
-                    Mage::helper('M2ePro')->__(
-                        'This number of Variation Attributes cannot be used in chosen Category'
-                    ) . '</span>';
-                break;
         }
 
         return '<span style="color: green;">' . Mage::helper('M2ePro')->__('Ready to be assigned') . '</span>';
@@ -233,9 +225,6 @@ HTML;
                 return '<span style="color: #808080;">' . $assignText . '</span>';
                 break;
             case self::ACTION_STATUS_VARIATIONS_NOT_SUPPORTED:
-                return '<span style="color: #808080;">' . $assignText . '</span>';
-                break;
-            case self::ACTION_STATUS_ATTRIBUTES_COUNT_MISMATCH:
                 return '<span style="color: #808080;">' . $assignText . '</span>';
                 break;
         }
@@ -362,10 +351,10 @@ HTML;
 
     //---------------------------------------
 
-    protected function getProductAttributesCountVariations()
+    protected function getVariationsProductsIds()
     {
-        if (is_null($this->productsAttributesCountVariations)) {
-            $this->productsAttributesCountVariations = array();
+        if (is_null($this->variationProductsIds)) {
+            $this->variationProductsIds = array();
 
             /** @var Ess_M2ePro_Model_Mysql4_Amazon_Listing_Product_Collection $collection */
             $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
@@ -376,21 +365,14 @@ HTML;
             $collection->getSelect()->reset(Zend_Db_Select::COLUMNS);
             $collection->getSelect()->columns(
                 array(
-                    'main_table.additional_data'
+                    'main_table.id'
                 )
             );
 
-            foreach ($collection->getData() as $row) {
-                $data = json_decode($row['additional_data'], true);
-
-                $count = count($data['variation_product_attributes']);
-                if (!in_array($count, $this->productsAttributesCountVariations)) {
-                    $this->productsAttributesCountVariations[] = $count;
-                }
-            }
+            $this->variationProductsIds = $collection->getData();
         }
 
-        return $this->productsAttributesCountVariations;
+        return $this->variationProductsIds;
     }
 
     // ####################################
@@ -415,25 +397,14 @@ HTML;
                 continue;
             }
 
-            $productAttrCounts = $this->getProductAttributesCountVariations();
+            $variationProductsIds = $this->getVariationsProductsIds();
 
-            if (!empty($productAttrCounts)) {
+            if (!empty($variationProductsIds)) {
                 $detailsModel = Mage::getModel('M2ePro/Amazon_Marketplace_Details');
                 $detailsModel->setMarketplaceId($this->getMarketplaceId());
                 $themes = $detailsModel->getVariationThemes($item['product_data_nick']);
 
                 if (empty($themes)) {
-                    $item['description_template_action_status'] = self::ACTION_STATUS_VARIATIONS_NOT_SUPPORTED;
-                    $preparedData[] = $item;
-                    continue;
-                }
-
-                $themeAttrCounts = array();
-                foreach ($themes as $theme) {
-                    $themeAttrCounts[] = count($theme['attributes']);
-                }
-
-                if (count(array_intersect($productAttrCounts, $themeAttrCounts)) !== count($productAttrCounts)) {
                     $item['description_template_action_status'] = self::ACTION_STATUS_VARIATIONS_NOT_SUPPORTED;
                     $preparedData[] = $item;
                     continue;

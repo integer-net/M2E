@@ -42,6 +42,9 @@ class Ess_M2ePro_Adminhtml_Wizard_AmazonController
         $this->getWizardHelper()->setStatus(
             'fullAmazonCategories', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
         );
+        $this->getWizardHelper()->setStatus(
+            'amazonShippingOverridePolicy', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
+        );
 
         parent::indexAction();
     }

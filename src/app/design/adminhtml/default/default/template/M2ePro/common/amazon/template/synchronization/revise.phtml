@@ -5,7 +5,7 @@
     will be automatically fully or partially updated.<br/>
     <ul class="list">
         <li><b>Partial Revise</b> - if there are changes introduced to the indicated parameters of the Magento Item, Amazon Items will be updated with just the specific data that has changed.</li>
-        <li><b>Full Revise</b> - contains groups of M2E Pro Settings. If any data in these groups (<i class="underline">Selling Format Policy</i>, <i class="underline">Listing Settings</i>, <i class="underline">Description Policy</i>) is changed, then Listings, which use these Policies in their Settings, will be automatically fully Revised.</li>
+        <li><b>Full Revise</b> - contains groups of M2E Pro Settings. If any data in these groups (<i class="underline">Selling Format Policy</i>, <i class="underline">Listing Settings</i>, <i class="underline">Description Policy</i>, <i class="underline">Shipping Override Policy</i>) is changed, then Listings, which use these Policies in their Settings, will be automatically fully Revised.</li>
     </ul></br>
     More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
     Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Revise+Rules')
@@ -25,6 +25,7 @@
         'revise_update_images'                           => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_UPDATE_IMAGES_NONE,
         'revise_change_selling_format_template'          => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_SELLING_FORMAT_TEMPLATE_YES,
         'revise_change_description_template'             => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_DESCRIPTION_TEMPLATE_NONE,
+        'revise_change_shipping_override_template'       => Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_YES,
         'revise_change_listing'                          => Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES
     );
 
@@ -241,6 +242,21 @@
 
                 <tr>
                     <td class="label">
+                        <label><?php echo Mage::helper('M2ePro')->__('Listing Settings'); ?>: </label>
+                    </td>
+                    <td class="value" style="width: auto;">
+                        <select id="revise_change_listing" name="revise_change_listing" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_NONE; ?>" <?php if ($formData['revise_change_listing'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES; ?>" <?php if ($formData['revise_change_listing'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        </select>
+                        <p class="note">
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon Listing(s) if its Listing Settings were changed.'); ?></span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label">
                         <label><?php echo Mage::helper('M2ePro')->__('Selling Format Policy'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
@@ -271,15 +287,15 @@
 
                 <tr>
                     <td class="label">
-                        <label><?php echo Mage::helper('M2ePro')->__('Listing Settings'); ?>: </label>
+                        <label><?php echo Mage::helper('M2ePro')->__('Shipping Override Policy'); ?>: </label>
                     </td>
                     <td class="value" style="width: auto;">
-                        <select id="revise_change_listing" name="revise_change_listing" class="required-entry">
-                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_NONE; ?>" <?php if ($formData['revise_change_listing'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
-                            <option value="<?php echo Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES; ?>" <?php if ($formData['revise_change_listing'] == Ess_M2ePro_Model_Template_Synchronization::REVISE_CHANGE_LISTING_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
+                        <select id="revise_change_shipping_override_template" name="revise_change_shipping_override_template" class="required-entry">
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_NONE; ?>" <?php if ($formData['revise_change_shipping_override_template'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('No'); ?></option>
+                            <option value="<?php echo Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_YES; ?>" <?php if ($formData['revise_change_shipping_override_template'] == Ess_M2ePro_Model_Amazon_Template_Synchronization::REVISE_CHANGE_SHIPPING_OVERRIDE_TEMPLATE_YES): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Yes'); ?></option>
                         </select>
                         <p class="note">
-                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon Listing(s) if its Listing Settings were changed.'); ?></span>
+                            <span><?php echo Mage::helper('M2ePro')->__('Automatically revises Amazon Listing(s) if its Shipping Override Policy was changed.'); ?></span>
                         </p>
                     </td>
                 </tr>

@@ -31,60 +31,6 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Template_Grid extends Mage_Admi
 
     // ##########################################
 
-    protected function _prepareCollection()
-    {
-        /** @var $connRead Varien_Db_Adapter_Pdo_Mysql */
-        $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
-
-        // Prepare selling format collection
-        // ----------------------------------
-        $collectionSellingFormat = Mage::getModel('M2ePro/Template_SellingFormat')->getCollection();
-        $collectionSellingFormat->getSelect()->reset(Varien_Db_Select::COLUMNS);
-        $collectionSellingFormat->getSelect()->columns(
-            array('id as template_id', 'title',
-                  new Zend_Db_Expr('\''.self::TEMPLATE_SELLING_FORMAT.'\' as `type`'),
-                  'create_date', 'update_date')
-        );
-        $collectionSellingFormat->getSelect()->where('component_mode = (?)', $this->nick);
-        // ----------------------------------
-
-        // Prepare synchronization collection
-        // ----------------------------------
-        $collectionSynchronization = Mage::getModel('M2ePro/Template_Synchronization')->getCollection();
-        $collectionSynchronization->getSelect()->reset(Varien_Db_Select::COLUMNS);
-        $collectionSynchronization->getSelect()->columns(
-            array('id as template_id', 'title',
-                new Zend_Db_Expr('\''.self::TEMPLATE_SYNCHRONIZATION.'\' as `type`'),
-                'create_date', 'update_date')
-        );
-        $collectionSynchronization->getSelect()->where('component_mode = (?)', $this->nick);
-        // ----------------------------------
-
-        // Prepare union select
-        // ----------------------------------
-        $unionSelect = $connRead->select();
-        $unionSelect->union(array(
-            $collectionSellingFormat->getSelect(),
-            $collectionSynchronization->getSelect()
-        ));
-        // ----------------------------------
-
-        // Prepare result collection
-        // ----------------------------------
-        $resultCollection = new Varien_Data_Collection_Db($connRead);
-        $resultCollection->getSelect()->reset()->from(
-            array('main_table' => $unionSelect),
-            array('template_id', 'title', 'type', 'create_date', 'update_date')
-        );
-        // ----------------------------------
-
-//        echo $resultCollection->getSelectSql(true); exit;
-
-        $this->setCollection($resultCollection);
-
-        return parent::_prepareCollection();
-    }
-
     protected function _prepareColumns()
     {
         $this->addColumn('title', array(
@@ -107,7 +53,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Template_Grid extends Mage_Admi
             'header'        => Mage::helper('M2ePro')->__('Type'),
             'align'         => 'left',
             'type'          => 'options',
-            'width'         => '100px',
+            'width'         => '120px',
             'sortable'      => false,
             'index'         => 'type',
             'filter_index'  => 'main_table.type',

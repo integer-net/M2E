@@ -21,4 +21,11 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Edit_Selling_Help extends Mage_Ad
     }
 
     // ####################################
+
+    public function isEditMode()
+    {
+        return !!$this->getRequest()->getParam('id');
+    }
+
+    // ####################################
 }

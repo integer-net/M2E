@@ -53,7 +53,7 @@ abstract class Ess_M2ePro_Model_Order_ShippingAddress extends Varien_Object
             $this->region = $countryRegions->getFirstItem();
 
             if ($this->isRegionValidationRequired() && !$this->region->getId()) {
-                throw new Exception(
+                throw new Ess_M2ePro_Model_Exception(
                     sprintf('State/Region "%s" in the shipping address is invalid.', $this->getState())
                 );
             }

@@ -63,10 +63,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
 
         $lockItem->remove();
 
-        $this->getAccount()->deleteObjectLocks(NULL, $processingRequest->getHash());
-        $this->getAccount()->deleteObjectLocks('synchronization', $processingRequest->getHash());
-        $this->getAccount()->deleteObjectLocks('synchronization_amazon', $processingRequest->getHash());
-        $this->getAccount()->deleteObjectLocks(
+        $this->getAccount()->deleteProcessingLocks(NULL, $processingRequest->getHash());
+        $this->getAccount()->deleteProcessingLocks('synchronization', $processingRequest->getHash());
+        $this->getAccount()->deleteProcessingLocks('synchronization_amazon', $processingRequest->getHash());
+        $this->getAccount()->deleteProcessingLocks(
             Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts::LOCK_ITEM_PREFIX,
             $processingRequest->getHash()
         );
@@ -265,26 +265,9 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
             $listingProductObj->addData($newData)->save();
         }
 
-        if (empty($parentIdsForProcessing)) {
-            return;
+        if (!empty($parentIdsForProcessing)) {
+            $this->processParentProcessors($parentIdsForProcessing);
         }
-
-        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $parentListingProductCollection */
-        $parentListingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
-        $parentListingProductCollection->addFieldToFilter('id', array('in' => array_unique($parentIdsForProcessing)));
-
-        $parentListingsProducts = $parentListingProductCollection->getItems();
-        if (empty($parentListingsProducts)) {
-            return;
-        }
-
-        $massProcessor = Mage::getModel(
-            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Mass'
-        );
-        $massProcessor->setListingsProducts($parentListingsProducts);
-        $massProcessor->setForceExecuting(false);
-
-        $massProcessor->execute();
     }
 
     protected function updateNotReceivedListingsProducts($receivedItems,$nextPart)
@@ -333,7 +316,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
         $collection->getSelect()->having('`api`.sku IS NULL');
 
         $tempColumns = array('main_table.id','main_table.status','main_table.listing_id',
-                             'main_table.product_id','api.sku');
+                             'main_table.product_id','second_table.is_variation_product',
+                             'second_table.variation_parent_id','api.sku');
         $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($tempColumns);
 
         /** @var $stmtTemp Zend_Db_Statement_Pdo */
@@ -341,6 +325,8 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
 
         $tempLog = Mage::getModel('M2ePro/Listing_Log');
         $tempLog->setComponentMode(Ess_M2ePro_Helper_Component_Amazon::NICK);
+
+        $parentIdsForProcessing = array();
 
         $notReceivedIds = array();
         while ($notReceivedItem = $stmtTemp->fetch()) {
@@ -370,6 +356,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
                     Ess_M2ePro_Model_Log_Abstract::TYPE_SUCCESS,
                     Ess_M2ePro_Model_Log_Abstract::PRIORITY_LOW
                 );
+
+                if (!empty($existingItem['is_variation_product']) && !empty($existingItem['variation_parent_id'])) {
+                    $parentIdsForProcessing[] = $notReceivedItem['variation_parent_id'];
+                }
             }
 
             $notReceivedIds[] = (int)$notReceivedItem['id'];
@@ -385,6 +375,10 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
         foreach ($chunckedIds as $partIds) {
             $where = '`id` IN ('.implode(',',$partIds).')';
             $connWrite->update($listingProductMainTable,$bind,$where);
+        }
+
+        if (!empty($parentIdsForProcessing)) {
+            $this->processParentProcessors($parentIdsForProcessing);
         }
     }
 
@@ -427,6 +421,30 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Defaults_UpdateListingsProducts_Re
         $stmtTemp = $connRead->query($collection->getSelect()->__toString());
 
         return $stmtTemp;
+    }
+
+    protected function processParentProcessors(array $parentIds)
+    {
+        if (empty($parentIds)) {
+            return;
+        }
+
+        /** @var Ess_M2ePro_Model_Mysql4_Listing_Product_Collection $parentListingProductCollection */
+        $parentListingProductCollection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
+        $parentListingProductCollection->addFieldToFilter('id', array('in' => array_unique($parentIds)));
+
+        $parentListingsProducts = $parentListingProductCollection->getItems();
+        if (empty($parentListingsProducts)) {
+            return;
+        }
+
+        $massProcessor = Mage::getModel(
+            'M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent_Processor_Mass'
+        );
+        $massProcessor->setListingsProducts($parentListingsProducts);
+        $massProcessor->setForceExecuting(false);
+
+        $massProcessor->execute();
     }
 
     // ########################################

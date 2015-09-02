@@ -13,6 +13,7 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationNewAmazonController
     {
         parent::_initAction();
         $this->getLayout()->getBlock('head')
+                          ->addJs('M2ePro/Wizard/Amazon/CustomHandler.js')
                           ->addJs('M2ePro/Wizard/MigrationNewAmazonHandler.js');
 
         return $this;
@@ -31,6 +32,9 @@ class Ess_M2ePro_Adminhtml_Wizard_MigrationNewAmazonController
     {
         $this->getWizardHelper()->setStatus(
             'fullAmazonCategories', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
+        );
+        $this->getWizardHelper()->setStatus(
+            'amazonShippingOverridePolicy', Ess_M2ePro_Helper_Module_Wizard::STATUS_SKIPPED
         );
 
         parent::indexAction();

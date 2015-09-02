@@ -310,7 +310,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
     /**
      * @return Ess_M2ePro_Model_Synchronization_OperationHistory
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     protected function getActualOperationHistory()
     {
@@ -319,7 +319,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
         }
 
         if (!$this->getParentOperationHistory()) {
-            throw new Exception('Parent Operation History must be specified');
+            throw new Ess_M2ePro_Model_Exception('Parent Operation History must be specified');
         }
 
         return $this->getParentOperationHistory();
@@ -327,7 +327,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
 
     /**
      * @return Ess_M2ePro_Model_Synchronization_LockItem
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     protected function getActualLockItem()
     {
@@ -336,7 +336,7 @@ abstract class Ess_M2ePro_Model_Synchronization_Task
         }
 
         if (!$this->getParentLockItem()) {
-            throw new Exception('Parent Lock Item must be specified');
+            throw new Ess_M2ePro_Model_Exception('Parent Lock Item must be specified');
         }
 
         return $this->getParentLockItem();

@@ -37,7 +37,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_ProductSearch_Grid extends M
         $data = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         $results = new Varien_Data_Collection();
-        foreach ($data as $index => $item) {
+        foreach ($data['data'] as $index => $item) {
             $temp = array(
                 'id' => $index,
                 'general_id' => isset($item['general_id']) ? $item['general_id'] : null,
@@ -226,7 +226,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_ProductSearch_Grid extends M
 </script>
 JAVASCRIPT;
 
-        return parent::_toHtml() . $javascriptsMain;
+        $searchData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
+
+        $searchParamsHtml = <<<HTML
+        <input id="buy_asin_search_type" type="hidden" value="{$searchData['type']}">
+        <input id="buy_asin_search_value" type="hidden" value="{$searchData['value']}">
+HTML;
+
+        return parent::_toHtml() . $javascriptsMain . $searchParamsHtml;
     }
 
     // ####################################

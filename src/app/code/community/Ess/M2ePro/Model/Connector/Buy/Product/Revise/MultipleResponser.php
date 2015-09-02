@@ -4,6 +4,10 @@
  * @copyright  Copyright (c) 2013 by  ESS-UA.
  */
 
+/**
+ * @method Ess_M2ePro_Model_Buy_Listing_Product_Action_Type_Revise_Response getResponseObject($listingProduct)
+ */
+
 class Ess_M2ePro_Model_Connector_Buy_Product_Revise_MultipleResponser
     extends Ess_M2ePro_Model_Connector_Buy_Product_Responser
 {
@@ -11,9 +15,7 @@ class Ess_M2ePro_Model_Connector_Buy_Product_Revise_MultipleResponser
 
     protected function getSuccessfulMessage(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
-        // M2ePro_TRANSLATIONS
-        // Item was successfully Revised
-        return 'Item was successfully Revised';
+        return $this->getResponseObject($listingProduct)->getSuccessfulMessage();
     }
 
     // ########################################

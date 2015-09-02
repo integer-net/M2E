@@ -43,16 +43,16 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
     /**
      * @param array $params
      * @param Ess_M2ePro_Model_Listing_Product[] $listingsProducts
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     public function __construct(array $params = array(), array $listingsProducts)
     {
         if (!isset($params['logs_action_id']) || !isset($params['status_changer'])) {
-            throw new Exception('Product Connector has not received some params');
+            throw new Ess_M2ePro_Model_Exception('Product Connector has not received some params');
         }
 
         if (empty($listingsProducts)) {
-            throw new Exception('Product Connector has received empty array');
+            throw new Ess_M2ePro_Model_Exception('Product Connector has received empty array');
         }
 
         /** @var Ess_M2ePro_Model_Account $account */
@@ -64,11 +64,11 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
         foreach($listingsProducts as $listingProduct) {
 
             if (!($listingProduct instanceof Ess_M2ePro_Model_Listing_Product)) {
-                throw new Exception('Product Connector has received invalid Product data type');
+                throw new Ess_M2ePro_Model_Exception('Product Connector has received invalid Product data type');
             }
 
             if ($account->getId() != $listingProduct->getListing()->getAccountId()) {
-                throw new Exception('Product Connector has received Products from different Accounts');
+                throw new Ess_M2ePro_Model_Exception('Product Connector has received Products from different Accounts');
             }
 
             $listingProductIds[] = $listingProduct->getId();
@@ -90,7 +90,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
         $actualListingsProducts = $listingProductCollection->getItems();
 
         if (empty($actualListingsProducts)) {
-            throw new Exception('All products were removed before connector processing');
+            throw new Ess_M2ePro_Model_Exception('All products were removed before connector processing');
         }
 
         foreach ($actualListingsProducts as $actualListingProduct) {
@@ -472,7 +472,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Requester
                 return 'Delete';
         }
 
-        throw new Exception('Wrong Action type');
+        throw new Ess_M2ePro_Model_Exception('Wrong Action type');
     }
 
     abstract protected function getActionType();

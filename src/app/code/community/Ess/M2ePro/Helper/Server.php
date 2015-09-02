@@ -117,14 +117,15 @@ class Ess_M2ePro_Helper_Server extends Mage_Core_Helper_Abstract
                 ->getKnowledgebaseUrl('664870-issues-with-m2e-pro-server-connection')
                 .'">here</a>';
 
-            throw new Ess_M2ePro_Model_Exception($errorMsg,
-                                                 array('curl_info' => $curlInfo, 'curl_error_number' => $errorNumber));
+            throw new Ess_M2ePro_Model_Exception_Connection($errorMsg,
+                                                            array('curl_error_number' => $errorNumber,
+                                                                  'curl_info' => $curlInfo));
         }
 
         return array(
-            'response'          => $response,
             'curl_error_number' => $errorNumber,
-            'curl_info'         => $curlInfo
+            'curl_info'         => $curlInfo,
+            'response'          => $response
         );
     }
 
@@ -166,7 +167,7 @@ class Ess_M2ePro_Helper_Server extends Mage_Core_Helper_Abstract
     private function setDefaultBaseUrlIndex($index)
     {
         Mage::helper('M2ePro/Primary')->getConfig()
-                ->getGroupValue('/server/','default_baseurl_index',$index);
+                ->setGroupValue('/server/','default_baseurl_index',$index);
     }
 
     private function setCurrentBaseUrlIndex($index)

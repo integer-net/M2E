@@ -1,3 +1,28 @@
+* 6.3.6 (r9445) (01/09/2015)
+
+* Added: [eBay] Ability to set Upload Images mode manually (Auto/Self-Hosted/EPS-hosted)
+* Added: [eBay] Up to 12 images is Self-Hosted upload images mode is used (earlier only 1)
+* Added: [eBay] Amount of images for each Variation Attribute can be selected manually
+* Added: [eBay] International Shipping Rate Table for "United States" marketplace
+* Added: [eBay] Extended Holiday Returns for "Canada (French)" marketplace
+* Added: [eBay] Freight Shipping Mode for "Canada (French)" marketplace
+* Added: [Amazon] Shipping Override Policy for each Product separately (all Marketplaces)
+* Added: [Amazon] Ability to switch Amazon Items Fulfillment mode (AFN -> MFN, MFN -> AFN)
+* Added: [Amazon] Ability to assign Magento Variational to Amazon Parent-Child Product if amount of attributes is different
+* Improvement: Many improvements of Help Blocks / Tips / Documentation links
+* Improvement: [eBay] Ability to use HTTPs protocol for Self-Hosted images
+* Improvement: [eBay] Boost of Synchronization Schedule feature performance
+* Improvement: [Amazon] Ability to filter AFN and MFN Products separately (QTY filter improvements)
+* Improvement: [Amazon/Rakuten.com] QTY attribute as source for Item Quantity
+* Fix: In some cases 3rd Party Synchronization is not working for all integrations
+* Fix: Message about extension should be updated after upgrade to the latest version
+* Fix: MySql exception "Integrity constraint violation" during customer creation for Magento Enterprise Edition
+* Fix: [Amazon] Tax percent was calculated incorrectly if order contains promotion discount
+* Fix: [Amazon] Quantity was reserved for FBA orders even if "Manage Stock" set to "No" in account settings
+* Fix: [Amazon] Wrong Status is shown for Amazon Parent Product based on Child Products Statuses
+* Fix: [Rakuten.com] Expedited Shipping doesn't work for some reasons
+* Fix: [Rakuten.com] Sometimes QTY/Price values can be wrong on Listings Grid
+
 * 6.3.5 (r9311) (09/08/2015)
 
 * Added: Hyperlinks to the certain documentation part into Help Block at the top of each Page Content

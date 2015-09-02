@@ -459,19 +459,48 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Search_Grid extends Mage_Adminht
         $productOptions = array();
 
         if ($listingProduct->isComponentModeAmazon()) {
-            if (!$listingProduct->getChildObject()->getVariationManager()->isIndividualType()) {
-                if ($listingProduct->getChildObject()->getVariationManager()->isVariationParent()) {
-                    $productOptions = $listingProduct->getChildObject()->getVariationManager()
+
+            $variationManager = $listingProduct->getChildObject()->getVariationManager();
+
+            if (!$variationManager->isIndividualType()) {
+
+                if ($variationManager->isVariationParent()) {
+
+                    $productAttributes = $listingProduct->getChildObject()->getVariationManager()
                         ->getTypeModel()->getProductAttributes();
 
+                    $virtualProductAttributes = $variationManager->getTypeModel()->getVirtualProductAttributes();
+                    $virtualChannelAttributes = $variationManager->getTypeModel()->getVirtualChannelAttributes();
+
                     $value .= '<div style="font-size: 11px; font-weight: bold; color: grey;"><br/>';
-                    $value .= implode(', ', $productOptions);
+                    $attributesStr = '';
+                    if (empty($virtualProductAttributes) && empty($virtualChannelAttributes)) {
+                        $attributesStr = implode(', ', $productAttributes);
+                    } else {
+                        foreach($productAttributes as $attribute) {
+                            if (in_array($attribute, array_keys($virtualProductAttributes))) {
+
+                                $attributesStr .= '<span style="border-bottom: 2px dotted grey">' . $attribute .
+                                    ' (' . $virtualProductAttributes[$attribute] . ')</span>, ';
+
+                            } else if (in_array($attribute, array_keys($virtualChannelAttributes))) {
+
+                                $attributesStr .= '<span>' . $attribute .
+                                    ' (' . $virtualChannelAttributes[$attribute] . ')</span>, ';
+
+                            } else {
+                                $attributesStr .= $attribute . ', ';
+                            }
+                        }
+                        $attributesStr = rtrim($attributesStr, ', ');
+                    }
+                    $value .= $attributesStr;
                     $value .= '</div>';
                 }
                 return $value;
             }
 
-            if ($listingProduct->getChildObject()->getVariationManager()->getTypeModel()->isVariationProductMatched()) {
+            if ($variationManager->getTypeModel()->isVariationProductMatched()) {
                 $productOptions = $listingProduct->getChildObject()->
                     getVariationManager()->getTypeModel()->getProductOptions();
             }

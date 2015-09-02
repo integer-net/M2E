@@ -42,4 +42,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_Tabs_Search
     }
 
     // ####################################
+
+    public function isEditMode()
+    {
+        return !!$this->getRequest()->getParam('id');
+    }
+
+    // ####################################
 }

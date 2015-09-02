@@ -135,14 +135,12 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
      */
     public function getMagentoProduct()
     {
-        if ($this->magentoProductModel) {
-            return $this->magentoProductModel;
+        if (is_null($this->magentoProductModel)) {
+            $this->magentoProductModel = Mage::getModel('M2ePro/Magento_Product_Cache');
+            $this->magentoProductModel->setProductId($this->getProductId());
         }
 
-        return $this->magentoProductModel = Mage::getModel('M2ePro/Magento_Product_Cache')
-                                                    ->setStoreId($this->getListing()->getStoreId())
-                                                    ->setProductId($this->getData('product_id'))
-                                                    ->setStatisticId($this->getId());
+        return $this->prepareMagentoProduct($this->magentoProductModel);
     }
 
     /**
@@ -150,7 +148,19 @@ class Ess_M2ePro_Model_Listing_Product extends Ess_M2ePro_Model_Component_Parent
      */
     public function setMagentoProduct(Ess_M2ePro_Model_Magento_Product_Cache $instance)
     {
-        $this->magentoProductModel = $instance;
+        $this->magentoProductModel = $this->prepareMagentoProduct($instance);
+    }
+
+    protected function prepareMagentoProduct(Ess_M2ePro_Model_Magento_Product_Cache $instance)
+    {
+        $instance->setStoreId($this->getListing()->getStoreId());
+        $instance->setStatisticId($this->getId());
+
+        if (method_exists($this->getChildObject(), 'prepareMagentoProduct')) {
+            $instance = $this->getChildObject()->prepareMagentoProduct($instance);
+        }
+
+        return $instance;
     }
 
     // ########################################

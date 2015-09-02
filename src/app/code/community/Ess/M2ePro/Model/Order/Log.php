@@ -17,7 +17,8 @@ class Ess_M2ePro_Model_Order_Log extends Mage_Core_Model_Abstract
     // ########################################
 
     public function add($componentMode, $orderId, $message, $type,
-                        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN)
+                        $initiator = Ess_M2ePro_Helper_Data::INITIATOR_UNKNOWN,
+                        array $additionalData = array())
     {
         $validTypeValues = array(
             Ess_M2ePro_Model_Log_Abstract::TYPE_ERROR,
@@ -41,11 +42,12 @@ class Ess_M2ePro_Model_Order_Log extends Mage_Core_Model_Abstract
         }
 
         $log = array(
-            'component_mode' => $componentMode,
-            'order_id'       => $orderId,
-            'message'        => $message,
-            'type'           => (int)$type,
-            'initiator'      => (int)$initiator
+            'component_mode'  => $componentMode,
+            'order_id'        => $orderId,
+            'message'         => $message,
+            'type'            => (int)$type,
+            'initiator'       => (int)$initiator,
+            'additional_data' => json_encode($additionalData)
         );
 
         $this->setId(null)

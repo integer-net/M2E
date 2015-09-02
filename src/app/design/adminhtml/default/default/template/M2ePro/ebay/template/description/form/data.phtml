@@ -109,6 +109,10 @@
             .observe('change', EbayTemplateDescriptionHandlerObj.gallery_images_change)
             .simulate('change');
 
+        $('variation_images')
+            .observe('change', EbayTemplateDescriptionHandlerObj.variation_images_change)
+            .simulate('change');
+
         $('product_details_ean',
           'product_details_upc',
           'product_details_epid',
@@ -373,7 +377,7 @@
                 <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_NONE; ?>" <?php if ($formData['gallery_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
                 <optgroup label="<?php echo Mage::helper('M2ePro')->__('Product Images'); ?>" gallery_images_mode="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_PRODUCT; ?>">
                     <option value="1" <?php if ($formData['gallery_images_limit'] == 1): echo ' selected="selected"'; endif; ?>>1</option>
-                    <?php for ($i = 2; $i <= 11; $i++): ?>
+                    <?php for ($i = 2; $i <= Ess_M2ePro_Model_Ebay_Template_Description_Source::GALLERY_IMAGES_COUNT_MAX; $i++): ?>
                         <option value="<?php echo $i; ?>" <?php if ($formData['gallery_images_limit'] == $i && $formData['gallery_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::GALLERY_IMAGES_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Up to').' '.$i; ?></option>
                     <?php endfor ?>
                 </optgroup>
@@ -411,6 +415,44 @@
                 <span><?php echo Mage::helper('M2ePro')->__(
                     'This Option only applies to Configurable Products. Allows you to have different Images for Multi-Variation Items, with changes based on the Attribute you choose.'
                 ); ?></span>
+            </p>
+        </td>
+    </tr>
+
+    <input type="hidden" id="variation_images_mode" name="description[variation_images_mode]" value="<?php echo $formData['variation_images_mode']; ?>">
+    <input type="hidden" id="variation_images_limit" name="description[variation_images_limit]" value="<?php echo $formData['variation_images_limit']; ?>">
+    <input type="hidden" id="variation_images_attribute" name="description[variation_images_attribute]" value="<?php echo $formData['variation_images_attribute']; ?>">
+
+    <tr id="variation_images_mode_tr">
+        <td class="label">
+            <label for="variation_images"><?php echo Mage::helper('M2ePro')->__('Variation Attribute Images'); ?>:</label>
+        </td>
+        <td class="value" style="width: auto;">
+            <select id="variation_images">
+                <option value="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::VARIATION_IMAGES_MODE_NONE; ?>" <?php if ($formData['variation_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::VARIATION_IMAGES_MODE_NONE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('None'); ?></option>
+                <optgroup label="<?php echo Mage::helper('M2ePro')->__('Product Images'); ?>" variation_images_mode="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::VARIATION_IMAGES_MODE_PRODUCT; ?>">
+                    <option value="1" <?php if ($formData['variation_images_limit'] == 1): echo ' selected="selected"'; endif; ?>>1</option>
+                    <?php for ($i = 2; $i <= Ess_M2ePro_Model_Ebay_Template_Description_Source::VARIATION_IMAGES_COUNT_MAX; $i++): ?>
+                        <option value="<?php echo $i; ?>" <?php if ($formData['variation_images_limit'] == $i && $formData['variation_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::VARIATION_IMAGES_MODE_PRODUCT): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__('Up to').' '.$i; ?></option>
+                    <?php endfor ?>
+                </optgroup>
+                <optgroup label="<?php echo Mage::helper('M2ePro')->__('Magento Attributes'); ?>" variation_images_mode="<?php echo Ess_M2ePro_Model_Ebay_Template_Description::VARIATION_IMAGES_MODE_ATTRIBUTE; ?>">
+                    <?php foreach($generalAttributesByTypes['text_images'] as $attribute) : ?>
+                        <option value="<?php echo $attribute['code']; ?>" <?php if ($attribute['code'] == $formData['variation_images_attribute'] && $formData['variation_images_mode'] == Ess_M2ePro_Model_Ebay_Template_Description::VARIATION_IMAGES_MODE_ATTRIBUTE): echo ' selected="selected"'; endif; ?>><?php echo Mage::helper('M2ePro')->__($attribute['label']); ?></option>
+                    <?php endforeach; ?>
+                </optgroup>
+            </select>
+            <p class="note">
+                <span>
+                    <?php echo Mage::helper('M2ePro')->__(
+                        'Allows to add Images from Product Variations. You can add up to 12 additional photos for each
+                        Variation. Please be thoughtful, as the the big number of added Images can decrease the Performance
+                        of Item Updating on eBay.</br></br>
+                        <strong>Note:</strong> Text, Multiple Select or Dropdown type Attribute can be used. The Value
+                        of Attribute must contain absolute urls. In Text type Attribute urls must be separated with comma.</br>
+                        <strong>e.g.</strong> http://mymagentostore.com/images/baseimage1.jpg, http://mymagentostore.com/images/baseimage2.jpg
+                    '); ?>
+                </span>
             </p>
         </td>
     </tr>

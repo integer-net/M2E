@@ -67,6 +67,12 @@ class Ess_M2ePro_Adminhtml_Common_TemplateController
             ));
         }
 
+        if ($type == Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Grid::TEMPLATE_SHIPPING_OVERRIDE) {
+            return $this->_redirect(
+                "*/adminhtml_common_amazon_template_shippingOverride/edit"
+            );
+        }
+
         $type = $this->prepareTemplateType($type);
 
         return $this->_redirect("*/adminhtml_common_{$channel}_template_{$type}/edit");
@@ -84,6 +90,12 @@ class Ess_M2ePro_Adminhtml_Common_TemplateController
             return $this->_redirect('*/*/index', array(
                 'channel' => $this->getRequest()->getParam('channel')
             ));
+        }
+
+        if ($type == Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Grid::TEMPLATE_SHIPPING_OVERRIDE) {
+            return $this->_redirect(
+                "*/adminhtml_common_amazon_template_shippingOverride/edit", array('id'=>$id)
+            );
         }
 
         $type = $this->prepareTemplateType($type);
@@ -118,7 +130,12 @@ class Ess_M2ePro_Adminhtml_Common_TemplateController
         $deleted = $locked = 0;
 
         foreach ($ids as $id) {
-            $template = Mage::helper('M2ePro/Component')->getUnknownObject('Template_' . $type, $id);
+            if (strtolower($type)==Ess_M2ePro_Block_Adminhtml_Common_Amazon_Template_Grid::TEMPLATE_SHIPPING_OVERRIDE) {
+                $template = Mage::getModel('M2ePro/Amazon_Template_ShippingOverride')->load($id);
+            } else {
+                $template = Mage::helper('M2ePro/Component')->getUnknownObject('Template_' . $type, $id);
+            }
+
             if ($template->isLocked()) {
                 $locked++;
             } else {

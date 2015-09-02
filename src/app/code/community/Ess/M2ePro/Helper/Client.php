@@ -22,7 +22,7 @@ class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
     {
         $domain = Mage::helper('M2ePro/Module')->getCacheConfig()->getGroupValue('/location_info/', 'domain');
         if (is_null($domain) && isset($_SERVER['HTTP_HOST'])) {
-            $domain = $_SERVER['HTTP_HOST'];
+            $domain = rtrim($_SERVER['HTTP_HOST'], '/');
         }
 
         if (!is_null($domain)) {
@@ -30,7 +30,7 @@ class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
             return strtolower(trim($domain));
         }
 
-        throw new Exception('Server domain is not defined');
+        throw new Ess_M2ePro_Model_Exception('Server domain is not defined');
     }
 
     public function getIp()
@@ -48,7 +48,7 @@ class Ess_M2ePro_Helper_Client extends Mage_Core_Helper_Abstract
             return strtolower(trim($serverIp));
         }
 
-        throw new Exception('Server IP is not defined');
+        throw new Ess_M2ePro_Model_Exception('Server IP is not defined');
     }
 
     public function getBaseDirectory()

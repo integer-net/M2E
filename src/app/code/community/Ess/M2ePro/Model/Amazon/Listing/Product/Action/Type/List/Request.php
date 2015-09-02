@@ -49,7 +49,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Request
         $data = array_merge(
             $data,
             $this->getRequestQty()->getData(),
-            $this->getRequestPrice()->getData()
+            $this->getRequestPrice()->getData(),
+            $this->getRequestShippingOverride()->getData()
         );
 
         return $data;
@@ -118,8 +119,14 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Request
             ->getTypeModel()
             ->getMatchedAttributes();
 
+        $virtualChannelAttributes = $typeModel->getParentTypeModel()->getVirtualChannelAttributes();
+
         $attributes = array();
         foreach ($typeModel->getProductOptions() as $attribute => $value) {
+            if (isset($virtualChannelAttributes[$attribute])) {
+                continue;
+            }
+
             $attributes[$matchedAttributes[$attribute]] = $value;
         }
 

@@ -242,7 +242,7 @@ class Ess_M2ePro_Adminhtml_Common_Listing_ProductAddController
         if (is_null($this->getSessionValue('current_category_id'))) {
             $currentNode = $treeBlock->getRoot()->getChildren()->getIterator()->current();
             if (!$currentNode) {
-                throw new Exception('No Categories found');
+                throw new Ess_M2ePro_Model_Exception('No Categories found');
             }
             $this->setSessionValue('current_category_id', $currentNode->getId());
         }
@@ -602,13 +602,13 @@ class Ess_M2ePro_Adminhtml_Common_Listing_ProductAddController
 
     //#############################################
 
-    /** @return Ess_M2ePro_Model_Ebay_Listing
+    /** @return Ess_M2ePro_Model_Amazon_Listing
      * @throws Exception
      */
     private function getListingFromRequest()
     {
         if (!$listingId = $this->getRequest()->getParam('id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         return Mage::helper('M2ePro/Component')->getCachedUnknownObject('Listing',$listingId)->getChildObject();

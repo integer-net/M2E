@@ -35,6 +35,8 @@ class Ess_M2ePro_Model_Magento_Customer extends Mage_Core_Model_Abstract
         $this->customer->setPassword($password);
         $this->customer->save();
 
+        $this->customer->setOrigData();
+
         // Add customer address
         // ---------------------------
         // do not replace setCustomerId with setData('customer_id', ..)

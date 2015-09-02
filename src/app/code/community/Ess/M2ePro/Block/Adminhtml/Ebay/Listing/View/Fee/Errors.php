@@ -23,7 +23,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Fee_Errors extends Mage_Admin
     public function getErrors()
     {
         if (empty($this->_data['errors']) || !is_array($this->_data['errors'])) {
-            throw new LogicException('Errors are not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Errors are not set.');
         }
 
         return $this->_data['errors'];

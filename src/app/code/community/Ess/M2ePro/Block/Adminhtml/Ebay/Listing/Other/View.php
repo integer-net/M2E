@@ -86,7 +86,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
             'Please enter correct Product ID or SKU' => $helper->__('Please enter correct Product ID or SKU')
         ));
 
-        // todo next (change)
+        // TODO NEXT (change)
         $component = Ess_M2ePro_Helper_Component_Ebay::NICK;
 
         $logViewUrl = $this->getUrl('*/adminhtml_ebay_log/listingOther', array(
@@ -206,7 +206,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Other_View extends Mage_Adminhtml_
     M2ePro.url.add({$urls});
     M2ePro.translator.add({$translations});
 
-    // todo next (change)
+    // TODO NEXT (change)
 
     M2eProEbay = {};
     M2eProEbay.url = {};

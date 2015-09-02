@@ -12,6 +12,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_TemplateDescription_Main
 
     // ####################################
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setTemplate('M2ePro/common/amazon/listing/template_description/main.phtml');
+    }
+
+    // ####################################
+
     /**
      * @param array $messages
      */
@@ -27,6 +35,8 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_TemplateDescription_Main
     {
         return $this->messages;
     }
+
+    // ####################################
 
     /**
      * @return boolean
@@ -44,12 +54,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_TemplateDescription_Main
         $this->newAsin = $newAsin;
     }
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->setTemplate('M2ePro/common/amazon/listing/template_description/main.phtml');
-    }
+    // ####################################
 
     public function getWarnings()
     {
@@ -67,4 +72,6 @@ HTML;
         }
         return $warnings;
     }
+
+    // ####################################
 }

@@ -261,12 +261,12 @@ class Ess_M2ePro_Adminhtml_Ebay_Template_DescriptionController
             array('store_id')
         );
 
-        $listingProductCollection
+        $listingProducts = $listingProductCollection
             ->addFieldToFilter('store_id', $storeId)
             ->setPageSize(100)
             ->getItems();
 
-        if (count($listingProductCollection) <= 0) {
+        if (count($listingProducts) <= 0) {
             return NULL;
         }
 

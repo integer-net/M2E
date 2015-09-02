@@ -138,8 +138,8 @@ class Ess_M2ePro_Model_Amazon_Account extends Ess_M2ePro_Model_Component_Child_A
     public function getMarketplace()
     {
         if (is_null($this->marketplaceModel)) {
-            $this->marketplaceModel = Mage::helper('M2ePro/Component')->getCachedComponentObject(
-                $this->getComponentMode(),'Marketplace',$this->getMarketplaceId()
+            $this->marketplaceModel = Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
+                'Marketplace',$this->getMarketplaceId()
             );
         }
 

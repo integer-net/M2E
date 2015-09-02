@@ -29,6 +29,7 @@ class Ess_M2ePro_Model_Mysql4_Amazon_Template_Synchronization
             'listing' => 'revise_change_listing',
             'sellingFormatTemplate' => 'revise_change_selling_format_template',
             'descriptionTemplate'   => 'revise_change_description_template',
+            'shippingOverrideTemplate' => 'revise_change_shipping_override_template'
         );
 
         $settings = $this->getEnabledReviseSettings($newData, $oldData, $settings);

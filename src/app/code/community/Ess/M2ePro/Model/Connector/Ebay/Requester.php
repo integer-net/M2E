@@ -101,7 +101,7 @@ abstract class Ess_M2ePro_Model_Connector_Ebay_Requester extends Ess_M2ePro_Mode
         }
 
         if (is_null($dateTime)) {
-            throw new Exception('eBay DateTime object is null');
+            throw new Ess_M2ePro_Model_Exception('eBay DateTime object is null');
         }
 
         return $dateTime;

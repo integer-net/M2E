@@ -8,13 +8,20 @@ class Ess_M2ePro_Helper_Module_Logger extends Mage_Core_Helper_Abstract
 {
     // ########################################
 
-    public function process($logData, $type = 'undefined', $overrideExistsLog = false)
+    public function process($logData, $type = NULL, $sendToServer = true)
     {
         try {
 
-            $logData = $this->prepareLogMessage($logData, $type);
-            $this->log($logData, $type, $overrideExistsLog);
+            $this->log($logData, $type);
 
+            if (!$sendToServer || !(bool)(int)Mage::helper('M2ePro/Module')->getConfig()
+                                                  ->getGroupValue('/debug/logging/', 'send_to_server')) {
+                return;
+            }
+
+            $type = is_null($type) ? 'undefined' : $type;
+
+            $logData = $this->prepareLogMessage($logData, $type);
             $logData .= $this->getCurrentUserActionInfo();
             $logData .= Mage::helper('M2ePro/Module_Support_Form')->getSummaryInfo();
 
@@ -37,16 +44,15 @@ class Ess_M2ePro_Helper_Module_Logger extends Mage_Core_Helper_Abstract
         return $logData;
     }
 
-    private function log($logMessage, $type, $overrideExistsLog = false)
+    private function log($logData, $type)
     {
-        $varDir = new Ess_M2ePro_Model_VariablesDir(array('child_folder' => 'logs'));
-        $varDir->create();
+        /** @var Ess_M2ePro_Model_Log_System $log */
+        $log = Mage::getModel('M2ePro/Log_System');
 
-        $fileName = $varDir->getPath().$type.'.log';
+        $log->setType(is_null($type) ? 'Logging' : "{$type} Logging");
+        $log->setDescription(is_string($logData) ? $logData : print_r($logData, true));
 
-        $overrideExistsLog
-            ? file_put_contents($fileName, $logMessage)
-            : file_put_contents($fileName, $logMessage, FILE_APPEND);
+        $log->save();
     }
 
     // ########################################

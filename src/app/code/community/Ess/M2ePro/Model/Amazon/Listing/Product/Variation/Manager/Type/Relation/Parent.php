@@ -38,6 +38,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         $collection = Mage::helper('M2ePro/Component_Amazon')->getCollection('Listing_Product');
         $collection->addFieldToFilter('variation_parent_id', $this->getListingProduct()->getId());
 
+        /** @var Ess_M2ePro_Model_Listing_Product[] $childListingsProducts */
         $childListingsProducts = $collection->getItems();
 
         if (!$this->isCacheEnabled()) {
@@ -62,49 +63,169 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     // ########################################
 
+    public function isActualProductAttributes()
+    {
+        $productAttributes = array_map('strtolower', (array)$this->getProductAttributes());
+        $magentoAttributes = array_map('strtolower', (array)$this->getMagentoAttributes());
+
+        sort($productAttributes);
+        sort($magentoAttributes);
+
+        return $productAttributes == $magentoAttributes;
+    }
+
+    public function isActualRealProductAttributes()
+    {
+        $realProductAttributes = array_map('strtolower', (array)$this->getRealProductAttributes());
+        $realMagentoAttributes = array_map('strtolower', (array)$this->getRealMagentoAttributes());
+
+        sort($realProductAttributes);
+        sort($realMagentoAttributes);
+
+        return $realProductAttributes == $realMagentoAttributes;
+    }
+
+    // ########################################
+
+    public function getProductAttributes()
+    {
+        return array_merge($this->getRealProductAttributes(), array_keys($this->getVirtualProductAttributes()));
+    }
+
+    public function getRealProductAttributes()
+    {
+        return parent::getProductAttributes();
+    }
+
+    // ########################################
+
+    public function resetProductAttributes($save = true)
+    {
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_product_attributes', $this->getRealMagentoAttributes()
+        );
+
+        $this->setVirtualProductAttributes(array(), false);
+        $this->setVirtualChannelAttributes(array(), false);
+
+        $this->restoreAllRemovedProductOptions(false);
+
+        $save && $this->getListingProduct()->save();
+    }
+
+    // ########################################
+
     public function hasChannelTheme()
     {
         return (bool)$this->getChannelTheme();
     }
 
-    public function getChannelTheme()
+    public function isActualChannelTheme()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        return !empty($additionalData['variation_channel_theme']) ?
-                      $additionalData['variation_channel_theme'] : NULL;
-    }
-
-    // ----------------------------------------
-
-    public function isChannelThemeSetManually()
-    {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-
-        if (!isset($additionalData['is_variation_channel_theme_set_manually'])) {
+        if (!$this->hasChannelTheme()) {
             return false;
         }
 
-        return (bool)$additionalData['is_variation_channel_theme_set_manually'];
+        $themeAttributes = Mage::getModel('M2ePro/Amazon_Marketplace_Details')
+            ->setMarketplaceId($this->getListingProduct()->getMarketplace()->getId())
+            ->getVariationThemeAttributes(
+                $this->getAmazonListingProduct()->getAmazonDescriptionTemplate()->getProductDataNick(),
+                $this->getChannelTheme()
+            );
+
+        $channelAttributes = $this->getRealChannelAttributes();
+
+        sort($themeAttributes);
+        sort($channelAttributes);
+
+        if ($this->getAmazonListingProduct()->getGeneralId() && $themeAttributes != $channelAttributes) {
+            return false;
+        }
+
+        $isThemeSetManually = $this->getListingProduct()->getSetting(
+            'additional_data', 'is_variation_channel_theme_set_manually', false
+        );
+
+        if ($isThemeSetManually) {
+            return true;
+        }
+
+        $themeAttributesSnapshot = $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_channel_theme_product_attributes_snapshot', array()
+        );
+
+        $magentoAttributes = $this->getMagentoAttributes();
+
+        sort($magentoAttributes);
+        sort($themeAttributesSnapshot);
+
+        return $themeAttributesSnapshot == $magentoAttributes;
     }
 
-    public function setIsChannelThemeSetManually($value = false, $save = true)
+    public function getChannelTheme()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['is_variation_channel_theme_set_manually'] = (bool)$value;
-
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
-        $save && $this->getListingProduct()->save();
+        return $this->getListingProduct()->getSetting('additional_data', 'variation_channel_theme', null);
     }
 
     // ----------------------------------------
 
-    public function setChannelTheme($value, $save = true)
+    public function setChannelTheme($value, $isManually = false, $save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_channel_theme'] = $value;
+        $this->getListingProduct()->setSetting('additional_data', 'variation_channel_theme', $value);
 
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'is_variation_channel_theme_set_manually', $isManually
+        );
+
+        if (!$isManually && !empty($value)) {
+            $this->getListingProduct()->setSetting(
+                'additional_data', 'variation_channel_theme_product_attributes_snapshot', $this->getMagentoAttributes()
+            );
+        } else {
+            $this->getListingProduct()->setSetting(
+                'additional_data', 'variation_channel_theme_product_attributes_snapshot', array()
+            );
+        }
+
+        $this->setVirtualProductAttributes(array(), false);
+        $this->setVirtualChannelAttributes(array(), false);
+
         $save && $this->getListingProduct()->save();
+    }
+
+    public function resetChannelTheme($save = true)
+    {
+        $this->setChannelTheme(null, false, $save);
+    }
+
+    // ########################################
+
+    public function getChannelAttributes()
+    {
+        if ($this->getAmazonListingProduct()->getGeneralId()) {
+            return array_keys($this->getChannelAttributesSets());
+        }
+
+        if ($this->hasChannelTheme()) {
+            $marketplaceDetails = Mage::getModel('M2ePro/Amazon_Marketplace_Details');
+            $marketplaceDetails->setMarketplaceId($this->getListingProduct()->getListing()->getMarketplaceId());
+
+            return $marketplaceDetails->getVariationThemeAttributes(
+                $this->getAmazonListingProduct()->getAmazonDescriptionTemplate()->getProductDataNick(),
+                $this->getChannelTheme()
+            );
+        }
+
+        return array();
+    }
+
+    public function getRealChannelAttributes()
+    {
+        if ($this->getAmazonListingProduct()->getGeneralId()) {
+            return array_keys($this->getRealChannelAttributesSets());
+        }
+
+        return $this->getChannelAttributes();
     }
 
     // ########################################
@@ -116,43 +237,220 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     public function getMatchedAttributes()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
+        $matchedAttributes = $this->getRealMatchedAttributes();
+        if (empty($matchedAttributes)) {
+            return array();
+        }
 
-        if (empty($additionalData['variation_matched_attributes'])) {
+        foreach ($this->getVirtualProductAttributes() as $attribute => $value) {
+            $matchedAttributes[$attribute] = $attribute;
+        }
+
+        foreach ($this->getVirtualChannelAttributes() as $attribute => $value) {
+            $matchedAttributes[$attribute] = $attribute;
+        }
+
+        return $matchedAttributes;
+    }
+
+    public function getRealMatchedAttributes()
+    {
+        $matchedAttributes = $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_matched_attributes', null
+        );
+
+        if (empty($matchedAttributes)) {
             return NULL;
         }
 
-        ksort($additionalData['variation_matched_attributes']);
+        ksort($matchedAttributes);
 
-        return $additionalData['variation_matched_attributes'];
+        return $matchedAttributes;
     }
 
     // ----------------------------------------
 
     public function setMatchedAttributes(array $matchedAttributes, $save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_matched_attributes'] = $matchedAttributes;
+        foreach ($this->getVirtualProductAttributes() as $attribute => $value) {
+            unset($matchedAttributes[$attribute]);
+        }
 
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        foreach ($this->getVirtualChannelAttributes() as $attribute => $value) {
+            unset($matchedAttributes[array_search($attribute, $matchedAttributes)]);
+        }
+
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_matched_attributes', $matchedAttributes
+        );
+
         $save && $this->getListingProduct()->save();
+    }
+
+    // ########################################
+
+    public function getVirtualProductAttributes()
+    {
+        return $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_virtual_product_attributes', array()
+        );
+    }
+
+    public function setVirtualProductAttributes(array $attributes, $save = true)
+    {
+        if (array_intersect(array_keys($attributes), $this->getRealProductAttributes())) {
+            throw new Ess_M2ePro_Model_Exception_Logic('Virtual product attributes are intersect with real attributes');
+        }
+
+        if (!empty($attributes)) {
+            $this->setVirtualChannelAttributes(array(), false);
+        }
+
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_virtual_product_attributes', $attributes
+        );
+
+        $save && $this->getListingProduct()->save();
+    }
+
+    public function isActualVirtualProductAttributes()
+    {
+        if (!$this->getVirtualProductAttributes()) {
+            return true;
+        }
+
+        if ($this->getAmazonListingProduct()->getGeneralId()) {
+            $channelAttributesSets = $this->getRealChannelAttributesSets();
+
+            foreach ($this->getVirtualProductAttributes() as $attribute => $value) {
+                if (!isset($channelAttributesSets[$attribute])) {
+                    return false;
+                }
+
+                $channelAttributeValues = $channelAttributesSets[$attribute];
+                if (!in_array($value, $channelAttributeValues) && !empty($channelAttributeValues)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if ($this->getChannelTheme()) {
+            $marketplaceDetails = Mage::getModel('M2ePro/Amazon_Marketplace_Details');
+            $marketplaceDetails->setMarketplaceId($this->getListingProduct()->getListing()->getMarketplaceId());
+
+            $themeAttributes = $marketplaceDetails->getVariationThemeAttributes(
+                $this->getAmazonListingProduct()->getAmazonDescriptionTemplate()->getProductDataNick(),
+                $this->getChannelTheme()
+            );
+
+            $virtualProductAttributes = array_keys($this->getVirtualProductAttributes());
+
+            return !array_diff($virtualProductAttributes, $themeAttributes);
+        }
+
+        return false;
+    }
+
+    // ----------------------------------------
+
+    public function getVirtualChannelAttributes()
+    {
+        return $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_virtual_channel_attributes', array()
+        );
+    }
+
+    public function setVirtualChannelAttributes(array $attributes, $save = true)
+    {
+        if (array_intersect(array_keys($attributes), $this->getRealChannelAttributes())) {
+            throw new Ess_M2ePro_Model_Exception_Logic('Virtual channel attributes are intersect with real attributes');
+        }
+
+        if (!empty($attributes)) {
+            $this->setVirtualProductAttributes(array(), false);
+        }
+
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_virtual_channel_attributes', $attributes
+        );
+
+        $save && $this->getListingProduct()->save();
+    }
+
+    public function isActualVirtualChannelAttributes()
+    {
+        if (!$this->getVirtualChannelAttributes()) {
+            return true;
+        }
+
+        $magentoVariations = $this->getRealMagentoVariations();
+        $magentoVariationsSet = $magentoVariations['set'];
+
+        foreach ($this->getVirtualChannelAttributes() as $attribute => $value) {
+            if (!isset($magentoVariationsSet[$attribute])) {
+                return false;
+            }
+
+            $productAttributeValues = $magentoVariationsSet[$attribute];
+            if (!in_array($value, $productAttributeValues)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // ########################################
 
     public function getChannelAttributesSets()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        return !empty($additionalData['variation_channel_attributes_sets']) ?
-                      $additionalData['variation_channel_attributes_sets'] : NULL;
+        $attributesSets = $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_channel_attributes_sets', null
+        );
+
+        if (empty($attributesSets)) {
+            return null;
+        }
+
+        foreach ($this->getVirtualChannelAttributes() as $virtualAttribute => $virtualValue) {
+            $attributesSets[$virtualAttribute] = array($virtualValue);
+        }
+
+        $virtualProductAttributes = $this->getVirtualProductAttributes();
+
+        if (!empty($virtualProductAttributes)) {
+            foreach ($attributesSets as $attribute => $values) {
+                if (!isset($virtualProductAttributes[$attribute])) {
+                    continue;
+                }
+
+                $virtualValue = $virtualProductAttributes[$attribute];
+                if (!in_array($virtualValue, $values)) {
+                    $attributesSets[$attribute] = array();
+                    continue;
+                }
+
+                $attributesSets[$attribute] = array($virtualValue);
+            }
+        }
+
+        return $attributesSets;
+    }
+
+    public function getRealChannelAttributesSets()
+    {
+        return $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_channel_attributes_sets', null
+        );
     }
 
     public function setChannelAttributesSets(array $channelAttributesSets, $save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_channel_attributes_sets'] = $channelAttributesSets;
-
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_channel_attributes_sets', $channelAttributesSets
+        );
         $save && $this->getListingProduct()->save();
     }
 
@@ -160,9 +458,47 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     public function getChannelVariations()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        return !empty($additionalData['variation_channel_variations']) ?
-               $additionalData['variation_channel_variations'] : NULL;
+        $channelVariations = $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_channel_variations', null
+        );
+
+        if (empty($channelVariations)) {
+            return null;
+        }
+
+        $virtualChannelAttributes = $this->getVirtualChannelAttributes();
+        if (!empty($virtualChannelAttributes)) {
+            foreach ($channelVariations as $generalId => $channelOptions) {
+                $channelVariations[$generalId] = $channelOptions + $virtualChannelAttributes;
+            }
+        }
+
+        $virtualProductAttributes = $this->getVirtualProductAttributes();
+        if (!empty($virtualProductAttributes)) {
+            foreach ($channelVariations as $generalId => $channelOptions) {
+                foreach ($channelOptions as $attribute => $value) {
+                    if (!isset($virtualProductAttributes[$attribute])) {
+                        continue;
+                    }
+
+                    if ($virtualProductAttributes[$attribute] == $value) {
+                        continue;
+                    }
+
+                    unset($channelVariations[$generalId]);
+                    break;
+                }
+            }
+        }
+
+        return $channelVariations;
+    }
+
+    public function getRealChannelVariations()
+    {
+        return $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_channel_variations', null
+        );
     }
 
     public function getChannelVariationGeneralId(array $options)
@@ -178,10 +514,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     public function setChannelVariations(array $channelVariations, $save = true)
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_channel_variations'] = $channelVariations;
-
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setSetting('additional_data', 'variation_channel_variations', $channelVariations);
         $save && $this->getListingProduct()->save();
     }
 
@@ -189,9 +522,9 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
     public function getRemovedProductOptions()
     {
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        return !empty($additionalData['variation_removed_product_variations']) ?
-               $additionalData['variation_removed_product_variations'] : array();
+        return $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_removed_product_variations', array()
+        );
     }
 
     public function isProductsOptionsRemoved(array $productOptions)
@@ -213,15 +546,15 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             return;
         }
 
-        $additionalData = $this->getListingProduct()->getAdditionalData();
+        $removedProductOptions = $this->getListingProduct()->getSetting(
+            'additional_data', 'variation_removed_product_variations', array()
+        );
 
-        if (!isset($additionalData['variation_removed_product_variations'])) {
-            $additionalData['variation_removed_product_variations'] = array();
-        }
+        $removedProductOptions[] = $productOptions;
 
-        $additionalData['variation_removed_product_variations'][] = $productOptions;
-
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_removed_product_variations', $removedProductOptions
+        );
         $save && $this->getListingProduct()->save();
     }
 
@@ -242,10 +575,17 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             break;
         }
 
-        $additionalData = $this->getListingProduct()->getAdditionalData();
-        $additionalData['variation_removed_product_variations'] = $removedProductOptions;
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_removed_product_variations', $removedProductOptions
+        );
+        $save && $this->getListingProduct()->save();
+    }
 
-        $this->getListingProduct()->setSettings('additional_data', $additionalData);
+    public function restoreAllRemovedProductOptions($save = true)
+    {
+        $this->getListingProduct()->setSetting(
+            'additional_data', 'variation_removed_product_variations', array()
+        );
         $save && $this->getListingProduct()->save();
     }
 
@@ -256,8 +596,6 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         $usedVariations = array();
 
         foreach ($this->getChildListingsProducts() as $childListingProduct) {
-            /** @var Ess_M2ePro_Model_Listing_Product $childListingProduct */
-
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Child $childTypeModel */
             $childTypeModel = $childListingProduct->getChildObject()->getVariationManager()->getTypeModel();
 
@@ -393,7 +731,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             'status'     => Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED,
             'general_id' => $generalId,
             'is_general_id_owner' => $this->getAmazonListingProduct()->isGeneralIdOwner(),
-            'status_changer'   => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN,
+            'status_changer'      => Ess_M2ePro_Model_Listing_Product::STATUS_CHANGER_UNKNOWN,
             'is_variation_product'    => 1,
             'is_variation_parent'     => 0,
             'variation_parent_id'     => $this->getListingProduct()->getId(),
@@ -457,8 +795,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
         unset($additionalData['variation_channel_theme']);
         unset($additionalData['is_variation_channel_theme_set_manually']);
+        unset($additionalData['variation_channel_theme_product_attributes_snapshot']);
 
         unset($additionalData['variation_matched_attributes']);
+        unset($additionalData['variation_virtual_product_attributes']);
+        unset($additionalData['variation_virtual_channel_attributes']);
         unset($additionalData['variation_channel_attributes_sets']);
         unset($additionalData['variation_channel_variations']);
         unset($additionalData['variation_removed_product_variations']);
@@ -467,18 +808,37 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
         $this->getListingProduct()->setData('variation_parent_need_processor', 0);
         $this->getListingProduct()->save();
 
-        foreach ($this->getChildListingsProducts() as $child) {
-
-            /** @var $child Ess_M2ePro_Model_Listing_Product */
+        foreach ($this->getChildListingsProducts() as $childListingProduct) {
 
             /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager $childVariationManager */
-            $childVariationManager = $child->getChildObject()->getVariationManager();
+            $childVariationManager = $childListingProduct->getChildObject()->getVariationManager();
 
             $childVariationManager->getTypeModel()->unsetChannelVariation();
             $childVariationManager->setIndividualType();
 
-            $child->save();
+            $childListingProduct->save();
         }
+    }
+
+    // ########################################
+
+    public function getRealMagentoAttributes()
+    {
+        $magentoVariations = $this->getRealMagentoVariations();
+        return array_keys($magentoVariations['set']);
+    }
+
+    public function getRealMagentoVariations()
+    {
+        $this->getMagentoProduct()->setIgnoreVariationVirtualAttributes(true);
+        $this->getMagentoProduct()->setIgnoreVariationFilterAttributes(true);
+
+        $magentoVariations = $this->getMagentoProduct()->getVariationInstance()->getVariationsTypeStandard();
+
+        $this->getMagentoProduct()->setIgnoreVariationVirtualAttributes(false);
+        $this->getMagentoProduct()->setIgnoreVariationFilterAttributes(false);
+
+        return $magentoVariations;
     }
 
     // ########################################

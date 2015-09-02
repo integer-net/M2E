@@ -23,6 +23,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Response
         $variationManager = $this->getAmazonListingProduct()->getVariationManager();
 
         if (!$variationManager->isRelationParentType()) {
+
             $data['is_afn_channel'] = Ess_M2ePro_Model_Amazon_Listing_Product::IS_AFN_CHANNEL_NO;
 
             $data = $this->appendQtyValues($data);
@@ -94,31 +95,29 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Response
             return;
         }
 
-        $channelOptions = $this->getRequestData()->getVariationAttributes();
+        $realChannelOptions = $this->getRequestData()->getVariationAttributes();
 
-        // set child product options
-        // -------------------
-        $typeModel->setChannelVariation($channelOptions);
-        // -------------------
+        $parentTypeModel = $typeModel->getParentTypeModel();
 
-        $parentListingProduct = $typeModel->getParentListingProduct();
-
-        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent $parentTypeModel */
-        $parentTypeModel = $parentListingProduct->getChildObject()
-            ->getVariationManager()
-            ->getTypeModel();
+        if ($parentTypeModel->getVirtualChannelAttributes()) {
+            $typeModel->setChannelVariation(
+                array_merge($realChannelOptions, $parentTypeModel->getVirtualChannelAttributes())
+            );
+        } else {
+            $typeModel->setChannelVariation($realChannelOptions);
+        }
 
         // add child variation to parent
         // -------------------
-        $channelVariations = (array)$parentTypeModel->getChannelVariations();
-        $channelVariations[$generalId] = $channelOptions;
+        $channelVariations = (array)$parentTypeModel->getRealChannelVariations();
+        $channelVariations[$generalId] = $realChannelOptions;
         $parentTypeModel->setChannelVariations($channelVariations, false);
         // -------------------
 
         // update parent attributes sets
         // -------------------
-        $channelAttributesSets = $parentTypeModel->getChannelAttributesSets();
-        foreach ($channelOptions as $attribute => $value) {
+        $channelAttributesSets = $parentTypeModel->getRealChannelAttributesSets();
+        foreach ($realChannelOptions as $attribute => $value) {
             if (!isset($channelAttributesSets[$attribute])) {
                 $channelAttributesSets[$attribute] = array();
             }
@@ -132,7 +131,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Action_Type_List_Response
         $parentTypeModel->setChannelAttributesSets($channelAttributesSets, false);
         // -------------------
 
-        $parentListingProduct->save();
+        $typeModel->getParentListingProduct()->save();
     }
 
     // ########################################

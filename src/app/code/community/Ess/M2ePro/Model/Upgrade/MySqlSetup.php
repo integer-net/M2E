@@ -12,6 +12,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
     public function endSetup()
     {
+        $this->resetServicingData();
         $this->removeConfigDuplicates();
         Mage::helper('M2ePro/Module')->clearCache();
         return parent::endSetup();
@@ -88,7 +89,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
      * @param $tableName
      * @return Ess_M2ePro_Model_Upgrade_Modifier_Config
      */
-    // todo next
+    // TODO NEXT (rename getConfigModifier)
     public function getConfigUpdater($tableName)
     {
         return $this->getModifier($tableName, 'config');
@@ -118,6 +119,11 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
     //####################################
 
+    public function generateRandomHash()
+    {
+        return sha1(microtime(1));
+    }
+
     public function removeConfigDuplicates()
     {
         $tables = $this->getTablesObject()->getAllHistoryConfigEntities();
@@ -125,7 +131,7 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
 
         foreach ($tables as $tableName) {
 
-            // todo next
+            // TODO NEXT (move to config modifier)
             if (!in_array($tableName, $connection->listTables())) {
                 return;
             }
@@ -209,11 +215,17 @@ class Ess_M2ePro_Model_Upgrade_MySqlSetup extends Mage_Core_Model_Resource_Setup
         defined('COMPILER_INCLUDE_PATH') && Mage::getModel('compiler/process')->run();
     }
 
-    //####################################
-
-    public function generateRandomHash()
+    private function resetServicingData()
     {
-        return sha1(microtime(1));
+        $connection = $this->getConnection();
+        $tableName = $this->getTable('m2epro_cache_config');
+
+        $connection->update($tableName, array('value' => NULL),
+            array(
+                '`group` = ?' => '/servicing/',
+                '`key` = ?' => 'last_update_time'
+            )
+        );
     }
 
     //####################################

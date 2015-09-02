@@ -23,7 +23,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_View_Fee_Details extends Mage_Admi
     public function getFees()
     {
         if (empty($this->_data['fees']) || !is_array($this->_data['fees'])) {
-            throw new LogicException('Fees are not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Fees are not set.');
         }
 
         $preparedData = array();

@@ -28,14 +28,14 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
      * Create rule instance from serialized array
      *
      * @param string $serialized
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      *
      */
     public function loadFromSerialized($serialized)
     {
         $prefix = $this->getPrefix();
         if (is_null($prefix)) {
-            throw new Exception('Prefix must be specified before.');
+            throw new Ess_M2ePro_Model_Exception('Prefix must be specified before.');
         }
 
         $this->_conditions = $this->getConditionInstance($prefix);
@@ -52,14 +52,14 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
      * Create rule instance form post array
      *
      * @param array $post
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      *
      */
     public function loadFromPost(array $post)
     {
         $prefix = $this->getPrefix();
         if (is_null($prefix)) {
-            throw new Exception('Prefix must be specified before.');
+            throw new Ess_M2ePro_Model_Exception('Prefix must be specified before.');
         }
 
         $this->loadFromSerialized($this->getSerializedFromPost($post, $prefix));
@@ -72,14 +72,14 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
      *
      * @param array $post
      * @return string
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      *
      */
     public function getSerializedFromPost(array $post)
     {
         $prefix = $this->getPrefix();
         if (is_null($prefix)) {
-            throw new Exception('Prefix must be specified before.');
+            throw new Ess_M2ePro_Model_Exception('Prefix must be specified before.');
         }
 
         $conditionsArray = $this->_convertFlatToRecursive($post['rule'][$prefix], $prefix);
@@ -154,14 +154,14 @@ Class Ess_M2ePro_Model_Magento_Product_Rule extends Ess_M2ePro_Model_Abstract
      * Get condition instance
      *
      * @return Ess_M2ePro_Model_Magento_Product_Rule_Condition_Combine
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      *
      */
     public function getConditions()
     {
         $prefix = $this->getPrefix();
         if (is_null($prefix)) {
-            throw new Exception('Prefix must be specified before.');
+            throw new Ess_M2ePro_Model_Exception('Prefix must be specified before.');
         }
 
         if (!is_null($this->_conditions)) {

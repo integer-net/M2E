@@ -98,6 +98,10 @@ class Ess_M2ePro_Model_Mysql4_Listing_Product_Variation
         $result = array();
 
         foreach ($select->query()->fetchAll() as $value) {
+            if (empty($value['product_id'])) {
+                continue;
+            }
+
             $result[$value['variation_id']][] = $value['product_id'];
         }
 

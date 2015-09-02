@@ -13,7 +13,7 @@ class Ess_M2ePro_Block_Adminhtml_Widget_Button_DropDown extends Ess_M2ePro_Block
     public function getTargetCssClass()
     {
         if (empty($this->_data['target_css_class'])) {
-            throw new LogicException('Target CSS Class is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Target CSS Class is not set.');
         }
 
         return $this->_data['target_css_class'];
@@ -53,7 +53,7 @@ HTML;
     private function getItems()
     {
         if (empty($this->_data['items']) || !is_array($this->_data['items'])) {
-            throw new LogicException('Items are not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Items are not set.');
         }
 
         return $this->_data['items'];

@@ -63,7 +63,7 @@ class Ess_M2ePro_Model_Order_Reserve
     public function place()
     {
         if ($this->isPlaced()) {
-            throw new LogicException('QTY is already reserved.');
+            throw new Ess_M2ePro_Model_Exception_Logic('QTY is already reserved.');
         }
 
         $this->order->associateWithStore(false);
@@ -87,7 +87,7 @@ class Ess_M2ePro_Model_Order_Reserve
     public function release()
     {
         if ($this->isReleased()) {
-            throw new LogicException('QTY is already released.');
+            throw new Ess_M2ePro_Model_Exception_Logic('QTY is already released.');
         }
 
         if (!$this->isPlaced()) {
@@ -112,7 +112,7 @@ class Ess_M2ePro_Model_Order_Reserve
     public function cancel()
     {
         if ($this->isCanceled()) {
-            throw new LogicException('QTY reserve is already canceled.');
+            throw new Ess_M2ePro_Model_Exception_Logic('QTY reserve is already canceled.');
         }
 
         if (!$this->isPlaced()) {
@@ -208,12 +208,13 @@ class Ess_M2ePro_Model_Order_Reserve
 
         if ($productsExistCount == 0 && $productsDeletedCount == 0) {
             $this->order->setData('reservation_state', self::STATE_UNKNOWN)->save();
-            throw new LogicException('The Order Item(s) was not Mapped to Magento Product(s) or Mapped incorrect.');
+            throw new Ess_M2ePro_Model_Exception_Logic('The Order Item(s) was not Mapped to Magento Product(s) or
+                Mapped incorrect.');
         }
 
         if ($productsExistCount == 0) {
             $this->order->setData('reservation_state', self::STATE_UNKNOWN)->save();
-            throw new LogicException('Product(s) does not exist.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Product(s) does not exist.');
         }
 
         if ($productsDeletedCount > 0) {

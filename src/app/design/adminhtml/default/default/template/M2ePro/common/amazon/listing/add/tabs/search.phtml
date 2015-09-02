@@ -1,3 +1,6 @@
+<?php $url = $this->isEditMode() ? Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Edit+Search+Settings') :
+    Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Step+3%3A+Search+Settings');
+?>
 <div id="block_notice_amazon_listing_general_search" class="block_notices_module" title="<?php echo Mage::helper('M2ePro')->__('Search Settings'); ?>">
     <?php echo Mage::helper('M2ePro')->__('In this Section you can specify the sources from which the values for ASIN/ISBN and UPC/EAN will be taken in case you have those for your Items. <br/><br/>
     These Settings will be used in two cases:
@@ -17,20 +20,19 @@
         <li>if no result by UPC/EAN parameter, then additional search by Magento Product Name is performed. (if enabled).</li>
     </ul>
     </br>
-    More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.',
-    Mage::helper('M2ePro/Module_Support')->getDocumentationUrl(Ess_M2ePro_Helper_Component_Amazon::NICK, 'Edit+Search+Settings')
+    More detailed information about ability to work with this Page you can find <a href="%url%" target="_blank">here</a>.', $url
     ); ?>
 </div>
 
 <?php
 
-    $showWarning = false;
-    /** @var Ess_M2ePro_Helper_Magento_Attribute $magentoAttributeHelper */
-    $magentoAttributeHelper = Mage::helper('M2ePro/Magento_Attribute');
+$showWarning = false;
+/** @var Ess_M2ePro_Helper_Magento_Attribute $magentoAttributeHelper */
+$magentoAttributeHelper = Mage::helper('M2ePro/Magento_Attribute');
 
-    $attributesByInputTypes = array(
-        'text' => $magentoAttributeHelper->filterByInputTypes($this->getData('general_attributes'), array('text')),
-    );
+$attributesByInputTypes = array(
+    'text' => $magentoAttributeHelper->filterByInputTypes($this->getData('general_attributes'), array('text')),
+);
 
 ?>
 

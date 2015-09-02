@@ -452,7 +452,7 @@ abstract class Ess_M2ePro_Model_Connector_Buy_Product_Responser
                 return 'Delete';
         }
 
-        throw new Exception('Wrong Action type');
+        throw new Ess_M2ePro_Model_Exception('Wrong Action type');
     }
 
     // ########################################

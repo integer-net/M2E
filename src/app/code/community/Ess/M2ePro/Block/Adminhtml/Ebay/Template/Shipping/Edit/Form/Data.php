@@ -29,14 +29,14 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Template_Shipping_Edit_Form_Data extends M
 
     /**
      * @return Ess_M2ePro_Model_Marketplace
-     * @throws LogicException
+     * @throws Ess_M2ePro_Model_Exception_Logic
      */
     public function getMarketplace()
     {
         $marketplace = Mage::helper('M2ePro/Data_Global')->getValue('ebay_marketplace');
 
         if (!$marketplace instanceof Ess_M2ePro_Model_Marketplace) {
-            throw new LogicException('Marketplace is required for editing Shipping Policy.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Marketplace is required for editing Shipping Policy.');
         }
 
         return $marketplace;

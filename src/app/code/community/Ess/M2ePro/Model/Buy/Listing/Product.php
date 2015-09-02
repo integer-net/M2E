@@ -135,9 +135,7 @@ class Ess_M2ePro_Model_Buy_Listing_Product extends Ess_M2ePro_Model_Component_Ch
     public function getNewProductTemplate()
     {
         return Mage::helper('M2ePro')->getCachedObject(
-            'Buy_Template_NewProduct',
-            $this->getData('template_new_product_id'),NULL,
-            array('template')
+            'Buy_Template_NewProduct',$this->getTemplateNewProductId(),NULL,array('template')
         );
     }
 

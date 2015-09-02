@@ -158,6 +158,18 @@ class Ess_M2ePro_Model_Ebay_Template_Description_Builder
             $prepared['gallery_images_attribute'] = $data['gallery_images_attribute'];
         }
 
+        if (isset($data['variation_images_mode'])) {
+            $prepared['variation_images_mode'] = (int)$data['variation_images_mode'];
+        }
+
+        if (isset($data['variation_images_limit'])) {
+            $prepared['variation_images_limit'] = (int)$data['variation_images_limit'];
+        }
+
+        if (isset($data['variation_images_attribute'])) {
+            $prepared['variation_images_attribute'] = $data['variation_images_attribute'];
+        }
+
         if (isset($data['reserve_price_custom_attribute'])) {
             $prepared['reserve_price_custom_attribute'] = $data['reserve_price_custom_attribute'];
         }

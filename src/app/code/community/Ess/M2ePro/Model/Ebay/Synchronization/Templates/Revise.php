@@ -316,7 +316,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
             $attributesForProductChange = array_merge(
                 $attributesForProductChange,
                 $template->getImageMainAttributes(),
-                $template->getGalleryImagesAttributes()
+                $template->getGalleryImagesAttributes(),
+                $template->getVariationImagesAttributes()
             );
         }
 
@@ -332,7 +333,8 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Templates_Revise
 
             $imagesAttributes = array_merge(
                 $ebayListingProduct->getEbayDescriptionTemplate()->getImageMainAttributes(),
-                $ebayListingProduct->getEbayDescriptionTemplate()->getGalleryImagesAttributes()
+                $ebayListingProduct->getEbayDescriptionTemplate()->getGalleryImagesAttributes(),
+                $ebayListingProduct->getEbayDescriptionTemplate()->getVariationImagesAttributes()
             );
 
             if (!in_array($listingProduct->getData('changed_attribute'), $imagesAttributes)) {

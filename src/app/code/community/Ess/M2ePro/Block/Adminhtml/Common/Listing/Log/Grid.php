@@ -27,6 +27,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Listing_Log_Grid extends Ess_M2ePro_Bloc
 
             $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_PRODUCT_FROM_COMPONENT] = '';
             $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_DELETE_AND_REMOVE_PRODUCT] = '';
+
+            $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_SWITCH_TO_AFN_ON_COMPONENT] = '';
+            $excludeActions[Ess_M2ePro_Model_Listing_Log::ACTION_SWITCH_TO_MFN_ON_COMPONENT] = '';
         }
 
         return array_diff_key($allActions, $excludeActions);

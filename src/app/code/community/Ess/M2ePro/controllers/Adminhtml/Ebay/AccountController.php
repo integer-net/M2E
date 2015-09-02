@@ -620,7 +620,7 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         }
 
         if (!isset($response['token_expired_date'])) {
-            throw new Exception('Account is not added or updated. Try again later.');
+            throw new Ess_M2ePro_Model_Exception('Account is not added or updated. Try again later.');
         }
 
         isset($response['hash']) && $data['server_hash'] = $response['hash'];
@@ -773,7 +773,7 @@ class Ess_M2ePro_Adminhtml_Ebay_AccountController extends Ess_M2ePro_Controller_
         }
 
         if ($i == 10) {
-            throw new Exception('Account title cannot be generated');
+            throw new Ess_M2ePro_Model_Exception('Account title cannot be generated');
         }
 
         return $accountTitle;

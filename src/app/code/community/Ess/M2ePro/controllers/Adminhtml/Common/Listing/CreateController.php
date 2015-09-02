@@ -196,7 +196,6 @@ class Ess_M2ePro_Adminhtml_Common_Listing_CreateController
                     'new_listing' => 1
                 )
             );
-            return;
         }
 
         $this->_initAction();

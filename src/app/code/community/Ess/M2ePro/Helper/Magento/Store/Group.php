@@ -47,7 +47,7 @@ class Ess_M2ePro_Helper_Magento_Store_Group
                 $this->defaultStoreGroup = Mage::getModel('core/store_group')->load(0);
 
                 if (is_null($this->defaultStoreGroup->getId())) {
-                    throw new Exception('Getting default store group is failed');
+                    throw new Ess_M2ePro_Model_Exception('Getting default store group is failed');
                 }
             }
         }
@@ -66,7 +66,7 @@ class Ess_M2ePro_Helper_Magento_Store_Group
     {
         if (!Mage::helper('M2ePro/Magento_Store_Website')->isExists($websiteId)) {
             $error = Mage::helper('M2ePro')->__('Website with id %value% does not exist.', (int)$websiteId);
-            throw new Exception($error);
+            throw new Ess_M2ePro_Model_Exception($error);
         }
 
         $group = new Mage_Core_Model_Store_Group();
@@ -81,12 +81,12 @@ class Ess_M2ePro_Helper_Magento_Store_Group
 
             if (!$category->hasEntityId()) {
                 $error = Mage::helper('M2ePro')->__('Category with %category_id% doen\'t exist', $rootCategoryId);
-                throw new Exception($error);
+                throw new Ess_M2ePro_Model_Exception($error);
             }
 
             if ((int)$category->getLevel() !== 1) {
                 $error = Mage::helper('M2ePro')->__('Category of level 1 must be provided.');
-                throw new Exception($error);
+                throw new Ess_M2ePro_Model_Exception($error);
             }
 
             $group->setRootCategoryId($rootCategoryId);

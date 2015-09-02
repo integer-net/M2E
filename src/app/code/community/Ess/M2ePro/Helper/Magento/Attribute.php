@@ -166,7 +166,7 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
     private function _getGeneralFromAttributeSets(array $attributeSetIds)
     {
         if (count($attributeSetIds) > 50) {
-            throw new Exception("Attribute sets must be less then 50");
+            throw new Ess_M2ePro_Model_Exception("Attribute sets must be less then 50");
         }
 
         $attributeCollection = Mage::getResourceModel('catalog/product_attribute_collection')
@@ -179,13 +179,13 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
 
     // --------------------------------
 
-    public function getGeneralFromProducts(array $products, $returnType = self::RETURN_TYPE_ARRAYS)
+    public function getGeneralFromProducts(array $products)
     {
         $productsAttributeSetIds = Mage::helper('M2ePro/Magento_AttributeSet')->getFromProducts(
             $products, self::RETURN_TYPE_IDS
         );
 
-        return $this->getGeneralFromAttributeSets($productsAttributeSetIds, $returnType);
+        return $this->getGeneralFromAttributeSets($productsAttributeSetIds);
     }
 
     // ################################
@@ -394,7 +394,6 @@ class Ess_M2ePro_Helper_Magento_Attribute extends Ess_M2ePro_Helper_Magento_Abst
             return false;
         }
 
-        //@todo Now we can only handle type "text" or "textarea"
         if ($frontendInput != 'text' && $frontendInput != 'textarea') {
             return false;
         }

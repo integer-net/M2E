@@ -152,7 +152,7 @@ class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager
         } else if ($this->isRelationChildType()) {
             $model = Mage::getModel('M2ePro/Amazon_Listing_Product_Variation_Manager_Type_Relation_Child');
         } else {
-            throw new Exception('This Product is not a Variation Product.');
+            throw new Ess_M2ePro_Model_Exception('This Product is not a Variation Product.');
         }
 
         /** @var $model Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Abstract */

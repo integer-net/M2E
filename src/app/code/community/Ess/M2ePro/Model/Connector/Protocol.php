@@ -83,7 +83,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
                     ->getKnowledgebaseUrl('664870-issues-with-m2e-pro-server-connection')
                 .'">here</a>';
 
-            throw new Ess_M2ePro_Model_Exception($errorMsg, $this->responseInfo);
+            throw new Ess_M2ePro_Model_Exception_Connection($errorMsg, $this->responseInfo);
         }
 
         $this->processResponseInfo($this->response['response']);
@@ -96,11 +96,17 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
         $this->resultType = $responseInfo['result']['type'];
 
         $internalServerErrorMessage = array();
+        $isMaintenanceModeEnabled = false;
 
         foreach ($responseInfo['result']['messages'] as $message) {
 
             if ($this->isMessageError($message) && $this->isMessageSenderSystem($message)) {
                 $internalServerErrorMessage[] = $message[self::MESSAGE_TEXT_KEY];
+
+                if ((int)$message[self::MESSAGE_CODE_KEY] == 3) {
+                    $isMaintenanceModeEnabled = true;
+                }
+
                 continue;
             }
 
@@ -109,9 +115,9 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
         if (!empty($internalServerErrorMessage)) {
 
-            throw new Exception(Mage::helper('M2ePro')->__(
+            throw new Ess_M2ePro_Model_Exception(Mage::helper('M2ePro')->__(
                 "Internal Server Error(s) [%error_message%]", implode(', ', $internalServerErrorMessage)
-            ));
+            ),array(),0,!$isMaintenanceModeEnabled);
         }
     }
 
@@ -119,7 +125,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
     /**
      * @return array
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     protected function getRequestHeaders()
     {
@@ -127,7 +133,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
         if (!is_array($commandTemp) || !isset($commandTemp[0]) ||
             !isset($commandTemp[1]) || !isset($commandTemp[2])) {
-            throw new Exception('Requested Command has invalid format.');
+            throw new Ess_M2ePro_Model_Exception('Requested Command has invalid format.');
         }
 
         return array(
@@ -150,7 +156,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
     /**
      * @return array
-     * @throws Exception
+     * @throws Ess_M2ePro_Model_Exception
      */
     protected function getRequestInfo()
     {
@@ -158,7 +164,7 @@ abstract class Ess_M2ePro_Model_Connector_Protocol
 
         if (!is_array($commandTemp) || !isset($commandTemp[0]) ||
             !isset($commandTemp[1]) || !isset($commandTemp[2])) {
-            throw new Exception('Requested Command has invalid format.');
+            throw new Ess_M2ePro_Model_Exception('Requested Command has invalid format.');
         }
 
         $request = array(

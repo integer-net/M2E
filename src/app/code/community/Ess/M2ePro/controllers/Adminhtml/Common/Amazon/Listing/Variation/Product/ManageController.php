@@ -37,6 +37,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
             ->addJs('M2ePro/Common/Amazon/Listing/TemplateDescriptionHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/VariationProductManageHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/VariationProductManageVariationsGridHandler.js')
+            ->addJs('M2ePro/Common/Amazon/Listing/FulfillmentHandler.js')
 
             ->addJs('M2ePro/TemplateHandler.js')
             ->addJs('M2ePro/Common/Listing/Category/TreeHandler.js')
@@ -388,8 +389,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
             return $this->getResponse()->setBody(json_encode($result));
         }
 
-        $parentTypeModel->setChannelTheme($variationTheme, false);
-        $parentTypeModel->setIsChannelThemeSetManually(true);
+        $parentTypeModel->setChannelTheme($variationTheme, true, false);
 
         $variationHelper = Mage::helper('M2ePro/Component_Amazon_Variation');
         $variationHelper->increaseThemeUsageCount($variationTheme, $listingProduct->getMarketplace()->getId());
@@ -462,6 +462,22 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_Variation_Product_ManageControl
         $amazonListingProduct = $listingProduct->getChildObject();
 
         $typeModel = $amazonListingProduct->getVariationManager()->getTypeModel();
+
+        if (!empty($variationAttributes['virtual_magento_attributes'])) {
+            $typeModel->setVirtualProductAttributes(
+                array_combine(
+                    $variationAttributes['virtual_magento_attributes'],
+                    $variationAttributes['virtual_magento_option']
+                )
+            );
+        } else if (!empty($variationAttributes['virtual_amazon_attributes'])) {
+            $typeModel->setVirtualChannelAttributes(
+                array_combine(
+                    $variationAttributes['virtual_amazon_attributes'],
+                    $variationAttributes['virtual_amazon_option']
+                )
+            );
+        }
 
         $typeModel->setMatchedAttributes($matchedAttributes);
         $typeModel->getProcessor()->process();

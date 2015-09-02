@@ -59,8 +59,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Add_NewAsin_Manual
 
     public function getGridHtml()
     {
-        $listing = Mage::helper('M2ePro/Component')
-            ->getCachedUnknownObject('Listing', $this->getRequest()->getParam('id'));
+        $listing = Mage::helper('M2ePro/Component')->getCachedUnknownObject(
+            'Listing', $this->getRequest()->getParam('id')
+        );
 
         $viewHeaderBlock = $this->getLayout()->createBlock(
             'M2ePro/adminhtml_listing_view_header','',
@@ -147,7 +148,7 @@ HTML;
     public function getListing()
     {
         if (!$listingId = $this->getRequest()->getParam('id')) {
-            throw new Exception('Listing is not defined');
+            throw new Ess_M2ePro_Model_Exception('Listing is not defined');
         }
 
         if (is_null($this->listing)) {

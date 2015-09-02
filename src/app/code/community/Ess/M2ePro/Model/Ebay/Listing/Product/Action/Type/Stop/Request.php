@@ -16,13 +16,6 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Stop_Request
         );
     }
 
-    protected function prepareFinalData(array $data)
-    {
-        $data = parent::prepareFinalData($data);
-        unset($data['is_eps_ebay_images_mode']);
-        return $data;
-    }
-
     // ########################################
 
     protected function initializeVariations() {}

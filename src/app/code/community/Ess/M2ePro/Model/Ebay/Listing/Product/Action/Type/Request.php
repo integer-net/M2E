@@ -78,12 +78,16 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Request
     protected function prepareFinalData(array $data)
     {
         $data['is_eps_ebay_images_mode'] = $this->getIsEpsImagesMode();
+        $data['upload_images_mode'] = (int)Mage::helper('M2ePro/Module')->getConfig()->getGroupValue(
+            '/ebay/description/', 'upload_images_mode'
+        );
 
         if (!isset($data['out_of_stock_control'])) {
             $data['out_of_stock_control'] = $this->getOutOfStockControlMode();
         }
 
         $data = $this->replaceVariationSpecificsNames($data);
+        $data = $this->replaceHttpsToHttpOfImagesUrls($data);
         $data = $this->resolveVariationAndItemSpecificsConflict($data);
         $data = $this->removeVariationsInstances($data);
 
@@ -105,6 +109,32 @@ abstract class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_Request
         }
 
         $data = $this->doReplaceVariationSpecifics($data, $additionalData['variations_specifics_replacements']);
+        return $data;
+    }
+
+    protected function replaceHttpsToHttpOfImagesUrls(array $data)
+    {
+        if ($data['is_eps_ebay_images_mode'] === false ||
+            (is_null($data['is_eps_ebay_images_mode']) &&
+                $data['upload_images_mode'] ==
+                    Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::UPLOAD_IMAGES_MODE_SELF)) {
+            return $data;
+        }
+
+        if (isset($data['images']['images'])) {
+            foreach ($data['images']['images'] as &$imageUrl) {
+                $imageUrl = str_replace('https://', 'http://', $imageUrl);
+            }
+        }
+
+        if (isset($data['variation_image']['images'])) {
+            foreach ($data['variation_image']['images'] as $attribute => &$imagesUrls) {
+                foreach ($imagesUrls as &$imageUrl) {
+                    $imageUrl = str_replace('https://', 'http://', $imageUrl);
+                }
+            }
+        }
+
         return $data;
     }
 

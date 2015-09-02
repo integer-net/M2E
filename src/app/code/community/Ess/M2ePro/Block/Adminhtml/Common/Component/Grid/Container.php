@@ -79,7 +79,7 @@ abstract class Ess_M2ePro_Block_Adminhtml_Common_Component_Grid_Container
         $method = "get{$component}NewUrl";
 
         if (!method_exists($this, $method)) {
-            throw new Exception('Method of adding a new entity is not defined.');
+            throw new Ess_M2ePro_Model_Exception('Method of adding a new entity is not defined.');
         }
 
         return $this->$method();

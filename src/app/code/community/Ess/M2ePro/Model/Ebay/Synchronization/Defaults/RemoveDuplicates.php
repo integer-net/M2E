@@ -126,7 +126,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
 
                 $additionalData = $product->getAdditionalData();
                 if (empty($additionalData['last_failed_action_data'])) {
-                    throw new Exception('last_failed_action_data is empty');
+                    throw new Ess_M2ePro_Model_Exception('last_failed_action_data is empty');
                 }
 
                 $lastFailedActionData = $additionalData['last_failed_action_data'];
@@ -157,7 +157,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
                     );
 
                     if (empty($itemInfo['relisted_item_id'])) {
-                        throw new Exception('Duplicate was not found');
+                        throw new Ess_M2ePro_Model_Exception('Duplicate was not found');
                     }
 
                     $this->duplicatedItems[$accountId][$marketplaceId][] = $itemInfo['relisted_item_id'];
@@ -185,7 +185,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
                 ));
 
                 if (empty($duplicatedItem)) {
-                    throw new Exception('Duplicate was not found');
+                    throw new Ess_M2ePro_Model_Exception('Duplicate was not found');
                 }
 
                 $this->duplicatedItems[$accountId][$marketplaceId][] = $duplicatedItem['id'];
@@ -217,7 +217,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
 
                 $additionalData = $product->getAdditionalData();
                 if (empty($additionalData['last_failed_action_data'])) {
-                    throw new Exception('last_failed_action_data is empty');
+                    throw new Ess_M2ePro_Model_Exception('last_failed_action_data is empty');
                 }
 
                 $lastFailedActionData = $additionalData['last_failed_action_data'];
@@ -245,7 +245,7 @@ final class Ess_M2ePro_Model_Ebay_Synchronization_Defaults_RemoveDuplicates
                 );
 
                 if (empty($itemInfo['relisted_item_id'])) {
-                    throw new Exception('Duplicate was not found');
+                    throw new Ess_M2ePro_Model_Exception('Duplicate was not found');
                 }
 
                 $this->duplicatedItems[$accountId][$marketplaceId][] = $itemInfo['relisted_item_id'];

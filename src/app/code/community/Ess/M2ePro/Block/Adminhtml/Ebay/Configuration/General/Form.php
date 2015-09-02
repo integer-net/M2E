@@ -55,6 +55,10 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Configuration_General_Form extends Mage_Ad
             '/ebay/connector/listing/','check_the_same_product_already_listed'
         );
 
+        $this->upload_images_mode = (int)$configModel->getGroupValue(
+            '/ebay/description/','upload_images_mode'
+        );
+
         /** @var Ess_M2ePro_Helper_Component_Ebay_Motor_Compatibility $compatibilityHelper */
         $compatibilityHelper = Mage::helper('M2ePro/Component_Ebay_Motor_Compatibility');
 

@@ -67,7 +67,7 @@ class Ess_M2ePro_Block_Adminhtml_Ebay_Listing_Variation_Product_Manage_View_Grid
     {
         // Get collection
         //----------------------------
-        /** @var Ess_M2ePro_Model_Mysql4_Amazon_Listing_Product_Collection $collection */
+        /** @var Ess_M2ePro_Model_Mysql4_Ebay_Listing_Product_Collection $collection */
         $collection = Mage::helper('M2ePro/Component_Ebay')->getCollection('Listing_Product_Variation');
         $collection->getSelect()->where('main_table.listing_product_id = ?',(int)$this->getListingProductId());
         $collection->getSelect()->group('main_table.id');

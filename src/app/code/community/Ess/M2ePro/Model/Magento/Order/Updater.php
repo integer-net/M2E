@@ -243,17 +243,17 @@ class Ess_M2ePro_Model_Magento_Order_Updater
         $this->magentoOrder->setActionFlag(Mage_Sales_Model_Order::ACTION_FLAG_UNHOLD, true);
 
         if ($this->magentoOrder->isCanceled()) {
-            //throw new Exception('Cancel is not allowed for Orders which were already Canceled.');
+            //throw new Ess_M2ePro_Model_Exception('Cancel is not allowed for Orders which were already Canceled.');
             return;
         }
 
         if ($this->magentoOrder->canUnhold()) {
-            throw new Exception('Cancel is not allowed for Orders which were put on Hold.');
+            throw new Ess_M2ePro_Model_Exception('Cancel is not allowed for Orders which were put on Hold.');
         }
 
         if ($this->magentoOrder->getState() === Mage_Sales_Model_Order::STATE_COMPLETE ||
             $this->magentoOrder->getState() === Mage_Sales_Model_Order::STATE_CLOSED) {
-            throw new Exception('Cancel is not allowed for Orders which were Completed or Closed.');
+            throw new Ess_M2ePro_Model_Exception('Cancel is not allowed for Orders which were Completed or Closed.');
         }
 
         $allInvoiced = true;
@@ -264,7 +264,7 @@ class Ess_M2ePro_Model_Magento_Order_Updater
             }
         }
         if ($allInvoiced) {
-            throw new Exception('Cancel is not allowed for Orders with Invoiced Items.');
+            throw new Ess_M2ePro_Model_Exception('Cancel is not allowed for Orders with Invoiced Items.');
         }
 
         $this->magentoOrder->cancel()->save();

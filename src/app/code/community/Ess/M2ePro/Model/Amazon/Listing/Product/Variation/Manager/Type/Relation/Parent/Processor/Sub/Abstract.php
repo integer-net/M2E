@@ -39,7 +39,7 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Re
     protected function validate()
     {
         if (is_null($this->getProcessor())) {
-            throw new LogicException('Processor was not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Processor was not set.');
         }
     }
 

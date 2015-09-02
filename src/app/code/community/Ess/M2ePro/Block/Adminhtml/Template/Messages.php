@@ -111,12 +111,9 @@ class Ess_M2ePro_Block_Adminhtml_Template_Messages extends Mage_Adminhtml_Block_
             return NULL;
         }
 
-        return Mage::helper('M2ePro/Component')
-            ->getCachedComponentObject(
-                $this->getComponentMode(),
-                'Marketplace',
-                (int)$this->_data['marketplace_id']
-            );
+        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
+            $this->getComponentMode(),'Marketplace',(int)$this->_data['marketplace_id']
+        );
     }
 
     // ########################################
@@ -144,7 +141,7 @@ class Ess_M2ePro_Block_Adminhtml_Template_Messages extends Mage_Adminhtml_Block_
     public function getTemplateNick()
     {
         if (is_null($this->templateNick)) {
-            throw new LogicException('Policy nick is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Policy nick is not set.');
         }
 
         return $this->templateNick;
@@ -161,7 +158,7 @@ class Ess_M2ePro_Block_Adminhtml_Template_Messages extends Mage_Adminhtml_Block_
     public function getComponentMode()
     {
         if (is_null($this->componentMode)) {
-            throw new LogicException('Component Mode is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Component Mode is not set.');
         }
 
         return $this->componentMode;
@@ -172,7 +169,7 @@ class Ess_M2ePro_Block_Adminhtml_Template_Messages extends Mage_Adminhtml_Block_
     protected function getTemplateData()
     {
         if (empty($this->_data['template_data']) || !is_array($this->_data['template_data'])) {
-            throw new LogicException('Policy data is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Policy data is not set.');
         }
 
         return $this->_data['template_data'];

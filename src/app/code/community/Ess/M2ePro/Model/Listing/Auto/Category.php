@@ -34,7 +34,7 @@ class Ess_M2ePro_Model_Listing_Auto_Category extends Ess_M2ePro_Model_Component_
     public function getGroup()
     {
         if ($this->getGroupId() <= 0) {
-            throw new LogicException('Group ID was not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('Group ID was not set.');
         }
 
         if (!is_null($this->group)) {

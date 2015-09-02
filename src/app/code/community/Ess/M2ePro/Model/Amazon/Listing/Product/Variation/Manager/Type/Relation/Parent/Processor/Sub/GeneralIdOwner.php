@@ -19,7 +19,6 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
     protected function execute()
     {
         $isGeneralIdOwner = $this->getProcessor()->getAmazonListingProduct()->isGeneralIdOwner();
-        $descriptionTemplateId = $this->getProcessor()->getAmazonListingProduct()->getTemplateDescriptionId();
 
         foreach ($this->getProcessor()->getTypeModel()->getChildListingsProducts() as $listingProduct) {
 
@@ -30,11 +29,6 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
 
             if ($amazonListingProduct->isGeneralIdOwner() != $isGeneralIdOwner) {
                 $listingProduct->setData('is_general_id_owner', $isGeneralIdOwner);
-                $needSave = true;
-            }
-
-            if ($amazonListingProduct->getTemplateDescriptionId() != $descriptionTemplateId) {
-                $listingProduct->setData('template_description_id', $descriptionTemplateId);
                 $needSave = true;
             }
 

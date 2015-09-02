@@ -183,6 +183,27 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
 
     //-----------------------------------------
 
+    public function isExistShippingOverrideTemplate()
+    {
+        return $this->getTemplateShippingOverrideId() > 0;
+    }
+
+    /**
+     * @return Ess_M2ePro_Model_Amazon_Template_ShippingOverride | null
+     */
+    public function getShippingOverrideTemplate()
+    {
+        if (!$this->isExistShippingOverrideTemplate()) {
+            return null;
+        }
+
+        return Mage::helper('M2ePro')->getCachedObject(
+            'Amazon_Template_ShippingOverride', $this->getTemplateShippingOverrideId(), NULL, array('template')
+        );
+    }
+
+    //-----------------------------------------
+
     public function isExistDescriptionTemplate()
     {
         return $this->getTemplateDescriptionId() > 0;
@@ -197,10 +218,8 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
             return null;
         }
 
-        return Mage::helper('M2ePro/Component')->getCachedComponentObject(
-            $this->getComponentMode(),'Template_Description',
-            $this->getTemplateDescriptionId(),NULL,
-            array('template')
+        return Mage::helper('M2ePro/Component_Amazon')->getCachedObject(
+            'Template_Description',$this->getTemplateDescriptionId(),NULL,array('template')
         );
     }
 
@@ -265,6 +284,27 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
         return $this->getMagentoProduct();
     }
 
+    public function prepareMagentoProduct(Ess_M2ePro_Model_Magento_Product_Cache $instance)
+    {
+        if (!$this->getVariationManager()->isRelationMode()) {
+            return $instance;
+        }
+
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Parent $parentTypeModel */
+
+        if ($this->getVariationManager()->isRelationParentType()) {
+            $parentTypeModel = $this->getVariationManager()->getTypeModel();
+        } else {
+            $parentAmazonListingProduct = $this->getVariationManager()->getTypeModel()->getAmazonParentListingProduct();
+            $parentTypeModel = $parentAmazonListingProduct->getVariationManager()->getTypeModel();
+        }
+
+        $instance->setVariationVirtualAttributes($parentTypeModel->getVirtualProductAttributes());
+        $instance->setVariationFilterAttributes($parentTypeModel->getVirtualChannelAttributes());
+
+        return $instance;
+    }
+
     // ########################################
 
     /**
@@ -300,6 +340,11 @@ class Ess_M2ePro_Model_Amazon_Listing_Product extends Ess_M2ePro_Model_Component
     public function getTemplateDescriptionId()
     {
         return (int)($this->getData('template_description_id'));
+    }
+
+    public function getTemplateShippingOverrideId()
+    {
+        return (int)($this->getData('template_shipping_override_id'));
     }
 
     //----------------------------------------

@@ -70,14 +70,16 @@ CommonBuyTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandle
         $('qty_modification_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODIFICATION_MODE_OFF');
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT') ||
-            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE')) {
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE') ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED')) {
 
             $('qty_modification_mode_tr').show();
 
             $('qty_modification_mode').value = M2ePro.php.constant('Ess_M2ePro_Model_Buy_Template_SellingFormat::QTY_MODIFICATION_MODE_ON');
 
             if (M2ePro.formData.qty_mode == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT') ||
-                M2ePro.formData.qty_mode == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE')) {
+                M2ePro.formData.qty_mode == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE') ||
+                M2ePro.formData.qty_mode == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED')) {
                 $('qty_modification_mode').value = M2ePro.formData.qty_modification_mode;
             }
         }
@@ -85,7 +87,8 @@ CommonBuyTemplateSellingFormatHandler.prototype = Object.extend(new CommonHandle
         $('qty_modification_mode').simulate('change');
 
         if (this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT') ||
-            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE')) {
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_ATTRIBUTE') ||
+            this.value == M2ePro.php.constant('Ess_M2ePro_Model_Template_SellingFormat::QTY_MODE_PRODUCT_FIXED')) {
 
             $('qty_percentage_tr').show();
         }

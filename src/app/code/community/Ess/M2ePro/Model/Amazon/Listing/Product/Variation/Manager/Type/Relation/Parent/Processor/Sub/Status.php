@@ -34,6 +34,7 @@ class Ess_M2EPro_Model_Amazon_Listing_Product_Variation_Manager_Type_Relation_Pa
             Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED => 0,
             Ess_M2ePro_Model_Listing_Product::STATUS_STOPPED    => 0,
             Ess_M2ePro_Model_Listing_Product::STATUS_BLOCKED    => 0,
+            Ess_M2ePro_Model_Listing_Product::STATUS_UNKNOWN    => 0,
         );
 
         foreach ($childListingProducts as $childListingProduct) {

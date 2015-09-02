@@ -209,7 +209,7 @@ class Ess_M2ePro_Helper_View extends Mage_Core_Helper_Abstract
         }
 
         if (count($resultLabels) > 1) {
-            throw new Exception('More than one menu path found');
+            throw new Ess_M2ePro_Model_Exception('More than one menu path found');
         }
 
         return array_shift($resultLabels);

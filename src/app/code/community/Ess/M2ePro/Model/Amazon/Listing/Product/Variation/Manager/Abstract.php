@@ -123,16 +123,4 @@ abstract class Ess_M2ePro_Model_Amazon_Listing_Product_Variation_Manager_Abstrac
     abstract public function clearTypeData();
 
     // ########################################
-
-    protected function getCurrentMagentoAttributes()
-    {
-        $magentoVariations = $this->getListingProduct()
-            ->getMagentoProduct()
-            ->getVariationInstance()
-            ->getVariationsTypeStandard();
-
-        return array_keys($magentoVariations['set']);
-    }
-
-    // ########################################
 }

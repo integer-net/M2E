@@ -39,4 +39,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Buy_Listing_Add_Tabs_Search
     }
 
     // #############################################
+
+    public function isEditMode()
+    {
+        return !!$this->getRequest()->getParam('id');
+    }
+
+    // ####################################
 }

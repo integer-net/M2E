@@ -250,40 +250,4 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Variation_Option extends Ess_M2ePro_
     }
 
     // ########################################
-
-    public function getMainImageLink()
-    {
-        $imageLink = '';
-
-        if ($this->getEbayDescriptionTemplate()->isImageMainModeProduct()) {
-            $imageLink = $this->getMagentoProduct()->getImageLink('image');
-        }
-        if ($this->getEbayDescriptionTemplate()->isImageMainModeAttribute()) {
-            $src = $this->getEbayDescriptionTemplate()->getImageMainSource();
-            $imageLink = $this->getMagentoProduct()->getImageLink($src['attribute']);
-        }
-
-        if (empty($imageLink)) {
-            return $imageLink;
-        }
-
-        return $this->getEbayListingProduct()->getDescriptionTemplateSource()->addWatermarkIfNeed($imageLink);
-    }
-
-    public function getGalleryImages()
-    {
-        if ($this->getEbayDescriptionTemplate()->isImageMainModeNone()) {
-            return array();
-        }
-
-        $mainImage = $this->getMainImageLink();
-
-        if ($mainImage == '') {
-            return array();
-        }
-
-        return array($mainImage);
-    }
-
-    // ########################################
 }

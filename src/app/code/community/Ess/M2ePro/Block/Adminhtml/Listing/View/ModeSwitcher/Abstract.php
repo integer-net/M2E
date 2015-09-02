@@ -62,7 +62,7 @@ HTML;
     private function getCurrentViewMode()
     {
         if (!isset($this->_data['current_view_mode'])) {
-            throw new LogicException('View Mode is not set.');
+            throw new Ess_M2ePro_Model_Exception_Logic('View Mode is not set.');
         }
 
         return $this->_data['current_view_mode'];

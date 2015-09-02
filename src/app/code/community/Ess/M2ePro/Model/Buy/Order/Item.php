@@ -187,13 +187,13 @@ class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_B
         $channelItem = $this->getChannelItem();
 
         if (!is_null($channelItem) && !$buyAccount->isMagentoOrdersListingsModeEnabled()) {
-            throw new Exception(
+            throw new Ess_M2ePro_Model_Exception(
                 'Magento Order Creation for Items Listed by M2E Pro is disabled in Account Settings.'
             );
         }
 
         if (is_null($channelItem) && !$buyAccount->isMagentoOrdersListingsOtherModeEnabled()) {
-            throw new Exception(
+            throw new Ess_M2ePro_Model_Exception(
                 'Magento Order Creation for Items Listed by 3rd party software is disabled in Account Settings.'
             );
         }
@@ -202,7 +202,7 @@ class Ess_M2ePro_Model_Buy_Order_Item extends Ess_M2ePro_Model_Component_Child_B
     private function createProduct()
     {
         if (!$this->getBuyOrder()->getBuyAccount()->isMagentoOrdersListingsOtherProductImportEnabled()) {
-            throw new Exception('Product Import is disabled in Rakuten.com Account Settings.');
+            throw new Ess_M2ePro_Model_Exception('Product Import is disabled in Rakuten.com Account Settings.');
         }
 
         $storeId = $this->getBuyOrder()->getBuyAccount()->getMagentoOrdersListingsOtherStoreId();
