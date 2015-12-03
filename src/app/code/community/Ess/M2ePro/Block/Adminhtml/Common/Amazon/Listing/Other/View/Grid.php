@@ -1,12 +1,14 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @author     M2E Pro Developers Team
+ * @copyright  2011-2015 ESS-UA [M2E Pro]
+ * @license    Commercial use is forbidden
  */
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
-    // ####################################
+    //########################################
 
     public function __construct()
     {
@@ -16,17 +18,17 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         $this->connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         // Initialization block
-        //------------------------------
+        // ---------------------------------------
         $this->setId('amazonListingOtherGrid');
-        //------------------------------
+        // ---------------------------------------
 
         // Set default values
-        //------------------------------
+        // ---------------------------------------
         $this->setDefaultSort('id');
         $this->setDefaultDir('DESC');
         $this->setSaveParametersInSession(true);
         $this->setUseAjax(true);
-        //------------------------------
+        // ---------------------------------------
     }
 
     public function getMassactionBlockName()
@@ -34,7 +36,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         return 'M2ePro/adminhtml_grid_massaction';
     }
 
-    // ####################################
+    //########################################
 
     protected function _prepareCollection()
     {
@@ -60,8 +62,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
             $collection->addFieldToFilter('main_table.marketplace_id',
                                           $this->getRequest()->getParam('marketplace'));
         }
-
-        //var_dump($collection->getSelect()->__toString()); exit();
 
         $this->setCollection($collection);
 
@@ -112,19 +112,26 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
             'filter_condition_callback' => array($this, 'callbackFilterQty')
         ));
 
-        $this->addColumn('online_price', array(
+        $priceColumn = array(
             'header' => Mage::helper('M2ePro')->__('Price'),
             'align' => 'right',
-            'width' => '100px',
+            'width' => '110px',
             'type' => 'number',
             'index' => 'online_price',
             'filter_index' => 'online_price',
-            'frame_callback' => array($this, 'callbackColumnPrice')
-        ));
+            'frame_callback' => array($this, 'callbackColumnPrice'),
+            'filter_condition_callback' => array($this, 'callbackFilterPrice')
+        );
+
+        if (Mage::helper('M2ePro/Component_Amazon')->isRepricingEnabled()) {
+            $priceColumn['filter'] = 'M2ePro/adminhtml_common_amazon_grid_column_filter_price';
+        }
+
+        $this->addColumn('online_price', $priceColumn);
 
         $this->addColumn('status', array(
             'header' => Mage::helper('M2ePro')->__('Status'),
-            'width' => '60px',
+            'width' => '75px',
             'index' => 'status',
             'filter_index' => 'main_table.status',
             'type' => 'options',
@@ -188,10 +195,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
     protected function _prepareMassaction()
     {
         // Set mass-action identifiers
-        //--------------------------------
-        $this->setMassactionIdField('`main_table`.id');
+        // ---------------------------------------
+        $this->setMassactionIdField('main_table.id');
         $this->getMassactionBlock()->setFormFieldName('ids');
-        //--------------------------------
+        // ---------------------------------------
 
         $this->getMassactionBlock()->setGroups(array(
             'mapping' => Mage::helper('M2ePro')->__('Mapping'),
@@ -199,7 +206,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         ));
 
         // Set mass-action
-        //--------------------------------
+        // ---------------------------------------
         $this->getMassactionBlock()->addItem('autoMapping', array(
             'label'   => Mage::helper('M2ePro')->__('Map Item(s) Automatically'),
             'url'     => '',
@@ -220,12 +227,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
             'url'     => '',
             'confirm' => Mage::helper('M2ePro')->__('Are you sure?')
         ), 'mapping');
-        //--------------------------------
+        // ---------------------------------------
 
         return parent::_prepareMassaction();
     }
 
-    // ####################################
+    //########################################
 
     public function callbackColumnProductId($value, $row, $column, $isExport)
     {
@@ -298,12 +305,33 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
 
     public function callbackColumnAvailableQty($value, $row, $column, $isExport)
     {
-        if (is_null($value) || $value === '') {
-            return Mage::helper('M2ePro')->__('N/A');
+        if ((bool)$row->getData('is_afn_channel')) {
+            $sku = $row->getData('sku');
+
+            $afn = Mage::helper('M2ePro')->__('AFN');
+            $total = Mage::helper('M2ePro')->__('Total');
+            $inStock = Mage::helper('M2ePro')->__('In Stock');
+            $productId = $row->getData('id');
+            $accountId = $row->getData('account_id');
+
+            return <<<HTML
+<div id="m2ePro_afn_qty_value_{$productId}">
+    <span class="m2ePro-online-sku-value" productId="{$productId}" style="display: none">{$sku}</span>
+    <span class="m2epro-empty-afn-qty-data" style="display: none">{$afn}</span>
+    <div class="m2epro-afn-qty-data" style="display: none">
+        <div class="total">{$total}: <span></span></div>
+        <div class="in-stock">{$inStock}: <span></span></div>
+    </div>
+    <a href="javascript:void(0)"
+        onclick="CommonAmazonListingAfnQtyHandlerObj.showAfnQty(this,'{$sku}',{$productId}, {$accountId})">
+        {$afn}
+    </a>
+</div>
+HTML;
         }
 
-        if ((bool)$row->getData('is_afn_channel')) {
-            return Mage::helper('M2ePro')->__('AFN');
+        if (is_null($value) || $value === '') {
+            return Mage::helper('M2ePro')->__('N/A');
         }
 
         if ($value <= 0) {
@@ -315,12 +343,34 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
     {
+        $html ='';
+
+        if (Mage::helper('M2ePro/Component_Amazon')->isRepricingEnabled() &&
+            (int)$row->getData('is_repricing') === Ess_M2ePro_Model_Amazon_Listing_Product::IS_REPRICING_YES) {
+            $text = Mage::helper('M2ePro')->__(
+                'This product is used by Amazon Repricing Tool.
+                 The Price cannot be updated through the M2E Pro.'
+            );
+
+            $html = <<<HTML
+<span style="float:right; text-align: left;">
+    <img class="tool-tip-image"
+         style="vertical-align: middle; width: 16px;"
+         src="{$this->getSkinUrl('M2ePro/images/money.png')}">
+    <span class="tool-tip-message tool-tip-message tip-left" style="display:none;">
+        <img src="{$this->getSkinUrl('M2ePro/images/i_icon.png')}">
+        <span>{$text}</span>
+    </span>
+</span>
+HTML;
+        }
+
         if (is_null($value) || $value === '') {
-            return Mage::helper('M2ePro')->__('N/A');
+            return Mage::helper('M2ePro')->__('N/A') . $html;
         }
 
         if ((float)$value <= 0) {
-            return '<span style="color: #f00;">0</span>';
+            return '<span style="color: #f00;">0</span>' . $html;
         }
 
         $currency = Mage::helper('M2ePro/Component_Amazon')
@@ -328,7 +378,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
                                 ->getChildObject()
                                 ->getDefaultCurrency();
 
-        return Mage::app()->getLocale()->currency($currency)->toCurrency($value);
+        return Mage::app()->getLocale()->currency($currency)->toCurrency($value) . $html;
     }
 
     public function callbackColumnStatus($value, $row, $column, $isExport)
@@ -358,7 +408,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         return $value.$this->getViewLogIconHtml($row->getId());
     }
 
-    // ####################################
+    //########################################
 
     protected function callbackFilterTitle($collection, $column)
     {
@@ -402,14 +452,45 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         $collection->getSelect()->where($where);
     }
 
-    // ####################################
+    protected function callbackFilterPrice($collection, $column)
+    {
+        $value = $column->getFilter()->getValue();
+
+        if (empty($value)) {
+            return;
+        }
+
+        $where = '';
+
+        if (isset($value['from']) && $value['from'] != '') {
+            $where .= 'online_price >= ' . $value['from'];
+        }
+
+        if (isset($value['to']) && $value['to'] != '') {
+            if (isset($value['from']) && $value['from'] != '') {
+                $where .= ' AND ';
+            }
+            $where .= 'online_price <= ' . $value['to'];
+        }
+
+        if (Mage::helper('M2ePro/Component_Amazon')->isRepricingEnabled() && !empty($value['is_repricing'])) {
+            if (!empty($where)) {
+                $where = '(' . $where . ') OR ';
+            }
+            $where .= 'is_repricing = ' . Ess_M2ePro_Model_Amazon_Listing_Product::IS_REPRICING_YES;
+        }
+
+        $collection->getSelect()->where($where);
+    }
+
+    //########################################
 
     public function getViewLogIconHtml($listingOtherId)
     {
         $listingOtherId = (int)$listingOtherId;
 
         // Get last messages
-        //--------------------------
+        // ---------------------------------------
         $dbSelect = $this->connRead->select()
             ->from(
                 Mage::getResourceModel('M2ePro/Listing_Other_Log')->getMainTable(),
@@ -421,10 +502,10 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
             ->limit(30);
 
         $logRows = $this->connRead->fetchAll($dbSelect);
-        //--------------------------
+        // ---------------------------------------
 
         // Get grouped messages by action_id
-        //--------------------------
+        // ---------------------------------------
         $actionsRows = array();
         $tempActionRows = array();
         $lastActionId = false;
@@ -542,11 +623,11 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
         return Mage::app()->getLocale()->date(strtotime($actionRows[0]['create_date']))->toString($format);
     }
 
-    // ####################################
+    //########################################
 
     protected function _toHtml()
     {
-        $javascriptsMain = <<<JAVASCRIPT
+        $javascriptsMain = <<<HTML
 <script type="text/javascript">
 
     if (typeof AmazonListingOtherGridHandlerObj != 'undefined') {
@@ -560,12 +641,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_Other_View_Grid extends M
     });
 
 </script>
-JAVASCRIPT;
+HTML;
 
         return parent::_toHtml().$javascriptsMain;
     }
 
-    // ####################################
+    //########################################
 
     public function getGridUrl()
     {
@@ -577,5 +658,5 @@ JAVASCRIPT;
         return false;
     }
 
-    // ####################################
+    //########################################
 }

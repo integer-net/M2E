@@ -1,20 +1,20 @@
 CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
 
-    //----------------------------------
+    // ---------------------------------------
 
     getComponent: function()
     {
         return 'amazon';
     },
 
-    //----------------------------------
+    // ---------------------------------------
 
     getMaxProductsInPart: function()
     {
         return 1000;
     },
 
-    //----------------------------------
+    // ---------------------------------------
 
     prepareActions: function($super)
     {
@@ -26,6 +26,7 @@ CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
         this.templateShippingOverrideHandler = new CommonAmazonListingTemplateShippingOverrideHandler(this);
         this.variationProductManageHandler = new CommonAmazonListingVariationProductManageHandler(this);
         this.fulfillmentHandler = new CommonAmazonFulfillmentHandler(this);
+        this.repricingHandler = new CommonAmazonRepricingHandler(this);
 
         this.actions = Object.extend(this.actions, {
 
@@ -59,6 +60,19 @@ CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
                 this.fulfillmentHandler.switchToMFN(id);
             }).bind(this),
 
+            addToRepricingAction: (function(id) {
+                id = id || this.getSelectedProductsString();
+                this.repricingHandler.addToRepricing(id);
+            }).bind(this),
+            editRepricingAction: (function(id) {
+                id = id || this.getSelectedProductsString();
+                this.repricingHandler.editRepricing(id);
+            }).bind(this),
+            removeFromRepricingAction: (function(id) {
+                id = id || this.getSelectedProductsString();
+                this.repricingHandler.removeFromRepricing(id);
+            }).bind(this),
+
             assignGeneralIdAction: (function() { this.productSearchHandler.searchGeneralIdAuto(this.getSelectedProductsString())}).bind(this),
             newGeneralIdAction: (function() { this.productSearchHandler.addNewGeneralId(this.getSelectedProductsString())}).bind(this),
             unassignGeneralIdAction: (function() { this.productSearchHandler.unmapFromGeneralId(this.getSelectedProductsString())}).bind(this)
@@ -67,7 +81,7 @@ CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
 
     },
 
-    //----------------------------------
+    // ---------------------------------------
 
     unassignTemplateDescriptionIdActionConfrim: function (id)
     {
@@ -78,7 +92,7 @@ CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
         this.templateDescriptionHandler.unassignFromTemplateDescrition(id)
     },
 
-    //----------------------------------
+    // ---------------------------------------
 
     unassignTemplateShippingOverrideIdActionConfrim: function (id)
     {
@@ -89,5 +103,5 @@ CommonAmazonListingGridHandler = Class.create(CommonListingGridHandler, {
         this.templateShippingOverrideHandler.unassign(id)
     }
 
-    //----------------------------------
+    // ---------------------------------------
 });

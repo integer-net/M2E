@@ -1,7 +1,9 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @author     M2E Pro Developers Team
+ * @copyright  2011-2015 ESS-UA [M2E Pro]
+ * @license    Commercial use is forbidden
  */
 
 class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abstract
@@ -15,14 +17,19 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
     const LAYOUT_MODE_ROW    = 'row';
     const LAYOUT_MODE_COLUMN = 'column';
 
-    // ########################################
+    //########################################
 
     public function parseTemplate($text, Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
         $design = Mage::getDesign();
 
         $oldArea = $design->getArea();
+        $oldStore = Mage::app()->getStore();
+        $oldPackageName = $design->getPackageName();
+
         $design->setArea('adminhtml');
+        Mage::app()->setCurrentStore(Mage::app()->getStore($magentoProduct->getStoreId()));
+        $design->setPackageName(Mage::getStoreConfig('design/package/name', Mage::app()->getStore()->getId()));
 
         $text = $this->insertAttributes($text, $magentoProduct);
         $text = $this->insertImages($text, $magentoProduct);
@@ -35,11 +42,13 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
         $text = $filter->filter($text);
 
         $design->setArea($oldArea);
+        Mage::app()->setCurrentStore($oldStore);
+        $design->setPackageName($oldPackageName);
 
         return $text;
     }
 
-    // ########################################
+    //########################################
 
     private function insertAttributes($text, Ess_M2ePro_Model_Magento_Product $magentoProduct)
     {
@@ -202,7 +211,7 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
         return $text;
     }
 
-    //----------------------------------------
+    // ---------------------------------------
 
     private function normalizeDescription($str)
     {
@@ -249,5 +258,5 @@ class Ess_M2ePro_Helper_Module_Renderer_Description extends Mage_Core_Helper_Abs
         return $str;
     }
 
-    // ########################################
+    //########################################
 }

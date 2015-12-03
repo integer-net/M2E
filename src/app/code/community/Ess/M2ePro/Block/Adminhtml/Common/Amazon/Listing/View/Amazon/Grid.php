@@ -1,7 +1,9 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @author     M2E Pro Developers Team
+ * @copyright  2011-2015 ESS-UA [M2E Pro]
+ * @license    Commercial use is forbidden
  */
 
 class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
@@ -17,7 +19,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
     private $hideSwitchToIndividualConfirm;
     private $hideSwitchToParentConfirm;
 
-    // ####################################
+    //########################################
 
     public function __construct()
     {
@@ -34,9 +36,9 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             $listing->getSetting('additional_data', 'hide_switch_to_parent_confirm', 0);
 
         // Initialization block
-        //------------------------------
+        // ---------------------------------------
         $this->setId('amazonListingViewAmazonGrid'.$listingData['id']);
-        //------------------------------
+        // ---------------------------------------
 
         $this->showAdvancedFilterProductsOption = false;
 
@@ -46,7 +48,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
         );
     }
 
-    // ####################################
+    //########################################
 
     public function getMainButtonsHtml()
     {
@@ -61,14 +63,14 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
         return $viewModeSwitcherBlock->toHtml() . parent::getMainButtonsHtml();
     }
 
-    // ####################################
+    //########################################
 
     protected function _prepareCollection()
     {
         $listingData = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         // Get collection
-        //----------------------------
+        // ---------------------------------------
         /* @var $collection Ess_M2ePro_Model_Mysql4_Magento_Product_Collection */
         $collection = Mage::getConfig()->getModelInstance('Ess_M2ePro_Model_Mysql4_Magento_Product_Collection',
             Mage::getModel('catalog/product')->getResource());
@@ -84,7 +86,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
                 'left'
             );
 
-        //----------------------------
+        // ---------------------------------------
 
         $collection->joinTable(
             array('lp' => 'M2ePro/Listing_Product'),
@@ -123,6 +125,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
                 'is_afn_channel'                 => 'is_afn_channel',
                 'is_general_id_owner'            => 'is_general_id_owner',
                 'is_variation_parent'            => 'is_variation_parent',
+                'is_repricing'                   => 'is_repricing',
                 'defected_messages'              => 'defected_messages',
                 'min_online_price'                      => 'IF(
                     (`t`.`variation_min_price` IS NULL),
@@ -192,8 +195,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             )
         );
 
-        //----------------------------
-//        exit($collection->getSelect()->__toString());
+        // ---------------------------------------
 
         // Set collection to grid
         $this->setCollection($collection);
@@ -216,7 +218,6 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
         $this->addColumn('name', array(
             'header'    => Mage::helper('M2ePro')->__('Product Title / Product SKU'),
             'align'     => 'left',
-            //'width'     => '300px',
             'type'      => 'text',
             'index'     => 'name',
             'filter_index' => 'name',
@@ -264,16 +265,22 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             $priceSortField = 'min_online_price';
         }
 
-        $this->addColumn('online_price', array(
+        $priceColumn = array(
             'header' => Mage::helper('M2ePro')->__('Price'),
             'align' => 'right',
-            'width' => '70px',
+            'width' => '110px',
             'type' => 'number',
             'index' => $priceSortField,
             'filter_index' => $priceSortField,
             'frame_callback' => array($this, 'callbackColumnPrice'),
             'filter_condition_callback' => array($this, 'callbackFilterPrice')
-        ));
+        );
+
+        if (Mage::helper('M2ePro/Component_Amazon')->isRepricingEnabled()) {
+            $priceColumn['filter'] = 'M2ePro/adminhtml_common_amazon_grid_column_filter_price';
+        }
+
+        $this->addColumn('online_price', $priceColumn);
 
         $this->addColumn('status', array(
             'header' => Mage::helper('M2ePro')->__('Status'),
@@ -313,13 +320,13 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
     protected function _prepareMassaction()
     {
         // Set massaction identifiers
-        //--------------------------------
+        // ---------------------------------------
         $this->setMassactionIdField('id');
         $this->setMassactionIdFieldOnlyIndexValue(true);
-        //--------------------------------
+        // ---------------------------------------
 
         // Set mass-action
-        //--------------------------------
+        // ---------------------------------------
         $groups = array(
             'actions'            => Mage::helper('M2ePro')->__('Actions'),
             'asin_isbn'          => Mage::helper('M2ePro')->__('ASIN / ISBN'),
@@ -381,12 +388,12 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             'url'      => '',
             'confirm'  => Mage::helper('M2ePro')->__('Are you sure?')
         ), 'asin_isbn');
-        //--------------------------------
+        // ---------------------------------------
 
         return parent::_prepareMassaction();
     }
 
-    // ####################################
+    //########################################
 
     public function callbackColumnProductTitle($productTitle, $row, $column, $isExport)
     {
@@ -426,7 +433,7 @@ class Ess_M2ePro_Block_Adminhtml_Common_Amazon_Listing_View_Amazon_Grid
             if (empty($virtualProductAttributes) && empty($virtualChannelAttributes)) {
                 $attributesStr = implode(', ', $productAttributes);
             } else {
-                foreach($productAttributes as $attribute) {
+                foreach ($productAttributes as $attribute) {
                     if (in_array($attribute, array_keys($virtualProductAttributes))) {
 
                         $attributesStr .= '<span style="border-bottom: 2px dotted grey">' . $attribute .
@@ -552,10 +559,10 @@ HTML;
             $value .= '</div>';
         }
 
-        // ---------------------------------
+        // ---------------------------------------
         $hasInActionLock = $this->getLockedData($row);
         $hasInActionLock = $hasInActionLock['in_action'];
-        // ---------------------------------
+        // ---------------------------------------
 
         if (!$hasInActionLock) {
 
@@ -669,7 +676,7 @@ HTML;
     public function callbackColumnGeneralId($generalId, $row, $column, $isExport)
     {
         if (empty($generalId)) {
-            if($row->getData('is_general_id_owner') == 1){
+            if ($row->getData('is_general_id_owner') == 1) {
                 return $this->getGeneralIdColumnValueGeneralIdOwner($row);
             }
             return $this->getGeneralIdColumnValueEmptyGeneralId($row);
@@ -687,7 +694,35 @@ HTML;
             }
 
             if ((bool)$row->getData('is_afn_channel')) {
-                return Mage::helper('M2ePro')->__('AFN');
+                $sku = $row->getData('amazon_sku');
+
+                if (empty($sku)) {
+                    return Mage::helper('M2ePro')->__('AFN');
+                }
+
+                $productId = $row->getData('id');
+                /** @var Ess_M2ePro_Model_Listing_Product $listingProduct */
+                $listingProduct = Mage::helper('M2ePro/Component_Amazon')->getObject('Listing_Product',$productId);
+
+                $afn = Mage::helper('M2ePro')->__('AFN');
+                $total = Mage::helper('M2ePro')->__('Total');
+                $inStock = Mage::helper('M2ePro')->__('In Stock');
+                $accountId = $listingProduct->getListing()->getAccountId();
+
+                return <<<HTML
+<div id="m2ePro_afn_qty_value_{$productId}">
+    <span class="m2ePro-online-sku-value" productId="{$productId}" style="display: none">{$sku}</span>
+    <span class="m2epro-empty-afn-qty-data" style="display: none">{$afn}</span>
+    <div class="m2epro-afn-qty-data" style="display: none">
+        <div class="total">{$total}: <span></span></div>
+        <div class="in-stock">{$inStock}: <span></span></div>
+    </div>
+    <a href="javascript:void(0)"
+        onclick="CommonAmazonListingAfnQtyHandlerObj.showAfnQty(this,'{$sku}',{$productId}, {$accountId})">
+        {$afn}
+    </a>
+</div>
+HTML;
             }
 
             if (is_null($value) || $value === '') {
@@ -728,7 +763,7 @@ HTML;
             return Mage::helper('M2ePro')->__('AFN');
         }
 
-        return $value . '<br>' . Mage::helper('M2ePro')->__('AFN');
+        return $value . '<br/>' . Mage::helper('M2ePro')->__('AFN');
     }
 
     public function callbackColumnPrice($value, $row, $column, $isExport)
@@ -740,6 +775,35 @@ HTML;
             return '<span style="color: gray;">' . Mage::helper('M2ePro')->__('Not Listed') . '</span>';
         }
 
+        $repricingHtml ='';
+
+        if (Mage::helper('M2ePro/Component_Amazon')->isRepricingEnabled() &&
+            (int)$row->getData('is_repricing') === Ess_M2ePro_Model_Amazon_Listing_Product::IS_REPRICING_YES) {
+            if ($row->getData('is_variation_parent')) {
+                $text = Mage::helper('M2ePro')->__(
+                    'Some Child Products are used by Amazon Repricing Tool.
+                     The Price cannot be updated through the M2E Pro.'
+                );
+            } else {
+                $text = Mage::helper('M2ePro')->__(
+                    'This product is used by Amazon Repricing Tool.
+                     The Price cannot be updated through the M2E Pro.'
+                );
+            }
+
+            $repricingHtml = <<<HTML
+<span style="float:right; text-align: left;">
+    <img class="tool-tip-image"
+         style="vertical-align: middle; width: 16px;"
+         src="{$this->getSkinUrl('M2ePro/images/money.png')}">
+    <span class="tool-tip-message tool-tip-message tip-left" style="display:none;">
+        <img src="{$this->getSkinUrl('M2ePro/images/i_icon.png')}">
+        <span>{$text}</span>
+    </span>
+</span>
+HTML;
+        }
+
         $onlineMinPrice = $row->getData('min_online_price');
         $onlineMaxPrice = $row->getData('max_online_price');
 
@@ -747,9 +811,9 @@ HTML;
             if ($row->getData('amazon_status') == Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED ||
                 $row->getData('is_variation_parent')
             ) {
-                return Mage::helper('M2ePro')->__('N/A');
+                return Mage::helper('M2ePro')->__('N/A') . $repricingHtml;
             } else {
-                return '<i style="color:gray;">receiving...</i>';
+                return '<i style="color:gray;">receiving...</i>' . $repricingHtml;
             }
         }
 
@@ -763,7 +827,8 @@ HTML;
             $onlineMinPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMinPrice);
             $onlineMaxPriceStr = Mage::app()->getLocale()->currency($currency)->toCurrency($onlineMaxPrice);
 
-            return $onlineMinPriceStr . (($onlineMinPrice != $onlineMaxPrice) ? ' - ' . $onlineMaxPriceStr :  '');
+            return $onlineMinPriceStr . (($onlineMinPrice != $onlineMaxPrice) ? ' - ' . $onlineMaxPriceStr :  '') .
+                $repricingHtml;
         }
 
         $onlinePrice = $row->getData('online_price');
@@ -814,10 +879,11 @@ HTML;
                     $currentTimestamp <= $endDateTimestamp &&
                     $salePrice < (float)$onlinePrice
                 ) {
-                    $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>';
+                    $resultHtml .= '<span style="color: grey; text-decoration: line-through;">'.$priceValue.'</span>' .
+                                    $repricingHtml;
                     $resultHtml .= '<br/>'.$intervalHtml.'&nbsp;'.$salePriceValue;
                 } else {
-                    $resultHtml .= $priceValue;
+                    $resultHtml .= $priceValue . $repricingHtml;
                     $resultHtml .= '<br/>'.$intervalHtml.
                         '<span style="color:gray;">'.'&nbsp;'.$salePriceValue.'</span>';
                 }
@@ -825,7 +891,7 @@ HTML;
         }
 
         if (empty($resultHtml)) {
-            $resultHtml = $priceValue;
+            $resultHtml = $priceValue . $repricingHtml;
         }
 
         return $resultHtml;
@@ -1022,7 +1088,7 @@ HTML;
         return $html;
     }
 
-    //----------------------------------------
+    // ---------------------------------------
 
     protected function callbackFilterTitle($collection, $column)
     {
@@ -1081,29 +1147,40 @@ HTML;
 
         $condition = '';
 
-        if (isset($value['from']) && $value['from'] != '') {
-            $condition = 'min_online_price >= \''.$value['from'].'\'';
-        }
-        if (isset($value['to']) && $value['to'] != '') {
+        if (isset($value['from']) || isset($value['to'])) {
+
             if (isset($value['from']) && $value['from'] != '') {
-                $condition .= ' AND ';
+                $condition = 'min_online_price >= \''.$value['from'].'\'';
             }
-            $condition .= 'min_online_price <= \''.$value['to'].'\'';
-        }
+            if (isset($value['to']) && $value['to'] != '') {
+                if (isset($value['from']) && $value['from'] != '') {
+                    $condition .= ' AND ';
+                }
+                $condition .= 'min_online_price <= \''.$value['to'].'\'';
+            }
 
-        $condition = '(' . $condition . ') OR (';
+            $condition = '(' . $condition . ') OR (';
 
-        if (isset($value['from']) && $value['from'] != '') {
-            $condition .= 'max_online_price >= \''.$value['from'].'\'';
-        }
-        if (isset($value['to']) && $value['to'] != '') {
             if (isset($value['from']) && $value['from'] != '') {
-                $condition .= ' AND ';
+                $condition .= 'max_online_price >= \''.$value['from'].'\'';
             }
-            $condition .= 'max_online_price <= \''.$value['to'].'\'';
+            if (isset($value['to']) && $value['to'] != '') {
+                if (isset($value['from']) && $value['from'] != '') {
+                    $condition .= ' AND ';
+                }
+                $condition .= 'max_online_price <= \''.$value['to'].'\'';
+            }
+
+            $condition .= ')';
+
         }
 
-        $condition .= ')';
+        if (Mage::helper('M2ePro/Component_Amazon')->isRepricingEnabled() && !empty($value['is_repricing'])) {
+            if (!empty($condition)) {
+                $condition = '(' . $condition . ') OR ';
+            }
+            $condition .= 'is_repricing = ' . Ess_M2ePro_Model_Amazon_Listing_Product::IS_REPRICING_YES;
+        }
 
         $collection->getSelect()->having($condition);
     }
@@ -1120,7 +1197,7 @@ HTML;
             (alp.variation_child_statuses REGEXP '\"{$value}\":[^0]') AND alp.is_variation_parent = 1");
     }
 
-    //----------------------------------------
+    // ---------------------------------------
 
     public function getViewLogIconHtml($listingProductId)
     {
@@ -1133,7 +1210,7 @@ HTML;
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         // Get last messages
-        //--------------------------
+        // ---------------------------------------
         $dbSelect = $connRead->select()
             ->from(
                 Mage::getResourceModel('M2ePro/Listing_Log')->getMainTable(),
@@ -1143,17 +1220,17 @@ HTML;
             ->order(array('id DESC'))
             ->limit(30);
 
-        if($listingProduct->getChildObject()->getVariationManager()->isVariationParent()) {
+        if ($listingProduct->getChildObject()->getVariationManager()->isVariationParent()) {
             $dbSelect->where('listing_product_id = ? OR parent_listing_product_id = ?', $listingProductId);
         } else {
             $dbSelect->where('listing_product_id = ?', $listingProductId);
         }
 
         $logRows = $connRead->fetchAll($dbSelect);
-        //--------------------------
+        // ---------------------------------------
 
         // Get grouped messages by action_id
-        //--------------------------
+        // ---------------------------------------
         $actionsRows = array();
         $tempActionRows = array();
         $lastActionId = false;
@@ -1340,7 +1417,7 @@ HTML;
         $connRead = Mage::getSingleton('core/resource')->getConnection('core_read');
 
         // Get last messages
-        //--------------------------
+        // ---------------------------------------
         $dbSelect = $connRead->select()
             ->from(
                 Mage::getResourceModel('M2ePro/Processing_Request')->getMainTable()
@@ -1352,7 +1429,7 @@ HTML;
         return !empty($result);
     }
 
-    // ####################################
+    //########################################
 
     public function getGridUrl()
     {
@@ -1364,25 +1441,25 @@ HTML;
         return false;
     }
 
-    // ####################################
+    //########################################
 
     protected function _getStore()
     {
         $listing = Mage::helper('M2ePro/Data_Global')->getValue('temp_data');
 
         // Get store filter
-        //----------------------------
+        // ---------------------------------------
         $storeId = $listing['store_id'];
-        //----------------------------
+        // ---------------------------------------
 
         return Mage::app()->getStore((int)$storeId);
     }
 
-    // ####################################
+    //########################################
 
     protected function _toHtml()
     {
-        $javascriptsMain = <<<JAVASCRIPT
+        $javascriptsMain = <<<HTML
 <script type="text/javascript">
 
     if (typeof ListingGridHandlerObj != 'undefined') {
@@ -1396,12 +1473,12 @@ HTML;
     });
 
 </script>
-JAVASCRIPT;
+HTML;
 
         return parent::_toHtml().$javascriptsMain;
     }
 
-    // ####################################
+    //########################################
 
     private function getLockedData($row)
     {
@@ -1418,21 +1495,21 @@ JAVASCRIPT;
         return $this->lockedDataCache[$listingProductId];
     }
 
-    // ####################################
+    //########################################
 
     private function getGeneralIdColumnValueEmptyGeneralId($row)
     {
-        // ---------------------------------
+        // ---------------------------------------
         if ((int)$row->getData('amazon_status') != Ess_M2ePro_Model_Listing_Product::STATUS_NOT_LISTED) {
             return '<i style="color:gray;">'.Mage::helper('M2ePro')->__('receiving...').'</i>';
         }
-        // ---------------------------------
+        // ---------------------------------------
 
-        // ---------------------------------
+        // ---------------------------------------
         $iconPath = $this->getSkinUrl('M2ePro/images/search_statuses/');
-        // ---------------------------------
+        // ---------------------------------------
 
-        // ---------------------------------
+        // ---------------------------------------
         $lpId = $row->getData('id');
 
         $productTitle = Mage::helper('M2ePro')->escapeHtml($row->getData('name'));
@@ -1441,13 +1518,13 @@ JAVASCRIPT;
         }
         $productTitle = Mage::helper('M2ePro')->__('Assign ASIN/ISBN For &quot;%product_title%&quot;', $productTitle);
         $productTitle = Mage::helper('M2ePro')->escapeJs($productTitle);
-        // ---------------------------------
+        // ---------------------------------------
 
-        // ---------------------------------
+        // ---------------------------------------
 
         $searchSettingsStatus = $row->getData('search_settings_status');
 
-        // ---------------------------------
+        // ---------------------------------------
         if ($searchSettingsStatus == Ess_M2ePro_Model_Amazon_Listing_Product::SEARCH_SETTINGS_STATUS_IN_PROGRESS) {
 
             $tip = Mage::helper('M2ePro')->__('Automatic ASIN/ISBN Search in Progress.');
@@ -1460,9 +1537,9 @@ JAVASCRIPT;
 </a>
 HTML;
         }
-        // ---------------------------------
+        // ---------------------------------------
 
-        // ---------------------------------
+        // ---------------------------------------
         $searchSettingsData = $row->getData('search_settings_data');
 
         $suggestData = array();
@@ -1471,7 +1548,7 @@ HTML;
             !empty($searchSettingsData['data']) && $suggestData = $searchSettingsData['data'];
 
         }
-        // ---------------------------------
+        // ---------------------------------------
 
         $na = Mage::helper('M2ePro')->__('N/A');
 
@@ -1530,7 +1607,7 @@ HTML;
         );
 
         $generalIdOwnerHtml = '';
-        if($row->getData('is_general_id_owner') == Ess_M2ePro_Model_Amazon_Listing_Product::IS_GENERAL_ID_OWNER_YES){
+        if ($row->getData('is_general_id_owner') == Ess_M2ePro_Model_Amazon_Listing_Product::IS_GENERAL_ID_OWNER_YES) {
 
             $generalIdOwnerHtml = '<br/><span style="font-size: 10px; color: grey;">'.
                                    Mage::helper('M2ePro')->__('creator of ASIN/ISBN').
@@ -1568,10 +1645,10 @@ HTML;
 
         }
 
-        // ---------------------------------
+        // ---------------------------------------
         $hasInActionLock = $this->getLockedData($row);
         $hasInActionLock = $hasInActionLock['in_action'];
-        // ---------------------------------
+        // ---------------------------------------
 
         if ($hasInActionLock) {
             return $text . $generalIdOwnerHtml;
@@ -1615,10 +1692,10 @@ HTML;
     {
         $text = Mage::helper('M2ePro')->__('New ASIN/ISBN');
 
-        // ---------------------------------
+        // ---------------------------------------
         $hasInActionLock = $this->getLockedData($row);
         $hasInActionLock = $hasInActionLock['in_action'];
-        // ---------------------------------
+        // ---------------------------------------
 
         if ($hasInActionLock) {
             return $text;
@@ -1641,7 +1718,7 @@ HTML;
         return $text;
     }
 
-    // ####################################
+    //########################################
 
     protected function getChildProductsWarningsData()
     {
@@ -1679,5 +1756,5 @@ HTML;
         return in_array($listingProductId, $this->getChildProductsWarningsData());
     }
 
-    // ####################################
+    //########################################
 }

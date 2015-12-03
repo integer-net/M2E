@@ -1,14 +1,23 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @author     M2E Pro Developers Team
+ * @copyright  2011-2015 ESS-UA [M2E Pro]
+ * @license    Commercial use is forbidden
  */
 
 class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
     extends Ess_M2ePro_Model_Synchronization_Templates_Inspector
 {
-    //####################################
+    //########################################
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     * @throws Exception
+     */
     public function isMeetListRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         if (!$listingProduct->isNotListed() || $listingProduct->isBlocked()) {
@@ -340,6 +349,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return true;
     }
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetRelistRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         if (!$listingProduct->isStopped() || $listingProduct->isBlocked()) {
@@ -479,6 +494,12 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return true;
     }
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetStopRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         if (!$listingProduct->isListed() || $listingProduct->isBlocked()) {
@@ -594,8 +615,14 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return false;
     }
 
-    // -----------------------------------
+    // ---------------------------------------
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetReviseGeneralRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
@@ -631,8 +658,13 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return true;
     }
 
-    // -----------------------------------
+    // ---------------------------------------
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetReviseQtyRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
@@ -665,14 +697,24 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return false;
     }
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetRevisePriceRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
+        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
+        $amazonListingProduct = $listingProduct->getChildObject();
+
         if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
             return false;
         }
 
-        /** @var Ess_M2ePro_Model_Amazon_Listing_Product $amazonListingProduct */
-        $amazonListingProduct = $listingProduct->getChildObject();
+        if (Mage::helper('M2ePro/Component_Amazon')->isRepricingEnabled() &&
+            $amazonListingProduct->isRepricing()) {
+            return false;
+        }
 
         $amazonSynchronizationTemplate = $amazonListingProduct->getAmazonSynchronizationTemplate();
 
@@ -731,8 +773,13 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return false;
     }
 
-    // -----------------------------------
+    // ---------------------------------------
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetReviseDetailsRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
@@ -750,6 +797,11 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return true;
     }
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetReviseImagesRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         if (!$this->isMeetReviseGeneralRequirements($listingProduct)) {
@@ -767,8 +819,13 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return true;
     }
 
-    // -----------------------------------
+    // ---------------------------------------
 
+    /**
+     * @param Ess_M2ePro_Model_Listing_Product $listingProduct
+     * @return bool
+     * @throws Ess_M2ePro_Model_Exception_Logic
+     */
     public function isMeetReviseSynchReasonsRequirements(Ess_M2ePro_Model_Listing_Product $listingProduct)
     {
         $reasons = $listingProduct->getSynchReasons();
@@ -810,7 +867,7 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return false;
     }
 
-    //####################################
+    //########################################
 
     private function checkRevisePricesRequirements(
         Ess_M2ePro_Model_Amazon_Template_Synchronization $amazonSynchronizationTemplate,
@@ -833,5 +890,5 @@ class Ess_M2ePro_Model_Amazon_Synchronization_Templates_Inspector
         return $deviation > $amazonSynchronizationTemplate->getReviseUpdatePriceMaxAllowedDeviation();
     }
 
-    //####################################
+    //########################################
 }

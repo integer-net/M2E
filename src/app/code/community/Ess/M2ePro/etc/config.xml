@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Ess_M2ePro>
-            <version>6.3.6</version>
+            <version>6.3.9</version>
         </Ess_M2ePro>
     </modules>
     <default>
@@ -28,27 +28,31 @@
                 <group>offline</group>
             </m2epropayment>
         </payment>
+        <web>
+            <routers>
+                <m2epro_router>
+                    <area>admin</area>
+                    <class>Ess_M2ePro_Controller_Router</class>
+                </m2epro_router>
+            </routers>
+        </web>
     </default>
-    <frontend>
-        <routers>
-            <M2ePro>
-                <use>m2epro_custom</use>
-                <args>
-                    <module>Ess_M2ePro</module>
-                    <frontName>M2ePro</frontName>
-                </args>
-            </M2ePro>
-        </routers>
-    </frontend>
     <admin>
         <routers>
             <M2ePro>
-                <use>admin</use>
+                <use>m2epro_router</use>
                 <args>
                     <module>Ess_M2ePro</module>
                     <frontName>M2ePro</frontName>
                 </args>
             </M2ePro>
+            <M2eProOld>
+                <use>admin</use>
+                <args>
+                    <module>Ess_M2ePro_Old</module>
+                    <frontName>M2ePro</frontName>
+                </args>
+            </M2eProOld>
         </routers>
     </admin>
     <adminhtml>
@@ -420,6 +424,36 @@
                 </observers>
             </sales_convert_quote_item_to_order_item>
 
+            <core_block_abstract_prepare_layout_after>
+                <observers>
+                    <M2ePro_observer_view_order>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>orderView</method>
+                    </M2ePro_observer_view_order>
+                </observers>
+            </core_block_abstract_prepare_layout_after>
+
+            <core_block_abstract_prepare_layout_after>
+                <observers>
+                    <M2ePro_observer_view_shipment_before>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>shipmentViewBefore</method>
+                    </M2ePro_observer_view_shipment_before>
+                </observers>
+            </core_block_abstract_prepare_layout_after>
+
+            <core_block_abstract_to_html_after>
+                <observers>
+                    <M2ePro_observer_view_shipment_after>
+                        <type>singleton</type>
+                        <class>Ess_M2ePro_Model_Observer_Dispatcher</class>
+                        <method>shipmentViewAfter</method>
+                    </M2ePro_observer_view_shipment_after>
+                </observers>
+            </core_block_abstract_to_html_after>
+
             <!-- internal orders -->
 
             <m2epro_associate_ebay_order_item_to_product>
@@ -761,6 +795,13 @@
                         <table>m2epro_ebay_template_other_category</table>
                     </Ebay_Template_OtherCategory>
 
+                    <Ebay_Motor_Filter>
+                        <table>m2epro_ebay_motor_filter</table>
+                    </Ebay_Motor_Filter>
+                    <Ebay_Motor_Group>
+                        <table>m2epro_ebay_motor_group</table>
+                    </Ebay_Motor_Group>
+
                     <!-- AMAZON -->
 
                     <Amazon_Item>
@@ -845,7 +886,7 @@
                     <cron_expr>*/1 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>M2ePro/Cron_Type_Magento::process</model>
+                    <model>M2ePro/Cron_Runner_Magento::process</model>
                 </run>
             </M2ePro_cron>
         </jobs>

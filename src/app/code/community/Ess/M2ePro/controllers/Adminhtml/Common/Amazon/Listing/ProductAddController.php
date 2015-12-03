@@ -1,7 +1,9 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2014 by  ESS-UA.
+ * @author     M2E Pro Developers Team
+ * @copyright  2011-2015 ESS-UA [M2E Pro]
+ * @license    Commercial use is forbidden
  */
 
 class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
@@ -11,7 +13,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
 
     protected $listing;
 
-    // ####################################
+    //########################################
 
     protected function _initAction()
     {
@@ -39,12 +41,13 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
             ->addJs('M2ePro/Common/Listing/GridHandler.js')
 
             ->addJs('M2ePro/Common/Amazon/Listing/ActionHandler.js')
-            ->addJs('M2ePro/Common/Amazon/Listing/TemplateDescriptionHandler.js')
+            ->addJs('M2ePro/Common/Amazon/Listing/Template/DescriptionHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/ChannelSettingsHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/SearchAsinGridHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/ProductSearchHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/VariationProductManageHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/FulfillmentHandler.js')
+            ->addJs('M2ePro/Common/Amazon/Listing/RepricingHandler.js')
             ->addJs('M2ePro/Common/Amazon/Listing/NewAsinTemplateDescriptionGridHandler.js');
 
         $this->_initPopUp();
@@ -54,7 +57,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return $this;
     }
 
-    // ####################################
+    //########################################
 
     public function indexAction()
     {
@@ -78,7 +81,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         }
 
         if (empty($listingProductsIds)) {
-            $this->_redirect('*/adminhtml_common_amazon_listing/view', array('id' => $listingId ));
+            $this->_redirect('*/adminhtml_common_amazon_listing/view', array('id' => $listingId));
             return;
         }
 
@@ -100,7 +103,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         }
     }
 
-    // ####################################
+    //########################################
 
     protected function asinSearchView()
     {
@@ -138,7 +141,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
 
         $this->_initAction();
 
-        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=18188583');
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=18188493');
 
         $this->_addContent($block)->renderLayout();
     }
@@ -162,7 +165,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
             ->renderLayout();
     }
 
-    // ####################################
+    //########################################
 
     public function viewListingAction()
     {
@@ -197,7 +200,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         ));
     }
 
-    // ####################################
+    //########################################
 
     public function removeAddedProductsAction()
     {
@@ -227,7 +230,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return;
     }
 
-    // ####################################
+    //########################################
 
     public function viewSearchSettingsAction()
     {
@@ -266,7 +269,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return;
     }
 
-    // ####################################
+    //########################################
 
     public function checkSearchResultsAction()
     {
@@ -308,7 +311,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return $this->getResponse()->setBody(json_encode(array('data' => $newAsinPopup->toHtml())));
     }
 
-    // ####################################
+    //########################################
 
     public function showNewAsinStepAction()
     {
@@ -330,12 +333,12 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         )));
     }
 
-    // ####################################
+    //########################################
 
     public function viewTemplateDescriptionPopupAction()
     {
         $mainBlock = $this->loadLayout()->getLayout()
-            ->createBlock('M2ePro/adminhtml_common_amazon_listing_templateDescription_main');
+            ->createBlock('M2ePro/adminhtml_common_amazon_listing_template_description_main');
 
         return $this->getResponse()->setBody($mainBlock->toHtml());
     }
@@ -353,7 +356,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         }
 
         $grid = $this->loadLayout()->getLayout()
-            ->createBlock('M2ePro/adminhtml_common_amazon_listing_templateDescription_grid');
+            ->createBlock('M2ePro/adminhtml_common_amazon_listing_template_description_grid');
         $grid->setCheckNewAsinAccepted(true);
         $grid->setProductsIds($listingProductsIds);
         $grid->setMapToTemplateJsFn('selectTemplateDescription');
@@ -361,7 +364,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return $this->getResponse()->setBody($grid->toHtml());
     }
 
-    // ####################################
+    //########################################
 
     public function descriptionTemplateAssignTypeAction()
     {
@@ -437,7 +440,12 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         }
 
         $block = $this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_newAsin_category');
-        $this->_initAction()->_addContent($block)->renderLayout();
+
+        $this->_initAction();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=18188493');
+
+        $this->_addContent($block)->renderLayout();
     }
 
     public function descriptionTemplateAssignManuallyAction()
@@ -454,12 +462,15 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
             return $this->getResponse()->setBody($grid->toHtml());
         }
 
-        $this->_initAction()
-            ->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_newAsin_manual'))
-            ->renderLayout();
+        $this->_initAction();
+
+        $this->setPageHelpLink(NULL, 'pages/viewpage.action?pageId=18188493');
+
+        $this->_addContent($this->getLayout()->createBlock('M2ePro/adminhtml_common_amazon_listing_add_newAsin_manual'))
+             ->renderLayout();
     }
 
-    // ####################################
+    //########################################
 
     public function checkNewAsinCategoryProductsAction()
     {
@@ -508,7 +519,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         )));
     }
 
-    // ####################################
+    //########################################
 
     public function resetNewAsinAction()
     {
@@ -532,7 +543,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         ));
     }
 
-    // ####################################
+    //########################################
 
     protected function setDescriptionTemplate($productsIds, $templateId)
     {
@@ -548,7 +559,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         }
     }
 
-    //#############################################
+    //########################################
 
     protected function runProcessorForParents($productsIds)
     {
@@ -571,7 +582,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         }
     }
 
-    //#############################################
+    //########################################
 
     protected function setSessionValue($key, $value)
     {
@@ -598,7 +609,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return isset($sessionData[$key]) ? $sessionData[$key] : NULL;
     }
 
-    //#############################################
+    //########################################
 
     /**
      * @return Ess_M2ePro_Model_Amazon_Listing
@@ -617,7 +628,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return $this->listing;
     }
 
-    // ####################################
+    //########################################
 
     protected function filterProductsForSearch($productsIds)
     {
@@ -641,7 +652,7 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
         return Mage::helper('M2ePro/Component_Amazon_Variation')->filterProductsNotMatchingForNewAsin($productsIds);
     }
 
-    // ####################################
+    //########################################
 
     protected function getLockedProductsInAction($productsIds)
     {
@@ -659,5 +670,5 @@ class Ess_M2ePro_Adminhtml_Common_Amazon_Listing_ProductAddController
             ->fetchCol($select);
     }
 
-    // ####################################
+    //########################################
 }

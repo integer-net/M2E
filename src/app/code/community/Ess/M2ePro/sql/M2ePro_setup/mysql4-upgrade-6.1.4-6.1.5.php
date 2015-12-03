@@ -1,6 +1,6 @@
 <?php
 
-//#############################################
+//########################################
 
 /** @var $installer Ess_M2ePro_Model_Upgrade_MySqlSetup */
 $installer = $this;
@@ -8,7 +8,7 @@ $installer->startSetup();
 
 $connection = $installer->getConnection();
 
-//#############################################
+//########################################
 
 /*
     RENAME TABLE `m2epro_ebay_motor_specific` TO `m2epro_ebay_dictionary_motor_specific`;
@@ -77,7 +77,7 @@ $connection = $installer->getConnection();
     ADD INDEX `parent_category_id` (`parent_category_id`);
 */
 
-//---------------------------------------------
+// ---------------------------------------
 
 $motorsOldTableName = $installer->getTable('m2epro_ebay_motor_specific');
 $motorsNewTableName = $installer->getTable('m2epro_ebay_dictionary_motor_specific');
@@ -112,7 +112,7 @@ SQL
     }
 }
 
-//---------------------------------------------
+// ---------------------------------------
 
 $dictionaryMarketplaceTableName = $installer->getTable('m2epro_ebay_dictionary_marketplace');
 
@@ -134,7 +134,7 @@ SQL
     }
 }
 
-//---------------------------------------------
+// ---------------------------------------
 
 $dictionaryCategoryTableName = $installer->getTable('m2epro_ebay_dictionary_category');
 
@@ -175,10 +175,9 @@ SQL
             $connection->addKey($dictionaryCategoryTableName, $newIndex, $newIndex);
         }
     }
-
 }
 
-//---------------------------------------------
+// ---------------------------------------
 
 $amazonDictionaryCategoryTableName = $installer->getTable('m2epro_amazon_dictionary_category');
 
@@ -226,7 +225,7 @@ SQL
     }
 }
 
-//---------------------------------------------
+// ---------------------------------------
 
 $amazonDictionaryMarketplaceTableName = $installer->getTable('m2epro_amazon_dictionary_marketplace');
 
@@ -248,7 +247,7 @@ SQL
     }
 }
 
-//---------------------------------------------
+// ---------------------------------------
 
 $amazonDictionarySpecificTableName = $installer->getTable('m2epro_amazon_dictionary_specific');
 
@@ -342,14 +341,14 @@ SQL
     }
 }
 
-//---------------------------------------------
+// ---------------------------------------
 
 $buyDictionaryCategoryTableName = $installer->getTable('m2epro_buy_dictionary_category');
 
 if ($installer->tableExists($buyDictionaryCategoryTableName)) {
 
     if ($connection->tableColumnExists($buyDictionaryCategoryTableName, 'category_id' !== false &&
-        $connection->tableColumnExists($buyDictionaryCategoryTableName, 'native_id') === false )) {
+        $connection->tableColumnExists($buyDictionaryCategoryTableName, 'native_id') === false)) {
         $connection->changeColumn(
                    $buyDictionaryCategoryTableName,
                        'category_id',
@@ -413,7 +412,7 @@ SQL
     }
 }
 
-//#############################################
+//########################################
 
 $installer->run(<<<SQL
 
@@ -424,8 +423,8 @@ $installer->run(<<<SQL
 SQL
 );
 
-//#############################################
+//########################################
 
 $installer->endSetup();
 
-//#############################################
+//########################################

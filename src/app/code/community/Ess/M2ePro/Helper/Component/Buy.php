@@ -1,18 +1,19 @@
 <?php
 
 /*
- * @copyright  Copyright (c) 2013 by  ESS-UA.
+ * @author     M2E Pro Developers Team
+ * @copyright  2011-2015 ESS-UA [M2E Pro]
+ * @license    Commercial use is forbidden
  */
 
 class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
 {
     const NICK  = 'buy';
 
+    const MARKETPLACE_ID = 33;
     const DEFAULT_CURRENCY = 'USD';
 
-    const MARKETPLACE_ID = 33;
-
-    // ########################################
+    //########################################
 
     public function getTitle()
     {
@@ -24,7 +25,7 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
         return Mage::helper('M2ePro')->__('Rakuten.com');
     }
 
-    // ########################################
+    //########################################
 
     public function getHumanTitleByListingProductStatus($status)
     {
@@ -41,7 +42,7 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
         return $statuses[$status];
     }
 
-    // ########################################
+    //########################################
 
     public function isEnabled()
     {
@@ -64,7 +65,7 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
         return !is_null($mode) && $mode == self::NICK;
     }
 
-    //-----------------------------------------
+    // ---------------------------------------
 
     public function getModel($modelName)
     {
@@ -88,7 +89,7 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
         return $this->getModel($modelName)->getCollection();
     }
 
-    // ########################################
+    //########################################
 
     /**
      * @return Ess_M2ePro_Model_Marketplace
@@ -108,7 +109,18 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
         return 'http://'.$this->getMarketplace()->getUrl().'/prod/'.$productId.'.html';
     }
 
-    // ########################################
+    //########################################
+
+    public function isGeneralId($string)
+    {
+        if (empty($string)) {
+            return false;
+        }
+
+        return preg_match('/^\d{8,9}$/', $string);
+    }
+
+    // ----------------------------------------
 
     public function getCarrierTitle($carrierCode, $title)
     {
@@ -170,12 +182,12 @@ class Ess_M2ePro_Helper_Component_Buy extends Mage_Core_Helper_Abstract
         );
     }
 
-    // ########################################
+    //########################################
 
     public function clearCache()
     {
         Mage::helper('M2ePro/Data_Cache_Permanent')->removeTagValues(self::NICK);
     }
 
-    // ########################################
+    //########################################
 }
