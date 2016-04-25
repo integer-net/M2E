@@ -36,13 +36,45 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Request
 
     //########################################
 
-    public function clearVariations()
+    public function resetVariations()
     {
         $variations = $this->getListingProduct()->getVariations(true);
 
         foreach ($variations as $variation) {
-           /** @var $variation Ess_M2ePro_Model_Listing_Product_Variation */
-           $variation->deleteInstance();
+
+            /** @var Ess_M2ePro_Model_Ebay_Listing_Product_Variation $ebayVariation */
+            $ebayVariation = $variation->getChildObject();
+
+            if ($ebayVariation->isDelete()) {
+                $variation->deleteInstance();
+                continue;
+            }
+
+            $needSave = false;
+
+            if ($ebayVariation->isAdd()) {
+                $variation->setData('add', 0);
+                $needSave = true;
+            }
+
+            if ($ebayVariation->isNotListed()) {
+                $variation->setData('online_sku', null);
+                $variation->setData('online_price', null);
+                $variation->setData('online_qty', null);
+                $variation->setData('online_qty_sold', null);
+
+                $needSave = true;
+            }
+
+            $additionalData = $variation->getAdditionalData();
+            if (!empty($additionalData['ebay_mpn_value'])) {
+                unset($additionalData['ebay_mpn_value']);
+                $variation->setSettings('additional_data', $additionalData);
+
+                $needSave = true;
+            }
+
+            $needSave && $variation->save();
         }
     }
 
@@ -129,6 +161,17 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Type_List_Request
         $data = $this->doReplaceVariationSpecifics($data, $replacements);
 
         $data['variations_specifics_replacements'] = $replacements;
+
+        return $data;
+    }
+
+    protected function resolveVariationMpnIssue(array $data)
+    {
+        if (!$this->getIsVariationItem()) {
+            return $data;
+        }
+
+        $data['without_mpn_variation_issue'] = true;
 
         return $data;
     }

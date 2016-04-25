@@ -124,7 +124,7 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
                 $item['specifics'][$option->getAttribute()] = $option->getOption();
             }
 
-            $data[] = $item;
+            $data[$variation->getId()] = $item;
         }
 
         $this->checkQtyWarnings($productsIds);
@@ -415,45 +415,97 @@ class Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Variations
 
     //########################################
 
+    /*
+        1) form variation MPN value (from additional only for list action)
+
+           TRY TO RETRIEVE FROM ADDITIONAL DATA OF EACH VARIATION
+           IF EMPTY: TRY TO RETRIEVE FROM DESCRIPTION POLICY SETTINGS
+
+        2) prepare variation MPN value (skip this for list action)
+
+         - item variations MPN flag == unknown (variation MPN value only from settings)
+                                      [-> item variations MPN flag == without MPN, item variations MPN flag == with MPN]
+           - without_mpn_variation_issue == NULL
+               empty variation MPN value -> set "Does Not Apply"
+               filled variation MPN value -> do nothing
+           - without_mpn_variation_issue == true
+               empty variation MPN value -> do nothing
+               filled variation MPN value -> do nothing
+
+         - item variations MPN flag == without MPN (variation MPN value only from settings)
+                                                                               [-> item variations MPN flag == with MPN]
+           - without_mpn_variation_issue == NULL / without_mpn_variation_issue == true
+               empty variation MPN value -> do nothing
+               filled variation MPNvalue  -> do nothing
+
+         - item variations MPN flag == with MPN (variation MPN value from additional or settings) [->]
+           - without_mpn_variation_issue == NULL
+               empty variation MPN value -> set "Does Not Apply"
+               filled variation MPN value -> do nothing
+           - without_mpn_variation_issue == true
+               empty variation MPN value -> do nothing
+               filled variation MPN value -> do nothing
+
+        3) after revise/relist error use getItem (skip this for list action)
+
+           CONDITIONS:
+             VARIATIONAL PRODUCT == true
+             VARIATIONS WERE SENT == true
+             ANY ERROR FROM LIST [in_array]
+             item variations MPN flag == unknown
+
+           ACTIONS:
+             set item variations MPN flag according to the request
+             set variations additional MPN values if need
+     */
+
     private function getVariationDetails(Ess_M2ePro_Model_Listing_Product_Variation $variation)
     {
         $data = array();
+
         /** @var Ess_M2ePro_Model_Ebay_Template_Description $ebayDescriptionTemplate */
         $ebayDescriptionTemplate = $this->getEbayListingProduct()->getEbayDescriptionTemplate();
-
-        $this->searchNotFoundAttributes();
-
-        $tempValue = NULL;
-
-        if ($ebayDescriptionTemplate->isProductDetailsModeDoesNotApply('brand')) {
-            $tempValue = Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::PRODUCT_DETAILS_UNBRANDED;
-        } elseif ($ebayDescriptionTemplate->isProductDetailsModeAttribute('brand') &&
-                  $this->processNotFoundAttributes(strtoupper('brand'))) {
-            $tempValue = $this->getEbayListingProduct()->getDescriptionTemplateSource()->getProductDetail('brand');
-        }
-
-        if ($tempValue) {
-            $data['brand'] = $tempValue;
-        }
 
         $options = NULL;
         $additionalData = $variation->getAdditionalData();
 
         foreach (array('isbn','upc','ean','mpn') as $tempType) {
 
+            if ($tempType == 'mpn' && !empty($additionalData['ebay_mpn_value'])) {
+                $data[$tempType] = $additionalData['ebay_mpn_value'];
+                continue;
+            }
+
             if (isset($additionalData['product_details'][$tempType])) {
                 $data[$tempType] = $additionalData['product_details'][$tempType];
                 continue;
             }
 
-            if (!$this->getMagentoProduct()->isConfigurableType() &&
-                !$this->getMagentoProduct()->isGroupedType()) {
+            if ($tempType == 'mpn') {
+
+                if ($ebayDescriptionTemplate->isProductDetailsModeNone('brand')) {
+                    continue;
+                }
+
+                if ($ebayDescriptionTemplate->isProductDetailsModeDoesNotApply('brand')) {
+                    $data[$tempType] = Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::
+                    PRODUCT_DETAILS_DOES_NOT_APPLY;
+                    continue;
+                }
+            }
+
+            if ($ebayDescriptionTemplate->isProductDetailsModeNone($tempType)) {
                 continue;
             }
 
             if ($ebayDescriptionTemplate->isProductDetailsModeDoesNotApply($tempType)) {
                 $data[$tempType] = Ess_M2ePro_Model_Ebay_Listing_Product_Action_Request_Description::
                                                                             PRODUCT_DETAILS_DOES_NOT_APPLY;
+                continue;
+            }
+
+            if (!$this->getMagentoProduct()->isConfigurableType() &&
+                !$this->getMagentoProduct()->isGroupedType()) {
                 continue;
             }
 
