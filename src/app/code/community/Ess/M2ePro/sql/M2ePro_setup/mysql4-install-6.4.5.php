@@ -22,6 +22,7 @@ CREATE TABLE `m2epro_account` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(255) NOT NULL,
   `component_mode` VARCHAR(10) DEFAULT NULL,
+  `additional_data` TEXT DEFAULT NULL,
   `update_date` DATETIME DEFAULT NULL,
   `create_date` DATETIME DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2476,10 +2477,10 @@ CREATE TABLE `m2epro_amazon_marketplace` (
   `marketplace_id` INT(11) UNSIGNED NOT NULL,
   `developer_key` VARCHAR(255) DEFAULT NULL,
   `default_currency` VARCHAR(255) NOT NULL,
-  `is_asin_available` tinyint(2) UNSIGNED NOT NULL DEFAULT 1,
+  `is_new_asin_available` tinyint(2) UNSIGNED NOT NULL DEFAULT 1,
   `is_merchant_fulfillment_available` tinyint(2) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`marketplace_id`),
-  INDEX `is_asin_available` (`is_asin_available`),
+  INDEX `is_new_asin_available` (`is_new_asin_available`),
   INDEX `is_merchant_fulfillment_available` (`is_merchant_fulfillment_available`)
 )
 ENGINE = INNODB
@@ -2904,15 +2905,15 @@ INSERT INTO `m2epro_marketplace` VALUES
   (32, 9, 'China', 'CN', 'amazon.cn', 0, 9, 'Asia / Pacific', 'amazon', '2013-05-08 00:00:00', '2013-05-08 00:00:00');
 
 INSERT INTO `m2epro_amazon_marketplace` VALUES
-  (24, '8636-1433-4377', 'CAD',0,0),
+  (24, '8636-1433-4377', 'CAD',1,0),
   (25, '7078-7205-1944', 'EUR',1,1),
   (26, '7078-7205-1944', 'EUR',1,0),
-  (27, NULL, '',1,0),
+  (27, NULL, '',0,0),
   (28, '7078-7205-1944', 'GBP',1,1),
   (29, '8636-1433-4377', 'USD',1,1),
   (30, '7078-7205-1944', 'EUR',1,0),
   (31, '7078-7205-1944', 'EUR',1,0),
-  (32, NULL, '',1,0);
+  (32, NULL, '',0,0);
 
 SQL
 );
